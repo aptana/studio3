@@ -338,13 +338,13 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	{
 		int offset = initialOffset;
 		String text = getText(source, initialOffset, commentNode);
+		if (!CommentScanner.isCaseSensitive())
+		{
+			text = text.toLowerCase();
+		}
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			if (!CommentScanner.isCaseSensitive())
-			{
-				line = line.toLowerCase();
-			}
 			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
 			{
 				String tag = entry.getKey();

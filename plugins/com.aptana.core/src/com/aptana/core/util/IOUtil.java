@@ -35,7 +35,6 @@
 package com.aptana.core.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,6 +43,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -71,6 +71,7 @@ public abstract class IOUtil
 
 	/**
 	 * Newlines will get converted into \n.
+	 * 
 	 * @param stream
 	 * @param charset
 	 * @return
@@ -122,7 +123,7 @@ public abstract class IOUtil
 			return;
 		CorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
 	}
-	
+
 	// If targetLocation does not exist, it will be created.
 	public static void copyDirectory(File sourceLocation, File targetLocation) throws IOException
 	{
@@ -186,34 +187,47 @@ public abstract class IOUtil
 
 	/**
 	 * extractFile
-	 *
+	 * 
 	 * @param path
 	 * @param file
 	 * @throws IOException
 	 */
-	public static void extractFile(String bundleId, IPath path, File file) throws IOException {
+	public static void extractFile(String bundleId, IPath path, File file) throws IOException
+	{
 		URL url = FileLocator.find(Platform.getBundle(bundleId), path, null);
 		InputStream in = null;
 		FileOutputStream out = null;
-		try {
+		try
+		{
 			in = url.openStream();
 			out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];
 			int n;
-			while ((n = in.read(buffer)) > 0) {
+			while ((n = in.read(buffer)) > 0)
+			{
 				out.write(buffer, 0, n);
 			}
-		} finally {
-			if (out != null) {
-				try {
+		}
+		finally
+		{
+			if (out != null)
+			{
+				try
+				{
 					out.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 				}
 			}
-			if (in != null) {
-				try {
+			if (in != null)
+			{
+				try
+				{
 					in.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 				}
 			}
 		}
@@ -222,11 +236,14 @@ public abstract class IOUtil
 	public static void write(OutputStream stream, String rawSource)
 	{
 		if (stream == null)
+		{
 			return;
-		BufferedWriter writer = null;
+		}
+		
+		Writer writer = null;
 		try
 		{
-			writer = new BufferedWriter(new OutputStreamWriter(stream));
+			writer = new OutputStreamWriter(stream);
 			writer.write(rawSource);
 		}
 		catch (IOException e)
@@ -237,7 +254,10 @@ public abstract class IOUtil
 		{
 			try
 			{
-				writer.close();
+				if (writer != null)
+				{
+					writer.close();
+				}
 			}
 			catch (IOException e)
 			{

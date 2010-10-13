@@ -145,13 +145,13 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 			String text = commentNode.getContent();
 			int offset = 0;
 			int lineOffset = 0;
+			if (!CommentScanner.isCaseSensitive())
+			{
+				text = text.toLowerCase();
+			}
 			String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
-				if (!CommentScanner.isCaseSensitive())
-				{
-					line = line.toLowerCase();
-				}
 				for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
 				{
 					String tag = entry.getKey();
