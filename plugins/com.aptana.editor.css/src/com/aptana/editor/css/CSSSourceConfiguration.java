@@ -55,6 +55,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -231,7 +232,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new ThemeingDamagerRepairer(getWordScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
@@ -240,12 +241,11 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, STRING);
 	}
 
-	protected ITokenScanner getWordScanner()
+	protected ITokenScanner getCommentScanner()
 	{
 		if (multilineCommentScanner == null)
 		{
-			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+			multilineCommentScanner = new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 		}
 		return multilineCommentScanner;
 	}

@@ -61,6 +61,7 @@ import org.eclipse.ui.progress.IElementCollector;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.core.io.PermissionDeniedException;
@@ -128,6 +129,19 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			}
 		} else if (object instanceof IConnectionPointCategory) {
             return ((IConnectionPointCategory) object).getConnectionPoints();
+		} else if (object instanceof LocalRoot) {
+			try {
+				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
+			} catch (CoreException e) {
+				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+			}
+		} else if (object instanceof IConnectionPointManager) {
+			List<Object> list = new ArrayList<Object>();
+			for (IConnectionPointCategory category : ((IConnectionPointManager) object).getConnectionPointCategories()) {
+				list.add(category);
+			}
+			return list.toArray();
 		}
 		return EMPTY;
 	}

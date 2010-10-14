@@ -47,38 +47,58 @@ import com.aptana.ui.IPropertyDialog;
 
 /**
  * @author Max Stepanov
- *
  */
-public class NewFTPConnectionAction implements IObjectActionDelegate {
+public class NewFTPConnectionAction implements IObjectActionDelegate
+{
+
+	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
 
 	private IWorkbenchPart targetPart;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
+	 * org.eclipse.ui.IWorkbenchPart)
 	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	{
 		this.targetPart = targetPart;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public void run(IAction action) {
+	public void run(IAction action)
+	{
 		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog) {
-			String typeId = action.getId();
-			int index = typeId.lastIndexOf('.');
-			if (index >= 0 && index+1 < typeId.length()) {
-				typeId = typeId.substring(index+1);
+		if (dlg instanceof IPropertyDialog)
+		{
+			String typeId;
+			if (action == null)
+			{
+				typeId = DEFAULT_TYPE;
+			}
+			else
+			{
+				typeId = action.getId();
+				int index = typeId.lastIndexOf('.');
+				if (index >= 0 && index + 1 < typeId.length())
+				{
+					typeId = typeId.substring(index + 1);
+				}
 			}
 			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
 		}
 		dlg.open();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
-	public void selectionChanged(IAction action, ISelection selection) {
+	public void selectionChanged(IAction action, ISelection selection)
+	{
 	}
 }

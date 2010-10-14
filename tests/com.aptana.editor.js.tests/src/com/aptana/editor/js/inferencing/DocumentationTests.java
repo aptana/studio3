@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.js.inferencing;
 
+import org.eclipse.core.runtime.Path;
+
 public class DocumentationTests extends InferencingTestsBase
 {
 	/**
@@ -41,28 +43,22 @@ public class DocumentationTests extends InferencingTestsBase
 	 */
 	public void testFunctionReturnType()
 	{
-		String source = this.getContent("inferencing/return-type-documentation.js");
-		
-		this.lastStatementTypeTests(source, "Function:Number");
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-type-documentation.js"), "Function:Number");
 	}
 	
 	/**
 	 * testFunctionReturnTypes
 	 */
 	public void testFunctionReturnTypes()
-	{
-		String source = this.getContent("inferencing/return-types-documentation.js");
-		
-		this.lastStatementTypeTests(source, "Function:Number,RegExp");
+	{		
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/return-types-documentation.js"), "Function:Number,RegExp");
 	}
 	
 	/**
 	 * testVarType
 	 */
 	public void testVarType()
-	{
-		String source = this.getContent("inferencing/type-documentation.js");
-		
-		this.lastStatementTypeTests(source, "Node");
+	{		
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/type-documentation.js"), "Node");
 	}
 }

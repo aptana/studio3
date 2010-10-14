@@ -105,10 +105,10 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
         setShellStyle(getShellStyle() | SWT.RESIZE);
         setHelpAvailable(false);
 
-        // sites.add(DefaultSiteConnection.getInstance());
+        sites.add(DefaultSiteConnection.getInstance());
 		sites.addAll(Arrays.asList(SyncingPlugin.getSiteConnectionManager().getSiteConnections()));
 
-		// setSelection(DefaultSiteConnection.getInstance());
+		setSelection(DefaultSiteConnection.getInstance());
 	}
 
 	public void setCreateNew(String name, IAdaptable source, IAdaptable destination) {
@@ -221,8 +221,7 @@ public class SiteConnectionsEditorDialog extends TitleAreaDialog implements Site
 						sitePropertiesWidget.setSource(null);
 						sitesViewer.refresh();
 						if (newSelectionIndex > -1 && newSelectionIndex < sitesViewer.getList().getItemCount()) {
-							setSelection(sites.get(newSelectionIndex));
-							// setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
+							setSelection(newSelectionIndex == 0 ? DefaultSiteConnection.getInstance() : sites.get(newSelectionIndex - 1));
 						}
 					}
 				}
