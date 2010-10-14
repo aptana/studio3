@@ -442,7 +442,7 @@
             allowMultiple="true"
             category="com.aptana"
             class="com.aptana.ide.ui.io.navigator.RemoteNavigatorView"
-            icon="icons/full/eview16/file_explorer.png"
+            icon="icons/full/eview16/remote.png"
             id="com.aptana.ui.io.remoteview"
             name="%view.remote.name">
       </view>
