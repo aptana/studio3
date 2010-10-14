@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -216,7 +215,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processCommentNode(IFileStore store, int initialOffset, CSSCommentNode commentNode)
 	{
 		String text = commentNode.getText();
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
@@ -224,10 +223,10 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (TaskTag entry : CommentScanner.getTaskTags())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
 				String tag = entry.getName();
-				if (!CommentScanner.isCaseSensitive())
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}

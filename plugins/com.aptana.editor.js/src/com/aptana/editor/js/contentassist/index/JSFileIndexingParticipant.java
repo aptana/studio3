@@ -52,7 +52,6 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -338,17 +337,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	{
 		int offset = initialOffset;
 		String text = getText(source, initialOffset, commentNode);
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (TaskTag entry : CommentScanner.getTaskTags())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
 				String tag = entry.getName();
-				if (!CommentScanner.isCaseSensitive())
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}

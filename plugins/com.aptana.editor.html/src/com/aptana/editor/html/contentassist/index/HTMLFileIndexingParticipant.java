@@ -53,7 +53,6 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -196,7 +195,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processHTMLCommentNode(IFileStore store, HTMLCommentNode commentNode)
 	{
 		String text = commentNode.getText();
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
@@ -204,10 +203,10 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (TaskTag entry : CommentScanner.getTaskTags())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
 				String tag = entry.getName();
-				if (!CommentScanner.isCaseSensitive())
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}
