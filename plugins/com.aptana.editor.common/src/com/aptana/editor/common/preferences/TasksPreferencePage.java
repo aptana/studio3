@@ -181,6 +181,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		{
 			public void selectionChanged(SelectionChangedEvent event)
 			{
+				// TODO Enable/disable buttons?
 			}
 		});
 		fTasksTableViewer.setInput(getTaskTags());
@@ -190,7 +191,6 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 	private void createTaskButtons(Composite parent)
 	{
-		// TODO Need to add buttons to allow adding/removing/editing task tags!
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.widthHint = 100;
@@ -210,25 +210,22 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 			public void widgetSelected(SelectionEvent e)
 			{
 				TaskTag tag = new TaskTag("", IMarker.PRIORITY_NORMAL);
-				if (fTasksTableViewer.getTable().getItemCount() > 0)
+
+				List<TaskTag> tags = new ArrayList<TaskTag>();
+				TableItem[] items = fTasksTableViewer.getTable().getItems();
+				for (TableItem anItem : items)
 				{
-					TableItem item = fTasksTableViewer.getTable().getItem(0);
-					tag = (TaskTag) item.getData();
+					TaskTag aTag = (TaskTag) anItem.getData();
+					tags.add(aTag);
 				}
+
 				// Open a dialog for user to enter the tag name and select priority!
-				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, getShell());
+				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, tags, getShell());
+				dialog.setTitle("New Task Tag");
 				if (dialog.open() == Window.OK)
 				{
 					TaskTag result = dialog.getTaskTag();
 					// Insert task in our model and set the new input on the table!
-
-					List<TaskTag> tags = new ArrayList<TaskTag>();
-					TableItem[] items = fTasksTableViewer.getTable().getItems();
-					for (TableItem item : items)
-					{
-						TaskTag aTag = (TaskTag) item.getData();
-						tags.add(aTag);
-					}
 					tags.add(result);
 
 					fTasksTableViewer.setInput(tags);
@@ -243,29 +240,26 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
+				List<TaskTag> tags = new ArrayList<TaskTag>();
+				TableItem[] items = fTasksTableViewer.getTable().getItems();
+				for (TableItem anItem : items)
+				{
+					TaskTag aTag = (TaskTag) anItem.getData();
+					tags.add(aTag);
+				}
+
 				int index = fTasksTableViewer.getTable().getSelectionIndex();
 				TableItem item = fTasksTableViewer.getTable().getItem(index);
 				TaskTag tag = (TaskTag) item.getData();
 				// Open a dialog for user to edit the tag name and priority!
-				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, getShell());
+				List<TaskTag> copy = new ArrayList<TaskTag>(tags);
+				copy.remove(index);
+				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, copy, getShell());
+				dialog.setTitle("Edit Task Tag");
 				if (dialog.open() == Window.OK)
 				{
 					TaskTag result = dialog.getTaskTag();
-					// Insert in place of the existing task in our model and set the new input on the table!
-					List<TaskTag> tags = new ArrayList<TaskTag>();
-					TableItem[] items = fTasksTableViewer.getTable().getItems();
-					for (TableItem anItem : items)
-					{
-						if (anItem.equals(item))
-						{
-							tags.add(result);
-						}
-						else
-						{
-							TaskTag aTag = (TaskTag) anItem.getData();
-							tags.add(aTag);
-						}
-					}
+					tags.set(index, result);
 					fTasksTableViewer.setInput(tags);
 				}
 			}
