@@ -35,7 +35,6 @@
 
 package com.aptana.editor.erb.html;
 
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.erb.IERBConstants;
@@ -49,24 +48,6 @@ import com.aptana.editor.html.parsing.HTMLParseState;
  */
 public class RHTMLEditor extends HTMLEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -76,9 +57,7 @@ public class RHTMLEditor extends HTMLEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new RHTMLSourceViewerConfiguration(getPreferenceStore(), this);
-
-		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new RHTMLDocumentProvider());
 	}
 

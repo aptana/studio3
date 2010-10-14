@@ -37,7 +37,6 @@ package com.aptana.editor.css;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
@@ -46,8 +45,6 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
@@ -64,22 +61,6 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
@@ -87,9 +68,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new CSSSourceViewerConfiguration(getPreferenceStore(), this);
-
-		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new CSSDocumentProvider());
 	}
 

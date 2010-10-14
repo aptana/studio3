@@ -35,28 +35,9 @@
 package com.aptana.editor.markdown;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 public class MarkdownEditor extends AbstractThemeableEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -66,9 +47,7 @@ public class MarkdownEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new MarkdownSourceViewerConfiguration(getPreferenceStore(), this);
-
-		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setSourceViewerConfiguration(new MarkdownSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new MarkdownDocumentProvider());
 	}
 }

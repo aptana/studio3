@@ -412,6 +412,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		try
 		{
+			if (getSourceViewer() instanceof CommonSourceViewerConfiguration)
+			{
+				((CommonSourceViewerConfiguration) getSourceViewer()).dispose();
+			}
 			if (fKeyListener != null)
 			{
 				ISourceViewer viewer = this.getSourceViewer();
