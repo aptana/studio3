@@ -18,7 +18,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -26,13 +25,11 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
@@ -41,6 +38,8 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.formatter.ui.internal.AbstractFormatterSelectionBlock;
 import com.aptana.formatter.ui.internal.preferences.ScriptSourcePreviewerUpdater;
 import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.ContributionExtensionManager;
 import com.aptana.ui.preferences.AbstractConfigurationBlockPropertyAndPreferencePage;
 import com.aptana.ui.preferences.AbstractOptionsBlock;
@@ -150,7 +149,7 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			ProjectionViewer viewer = new ProjectionViewer(parent, verticalRuler, overviewRuler,
 					showAnnotationsOverview, styles);
 			setFont(viewer, JFaceResources.getTextFont());
-			// TODO - Shalom - Attach the Theme colors (see AbstractThemeableEditor)
+			setBackgroundColor(viewer);
 			return viewer;
 		}
 
@@ -177,6 +176,20 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		}
 
 		/**
+		 * Sets the background color according to the active Theme
+		 * 
+		 * @param viewer
+		 */
+		private void setBackgroundColor(ISourceViewer sourceViewer)
+		{
+			ColorManager colorManager = ThemePlugin.getDefault().getColorManager();
+			IThemeManager themeManager = ThemePlugin.getDefault().getThemeManager();
+			Color color = colorManager.getColor(themeManager.getCurrentTheme().getBackground());
+			StyledText styledText = sourceViewer.getTextWidget();
+			styledText.setBackground(color);
+		}
+
+		/**
 		 * Sets the font for the given viewer sustaining selection and scroll position.
 		 * 
 		 * @param sourceViewer
@@ -186,42 +199,8 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 		 */
 		private void setFont(ISourceViewer sourceViewer, Font font)
 		{
-			if (sourceViewer.getDocument() != null)
-			{
-
-				ISelectionProvider provider = sourceViewer.getSelectionProvider();
-				ISelection selection = provider.getSelection();
-				int topIndex = sourceViewer.getTopIndex();
-
-				StyledText styledText = sourceViewer.getTextWidget();
-				Control parent = styledText;
-				if (sourceViewer instanceof ITextViewerExtension)
-				{
-					ITextViewerExtension extension = (ITextViewerExtension) sourceViewer;
-					parent = extension.getControl();
-				}
-
-				parent.setRedraw(false);
-
-				styledText.setFont(font);
-				provider.setSelection(selection);
-				sourceViewer.setTopIndex(topIndex);
-
-				if (parent instanceof Composite)
-				{
-					Composite composite = (Composite) parent;
-					composite.layout(true);
-				}
-
-				parent.setRedraw(true);
-
-			}
-			else
-			{
-
-				StyledText styledText = sourceViewer.getTextWidget();
-				styledText.setFont(font);
-			}
+			StyledText styledText = sourceViewer.getTextWidget();
+			styledText.setFont(font);
 		}
 
 	}
