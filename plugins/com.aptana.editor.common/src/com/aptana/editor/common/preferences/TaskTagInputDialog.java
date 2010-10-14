@@ -25,7 +25,6 @@ import com.aptana.editor.common.tasks.TaskTag;
 class TaskTagInputDialog extends StatusDialog
 {
 
-	private TaskTag tag;
 	private Text fTagNameText;
 	private Combo fPriorityCombo;
 	private String fPriority;
@@ -35,7 +34,6 @@ class TaskTagInputDialog extends StatusDialog
 	public TaskTagInputDialog(TaskTag tag, List<TaskTag> existingTags, Shell parent)
 	{
 		super(parent);
-		this.tag = tag;
 		this.existingTags = existingTags;
 		this.fTagName = tag.getName();
 		this.fPriority = tag.getPriorityName();
@@ -49,7 +47,7 @@ class TaskTagInputDialog extends StatusDialog
 		((GridLayout) composite.getLayout()).makeColumnsEqualWidth = false;
 
 		Label nameLabel = new Label(composite, SWT.NONE);
-		nameLabel.setText("Tag:");
+		nameLabel.setText(Messages.TaskTagInputDialog_NameLabel);
 
 		// Add a text field for name
 		fTagNameText = new Text(composite, SWT.BORDER | SWT.SINGLE);
@@ -66,7 +64,7 @@ class TaskTagInputDialog extends StatusDialog
 		fTagNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		Label priorityLabel = new Label(composite, SWT.NONE);
-		priorityLabel.setText("Priority:");
+		priorityLabel.setText(Messages.TaskTagInputDialog_PriorityLabel);
 
 		// Add a Combo for priority
 		fPriorityCombo = new Combo(composite, SWT.DROP_DOWN | SWT.SINGLE | SWT.READ_ONLY);
@@ -105,7 +103,8 @@ class TaskTagInputDialog extends StatusDialog
 	{
 		if (fTagName.length() == 0)
 		{
-			updateStatus(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, "Tag name must not be empty!"));
+			updateStatus(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID,
+					Messages.TaskTagInputDialog_NonEmptyNameError));
 			return;
 		}
 		for (TaskTag existingTag : existingTags)
@@ -113,7 +112,8 @@ class TaskTagInputDialog extends StatusDialog
 			if (existingTag.getName().equals(fTagName))
 			{
 				// Add a error message to dialog!
-				updateStatus(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, "Tag name must be unique!"));
+				updateStatus(new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID,
+						Messages.TaskTagInputDialog_UniqueNameError));
 				return;
 			}
 		}

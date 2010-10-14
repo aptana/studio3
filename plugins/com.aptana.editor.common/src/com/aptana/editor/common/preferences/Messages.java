@@ -39,6 +39,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
+	public static String TaskTagInputDialog_NameLabel;
+	public static String TaskTagInputDialog_NonEmptyNameError;
+	public static String TaskTagInputDialog_PriorityLabel;
+	public static String TaskTagInputDialog_UniqueNameError;
 	public static String UserAgentPreferencePage_Select_All;
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
