@@ -14,9 +14,19 @@ package com.aptana.formatter.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
 
 public abstract class FormatterNodeRewriter {
+	
+	/**
+	 * @param root
+	 */
+	public void rewrite(IFormatterContainerNode root)
+	{
+		mergeTextNodes(root);
+		insertComments(root);
+	}
 
 	protected void mergeTextNodes(IFormatterContainerNode root) {
 		final List<IFormatterNode> body = root.getBody();
@@ -47,6 +57,42 @@ public abstract class FormatterNodeRewriter {
 		for (final IFormatterNode node : body) {
 			if (node instanceof IFormatterContainerNode) {
 				mergeTextNodes((IFormatterContainerNode) node);
+			}
+		}
+	}
+	
+	protected void attachComments(IFormatterContainerNode root)
+	{
+		final List<IFormatterNode> commentNodes = new ArrayList<IFormatterNode>();
+		final List<IFormatterNode> comments = new ArrayList<IFormatterNode>();
+		final List<IFormatterNode> body = root.getBody();
+		for (IFormatterNode node : body)
+		{
+			if (node instanceof FormatterCommentNode)
+			{
+				comments.add(node);
+			}
+			else if (FormatterUtils.isNewLine(node) && !comments.isEmpty()
+					&& comments.get(comments.size() - 1) instanceof FormatterCommentNode)
+			{
+				comments.add(node);
+			}
+			else if (!comments.isEmpty())
+			{
+				if (node instanceof IFormatterCommentableNode)
+				{
+					((IFormatterCommentableNode) node).insertBefore(comments);
+					commentNodes.addAll(comments);
+				}
+				comments.clear();
+			}
+		}
+		body.removeAll(commentNodes);
+		for (Object node : body)
+		{
+			if (node instanceof IFormatterContainerNode)
+			{
+				attachComments((IFormatterContainerNode) node);
 			}
 		}
 	}
@@ -148,7 +194,7 @@ public abstract class FormatterNodeRewriter {
 			result.add(new FormatterTextNode(document, start, end));
 		}
 	}
-
+	
 	protected abstract IFormatterNode createCommentNode(
 			IFormatterDocument document, int startOffset, int endOffset,
 			Object object);
