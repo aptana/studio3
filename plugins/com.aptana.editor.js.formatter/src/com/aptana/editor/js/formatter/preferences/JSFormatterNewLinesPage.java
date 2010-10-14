@@ -36,11 +36,9 @@ package com.aptana.editor.js.formatter.preferences;
 
 import java.net.URL;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.ui.FormatterModifyDialog;
@@ -49,14 +47,14 @@ import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.ui.util.SWTFactory;
 
 /**
- * A HTML formatter tab for new-lines insertions.
+ * A JS formatter tab for new-lines insertions.
  * 
- * @author Shalom
+ * @author Shalom Gibly <sgibly@aptana.com>
  */
 public class JSFormatterNewLinesPage extends FormatterModifyTabPage
 {
 
-	private static final String NEW_LINES_PREVIEW_FILE = "indentation-preview.html"; //$NON-NLS-1$
+	private static final String NEW_LINES_PREVIEW_FILE = "indentation-preview.js"; //$NON-NLS-1$
 
 	/**
 	 * Constructor.
@@ -78,11 +76,18 @@ public class JSFormatterNewLinesPage extends FormatterModifyTabPage
 	@Override
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_exclusionsGroupLabel, 1, 1,
+		Group group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_newLinesGroupLabel, 1, 1,
 				GridData.FILL_BOTH);
-		Label exclutionLabel = new Label(group, SWT.WRAP);
-		exclutionLabel.setText(Messages.JSFormatterNewLinesPage_exclusionsMessage);
-		manager.createManagedList(group, JSFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT,
+				Messages.JSFormatterNewLinesPage_newLineBeforeIf);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
+				Messages.JSFormatterNewLinesPage_newLineBeforeElse);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT,
+				Messages.JSFormatterNewLinesPage_newLineBeforeCatch);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
+				Messages.JSFormatterNewLinesPage_newLineBeforeFinally);
+		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
+				Messages.JSFormatterNewLinesPage_newLineBeforeWhileInDo);
 	}
 
 	/*

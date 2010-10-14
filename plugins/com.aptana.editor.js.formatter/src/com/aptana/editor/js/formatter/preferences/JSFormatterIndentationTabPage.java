@@ -36,7 +36,6 @@ package com.aptana.editor.js.formatter.preferences;
 
 import java.net.URL;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,7 +44,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
@@ -63,7 +61,7 @@ import com.aptana.ui.util.SWTFactory;
  */
 public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 {
-	private static final String INDENTATION_PREVIEW_FILE = "indentation-preview.html"; //$NON-NLS-1$
+	private static final String INDENTATION_PREVIEW_FILE = "indentation-preview.js"; //$NON-NLS-1$
 	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
 			CodeFormatterConstants.MIXED };
 	private final String[] tabOptionNames = new String[] {
@@ -115,11 +113,13 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 		});
 		new TabOptionHandler(manager, tabOptions, indentationSize);
 
-		group = SWTFactory.createGroup(parent,
-				Messages.JSFormatterTabPage_exclusionsGroupLabel, 1, 1, GridData.FILL_BOTH);
-		Label exclutionLabel = new Label(group, SWT.WRAP);
-		exclutionLabel.setText(Messages.JSFormatterIndentationTabPage_exclusionsMessage);
-		manager.createManagedList(group, JSFormatterConstants.INDENT_EXCLUDED_TAGS);
+		group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_indentGroupLabel, 1, 1, GridData.FILL_BOTH);
+		manager.createCheckbox(group, JSFormatterConstants.INDENT_BLOCKS,
+				Messages.JSFormatterIndentationTabPage_statementsWithinBlocks);
+		manager.createCheckbox(group, JSFormatterConstants.INDENT_SWITCH_BODY,
+				Messages.JSFormatterIndentationTabPage_statementsWithinSwitch);
+		manager.createCheckbox(group, JSFormatterConstants.INDENT_CASE_BODY,
+				Messages.JSFormatterIndentationTabPage_statementsWithinCase);
 	}
 
 	/**

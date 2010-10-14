@@ -52,4 +52,17 @@ public class ScriptFormatterManager extends ContributionExtensionManager
 	{
 		return (IScriptFormatterFactory) getInstance().getSelectedContribution(contentType);
 	}
+
+	/**
+	 * Returns the main Content-Type that this factory is set for. The content-type that is returned is the one defined
+	 * in the extension contribution of the given facotry.
+	 * 
+	 * @param factory
+	 *            An {@link IScriptFormatterFactory}
+	 * @return the main Content-Type that the given factory
+	 */
+	public static String getContentTypeByFactory(IScriptFormatterFactory factory)
+	{
+		return getInstance().getContentTypeByContribution(factory);
+	}
 }

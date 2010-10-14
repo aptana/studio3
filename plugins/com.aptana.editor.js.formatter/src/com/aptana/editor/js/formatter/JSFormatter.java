@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.formatter;
 
 import java.util.Map;
@@ -27,7 +61,6 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * Javascript code formatter.
@@ -38,10 +71,25 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 {
 
 	/**
-	 * Blank lines constants
+	 * Brace positions constants
 	 */
-	protected static final String[] BLANK_LINES = { JSFormatterConstants.LINES_AFTER_ELEMENTS,
-			JSFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, JSFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS };
+	protected static final String[] BRACE_POSITIONS = { JSFormatterConstants.BRACE_POSITION_BLOCK,
+			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
+			JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION };
+
+	/**
+	 * New-lines constants
+	 */
+	protected static final String[] NEW_LINES_POSITIONS = { JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT };
+
+	/**
+	 * Indentation constants
+	 */
+	protected static final String[] INDENTATIONS = { JSFormatterConstants.INDENT_BLOCKS,
+			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY };
 
 	private String lineSeparator;
 
@@ -275,15 +323,23 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(JSFormatterConstants.FORMATTER_TAB_SIZE, getInt(JSFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(JSFormatterConstants.WRAP_COMMENTS, getBoolean(JSFormatterConstants.WRAP_COMMENTS));
-		document.setSet(JSFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(
-				JSFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(JSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
-				JSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		for (int i = 0; i < BLANK_LINES.length; i++)
+		document.setInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
+				getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION));
+		// Set the indentation values
+		for (String key : INDENTATIONS)
 		{
-			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
+			document.setBoolean(key, getBoolean(key));
+		}
+		// Set the new-lines values
+		for (String key : NEW_LINES_POSITIONS)
+		{
+			document.setBoolean(key, getBoolean(key));
+		}
+		// Set the braces values
+		for (String key : BRACE_POSITIONS)
+		{
+			document.setString(key, getString(key));
 		}
 		return document;
 	}
-
 }

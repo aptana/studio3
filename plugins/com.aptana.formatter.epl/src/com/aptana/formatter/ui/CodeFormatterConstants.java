@@ -1,6 +1,7 @@
 package com.aptana.formatter.ui;
 
-public class CodeFormatterConstants {
+public class CodeFormatterConstants
+{
 
 	/**
 	 * <pre>
@@ -63,4 +64,21 @@ public class CodeFormatterConstants {
 	 */
 	public static final String SPACE = "space"; //$NON-NLS-1$
 
+	/**
+	 * Indicate that the brace should be positioned in the same line.
+	 * 
+	 * <pre>
+	 * FORMATTER / Possible value for the Brace position formatter option
+	 * </pre>
+	 */
+	public static final String SAME_LINE = "same.line"; //$NON-NLS-1$
+	
+	/**
+	 * Indicate that the brace should be positioned in a new line.
+	 * 
+	 * <pre>
+	 * FORMATTER / Possible value for the Brace position formatter option
+	 * </pre>
+	 */
+	public static final String NEW_LINE = "new.line"; //$NON-NLS-1$
 }

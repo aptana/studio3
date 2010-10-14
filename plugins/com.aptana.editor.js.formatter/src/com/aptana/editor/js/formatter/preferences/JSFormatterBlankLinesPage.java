@@ -47,7 +47,7 @@ import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.ui.util.SWTFactory;
 
 /**
- * Blank-lines configuration tab for the HTML code formatter.
+ * Blank-lines configuration tab for the JS code formatter.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
@@ -64,14 +64,10 @@ public class JSFormatterBlankLinesPage extends FormatterModifyTabPage
 
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group blankLinesGroup = SWTFactory.createGroup(parent,
-				Messages.JSFormatterBlankLinesPage_blankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
-		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_AFTER_ELEMENTS,
-				Messages.JSFormatterBlankLinesPage_afterElements);
-		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS,
-				Messages.JSFormatterBlankLinesPage_afterSpecialElements);
-		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
-				Messages.JSFormatterBlankLinesPage_beforeSpecialElements);
+		Group blankLinesGroup = SWTFactory.createGroup(parent, Messages.JSFormatterBlankLinesPage_blankLinesGroupLabel,
+				2, 1, GridData.FILL_HORIZONTAL);
+		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
+				Messages.JSFormatterBlankLinesPage_afterFunctionDeclaration);
 
 		Group preserveLinesGroup = SWTFactory.createGroup(parent,
 				Messages.JSFormatterBlankLinesPage_existingBlankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
@@ -81,7 +77,7 @@ public class JSFormatterBlankLinesPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("blank-lines-preview.html"); //$NON-NLS-1$
+		return getClass().getResource("blank-lines-preview.js"); //$NON-NLS-1$
 	}
 
 }
