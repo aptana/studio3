@@ -495,6 +495,30 @@ class PathFilter extends ViewerFilter
 			}
 			cache.put(parent, filtered);
 		}
+		else
+		{
+			// Sometimes the items in the cache are stale and it causes an ArrayIndexOutofBoundsException in
+			// org.eclipse.jface.viewers.StructuredViewer.notifyFilteredOut(StructuredViewer.java:920)
+			// Iterate over filtered and return the equivalent item in elements by testing equals to fix bug
+			// mentioned above
+			List<Object> copyOfCache = new ArrayList<Object>();
+			for (Object cached : filtered)
+			{
+				for (Object element : elements)
+				{
+					if (cached.equals(element))
+					{
+						copyOfCache.add(element);
+						break;
+					}
+				}
+				if (copyOfCache.size() == filtered.length)
+				{
+					break;
+				}
+			}
+			filtered = copyOfCache.toArray();
+		}
 		return filtered;
 	}
 
