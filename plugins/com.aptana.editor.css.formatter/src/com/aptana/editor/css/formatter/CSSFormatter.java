@@ -183,11 +183,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				{
 					if (!input.equals(output))
 					{
-						
-						//TODO need to compare the contents of the AST like comments and declarations
-						parseState.setEditState(output, null, 0, 0);
-						IParseRootNode outputParseResult = parser.parse(parseState);
-						if (parseResult.equals(outputParseResult))
+						if (equalsIgnoreWhiteSpaceAndAsterisk(input, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
@@ -287,6 +283,21 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
 		}
 		return document;
+	}
+	
+	private boolean equalsIgnoreWhiteSpaceAndAsterisk(String in, String out)
+	{
+		if (in == null)
+		{
+			return out == null;
+		}
+		if (out == null)
+		{
+			return false;
+		}
+		in = in.replaceAll("[\\s\\*]", "");
+		out = out.replaceAll("[\\s\\*]", "");
+		return in.equals(out);
 	}
 
 }
