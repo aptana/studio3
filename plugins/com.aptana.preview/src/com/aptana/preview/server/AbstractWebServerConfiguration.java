@@ -1,10 +1,3 @@
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorMatchingStrategy;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.PartInitException;
-
-import com.aptana.preview.internal.PreviewEditorInput;
-
 /**
  * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
@@ -40,29 +33,75 @@ import com.aptana.preview.internal.PreviewEditorInput;
  * Any modifications to this file must keep this entire header intact.
  */
 
+package com.aptana.preview.server;
+
+import java.net.URL;
+
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
+
+import com.aptana.core.epl.IMemento;
+
 /**
  * @author Max Stepanov
  *
  */
-public class PreviewEditorMatchingStrategy implements IEditorMatchingStrategy {
+public abstract class AbstractWebServerConfiguration implements IExecutableExtension {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorMatchingStrategy#matches(org.eclipse.ui.IEditorReference, org.eclipse.ui.IEditorInput)
+	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
+	
+	private String type;
+	private String name;
+	
+	/**
+	 * 
 	 */
-	@Override
-	public boolean matches(IEditorReference editorRef, IEditorInput input) {
-		if (input instanceof PreviewEditorInput) {
-			PreviewEditorInput pei = (PreviewEditorInput) input;
-			try {
-				PreviewEditorInput editorInput = (PreviewEditorInput) editorRef.getEditorInput();
-				if (editorInput.isFixed() || pei.isFixed()) {
-					return editorInput.equals(pei);
-				}
-			} catch (PartInitException e) {
-			}
-			return true;
-		}
-		return false;
+	protected AbstractWebServerConfiguration() {
 	}
 
+	public abstract URL resolve(IFileStore file);
+	public abstract IFileStore resolve(URL url);
+	
+	protected void loadState(IMemento memento) {
+		IMemento child = memento.getChild(ELEMENT_NAME);
+		if (child != null) {
+			name = child.getTextData();
+		}		
+	}
+	
+	protected void saveState(IMemento memento) {
+		memento.createChild(ELEMENT_NAME).putTextData(name);
+	}
+	
+	protected boolean isPersistent() {
+		return true;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+	 */
+	@Override
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
+		type = config.getAttribute(ServerConfigurationManager.ATT_ID);
+	}
+
+	/* package */ final String getType() {
+		return type;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public final String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public final void setName(String name) {
+		this.name = name;
+	}
 }

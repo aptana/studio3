@@ -1,9 +1,18 @@
 package com.aptana.preview;
 
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.ISavedState;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.preview.server.ServerConfigurationManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -29,6 +38,15 @@ public class Activator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, new WorkspaceSaveParticipant());
+		if (lastState != null)
+		{
+			IPath location = lastState.lookup(new Path(ServerConfigurationManager.STATE_FILENAME));
+			if (location != null)
+			{
+				ServerConfigurationManager.getInstance().loadState(getStateLocation().append(location));
+			}
+		}
 	}
 
 	/*
@@ -36,6 +54,7 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
 		plugin = null;
 		super.stop(context);
 	}
@@ -63,6 +82,48 @@ public class Activator extends AbstractUIPlugin {
 
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
+	}
+	
+	private class WorkspaceSaveParticipant implements ISaveParticipant {
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.resources.ISaveParticipant#doneSaving(org.eclipse.core.resources.ISaveContext)
+		 */
+		@Override
+		public void doneSaving(ISaveContext context) {
+			IPath prevSavePath = new Path(ServerConfigurationManager.STATE_FILENAME).addFileExtension(
+					Integer.toString(context.getPreviousSaveNumber()));
+			getStateLocation().append(prevSavePath).toFile().delete();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.resources.ISaveParticipant#prepareToSave(org.eclipse.core.resources.ISaveContext)
+		 */
+		@Override
+		public void prepareToSave(ISaveContext context) throws CoreException {
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.resources.ISaveParticipant#rollback(org.eclipse.core.resources.ISaveContext)
+		 */
+		@Override
+		public void rollback(ISaveContext context) {
+			IPath savePath = new Path(ServerConfigurationManager.STATE_FILENAME).addFileExtension(
+					Integer.toString(context.getSaveNumber()));
+			getStateLocation().append(savePath).toFile().delete();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.resources.ISaveParticipant#saving(org.eclipse.core.resources.ISaveContext)
+		 */
+		@Override
+		public void saving(ISaveContext context) throws CoreException {
+			IPath savePath = new Path(ServerConfigurationManager.STATE_FILENAME).addFileExtension(
+					Integer.toString(context.getSaveNumber()));
+			ServerConfigurationManager.getInstance().saveState(getStateLocation().append(savePath));
+			context.map(new Path(ServerConfigurationManager.STATE_FILENAME), savePath);
+			context.needSaveNumber();
+		}
 	}
 
 }

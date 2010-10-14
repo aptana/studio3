@@ -3,7 +3,7 @@
 <schema targetNamespace="com.aptana.preview" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.preview" id="previewHandlers" name="Preview Handlers"/>
+         <meta.schema plugin="com.aptana.preview" id="webServerType" name="WebServer Type"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="handler"/>
+            <element ref="type"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,25 +47,22 @@
       </complexType>
    </element>
 
-   <element name="handler">
+   <element name="type">
       <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.aptana.preview.IPreviewHandler"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="contentType" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.core.contenttype.contentTypes/content-type/@id"/>
+                  <meta.attribute kind="java" basedOn="com.aptana.preview.server.AbstractWebServerConfiguration:"/>
                </appinfo>
             </annotation>
          </attribute>

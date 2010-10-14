@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="previewHandlers" name="Preview Handlers" schema="schema/previewHandlers.exsd"/>
+   <extension-point id="webServerTypes" name="WebServer Types" schema="schema/webServerTypes.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -38,9 +39,50 @@
             default="false"
             icon="icons/etool16/preview.png"
             id="com.aptana.preview.editor"
-            matchingStrategy="PreviewEditorMatchingStrategy"
+            matchingStrategy="com.aptana.preview.internal.PreviewEditorMatchingStrategy"
             name="Preview Editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.aptana.preview.ui.properties.ProjectPreviewPropertyPage"
+            icon="icons/obj16/preview.png"
+            id="com.aptana.preview.propertyPages.Preview"
+            name="Preview Settings">
+         <enabledWhen>
+            <adapt
+                  type="org.eclipse.core.resources.IProject">
+            </adapt>
+         </enabledWhen>
+         <keywordReference
+               id="com.aptana.preview.keyword"></keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="com.aptana.preview.keyword"
+            label="preview">
+      </keyword>
+   </extension>
+   <extension
+         point="com.aptana.preview.previewHandlers">
+      <handler
+            class="com.aptana.preview.internal.impl.WebServerPreviewHandler"
+            contentType="com.aptana.contenttype.html">
+      </handler>
+      <handler
+            class="com.aptana.preview.internal.impl.PHPPreviewHandler"
+            contentType="com.aptana.contenttype.html.php">
+      </handler>
+   </extension>
+   <extension
+         point="com.aptana.preview.webServerTypes">
+      <type
+            class="com.aptana.preview.server.SimpleWebServerConfiguration"
+            id="com.aptana.preview.server.simple">
+      </type>
    </extension>
 
 </plugin>
