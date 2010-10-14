@@ -32,73 +32,26 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.ide.ui.io.navigator;
 
-package com.aptana.ide.ui.ftp.actions;
-
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
-
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
-import com.aptana.ui.IPropertyDialog;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 
 /**
- * @author Max Stepanov
+ * A custom label provider for file navigator to provide additional features such as tooltip support.
  */
-public class NewFTPConnectionAction implements IObjectActionDelegate
+@SuppressWarnings("restriction")
+public class FileNavigatorDecoratingLabelProvider extends NavigatorDecoratingLabelProvider
 {
 
-	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
-
-	private IWorkbenchPart targetPart;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 * org.eclipse.ui.IWorkbenchPart)
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	public FileNavigatorDecoratingLabelProvider(ILabelProvider commonLabelProvider)
 	{
-		this.targetPart = targetPart;
+		super(commonLabelProvider);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action)
+	@Override
+	public String getToolTipText(Object element)
 	{
-		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
-		{
-			String typeId;
-			if (action == null)
-			{
-				typeId = DEFAULT_TYPE;
-			}
-			else
-			{
-				typeId = action.getId();
-				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
-					typeId = typeId.substring(index + 1);
-				}
-			}
-			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
-		}
-		dlg.open();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+		return element.toString();
 	}
 }

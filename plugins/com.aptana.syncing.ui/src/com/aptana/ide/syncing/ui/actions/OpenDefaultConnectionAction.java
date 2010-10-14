@@ -32,73 +32,54 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-
-package com.aptana.ide.ui.ftp.actions;
+package com.aptana.ide.syncing.ui.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
-import com.aptana.ui.IPropertyDialog;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.syncing.core.DefaultSiteConnection;
+import com.aptana.ide.syncing.ui.editors.EditorUtils;
 
 /**
- * @author Max Stepanov
+ * Opens the editor for the default connection with the selected FTP site as the destination.
+ * 
+ * @author Michael Xia (mxia@aptana.com)
  */
-public class NewFTPConnectionAction implements IObjectActionDelegate
+public class OpenDefaultConnectionAction implements IObjectActionDelegate
 {
 
-	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
+	private IConnectionPoint fDestination;
 
-	private IWorkbenchPart targetPart;
+	public OpenDefaultConnectionAction()
+	{
+	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 * org.eclipse.ui.IWorkbenchPart)
-	 */
 	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
-		this.targetPart = targetPart;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
 	public void run(IAction action)
 	{
-		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
-		{
-			String typeId;
-			if (action == null)
-			{
-				typeId = DEFAULT_TYPE;
-			}
-			else
-			{
-				typeId = action.getId();
-				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
-					typeId = typeId.substring(index + 1);
-				}
-			}
-			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
-		}
-		dlg.open();
+		DefaultSiteConnection connection = DefaultSiteConnection.getInstance();
+		connection.setDestination(fDestination);
+
+		EditorUtils.openConnectionEditor(connection);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
 	public void selectionChanged(IAction action, ISelection selection)
 	{
+		fDestination = null;
+		if (selection instanceof IStructuredSelection)
+		{
+			Object element = ((IStructuredSelection) selection).getFirstElement();
+			if (element instanceof IConnectionPoint)
+			{
+				fDestination = (IConnectionPoint) element;
+			}
+		}
 	}
 }

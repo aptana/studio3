@@ -32,73 +32,24 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.ide.ui.io.navigator.actions;
 
-package com.aptana.ide.ui.ftp.actions;
+import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import com.aptana.ide.ui.io.actions.DeleteConnectionAction;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
-import com.aptana.ui.IPropertyDialog;
-
-/**
- * @author Max Stepanov
- */
-public class NewFTPConnectionAction implements IObjectActionDelegate
+public class ConnectionDeleteAction extends BaseSelectionListenerAction
 {
 
-	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
-
-	private IWorkbenchPart targetPart;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 * org.eclipse.ui.IWorkbenchPart)
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	public ConnectionDeleteAction()
 	{
-		this.targetPart = targetPart;
+		super(Messages.FileSystemDeleteAction_Text);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action)
+	public void run()
 	{
-		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
-		{
-			String typeId;
-			if (action == null)
-			{
-				typeId = DEFAULT_TYPE;
-			}
-			else
-			{
-				typeId = action.getId();
-				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
-					typeId = typeId.substring(index + 1);
-				}
-			}
-			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
-		}
-		dlg.open();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+		DeleteConnectionAction action = new DeleteConnectionAction();
+		action.selectionChanged(this, getStructuredSelection());
+		action.run(this);
 	}
 }

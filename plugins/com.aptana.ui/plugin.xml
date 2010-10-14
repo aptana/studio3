@@ -30,6 +30,16 @@
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
+               id="com.aptana.ui.io.remoteview"
+               minimized="false"
+               relationship="stack"
+               relative="com.aptana.explorer.view"
+               visible="false">
+         </view>
+         <viewShortcut
+               id="com.aptana.ui.io.remoteview">
+         </viewShortcut>
+         <view
                id="org.eclipse.ui.views.ContentOutline"
                ratio="0.75"
                relationship="bottom"

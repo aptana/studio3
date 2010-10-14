@@ -65,6 +65,8 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
+import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
+import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.navigator.internal.NavigatorDecoratorLoader;
 import com.aptana.ui.UIUtils;
 
@@ -228,26 +230,48 @@ public class IOUIPlugin extends AbstractUIPlugin {
             public void run() {
                 try {
                     IViewPart view = findView(IPageLayout.ID_PROJECT_EXPLORER);
-                    if (view != null && view instanceof CommonNavigator) {
-                        CommonViewer viewer = ((CommonNavigator) view).getCommonViewer();
-                        if (element == null) {
-                            // full refresh
-                            viewer.refresh();
-                        } else {
-                            viewer.refresh(element);
-                        }
+                    refreshNavigatorInternal(view, element, selection);
 
-                        if (selection != null) {
-                            // ensures the category's new content are loaded
-                            viewer.expandToLevel(element, 1);
-                            viewer.setSelection(new StructuredSelection(selection));
-                        }
-                    }
+                    view = findView(RemoteNavigatorView.ID);
+                    refreshNavigatorInternal(view, element, selection);
                 } catch (PartInitException e) {
                 }
             }
         });
     }
+
+	private static void refreshNavigatorInternal(IViewPart viewPart, Object element, Object selection)
+	{
+		if (viewPart == null)
+		{
+			return;
+		}
+		if (viewPart instanceof IRefreshableNavigator)
+		{
+			((IRefreshableNavigator) viewPart).refresh(element);
+		}
+		else if (viewPart instanceof CommonNavigator)
+		{
+			CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+			if (element == null)
+			{
+				// full refresh
+				viewer.refresh();
+			}
+			else
+			{
+				viewer.refresh(element);
+			}
+		}
+
+		if (selection != null && viewPart instanceof CommonNavigator)
+		{
+			// ensures the category's new content are loaded
+			CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+			viewer.expandToLevel(element, 1);
+			viewer.setSelection(new StructuredSelection(selection));
+		}
+	}
 
     public static void logError(String msg, Exception e) {
         log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));

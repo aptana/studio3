@@ -430,6 +430,25 @@
                tooltip="%Action.Cloak.tooltip">
          </action>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ide.syncing.ui.ftpConnectionPointContribution"
+            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+         <action
+               class="com.aptana.ide.syncing.ui.actions.OpenDefaultConnectionAction"
+               enablesFor="1"
+               icon="icons/full/elcl16/arrow_up_down.png"
+               id="com.aptana.ide.syncing.ui.actions.OpenConnectionExplorerAction"
+               label="%action.openConnection.label"
+               menubarPath="group.edit"
+               tooltip="%action.openConnection.tooltip">
+         </action>
+         <visibility>
+            <objectClass
+                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
+            </objectClass>
+         </visibility>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

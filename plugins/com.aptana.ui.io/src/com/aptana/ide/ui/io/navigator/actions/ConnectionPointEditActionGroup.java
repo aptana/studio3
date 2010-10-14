@@ -32,73 +32,52 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.ide.ui.io.navigator.actions;
 
-package com.aptana.ide.ui.ftp.actions;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionGroup;
+import org.eclipse.ui.navigator.ICommonMenuConstants;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
-
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
-import com.aptana.ui.IPropertyDialog;
-
-/**
- * @author Max Stepanov
- */
-public class NewFTPConnectionAction implements IObjectActionDelegate
+public class ConnectionPointEditActionGroup extends ActionGroup
 {
 
-	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
+	private ConnectionDeleteAction fDeleteAction;
 
-	private IWorkbenchPart targetPart;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 * org.eclipse.ui.IWorkbenchPart)
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	public ConnectionPointEditActionGroup()
 	{
-		this.targetPart = targetPart;
+		makeActions();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action)
+	@Override
+	public void fillContextMenu(IMenuManager menu)
 	{
-		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
-		{
-			String typeId;
-			if (action == null)
-			{
-				typeId = DEFAULT_TYPE;
-			}
-			else
-			{
-				typeId = action.getId();
-				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
-					typeId = typeId.substring(index + 1);
-				}
-			}
-			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
-		}
-		dlg.open();
+		menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, fDeleteAction);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection)
+	@Override
+	public void updateActionBars()
 	{
+		fDeleteAction.selectionChanged(getSelection());
+	}
+
+	protected void makeActions()
+	{
+		ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
+
+		fDeleteAction = new ConnectionDeleteAction();
+		fDeleteAction.setDisabledImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE_DISABLED));
+		fDeleteAction.setImageDescriptor(images.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+		fDeleteAction.setActionDefinitionId(IWorkbenchCommandConstants.EDIT_DELETE);
+		fDeleteAction.setAccelerator(SWT.DEL);
+	}
+
+	private IStructuredSelection getSelection()
+	{
+		return (IStructuredSelection) getContext().getSelection();
 	}
 }

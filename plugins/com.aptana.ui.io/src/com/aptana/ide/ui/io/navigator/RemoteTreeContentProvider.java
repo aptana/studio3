@@ -32,73 +32,24 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.ide.ui.io.navigator;
 
-package com.aptana.ide.ui.ftp.actions;
-
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.core.resources.IWorkspaceRoot;
 
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
-import com.aptana.ui.IPropertyDialog;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
-/**
- * @author Max Stepanov
- */
-public class NewFTPConnectionAction implements IObjectActionDelegate
+public class RemoteTreeContentProvider extends FileTreeContentProvider
 {
 
-	private static final String DEFAULT_TYPE = "ftp"; //$NON-NLS-1$
-
-	private IWorkbenchPart targetPart;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-	 * org.eclipse.ui.IWorkbenchPart)
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart)
+	@Override
+	public Object[] getElements(Object inputElement)
 	{
-		this.targetPart = targetPart;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-	 */
-	public void run(IAction action)
-	{
-		Dialog dlg = new FTPPropertyDialogProvider().createPropertyDialog(targetPart.getSite());
-		if (dlg instanceof IPropertyDialog)
+		if (inputElement instanceof IWorkspaceRoot)
 		{
-			String typeId;
-			if (action == null)
-			{
-				typeId = DEFAULT_TYPE;
-			}
-			else
-			{
-				typeId = action.getId();
-				int index = typeId.lastIndexOf('.');
-				if (index >= 0 && index + 1 < typeId.length())
-				{
-					typeId = typeId.substring(index + 1);
-				}
-			}
-			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
+			inputElement = CoreIOPlugin.getConnectionPointManager().getConnectionPointCategory(
+					IBaseRemoteConnectionPoint.CATEGORY);
 		}
-		dlg.open();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-	 * org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IAction action, ISelection selection)
-	{
+		return super.getElements(inputElement);
 	}
 }
