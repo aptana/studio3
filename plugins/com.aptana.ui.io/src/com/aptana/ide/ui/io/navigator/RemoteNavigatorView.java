@@ -39,7 +39,6 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
