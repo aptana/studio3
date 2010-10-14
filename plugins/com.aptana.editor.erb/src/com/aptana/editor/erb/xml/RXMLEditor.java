@@ -36,26 +36,52 @@
 package com.aptana.editor.erb.xml;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 
 /**
  * @author Max Stepanov
- *
  */
-public class RXMLEditor extends AbstractThemeableEditor {
+public class RXMLEditor extends AbstractThemeableEditor
+{
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+
+		super.dispose();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new RXMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new RXMLDocumentProvider());
-    }
-	
+		fSourceViewerConfiguration = new RXMLSourceViewerConfiguration(getPreferenceStore(), this);
+
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setDocumentProvider(new RXMLDocumentProvider());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
 	@Override
 	protected FileService createFileService()
 	{
