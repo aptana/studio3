@@ -509,6 +509,9 @@
             <actionExtension
                   pattern="org.eclipse.ui.navigator.resources.PropertiesActionProvider">
             </actionExtension>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.ResourceMgmtActions">
+            </actionExtension>
          </includes>
       </viewerActionBinding>
       <dragAssistant
