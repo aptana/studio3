@@ -102,7 +102,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		layout.marginWidth = 0;
 		composite.setLayout(layout);
 		Label label = new Label(composite, SWT.WRAP);
-		label.setText("Strings used as task markers in comments.");
+		label.setText(Messages.TasksPreferencePage_Description);
 		label.setFont(parent.getFont());
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.widthHint = 400;
@@ -131,7 +131,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 		fCaseSensitiveButton = new Button(composite, SWT.CHECK);
 		fCaseSensitiveButton.setFont(parent.getFont());
-		fCaseSensitiveButton.setText("Case sensitive task tags");
+		fCaseSensitiveButton.setText(Messages.TasksPreferencePage_CaseSensitiveLabel);
 
 		fCaseSensitiveButton.setSelection(getPreferenceStore()
 				.getBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
@@ -157,18 +157,13 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		TableColumn tagNameColumn = new TableColumn(table, SWT.NONE);
-		tagNameColumn.setText("Tag");
+		tagNameColumn.setText(Messages.TasksPreferencePage_TagNameColumnHeader);
 		tagNameColumn.setWidth(100);
 		TableColumn tagPriorityColumn = new TableColumn(table, SWT.NONE);
-		tagPriorityColumn.setText("Priority");
+		tagPriorityColumn.setText(Messages.TasksPreferencePage_PriorityColumnHeader);
 		tagPriorityColumn.setWidth(100);
 		table.setFont(parent.getFont());
-		table.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-			}
-		});
+
 		fTasksTableViewer = new TableViewer(table);
 		table.setFont(parent.getFont());
 		table.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -181,7 +176,10 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		{
 			public void selectionChanged(SelectionChangedEvent event)
 			{
-				// TODO Enable/disable buttons?
+				// Enable/disable buttons
+				boolean enable = !event.getSelection().isEmpty();
+				fEditButton.setEnabled(enable);
+				fRemoveButton.setEnabled(enable);
 			}
 		});
 		fTasksTableViewer.setInput(getTaskTags());
@@ -203,13 +201,13 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 		// Now create the buttons
 		fAddButton = new Button(composite, SWT.PUSH);
-		fAddButton.setText("Add...");
+		fAddButton.setText(Messages.TasksPreferencePage_AddButtonLabel);
 		fAddButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				TaskTag tag = new TaskTag("", IMarker.PRIORITY_NORMAL);
+				TaskTag tag = new TaskTag("", IMarker.PRIORITY_NORMAL); //$NON-NLS-1$
 
 				List<TaskTag> tags = new ArrayList<TaskTag>();
 				TableItem[] items = fTasksTableViewer.getTable().getItems();
@@ -221,7 +219,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 				// Open a dialog for user to enter the tag name and select priority!
 				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, tags, getShell());
-				dialog.setTitle("New Task Tag");
+				dialog.setTitle(Messages.TasksPreferencePage_NewTagTitle);
 				if (dialog.open() == Window.OK)
 				{
 					TaskTag result = dialog.getTaskTag();
@@ -234,7 +232,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		});
 
 		fEditButton = new Button(composite, SWT.PUSH);
-		fEditButton.setText("Edit...");
+		fEditButton.setText(Messages.TasksPreferencePage_EditButtonLabel);
 		fEditButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -255,7 +253,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				List<TaskTag> copy = new ArrayList<TaskTag>(tags);
 				copy.remove(index);
 				TaskTagInputDialog dialog = new TaskTagInputDialog(tag, copy, getShell());
-				dialog.setTitle("Edit Task Tag");
+				dialog.setTitle(Messages.TasksPreferencePage_EditTagTitle);
 				if (dialog.open() == Window.OK)
 				{
 					TaskTag result = dialog.getTaskTag();
@@ -266,7 +264,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		});
 
 		fRemoveButton = new Button(composite, SWT.PUSH);
-		fRemoveButton.setText("Remove");
+		fRemoveButton.setText(Messages.TasksPreferencePage_RemoveButtonLabel);
 		fRemoveButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
