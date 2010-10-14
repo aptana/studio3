@@ -38,6 +38,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
@@ -48,16 +49,34 @@ import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
-
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+	
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+		
+		super.dispose();
+	}
+	
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
+		
+		fSourceViewerConfiguration = new HTMLSourceViewerConfiguration(getPreferenceStore(), this);
 
-		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new HTMLDocumentProvider());
 	}
 

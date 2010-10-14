@@ -37,28 +37,62 @@ package com.aptana.editor.xml;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
 import com.aptana.editor.xml.parsing.IXMLParserConstants;
 
-public class XMLEditor extends AbstractThemeableEditor {
+public class XMLEditor extends AbstractThemeableEditor
+{
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
 
-        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new XMLDocumentProvider());
-    }
-    
-    @Override
-    protected FileService createFileService()
-    {
-    	return new FileService(IXMLParserConstants.LANGUAGE);
-    }
+		super.dispose();
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
+
+		fSourceViewerConfiguration = new XMLSourceViewerConfiguration(getPreferenceStore(), this);
+
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setDocumentProvider(new XMLDocumentProvider());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(IXMLParserConstants.LANGUAGE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
 	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
@@ -69,6 +103,10 @@ public class XMLEditor extends AbstractThemeableEditor {
 		return outline;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
+	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{

@@ -35,16 +35,40 @@
 package com.aptana.editor.text;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 public class TextEditor extends AbstractThemeableEditor
 {
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+
+		super.dispose();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
 
-		setSourceViewerConfiguration(new TextSourceViewerConfiguration(getPreferenceStore(), this));
+		fSourceViewerConfiguration = new TextSourceViewerConfiguration(getPreferenceStore(), this);
+
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new TextDocumentProvider());
 	}
 

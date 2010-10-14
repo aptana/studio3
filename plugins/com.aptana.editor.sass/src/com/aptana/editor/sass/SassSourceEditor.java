@@ -35,20 +35,48 @@
 package com.aptana.editor.sass;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.parsing.FileService;
 
 public class SassSourceEditor extends AbstractThemeableEditor
 {
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+
+		super.dispose();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
+		
+		fSourceViewerConfiguration = new SassSourceViewerConfiguration(getPreferenceStore(), this);
 
-		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new SassDocumentProvider());
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
 	@Override
 	protected FileService createFileService()
 	{
