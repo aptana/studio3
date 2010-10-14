@@ -60,15 +60,6 @@ public class HTMLFormatterNodeRewriter extends FormatterNodeRewriter
 		this.document = document;
 	}
 
-	/**
-	 * @param root
-	 */
-	public void rewrite(IFormatterContainerNode root)
-	{
-		mergeTextNodes(root);
-		insertComments(root);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#createCommentNode(com.aptana.formatter.IFormatterDocument,

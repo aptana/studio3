@@ -102,14 +102,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				.getName().toLowerCase());
 
 		CSSSelectorNode[] selectors = ruleNode.getSelectors();
-		int selectorsEndOffset = getEndWithoutWhiteSpaces(selectors[selectors.length - 1].getEndingOffset() + 1,
+//		int selectorsEndOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1,
+//				document);
+		int blockStartOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1,
 				document);
-		int blockStartOffset = getBeginWithoutWhiteSpaces(selectors[selectors.length - 1].getEndingOffset() + 1,
-				document);
-		// TODO: Account for case where there are no declarations??
 
 		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
-		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(), selectorsEndOffset + 1));
+		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(), blockStartOffset));
 		push(formatterRuleNode);
 
 		checkedPop(formatterRuleNode, -1);
@@ -120,10 +119,13 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
-		if (declarations != null)
+		if (declarations != null && declarations.length != 0)
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
 					declarations[0].getStartingOffset()));
+		} else
+		{
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, ruleNode.getEndingOffset()));
 		}
 
 		for (int i = 0; i < declarations.length; ++i)
@@ -155,39 +157,16 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 	}
 
-	/**
-	 * @param i
-	 * @param document2
-	 * @return
-	 */
-	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
+	private int getBlockStartOffset(int offset, FormatterDocument document)
 	{
 		int length = document.getLength();
 		while (offset < length)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)))
+			if (document.charAt(offset) == '{')
 			{
 				break;
 			}
 			offset++;
-		}
-		return offset;
-	}
-
-	/**
-	 * @param startingOffset
-	 * @param document2
-	 * @return
-	 */
-	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
-	{
-		while (offset > 0)
-		{
-			if (!Character.isWhitespace(document.charAt(offset)))
-			{
-				break;
-			}
-			offset--;
 		}
 		return offset;
 	}

@@ -183,7 +183,11 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				{
 					if (!input.equals(output))
 					{
-						if (equalsIgnoreWhitespaces(input, output))
+						
+						//TODO need to compare the contents of the AST like comments and declarations
+						parseState.setEditState(output, null, 0, 0);
+						IParseRootNode outputParseResult = parser.parse(parseState);
+						if (parseResult.equals(outputParseResult))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}

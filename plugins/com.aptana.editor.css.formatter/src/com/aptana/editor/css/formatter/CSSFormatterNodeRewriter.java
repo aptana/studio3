@@ -1,219 +1,41 @@
 package com.aptana.editor.css.formatter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.aptana.editor.css.formatter.nodes.FormatterCSSCommentNode;
 import com.aptana.formatter.FormatterDocument;
-import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
-import com.aptana.formatter.nodes.FormatterTextNode;
-import com.aptana.formatter.nodes.IFormatterCommentableNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
-import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
-public class CSSFormatterNodeRewriter
+public class CSSFormatterNodeRewriter extends FormatterNodeRewriter
 {
-
-	private final IFormatterDocument document;
-	private final List<IParseNode> comments = new ArrayList<IParseNode>();
 
 	public CSSFormatterNodeRewriter(IParseRootNode parseResult, FormatterDocument document)
 	{
-		this.document = document;
-
 		for (IParseNode commentNode : parseResult.getCommentNodes())
 		{
-			comments.add(commentNode);
+			addComment(commentNode.getStartingOffset(), commentNode.getEndingOffset(), commentNode);
 		}
 	}
 
 	public void rewrite(IFormatterContainerNode root)
 	{
-		mergeTextNodes(root);
-		insertComments(root);
+		super.rewrite(root);
 		attachComments(root);
 	}
 
-	private void mergeTextNodes(IFormatterContainerNode root)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#createCommentNode(com.aptana.formatter.IFormatterDocument,
+	 * int, int, java.lang.Object)
+	 */
+	@Override
+	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
+			Object object)
 	{
-		final List<IFormatterNode> body = root.getBody();
-		final List<IFormatterNode> newBody = new ArrayList<IFormatterNode>();
-		final List<IFormatterNode> texts = new ArrayList<IFormatterNode>();
-		for (IFormatterNode node : body)
-		{
-			if (isPlainTextNode(node))
-			{
-				if (!texts.isEmpty()
-						&& ((IFormatterTextNode) texts.get(texts.size() - 1)).getEndOffset() != node.getStartOffset())
-				{
-					flushTextNodes(texts, newBody);
-				}
-				texts.add(node);
-			}
-			else
-			{
-				if (!texts.isEmpty())
-				{
-					flushTextNodes(texts, newBody);
-				}
-				newBody.add(node);
-			}
-		}
-		if (!texts.isEmpty())
-		{
-			flushTextNodes(texts, newBody);
-		}
-		if (body.size() != newBody.size())
-		{
-			body.clear();
-			body.addAll(newBody);
-		}
-		for (IFormatterNode node : body)
-		{
-			if (node instanceof IFormatterContainerNode)
-			{
-				mergeTextNodes((IFormatterContainerNode) node);
-			}
-		}
-	}
-
-	private void flushTextNodes(List<IFormatterNode> texts, List<IFormatterNode> newBody)
-	{
-		if (texts.size() > 1)
-		{
-			final IFormatterNode first = texts.get(0);
-			final IFormatterNode last = texts.get(texts.size() - 1);
-			newBody.add(new FormatterTextNode(document, first.getStartOffset(), last.getEndOffset()));
-		}
-		else
-		{
-			newBody.addAll(texts);
-		}
-		texts.clear();
-	}
-
-	private void insertComments(IFormatterContainerNode root)
-	{
-		final List<IFormatterNode> body = root.getBody();
-		final List<IFormatterNode> newBody = new ArrayList<IFormatterNode>();
-		boolean changes = false;
-		for (IFormatterNode node : body)
-		{
-			if (isPlainTextNode(node))
-			{
-				if (hasComments(node.getStartOffset(), node.getEndOffset()))
-				{
-					selectValidRanges(node.getStartOffset(), node.getEndOffset(), newBody);
-					changes = true;
-				}
-				else
-				{
-					newBody.add(node);
-				}
-			}
-			else
-			{
-				newBody.add(node);
-			}
-		}
-		if (changes)
-		{
-			body.clear();
-			body.addAll(newBody);
-		}
-		for (IFormatterNode node : body)
-		{
-			if (node instanceof IFormatterContainerNode)
-			{
-				insertComments((IFormatterContainerNode) node);
-			}
-		}
-	}
-
-	private void attachComments(IFormatterContainerNode root)
-	{
-		final List<IFormatterNode> commentNodes = new ArrayList<IFormatterNode>();
-		final List<IFormatterNode> comments = new ArrayList<IFormatterNode>();
-		final List<IFormatterNode> body = root.getBody();
-		for (IFormatterNode node : body)
-		{
-			if (node instanceof FormatterCommentNode)
-			{
-				comments.add(node);
-			}
-			else if (FormatterUtils.isNewLine(node) && !comments.isEmpty()
-					&& comments.get(comments.size() - 1) instanceof FormatterCommentNode)
-			{
-				comments.add(node);
-			}
-			else if (!comments.isEmpty())
-			{
-				if (node instanceof IFormatterCommentableNode)
-				{
-					((IFormatterCommentableNode) node).insertBefore(comments);
-					commentNodes.addAll(comments);
-				}
-				comments.clear();
-			}
-		}
-		body.removeAll(commentNodes);
-		for (Object node : body)
-		{
-			if (node instanceof IFormatterContainerNode)
-			{
-				attachComments((IFormatterContainerNode) node);
-			}
-		}
-	}
-
-	private boolean isPlainTextNode(final IFormatterNode node)
-	{
-		return node.getClass() == FormatterTextNode.class;
-	}
-
-	private boolean hasComments(int startOffset, int endOffset)
-	{
-		for (IParseNode comment : comments)
-		{
-			if (comment.getStartingOffset() < endOffset && startOffset < comment.getEndingOffset())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void selectValidRanges(int start, int end, List<IFormatterNode> result)
-	{
-		for (IParseNode comment : comments)
-		{
-			if (start <= comment.getEndingOffset() && comment.getStartingOffset() <= end)
-			{
-				if (start < comment.getStartingOffset())
-				{
-					int validEnd = Math.min(end, comment.getStartingOffset());
-					result.add(new FormatterTextNode(document, start, validEnd));
-					start = comment.getStartingOffset();
-				}
-				result.add(new FormatterCSSCommentNode(document, start, Math.min(comment.getEndingOffset(), end)));
-				start = comment.getEndingOffset();
-				if (start > end)
-				{
-					break;
-				}
-			}
-		}
-		if (start < end)
-		{
-			result.add(new FormatterTextNode(document, start, end));
-		}
+		return new FormatterCSSCommentNode(document, startOffset, endOffset);
 	}
 
 }
