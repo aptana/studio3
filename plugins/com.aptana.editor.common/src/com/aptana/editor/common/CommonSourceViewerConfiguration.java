@@ -97,6 +97,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	}
 
 	/**
+	 * dispose
+	 */
+	public void dispose()
+	{
+		fTextEditor = null;
+		fDoubleClickStrategy = null;
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
+	}
+	
+	/**
 	 * getAbstractThemeableEditor
 	 * 
 	 * @return
