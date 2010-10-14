@@ -506,6 +506,9 @@
             <actionExtension
                   pattern="com.aptana.ide.ui.io.navigator.actions.*">
             </actionExtension>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.PropertiesActionProvider">
+            </actionExtension>
          </includes>
       </viewerActionBinding>
       <dragAssistant
