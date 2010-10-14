@@ -56,7 +56,7 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 public class ProjectSiteConnections extends PlatformObject implements IWorkbenchAdapter {
 
     private static ImageDescriptor IMAGE_DESCRIPTOR = SyncingUIPlugin
-            .getImageDescriptor("icons/full/obj16/ftp.png"); //$NON-NLS-1$
+            .getImageDescriptor("icons/full/obj16/connection.png"); //$NON-NLS-1$
 
     private IProject fProject;
 

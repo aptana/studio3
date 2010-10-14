@@ -35,30 +35,12 @@
 package com.aptana.editor.dtd;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.dtd.parsing.DTDParserConstants;
 
 public class DTDEditor extends AbstractThemeableEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -67,9 +49,7 @@ public class DTDEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new DTDSourceViewerConfiguration(this.getPreferenceStore(), this);
-
-		this.setSourceViewerConfiguration(fSourceViewerConfiguration);
+		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new DTDDocumentProvider());
 	}
 
@@ -80,5 +60,14 @@ public class DTDEditor extends AbstractThemeableEditor
 	protected FileService createFileService()
 	{
 		return new FileService(DTDParserConstants.LANGUAGE);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		return null;
 	}
 }

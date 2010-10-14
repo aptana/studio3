@@ -35,28 +35,9 @@
 package com.aptana.editor.beaver;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 public class BeaverEditor extends AbstractThemeableEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -65,9 +46,7 @@ public class BeaverEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new BeaverSourceViewerConfiguration(this.getPreferenceStore(), this);
-
-		this.setSourceViewerConfiguration(fSourceViewerConfiguration);
+		this.setSourceViewerConfiguration(new BeaverSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new BeaverDocumentProvider());
 	}
 }
