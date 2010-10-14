@@ -40,6 +40,7 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
@@ -54,19 +55,38 @@ import com.aptana.parsing.lexer.IRange;
 public class RubySourceEditor extends AbstractThemeableEditor
 {
 
-	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'',
-			'"', '"', '|', '|', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+	private static final char[] PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"', '|', '|', '\u201C', '\u201D',
+		'\u2018', '\u2019' }; // curly double quotes, curly single quotes
+
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+
+		super.dispose();
+	}
 
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
 
-		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] {
-				RubyEditorPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() }));
+		setPreferenceStore(new ChainedPreferenceStore(new IPreferenceStore[] { RubyEditorPlugin.getDefault().getPreferenceStore(),
+			CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 
-		setSourceViewerConfiguration(new RubySourceViewerConfiguration(getPreferenceStore(), this));
+		fSourceViewerConfiguration = new RubySourceViewerConfiguration(getPreferenceStore(), this);
+
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new RubyDocumentProvider());
 	}
 
@@ -75,7 +95,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 	{
 		return new FileService(IRubyParserConstants.LANGUAGE);
 	}
-	
+
 	protected char[] getPairMatchingCharacters()
 	{
 		return PAIR_MATCHING_CHARS;
@@ -97,7 +117,8 @@ public class RubySourceEditor extends AbstractThemeableEditor
 		if (element instanceof CommonOutlineItem)
 		{
 			IParseNode node = ((CommonOutlineItem) element).getReferenceNode();
-			if (node instanceof IImportContainer) {
+			if (node instanceof IImportContainer)
+			{
 				// just sets the highlight range and moves the cursor
 				setHighlightRange(element.getStartingOffset(), element.getLength(), true);
 				return;
