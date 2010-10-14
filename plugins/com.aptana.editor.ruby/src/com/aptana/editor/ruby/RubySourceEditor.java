@@ -85,7 +85,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 			CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() }));
 
 		fSourceViewerConfiguration = new RubySourceViewerConfiguration(getPreferenceStore(), this);
-			
+
 		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new RubyDocumentProvider());
 	}

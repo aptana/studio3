@@ -41,9 +41,10 @@ import com.aptana.editor.dtd.parsing.DTDParserConstants;
 
 public class DTDEditor extends AbstractThemeableEditor
 {
-private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-	
-	/* (non-Javadoc)
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
 	 */
 	@Override
@@ -54,10 +55,10 @@ private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 			fSourceViewerConfiguration.dispose();
 			fSourceViewerConfiguration = null;
 		}
-		
+
 		super.dispose();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -65,7 +66,7 @@ private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
-		
+
 		fSourceViewerConfiguration = new DTDSourceViewerConfiguration(this.getPreferenceStore(), this);
 
 		this.setSourceViewerConfiguration(fSourceViewerConfiguration);

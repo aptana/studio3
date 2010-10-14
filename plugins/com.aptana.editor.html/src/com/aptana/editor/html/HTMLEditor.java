@@ -49,12 +49,13 @@ import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
-	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
-	
+	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"', '<', '>', '\u201C',
+		'\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+
 	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
 	 */
 	@Override
@@ -65,15 +66,15 @@ public class HTMLEditor extends AbstractThemeableEditor
 			fSourceViewerConfiguration.dispose();
 			fSourceViewerConfiguration = null;
 		}
-		
+
 		super.dispose();
 	}
-	
+
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
-		
+
 		fSourceViewerConfiguration = new HTMLSourceViewerConfiguration(getPreferenceStore(), this);
 
 		setSourceViewerConfiguration(fSourceViewerConfiguration);

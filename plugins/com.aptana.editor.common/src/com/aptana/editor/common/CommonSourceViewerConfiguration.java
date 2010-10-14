@@ -76,8 +76,7 @@ import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
-		ITopContentTypesProvider
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
@@ -109,7 +108,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 			fThemeChangeListener = null;
 		}
 	}
-	
+
 	/**
 	 * getAbstractThemeableEditor
 	 * 
@@ -228,8 +227,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
-		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer),
-				IDocument.DEFAULT_CONTENT_TYPE);
+		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
 	}
 
 	/*
@@ -255,7 +253,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.
 	 * source.ISourceViewer)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings( { "unchecked", "rawtypes" })
 	@Override
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
@@ -271,8 +269,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	public String getIndent()
 	{
-		boolean useSpaces = fPreferenceStore
-				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		boolean useSpaces = fPreferenceStore.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 
 		if (useSpaces)
 		{
@@ -408,8 +405,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	{
 		if (fTextEditor != null && fTextEditor.isEditable())
 		{
-			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor,
-					getConfiguredDocumentPartitioning(sourceViewer));
+			CommonCompositeReconcilingStrategy strategy = new CommonCompositeReconcilingStrategy(fTextEditor, getConfiguredDocumentPartitioning(sourceViewer));
 			CommonReconciler reconciler = new CommonReconciler(fTextEditor, strategy, false);
 
 			reconciler.setIsIncrementalReconciler(false);

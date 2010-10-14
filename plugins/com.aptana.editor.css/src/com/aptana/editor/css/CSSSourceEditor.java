@@ -74,7 +74,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 			fSourceViewerConfiguration.dispose();
 			fSourceViewerConfiguration = null;
 		}
-		
+
 		super.dispose();
 	}
 

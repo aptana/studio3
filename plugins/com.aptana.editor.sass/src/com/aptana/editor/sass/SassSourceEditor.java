@@ -66,7 +66,7 @@ public class SassSourceEditor extends AbstractThemeableEditor
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
-		
+
 		fSourceViewerConfiguration = new SassSourceViewerConfiguration(getPreferenceStore(), this);
 
 		setSourceViewerConfiguration(fSourceViewerConfiguration);
