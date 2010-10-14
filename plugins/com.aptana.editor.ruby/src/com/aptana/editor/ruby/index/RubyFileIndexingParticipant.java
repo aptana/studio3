@@ -35,7 +35,6 @@
 package com.aptana.editor.ruby.index;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -49,6 +48,7 @@ import org.jrubyparser.ast.Node;
 import org.jrubyparser.parser.ParserResult;
 
 import com.aptana.core.util.IOUtil;
+import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.ruby.RubyEditorPlugin;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
@@ -152,9 +152,9 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 			String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
-				for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+				for (TaskTag entry : CommentScanner.getTaskTags())
 				{
-					String tag = entry.getKey();
+					String tag = entry.getName();
 					if (!CommentScanner.isCaseSensitive())
 					{
 						tag = tag.toLowerCase();
@@ -167,7 +167,7 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 					String message = line.substring(index).trim();
 					int start = commentNode.getPosition().getStartOffset() + offset + index;
-					createTask(store, message, entry.getValue(), commentNode.getPosition().getStartLine() + lineOffset,
+					createTask(store, message, entry.getPriority(), commentNode.getPosition().getStartLine() + lineOffset,
 							start, start + message.length());
 				}
 				// FIXME This doesn't take the newline into account from split!
