@@ -99,8 +99,7 @@ public class RemoteNavigatorView extends CommonNavigator implements IRefreshable
 	{
 		// if the content of the remote category changed, refresh the root
 		if (element == null
-				|| (element instanceof IConnectionPointCategory && IBaseRemoteConnectionPoint.CATEGORY
-						.equals(((IConnectionPointCategory) element).getId())))
+				|| (element instanceof IConnectionPointCategory && ((IConnectionPointCategory) element).isRemote()))
 		{
 			refresh();
 		}
