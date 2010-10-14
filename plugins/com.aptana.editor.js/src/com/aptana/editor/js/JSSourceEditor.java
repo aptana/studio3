@@ -37,6 +37,7 @@ package com.aptana.editor.js;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
@@ -45,22 +46,53 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 
 public class JSSourceEditor extends AbstractThemeableEditor
 {
+	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (fSourceViewerConfiguration != null)
+		{
+			fSourceViewerConfiguration.dispose();
+			fSourceViewerConfiguration = null;
+		}
+
+		super.dispose();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
 		super.initializeEditor();
 
-		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
+		fSourceViewerConfiguration = new JSSourceViewerConfiguration(getPreferenceStore(), this);
+
+		setSourceViewerConfiguration(fSourceViewerConfiguration);
 		setDocumentProvider(new JSDocumentProvider());
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
 	@Override
 	protected FileService createFileService()
 	{
 		return new FileService(IJSParserConstants.LANGUAGE);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
 	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
@@ -71,6 +103,10 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		return outline;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
+	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
