@@ -629,6 +629,7 @@ public class GitIndex
 	private boolean doCommit(String commitMessage)
 	{
 		int exitCode = 1;
+		commitMessage = commitMessage.replace("\"", "\\\"");
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage);
 		if (result != null && !result.isEmpty())
 		{
