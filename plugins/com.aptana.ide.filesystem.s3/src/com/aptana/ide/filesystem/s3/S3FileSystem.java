@@ -7,6 +7,7 @@ import java.net.URI;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileSystem;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 public class S3FileSystem extends FileSystem
@@ -31,7 +32,7 @@ public class S3FileSystem extends FileSystem
 	}
 
 	@Override
-	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor)
+	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor) throws CoreException
 	{
 		if (!(root instanceof S3FileStore))
 			return null;
@@ -45,14 +46,11 @@ public class S3FileSystem extends FileSystem
 		}
 		catch (MalformedURLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw S3FileSystemPlugin.coreException(e);
 		}
-		return null;
 	}
 }
