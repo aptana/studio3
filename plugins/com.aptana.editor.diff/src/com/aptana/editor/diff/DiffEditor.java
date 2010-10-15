@@ -38,7 +38,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class DiffEditor extends AbstractThemeableEditor
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
@@ -47,5 +50,4 @@ public class DiffEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new DiffSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new DiffDocumentProvider());
 	}
-
 }

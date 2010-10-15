@@ -36,6 +36,8 @@ package com.aptana.editor.js.inferencing;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Path;
+
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 
@@ -98,8 +100,7 @@ public class ObjectInferencingTests extends InferencingTestsBase
 	 */
 	public void testNestedObjects()
 	{
-		String source = this.getContent("inferencing/nested-objects.js");
-		List<String> types = this.getLastStatementTypes(source);
+		List<String> types = this.getLastStatementTypes(Path.fromPortableString("inferencing/nested-objects.js"));
 
 		assertEquals(1, types.size());
 		String typeName = types.get(0);

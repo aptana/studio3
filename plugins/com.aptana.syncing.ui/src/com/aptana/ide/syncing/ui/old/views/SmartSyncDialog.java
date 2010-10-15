@@ -131,7 +131,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		DirectionToolBar.Client, OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {
 
-	private static final String ICON = "icons/full/obj16/direction_both.gif"; //$NON-NLS-1$
+	private static final String ICON = "icons/full/elcl16/arrow_up_down.png"; //$NON-NLS-1$
 	private static final String ICON_UPDATE = "icons/full/obj16/sync.png"; //$NON-NLS-1$
 	private static final String ICON_SKIP = "icons/full/obj16/skip.png"; //$NON-NLS-1$
 	private static final String ICON_DELETE = "icons/full/obj16/delete.png"; //$NON-NLS-1$
