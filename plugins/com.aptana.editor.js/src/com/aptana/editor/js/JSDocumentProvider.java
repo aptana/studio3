@@ -35,9 +35,6 @@
 package com.aptana.editor.js;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.core.runtime.content.IContentTypeManager;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
@@ -47,7 +44,10 @@ import com.aptana.editor.common.CommonEditorPlugin;
 
 public class JSDocumentProvider extends CommonDocumentProvider
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
+	 */
 	@Override
 	public void connect(Object element) throws CoreException
 	{
@@ -56,23 +56,19 @@ public class JSDocumentProvider extends CommonDocumentProvider
 		IDocument document = getDocument(element);
 		if (document != null)
 		{
-			IDocumentPartitioner partitioner = new FastPartitioner(new JSSourcePartitionScanner(),
-					JSSourceConfiguration.CONTENT_TYPES);
+			IDocumentPartitioner partitioner = new FastPartitioner(new JSSourcePartitionScanner(), JSSourceConfiguration.CONTENT_TYPES);
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
-					JSSourceConfiguration.getDefault());
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, JSSourceConfiguration.getDefault());
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
 	protected String getDefaultContentType(String filename)
 	{
-		IContentTypeManager manager = Platform.getContentTypeManager();
-		IContentType type = manager.getContentType(IJSConstants.CONTENT_TYPE_JSON);
-		if (type.isAssociatedWith(filename))
-		{
-			return IJSConstants.CONTENT_TYPE_JSON;
-		}		
 		return IJSConstants.CONTENT_TYPE_JS;
 	}
 }
