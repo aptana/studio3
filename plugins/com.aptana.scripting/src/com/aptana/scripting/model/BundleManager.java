@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -1593,7 +1594,13 @@ public class BundleManager
 	{
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			File projectDirectory = project.getLocation().toFile();
+			IPath location = project.getLocation();
+			if (location == null)
+			{
+				// Log that it was null somehow to track down when this occurs?
+				continue;
+			}
+			File projectDirectory = location.toFile();
 			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
 
 			for (File bundle : this.getBundleDirectories(bundlesDirectory))
