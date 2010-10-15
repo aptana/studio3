@@ -427,6 +427,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
+							positions.add(cursorPosition + 4 + element.getName().length());
 						}
 						else
 						{
