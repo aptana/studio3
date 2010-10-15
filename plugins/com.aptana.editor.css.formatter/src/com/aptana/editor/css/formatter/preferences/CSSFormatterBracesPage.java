@@ -12,24 +12,26 @@ import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.ui.util.SWTFactory;
 
-public class CSSFormatterCommentsPage extends FormatterModifyTabPage
+public class CSSFormatterBracesPage extends FormatterModifyTabPage
 {
-	public CSSFormatterCommentsPage(IFormatterModifyDialog dialog)
+//	private final String[] tabOptionItems = new String[] { 1, 2, 3 };
+	private final String[] tabOptionNames = new String[] { "Same line", "Next line", "Next line indented" };
+
+	public CSSFormatterBracesPage(IFormatterModifyDialog dialog)
 	{
 		super(dialog);
 	}
 
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group commentGroup = SWTFactory.createGroup(parent, "Comments Formatting", 2, 1, GridData.FILL_HORIZONTAL);
-		manager.createCheckbox(commentGroup, CSSFormatterConstants.WRAP_COMMENTS, "Enable comments wrapping");
-		manager.createNumber(commentGroup, CSSFormatterConstants.WRAP_COMMENTS_LENGTH, "Maximum line width");
-
+		Group bracesGroup = SWTFactory.createGroup(parent, "Brace positions", 1, 2, GridData.FILL_HORIZONTAL);
+		
+//		manager.createCombo(parent, /*some constant for braces indent*/, "Blocks", tabOptionItems, tabOptionNames);
 	}
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("comments-preview.css");
+		return getClass().getResource("braces-preview.css");
 	}
 
 }
