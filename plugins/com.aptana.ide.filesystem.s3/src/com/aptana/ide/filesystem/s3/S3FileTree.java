@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.filesystem.provider.FileTree;
 
@@ -18,8 +17,10 @@ import com.amazon.s3.ListEntry;
  * 
  * @author cwilliams
  */
-public class S3FileTree extends FileTree implements IFileTree
+public class S3FileTree extends FileTree
 {
+
+	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	private List<ListEntry> entries;
 
@@ -48,7 +49,7 @@ public class S3FileTree extends FileTree implements IFileTree
 	private FileInfo generateFileInfo(ListEntry match)
 	{
 		String name = match.key;
-		int lastSlash = name.lastIndexOf("/");
+		int lastSlash = name.lastIndexOf(SEPARATOR);
 		boolean isDirectory = false;
 		if (lastSlash != -1)
 		{
@@ -56,14 +57,14 @@ public class S3FileTree extends FileTree implements IFileTree
 			{
 				name = name.substring(0, lastSlash);
 				isDirectory = true;
-				lastSlash = name.lastIndexOf("/");
+				lastSlash = name.lastIndexOf(SEPARATOR);
 				if (lastSlash != -1)
 					name = name.substring(lastSlash + 1);
 			}
 			else
 			{
 				name = name.substring(lastSlash);
-				if (name.startsWith("/"))
+				if (name.startsWith(SEPARATOR))
 					name = name.substring(1);
 			}
 		}
@@ -80,24 +81,24 @@ public class S3FileTree extends FileTree implements IFileTree
 	{
 		S3FileStore s3Store = (S3FileStore) store;
 		String key = s3Store.getKey();
-		if (key.startsWith("/"))
+		if (key.startsWith(SEPARATOR))
 			key = key.substring(1);
 		// Find all the entries that have the key as prefix
 		List<ListEntry> matches = new ArrayList<ListEntry>();
 		for (ListEntry entry : entries)
 		{
 			String relative = entry.key;
-			if (relative.startsWith("/"))
+			if (relative.startsWith(SEPARATOR))
 				relative = relative.substring(1);
-			if (!(key.length() == 0 || relative.startsWith(key + "/")))
+			if (!(key.length() == 0 || relative.startsWith(key + SEPARATOR)))
 				continue;
 			// Only limit to direct children!
 			relative = relative.substring(key.length());
-			if (relative.startsWith("/"))
+			if (relative.startsWith(SEPARATOR))
 				relative = relative.substring(1);
-			if (relative.endsWith("/"))
+			if (relative.endsWith(SEPARATOR))
 				relative = relative.substring(0, relative.length() - 1);
-			if (relative.length() == 0 || relative.indexOf("/") != -1)
+			if (relative.length() == 0 || relative.indexOf(SEPARATOR) != -1)
 				continue;
 			matches.add(entry);
 		}
@@ -115,7 +116,7 @@ public class S3FileTree extends FileTree implements IFileTree
 		for (ListEntry match : matches)
 		{
 			String childName = match.key;
-			if (childName.endsWith("/"))
+			if (childName.endsWith(SEPARATOR))
 				childName = childName.substring(0, childName.length() - 1);
 			childrenStores.add(s3Store.getChild(childName));
 		}
@@ -133,9 +134,9 @@ public class S3FileTree extends FileTree implements IFileTree
 		for (ListEntry entry : entries)
 		{
 			String entryKey = entry.key;
-			if (entryKey.startsWith("/"))
+			if (entryKey.startsWith(SEPARATOR))
 				entryKey = entryKey.substring(1);
-			if (entryKey.endsWith("/"))
+			if (entryKey.endsWith(SEPARATOR))
 				entryKey = entryKey.substring(0, entryKey.length() - 1);
 			if (entryKey.equals(key))
 				return generateFileInfo(entry);

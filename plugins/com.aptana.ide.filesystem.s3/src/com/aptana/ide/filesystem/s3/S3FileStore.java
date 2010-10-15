@@ -35,14 +35,19 @@ import com.amazon.s3.Response;
 public class S3FileStore extends FileStore
 {
 
+	private static final String DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss z"; //$NON-NLS-1$
+	private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
+	private static final String CONTENT_LENGTH = "Content-Length"; //$NON-NLS-1$
+	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 	private static final String FOLDER_SUFFIX = "_$folder$"; //$NON-NLS-1$
+
 	private URI uri;
 	private Path path;
 
 	public S3FileStore(URI uri)
 	{
 		this.uri = uri;
-		this.path = new Path(uri.getPath().replaceAll("%2F", "/")); //$NON-NLS-1$ //$NON-NLS-2$
+		this.path = new Path(uri.getPath().replaceAll("%2F", SEPARATOR)); //$NON-NLS-1$
 	}
 
 	@Override
@@ -73,12 +78,12 @@ public class S3FileStore extends FileStore
 				try
 				{
 					String relative = entry.key.substring(prefix.length());
-					if (prefix.length() == 0 || relative.startsWith("/"))
+					if (prefix.length() == 0 || relative.startsWith(SEPARATOR))
 					{ // actual children
 						if (prefix.length() > 0)
 							relative = relative.substring(1);
 						// only add direct children (so take up to next path separator)
-						int index = relative.indexOf("/");
+						int index = relative.indexOf(SEPARATOR);
 						if (index != -1)
 						{
 							relative = relative.substring(0, index);
@@ -119,6 +124,7 @@ public class S3FileStore extends FileStore
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	String[] getBuckets() throws MalformedURLException, IOException
 	{
 		// We're outside any buckets. List the buckets!
@@ -142,7 +148,7 @@ public class S3FileStore extends FileStore
 	private String getPrefix()
 	{
 		String prefix = path.removeFirstSegments(1).toPortableString();
-		if (prefix.startsWith("/"))
+		if (prefix.startsWith(SEPARATOR))
 		{
 			prefix = prefix.substring(1);
 		}
@@ -168,15 +174,15 @@ public class S3FileStore extends FileStore
 				{
 					info.setExists(true);
 					info.setDirectory(false);
-					String length = connection.getHeaderField("Content-Length");
+					String length = connection.getHeaderField(CONTENT_LENGTH);
 					if (length != null)
 						info.setLength(Long.parseLong(length));
 					try
 					{
-						String lastModified = connection.getHeaderField("Last-Modified");
+						String lastModified = connection.getHeaderField(LAST_MODIFIED);
 						if (lastModified != null)
 						{
-							Date date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z").parse(lastModified);
+							Date date = new SimpleDateFormat(DATE_FORMAT).parse(lastModified);
 							info.setLastModified(date.getTime());
 						}
 					}
@@ -276,25 +282,25 @@ public class S3FileStore extends FileStore
 
 	private AWSAuthConnection getAWSConnection()
 	{
-		if (getBucket() != null && getBucket().indexOf(".") != -1)
+		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
 			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false);
 		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey());
 	}
 
 	private String getSecretAccessKey()
 	{
-		return uri.getUserInfo().split(":")[1];
+		return uri.getUserInfo().split(":")[1]; //$NON-NLS-1$
 	}
 
 	private String getAccessKey()
 	{
-		return uri.getUserInfo().split(":")[0];
+		return uri.getUserInfo().split(":")[0]; //$NON-NLS-1$
 	}
 
 	String getKey()
 	{
 		String key = path.removeFirstSegments(1).toPortableString();
-		if (key.startsWith("/") && key.length() > 1)
+		if (key.startsWith(SEPARATOR) && key.length() > 1)
 			return key.substring(1);
 		return key;
 	}

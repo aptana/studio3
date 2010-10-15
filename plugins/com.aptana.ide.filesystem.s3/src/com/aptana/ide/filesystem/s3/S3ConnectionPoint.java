@@ -73,8 +73,6 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	private char[] password;
 	private String host = DEFAULT_HOST;
 
-	private AWSAuthConnection connection;
-
 	/**
 	 * Default constructor
 	 */
@@ -284,7 +282,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		}
 		catch (Exception e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 	}
 
