@@ -63,6 +63,7 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.amazon.s3.AWSAuthConnection;
 import com.amazon.s3.Bucket;
+import com.amazon.s3.CallingFormat;
 import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
@@ -197,11 +198,19 @@ public class S3FileStore extends FileStore
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException
 	{
 		FileInfo info = new FileInfo(getName());
-		if (getKey() == null || getKey().length() == 0)
+		if (isBucket())
 		{
 			// we're a bucket
-			info.setExists(true);
-			info.setDirectory(true);
+			try
+			{
+				boolean exists = getAWSConnection().checkBucketExists(getBucket());
+				info.setExists(exists);
+				info.setDirectory(true);
+			}
+			catch (IOException e)
+			{
+				throw S3FileSystemPlugin.coreException(e);
+			}
 		}
 		else
 		{
@@ -252,6 +261,11 @@ public class S3FileStore extends FileStore
 			}
 		}
 		return info;
+	}
+
+	private boolean isBucket()
+	{
+		return getKey() == null || getKey().length() == 0;
 	}
 
 	@Override
@@ -321,8 +335,10 @@ public class S3FileStore extends FileStore
 	AWSAuthConnection getAWSConnection()
 	{
 		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
-			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false);
-		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey());
+			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false, uri.getHost(),
+					CallingFormat.getPathCallingFormat());
+		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), true, uri.getHost(),
+				CallingFormat.getPathCallingFormat());
 	}
 
 	private char[] promptPassword(String title, String message)
@@ -407,21 +423,32 @@ public class S3FileStore extends FileStore
 	{
 		try
 		{
-			// TODO There's got to be a faster way to delete the subdirectory structure using listEntries and filtering
-			// down to just children (not peers starting with same prefix)
-			// Delete depth first
-			IFileStore[] children = childStores(options, monitor);
-			for (IFileStore child : children)
+			if (isBucket())
 			{
-				child.delete(options, monitor);
+				// Deleting a bucket!
+				Response resp = getAWSConnection().deleteBucket(getBucket(), null);
+				resp.connection.getResponseCode(); // force connection to finish
 			}
+			else
+			{
+				// TODO There's got to be a faster way to delete the subdirectory structure using listEntries and
+				// filtering
+				// down to just children (not peers starting with same prefix)
+				// Delete depth first
+				IFileStore[] children = childStores(options, monitor);
+				for (IFileStore child : children)
+				{
+					child.delete(options, monitor);
+				}
 
-			Response resp = getAWSConnection().delete(getBucket(), getKey(), null);
-			resp.connection.getResponseCode(); // force connection to finish
+				String key = getKey();
+				Response resp = getAWSConnection().delete(getBucket(), key, null);
+				resp.connection.getResponseCode(); // force connection to finish
 
-			// Handle if we're faking a folder. try to delete the fake folder suffix file.
-			resp = getAWSConnection().delete(getBucket(), getKey() + FOLDER_SUFFIX, null);
-			resp.connection.getResponseCode(); // force connection to finish
+				// Handle if we're faking a folder. try to delete the fake folder suffix file.
+				resp = getAWSConnection().delete(getBucket(), key + FOLDER_SUFFIX, null);
+				resp.connection.getResponseCode(); // force connection to finish
+			}
 		}
 		catch (MalformedURLException e)
 		{
@@ -456,9 +483,24 @@ public class S3FileStore extends FileStore
 	{
 		try
 		{
-			HttpURLConnection connection = getAWSConnection().putRaw(getBucket(), getKey() + FOLDER_SUFFIX, null);
-			connection.getOutputStream().write(new byte[] {});
-			connection.getResponseCode();
+			HttpURLConnection connection = null;
+			if (isBucket())
+			{
+				// Empty key means we're actually creating a bucket!
+				Response resp = getAWSConnection().createBucket(getBucket(), null, null);
+				connection = resp.connection;
+			}
+			else
+			{
+				connection = getAWSConnection().putRaw(getBucket(), getKey() + FOLDER_SUFFIX, null);
+				connection.getOutputStream().write(new byte[] {});
+			}
+			int responseCode = connection.getResponseCode();
+			if (responseCode >= 400)
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
+						"Failed to create folder/bucket with error code: " + responseCode));
+			}
 		}
 		catch (MalformedURLException e)
 		{
