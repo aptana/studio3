@@ -225,7 +225,7 @@
                icon="icons/full/elcl16/arrow_up_down.png"
                id="aptanasynchronize"
                label="%Menu.Synchronize.name"
-               path="group.synchronize">
+               path="group.edit">
             <groupMarker
                   name="syncingGroup">
             </groupMarker>
