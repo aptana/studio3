@@ -48,11 +48,21 @@ public abstract class AbstractFormatterNode implements IFormatterNode {
 		return document.getInt(key);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumeNewLines()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
 	 */
-	public boolean shouldIgnorePreviousNewLines()
+	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		return false;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
+	 */
+	public int getSpacesCountBefore()
+	{
+		return 0;
 	}
 }

@@ -13,6 +13,7 @@ package com.aptana.formatter.nodes;
 
 import java.util.Stack;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 
@@ -53,11 +54,18 @@ public class AbstractFormatterNodeBuilder
 	{
 		if (parentNode.getEndOffset() < pos)
 		{
-			if (node.shouldIgnorePreviousNewLines())
+			// Check if the node should consume any gaps that we have to previous node end offset.
+			// This way, we can consume all white-spaces in between.
+			if (node.shouldConsumePreviousWhiteSpaces())
 			{
 				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
 				if (text.trim().length() == 0)
 				{
+					int spacesToMaintain = node.getSpacesCountBefore();
+					if (spacesToMaintain > 0)
+					{
+						// StringUtil.
+					}
 					return;
 				}
 			}

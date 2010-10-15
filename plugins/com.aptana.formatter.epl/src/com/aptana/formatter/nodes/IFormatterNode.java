@@ -31,11 +31,17 @@ public interface IFormatterNode
 	IFormatterDocument getDocument();
 
 	/**
-	 * Returns true if the formatter node should ignore and consume any new lines that appears between the
-	 * <b>previous</b> node and this one.
+	 * Returns true if the formatter node should ignore and consume any white-spaces that appear between the
+	 * <b>previous</b> node and this node.
 	 * 
-	 * @return True if these new-lines should be consumed; False, otherwise.
+	 * @return True if these white-spaces should be consumed; False, otherwise.
 	 */
-	boolean shouldIgnorePreviousNewLines();
+	boolean shouldConsumePreviousWhiteSpaces();
 
+	/**
+	 * Returns the number of spaces that will be maintained or inserted before this node.
+	 * 
+	 * @return The number of spaces to maintain.
+	 */
+	int getSpacesCountBefore();
 }
