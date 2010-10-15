@@ -55,16 +55,4 @@ public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNo
 	{
 		super(document);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
-	 */
-	@Override
-	protected boolean isAddingNewLine()
-	{
-		// TODO - Set this one to true in case we'll decide the break multiple boolean
-		// expressions in this while condition to a separate line.
-		return false;
-	}
 }

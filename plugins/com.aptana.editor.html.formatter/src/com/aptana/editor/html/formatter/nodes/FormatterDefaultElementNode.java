@@ -72,12 +72,21 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
 		return !set.contains(element);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	protected boolean isAddingEndNewLine()
+	{
+		return isAddingBeginNewLine();
 	}
 
 	/*

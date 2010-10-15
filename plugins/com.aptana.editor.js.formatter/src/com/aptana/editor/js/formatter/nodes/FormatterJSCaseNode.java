@@ -58,13 +58,21 @@ public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		// always add a new line in front of a 'case'
 		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	protected boolean isAddingEndNewLine()
+	{
+		return isAddingBeginNewLine();
 	}
 
 	/*

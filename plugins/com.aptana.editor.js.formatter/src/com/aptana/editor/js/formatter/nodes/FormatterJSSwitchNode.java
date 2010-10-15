@@ -58,7 +58,7 @@ public class FormatterJSSwitchNode extends FormatterJSBlockNode
 	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingNewLine()
 	 */
 	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
 	}

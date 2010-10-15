@@ -33,7 +33,11 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		boolean addingNewLine = isAddingNewLine();
+		if (shouldConsumePreviousWhiteSpaces() && getSpacesCountBefore() > 0)
+		{
+			writeSpaces(visitor, context, getSpacesCountBefore());
+		}
+		boolean addingNewLine = isAddingBeginNewLine();
 		if (addingNewLine && !visitor.endsWithNewLine())
 		{
 			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add

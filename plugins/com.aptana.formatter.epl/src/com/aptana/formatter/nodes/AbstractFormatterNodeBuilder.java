@@ -13,13 +13,11 @@ package com.aptana.formatter.nodes;
 
 import java.util.Stack;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 
 public class AbstractFormatterNodeBuilder
 {
-
 	private final Stack<IFormatterContainerNode> stack = new Stack<IFormatterContainerNode>();
 
 	protected void start(IFormatterContainerNode root)
@@ -61,11 +59,6 @@ public class AbstractFormatterNodeBuilder
 				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
 				if (text.trim().length() == 0)
 				{
-					int spacesToMaintain = node.getSpacesCountBefore();
-					if (spacesToMaintain > 0)
-					{
-						// StringUtil.
-					}
 					return;
 				}
 			}

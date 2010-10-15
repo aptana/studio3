@@ -78,13 +78,22 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
 	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
 				JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	protected boolean isAddingEndNewLine()
+	{
+		return true;
 	}
 
 	/*

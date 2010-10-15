@@ -54,6 +54,7 @@ import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSContinueNode;
 import com.aptana.editor.js.parsing.ast.JSDefaultNode;
 import com.aptana.editor.js.parsing.ast.JSDoNode;
+import com.aptana.editor.js.parsing.ast.JSErrorNode;
 import com.aptana.editor.js.parsing.ast.JSFinallyNode;
 import com.aptana.editor.js.parsing.ast.JSForInNode;
 import com.aptana.editor.js.parsing.ast.JSForNode;
@@ -136,6 +137,16 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(bodyNode, body.getEndingOffset());
 			int end = locateColonOrSemicolonInLine(bodyNode.getEndOffset() + 1, document);
 			bodyNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSErrorNode)
+		 */
+		@Override
+		public void visit(JSErrorNode node)
+		{
+			// do nothing. Avoid visiting the children.
 		}
 
 		/*

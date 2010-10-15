@@ -55,10 +55,21 @@ public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
 	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
+	{
+		// TODO preferences?
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	@Override
+	protected boolean isAddingEndNewLine()
 	{
 		// TODO preferences?
 		return false;

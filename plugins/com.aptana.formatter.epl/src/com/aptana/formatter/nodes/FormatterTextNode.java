@@ -39,6 +39,10 @@ public class FormatterTextNode extends AbstractFormatterNode implements
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor)
 			throws Exception {
+		if (shouldConsumePreviousWhiteSpaces() && getSpacesCountBefore() > 0)
+		{
+			writeSpaces(visitor, context, getSpacesCountBefore());
+		}
 		visitor.write(context, getStartOffset(), getEndOffset());
 	}
 

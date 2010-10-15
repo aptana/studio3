@@ -57,10 +57,10 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
 	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		// adds a new line before the start curly bracket
 		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(

@@ -68,7 +68,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, false);
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT, false);
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT, false);
-		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, false);
+		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, true);
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT, false);
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT, false);
 		store.setDefault(JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT, false);

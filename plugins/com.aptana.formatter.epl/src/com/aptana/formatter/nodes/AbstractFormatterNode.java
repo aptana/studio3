@@ -11,27 +11,34 @@
  *******************************************************************************/
 package com.aptana.formatter.nodes;
 
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 
-public abstract class AbstractFormatterNode implements IFormatterNode {
+public abstract class AbstractFormatterNode implements IFormatterNode
+{
 
+	private static final String SPACES = "                                                    "; //$NON-NLS-1$
 	private final IFormatterDocument document;
 
 	/**
 	 * @param document
 	 */
-	public AbstractFormatterNode(IFormatterDocument document) {
+	public AbstractFormatterNode(IFormatterDocument document)
+	{
 		this.document = document;
 	}
 
 	/*
 	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getDocument()
 	 */
-	public IFormatterDocument getDocument() {
+	public IFormatterDocument getDocument()
+	{
 		return document;
 	}
 
-	protected String getShortClassName() {
+	protected String getShortClassName()
+	{
 		final String name = getClass().getName();
 		int index = name.lastIndexOf('.');
 		return index > 0 ? name.substring(index + 1) : name;
@@ -40,12 +47,41 @@ public abstract class AbstractFormatterNode implements IFormatterNode {
 	/*
 	 * @see java.lang.Object#toString()
 	 */
-	public String toString() {
+	public String toString()
+	{
 		return getShortClassName();
 	}
 
-	protected int getInt(String key) {
+	protected int getInt(String key)
+	{
 		return document.getInt(key);
+	}
+
+	/**
+	 * Write spaces.
+	 * 
+	 * @param visitor
+	 * @param context
+	 * @param count
+	 */
+	protected void writeSpaces(IFormatterWriter visitor, IFormatterContext context, int count)
+	{
+		if (count > 0)
+		{
+			if (SPACES.length() > count)
+			{
+				visitor.writeText(context, SPACES.substring(0, count));
+			}
+			else
+			{
+				StringBuilder builder = new StringBuilder(SPACES.length() * 2);
+				while (builder.length() < count)
+				{
+					builder.append(SPACES);
+				}
+				visitor.writeText(context, builder.substring(0, count));
+			}
+		}
 	}
 
 	/*
@@ -56,7 +92,7 @@ public abstract class AbstractFormatterNode implements IFormatterNode {
 	{
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()

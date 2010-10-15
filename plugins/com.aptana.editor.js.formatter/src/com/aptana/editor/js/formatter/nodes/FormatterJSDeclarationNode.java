@@ -70,10 +70,10 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
 	@Override
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
 		// To change this behavior, it's recommended to create a designated subclass and override this method to return
 		// the value set in the preferences.
@@ -93,16 +93,19 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 			case JSNodeTypes.NAME_VALUE_PAIR:
 			case JSNodeTypes.FUNCTION:
 				return false;
-			case JSNodeTypes.DO:
-			case JSNodeTypes.TRY:
-			case JSNodeTypes.SWITCH:
-				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
+//			case JSNodeTypes.DO:
+//			case JSNodeTypes.TRY:
+//			case JSNodeTypes.SWITCH:
+//			case JSNodeTypes.FOR:
+//			case JSNodeTypes.FOR_IN:
+//			case JSNodeTypes.WHILE:
+//				return !hasBlockedChild || getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
 			case JSNodeTypes.IF:
 				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT);
 			case JSNodeTypes.CATCH:
-				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
+				return !hasBlockedChild || getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
 			case JSNodeTypes.FINALLY:
-				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
+				return !hasBlockedChild || getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
 		}
 		return true;
 	}

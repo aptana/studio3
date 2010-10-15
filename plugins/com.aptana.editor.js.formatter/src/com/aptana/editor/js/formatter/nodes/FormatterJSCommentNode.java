@@ -66,9 +66,4 @@ public class FormatterJSCommentNode extends FormatterCommentNode
 	{
 		return JSFormatterConstants.WRAP_COMMENTS;
 	}
-	
-	protected boolean isAddingNewLine()
-	{
-		return true;
-	}
 }

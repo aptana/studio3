@@ -122,21 +122,22 @@ public class FormatterWriter implements IFormatterWriter
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.IFormatterWriter#removeTrailingLineBreaks()
 	 */
 	public void removeTrailingLineBreaks()
 	{
 		int length = writer.length();
-//		for (int i = length - 1; i >= 0; i--)
-//		{
-//			char c = writer.charAt(i);
-//			if (c == '\n') {
-//				
-//			}
-//		}
+		// for (int i = length - 1; i >= 0; i--)
+		// {
+		// char c = writer.charAt(i);
+		// if (c == '\n') {
+		//				
+		// }
+		// }
 	}
-	
+
 	public void skipNextLineBreaks(IFormatterContext context)
 	{
 		if (!keepLines)

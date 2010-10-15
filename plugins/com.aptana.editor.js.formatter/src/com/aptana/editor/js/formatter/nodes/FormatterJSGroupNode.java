@@ -63,16 +63,4 @@ public class FormatterJSGroupNode extends FormatterBlockWithBeginEndNode
 	{
 		return getDocument().getBoolean(JSFormatterConstants.INDENT_GROUP_BODY);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
-	 */
-	@Override
-	protected boolean isAddingNewLine()
-	{
-		// TODO preference key?
-		return false;
-	}
-
 }
