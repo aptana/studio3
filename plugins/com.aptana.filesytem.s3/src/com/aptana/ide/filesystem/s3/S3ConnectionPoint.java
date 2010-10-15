@@ -73,6 +73,8 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	private char[] password;
 	private String host = DEFAULT_HOST;
 
+	private boolean isConnected;
+
 	/**
 	 * Default constructor
 	 */
@@ -204,7 +206,12 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	{
 		try
 		{
-			return new URI(TYPE, getAccessKey(), getHost(), getPort(), getPath().toString(), (String) null,
+			String userInfo = getAccessKey();
+			if (password != null && password.length > 0)
+			{
+				userInfo += ":" + new String(password);
+			}
+			return new URI(TYPE, userInfo, getHost(), getPort(), getPath().toString(), (String) null,
 					(String) null);
 		}
 		catch (URISyntaxException e)
@@ -267,6 +274,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 				throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID,
 						"Failed to connect. Invalid credentials?"));
 			}
+			isConnected = true;
 		}
 		catch (CoreException e)
 		{
@@ -286,6 +294,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	public void disconnect(IProgressMonitor monitor) throws CoreException
 	{
 		// do nothing
+		isConnected = false;
 	}
 
 	/*
@@ -295,7 +304,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	@Override
 	public boolean isConnected()
 	{
-		return true;
+		return isConnected;
 	}
 
 	/*
@@ -305,7 +314,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	@Override
 	public boolean canDisconnect()
 	{
-		return true;
+		return isConnected();
 	}
 
 }
