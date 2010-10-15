@@ -9,11 +9,11 @@
 
 package com.amazon.s3;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -227,8 +227,7 @@ public class AWSAuthConnection {
     {
     	HttpURLConnection request =
     		makeRequest("PUT", bucket, Utils.urlencode(key), null, headers);
-
-    	request.setDoOutput(true);
+      	request.setDoOutput(true);
     	return request;
     }
 
@@ -313,15 +312,15 @@ public class AWSAuthConnection {
     }
     
     public HttpURLConnection getRaw(String bucket, String key, Map headers)
-    throws MalformedURLException, IOException
+        throws MalformedURLException, IOException
     {
-    	return makeRequest("GET", bucket, Utils.urlencode(key), null, headers);
+      	return makeRequest("GET", bucket, Utils.urlencode(key), null, headers);
     }
-    
+        
     public HttpURLConnection head(String bucket, String key, Map headers)
-    	throws MalformedURLException, IOException
+      	throws MalformedURLException, IOException
     {
-    	return makeRequest("HEAD", bucket, Utils.urlencode(key), null, headers);
+      	return makeRequest("HEAD", bucket, Utils.urlencode(key), null, headers);
     }
 
     /**

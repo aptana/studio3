@@ -106,8 +106,7 @@ public class S3FileStore extends FileStore
 				}
 				catch (Exception e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 				}
 			}
 			return keys.toArray(new String[keys.size()]);
@@ -225,8 +224,7 @@ public class S3FileStore extends FileStore
 		}
 		catch (URISyntaxException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 		}
 		return null;
 	}
@@ -255,8 +253,7 @@ public class S3FileStore extends FileStore
 		}
 		catch (URISyntaxException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
 		}
 		return null;
 	}
@@ -528,7 +525,7 @@ public class S3FileStore extends FileStore
 		String prefix = getPrefix();
 		if (prefix != null && prefix.trim().length() == 0)
 			prefix = null;
-		// TODO If the list is truncated we need to grab the last entry as a marker and continually iterate and combine
+		// FIXME If the list is truncated we need to grab the last entry as a marker and continually iterate and combine
 		// responses!
 		ListBucketResponse resp = getAWSConnection().listBucket(getBucket(), prefix, null, null, null);
 		return resp.entries;
