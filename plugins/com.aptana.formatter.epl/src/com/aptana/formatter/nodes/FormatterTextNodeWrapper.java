@@ -56,4 +56,19 @@ public class FormatterTextNodeWrapper implements IFormatterTextNode {
 		return target.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
+	 */
+	public int getSpacesCountBefore()
+	{
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return false;
+	}
 }

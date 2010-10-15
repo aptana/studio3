@@ -58,10 +58,20 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldIgnorePreviousNewLines()
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
 	 */
 	@Override
-	public boolean shouldIgnorePreviousNewLines()
+	public int getSpacesCountBefore()
+	{
+		return 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		return true;
 	}
