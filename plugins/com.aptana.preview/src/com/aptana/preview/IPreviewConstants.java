@@ -35,66 +35,13 @@
 
 package com.aptana.preview;
 
-import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.ui.IEditorInput;
+import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * @author Max Stepanov
  *
  */
-public final class SourceConfig {
+public interface IPreviewConstants {
 
-	private IEditorInput editorInput;
-	private IProject project;
-	private IPath location;
-	private String content;
-	private IFileStore fileStore;
-	
-	/**
-	 * 
-	 */
-	public SourceConfig(IEditorInput editorInput, IProject project, IPath location, String content) {
-		this.editorInput = editorInput;
-		this.project = project;
-		this.location = location;
-		this.content = content;
-	}
-
-	/**
-	 * @return the editorInput
-	 */
-	public IEditorInput getEditorInput() {
-		return editorInput;
-	}
-
-	/**
-	 * @return the project
-	 */
-	public IProject getProject() {
-		return project;
-	}
-
-	/**
-	 * @return the location
-	 */
-	public IPath getLocation() {
-		return location;
-	}
-
-	/**
-	 * @return the fileStore
-	 */
-	public IFileStore getFileStore() {
-		return fileStore;
-	}
-
-	/**
-	 * @return the content
-	 */
-	public String getContent() {
-		return content;
-	}
-
+	public QualifiedName PROJECT_PREVIEW_SERVER = new QualifiedName(Activator.PLUGIN_ID, "projectPreviewServer");
 }

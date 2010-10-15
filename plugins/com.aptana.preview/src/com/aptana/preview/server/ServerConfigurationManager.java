@@ -182,7 +182,7 @@ public class ServerConfigurationManager {
 		}
 	}
 
-	public AbstractWebServerConfiguration createConnectionPoint(String typeId) throws CoreException {
+	public AbstractWebServerConfiguration createServerConfiguration(String typeId) throws CoreException {
 		AbstractWebServerConfiguration serverConfiguration  = null;		
 		IConfigurationElement element = configurationElements.get(typeId);
 		if (element != null) {
@@ -192,6 +192,36 @@ public class ServerConfigurationManager {
 			}
 		}
 		return serverConfiguration;
+	}
+	
+	public void addServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
+		if (serverConfiguration == null) {
+			throw new IllegalArgumentException();
+		}
+		if (!serverConfigurations.contains(serverConfiguration)) {
+			serverConfigurations.add(serverConfiguration);
+		}
+	}
+	
+	public void removeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
+		if (serverConfigurations.contains(serverConfiguration)) {
+			serverConfigurations.remove(serverConfiguration);
+		}		
+	}
+	
+	public List<AbstractWebServerConfiguration> getServerConfigurations() {
+		return Collections.unmodifiableList(serverConfigurations);
+	}
+	
+	public AbstractWebServerConfiguration findServerConfiguration(String name) {
+		synchronized (serverConfigurations) {
+			for (AbstractWebServerConfiguration i : serverConfigurations) {
+				if (name.equals(i.getName())) {
+					return i;
+				}
+			}
+		}
+		return null;
 	}
 
 	private IMemento storeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {

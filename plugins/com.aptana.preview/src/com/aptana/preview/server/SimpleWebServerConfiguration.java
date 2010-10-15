@@ -37,13 +37,17 @@ package com.aptana.preview.server;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.preview.Activator;
 
 /**
@@ -65,6 +69,17 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 	public URL resolve(IFileStore file) {
 		if (!isValid()) {
 			return null;
+		}
+		IPath relativePath = EFSUtils.getRelativePath(documentRoot, file);
+		if (relativePath != null) {
+			try {
+				URI uri = URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
+				return uri.toURL();
+			} catch (URISyntaxException e) {
+				Activator.log(e);
+			} catch (MalformedURLException e) {
+				Activator.log(e);
+			}
 		}
 		return null;
 	}

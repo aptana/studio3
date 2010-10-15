@@ -35,12 +35,16 @@
 
 package com.aptana.preview.internal.impl;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
+import java.net.URL;
 
+import org.eclipse.core.runtime.CoreException;
+
+import com.aptana.preview.IPreviewConstants;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.SourceConfig;
+import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.ServerConfigurationManager;
 
 /**
  * @author Max Stepanov
@@ -53,7 +57,16 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 	 */
 	@Override
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		config.getProject().getPersistentProperty(new QualifiedName("", "serverId"));
+		String serverConfigurationName = config.getProject().getPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER);
+		if (serverConfigurationName != null && serverConfigurationName.length() > 0) {
+			AbstractWebServerConfiguration serverConfiguration = ServerConfigurationManager.getInstance().findServerConfiguration(serverConfigurationName);
+			if (serverConfiguration != null) {
+				URL url = serverConfiguration.resolve(config.getFileStore());
+				if (url != null) {
+					return new PreviewConfig(url);
+				}
+			}
+		}
 		return null;
 	}
 

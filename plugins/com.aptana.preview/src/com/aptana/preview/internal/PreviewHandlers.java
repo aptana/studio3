@@ -54,7 +54,6 @@ public final class PreviewHandlers {
 
 	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".previewHandlers"; //$NON-NLS-1$
 	private static final String TAG_HANDLER = "handler"; //$NON-NLS-1$
-	private static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_CONTENTTYPE = "contentType"; //$NON-NLS-1$
 
@@ -87,11 +86,6 @@ public final class PreviewHandlers {
 			return;
 		}
 		if (TAG_HANDLER.equals(element.getName())) {
-			String id = element.getAttribute(ATT_ID);
-			if (id == null || id.length() == 0) {
-				return;
-			}
-
 			String clazz = element.getAttribute(ATT_CLASS);
 			if (clazz == null || clazz.length() == 0) {
 				return;

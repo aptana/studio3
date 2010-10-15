@@ -144,6 +144,9 @@ public final class PreviewManager {
 		}
 		SourceConfig sourceConfig = new SourceConfig(editorInput, project, project != null ? workspacePath : path, content);
 		PreviewConfig previewConfig = handler.handle(sourceConfig);
+		if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
+			previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+		}
 		if (previewConfig != null) {
 			showEditor(sourceConfig, previewConfig);
 		}
