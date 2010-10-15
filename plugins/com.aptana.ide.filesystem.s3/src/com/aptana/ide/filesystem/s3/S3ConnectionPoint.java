@@ -204,23 +204,14 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	{
 		try
 		{
-			return new URI(TYPE, (getAccessKey() + ":" + new String(getOrPromptForPassword())), getHost(), getPort(), //$NON-NLS-1$
-					getPath().toString(), (String) null, (String) null);
+			return new URI(TYPE, getAccessKey(), getHost(), getPort(), getPath().toString(), (String) null,
+					(String) null);
 		}
 		catch (URISyntaxException e)
 		{
 			S3FileSystemPlugin.log(e);
 			return null;
 		}
-	}
-
-	private char[] getOrPromptForPassword()
-	{
-		if (getPassword() != null)
-			return getPassword();
-		setPassword(CoreIOPlugin.getAuthenticationManager().promptPassword(getAccessKey(), getAccessKey(),
-				"Gimme yer Secret Access Key!", "I wants it now!"));
-		return getPassword();
 	}
 
 	/*
@@ -269,7 +260,8 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	{
 		try
 		{
-			ListAllMyBucketsResponse resp = getConnection().listAllMyBuckets(null);
+			AWSAuthConnection connection = ((S3FileStore) getRoot()).getAWSConnection();
+			ListAllMyBucketsResponse resp = connection.listAllMyBuckets(null);
 			if (resp == null || resp.entries == null)
 			{
 				throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID,
@@ -284,11 +276,6 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		{
 			throw S3FileSystemPlugin.coreException(e);
 		}
-	}
-
-	protected AWSAuthConnection getConnection()
-	{
-		return new AWSAuthConnection(accessKey, new String(password), true, host);
 	}
 
 	/*

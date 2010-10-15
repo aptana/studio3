@@ -42,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -65,6 +67,7 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 public class S3FileStore extends FileStore
 {
@@ -77,6 +80,7 @@ public class S3FileStore extends FileStore
 
 	private URI uri;
 	private Path path;
+	private String accessKey;
 
 	public S3FileStore(URI uri)
 	{
@@ -314,21 +318,67 @@ public class S3FileStore extends FileStore
 		}
 	}
 
-	private AWSAuthConnection getAWSConnection()
+	AWSAuthConnection getAWSConnection()
 	{
 		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
 			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false);
 		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey());
 	}
 
-	private String getSecretAccessKey()
+	private char[] promptPassword(String title, String message)
 	{
-		return uri.getUserInfo().split(":")[1]; //$NON-NLS-1$
+		char[] password = CoreIOPlugin.getAuthenticationManager().promptPassword(getAuthId(), getAccessKey(), title,
+				message);
+		if (password == null)
+		{
+			password = new char[0];
+			throw new OperationCanceledException();
+		}
+		return password;
 	}
 
-	private String getAccessKey()
+	private char[] getOrPromptPassword(String title, String message)
 	{
-		return uri.getUserInfo().split(":")[0]; //$NON-NLS-1$
+		char[] password = CoreIOPlugin.getAuthenticationManager().getPassword(getAuthId());
+		if (password == null)
+		{
+			password = new char[0];
+			promptPassword(title, message);
+		}
+		return password;
+	}
+
+	private String getAuthId()
+	{
+		return Policy.generateAuthId(S3ConnectionPoint.TYPE, getAccessKey(), uri.getHost());
+	}
+
+	private String getSecretAccessKey()
+	{
+		String userInfo = uri.getUserInfo();
+		if (userInfo.contains(":")) //$NON-NLS-1$
+		{
+			return userInfo.split(":")[1]; //$NON-NLS-1$
+		}
+		return new String(getOrPromptPassword(MessageFormat.format("S3 Authentication for {0}", getAccessKey()),
+				"Please enter your secret access key."));
+	}
+
+	private synchronized String getAccessKey()
+	{
+		if (accessKey == null)
+		{
+			String userInfo = uri.getUserInfo();
+			if (userInfo.contains(":")) //$NON-NLS-1$
+			{
+				accessKey = userInfo.split(":")[0]; //$NON-NLS-1$
+			}
+			else
+			{
+				accessKey = userInfo;
+			}
+		}
+		return accessKey;
 	}
 
 	String getKey()

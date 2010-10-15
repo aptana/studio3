@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ui.s3.internal;
+package com.aptana.ide.filesystem.s3;
 
 import java.text.MessageFormat;
 
@@ -54,15 +54,15 @@ public final class Policy
 
 	public static String generateAuthId(String proto, IBaseRemoteConnectionPoint connectionPoint)
 	{
-		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost(), connectionPoint.getPort());
+		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost());
 	}
 
-	public static String generateAuthId(String proto, String login, String host, int port)
+	public static String generateAuthId(String proto, String login, String host)
 	{
-		if (host != null && host.length() > 0 && port > 0 && login != null && login.length() > 0)
+		if (host != null && host.length() > 0 && login != null && login.length() > 0)
 		{
-			return MessageFormat.format("{0}/{1}@{2}:{3}", new Object[] { //$NON-NLS-1$
-					proto, login, host, Integer.toString(port) });
+			return MessageFormat.format("{0}/{1}@{2}", new Object[] { //$NON-NLS-1$
+					proto, login, host });
 		}
 		return null;
 	}
