@@ -1,0 +1,154 @@
+// java -jar beaver.js -T -w JSON.beaver
+%package "com.aptana.editor.json.parsing";
+
+%class "JSONParser";
+
+%import "java.util.ArrayList";
+
+%import "com.aptana.editor.json.parsing.ast.*";
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.ast.IParseRootNode";
+
+%implements "IParser";
+
+%embed {:
+    /*
+     * (non-Javadoc)
+     * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
+     */
+    public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+    {
+        JSONScanner scanner = new JSONScanner();
+
+        // grab source
+        char[] characters = parseState.getSource();
+
+        // make sure we have some source
+        String source = (characters != null) ? new String(characters) : "";
+
+        // send source to the scanner
+        scanner.setSource(source);
+
+        // parse
+        IParseRootNode result = (IParseRootNode) parse(scanner);
+
+        // save reference to result
+        parseState.setParseResult(result);
+
+        return result;
+    }
+:};
+
+%terminals STRING_DOUBLE, STRING_SINGLE;
+%terminals LCURLY, RCURLY, LBRACKET, RBRACKET;
+%terminals COMMA, COLON;
+%terminals NUMBER, TRUE, FALSE, NULL;
+
+%typeof Entry, String, Value = "JSONNode";
+%typeof NUMBER, TRUE, FALSE, NULL = "JSONNode";
+
+%goal JSON;
+
+JSON
+    =   Value.v
+        {:
+            return new JSONParseRootNode(new Symbol[] { v });
+        :}
+    |
+        {:
+            return new JSONParseRootNode();
+        :}
+    ;
+
+Value
+    =   String
+    |   NUMBER
+    	{:
+    		return new JSONNumberNode();
+    	:}
+    |   Object
+    |   Array
+    |   TRUE
+    	{:
+    		return new JSONTrueNode();
+    	:}
+    |   FALSE
+    	{:
+    		return new JSONFalseNode();
+    	:}
+    |   NULL
+    	{:
+    		return new JSONNullNode();
+    	:}
+    ;
+    
+String
+    =   STRING_DOUBLE
+    	{:
+    		return new JSONStringNode();
+    	:}
+    |   STRING_SINGLE
+    	{:
+    		return new JSONStringNode();
+    	:}
+    ;
+
+Object
+    =   LCURLY RCURLY
+        {:
+            return new JSONObjectNode();
+        :}
+    |   LCURLY Entries.e RCURLY
+        {:
+            JSONObjectNode object = new JSONObjectNode();
+            
+            for (IParseNode node : e)
+            {
+                object.addChild(node);
+            }
+            
+            return object;
+        :}
+    ;
+
+Entries
+    =   Entries COMMA Entry
+    |   Entry
+    ;
+
+Entry
+    =   String.s COLON Value.v
+        {:
+            JSONEntryNode entry = new JSONEntryNode();
+            
+            entry.addChild(s);
+            entry.addChild(v);
+            
+            return entry;
+        :}
+    ;
+
+Array
+    =   LBRACKET RBRACKET
+        {:
+            return new JSONArrayNode();
+        :}
+    |   LBRACKET Values.v RBRACKET
+        {:
+            JSONArrayNode array = new JSONArrayNode();
+            
+            for (IParseNode node : v)
+            {
+                array.addChild(node);
+            }
+            
+            return array;
+        :}
+    ;
+
+Values
+    =   Values COMMA Value
+    |   Value
+    ;
