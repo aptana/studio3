@@ -42,6 +42,8 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
 			// a new-line.
 			visitor.writeLineBreak(context);
+		} else if (!addingNewLine && visitor.endsWithNewLine()) {
+			visitor.removeTrailingLineBreaks();
 		}
 		if (begin != null)
 		{

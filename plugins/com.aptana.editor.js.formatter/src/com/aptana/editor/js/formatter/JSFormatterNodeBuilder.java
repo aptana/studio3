@@ -38,16 +38,16 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDefaultLineNode;
-import com.aptana.editor.js.formatter.nodes.FormatterJSDoWhileBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseIfNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSElseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSObjectNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSSwitchNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
-import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
 import com.aptana.editor.js.parsing.ast.JSCaseNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
@@ -107,6 +107,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return rootNode;
 	}
 
+	/**
+	 * Build the formatter nodes by walking the JavaScript AST.
+	 */
 	private class JSFormatterTreeWalker extends JSTreeWalker
 	{
 
@@ -118,14 +121,14 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSFunctionNode node)
 		{
 			// First, push the function declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true,
-					getPreventNewLineHint(node));
-			IParseNode body = node.getBody();
-			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node);
+			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getParameters()
+					.getEndingOffset() + 1));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
 
 			// Then, push the body
+			IParseNode body = node.getBody();
 			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document);
 			bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(bodyNode);
@@ -149,8 +152,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			// First, construct the if condition node
-			FormatterBlockWithBeginNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock, true);
-			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), trueBlock.getStartingOffset()));
+			FormatterBlockWithBeginNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock, node);
+			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getRightParenthesis()
+					.getEnd() + 1));
 			push(conditionNode);
 
 			// Construct the 'true' part of the 'if' and visit its children
@@ -172,20 +176,12 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				// to
 				// locate it in between the end of the 'true' block and the begin of the 'false' block.
 				int trueBlockEnd = trueBlock.getEndingOffset();
-				String segment = document.get(trueBlockEnd + 1, falseBlock.getStartingOffset());
+				int falseBlockStart = falseBlock.getStartingOffset();
+				String segment = document.get(trueBlockEnd + 1, falseBlockStart);
 				int elsePos = segment.toLowerCase().indexOf("else"); //$NON-NLS-1$
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
-				int elseBlockDeclarationEnd = falseBlock.getStartingOffset();
-				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
-				FormatterBlockWithBeginNode elseNode;
-				if (isElseIf)
-				{
-					elseNode = new FormatterJSElseIfNode(document, isCurlyTrueBlock);
-				}
-				else
-				{
-					elseNode = new FormatterJSDeclarationNode(document, isCurlyFalseBlock, false);
-				}
+				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
+				FormatterBlockWithBeginNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock);
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -194,9 +190,24 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 				else
 				{
-					// Just visit the children
-					falseBlock.accept(this);
-					// visitChildren(falseBlock);
+					boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
+					if (isElseIf)
+					{
+						// Wrap the incoming 'if' with an Else-If node that will allow us later to break it and indent
+						// it.
+						FormatterJSElseIfNode elseIfNode = new FormatterJSElseIfNode(document);
+						elseIfNode.setBegin(createTextNode(document, falseBlockStart, falseBlockStart));
+						push(elseIfNode);
+						falseBlock.accept(this);
+						int falseBlockEnd = falseBlock.getEndingOffset() + 1;
+						checkedPop(elseIfNode, falseBlockEnd);
+						elseIfNode.setEnd(createTextNode(document, falseBlockEnd, falseBlockEnd));
+					}
+					else
+					{
+						// Just visit the children
+						falseBlock.accept(this);
+					}
 				}
 				checkedPop(elseNode, falseBlock.getEndingOffset() + 1);
 			}
@@ -210,18 +221,19 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSDoNode node)
 		{
 			// First, push the 'do' declaration node
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, false);
-			IParseNode body = node.getBody();
-			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), body.getStartingOffset()));
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document, true, node);
+			int startingOffset = node.getStartingOffset();
+			declarationNode.setBegin(createTextNode(document, startingOffset, startingOffset + 2));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);
 
 			// Push the special do-while block node
-			FormatterJSDoWhileBlockNode doWhileBlock = new FormatterJSDoWhileBlockNode(document);
+			JSNode body = (JSNode) node.getBody();
+			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document);
 			doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(doWhileBlock);
 			// visit the body only
-			super.visit((JSNode) node.getBody());
+			body.accept(this);
 			int blockEnd = body.getEndingOffset();
 			checkedPop(doWhileBlock, blockEnd);
 			doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd + 1));
@@ -231,12 +243,15 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// We wrap this node as a begin-end node that will hold the condition internals as children
 			JSNode condition = (JSNode) node.getCondition();
 			FormatterJSNonBlockedWhileNode whileNode = new FormatterJSNonBlockedWhileNode(document);
-			whileNode.setBegin(createTextNode(document, blockEnd + 1, condition.getStartingOffset()));
+			// Search for the exact 'while' start offset
+			int whileBeginOffset = locateCharacterSkippingWhitespaces(document, blockEnd + 1, 'w', true);
+			whileNode.setBegin(createTextNode(document, whileBeginOffset, condition.getStartingOffset()));
 			push(whileNode);
 			visitChildren(condition);
 			int conditionEnd = condition.getEndingOffset() + 1;
 			checkedPop(whileNode, conditionEnd);
-			int end = locateColonOrSemicolonInLine(conditionEnd, document);
+			conditionEnd = locateCharacterSkippingWhitespaces(document, conditionEnd, ')', false);
+			int end = locateColonOrSemicolonInLine(conditionEnd + 1, document);
 			whileNode.setEnd(createTextNode(document, conditionEnd, end));
 		}
 
@@ -247,7 +262,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWhileNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
 		}
 
 		/*
@@ -257,7 +272,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWithNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
 		}
 
 		/*
@@ -267,7 +282,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSForInNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
 		}
 
 		/*
@@ -277,7 +292,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSForNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
 		}
 
 		/*
@@ -305,15 +320,15 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSSwitchNode node)
 		{
 			// Push the switch-case declaration node
-			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true,
-					getPreventNewLineHint(node));
-			int blockStart = node.getLeftBrace().getStart();
-			switchNode.setBegin(createTextNode(document, node.getStartingOffset(), blockStart));
+			FormatterJSDeclarationNode switchNode = new FormatterJSDeclarationNode(document, true, node);
+			switchNode.setBegin(createTextNode(document, node.getStartingOffset(),
+					node.getRightParenthesis().getEnd() + 1));
 			push(switchNode);
 			checkedPop(switchNode, -1);
 
 			// push a switch-case body node
-			FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document);
+			int blockStart = node.getLeftBrace().getStart();
+			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document);
 			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
 			push(blockNode);
 			// visit the children under that block node
@@ -352,7 +367,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSTryNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			// The declarationEndOffset that we pass here is defined to the end of the 'try' word (avoiding any trailing
+			// new-lines and spaces)
+			visitCommonBlock(node, node.getStartingOffset() + 2, node.getBody());
 			IParseNode catchBlock = node.getCatchBlock();
 			if (catchBlock.getNodeType() == JSNodeTypes.CATCH)
 			{
@@ -372,7 +389,10 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSCatchNode node)
 		{
-			visitCommonBlock(node, node.getBody());
+			// search for the closing brace of the catch declaration
+			int declarationEndOffset = node.getIdentifier().getEndingOffset() + 1;
+			declarationEndOffset = locateCharacterSkippingWhitespaces(document, declarationEndOffset, ')', false);
+			visitCommonBlock(node, declarationEndOffset, node.getBody());
 		}
 
 		/*
@@ -382,7 +402,9 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSFinallyNode node)
 		{
-			visitCommonBlock(node, node.getBlock());
+			// The declarationEndOffset that we pass here is defined to the end of the 'finally' word (avoiding any
+			// trailing new-lines and spaces)
+			visitCommonBlock(node, node.getStartingOffset() + 6, node.getBlock());
 		}
 
 		/*
@@ -630,31 +652,29 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		/**
-		 * Returns true is the given node is on the right side of an assignment expression.
+		 * A common visit of a block.<br>
+		 * In case it's a block that has brackets, we make sure that no new-lines exist in the block beginning or the
+		 * previous code ending. This will allow us to move that block one line up in case the user decides he/she want
+		 * to see the blocks at the same line.
 		 * 
 		 * @param node
 		 */
-		private boolean getPreventNewLineHint(JSNode node)
-		{
-			IParseNode parent = node.getParent();
-			short nodeType = parent.getNodeType();
-			return nodeType == JSNodeTypes.DECLARATION || nodeType == JSNodeTypes.ASSIGN
-					|| nodeType == JSNodeTypes.RETURN || nodeType == JSNodeTypes.INVOKE
-					|| nodeType == JSNodeTypes.NAME_VALUE_PAIR || nodeType == JSNodeTypes.GROUP
-					|| nodeType == JSNodeTypes.CONDITIONAL || (parent instanceof JSBinaryOperatorNode);
-		}
-
-		/**
-		 * @param node
-		 */
-		private void visitCommonBlock(JSNode node, IParseNode body)
+		private void visitCommonBlock(JSNode node, int declarationEndOffset, IParseNode body)
 		{
 			boolean hasBody = (body.getNodeType() != JSNodeTypes.EMPTY);
 			// First, push the declaration part
 			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
 			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
-					(body.getNodeType() == JSNodeTypes.STATEMENTS), getPreventNewLineHint(node));
-			int endDeclarationOffset = (hasBody ? body.getStartingOffset() : body.getEndingOffset() + 1);
+					(body.getNodeType() == JSNodeTypes.STATEMENTS), node);
+			int endDeclarationOffset;
+			if (hasBody)
+			{
+				endDeclarationOffset = declarationEndOffset + 1;
+			}
+			else
+			{
+				endDeclarationOffset = body.getEndingOffset() + 1;
+			}
 			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), endDeclarationOffset));
 			push(declarationNode);
 			checkedPop(declarationNode, -1);

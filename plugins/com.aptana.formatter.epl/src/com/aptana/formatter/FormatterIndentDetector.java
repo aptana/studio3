@@ -74,6 +74,14 @@ public class FormatterIndentDetector implements IFormatterWriter
 		// empty
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#removeTrailingLineBreaks()
+	 */
+	public void removeTrailingLineBreaks()
+	{
+		// empty
+	}
+
 	public void appendToPreviousLine(IFormatterContext context, String text)
 	{
 		// empty

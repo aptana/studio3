@@ -13,6 +13,7 @@ package com.aptana.formatter.nodes;
 
 import java.util.Stack;
 
+import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 
 public class AbstractFormatterNodeBuilder
@@ -42,18 +43,67 @@ public class AbstractFormatterNodeBuilder
 		IFormatterContainerNode parentNode = peek();
 		if (!node.isEmpty())
 		{
-			advanceParent(parentNode, node.getStartOffset());
+			advanceParent(node, parentNode, node.getStartOffset());
 		}
 		parentNode.addChild(node);
 		return node;
 	}
 
-	private void advanceParent(IFormatterContainerNode parentNode, final int pos)
+	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, final int pos)
 	{
 		if (parentNode.getEndOffset() < pos)
 		{
+			if (node.shouldIgnorePreviousNewLines())
+			{
+				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
+				if (text.trim().length() == 0)
+				{
+					return;
+				}
+			}
 			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
+
 		}
+	}
+
+	/**
+	 * A utility method that locates the given char in the document, skipping any white-spaces. In case the character
+	 * was not found between the given offset and the next non-white-space char, the original offset is returned.
+	 * 
+	 * @param document
+	 *            A {@link FormatterDocument}
+	 * @param startOffset
+	 *            The start offset of the search
+	 * @param c
+	 *            The character to search for by scanning the document characters forward from the given start offset
+	 *            (including the offset)
+	 * @param caseSensitive
+	 *            Indicate that the matching of the characters should be done in a case sensitive way or not.
+	 * @return The offset of the char; The original offset is returned in case the search for the char failed.
+	 */
+	protected static int locateCharacterSkippingWhitespaces(FormatterDocument document, int startOffset, char c,
+			boolean caseSensitive)
+	{
+		char toCheck = (caseSensitive) ? c : Character.toLowerCase(c);
+		for (int i = startOffset; i < document.getLength(); i++)
+		{
+			char next = document.charAt(i);
+			if (!caseSensitive)
+			{
+				next = Character.toLowerCase(next);
+			}
+			if (toCheck == next)
+			{
+				startOffset = i;
+				break;
+			}
+			if (Character.isWhitespace(next))
+			{
+				continue;
+			}
+			break;
+		}
+		return startOffset;
 	}
 
 	protected void checkedPop(IFormatterContainerNode expected, int bodyEnd)

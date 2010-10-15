@@ -15,12 +15,12 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
 
-public interface IFormatterNode {
+public interface IFormatterNode
+{
 
 	int DEFAULT_OFFSET = 0;
 
-	void accept(IFormatterContext context, IFormatterWriter visitor)
-			throws Exception;
+	void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception;
 
 	boolean isEmpty();
 
@@ -29,5 +29,13 @@ public interface IFormatterNode {
 	int getEndOffset();
 
 	IFormatterDocument getDocument();
+
+	/**
+	 * Returns true if the formatter node should ignore and consume any new lines that appears between the
+	 * <b>previous</b> node and this one.
+	 * 
+	 * @return True if these new-lines should be consumed; False, otherwise.
+	 */
+	boolean shouldIgnorePreviousNewLines();
 
 }

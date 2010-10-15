@@ -83,13 +83,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	protected static final String[] NEW_LINES_POSITIONS = { JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT };
+			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS};
 
 	/**
 	 * Indentation constants
 	 */
 	protected static final String[] INDENTATIONS = { JSFormatterConstants.INDENT_BLOCKS,
-			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY };
+			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
+			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY};
 
 	private String lineSeparator;
 

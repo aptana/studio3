@@ -35,68 +35,42 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterWriter;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A formatter node that marks an 'if' block that arrives right after an 'else' ("...else if...")
+ * Formatter node for Switch block.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSElseIfNode extends FormatterBlockWithBeginEndNode
+public class FormatterJSSwitchNode extends FormatterJSBlockNode
 {
 
 	/**
 	 * @param document
-	 * @param hasBlockedChild
-	 * @param isInAssignment
 	 */
-	public FormatterJSElseIfNode(IFormatterDocument document)
+	public FormatterJSSwitchNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingNewLine()
 	 */
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// breaking else-if expressions?
-		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
+		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptBody(com.aptana.formatter.IFormatterContext,
-	 * com.aptana.formatter.IFormatterWriter)
-	 */
-	@Override
-	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
-	{
-		int indent = context.getIndent();
-		if (indent > 0)
-		{
-			context.decIndent();
-		}
-		super.acceptBody(context, visitor);
-		if (indent > 0)
-		{
-			context.incIndent();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isIndenting()
 	 */
 	@Override
 	protected boolean isIndenting()
 	{
-		return false;
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_SWITCH_BODY);
 	}
 
 }

@@ -47,4 +47,12 @@ public abstract class AbstractFormatterNode implements IFormatterNode {
 	protected int getInt(String key) {
 		return document.getInt(key);
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumeNewLines()
+	 */
+	public boolean shouldIgnorePreviousNewLines()
+	{
+		return false;
+	}
 }

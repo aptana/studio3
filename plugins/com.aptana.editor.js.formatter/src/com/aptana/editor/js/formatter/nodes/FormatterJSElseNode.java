@@ -34,34 +34,49 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * A JS block node for a do-while block.<br>
- * This block can control the insertion of a new line after the closing curly-bracket and before the 'while' condition.
+ * Formatter node for 'else' nodes.
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSDoWhileBlockNode extends FormatterJSBlockNode
+public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 {
+
+	private boolean hasBlock;
 
 	/**
 	 * @param document
+	 * @param b
+	 * @param hasBlock
 	 */
-	public FormatterJSDoWhileBlockNode(IFormatterDocument document)
+	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock)
 	{
 		super(document);
+		this.hasBlock = hasBlock;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
 	 */
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO - Set this from the 'control-statement' setting of the do-while block
-		return true;
+		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		return !hasBlock;
 	}
 
 }

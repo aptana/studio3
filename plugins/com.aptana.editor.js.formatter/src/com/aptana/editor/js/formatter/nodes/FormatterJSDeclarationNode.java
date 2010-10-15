@@ -34,6 +34,10 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSNode;
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -48,7 +52,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 {
 
 	private boolean hasBlockedChild;
-	private boolean noNewLine;
+	private JSNode parent;
 
 	/**
 	 * @param document
@@ -57,11 +61,11 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	 *            Provide a hint flag to block any new line added before this node. Note that this is just a hint which
 	 *            can be overwritten by a preference setting.
 	 */
-	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, boolean noNewLine)
+	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, JSNode parent)
 	{
 		super(document);
 		this.hasBlockedChild = hasBlockedChild;
-		this.noNewLine = noNewLine;
+		this.parent = parent;
 	}
 
 	/*
@@ -73,7 +77,34 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	{
 		// To change this behavior, it's recommended to create a designated subclass and override this method to return
 		// the value set in the preferences.
-		return !noNewLine;
+		if (parent instanceof JSBinaryOperatorNode)
+		{
+			return false;
+		}
+		switch (parent.getNodeType())
+		{
+			case JSNodeTypes.DECLARATION:
+			case JSNodeTypes.ASSIGN:
+			case JSNodeTypes.RETURN:
+			case JSNodeTypes.INVOKE:
+			case JSNodeTypes.GROUP:
+			case JSNodeTypes.ARGUMENTS:
+			case JSNodeTypes.CONDITIONAL:
+			case JSNodeTypes.NAME_VALUE_PAIR:
+			case JSNodeTypes.FUNCTION:
+				return false;
+			case JSNodeTypes.DO:
+			case JSNodeTypes.TRY:
+			case JSNodeTypes.SWITCH:
+				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
+			case JSNodeTypes.IF:
+				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT);
+			case JSNodeTypes.CATCH:
+				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
+			case JSNodeTypes.FINALLY:
+				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
+		}
+		return true;
 	}
 
 	/*
@@ -83,7 +114,6 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO attach the preference key
 		return !hasBlockedChild;
 	}
 }

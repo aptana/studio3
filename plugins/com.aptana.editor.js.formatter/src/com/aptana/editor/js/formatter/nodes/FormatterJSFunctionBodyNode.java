@@ -34,7 +34,9 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
  * A JS function body formatter node.<br>
@@ -60,8 +62,9 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO attach the preference key
-		return true;
+		// adds a new line before the start curly bracket
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION));
 	}
 
 	/*
@@ -71,7 +74,6 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO attach the preference key
-		return true;
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_FUNCTION_BODY);
 	}
 }

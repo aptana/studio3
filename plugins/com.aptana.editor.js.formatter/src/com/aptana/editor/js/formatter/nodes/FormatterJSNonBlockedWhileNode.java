@@ -46,8 +46,10 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNode
 {
 
+
 	/**
 	 * @param document
+	 * @param parentNodeType
 	 */
 	public FormatterJSNonBlockedWhileNode(IFormatterDocument document)
 	{
@@ -62,7 +64,7 @@ public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNo
 	protected boolean isAddingNewLine()
 	{
 		// TODO - Set this one to true in case we'll decide the break multiple boolean
-		// expressions in this while condition.
+		// expressions in this while condition to a separate line.
 		return false;
 	}
 }

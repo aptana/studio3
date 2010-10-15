@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
@@ -62,6 +63,7 @@ public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isAddingNewLine()
 	{
+		// always add a new line in front of a 'case'
 		return true;
 	}
 
@@ -72,7 +74,6 @@ public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO attach the preference key
-		return true;
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_CASE_BODY);
 	}
 }

@@ -34,8 +34,10 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
  * A generic JS block formatter node.<br>
@@ -56,13 +58,23 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldIgnorePreviousNewLines()
+	 */
+	@Override
+	public boolean shouldIgnorePreviousNewLines()
+	{
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
 	 */
 	@Override
 	protected boolean isAddingNewLine()
 	{
-		// TODO attach the preference key
-		return true;
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 	}
 
 	/*
@@ -72,7 +84,6 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO attach the preference key
-		return true;
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_BLOCKS);
 	}
 }

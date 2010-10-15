@@ -58,15 +58,18 @@ public interface JSFormatterConstants
 
 	// Indentation
 	public static final String INDENT_BLOCKS = FORMATTER_ID + ".indent.blocks"; //$NON-NLS-1$
+	public static final String INDENT_FUNCTION_BODY = FORMATTER_ID + ".indent.function.body"; //$NON-NLS-1$
 	public static final String INDENT_SWITCH_BODY = FORMATTER_ID + ".indent.switch.body"; //$NON-NLS-1$
 	public static final String INDENT_CASE_BODY = FORMATTER_ID + ".indent.case.body"; //$NON-NLS-1$
-
+	public static final String INDENT_GROUP_BODY = FORMATTER_ID + ".indent.group.body"; //$NON-NLS-1$
 	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID + '.'
 			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
 
 	// New lines
+	public static final String NEW_LINES_BEFORE_BLOCKS = FORMATTER_ID + ".newline.before.block"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_IF_STATEMENT = FORMATTER_ID + ".newline.before.if"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_ELSE_STATEMENT = FORMATTER_ID + ".newline.before.else"; //$NON-NLS-1$
+	public static final String NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT = FORMATTER_ID + ".newline.before.if.in.elseif"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_CATCH_STATEMENT = FORMATTER_ID + ".newline.before.catch"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_FINALLY_STATEMENT = FORMATTER_ID + ".newline.before.finally"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_DO_WHILE_STATEMENT = FORMATTER_ID + ".newline.before.dowhile"; //$NON-NLS-1$

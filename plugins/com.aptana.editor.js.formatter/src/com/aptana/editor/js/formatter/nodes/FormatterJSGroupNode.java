@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
@@ -60,8 +61,7 @@ public class FormatterJSGroupNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isIndenting()
 	{
-		// TODO - Attach to a preference key
-		return true;
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_GROUP_BODY);
 	}
 
 	/*

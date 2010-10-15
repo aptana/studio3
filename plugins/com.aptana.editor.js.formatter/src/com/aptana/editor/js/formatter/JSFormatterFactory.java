@@ -70,13 +70,16 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 			JSFormatterConstants.FORMATTER_TAB_SIZE, JSFormatterConstants.WRAP_COMMENTS,
 			JSFormatterConstants.WRAP_COMMENTS_LENGTH, JSFormatterConstants.INDENT_BLOCKS,
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
+			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY,
 			JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
+			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
-			JSFormatterConstants.PRESERVED_LINES, JSFormatterConstants.BRACE_POSITION_BLOCK,
-			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
+			JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
+			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION, JSFormatterConstants.PRESERVED_LINES,
+			JSFormatterConstants.BRACE_POSITION_BLOCK, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE,
+			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
 			JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION };
 
 	public PreferenceKey[] getPreferenceKeys()

@@ -56,15 +56,21 @@ public class Messages extends NLS
 	public static String JSFormatterModifyDialog_commentsTabName;
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
+	
 	public static String JSFormatterModifyDialog_newLinesTabName;
+	public static String JSFormatterNewLinesPage_newLineBeforeBlocks;
 	public static String JSFormatterNewLinesPage_newLineBeforeCatch;
 	public static String JSFormatterNewLinesPage_newLineBeforeElse;
+	public static String JSFormatterNewLinesPage_newLineBreakElseIf;
 	public static String JSFormatterNewLinesPage_newLineBeforeFinally;
 	public static String JSFormatterNewLinesPage_newLineBeforeIf;
 	public static String JSFormatterNewLinesPage_newLineBeforeWhileInDo;
+	
 	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
 	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
 	public static String JSFormatterIndentationTabPage_statementsWithinCase;
+	public static String JSFormatterIndentationTabPage_statementsWithinFunctions;
+	public static String JSFormatterIndentationTabPage_statementsWithinJSGroups;
 	static
 	{
 		// initialize resource bundle
