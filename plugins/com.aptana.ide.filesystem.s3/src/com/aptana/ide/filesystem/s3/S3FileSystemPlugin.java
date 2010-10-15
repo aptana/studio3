@@ -1,24 +1,27 @@
 package com.aptana.ide.filesystem.s3;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin
+public class S3FileSystemPlugin extends Plugin
 {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.ide.filesystem.s3"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static S3FileSystemPlugin plugin;
 
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public S3FileSystemPlugin()
 	{
 	}
 
@@ -47,9 +50,33 @@ public class Activator extends Plugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static S3FileSystemPlugin getDefault()
 	{
 		return plugin;
 	}
 
+	public static void log(Exception e)
+	{
+		getDefault().getLog().log(status(e));
+	}
+
+	public static CoreException coreException(Exception e)
+	{
+		return coreException(-1, e);
+	}
+
+	private static IStatus status(Exception e)
+	{
+		return status(-1, e);
+	}
+
+	private static IStatus status(int errorCode, Exception e)
+	{
+		return new Status(IStatus.ERROR, PLUGIN_ID, errorCode, e.getMessage(), e);
+	}
+
+	public static CoreException coreException(int errorCode, Exception e)
+	{
+		return new CoreException(status(errorCode, e));
+	}
 }

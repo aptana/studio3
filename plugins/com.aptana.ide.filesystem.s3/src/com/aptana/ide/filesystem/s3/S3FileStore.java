@@ -22,9 +22,7 @@ import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.amazon.s3.AWSAuthConnection;
@@ -106,18 +104,18 @@ public class S3FileStore extends FileStore
 				}
 				catch (Exception e)
 				{
-					Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					S3FileSystemPlugin.log(e);
 				}
 			}
 			return keys.toArray(new String[keys.size()]);
 		}
 		catch (MalformedURLException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 	}
 
@@ -202,11 +200,11 @@ public class S3FileStore extends FileStore
 			}
 			catch (MalformedURLException e)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+				throw S3FileSystemPlugin.coreException(e);
 			}
 			catch (IOException e)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+				throw S3FileSystemPlugin.coreException(e);
 			}
 		}
 		return info;
@@ -224,7 +222,7 @@ public class S3FileStore extends FileStore
 		}
 		catch (URISyntaxException e)
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			S3FileSystemPlugin.log(e);
 		}
 		return null;
 	}
@@ -253,7 +251,7 @@ public class S3FileStore extends FileStore
 		}
 		catch (URISyntaxException e)
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			S3FileSystemPlugin.log(e);
 		}
 		return null;
 	}
@@ -268,11 +266,11 @@ public class S3FileStore extends FileStore
 		}
 		catch (MalformedURLException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 	}
 
@@ -337,11 +335,11 @@ public class S3FileStore extends FileStore
 		}
 		catch (MalformedURLException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 	}
 
@@ -355,11 +353,11 @@ public class S3FileStore extends FileStore
 		}
 		catch (MalformedURLException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 	}
 
@@ -374,11 +372,11 @@ public class S3FileStore extends FileStore
 		}
 		catch (MalformedURLException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, e.getMessage(), e));
+			throw S3FileSystemPlugin.coreException(e);
 		}
 		return this;
 	}
@@ -428,8 +426,7 @@ public class S3FileStore extends FileStore
 			}
 			catch (IOException e)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, EFS.ERROR_WRITE,
-						"Could not write file", e));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_WRITE, e);
 			}
 		}
 		return super.toLocalFile(options, monitor);
@@ -462,13 +459,11 @@ public class S3FileStore extends FileStore
 			}
 			catch (MalformedURLException e)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, EFS.ERROR_INTERNAL,
-						e.getMessage(), e));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, e);
 			}
 			catch (IOException e)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, EFS.ERROR_INTERNAL,
-						e.getMessage(), e));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, e);
 			}
 		}
 		else

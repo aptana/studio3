@@ -211,7 +211,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		}
 		catch (URISyntaxException e)
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			S3FileSystemPlugin.log(e);
 			return null;
 		}
 	}
@@ -274,7 +274,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 			ListAllMyBucketsResponse resp = getConnection().listAllMyBuckets(null);
 			if (resp == null || resp.entries == null)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID,
 						"Failed to connect. Invalid credentials?"));
 			}
 		}
@@ -284,7 +284,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		}
 		catch (Exception e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 	}
 

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: S3 Filesystem Provider
 Bundle-SymbolicName: com.aptana.ide.filesystem.s3;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: com.aptana.ide.filesystem.s3.Activator
+Bundle-Activator: com.aptana.ide.filesystem.s3.S3FileSystemPlugin
 Bundle-Vendor: Aptana, Inc.
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem;bundle-version="1.0.0",
