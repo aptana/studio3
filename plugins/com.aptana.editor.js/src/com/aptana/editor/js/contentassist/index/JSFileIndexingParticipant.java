@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -52,7 +51,7 @@ import org.jaxen.JaxenException;
 import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -338,17 +337,17 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	{
 		int offset = initialOffset;
 		String text = getText(source, initialOffset, commentNode);
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
-				String tag = entry.getKey();
-				if (!CommentScanner.isCaseSensitive())
+				String tag = entry.getName();
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}
@@ -370,7 +369,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 2).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getValue(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
 			}
 			// FIXME This doesn't take the newline into account from split!
 			offset += line.length();

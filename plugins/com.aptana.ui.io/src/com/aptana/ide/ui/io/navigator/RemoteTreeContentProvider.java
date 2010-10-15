@@ -34,10 +34,15 @@
  */
 package com.aptana.ide.ui.io.navigator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.core.resources.IWorkspaceRoot;
 
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.IConnectionPointCategory;
 
 public class RemoteTreeContentProvider extends FileTreeContentProvider
 {
@@ -47,8 +52,18 @@ public class RemoteTreeContentProvider extends FileTreeContentProvider
 	{
 		if (inputElement instanceof IWorkspaceRoot)
 		{
-			inputElement = CoreIOPlugin.getConnectionPointManager().getConnectionPointCategory(
-					IBaseRemoteConnectionPoint.CATEGORY);
+			// the top level would have all the connection points from remote categories
+			List<IConnectionPoint> connections = new ArrayList<IConnectionPoint>();
+			IConnectionPointCategory[] categories = CoreIOPlugin.getConnectionPointManager()
+					.getConnectionPointCategories();
+			for (IConnectionPointCategory category : categories)
+			{
+				if (category.isRemote())
+				{
+					connections.addAll(Arrays.asList(category.getConnectionPoints()));
+				}
+			}
+			return connections.toArray(new IConnectionPoint[connections.size()]);
 		}
 		return super.getElements(inputElement);
 	}

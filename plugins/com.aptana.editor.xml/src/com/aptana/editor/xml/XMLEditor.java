@@ -37,7 +37,6 @@ package com.aptana.editor.xml;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
@@ -46,24 +45,6 @@ import com.aptana.editor.xml.parsing.IXMLParserConstants;
 
 public class XMLEditor extends AbstractThemeableEditor
 {
-	private CommonSourceViewerConfiguration fSourceViewerConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#dispose()
-	 */
-	@Override
-	public void dispose()
-	{
-		if (fSourceViewerConfiguration != null)
-		{
-			fSourceViewerConfiguration.dispose();
-			fSourceViewerConfiguration = null;
-		}
-
-		super.dispose();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -73,9 +54,7 @@ public class XMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		fSourceViewerConfiguration = new XMLSourceViewerConfiguration(getPreferenceStore(), this);
-
-		setSourceViewerConfiguration(fSourceViewerConfiguration);
+		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
 	}
 

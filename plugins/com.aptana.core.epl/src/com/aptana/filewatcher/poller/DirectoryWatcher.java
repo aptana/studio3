@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.filewatcher.FileWatcherPlugin;
+import com.aptana.core.epl.CoreEPLPlugin;
 
 class DirectoryWatcher
 {
@@ -29,10 +29,10 @@ class DirectoryWatcher
 		private final long pollFrequency;
 		private boolean done = false;
 
-		public WatcherThread(long pollFrequency)
+		public WatcherThread(long frequency)
 		{
 			super("Directory Watcher"); //$NON-NLS-1$
-			this.pollFrequency = pollFrequency;
+			this.pollFrequency = frequency;
 		}
 
 		public void run()
@@ -71,7 +71,7 @@ class DirectoryWatcher
 
 	private static void log(String string, Throwable e)
 	{
-		FileWatcherPlugin.log(string, e);
+		CoreEPLPlugin.log(string, e);
 	}
 
 	final File[] directories;

@@ -7,7 +7,8 @@ Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.resources,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ com.aptana.core.epl;bundle-version="3.0.0"
 Export-Package: com.aptana.filewatcher,
  net.contentobjects.jnotify
 Bundle-ActivationPolicy: lazy

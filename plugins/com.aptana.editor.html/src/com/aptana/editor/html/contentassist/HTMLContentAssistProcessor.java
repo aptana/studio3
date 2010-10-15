@@ -98,7 +98,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
@@ -385,13 +385,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 
 			HTMLParseState state = null;
-
 			for (ElementElement element : elements)
 			{
-				String[] userAgents = element.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
-
+				List<Integer> positions = new ArrayList<Integer>();
 				int cursorPosition = replaceString.length();
 				if (close)
 				{
@@ -409,8 +406,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					else if (state.isEmptyTagType(element.getName()))
 					{
 						replaceString += " />"; //$NON-NLS-1$
-						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
-						cursorPosition += 3;
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
+						// now it's stuck at end of tag
+						positions.add(cursorPosition + 3);
 					}
 					else
 					{
@@ -428,22 +426,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						if (!OpenTagCloser.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
+							positions.add(cursorPosition + 4 + element.getName().length());
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
 						}
 					}
 				}
-
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-				proposal.setFileLocation(HTMLIndexConstants.CORE);
-				proposal.setUserAgentImages(userAgentIcons);
+				positions.add(0, cursorPosition);
+				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, offset, replaceLength, element,
+						positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}

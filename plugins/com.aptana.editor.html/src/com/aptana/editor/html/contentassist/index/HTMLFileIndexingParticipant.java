@@ -37,7 +37,6 @@ package com.aptana.editor.html.contentassist.index;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -53,7 +52,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
-import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -196,7 +195,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processHTMLCommentNode(IFileStore store, HTMLCommentNode commentNode)
 	{
 		String text = commentNode.getText();
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
@@ -204,10 +203,10 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
-				String tag = entry.getKey();
-				if (!CommentScanner.isCaseSensitive())
+				String tag = entry.getName();
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}
@@ -224,7 +223,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 3).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getValue(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
 			}
 			// FIXME This doesn't take the newline into account from split!
 			offset += line.length();
@@ -237,7 +236,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param index
 	 * @param file
 	 * @param parent
-	 * @param monitor 
+	 * @param monitor
 	 */
 	private void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
 	{

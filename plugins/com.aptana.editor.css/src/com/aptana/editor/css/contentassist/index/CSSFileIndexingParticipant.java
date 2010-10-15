@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -45,7 +44,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -216,7 +215,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void processCommentNode(IFileStore store, int initialOffset, CSSCommentNode commentNode)
 	{
 		String text = commentNode.getText();
-		if (!CommentScanner.isCaseSensitive())
+		if (!TaskTag.isCaseSensitive())
 		{
 			text = text.toLowerCase();
 		}
@@ -224,10 +223,10 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 		for (String line : lines)
 		{
-			for (Map.Entry<String, Integer> entry : CommentScanner.DEFAULT_TAGS.entrySet())
+			for (TaskTag entry : TaskTag.getTaskTags())
 			{
-				String tag = entry.getKey();
-				if (!CommentScanner.isCaseSensitive())
+				String tag = entry.getName();
+				if (!TaskTag.isCaseSensitive())
 				{
 					tag = tag.toLowerCase();
 				}
@@ -244,7 +243,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					message = message.substring(0, message.length() - 2).trim();
 				}
 				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getValue(), -1, start, start + message.length());
+				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
 			}
 			// FIXME This doesn't take the newline into account from split!
 			offset += line.length();
