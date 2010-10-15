@@ -7,7 +7,7 @@ Bundle-Activator: com.aptana.ui.s3.S3UIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- com.aptana.ide.filesystem.s3;bundle-version="1.0.0",
+ com.aptana.filesystem.s3;bundle-version="1.0.0",
  com.aptana.ui;bundle-version="3.0.0",
  com.aptana.ui.io;bundle-version="3.0.0",
  com.aptana.core;bundle-version="3.0.0",
