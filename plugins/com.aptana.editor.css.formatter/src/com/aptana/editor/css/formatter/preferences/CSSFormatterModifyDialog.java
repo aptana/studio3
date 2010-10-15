@@ -5,9 +5,8 @@ import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.IScriptFormatterFactory;
 
 /**
- * HTML formatter settings dialog.
+ * CSS formatter settings dialog.
  * 
- * @author Shalom Gibly <sgibly@aptana.com>
  */
 public class CSSFormatterModifyDialog extends FormatterModifyDialog
 {
@@ -20,9 +19,13 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 	public CSSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
+		setTitle("CSS Formatter");
 	}
 
 	protected void addPages()
 	{
+		addTabPage("Control Statements", new CSSFormatterControlStatementsPage(this));
+		addTabPage("Braces", new CSSFormatterBracesPage(this));
+		addTabPage("Comments", new CSSFormatterCommentsPage(this));
 	}
 }

@@ -30,6 +30,8 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta,td,th".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
 						IPreferenceDelegate.PREFERECE_DELIMITER));
 		store.setDefault(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
+		store.setDefault(CSSFormatterConstants.LINES_BEFORE_NON_CSS_ELEMENTS, 1);
+		store.setDefault(CSSFormatterConstants.LINES_AFTER_NON_CSS_ELEMENTS, 1);
 		store.setDefault(CSSFormatterConstants.PRESERVED_LINES, 1);
 	}
 }
