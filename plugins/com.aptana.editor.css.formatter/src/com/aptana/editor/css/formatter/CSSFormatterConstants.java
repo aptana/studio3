@@ -23,18 +23,15 @@ public interface CSSFormatterConstants
 	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
 
 	// Indentation
-	public static final String INDENT_EXCLUDED_TAGS = FORMATTER_ID + ".indent.excluded"; //$NON-NLS-1$
 	
 	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID + '.'
 			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
 
 	// New lines
-	public static final String NEW_LINES_EXCLUDED_TAGS = FORMATTER_ID + ".newline.excluded"; //$NON-NLS-1$
+	public static final String NEW_LINES_BEFORE_BLOCKS = FORMATTER_ID + ".indent.blocks";
 	
 	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
-	public static final String LINES_BEFORE_NON_CSS_ELEMENTS = FORMATTER_ID + ".line.before.non.css"; //$NON-NLS-1$
-	public static final String LINES_AFTER_NON_CSS_ELEMENTS = FORMATTER_ID + ".line.after.non.css"; //$NON-NLS-1$
 	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
 
 	

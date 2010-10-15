@@ -22,7 +22,7 @@ public class CSSFormatterCommentsPage extends FormatterModifyTabPage
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
 		Group commentGroup = SWTFactory.createGroup(parent, "Comments Formatting", 2, 1, GridData.FILL_HORIZONTAL);
-		manager.createCheckbox(commentGroup, CSSFormatterConstants.WRAP_COMMENTS, "Enable comments wrapping");
+		manager.createCheckbox(commentGroup, CSSFormatterConstants.WRAP_COMMENTS, "Enable comments wrapping", 2);
 		manager.createNumber(commentGroup, CSSFormatterConstants.WRAP_COMMENTS_LENGTH, "Maximum line width");
 
 	}

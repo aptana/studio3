@@ -1,7 +1,5 @@
 package com.aptana.editor.css.formatter.nodes;
 
-import java.util.Set;
-
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
@@ -31,18 +29,25 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isIndenting()
 	{
-		Set<String> set = getDocument().getSet(CSSFormatterConstants.INDENT_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
-		Set<String> set = getDocument().getSet(CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return getDocument().getBoolean(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	
+	protected boolean isAddingEndNewLine(){
+		return true;
 	}
 
 	/*

@@ -32,8 +32,4 @@ public class FormatterCSSCommentNode extends FormatterCommentNode
 		return CSSFormatterConstants.WRAP_COMMENTS;
 	}
 	
-	protected boolean isAddingNewLine()
-	{
-		return true;
-	}
 }

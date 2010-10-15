@@ -15,7 +15,7 @@ import com.aptana.ui.util.SWTFactory;
 public class CSSFormatterBracesPage extends FormatterModifyTabPage
 {
 //	private final String[] tabOptionItems = new String[] { 1, 2, 3 };
-	private final String[] tabOptionNames = new String[] { "Same line", "Next line", "Next line indented" };
+//	private final String[] tabOptionNames = new String[] { "Same line", "Next line", "Next line indented" };
 
 	public CSSFormatterBracesPage(IFormatterModifyDialog dialog)
 	{
@@ -26,6 +26,7 @@ public class CSSFormatterBracesPage extends FormatterModifyTabPage
 	{
 		Group bracesGroup = SWTFactory.createGroup(parent, "Brace positions", 1, 2, GridData.FILL_HORIZONTAL);
 		
+		manager.createCheckbox(bracesGroup, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, "Insert new line before block");
 //		manager.createCombo(parent, /*some constant for braces indent*/, "Blocks", tabOptionItems, tabOptionNames);
 	}
 

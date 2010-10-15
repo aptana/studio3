@@ -26,6 +26,11 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 	{
 		addTabPage("Control Statements", new CSSFormatterControlStatementsPage(this));
 		addTabPage("Braces", new CSSFormatterBracesPage(this));
-		addTabPage("Comments", new CSSFormatterCommentsPage(this));
+
+		// TODO: Fix issue with comments not wrapping correctly with newlines
+		// Something like: /* 
+		//						border: 1px solid red;
+		//					*/
+//		addTabPage("Comments", new CSSFormatterCommentsPage(this));
 	}
 }
