@@ -1,5 +1,8 @@
 package com.aptana.editor.json;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -8,8 +11,56 @@ import org.osgi.framework.BundleContext;
  */
 public class JSONPlugin extends AbstractUIPlugin
 {
-	public static final String PLUGIN_ID = "com.aptana.editor.json";
+	public static final String PLUGIN_ID = "com.aptana.editor.json"; //$NON-NLS-1$
 	private static JSONPlugin plugin;
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static JSONPlugin getDefault()
+	{
+		return plugin;
+	}
+
+	/**
+	 * getImage
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static Image getImage(String path)
+	{
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
+
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+
+			if (id == null)
+			{
+				return null;
+			}
+
+			registry.put(path, id);
+			image = registry.get(path);
+		}
+
+		return image;
+	}
+
+	/**
+	 * getImageDescriptor
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
 	/**
 	 * The constructor
@@ -36,15 +87,5 @@ public class JSONPlugin extends AbstractUIPlugin
 	{
 		plugin = null;
 		super.stop(context);
-	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static JSONPlugin getDefault()
-	{
-		return plugin;
 	}
 }
