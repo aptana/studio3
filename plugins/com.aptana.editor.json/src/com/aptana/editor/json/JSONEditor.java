@@ -35,11 +35,39 @@
 package com.aptana.editor.json;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.json.outline.JSONOutlineContentProvider;
+import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 import com.aptana.editor.json.parsing.IJSONParserConstants;
 
 public class JSONEditor extends AbstractThemeableEditor
 {
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(IJSONParserConstants.LANGUAGE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		CommonOutlinePage outline = super.createOutlinePage();
+
+		outline.setContentProvider(new JSONOutlineContentProvider());
+		outline.setLabelProvider(new JSONOutlineLabelProvider());
+
+		return outline;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -50,14 +78,5 @@ public class JSONEditor extends AbstractThemeableEditor
 
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new JSONDocumentProvider());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(IJSONParserConstants.LANGUAGE);
 	}
 }
