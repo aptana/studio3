@@ -37,9 +37,11 @@ package com.aptana.editor.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
@@ -76,6 +78,9 @@ public class JSONSourceScanner extends RuleBasedScanner
 
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
+		rules.add(new EndOfLineRule("//", createToken(JSONTokenType.COMMENT)));
+		rules.add(new MultiLineRule("/*", "*/", createToken(JSONTokenType.COMMENT)));
+		
 		rules.add(new SingleLineRule("\"", "\"", createToken(JSONTokenType.STRING_DOUBLE)));
 		rules.add(new SingleLineRule("'", "'", createToken(JSONTokenType.STRING_SINGLE)));
 
