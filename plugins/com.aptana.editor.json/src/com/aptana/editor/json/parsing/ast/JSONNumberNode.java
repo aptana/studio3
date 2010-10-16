@@ -39,11 +39,24 @@ package com.aptana.editor.json.parsing.ast;
  */
 public class JSONNumberNode extends JSONNode
 {
+	private String _text;
+
 	/**
 	 * JSONNumberNode
 	 */
-	public JSONNumberNode()
+	public JSONNumberNode(String text)
 	{
 		super(JSONNodeType.NUMBER);
+
+		this._text = text;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getText()
+	 */
+	public String getText()
+	{
+		return this._text;
 	}
 }

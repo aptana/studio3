@@ -73,6 +73,16 @@ public class JSONNode extends ParseNode
 		return this._type.getIndex();
 	}
 
+	/**
+	 * getType
+	 * 
+	 * @return
+	 */
+	public JSONNodeType getType()
+	{
+		return this._type;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#toString()

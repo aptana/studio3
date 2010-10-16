@@ -46,4 +46,13 @@ public class JSONTrueNode extends JSONNode
 	{
 		super(JSONNodeType.TRUE);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getText()
+	 */
+	public String getText()
+	{
+		return "true"; //$NON-NLS-1$
+	}
 }

@@ -46,4 +46,13 @@ public class JSONNullNode extends JSONNode
 	{
 		super(JSONNodeType.NULL);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getText()
+	 */
+	public String getText()
+	{
+		return "null"; //$NON-NLS-1$
+	}
 }
