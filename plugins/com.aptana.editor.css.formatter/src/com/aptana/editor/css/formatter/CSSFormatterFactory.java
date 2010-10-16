@@ -29,10 +29,8 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 			// TODO - Add more...
 			CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, CSSFormatterConstants.FORMATTER_TAB_CHAR,
 			CSSFormatterConstants.FORMATTER_TAB_SIZE, CSSFormatterConstants.WRAP_COMMENTS,
-			CSSFormatterConstants.WRAP_COMMENTS_LENGTH, CSSFormatterConstants.INDENT_EXCLUDED_TAGS,
-			CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS, CSSFormatterConstants.LINES_AFTER_ELEMENTS,
-			CSSFormatterConstants.LINES_AFTER_NON_CSS_ELEMENTS,
-			CSSFormatterConstants.LINES_BEFORE_NON_CSS_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES };
+			CSSFormatterConstants.WRAP_COMMENTS_LENGTH, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
+			CSSFormatterConstants.LINES_AFTER_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{
@@ -75,5 +73,5 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 	{
 		return CSSFormatterPlugin.getDefault().getPreferenceStore();
 	}
-	
+
 }

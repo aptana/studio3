@@ -6,11 +6,9 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
-import com.aptana.formatter.nodes.FormatterCommentNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSCommentNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRuleNode;
 import com.aptana.editor.css.parsing.ast.*;
@@ -63,21 +61,9 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
-
-		// DEBUG
-		// System.out.println(elementNode.getName() + "[" + elementNode.getStartingOffset() + ", "
-		// + elementNode.getEndingOffset() + "]");
-
 		CSSNode cssNode = (CSSNode) node;
-		if (cssNode.getNodeType() == CSSNodeTypes.COMMENT)
-		{
-			// We got a CSSCommentNode
-			FormatterCommentNode commentNode = new FormatterCSSCommentNode(document, cssNode.getStartingOffset(),
-					cssNode.getEndingOffset() + 1);
-			// We just need to add a child here. We cannot 'push', since the comment node is not a container node.
-			addChild(commentNode);
-		}
-		else if (cssNode.getNodeType() == CSSNodeTypes.RULE)
+	
+		if (cssNode.getNodeType() == CSSNodeTypes.RULE)
 		{
 			pushFormatterNode(cssNode);
 		}
@@ -102,10 +88,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				.getName().toLowerCase());
 
 		CSSSelectorNode[] selectors = ruleNode.getSelectors();
-//		int selectorsEndOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1,
-//				document);
-		int blockStartOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1,
-				document);
+		int blockStartOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1, document);
 
 		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
 		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(), blockStartOffset));
@@ -113,7 +96,6 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		checkedPop(formatterRuleNode, -1);
 
-		// TODO: need to change the type of element
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, StringUtil.EMPTY);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
@@ -123,7 +105,8 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
 					declarations[0].getStartingOffset()));
-		} else
+		}
+		else
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, ruleNode.getEndingOffset()));
 		}

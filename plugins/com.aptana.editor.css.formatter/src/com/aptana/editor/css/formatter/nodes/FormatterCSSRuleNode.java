@@ -32,20 +32,18 @@ public class FormatterCSSRuleNode extends FormatterBlockWithBeginNode
 	 */
 	protected boolean isIndenting()
 	{
-		Set<String> set = getDocument().getSet(CSSFormatterConstants.INDENT_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	protected boolean isAddingNewLine()
+	protected boolean isAddingBeginNewLine()
 	{
-		Set<String> set = getDocument().getSet(CSSFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return false;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see
