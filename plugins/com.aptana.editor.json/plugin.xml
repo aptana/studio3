@@ -22,7 +22,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="json"
             id="com.aptana.contenttype.json"
-            name="JSON Source"
+            name="%content-type.name"
             priority="normal">
       </content-type>
    </extension>
