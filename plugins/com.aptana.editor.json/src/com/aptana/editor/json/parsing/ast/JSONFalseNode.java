@@ -46,7 +46,7 @@ public class JSONFalseNode extends JSONNode
 	{
 		super(JSONNodeType.FALSE);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getText()

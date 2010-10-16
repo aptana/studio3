@@ -41,7 +41,6 @@ import com.aptana.parsing.ast.ParseRootNode;
 
 /**
  * @author klindsey
- *
  */
 public class JSONParseRootNode extends ParseRootNode
 {

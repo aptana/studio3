@@ -62,40 +62,40 @@ public class JSONOutlineLabelProvider extends LabelProvider
 	public Image getImage(Object element)
 	{
 		Image result = null;
-		
+
 		if (element instanceof JSONNode)
 		{
 			JSONNode node = (JSONNode) element;
-			
+
 			switch (node.getType())
 			{
 				case ARRAY:
 					result = ARRAY;
 					break;
-					
+
 				case TRUE:
 				case FALSE:
 					result = BOOLEAN;
 					break;
-					
+
 				case NULL:
 					result = NULL;
 					break;
-					
+
 				case NUMBER:
 					result = NUMBER;
 					break;
-					
+
 				case OBJECT:
 					result = OBJECT;
 					break;
-					
+
 				case STRING:
 					result = STRING;
 					break;
 			}
 		}
-		
+
 		return (result == null) ? super.getImage(element) : result;
 	}
 
@@ -107,12 +107,12 @@ public class JSONOutlineLabelProvider extends LabelProvider
 	public String getText(Object element)
 	{
 		String result = null;
-		
+
 		if (element instanceof JSONNode)
 		{
 			JSONNode node = (JSONNode) element;
 			IParseNode parent = node.getParent();
-			
+
 			if (parent instanceof JSONEntryNode)
 			{
 				result = parent.getFirstChild().getText();
@@ -122,8 +122,8 @@ public class JSONOutlineLabelProvider extends LabelProvider
 				result = node.getText();
 			}
 		}
-		
-		return (result == null ) ? super.getText(element) : result;
+
+		return (result == null) ? super.getText(element) : result;
 	}
 
 }

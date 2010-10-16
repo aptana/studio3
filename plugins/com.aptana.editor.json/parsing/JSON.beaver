@@ -83,7 +83,7 @@ Value
     		return new JSONNullNode();
     	:}
     ;
-    
+
 String
     =   STRING_DOUBLE.s
     	{:
@@ -103,12 +103,12 @@ Object
     |   LCURLY Entries.e RCURLY
         {:
             JSONObjectNode object = new JSONObjectNode();
-            
+
             for (IParseNode node : e)
             {
                 object.addChild(node);
             }
-            
+
             return object;
         :}
     ;
@@ -122,10 +122,10 @@ Entry
     =   String.s COLON Value.v
         {:
             JSONEntryNode entry = new JSONEntryNode();
-            
+
             entry.addChild(s);
             entry.addChild(v);
-            
+
             return entry;
         :}
     ;
@@ -138,12 +138,12 @@ Array
     |   LBRACKET Values.v RBRACKET
         {:
             JSONArrayNode array = new JSONArrayNode();
-            
+
             for (IParseNode node : v)
             {
                 array.addChild(node);
             }
-            
+
             return array;
         :}
     ;

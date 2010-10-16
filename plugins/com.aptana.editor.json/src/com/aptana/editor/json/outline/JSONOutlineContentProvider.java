@@ -53,12 +53,12 @@ public class JSONOutlineContentProvider extends CommonOutlineContentProvider
 		{
 			JSONObjectNode entry = (JSONObjectNode) parentElement;
 			Object[] children = new Object[entry.getChildCount()];
-			
+
 			for (int i = 0; i < children.length; i++)
 			{
 				children[i] = entry.getChild(i).getLastChild();
 			}
-			
+
 			return children;
 		}
 		else

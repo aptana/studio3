@@ -46,7 +46,7 @@ public class JSONObjectNode extends JSONNode
 	{
 		super(JSONNodeType.OBJECT);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getText()

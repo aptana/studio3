@@ -46,7 +46,7 @@ public class JSONArrayNode extends JSONNode
 	{
 		super(JSONNodeType.ARRAY);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getText()

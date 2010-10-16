@@ -59,53 +59,53 @@ public class JSONParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_v = _symbols[offset + 1];
 					final JSONNode v = (JSONNode) _symbol_v.value;
-					
+
             return new JSONParseRootNode(new Symbol[] { v });
 			}
 			case 1: // JSON = 
 			{
-					
+
             return new JSONParseRootNode();
 			}
 			case 3: // Value = NUMBER.n
 			{
 					final Symbol _symbol_n = _symbols[offset + 1];
 					final String n = (String) _symbol_n.value;
-					
+
     		return new JSONNumberNode(n);
 			}
 			case 6: // Value = TRUE
 			{
-					
+
     		return new JSONTrueNode();
 			}
 			case 7: // Value = FALSE
 			{
-					
+
     		return new JSONFalseNode();
 			}
 			case 8: // Value = NULL
 			{
-					
+
     		return new JSONNullNode();
 			}
 			case 9: // String = STRING_DOUBLE.s
 			{
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
-					
+
     		return new JSONStringNode(s.substring(1, s.length() - 1));
 			}
 			case 10: // String = STRING_SINGLE.s
 			{
 					final Symbol _symbol_s = _symbols[offset + 1];
 					final String s = (String) _symbol_s.value;
-					
+
     		return new JSONStringNode(s.substring(1, s.length() - 1));
 			}
 			case 11: // Object = LCURLY RCURLY
 			{
-					
+
             return new JSONObjectNode();
 			}
 			case 12: // Object = LCURLY Entries.e RCURLY
@@ -113,14 +113,14 @@ public class JSONParser extends Parser implements IParser {
 					final Symbol _symbol_e = _symbols[offset + 2];
 					final ArrayList _list_e = (ArrayList) _symbol_e.value;
 					final JSONNode[] e = _list_e == null ? new JSONNode[0] : (JSONNode[]) _list_e.toArray(new JSONNode[_list_e.size()]);
-					
+
             JSONObjectNode object = new JSONObjectNode();
-            
+
             for (IParseNode node : e)
             {
                 object.addChild(node);
             }
-            
+
             return object;
 			}
 			case 13: // Entries = Entries COMMA Entry
@@ -137,17 +137,17 @@ public class JSONParser extends Parser implements IParser {
 					final JSONNode s = (JSONNode) _symbol_s.value;
 					final Symbol _symbol_v = _symbols[offset + 3];
 					final JSONNode v = (JSONNode) _symbol_v.value;
-					
+
             JSONEntryNode entry = new JSONEntryNode();
-            
+
             entry.addChild(s);
             entry.addChild(v);
-            
+
             return entry;
 			}
 			case 16: // Array = LBRACKET RBRACKET
 			{
-					
+
             return new JSONArrayNode();
 			}
 			case 17: // Array = LBRACKET Values.v RBRACKET
@@ -155,14 +155,14 @@ public class JSONParser extends Parser implements IParser {
 					final Symbol _symbol_v = _symbols[offset + 2];
 					final ArrayList _list_v = (ArrayList) _symbol_v.value;
 					final JSONNode[] v = _list_v == null ? new JSONNode[0] : (JSONNode[]) _list_v.toArray(new JSONNode[_list_v.size()]);
-					
+
             JSONArrayNode array = new JSONArrayNode();
-            
+
             for (IParseNode node : v)
             {
                 array.addChild(node);
             }
-            
+
             return array;
 			}
 			case 18: // Values = Values COMMA Value

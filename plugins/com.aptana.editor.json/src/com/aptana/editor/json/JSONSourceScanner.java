@@ -80,7 +80,7 @@ public class JSONSourceScanner extends RuleBasedScanner
 
 		rules.add(new EndOfLineRule("//", createToken(JSONTokenType.COMMENT)));
 		rules.add(new MultiLineRule("/*", "*/", createToken(JSONTokenType.COMMENT)));
-		
+
 		rules.add(new SingleLineRule("\"", "\"", createToken(JSONTokenType.STRING_DOUBLE)));
 		rules.add(new SingleLineRule("'", "'", createToken(JSONTokenType.STRING_SINGLE)));
 
