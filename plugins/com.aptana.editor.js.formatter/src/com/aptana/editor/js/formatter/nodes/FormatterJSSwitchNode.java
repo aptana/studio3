@@ -55,7 +55,7 @@ public class FormatterJSSwitchNode extends FormatterJSBlockNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingNewLine()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingBeginNewLine()
 	 */
 	@Override
 	protected boolean isAddingBeginNewLine()

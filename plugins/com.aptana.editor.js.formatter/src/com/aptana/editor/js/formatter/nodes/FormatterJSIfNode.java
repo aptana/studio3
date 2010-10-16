@@ -35,82 +35,100 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.editor.js.parsing.ast.JSBinaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.IFormatterWriter;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
- * A JS declaration formatter node.<br>
- * This node represents a declaration part of a javascript block. It can be a function declaration, an if statement
- * part, a while statement declaration etc. Everything up to the open bracket (if exists) will be in this 'declaration'.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @author Shalom
  */
-public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
+public class FormatterJSIfNode extends FormatterJSDeclarationNode
 {
 
-	protected boolean hasBlockedChild;
-	protected IParseNode node;
+	private boolean inElseIf;
 
 	/**
 	 * @param document
 	 * @param hasBlockedChild
-	 * @param noNewLine
-	 *            Provide a hint flag to block any new line added before this node. Note that this is just a hint which
-	 *            can be overwritten by a preference setting.
 	 * @param node
 	 */
-	public FormatterJSDeclarationNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node)
+	public FormatterJSIfNode(IFormatterDocument document, boolean hasBlockedChild, IParseNode node)
 	{
-		super(document);
-		this.hasBlockedChild = hasBlockedChild;
-		this.node = node;
+		super(document, hasBlockedChild, node);
+		// Check if this node is located in the 'false' block of a parent 'if'. In that case, we can say for sure that
+		// this 'if' arrives right after an 'else'.
+		if (node.getParent().getNodeType() == JSNodeTypes.IF)
+		{
+			JSIfNode parentIfNode = (JSIfNode) node.getParent();
+			inElseIf = parentIfNode.getFalseBlock() == node;
+		}
 	}
 
-	/**
-	 * For a declaration, when this call returns true, a new line is added before the declaration.
-	 * 
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return super.shouldConsumePreviousWhiteSpaces();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
+	 */
+	@Override
+	public int getSpacesCountBefore()
+	{
+		if (shouldConsumePreviousWhiteSpaces())
+		{
+			return 1;
+		}
+		return super.getSpacesCountBefore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode#isAddingBeginNewLine()
 	 */
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		// To change this behavior, it's recommended to create a designated subclass and override this method to return
-		// the value set in the preferences.
-		if (node instanceof JSBinaryOperatorNode)
+		if (inElseIf)
 		{
-			return false;
-		}
-		switch (node.getNodeType())
-		{
-			case JSNodeTypes.DECLARATION:
-			case JSNodeTypes.ASSIGN:
-			case JSNodeTypes.RETURN:
-			case JSNodeTypes.INVOKE:
-			case JSNodeTypes.GROUP:
-			case JSNodeTypes.ARGUMENTS:
-			case JSNodeTypes.CONDITIONAL:
-			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.TRY:
-				return false;
-			case JSNodeTypes.CATCH:
-				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
-			case JSNodeTypes.FINALLY:
-				return !hasBlockedChild
-						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
+			return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
 		}
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptBody(com.aptana.formatter.IFormatterContext,
+	 * com.aptana.formatter.IFormatterWriter)
 	 */
 	@Override
-	protected boolean isIndenting()
+	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		return !hasBlockedChild;
+		if (inElseIf && !getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT))
+		{
+			int indent = context.getIndent();
+			if (indent > 0)
+			{
+				context.decIndent();
+			}
+			super.acceptBody(context, visitor);
+			if (indent > 0)
+			{
+				context.incIndent();
+			}
+		}
+		else
+		{
+			super.acceptBody(context, visitor);
+		}
 	}
 }

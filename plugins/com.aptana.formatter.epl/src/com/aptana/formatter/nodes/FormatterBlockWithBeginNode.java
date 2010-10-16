@@ -53,10 +53,10 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			context.incIndent();
 		}
-		if (addingNewLine)
-		{
-			visitor.writeLineBreak(context);
-		}
+		// if (addingNewLine)
+		// {
+		// visitor.writeLineBreak(context);
+		// }
 		super.accept(context, visitor);
 		if (indenting)
 		{

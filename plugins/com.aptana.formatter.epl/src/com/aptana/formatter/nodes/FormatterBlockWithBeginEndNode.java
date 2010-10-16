@@ -41,15 +41,11 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 		}
 		context.setBlankLines(getBlankLinesBefore(context));
 		boolean beginWithNewLine = isAddingBeginNewLine();
-		if (beginWithNewLine && !visitor.endsWithNewLine())
+		if (beginWithNewLine && !visitor.endsWithNewLine() && !shouldConsumePreviousWhiteSpaces())
 		{
 			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
 			// a new-line.
 			visitor.writeLineBreak(context);
-		}
-		else if (!beginWithNewLine && visitor.endsWithNewLine())
-		{
-			visitor.removeTrailingLineBreaks();
 		}
 		if (begin != null)
 		{
@@ -85,10 +81,10 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 				visitor.writeLineBreak(context);
 			}
 			visitor.write(context, end.getStartOffset(), end.getEndOffset());
-			if (endWithNewLine)
-			{
-				visitor.writeLineBreak(context);
-			}
+			// if (endWithNewLine)
+			// {
+			// visitor.writeLineBreak(context);
+			// }
 		}
 		context.setBlankLines(getBlankLinesAfter(context));
 	}

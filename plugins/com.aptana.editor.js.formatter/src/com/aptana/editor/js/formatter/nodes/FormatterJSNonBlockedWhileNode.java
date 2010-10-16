@@ -34,8 +34,9 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
  * A formatter node that represents 'while' statements that end with a semicolon and do not contain an inner block.<br>
@@ -43,9 +44,8 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNode
+public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginNode
 {
-
 
 	/**
 	 * @param document
@@ -54,5 +54,15 @@ public class FormatterJSNonBlockedWhileNode extends FormatterBlockWithBeginEndNo
 	public FormatterJSNonBlockedWhileNode(IFormatterDocument document)
 	{
 		super(document);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 */
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT);
 	}
 }

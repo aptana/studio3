@@ -42,6 +42,7 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSElseIfNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSElseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSIfNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSObjectNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSSwitchNode;
@@ -163,7 +164,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			// First, construct the if condition node
-			FormatterBlockWithBeginNode conditionNode = new FormatterJSDeclarationNode(document, isCurlyTrueBlock, node);
+			FormatterBlockWithBeginNode conditionNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node);
 			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getRightParenthesis()
 					.getEnd() + 1));
 			push(conditionNode);
@@ -192,7 +193,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elsePos = segment.toLowerCase().indexOf("else"); //$NON-NLS-1$
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
-				FormatterBlockWithBeginNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock);
+				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock);
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -252,18 +253,13 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// now deal with the 'while' condition part. we need to include the word 'while' that appears
 			// somewhere between the block-end and the condition start.
 			// We wrap this node as a begin-end node that will hold the condition internals as children
-			JSNode condition = (JSNode) node.getCondition();
 			FormatterJSNonBlockedWhileNode whileNode = new FormatterJSNonBlockedWhileNode(document);
 			// Search for the exact 'while' start offset
 			int whileBeginOffset = locateCharacterSkippingWhitespaces(document, blockEnd + 1, 'w', true);
-			whileNode.setBegin(createTextNode(document, whileBeginOffset, condition.getStartingOffset()));
+			int conditionEnd = locateColonOrSemicolonInLine(node.getEndingOffset() + 1, document);
+			whileNode.setBegin(createTextNode(document, whileBeginOffset, conditionEnd));
 			push(whileNode);
-			visitChildren(condition);
-			int conditionEnd = condition.getEndingOffset() + 1;
-			checkedPop(whileNode, conditionEnd);
-			conditionEnd = locateCharacterSkippingWhitespaces(document, conditionEnd, ')', false);
-			int end = locateColonOrSemicolonInLine(conditionEnd + 1, document);
-			whileNode.setEnd(createTextNode(document, conditionEnd, end));
+			checkedPop(whileNode, -1);
 		}
 
 		/*

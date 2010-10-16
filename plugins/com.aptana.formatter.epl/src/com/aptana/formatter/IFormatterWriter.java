@@ -35,8 +35,6 @@ public interface IFormatterWriter
 	 */
 	void writeLineBreak(IFormatterContext context);
 	
-	void removeTrailingLineBreaks();
-
 	void skipNextLineBreaks(IFormatterContext context);
 
 	void appendToPreviousLine(IFormatterContext context, String text);
