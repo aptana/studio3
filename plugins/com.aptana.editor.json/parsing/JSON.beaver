@@ -46,8 +46,8 @@
 %terminals COMMA, COLON;
 %terminals NUMBER, TRUE, FALSE, NULL;
 
-%typeof Entry, String, Value = "JSONNode";
-%typeof NUMBER, TRUE, FALSE, NULL = "JSONNode";
+%typeof Entry, Value, String = "JSONNode";
+%typeof STRING_SINGLE, STRING_DOUBLE, NUMBER = "String";
 
 %goal JSON;
 
@@ -64,9 +64,9 @@ JSON
 
 Value
     =   String
-    |   NUMBER
+    |   NUMBER.n
     	{:
-    		return new JSONNumberNode();
+    		return new JSONNumberNode(n);
     	:}
     |   Object
     |   Array
@@ -85,13 +85,13 @@ Value
     ;
     
 String
-    =   STRING_DOUBLE
+    =   STRING_DOUBLE.s
     	{:
-    		return new JSONStringNode();
+    		return new JSONStringNode(s.substring(1, s.length() - 1));
     	:}
-    |   STRING_SINGLE
+    |   STRING_SINGLE.s
     	{:
-    		return new JSONStringNode();
+    		return new JSONStringNode(s.substring(1, s.length() - 1));
     	:}
     ;
 
