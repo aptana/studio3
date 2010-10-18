@@ -32,43 +32,90 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.ide.filesystem.s3;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
+import org.osgi.framework.BundleContext;
 
-public class DTDEditor extends AbstractThemeableEditor
+/**
+ * The activator class controls the plug-in life cycle
+ */
+public class S3FileSystemPlugin extends Plugin
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.ide.filesystem.s3"; //$NON-NLS-1$
+
+	// The shared instance
+	private static S3FileSystemPlugin plugin;
+
+	/**
+	 * The constructor
 	 */
-	protected FileService createFileService()
+	public S3FileSystemPlugin()
 	{
-		return new FileService(DTDParserConstants.LANGUAGE);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public void start(BundleContext context) throws Exception
 	{
-		return null;
+		super.start(context);
+		plugin = this;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	protected void initializeEditor()
+	public void stop(BundleContext context) throws Exception
 	{
-		super.initializeEditor();
+		plugin = null;
+		super.stop(context);
+	}
 
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static S3FileSystemPlugin getDefault()
+	{
+		return plugin;
+	}
+
+	public static void log(Exception e)
+	{
+		getDefault().getLog().log(status(e));
+	}
+
+	public static CoreException coreException(Exception e)
+	{
+		return coreException(-1, e);
+	}
+
+	private static IStatus status(Exception e)
+	{
+		return status(-1, e.getMessage(), e);
+	}
+
+	private static IStatus status(int errorCode, String msg, Exception e)
+	{
+		return new Status(IStatus.ERROR, PLUGIN_ID, errorCode, msg, e);
+	}
+
+	public static CoreException coreException(int errorCode, Exception e)
+	{
+		return coreException(errorCode, e.getMessage(), e);
+	}
+
+	public static CoreException coreException(int errorCode, String msg, Exception e)
+	{
+		return new CoreException(status(errorCode, msg, e));
 	}
 }

@@ -32,43 +32,31 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+package com.aptana.ui.s3.internal;
 
-public class DTDEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.IShellProvider;
+
+import com.aptana.ui.IPropertyDialogProvider;
+import com.aptana.ui.s3.dialogs.S3ConnectionPointPropertyDialog;
+
+/**
+ * @author Max Stepanov
+ *
+ */
+public class S3PropertyDialogProvider implements IPropertyDialogProvider {
+
+	/* (non-Javadoc)
+	 * @see com.aptana.ide.ui.io.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
 	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
+	public Dialog createPropertyDialog(IShellProvider shellProvider) {
+		IPropertyDialogProvider contributedPropertyDialogProvider = (IPropertyDialogProvider) Platform.getAdapterManager()
+								.loadAdapter(this, IPropertyDialogProvider.class.getName());
+		if (contributedPropertyDialogProvider != null && contributedPropertyDialogProvider != this) {
+			return contributedPropertyDialogProvider.createPropertyDialog(shellProvider);
+		}
+		return new S3ConnectionPointPropertyDialog(shellProvider.getShell());
 	}
 }

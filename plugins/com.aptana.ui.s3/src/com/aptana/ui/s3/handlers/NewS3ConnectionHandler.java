@@ -32,43 +32,23 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.ui.s3.handlers;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class DTDEditor extends AbstractThemeableEditor
+import com.aptana.ui.s3.actions.NewS3ConnectionAction;
+
+public class NewS3ConnectionHandler extends AbstractHandler
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
+		NewS3ConnectionAction action = new NewS3ConnectionAction();
+		action.setActivePart(null, HandlerUtil.getActivePart(event));
+		action.run(null);
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
 	}
 }

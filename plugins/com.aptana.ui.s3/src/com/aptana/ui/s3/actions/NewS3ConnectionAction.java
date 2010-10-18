@@ -32,43 +32,73 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+package com.aptana.ui.s3.actions;
 
-public class DTDEditor extends AbstractThemeableEditor
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
+
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ui.s3.internal.S3PropertyDialogProvider;
+import com.aptana.ui.IPropertyDialog;
+
+/**
+ * @author Max Stepanov
+ */
+public class NewS3ConnectionAction implements IObjectActionDelegate
 {
+
+	private static final String DEFAULT_TYPE = "s3"; //$NON-NLS-1$
+
+	private IWorkbenchPart targetPart;
+
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
+	 * org.eclipse.ui.IWorkbenchPart)
 	 */
-	protected FileService createFileService()
+	public void setActivePart(IAction action, IWorkbenchPart targetPart)
 	{
-		return new FileService(DTDParserConstants.LANGUAGE);
+		this.targetPart = targetPart;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public void run(IAction action)
 	{
-		return null;
+		Dialog dlg = new S3PropertyDialogProvider().createPropertyDialog(targetPart.getSite());
+		if (dlg instanceof IPropertyDialog)
+		{
+			String typeId;
+			if (action == null)
+			{
+				typeId = DEFAULT_TYPE;
+			}
+			else
+			{
+				typeId = action.getId();
+				int index = typeId.lastIndexOf('.');
+				if (index >= 0 && index + 1 < typeId.length())
+				{
+					typeId = typeId.substring(index + 1);
+				}
+			}
+			((IPropertyDialog) dlg).setPropertySource(CoreIOPlugin.getConnectionPointManager().getType(typeId));
+		}
+		dlg.open();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 * org.eclipse.jface.viewers.ISelection)
 	 */
-	protected void initializeEditor()
+	public void selectionChanged(IAction action, ISelection selection)
 	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
 	}
 }

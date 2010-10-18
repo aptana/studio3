@@ -32,43 +32,20 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+package com.aptana.ui.s3.internal;
 
-public class DTDEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
-	}
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
-		return null;
-	}
+import com.aptana.ide.core.io.IConnectionPoint;
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
+/**
+ * @author Max Stepanov
+ *
+ */
+public interface IConnectionRunnable {
 
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
-	}
+	public void beforeConnect(IConnectionPoint connectionPoint) throws CoreException, InterruptedException;
+	public void afterConnect(IConnectionPoint connectionPoint, IProgressMonitor monitor) throws CoreException, InterruptedException;
 }

@@ -32,43 +32,72 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.ui.s3;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleContext;
 
-public class DTDEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+/**
+ * The activator class controls the plug-in life cycle
+ */
+public class S3UIPlugin extends AbstractUIPlugin {
+
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.ui.s3"; //$NON-NLS-1$
+
+	// The shared instance
+	private static S3UIPlugin plugin;
+	
+	/**
+	 * The constructor
 	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
+	public S3UIPlugin() {
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
-		return null;
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
 	}
+
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static S3UIPlugin getDefault() {
+		return plugin;
+	}
+
+	public static void logImportant(CoreException e)
+	{
+		getDefault().getLog().log(e.getStatus());
+	}
+
+	public static void logError(String msg, CoreException e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	}
+
+	public static ImageDescriptor getImageDescriptor(String string)
+	{
+		return imageDescriptorFromPlugin(PLUGIN_ID, string);
+	}
+
 }

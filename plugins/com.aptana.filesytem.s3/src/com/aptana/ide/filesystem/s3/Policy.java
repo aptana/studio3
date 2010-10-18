@@ -32,43 +32,38 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+package com.aptana.ide.filesystem.s3;
 
-public class DTDEditor extends AbstractThemeableEditor
+import java.text.MessageFormat;
+
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+
+/**
+ * @author Max Stepanov
+ */
+public final class Policy
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+
+	/**
+	 * 
 	 */
-	protected FileService createFileService()
+	private Policy()
 	{
-		return new FileService(DTDParserConstants.LANGUAGE);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public static String generateAuthId(String proto, IBaseRemoteConnectionPoint connectionPoint)
 	{
+		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost());
+	}
+
+	public static String generateAuthId(String proto, String login, String host)
+	{
+		if (host != null && host.length() > 0 && login != null && login.length() > 0)
+		{
+			return MessageFormat.format("{0}/{1}@{2}", new Object[] { //$NON-NLS-1$
+					proto, login, host });
+		}
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
 	}
 }

@@ -32,43 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+package com.aptana.ui.s3.internal;
 
-public class DTDEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
+import com.aptana.ide.core.io.ConnectionContext;
+
+/**
+ * @author Max Stepanov
+ *
+ */
+public interface IOptionsComposite {
+
+	public static interface Listener {
+
+		public boolean isValid();
+		public void validate();
+		public boolean testConnection(ConnectionContext context, IConnectionRunnable connectRunnable);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	public void loadPropertiesFrom(Object element);
+	
+	/**
+	 * 
+	 * @param element
+	 * @return true if element properties has been changed
 	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
-		return null;
-	}
+	public boolean savePropertiesTo(Object element);
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
-
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
-	}
+	public String isValid();
+	public void setValid(boolean valid);
+	public void lockUI(boolean lock);
 }

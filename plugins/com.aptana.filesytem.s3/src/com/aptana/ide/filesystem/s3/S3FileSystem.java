@@ -32,43 +32,59 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.ide.filesystem.s3;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 
-public class DTDEditor extends AbstractThemeableEditor
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.IFileTree;
+import org.eclipse.core.filesystem.provider.FileSystem;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+public class S3FileSystem extends FileSystem
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
-	protected CommonOutlinePage createOutlinePage()
+	public IFileStore getStore(URI uri)
 	{
-		return null;
+		return new S3FileStore(uri);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
-	protected void initializeEditor()
+	@Override
+	public boolean canDelete()
 	{
-		super.initializeEditor();
+		return true;
+	}
 
-		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
-		this.setDocumentProvider(new DTDDocumentProvider());
+	@Override
+	public boolean canWrite()
+	{
+		return true;
+	}
+
+	@Override
+	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor) throws CoreException
+	{
+		if (!(root instanceof S3FileStore))
+			return null;
+		try
+		{
+			S3FileStore s3Store = (S3FileStore) root;
+			if (monitor != null && monitor.isCanceled())
+				return null;
+			// FIXME What about when s3Store is the absolute root (not in a bucket)?!
+			return new S3FileTree(root, s3Store.listEntries());
+		}
+		catch (MalformedURLException e)
+		{
+			throw S3FileSystemPlugin.coreException(e);
+		}
+		catch (IOException e)
+		{
+			throw S3FileSystemPlugin.coreException(e);
+		}
 	}
 }

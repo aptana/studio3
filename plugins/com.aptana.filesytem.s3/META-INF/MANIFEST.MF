@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: S3 Filesystem Provider
+Bundle-SymbolicName: com.aptana.filesystem.s3;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.aptana.ide.filesystem.s3.S3FileSystemPlugin
+Bundle-Vendor: Aptana, Inc.
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.filesystem;bundle-version="1.0.0",
+ com.aptana.core.io;bundle-version="3.0.0",
+ com.aptana.core.epl;bundle-version="3.0.0",
+ com.aptana.core;bundle-version="3.0.0",
+ com.amazon.s3;bundle-version="1.0.0";visibility:=reexport
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.ide.filesystem.s3
