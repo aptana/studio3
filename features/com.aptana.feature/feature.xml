@@ -429,7 +429,7 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.ide.filesystem.s3"
+         id="com.aptana.filesystem.s3"
          download-size="0"
          install-size="0"
          version="0.0.0"
