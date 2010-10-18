@@ -198,6 +198,8 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	public void setPassword(char[] password)
 	{
 		this.password = password;
+		String authId = Policy.generateAuthId(TYPE, this);
+		CoreIOPlugin.getAuthenticationManager().setPassword(authId, password, false);
 		notifyChanged();
 	}
 
@@ -207,12 +209,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		try
 		{
 			String userInfo = getAccessKey();
-			if (password != null && password.length > 0)
-			{
-				userInfo += ":" + new String(password);
-			}
-			return new URI(TYPE, userInfo, getHost(), getPort(), getPath().toString(), (String) null,
-					(String) null);
+			return new URI(TYPE, userInfo, getHost(), getPort(), getPath().toString(), (String) null, (String) null);
 		}
 		catch (URISyntaxException e)
 		{

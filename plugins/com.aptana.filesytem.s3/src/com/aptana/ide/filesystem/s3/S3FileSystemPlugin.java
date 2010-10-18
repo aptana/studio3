@@ -101,16 +101,21 @@ public class S3FileSystemPlugin extends Plugin
 
 	private static IStatus status(Exception e)
 	{
-		return status(-1, e);
+		return status(-1, e.getMessage(), e);
 	}
 
-	private static IStatus status(int errorCode, Exception e)
+	private static IStatus status(int errorCode, String msg, Exception e)
 	{
-		return new Status(IStatus.ERROR, PLUGIN_ID, errorCode, e.getMessage(), e);
+		return new Status(IStatus.ERROR, PLUGIN_ID, errorCode, msg, e);
 	}
 
 	public static CoreException coreException(int errorCode, Exception e)
 	{
-		return new CoreException(status(errorCode, e));
+		return coreException(errorCode, e.getMessage(), e);
+	}
+
+	public static CoreException coreException(int errorCode, String msg, Exception e)
+	{
+		return new CoreException(status(errorCode, msg, e));
 	}
 }

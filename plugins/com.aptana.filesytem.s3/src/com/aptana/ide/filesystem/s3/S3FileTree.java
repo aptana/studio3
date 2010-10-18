@@ -35,7 +35,10 @@
 package com.aptana.ide.filesystem.s3;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -68,7 +71,9 @@ public class S3FileTree extends FileTree
 	public IFileInfo[] getChildInfos(IFileStore store)
 	{
 		if (!(store instanceof S3FileStore))
+		{
 			return null;
+		}
 		List<ListEntry> matches = getChildEntries(store);
 		List<IFileInfo> infos = new ArrayList<IFileInfo>();
 		for (ListEntry match : matches)
@@ -84,7 +89,7 @@ public class S3FileTree extends FileTree
 	{
 		String name = match.key;
 		int lastSlash = name.lastIndexOf(SEPARATOR);
-		boolean isDirectory = false;
+		boolean isDirectory = (match instanceof PsuedoDirEntry);
 		if (lastSlash != -1)
 		{
 			if (lastSlash == (name.length() - 1))
@@ -93,13 +98,17 @@ public class S3FileTree extends FileTree
 				isDirectory = true;
 				lastSlash = name.lastIndexOf(SEPARATOR);
 				if (lastSlash != -1)
+				{
 					name = name.substring(lastSlash + 1);
+				}
 			}
 			else
 			{
 				name = name.substring(lastSlash);
 				if (name.startsWith(SEPARATOR))
+				{
 					name = name.substring(1);
+				}
 			}
 		}
 
@@ -116,34 +125,75 @@ public class S3FileTree extends FileTree
 		S3FileStore s3Store = (S3FileStore) store;
 		String key = s3Store.getKey();
 		if (key.startsWith(SEPARATOR))
+		{
 			key = key.substring(1);
+		}
+		// FIXME This isn't including the subdirs!
+		Set<String> pseudoDirs = new HashSet<String>();
 		// Find all the entries that have the key as prefix
 		List<ListEntry> matches = new ArrayList<ListEntry>();
 		for (ListEntry entry : entries)
 		{
 			String relative = entry.key;
 			if (relative.startsWith(SEPARATOR))
+			{
 				relative = relative.substring(1);
+			}
 			if (!(key.length() == 0 || relative.startsWith(key + SEPARATOR)))
+			{
 				continue;
+			}
 			// Only limit to direct children!
 			relative = relative.substring(key.length());
 			if (relative.startsWith(SEPARATOR))
+			{
 				relative = relative.substring(1);
+			}
 			if (relative.endsWith(SEPARATOR))
+			{
 				relative = relative.substring(0, relative.length() - 1);
-			if (relative.length() == 0 || relative.indexOf(SEPARATOR) != -1)
+			}
+			if (relative.length() == 0)
+			{
 				continue;
-			matches.add(entry);
+			}
+			int index = relative.indexOf(SEPARATOR);
+			if (index != -1)
+			{
+				String dirName = relative.substring(0, index);
+				if (!pseudoDirs.contains(dirName))
+				{
+					ListEntry dirEntry = new PsuedoDirEntry(dirName);
+					pseudoDirs.add(dirEntry.key);
+					matches.add(dirEntry);
+				}
+			}
+			else
+			{
+				matches.add(entry);
+			}
 		}
 		return matches;
+	}
+
+	private class PsuedoDirEntry extends ListEntry
+	{
+		public PsuedoDirEntry(String dirName)
+		{
+			super();
+			size = 0;
+			lastModified = new Date();
+			key = dirName;
+		}
 	}
 
 	@Override
 	public IFileStore[] getChildStores(IFileStore store)
 	{
 		if (!(store instanceof S3FileStore))
+		{
 			return null;
+		}
 		S3FileStore s3Store = (S3FileStore) store;
 		List<ListEntry> matches = getChildEntries(s3Store);
 		List<IFileStore> childrenStores = new ArrayList<IFileStore>();
@@ -151,7 +201,9 @@ public class S3FileTree extends FileTree
 		{
 			String childName = match.key;
 			if (childName.endsWith(SEPARATOR))
+			{
 				childName = childName.substring(0, childName.length() - 1);
+			}
 			childrenStores.add(s3Store.getChild(childName));
 		}
 		return childrenStores.toArray(new IFileStore[childrenStores.size()]);
@@ -161,7 +213,9 @@ public class S3FileTree extends FileTree
 	public IFileInfo getFileInfo(IFileStore store)
 	{
 		if (!(store instanceof S3FileStore))
+		{
 			return null;
+		}
 		S3FileStore s3Store = (S3FileStore) store;
 		String key = s3Store.getKey();
 		// generate an info from a ListEntry if we have a match!
@@ -169,11 +223,17 @@ public class S3FileTree extends FileTree
 		{
 			String entryKey = entry.key;
 			if (entryKey.startsWith(SEPARATOR))
+			{
 				entryKey = entryKey.substring(1);
+			}
 			if (entryKey.endsWith(SEPARATOR))
+			{
 				entryKey = entryKey.substring(0, entryKey.length() - 1);
+			}
 			if (entryKey.equals(key))
+			{
 				return generateFileInfo(entry);
+			}
 		}
 		return s3Store.fetchInfo();
 	}

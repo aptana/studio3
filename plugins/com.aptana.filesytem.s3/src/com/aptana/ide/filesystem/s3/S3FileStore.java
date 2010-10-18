@@ -35,6 +35,7 @@
 package com.aptana.ide.filesystem.s3;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -198,7 +199,14 @@ public class S3FileStore extends FileStore
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException
 	{
 		FileInfo info = new FileInfo(getName());
-		if (isBucket())
+		if (path.isRoot())
+		{
+			info.setExists(true);
+			info.setDirectory(true);
+			info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
+			info.setAttribute(EFS.ATTRIBUTE_GROUP_EXECUTE, true);
+		}
+		else if (isBucket())
 		{
 			// we're a bucket
 			try
@@ -206,6 +214,7 @@ public class S3FileStore extends FileStore
 				boolean exists = getAWSConnection().checkBucketExists(getBucket());
 				info.setExists(exists);
 				info.setDirectory(true);
+				info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 			}
 			catch (IOException e)
 			{
@@ -248,6 +257,9 @@ public class S3FileStore extends FileStore
 					{
 						info.setDirectory(true);
 						info.setExists(true);
+						info.setLastModified(System.currentTimeMillis());
+						info.setLength(EFS.NONE);
+						info.setAttribute(EFS.ATTRIBUTE_OWNER_EXECUTE, true);
 					}
 				}
 			}
@@ -320,7 +332,21 @@ public class S3FileStore extends FileStore
 		try
 		{
 			HttpURLConnection connection = getAWSConnection().getRaw(getBucket(), getKey(), null);
-			return connection.getInputStream();
+			int responseCode = connection.getResponseCode();
+			// Throw a CoreException wrapping a FileNotFoundException when we're trying to read an S3Object that doesn't
+			// exist
+			if (responseCode == 404)
+			{
+				// tests expect message to be the filepath
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_NOT_EXISTS,
+						new FileNotFoundException(path.toPortableString()));
+			}
+			if (responseCode < 400)
+			{
+				return connection.getInputStream();
+			}
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception("Failed to open inputstream on "
+					+ path.toPortableString() + ". Error code: " + responseCode));
 		}
 		catch (MalformedURLException e)
 		{
@@ -423,32 +449,39 @@ public class S3FileStore extends FileStore
 	{
 		try
 		{
+			// TODO There's got to be a faster way to delete the subdirectory structure using listEntries and
+			// filtering
+			// down to just children (not peers starting with same prefix)
+			// Delete depth first
+			IFileStore[] children = childStores(options, monitor);
+			for (IFileStore child : children)
+			{
+				child.delete(options, monitor);
+			}
+
+			int responseCode = 0;
 			if (isBucket())
 			{
 				// Deleting a bucket!
 				Response resp = getAWSConnection().deleteBucket(getBucket(), null);
-				resp.connection.getResponseCode(); // force connection to finish
+				responseCode = resp.connection.getResponseCode(); // force connection to finish
 			}
 			else
 			{
-				// TODO There's got to be a faster way to delete the subdirectory structure using listEntries and
-				// filtering
-				// down to just children (not peers starting with same prefix)
-				// Delete depth first
-				IFileStore[] children = childStores(options, monitor);
-				for (IFileStore child : children)
-				{
-					child.delete(options, monitor);
-				}
 
 				String key = getKey();
 				Response resp = getAWSConnection().delete(getBucket(), key, null);
-				resp.connection.getResponseCode(); // force connection to finish
+				responseCode = resp.connection.getResponseCode(); // force connection to finish
 
 				// Handle if we're faking a folder. try to delete the fake folder suffix file.
 				resp = getAWSConnection().delete(getBucket(), key + FOLDER_SUFFIX, null);
 				resp.connection.getResponseCode(); // force connection to finish
 			}
+			if (responseCode < 400)
+			{
+				return;
+			}
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_DELETE, new Exception(path.toPortableString()));
 		}
 		catch (MalformedURLException e)
 		{
@@ -465,6 +498,19 @@ public class S3FileStore extends FileStore
 	{
 		try
 		{
+			// If we know this is a bucket, just fail right away because you can't write to the bucket itself!
+			if (isBucket())
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_READ_ONLY, new Exception("Can't write to a bucket!")); //$NON-NLS-1$
+			}
+			// if "parent" doesn't exist, need to fail
+			IFileStore parent = getParent();
+			IFileInfo info = parent.fetchInfo();
+			if (!info.exists())
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_WRITE,
+						new FileNotFoundException(path.toPortableString()));
+			}
 			HttpURLConnection connection = getAWSConnection().putRaw(getBucket(), getKey(), null);
 			return new HttpForcingOutputStream(connection.getOutputStream(), connection);
 		}
@@ -492,6 +538,24 @@ public class S3FileStore extends FileStore
 			}
 			else
 			{
+				// If the options are SHALLOW, we must not create the object unless the "parents" exist!
+				if ((options & EFS.SHALLOW) != 0)
+				{
+					IFileStore parent = getParent();
+					IFileInfo info = parent.fetchInfo();
+					// Tests expect that we return FileNotFound for current path when parent doesn't exist or is not a
+					// directory!
+					if (!info.exists())
+					{
+						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent doesn't exist",
+								new FileNotFoundException(path.toPortableString()));
+					}
+					if (!info.isDirectory())
+					{
+						throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent isn't a directory",
+								new FileNotFoundException(path.toPortableString()));
+					}
+				}
 				connection = getAWSConnection().putRaw(getBucket(), getKey() + FOLDER_SUFFIX, null);
 				connection.getOutputStream().write(new byte[] {});
 			}
@@ -585,6 +649,34 @@ public class S3FileStore extends FileStore
 		if (destination instanceof S3FileStore)
 		{
 			S3FileStore s3Dest = (S3FileStore) destination;
+
+			if ((options & EFS.OVERWRITE) == 0)
+			{
+				IFileInfo destInfo = destination.fetchInfo();
+				if (destInfo.exists())
+				{
+					throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+							"Destination exists and OVERWRITE flag was not specified", new FileNotFoundException(
+									s3Dest.path.toPortableString()));
+				}
+			}
+
+			// We must not create the object unless the "parent" exists!
+			IFileStore parent = destination.getParent();
+			IFileInfo info = parent.fetchInfo();
+			// Tests expect that we return FileNotFound for path when parent doesn't exist or is not a
+			// directory!
+			if (!info.exists())
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent doesn't exist",
+						new FileNotFoundException(s3Dest.path.toPortableString()));
+			}
+			if (!info.isDirectory())
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, "Parent isn't a directory",
+						new FileNotFoundException(s3Dest.path.toPortableString()));
+			}
+
 			try
 			{
 				getAWSConnection().copy(getBucket(), getKey(), s3Dest.getBucket(), s3Dest.getKey(), null);
@@ -599,7 +691,59 @@ public class S3FileStore extends FileStore
 			}
 		}
 		else
+		{
 			super.copyFile(sourceInfo, destination, options, monitor);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	List<ListEntry> listEntries() throws MalformedURLException, IOException
+	{
+		String prefix = getPrefix();
+		if (prefix != null && prefix.trim().length() == 0)
+			prefix = null;
+		// FIXME If the list is truncated we need to grab the last entry as a marker and continually iterate and combine
+		// responses!
+		ListBucketResponse resp = getAWSConnection().listBucket(getBucket(), prefix, null, null, null);
+		return resp.entries;
+	}
+
+	@Override
+	public void move(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		try
+		{
+			copy(destination, options, sub.newChild(70));
+			delete(EFS.NONE, sub.newChild(30));
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	@Override
+	protected void copyDirectory(IFileInfo sourceInfo, IFileStore destination, int options, IProgressMonitor monitor)
+			throws CoreException
+	{
+		if ((options & EFS.OVERWRITE) == 0)
+		{
+			IFileInfo destInfo = destination.fetchInfo();
+			if (destInfo.exists())
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_EXISTS, new FileNotFoundException(destination.toURI()
+						.getPath()));
+			}
+		}
+		IFileStore destParent = destination.getParent();
+		IFileInfo fi = destParent.fetchInfo();
+		if (!fi.exists())
+		{
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_WRITE, new FileNotFoundException(destination.toURI()
+					.getPath()));
+		}
+		super.copyDirectory(sourceInfo, destination, options, monitor);
 	}
 
 	private static class HttpForcingOutputStream extends OutputStream
@@ -644,17 +788,5 @@ public class S3FileStore extends FileStore
 		{
 			out.write(b);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	List<ListEntry> listEntries() throws MalformedURLException, IOException
-	{
-		String prefix = getPrefix();
-		if (prefix != null && prefix.trim().length() == 0)
-			prefix = null;
-		// FIXME If the list is truncated we need to grab the last entry as a marker and continually iterate and combine
-		// responses!
-		ListBucketResponse resp = getAWSConnection().listBucket(getBucket(), prefix, null, null, null);
-		return resp.entries;
 	}
 }
