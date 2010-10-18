@@ -43,7 +43,7 @@ public class FormatterCSSRuleNode extends FormatterBlockWithBeginNode
 	{
 		return false;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see

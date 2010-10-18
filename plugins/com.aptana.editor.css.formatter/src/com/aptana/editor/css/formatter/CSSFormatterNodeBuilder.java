@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.formatter;
 
 import com.aptana.core.util.StringUtil;
@@ -15,7 +49,7 @@ import com.aptana.editor.css.parsing.ast.*;
 
 /**
  * CSS formatter node builder.<br>
- * This builder generates the formatter nodes that will then be processed by the {@link HTMLFormatterNodeRewriter} to
+ * This builder generates the formatter nodes that will then be processed by the {@link CSSFormatterNodeRewriter} to
  * produce the output for the code formatting process.
  */
 public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
@@ -62,7 +96,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void addNode(IParseNode node)
 	{
 		CSSNode cssNode = (CSSNode) node;
-	
+
 		if (cssNode.getNodeType() == CSSNodeTypes.RULE)
 		{
 			pushFormatterNode(cssNode);
@@ -71,12 +105,10 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	}
 
 	/**
-	 * Determine the type of the node and return a formatter node that should represent it while rewriting the doc.<br>
-	 * Ant HTMLElementNode is acceptable here, even the special nodes. These special node just represents the wrapping
-	 * nodes around the 'foreign' nodes that exist as their children (nodes produced from the RHTML parser and JS
-	 * parser, for example).<br>
-	 * This behavior allows the inner child of these HTMLSpecialNodes to be processed in the
-	 * {@link #addNode(IParseNode)} method and produce a FormatterSpecialElementNode.<br>
+	 * Accepts a CSSRuleNode and breaks down the node into different formatter nodes which should represent it while
+	 * rewriting the doc.<br>
+	 * The CSSRuleNode will be broken down into several nodes of type FormatterCSSRuleNode, FormatterCSSBlockNode, and
+	 * FormatterCSSDeclarationNode (if declarations are present).
 	 * 
 	 * @param node
 	 * @return FormatterBlockWithBeginEndNode sub-classing instance

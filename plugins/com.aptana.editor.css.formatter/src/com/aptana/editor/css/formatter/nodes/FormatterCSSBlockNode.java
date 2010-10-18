@@ -8,7 +8,6 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 /**
  * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
  * be indented.
- * 
  */
 public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 {
@@ -40,13 +39,14 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	{
 		return getDocument().getBoolean(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
 	 */
-	
-	protected boolean isAddingEndNewLine(){
+
+	protected boolean isAddingEndNewLine()
+	{
 		return true;
 	}
 
