@@ -48,34 +48,38 @@ import org.eclipse.jface.text.rules.WordRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
-import com.aptana.editor.xml.parsing.lexer.XMLToken;
+import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
 
 public class XMLTokenScanner extends RuleBasedScanner
 {
-
+	/**
+	 * XMLTokenScanner
+	 */
 	public XMLTokenScanner()
 	{
 		List<IRule> rules = new ArrayList<IRule>();
-		// generic whitespace rule
+
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-		// comments
-		rules.add(new MultiLineRule("<!--", "-->", createToken(XMLToken.COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
-		// CDATA
-		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(XMLToken.CDATA))); //$NON-NLS-1$ //$NON-NLS-2$
-		// declaration
-		rules.add(new TagRule("?xml", createToken(XMLToken.DECLARATION))); //$NON-NLS-1$
-		// tags
-		rules.add(new TagRule("/", createToken(XMLToken.END_TAG))); //$NON-NLS-1$
-		rules.add(new TagRule(createToken(XMLToken.START_TAG)));
+		rules.add(new MultiLineRule("<!--", "-->", createToken(XMLTokenType.COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("<![CDATA[", "]]>", createToken(XMLTokenType.CDATA))); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new TagRule("?xml", createToken(XMLTokenType.DECLARATION))); //$NON-NLS-1$
+		rules.add(new TagRule("/", createToken(XMLTokenType.END_TAG))); //$NON-NLS-1$
+		rules.add(new TagRule(createToken(XMLTokenType.START_TAG)));
 
 		// text
-		IToken token = createToken(XMLToken.TEXT);
+		IToken token = createToken(XMLTokenType.TEXT);
 		rules.add(new WordRule(new WordDetector(), token));
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(token);
 	}
 
+	/**
+	 * createToken
+	 * 
+	 * @param data
+	 * @return
+	 */
 	protected IToken createToken(Object data)
 	{
 		return new Token(data);
