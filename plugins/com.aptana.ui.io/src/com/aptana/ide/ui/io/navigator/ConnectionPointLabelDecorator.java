@@ -37,36 +37,72 @@ package com.aptana.ide.ui.io.navigator;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.FileUtil;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 
 /**
- * A custom label provider for file navigator to provide additional features such as tooltip support.
+ * @author Michael Xia (mxia@aptana.com)
  */
-@SuppressWarnings("restriction")
-public class FileNavigatorDecoratingLabelProvider extends NavigatorDecoratingLabelProvider
+public class ConnectionPointLabelDecorator implements ILabelDecorator
 {
 
-	public FileNavigatorDecoratingLabelProvider(ILabelProvider commonLabelProvider)
+	public void addListener(ILabelProviderListener listener)
 	{
-		super(commonLabelProvider);
 	}
 
-	@Override
-	public String getToolTipText(Object element)
+	public void dispose()
+	{
+	}
+
+	public boolean isLabelProperty(Object element, String property)
+	{
+		return false;
+	}
+
+	public void removeListener(ILabelProviderListener listener)
+	{
+	}
+
+	public Image decorateImage(Image image, Object element)
+	{
+		return null;
+	}
+
+	public String decorateText(String text, Object element)
 	{
 		if (element instanceof IBaseRemoteConnectionPoint)
 		{
-			IPath path = ((IBaseRemoteConnectionPoint) element).getPath();
-			if (path.segmentCount() > 0)
+			IBaseRemoteConnectionPoint currentConnection = (IBaseRemoteConnectionPoint) element;
+			String currentName = currentConnection.getName();
+			if (currentName == null)
 			{
-				return MessageFormat.format(
-						"{0} ({1})", new Object[] { ((IConnectionPoint) element).getName(), path.toPortableString() }); //$NON-NLS-1$
+				return text;
+			}
+			IPath currentPath = currentConnection.getPath();
+			if (Path.ROOT.equals(currentPath))
+			{
+				return text;
+			}
+
+			IConnectionPoint[] connections = CoreIOPlugin.getConnectionPointManager().getConnectionPoints();
+			for (IConnectionPoint connection : connections)
+			{
+				if (connection != currentConnection && connection instanceof IBaseRemoteConnectionPoint
+						&& currentName.equals(connection.getName()))
+				{
+					// there are remote connections with the same name, so adds the compressed path to distinguish
+					return MessageFormat.format("{0} ({1})", text, //$NON-NLS-1$
+							FileUtil.compressLeadingPath(currentPath.toPortableString(), 20));
+				}
 			}
 		}
-		return element.toString();
+		return text;
 	}
 }
