@@ -40,7 +40,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.swt.SWT;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Shell;
 
 public class HTMLContentAssistProcessorTest extends LocationTestCase
 {
@@ -221,7 +221,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	protected ITextViewer createTextViewer(IDocument fDocument)
 	{
-		ITextViewer viewer = new TextViewer(PlatformUI.getWorkbench().getDisplay().getActiveShell(), SWT.NONE);
+		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
 		viewer.setDocument(fDocument);
 		return viewer;
 	}
