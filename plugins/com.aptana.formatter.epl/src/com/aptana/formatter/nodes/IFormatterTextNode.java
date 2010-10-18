@@ -11,7 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter.nodes;
 
-public interface IFormatterTextNode extends IFormatterNode {
+public interface IFormatterTextNode extends IFormatterNode
+{
 
 	String getText();
 

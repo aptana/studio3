@@ -11,7 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
-public interface IFormatterRawWriter {
+public interface IFormatterRawWriter
+{
 
 	void writeText(IFormatterContext context, String text);
 

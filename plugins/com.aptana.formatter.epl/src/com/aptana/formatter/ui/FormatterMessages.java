@@ -13,7 +13,8 @@ package com.aptana.formatter.ui;
 
 import org.eclipse.osgi.util.NLS;
 
-public class FormatterMessages extends NLS {
+public class FormatterMessages extends NLS
+{
 	private static final String BUNDLE_NAME = "com.aptana.formatter.ui.FormatterMessages"; //$NON-NLS-1$
 	public static String AbstractFormatterSelectionBlock_activeProfileName;
 	public static String AbstractScriptFormatterFactory_defaultProfileName;
@@ -69,7 +70,7 @@ public class FormatterMessages extends NLS {
 	public static String ScriptFormattingStrategy_formattingError;
 	public static String ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError;
 	public static String ScriptFormattingStrategy_unexpectedFormatterError;
-	
+
 	public static String IndentationTabPage_generalSettings;
 	public static String IndentationTabPage_preview_header;
 
@@ -96,11 +97,13 @@ public class FormatterMessages extends NLS {
 	public static String RubyFormatterIndentationTabPage_statementWithinIfBody;
 	public static String RubyFormatterIndentationTabPage_statementWithinWhenBody;
 
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, FormatterMessages.class);
 	}
 
-	private FormatterMessages() {
+	private FormatterMessages()
+	{
 	}
 }

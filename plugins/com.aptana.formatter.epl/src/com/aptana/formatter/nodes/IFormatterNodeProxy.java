@@ -14,7 +14,8 @@ package com.aptana.formatter.nodes;
 /**
  * @since 2.0
  */
-public interface IFormatterNodeProxy {
+public interface IFormatterNodeProxy
+{
 
 	IFormatterNode getTargetNode();
 

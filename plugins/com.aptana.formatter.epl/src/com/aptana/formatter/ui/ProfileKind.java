@@ -11,6 +11,7 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-public enum ProfileKind {
+public enum ProfileKind
+{
 	TEMPORARY, CUSTOM
 }

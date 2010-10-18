@@ -16,10 +16,10 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
 
-public interface IProfileStore {
+public interface IProfileStore
+{
 
-	void writeProfilesToFile(Collection<IProfile> profiles, File file)
-			throws CoreException;
+	void writeProfilesToFile(Collection<IProfile> profiles, File file) throws CoreException;
 
 	Collection<IProfile> readProfilesFromFile(File file) throws CoreException;
 

@@ -86,8 +86,10 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 		return text;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.IFormatterControlManager#createManagedList(org.eclipse.swt.widgets.Group,
+	 * java.lang.String)
 	 */
 	public Control createManagedList(Group group, Object key)
 	{
@@ -95,7 +97,7 @@ public class FormatterControlManager implements IFormatterControlManager, IStatu
 		bindingManager.bindControl(list.getList(), key);
 		return list.getControl();
 	}
-	
+
 	private final Map<Control, Label> labelAssociations = new HashMap<Control, Label>();
 
 	/**

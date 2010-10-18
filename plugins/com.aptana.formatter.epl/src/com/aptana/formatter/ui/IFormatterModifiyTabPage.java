@@ -13,7 +13,8 @@ package com.aptana.formatter.ui;
 
 import org.eclipse.swt.widgets.Composite;
 
-public interface IFormatterModifiyTabPage {
+public interface IFormatterModifiyTabPage
+{
 
 	Composite createContents(IFormatterControlManager manager, Composite parent);
 

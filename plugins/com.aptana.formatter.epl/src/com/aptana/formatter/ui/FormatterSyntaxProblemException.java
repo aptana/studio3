@@ -11,11 +11,13 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-public class FormatterSyntaxProblemException extends FormatterException {
+public class FormatterSyntaxProblemException extends FormatterException
+{
 
 	private static final long serialVersionUID = 4527887872127464243L;
 
-	public FormatterSyntaxProblemException() {
+	public FormatterSyntaxProblemException()
+	{
 		// empty
 	}
 
@@ -23,21 +25,24 @@ public class FormatterSyntaxProblemException extends FormatterException {
 	 * @param message
 	 * @param cause
 	 */
-	public FormatterSyntaxProblemException(String message, Throwable cause) {
+	public FormatterSyntaxProblemException(String message, Throwable cause)
+	{
 		super(message, cause);
 	}
 
 	/**
 	 * @param message
 	 */
-	public FormatterSyntaxProblemException(String message) {
+	public FormatterSyntaxProblemException(String message)
+	{
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public FormatterSyntaxProblemException(Throwable cause) {
+	public FormatterSyntaxProblemException(Throwable cause)
+	{
 		super(cause);
 	}
 

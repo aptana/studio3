@@ -16,7 +16,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-public interface IFormatterModifyDialogOwner {
+public interface IFormatterModifyDialogOwner
+{
 
 	Shell getShell();
 

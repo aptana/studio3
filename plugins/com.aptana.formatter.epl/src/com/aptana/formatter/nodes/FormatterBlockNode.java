@@ -140,7 +140,7 @@ public class FormatterBlockNode extends AbstractFormatterNode implements IFormat
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Returns true if the node suppose to add a new line at its ending; False, otherwise.<br>
 	 * The default implementation is false. Subclasses may override.

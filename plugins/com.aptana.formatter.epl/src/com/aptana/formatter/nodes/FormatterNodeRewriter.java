@@ -17,8 +17,9 @@ import java.util.List;
 import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.IFormatterDocument;
 
-public abstract class FormatterNodeRewriter {
-	
+public abstract class FormatterNodeRewriter
+{
+
 	/**
 	 * @param root
 	 */
@@ -28,39 +29,49 @@ public abstract class FormatterNodeRewriter {
 		insertComments(root);
 	}
 
-	protected void mergeTextNodes(IFormatterContainerNode root) {
+	protected void mergeTextNodes(IFormatterContainerNode root)
+	{
 		final List<IFormatterNode> body = root.getBody();
 		final List<IFormatterNode> newBody = new ArrayList<IFormatterNode>();
 		final List<IFormatterNode> texts = new ArrayList<IFormatterNode>();
-		for (final IFormatterNode node : body) {
-			if (isPlainTextNode(node)) {
+		for (final IFormatterNode node : body)
+		{
+			if (isPlainTextNode(node))
+			{
 				if (!texts.isEmpty()
-						&& ((IFormatterTextNode) texts.get(texts.size() - 1))
-								.getEndOffset() != node.getStartOffset()) {
+						&& ((IFormatterTextNode) texts.get(texts.size() - 1)).getEndOffset() != node.getStartOffset())
+				{
 					flushTextNodes(texts, newBody);
 				}
 				texts.add(node);
-			} else {
-				if (!texts.isEmpty()) {
+			}
+			else
+			{
+				if (!texts.isEmpty())
+				{
 					flushTextNodes(texts, newBody);
 				}
 				newBody.add(node);
 			}
 		}
-		if (!texts.isEmpty()) {
+		if (!texts.isEmpty())
+		{
 			flushTextNodes(texts, newBody);
 		}
-		if (body.size() != newBody.size()) {
+		if (body.size() != newBody.size())
+		{
 			body.clear();
 			body.addAll(newBody);
 		}
-		for (final IFormatterNode node : body) {
-			if (node instanceof IFormatterContainerNode) {
+		for (final IFormatterNode node : body)
+		{
+			if (node instanceof IFormatterContainerNode)
+			{
 				mergeTextNodes((IFormatterContainerNode) node);
 			}
 		}
 	}
-	
+
 	protected void attachComments(IFormatterContainerNode root)
 	{
 		final List<IFormatterNode> commentNodes = new ArrayList<IFormatterNode>();
@@ -97,29 +108,34 @@ public abstract class FormatterNodeRewriter {
 		}
 	}
 
-	private void flushTextNodes(List<IFormatterNode> texts,
-			List<IFormatterNode> newBody) {
-		if (texts.size() > 1) {
+	private void flushTextNodes(List<IFormatterNode> texts, List<IFormatterNode> newBody)
+	{
+		if (texts.size() > 1)
+		{
 			final IFormatterNode first = texts.get(0);
 			final IFormatterNode last = texts.get(texts.size() - 1);
-			newBody.add(new FormatterTextNode(first.getDocument(), first
-					.getStartOffset(), last.getEndOffset()));
-		} else {
+			newBody.add(new FormatterTextNode(first.getDocument(), first.getStartOffset(), last.getEndOffset()));
+		}
+		else
+		{
 			newBody.addAll(texts);
 		}
 		texts.clear();
 	}
 
-	protected boolean isPlainTextNode(final IFormatterNode node) {
+	protected boolean isPlainTextNode(final IFormatterNode node)
+	{
 		return node.getClass() == FormatterTextNode.class;
 	}
 
-	private static class CommentInfo {
+	private static class CommentInfo
+	{
 		final int startOffset;
 		final int endOffset;
 		final Object object;
 
-		public CommentInfo(int startOffset, int endOffset, Object object) {
+		public CommentInfo(int startOffset, int endOffset, Object object)
+		{
 			this.startOffset = startOffset;
 			this.endOffset = endOffset;
 			this.object = object;
@@ -129,74 +145,88 @@ public abstract class FormatterNodeRewriter {
 
 	private final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
-	protected void addComment(int startOffset, int endOffset, Object object) {
+	protected void addComment(int startOffset, int endOffset, Object object)
+	{
 		comments.add(new CommentInfo(startOffset, endOffset, object));
 	}
 
-	protected void insertComments(IFormatterContainerNode root) {
+	protected void insertComments(IFormatterContainerNode root)
+	{
 		final List<IFormatterNode> body = root.getBody();
 		final List<IFormatterNode> newBody = new ArrayList<IFormatterNode>();
 		boolean changes = false;
-		for (final IFormatterNode node : body) {
-			if (isPlainTextNode(node)) {
-				if (hasComments(node.getStartOffset(), node.getEndOffset())) {
-					selectValidRanges(root.getDocument(),
-							node.getStartOffset(), node.getEndOffset(), newBody);
+		for (final IFormatterNode node : body)
+		{
+			if (isPlainTextNode(node))
+			{
+				if (hasComments(node.getStartOffset(), node.getEndOffset()))
+				{
+					selectValidRanges(root.getDocument(), node.getStartOffset(), node.getEndOffset(), newBody);
 					changes = true;
-				} else {
+				}
+				else
+				{
 					newBody.add(node);
 				}
-			} else {
+			}
+			else
+			{
 				newBody.add(node);
 			}
 		}
-		if (changes) {
+		if (changes)
+		{
 			body.clear();
 			body.addAll(newBody);
 		}
-		for (final IFormatterNode node : body) {
-			if (node instanceof IFormatterContainerNode) {
+		for (final IFormatterNode node : body)
+		{
+			if (node instanceof IFormatterContainerNode)
+			{
 				insertComments((IFormatterContainerNode) node);
 			}
 		}
 	}
 
-	private boolean hasComments(int startOffset, int endOffset) {
-		for (final CommentInfo commentNode : comments) {
-			if (commentNode.startOffset < endOffset
-					&& startOffset < commentNode.endOffset) {
+	private boolean hasComments(int startOffset, int endOffset)
+	{
+		for (final CommentInfo commentNode : comments)
+		{
+			if (commentNode.startOffset < endOffset && startOffset < commentNode.endOffset)
+			{
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private void selectValidRanges(IFormatterDocument document, int start,
-			int end, List<IFormatterNode> result) {
-		for (final CommentInfo comment : comments) {
-			if (start <= comment.endOffset && comment.startOffset <= end) {
-				if (start < comment.startOffset) {
+	private void selectValidRanges(IFormatterDocument document, int start, int end, List<IFormatterNode> result)
+	{
+		for (final CommentInfo comment : comments)
+		{
+			if (start <= comment.endOffset && comment.startOffset <= end)
+			{
+				if (start < comment.startOffset)
+				{
 					int validEnd = Math.min(end, comment.startOffset);
-					result
-							.add(new FormatterTextNode(document, start,
-									validEnd));
+					result.add(new FormatterTextNode(document, start, validEnd));
 					start = comment.startOffset;
 				}
-				result.add(createCommentNode(document, start, Math.min(
-						comment.endOffset, end), comment.object));
+				result.add(createCommentNode(document, start, Math.min(comment.endOffset, end), comment.object));
 				start = comment.endOffset;
-				if (start > end) {
+				if (start > end)
+				{
 					break;
 				}
 			}
 		}
-		if (start < end) {
+		if (start < end)
+		{
 			result.add(new FormatterTextNode(document, start, end));
 		}
 	}
-	
-	protected abstract IFormatterNode createCommentNode(
-			IFormatterDocument document, int startOffset, int endOffset,
+
+	protected abstract IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object);
 
 }

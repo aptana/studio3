@@ -18,45 +18,54 @@ import com.aptana.formatter.IFormatterWriter;
 /**
  * @since 2.0
  */
-public class FormatterTextNodeWrapper implements IFormatterTextNode {
+public class FormatterTextNodeWrapper implements IFormatterTextNode
+{
 
 	protected final IFormatterTextNode target;
 
-	public FormatterTextNodeWrapper(IFormatterTextNode target) {
+	public FormatterTextNodeWrapper(IFormatterTextNode target)
+	{
 		this.target = target;
 	}
 
-	public String getText() {
+	public String getText()
+	{
 		return target.getText();
 	}
 
-	public void accept(IFormatterContext context, IFormatterWriter visitor)
-			throws Exception {
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
 		target.accept(context, visitor);
 	}
 
-	public IFormatterDocument getDocument() {
+	public IFormatterDocument getDocument()
+	{
 		return target.getDocument();
 	}
 
-	public int getEndOffset() {
+	public int getEndOffset()
+	{
 		return target.getEndOffset();
 	}
 
-	public int getStartOffset() {
+	public int getStartOffset()
+	{
 		return target.getStartOffset();
 	}
 
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		return target.isEmpty();
 	}
 
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return target.toString();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
 	 */
 	public int getSpacesCountBefore()
@@ -64,7 +73,8 @@ public class FormatterTextNodeWrapper implements IFormatterTextNode {
 		return 0;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
 	 */
 	public boolean shouldConsumePreviousWhiteSpaces()

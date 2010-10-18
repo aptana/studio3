@@ -13,7 +13,8 @@ package com.aptana.formatter.ui;
 
 import java.util.Map;
 
-public interface IFormatterModifyDialog {
+public interface IFormatterModifyDialog
+{
 
 	void setProfileManager(IProfileManager manager);
 
@@ -25,9 +26,8 @@ public interface IFormatterModifyDialog {
 	void setPreferences(Map<String, String> prefs);
 
 	/**
-	 * Opens the modal dialog and returns only after the dialog was completed.
-	 * The return value should be {@link org.eclipse.jface.window.Window#OK} or
-	 * {@link org.eclipse.jface.window.Window#CANCEL}
+	 * Opens the modal dialog and returns only after the dialog was completed. The return value should be
+	 * {@link org.eclipse.jface.window.Window#OK} or {@link org.eclipse.jface.window.Window#CANCEL}
 	 */
 	int open();
 

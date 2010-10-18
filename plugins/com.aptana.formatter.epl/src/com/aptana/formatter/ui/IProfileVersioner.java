@@ -16,7 +16,8 @@ package com.aptana.formatter.ui;
  * 
  * @see GeneralProfileVersioner
  */
-public interface IProfileVersioner {
+public interface IProfileVersioner
+{
 
 	public int getFirstVersion();
 

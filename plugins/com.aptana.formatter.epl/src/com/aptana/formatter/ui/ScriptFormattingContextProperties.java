@@ -11,28 +11,27 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-public class ScriptFormattingContextProperties {
+public class ScriptFormattingContextProperties
+{
 
 	/**
-	 * Property key of the project property. The property must be
-	 * <code>org.eclipse.core.resources.IProject</code>. If set the preferences
-	 * of the specified project will be used first.
+	 * Property key of the project property. The property must be <code>org.eclipse.core.resources.IProject</code>. If
+	 * set the preferences of the specified project will be used first.
 	 * <p>
 	 * Value: <code>"formatting.context.project"</code>
 	 */
 	public static final String CONTEXT_PROJECT = "formatting.context.project"; //$NON-NLS-1$
 
 	/**
-	 * Property key of the formatter id property. The property must be of the
-	 * type <code>java.lang.String</code>.
+	 * Property key of the formatter id property. The property must be of the type <code>java.lang.String</code>.
 	 * <p>
 	 * Value: <code>"formatting.context.formatterId"</code>
 	 */
 	public static final String CONTEXT_FORMATTER_ID = "formatting.context.formatterId"; //$NON-NLS-1$
-	
+
 	/**
-	 * Property key that indicates that the formatter is running as a 'slave'. The property must be of the
-	 * type <code>java.lang.Boolean</code>.
+	 * Property key that indicates that the formatter is running as a 'slave'. The property must be of the type
+	 * <code>java.lang.Boolean</code>.
 	 * <p>
 	 * Value: <code>"formatting.context.isSlave"</code>
 	 */

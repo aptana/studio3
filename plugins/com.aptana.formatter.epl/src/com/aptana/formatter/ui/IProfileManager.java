@@ -66,7 +66,7 @@ public interface IProfileManager
 	public IProfile findProfile(String profileId);
 
 	public void addPropertyChangeListener(IPropertyChangeListener listener);
-	
+
 	public void removePropertyChangeListener(IPropertyChangeListener listener);
 
 	/**

@@ -14,12 +14,13 @@ package com.aptana.formatter.ui;
 import java.util.Map;
 
 /**
- * Represents a profile with a unique ID, a name and a map containing the code
- * formatter settings.
+ * Represents a profile with a unique ID, a name and a map containing the code formatter settings.
  */
-public interface IProfile extends Comparable<IProfile> {
+public interface IProfile extends Comparable<IProfile>
+{
 
-	public interface ICustomProfile extends IProfile {
+	public interface ICustomProfile extends IProfile
+	{
 		void setVersion(int version);
 	}
 

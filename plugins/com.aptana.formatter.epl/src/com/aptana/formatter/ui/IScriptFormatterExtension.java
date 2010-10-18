@@ -13,7 +13,8 @@ package com.aptana.formatter.ui;
 
 import org.eclipse.core.resources.IProject;
 
-public interface IScriptFormatterExtension extends IScriptFormatter {
+public interface IScriptFormatterExtension extends IScriptFormatter
+{
 
 	void initialize(IProject project);
 

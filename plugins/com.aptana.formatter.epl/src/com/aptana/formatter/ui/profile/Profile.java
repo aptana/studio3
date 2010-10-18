@@ -16,16 +16,18 @@ import java.util.Map;
 import com.aptana.formatter.ui.IProfile;
 
 /**
- * Represents a profile with a unique ID, a name and a map containing the code
- * formatter settings.
+ * Represents a profile with a unique ID, a name and a map containing the code formatter settings.
  */
-public abstract class Profile implements IProfile {
+public abstract class Profile implements IProfile
+{
 
-	public boolean equalsTo(Map<String, String> otherMap) {
+	public boolean equalsTo(Map<String, String> otherMap)
+	{
 		return getSettings().equals(otherMap);
 	}
 
-	public boolean isBuiltInProfile() {
+	public boolean isBuiltInProfile()
+	{
 		return false;
 	}
 }

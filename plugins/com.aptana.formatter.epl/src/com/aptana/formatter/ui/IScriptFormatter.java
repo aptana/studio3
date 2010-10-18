@@ -81,8 +81,8 @@ public interface IScriptFormatter
 	/**
 	 * Returns the indentation type, as defined in the formatter preferences.
 	 * 
-	 * @return The indentation type - One of {@link CodeFormatterConstants#TAB}, {@link CodeFormatterConstants#SPACE}
-	 *         or {@link CodeFormatterConstants#MIXED}
+	 * @return The indentation type - One of {@link CodeFormatterConstants#TAB}, {@link CodeFormatterConstants#SPACE} or
+	 *         {@link CodeFormatterConstants#MIXED}
 	 */
 	String getIndentType();
 }

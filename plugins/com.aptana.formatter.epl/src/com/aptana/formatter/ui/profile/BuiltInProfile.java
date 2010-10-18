@@ -17,13 +17,14 @@ import java.util.Map;
 import com.aptana.formatter.ui.IProfile;
 
 /**
- * Represents a built-in profile. The state of a built-in profile cannot be
- * changed after instantiation.
+ * Represents a built-in profile. The state of a built-in profile cannot be changed after instantiation.
  */
-public class BuiltInProfile extends Profile {
+public class BuiltInProfile extends Profile
+{
 
-	public BuiltInProfile(String ID, String name, Map<String, String> settings,
-			int order, String formatter, int currentVersion) {
+	public BuiltInProfile(String ID, String name, Map<String, String> settings, int order, String formatter,
+			int currentVersion)
+	{
 		fName = name;
 		fID = ID;
 		fSettings = Collections.unmodifiableMap(settings);
@@ -32,42 +33,52 @@ public class BuiltInProfile extends Profile {
 		fCurrentVersion = currentVersion;
 	}
 
-	public String getName() {
+	public String getName()
+	{
 		return fName;
 	}
 
-	public Map<String, String> getSettings() {
+	public Map<String, String> getSettings()
+	{
 		return fSettings;
 	}
 
-	public void setSettings(Map<String, String> settings) {
+	public void setSettings(Map<String, String> settings)
+	{
 	}
 
-	public String getID() {
+	public String getID()
+	{
 		return fID;
 	}
 
-	public final int compareTo(IProfile o) {
-		if (o instanceof BuiltInProfile) {
+	public final int compareTo(IProfile o)
+	{
+		if (o instanceof BuiltInProfile)
+		{
 			return fOrder - ((BuiltInProfile) o).fOrder;
 		}
 		return -1;
 	}
 
-	public boolean isProfileToSave() {
+	public boolean isProfileToSave()
+	{
 		return false;
 	}
 
 	@Override
-	public boolean isBuiltInProfile() {
+	public boolean isBuiltInProfile()
+	{
 		return true;
 	}
 
-	public int getVersion() {
+	public int getVersion()
+	{
 		return fCurrentVersion;
 	}
 
-	public String getFormatterId() {
+	public String getFormatterId()
+	{
 		return fFormatter;
 	}
 

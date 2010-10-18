@@ -14,7 +14,8 @@ package com.aptana.formatter;
 /**
  * @since 2.0
  */
-public interface IFormatterIndentGenerator {
+public interface IFormatterIndentGenerator
+{
 
 	void generateIndent(int indentLevel, StringBuilder target);
 

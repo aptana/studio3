@@ -11,7 +11,8 @@
  *******************************************************************************/
 package com.aptana.formatter;
 
-public interface IFormatterCallback {
+public interface IFormatterCallback
+{
 
 	/**
 	 * @param context

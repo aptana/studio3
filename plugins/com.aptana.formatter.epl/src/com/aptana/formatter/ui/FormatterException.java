@@ -11,11 +11,13 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-public class FormatterException extends Exception {
+public class FormatterException extends Exception
+{
 
 	private static final long serialVersionUID = -1771588890906618803L;
 
-	public FormatterException() {
+	public FormatterException()
+	{
 		// empty
 	}
 
@@ -23,21 +25,24 @@ public class FormatterException extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public FormatterException(String message, Throwable cause) {
+	public FormatterException(String message, Throwable cause)
+	{
 		super(message, cause);
 	}
 
 	/**
 	 * @param message
 	 */
-	public FormatterException(String message) {
+	public FormatterException(String message)
+	{
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public FormatterException(Throwable cause) {
+	public FormatterException(Throwable cause)
+	{
 		super(cause);
 	}
 

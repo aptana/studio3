@@ -13,7 +13,8 @@ package com.aptana.formatter.nodes;
 
 import java.util.List;
 
-public interface IFormatterContainerNode extends IFormatterNode {
+public interface IFormatterContainerNode extends IFormatterNode
+{
 
 	void addChild(IFormatterNode child);
 
