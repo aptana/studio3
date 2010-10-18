@@ -42,7 +42,7 @@ import com.aptana.scope.ScopeSelector;
 public abstract class AbstractBundleElement extends AbstractElement
 {
 	private static final String ALL_SCOPES = "all"; //$NON-NLS-1$
-	
+
 	private String _scope;
 	private IScopeSelector _scopeSelector;
 	protected BundleElement owningBundle;
@@ -95,10 +95,10 @@ public abstract class AbstractBundleElement extends AbstractElement
 				this._scopeSelector = new ScopeSelector(this._scope);
 			}
 		}
-		
+
 		return this._scopeSelector;
 	}
-	
+
 	/**
 	 * matches
 	 * 
@@ -109,15 +109,15 @@ public abstract class AbstractBundleElement extends AbstractElement
 	{
 		IScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
-		
+
 		if (selector != null)
 		{
 			result = selector.matches(scope);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * matches
 	 * 
@@ -128,15 +128,15 @@ public abstract class AbstractBundleElement extends AbstractElement
 	{
 		IScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
-		
+
 		if (selector != null)
 		{
 			result = selector.matches(scopes);
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * setOwningBundle
 	 * 
@@ -161,7 +161,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 		{
 			scope = null;
 		}
-		
+
 		if (StringUtil.areNotEqual(this._scope, scope))
 		{
 			this._scope = scope;

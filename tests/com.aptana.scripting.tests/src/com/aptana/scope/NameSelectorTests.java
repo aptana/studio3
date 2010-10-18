@@ -45,10 +45,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("source");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertTrue(selector.matches("source.ruby"));
 	}
-	
+
 	/**
 	 * testNameIsIdentical
 	 */
@@ -56,10 +56,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("source.ruby");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertTrue(selector.matches("source.ruby"));
 	}
-	
+
 	/**
 	 * testNameIsPartial
 	 */
@@ -67,10 +67,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("sourc");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertFalse(selector.matches("source.ruby"));
 	}
-	
+
 	/**
 	 * testNameIsEmpty
 	 */
@@ -78,10 +78,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertFalse(selector.matches("source.ruby"));
 	}
-	
+
 	/**
 	 * testScopeIsEmpty
 	 */
@@ -89,10 +89,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("source");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertFalse(selector.matches(""));
 	}
-	
+
 	/**
 	 * testNameIsNull
 	 */
@@ -100,10 +100,10 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector(null);
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertFalse(selector.matches("source.ruby"));
 	}
-	
+
 	/**
 	 * testScopeIsNull
 	 */
@@ -111,7 +111,7 @@ public class NameSelectorTests extends TestCase
 	{
 		NameSelector name = new NameSelector("source");
 		IScopeSelector selector = new ScopeSelector(name);
-		
+
 		assertFalse(selector.matches((String) null));
 	}
 }

@@ -67,19 +67,19 @@ public class NegativeLookaheadTests extends TestCase
 
 		assertTrue(selector.matches("A B"));
 	}
-	
+
 	/**
 	 * testMultipleLookahead
 	 */
 	public void testMultipleLookahead()
 	{
 		IScopeSelector selector = new ScopeSelector("A B - C D");
-		
+
 		assertTrue(selector.matches("A B"));
 		assertTrue(selector.matches("A B C"));
 		assertFalse(selector.matches("A B C D"));
 	}
-	
+
 	public void testAS3_894()
 	{
 		IScopeSelector selector = new ScopeSelector("source -meta.source.embedded");
