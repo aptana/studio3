@@ -36,6 +36,7 @@ package com.aptana.editor.xml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -73,5 +74,15 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
 		XMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
+	@Override
+	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
+	{
+		//return new XMLContentAssistProcessor(this.getAbstractThemeableEditor());
+		return null;
 	}
 }

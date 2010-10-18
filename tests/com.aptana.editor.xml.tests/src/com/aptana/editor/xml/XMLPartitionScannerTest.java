@@ -118,7 +118,7 @@ public class XMLPartitionScannerTest extends TestCase
 		String source = "<!-- This is XML comment on one Line -->";
 		for (int i = 0; i < source.length(); i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_COMMENT, source, i);
+			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class XMLPartitionScannerTest extends TestCase
 		String source = "<!-- This is XML comment\nspanning multiple lines -->";
 		for (int i = 0; i < source.length(); i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_COMMENT, source, i);
+			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class XMLPartitionScannerTest extends TestCase
 		String source = "<tag>";
 		for (int i = 0; i < source.length(); i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_TAG, source, i);
+			assertContentType(XMLSourceConfiguration.TAG, source, i);
 		}
 	}
 
@@ -145,7 +145,7 @@ public class XMLPartitionScannerTest extends TestCase
 		String source = "</tag>";
 		for (int i = 0; i < source.length(); i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_TAG, source, i);
+			assertContentType(XMLSourceConfiguration.TAG, source, i);
 		}
 	}
 
@@ -161,11 +161,11 @@ public class XMLPartitionScannerTest extends TestCase
 		}
 		for (int i = 61; i <= 68; i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_TAG, source, i);
+			assertContentType(XMLSourceConfiguration.TAG, source, i);
 		}
 		for (int i = 75; i <= 82; i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_TAG, source, i);
+			assertContentType(XMLSourceConfiguration.TAG, source, i);
 		}
 		for (int i = 91; i <= 115; i++)
 		{
@@ -173,7 +173,7 @@ public class XMLPartitionScannerTest extends TestCase
 		}
 		for (int i = 138; i <= 168; i++)
 		{
-			assertContentType(XMLSourceConfiguration.XML_COMMENT, source, i);
+			assertContentType(XMLSourceConfiguration.COMMENT, source, i);
 		}
 	}
 

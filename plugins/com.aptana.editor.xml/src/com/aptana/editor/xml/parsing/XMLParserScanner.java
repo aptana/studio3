@@ -40,75 +40,175 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.Token;
 
-import beaver.Scanner;
-import beaver.Symbol;
+import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.parsing.lexer.Lexeme;
 
-import com.aptana.editor.xml.parsing.lexer.XMLToken;
-
-public class XMLParserScanner extends Scanner
+public class XMLParserScanner implements ITokenScanner
 {
-
 	private XMLTokenScanner fTokenScanner;
 	private IDocument fDocument;
 
+	/**
+	 * XMLParserScanner
+	 */
 	public XMLParserScanner()
 	{
 		fTokenScanner = new XMLTokenScanner();
 	}
 
-	public void setSource(String text)
+	/**
+	 * createLexeme
+	 * 
+	 * @param data
+	 * @return
+	 * @throws Exception
+	 */
+	protected Lexeme<XMLTokenType> createLexeme(Object data) throws Exception
 	{
-		setSource(new Document(text));
+		int offset = fTokenScanner.getTokenOffset();
+		int length = fTokenScanner.getTokenLength();
+		XMLTokenType type = (data == null) ? XMLTokenType.EOF : (XMLTokenType) data;
+
+		try
+		{
+			int totalLength = fDocument.getLength();
+
+			if (offset > totalLength)
+			{
+				offset = totalLength;
+			}
+			if (length == -1)
+			{
+				length = 0;
+			}
+
+			return new Lexeme<XMLTokenType>(type, offset, offset + length - 1, fDocument.get(offset, length));
+		}
+		catch (BadLocationException e)
+		{
+			throw new Exception(e.getLocalizedMessage());
+		}
 	}
 
+	/**
+	 * getSource
+	 * 
+	 * @param offset
+	 * @param length
+	 * @return
+	 */
+	public String getSource(int offset, int length)
+	{
+		String result = ""; //$NON-NLS-1$
+
+		try
+		{
+			result = this.fDocument.get(offset, length);
+		}
+		catch (BadLocationException e)
+		{
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenLength()
+	 */
+	public int getTokenLength()
+	{
+		return fTokenScanner.getTokenLength();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.ITokenScanner#getTokenOffset()
+	 */
+	public int getTokenOffset()
+	{
+		return fTokenScanner.getTokenOffset();
+	}
+
+	/**
+	 * isComment
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private boolean isComment(Object data)
+	{
+		return (data != null && ((XMLTokenType) data) == XMLTokenType.COMMENT);
+	}
+
+	/**
+	 * nextLexeme
+	 */
+	public Lexeme<XMLTokenType> nextLexeme() throws IOException, Exception
+	{
+		IToken token = fTokenScanner.nextToken();
+		Object data = token.getData();
+
+		while (token.isWhitespace() || isComment(data))
+		{
+			token = fTokenScanner.nextToken();
+			data = token.getData();
+		}
+
+		return createLexeme(data);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.ITokenScanner#nextToken()
+	 */
+	public IToken nextToken()
+	{
+		try
+		{
+			Lexeme<XMLTokenType> lexeme = this.nextLexeme();
+
+			return new Token(lexeme.getType());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return Token.UNDEFINED;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.ITokenScanner#setRange(org.eclipse.jface.text.IDocument, int, int)
+	 */
+	public void setRange(IDocument document, int offset, int length)
+	{
+		fDocument = document;
+		fTokenScanner.setRange(document, offset, length);
+	}
+
+	/**
+	 * setSource
+	 * 
+	 * @param document
+	 */
 	public void setSource(IDocument document)
 	{
 		fDocument = document;
 		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
 	}
 
-	@Override
-	public Symbol nextToken() throws IOException, Exception
+	/**
+	 * setSource
+	 * 
+	 * @param text
+	 */
+	public void setSource(String text)
 	{
-		IToken token = fTokenScanner.nextToken();
-		Object data = token.getData();
-		while (isIgnored(token))
-		{
-			token = fTokenScanner.nextToken();
-			data = token.getData();
-		}
-
-		int offset = fTokenScanner.getTokenOffset();
-		int length = fTokenScanner.getTokenLength();
-
-		short type = XMLToken.EOF.getIndex();
-		if (data instanceof XMLToken)
-		{
-			type = ((XMLToken) data).getIndex();
-		}
-		try
-		{
-			return new Symbol(type, offset, offset + length - 1, fDocument.get(offset, length));
-		}
-		catch (BadLocationException e)
-		{
-			throw new Scanner.Exception(e.getLocalizedMessage());
-		}
-	}
-
-	private boolean isIgnored(IToken token)
-	{
-		// ignores the whitespace and comments by default
-		if (token.isWhitespace())
-		{
-			return true;
-		}
-		Object data = token.getData();
-		if (data == null)
-		{
-			return false;
-		}
-		return data.equals(XMLToken.COMMENT);
+		setSource(new Document(text));
 	}
 }

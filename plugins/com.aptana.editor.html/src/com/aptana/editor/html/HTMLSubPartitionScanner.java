@@ -46,6 +46,7 @@ import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.svg.SVGSourceConfiguration;
 
 /**
  * @author Max Stepanov
@@ -55,12 +56,16 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 
 	private static final int TYPE_JS = 1;
 	private static final int TYPE_CSS = 2;
-	
+	private static final int TYPE_SVG = 3;
+
 	private static final String[] JS_SWITCH_SEQUENCES = new String[] {
 		"</script>" //$NON-NLS-1$
 	};
 	private static final String[] CSS_SWITCH_SEQUENCES = new String[] {
 		"</style>" //$NON-NLS-1$
+	};
+	private static final String[] SVG_SWITCH_SEQUENCES = new String[] {
+		"</svg>" //$NON-NLS-1$
 	};
 
 	private static final String[][] EMPTY = new String[0][];
@@ -72,10 +77,12 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 		super(new ISubPartitionScanner[] {
 				new SubPartitionScanner(HTMLSourceConfiguration.getDefault().getPartitioningRules(), HTMLSourceConfiguration.CONTENT_TYPES, new Token(HTMLSourceConfiguration.DEFAULT)),
 				JSSourceConfiguration.getDefault().createSubPartitionScanner(),
-				CSSSourceConfiguration.getDefault().createSubPartitionScanner()
+				CSSSourceConfiguration.getDefault().createSubPartitionScanner(),
+				SVGSourceConfiguration.getDefault().createSubPartitionScanner()
 			}, new IPartitionScannerSwitchStrategy[] {
 				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES, EMPTY),
-				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES, EMPTY)
+				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES, EMPTY),
+				new PartitionScannerSwitchStrategy(SVG_SWITCH_SEQUENCES, EMPTY)
 			});
 	}
 
@@ -93,6 +100,8 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner {
 			current = TYPE_JS;
 		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)) {
 			current = TYPE_CSS;
+		} else if (HTMLSourceConfiguration.HTML_SVG.equals(contentType)) {
+			current = TYPE_SVG;
 		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
 				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
