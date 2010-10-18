@@ -10,9 +10,9 @@
             extensions="json"
             icon="icons/js.png"
             id="com.aptana.editor.json"
-            name="JSON Source Editor">
+            name="%editor.name">
          <contentTypeBinding
-               contentTypeId="com.aptana.contenttype.js">
+               contentTypeId="com.aptana.contenttype.json">
          </contentTypeBinding>
       </editor>
    </extension>
