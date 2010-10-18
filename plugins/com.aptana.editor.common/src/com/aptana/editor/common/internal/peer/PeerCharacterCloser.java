@@ -65,6 +65,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SmartTypingPairsElement;
@@ -90,8 +91,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs = NO_PAIRS;
 
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
-	private static final ScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
+	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer)
 	{
@@ -255,17 +256,17 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			return NO_PAIRS;
 		}
-		Map<ScopeSelector, SmartTypingPairsElement> map = new HashMap<ScopeSelector, SmartTypingPairsElement>();
+		Map<IScopeSelector, SmartTypingPairsElement> map = new HashMap<IScopeSelector, SmartTypingPairsElement>();
 		for (SmartTypingPairsElement pe : pairs)
 		{
-			ScopeSelector ss = pe.getScopeSelector();
+			IScopeSelector ss = pe.getScopeSelector();
 			if (ss == null)
 			{
 				continue;
 			}
 			map.put(ss, pe);
 		}
-		ScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
 		return yay.getPairs();
 	}

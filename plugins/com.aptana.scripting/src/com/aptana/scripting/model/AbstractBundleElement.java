@@ -35,6 +35,8 @@
 package com.aptana.scripting.model;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.scope.IScopeSelector;
+import com.aptana.scope.MatchAnyScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 public abstract class AbstractBundleElement extends AbstractElement
@@ -42,7 +44,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	private static final String ALL_SCOPES = "all"; //$NON-NLS-1$
 	
 	private String _scope;
-	private ScopeSelector _scopeSelector;
+	private IScopeSelector _scopeSelector;
 	protected BundleElement owningBundle;
 
 	/**
@@ -80,11 +82,18 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public ScopeSelector getScopeSelector()
+	public IScopeSelector getScopeSelector()
 	{
-		if (this._scopeSelector == null && this._scope != null && this._scope.length() > 0)
+		if (this._scopeSelector == null)
 		{
-			this._scopeSelector = new ScopeSelector(this._scope);
+			if (this._scope == null || this._scope.length() == 0)
+			{
+				this._scopeSelector = new MatchAnyScopeSelector();
+			}
+			else
+			{
+				this._scopeSelector = new ScopeSelector(this._scope);
+			}
 		}
 		
 		return this._scopeSelector;
@@ -98,7 +107,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String scope)
 	{
-		ScopeSelector selector = this.getScopeSelector();
+		IScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
 		
 		if (selector != null)
@@ -117,7 +126,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String[] scopes)
 	{
-		ScopeSelector selector = this.getScopeSelector();
+		IScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
 		
 		if (selector != null)

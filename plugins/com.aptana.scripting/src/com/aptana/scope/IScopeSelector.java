@@ -34,84 +34,49 @@
  */
 package com.aptana.scope;
 
-import junit.framework.TestCase;
-
-public class NameSelectorTests extends TestCase
+/**
+ * IScopeSelector
+ */
+public interface IScopeSelector
 {
 	/**
-	 * testNameIsPrefix
+	 * getMatchFragments
+	 * 
+	 * @return
 	 */
-	public void testNameIsPrefix()
-	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertTrue(selector.matches("source.ruby"));
-	}
-	
+
 	/**
-	 * testNameIsIdentical
+	 * getMatchFragments
 	 */
-	public void testNameIsIdentical()
-	{
-		NameSelector name = new NameSelector("source.ruby");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertTrue(selector.matches("source.ruby"));
-	}
-	
+	int getMatchFragments();
+
 	/**
-	 * testNameIsPartial
+	 * getMatchLength
+	 * 
+	 * @return
 	 */
-	public void testNameIsPartial()
-	{
-		NameSelector name = new NameSelector("sourc");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
-	}
-	
+	int getMatchLength();
+
 	/**
-	 * testNameIsEmpty
+	 * getMatchOffset
+	 * 
+	 * @return
 	 */
-	public void testNameIsEmpty()
-	{
-		NameSelector name = new NameSelector("");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
-	}
-	
+	int getMatchOffset();
+
 	/**
-	 * testScopeIsEmpty
+	 * matches
+	 * 
+	 * @param scope
+	 * @return
 	 */
-	public void testScopeIsEmpty()
-	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches(""));
-	}
-	
+	boolean matches(String scope);
+
 	/**
-	 * testNameIsNull
+	 * matches
+	 * 
+	 * @param scopes
+	 * @return
 	 */
-	public void testNameIsNull()
-	{
-		NameSelector name = new NameSelector(null);
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
-	}
-	
-	/**
-	 * testScopeIsNull
-	 */
-	public void testScopeIsNull()
-	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches((String) null));
-	}
+	boolean matches(String[] scopes);
 }

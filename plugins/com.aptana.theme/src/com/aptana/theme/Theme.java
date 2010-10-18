@@ -59,6 +59,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.internal.ThemeManager;
 
@@ -86,7 +87,7 @@ public class Theme
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
 	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
 
-	private Map<ScopeSelector, DelayedTextAttribute> coloringRules;
+	private Map<IScopeSelector, DelayedTextAttribute> coloringRules;
 	private ColorManager colorManager;
 	private RGB defaultFG;
 	private RGBa lineHighlight;
@@ -100,7 +101,7 @@ public class Theme
 	/**
 	 * Used for recursion in getDelayedTextAttribute to avoid matching same rule on scope twice
 	 */
-	private ScopeSelector lastSelectorMatch;
+	private IScopeSelector lastSelectorMatch;
 
 	/**
 	 * A cache to memoize the ultimate TextAttribute generated for a given fully qualified scope.
@@ -110,7 +111,7 @@ public class Theme
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
-		coloringRules = new HashMap<ScopeSelector, DelayedTextAttribute>();
+		coloringRules = new HashMap<IScopeSelector, DelayedTextAttribute>();
 		cache = new HashMap<String, TextAttribute>();
 		parseProps(props);
 		storeDefaults();
@@ -267,7 +268,7 @@ public class Theme
 
 	private DelayedTextAttribute getDelayedTextAttribute(String scope)
 	{
-		ScopeSelector match = findMatch(scope);
+		IScopeSelector match = findMatch(scope);
 		if (match != null)
 		{
 			// This is to avoid matching the same selector multiple times when recursing up the scope! Basically our
@@ -350,7 +351,7 @@ public class Theme
 		return parentAttr;
 	}
 
-	private ScopeSelector findMatch(String scope)
+	private IScopeSelector findMatch(String scope)
 	{
 		return ScopeSelector.bestMatch(coloringRules.keySet(), scope);
 	}
@@ -431,7 +432,7 @@ public class Theme
 	public Map<String, TextAttribute> getTokens()
 	{
 		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
-		for (Map.Entry<ScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
+		for (Map.Entry<IScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
 		{
 			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue(), false));
 		}
@@ -471,7 +472,7 @@ public class Theme
 		props.put(FOREGROUND_PROP_KEY, toHex(getForeground()));
 		props.put(BACKGROUND_PROP_KEY, toHex(getBackground()));
 		props.put(CARET_PROP_KEY, toHex(caret));
-		for (Map.Entry<ScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
+		for (Map.Entry<IScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
 		{
 			if (entry.getKey() == null)
 				continue;

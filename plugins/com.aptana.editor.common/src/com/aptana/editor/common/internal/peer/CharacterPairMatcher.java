@@ -26,6 +26,7 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 /**
@@ -39,7 +40,7 @@ import com.aptana.scope.ScopeSelector;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 
 	private int fAnchor = -1;
 	private final CharPairs fPairs;

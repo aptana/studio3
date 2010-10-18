@@ -34,84 +34,53 @@
  */
 package com.aptana.scope;
 
-import junit.framework.TestCase;
-
-public class NameSelectorTests extends TestCase
+/**
+ * MatchAnyScopeSelector
+ */
+public class MatchAnyScopeSelector implements IScopeSelector
 {
-	/**
-	 * testNameIsPrefix
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#getMatchFragments()
 	 */
-	public void testNameIsPrefix()
+	public int getMatchFragments()
 	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertTrue(selector.matches("source.ruby"));
+		return 0;
 	}
-	
-	/**
-	 * testNameIsIdentical
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#getMatchLength()
 	 */
-	public void testNameIsIdentical()
+	public int getMatchLength()
 	{
-		NameSelector name = new NameSelector("source.ruby");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertTrue(selector.matches("source.ruby"));
+		return 0;
 	}
-	
-	/**
-	 * testNameIsPartial
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#getMatchOffset()
 	 */
-	public void testNameIsPartial()
+	public int getMatchOffset()
 	{
-		NameSelector name = new NameSelector("sourc");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
+		return 0;
 	}
-	
-	/**
-	 * testNameIsEmpty
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#matches(java.lang.String)
 	 */
-	public void testNameIsEmpty()
+	public boolean matches(String scope)
 	{
-		NameSelector name = new NameSelector("");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
+		return true;
 	}
-	
-	/**
-	 * testScopeIsEmpty
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scope.IScopeSelector#matches(java.lang.String[])
 	 */
-	public void testScopeIsEmpty()
+	public boolean matches(String[] scopes)
 	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches(""));
-	}
-	
-	/**
-	 * testNameIsNull
-	 */
-	public void testNameIsNull()
-	{
-		NameSelector name = new NameSelector(null);
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches("source.ruby"));
-	}
-	
-	/**
-	 * testScopeIsNull
-	 */
-	public void testScopeIsNull()
-	{
-		NameSelector name = new NameSelector("source");
-		IScopeSelector selector = new ScopeSelector(name);
-		
-		assertFalse(selector.matches((String) null));
+		return true;
 	}
 }
