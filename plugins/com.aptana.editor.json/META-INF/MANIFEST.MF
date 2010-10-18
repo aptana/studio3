@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
  com.aptana.editor.common,
- com.aptana.editor.js,
  com.aptana.parsing,
  beaver;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
