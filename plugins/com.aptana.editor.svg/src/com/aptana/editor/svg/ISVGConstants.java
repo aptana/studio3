@@ -40,5 +40,5 @@ package com.aptana.editor.svg;
  */
 public interface ISVGConstants
 {
-	public String CONTENT_TYPE_SVG = "com.aptana.contenttype.svg"; //$NON-NLS-1$
+	public static final String CONTENT_TYPE_SVG = "com.aptana.contenttype.svg"; //$NON-NLS-1$
 }
