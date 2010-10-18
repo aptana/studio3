@@ -10,7 +10,6 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 /**
  * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
  * be indented.
- * 
  */
 public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
 {

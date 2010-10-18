@@ -6,7 +6,6 @@ import com.aptana.formatter.nodes.FormatterCommentNode;
 
 /**
  * An HTML formatter comment node
- * 
  */
 public class FormatterCSSCommentNode extends FormatterCommentNode
 {
@@ -31,5 +30,5 @@ public class FormatterCSSCommentNode extends FormatterCommentNode
 	{
 		return CSSFormatterConstants.WRAP_COMMENTS;
 	}
-	
+
 }
