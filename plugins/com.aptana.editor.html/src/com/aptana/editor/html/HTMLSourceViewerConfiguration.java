@@ -53,6 +53,8 @@ import com.aptana.editor.css.text.CSSTextHover;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
+import com.aptana.editor.svg.SVGSourceConfiguration;
+import com.aptana.editor.svg.contentassist.SVGContentAssistProcessor;
 
 public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
@@ -73,7 +75,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	{
 		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
 				HTMLSourceConfiguration.CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES,
-				CSSSourceConfiguration.CONTENT_TYPES });
+				CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
@@ -108,6 +110,10 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
 		{
 			return new CSSContentAssistProcessor(editor);
+		}
+		if (contentType.startsWith(SVGSourceConfiguration.PREFIX))
+		{
+			return new SVGContentAssistProcessor(editor);
 		}
 		return new HTMLContentAssistProcessor(editor);
 	}
