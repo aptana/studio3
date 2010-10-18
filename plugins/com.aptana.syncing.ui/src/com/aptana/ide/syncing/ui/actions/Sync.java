@@ -81,10 +81,12 @@ public final class Sync
 			IPath path = ((IPathEditorInput) input).getPath();
 			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 			IFile file = workspaceRoot.getFileForLocation(path);
-			if(file != null) {
+			if (file != null)
+			{
 				upload(file);
 			}
-			else {
+			else
+			{
 				upload(path);
 			}
 		}
