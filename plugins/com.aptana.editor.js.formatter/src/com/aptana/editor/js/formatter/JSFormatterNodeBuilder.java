@@ -164,7 +164,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			boolean isCurlyTrueBlock = (trueBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			boolean isCurlyFalseBlock = (!isEmptyFalseBlock && falseBlock.getNodeType() == JSNodeTypes.STATEMENTS);
 			// First, construct the if condition node
-			FormatterBlockWithBeginNode conditionNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node);
+			FormatterJSIfNode conditionNode = new FormatterJSIfNode(document, isCurlyTrueBlock, node);
 			conditionNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getRightParenthesis()
 					.getEnd() + 1));
 			push(conditionNode);
@@ -193,7 +193,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elsePos = segment.toLowerCase().indexOf("else"); //$NON-NLS-1$
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
-				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock);
+				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
+				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf);
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -202,7 +203,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 				else
 				{
-					boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
 					if (isElseIf)
 					{
 						// Wrap the incoming 'if' with an Else-If node that will allow us later to break it and indent

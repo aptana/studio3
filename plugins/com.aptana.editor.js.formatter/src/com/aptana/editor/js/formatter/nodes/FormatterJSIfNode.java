@@ -69,12 +69,22 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		return !hasBlockedChild;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
 	 */
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		return super.shouldConsumePreviousWhiteSpaces();
+		return inElseIf;
 	}
 
 	/*
@@ -113,7 +123,7 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 	@Override
 	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		if (inElseIf && !getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT))
+		if (inElseIf && getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT))
 		{
 			int indent = context.getIndent();
 			if (indent > 0)

@@ -47,16 +47,18 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 {
 
 	private boolean hasBlock;
+	private final boolean isElseIf;
 
 	/**
 	 * @param document
 	 * @param b
 	 * @param hasBlock
 	 */
-	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock)
+	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock, boolean isElseIf)
 	{
 		super(document);
 		this.hasBlock = hasBlock;
+		this.isElseIf = isElseIf;
 	}
 
 	/*
@@ -96,7 +98,11 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isIndenting()
 	{
-		return !hasBlock;
+		// We add indent after that 'else' in case it does not have a blocked child, and
+		// the non-blocked child is not an else-if. In case it is, we check if this else-if should be
+		// broken into two lines. If so, we indent anyway.
+		return !hasBlock
+				&& (!isElseIf || isElseIf
+						&& !getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT));
 	}
-
 }

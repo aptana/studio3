@@ -56,6 +56,7 @@ public class Messages extends NLS
 	public static String JSFormatterModifyDialog_commentsTabName;
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
+	public static String JSFormatterModifyDialog_bracesTabName;
 	
 	public static String JSFormatterModifyDialog_newLinesTabName;
 	public static String JSFormatterNewLinesPage_newLineBeforeBlocks;
