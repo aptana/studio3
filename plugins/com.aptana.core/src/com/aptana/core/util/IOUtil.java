@@ -126,7 +126,13 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * copyDirectory
+	 * Recursively copy one directory to a new destination directory. If a file
+	 * is passed in instead of a directory, this method will delegate to
+	 * copyFile to perform the copy. Various tests for existence, readability,
+	 * and writability are performed before copying. If any of these tests fail,
+	 * the copy be aborted. Note that this means that if a failure occurs
+	 * somewhere in a descendant file/directory, all files up to that point will
+	 * exist, but no files after that point will be copied. 
 	 * 
 	 * @param source
 	 * @param destination
@@ -187,7 +193,7 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * copyFile
+	 * Copy the contents of one file to another. This is a byte-wise copy
 	 * 
 	 * @param source
 	 * @param destination
