@@ -61,7 +61,7 @@ public class SVGParser extends XMLParser
 	 */
 	private void advanceToCloseTag(String elementName)
 	{
-		String closeTagStart = "</" + elementName;
+		String closeTagStart = "</" + elementName; //$NON-NLS-1$
 		int length = closeTagStart.length();
 
 		try
@@ -189,11 +189,11 @@ public class SVGParser extends XMLParser
 			{
 				String elementName = element.getName();
 
-				if ("script".equals(elementName))
+				if ("script".equals(elementName)) //$NON-NLS-1$
 				{
 					this.processLanguage(IJSParserConstants.LANGUAGE, elementName);
 				}
-				else if ("style".equals(elementName))
+				else if ("style".equals(elementName)) //$NON-NLS-1$
 				{
 					this.processLanguage(ICSSParserConstants.LANGUAGE, elementName);
 				}

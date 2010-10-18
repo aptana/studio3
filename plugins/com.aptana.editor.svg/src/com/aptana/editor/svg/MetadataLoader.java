@@ -74,7 +74,7 @@ public class MetadataLoader extends Job
 	 */
 	public MetadataLoader()
 	{
-		super("Loading SVG metadata...");
+		super(Messages.MetadataLoader_Loading_SVG_Metadata);
 
 		this.setPriority(Job.LONG);
 	}
