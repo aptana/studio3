@@ -45,6 +45,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -124,59 +125,113 @@ public abstract class IOUtil
 		CorePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e));
 	}
 
-	// If targetLocation does not exist, it will be created.
-	public static void copyDirectory(File sourceLocation, File targetLocation) throws IOException
+	/**
+	 * copyDirectory
+	 * 
+	 * @param source
+	 * @param destination
+	 * @throws IOException
+	 */
+	public static void copyDirectory(File source, File destination) throws IOException
 	{
-
-		if (sourceLocation.isDirectory())
+		if (source.isDirectory())
 		{
-			if (!targetLocation.exists())
+			String error = null;
+
+			// make sure we can read the source directory and that we have a
+			// writable destination directory
+			if (source.canRead() == false)
 			{
-				targetLocation.mkdir();
+				error = Messages.IOUtil_Source_Directory_Not_Readable;
 			}
-			for (String child : sourceLocation.list())
+			else if (destination.exists() == false)
 			{
-				copyDirectory(new File(sourceLocation, child), new File(targetLocation, child));
+				if (destination.mkdir() == false)
+				{
+					error = Messages.IOUtil_Destination_Directory_Uncreatable;
+				}
+			}
+			else if (destination.isDirectory() == false)
+			{
+				error = Messages.IOUtil_Destination_Is_Not_A_Directory;
+			}
+			else if (destination.canWrite() == false)
+			{
+				error = Messages.IOUtil_Destination_Directory_Not_Writable;
+			}
+
+			if (error == null)
+			{
+				// copy all files in the source directory
+				for (String filename : source.list())
+				{
+					copyDirectory(new File(source, filename), new File(destination, filename));
+				}
+			}
+			else
+			{
+				String message = MessageFormat.format( //
+					Messages.IOUtil_Unable_To_Copy_Because, //
+					source, //
+					destination, //
+					error //
+				);
+
+				CorePlugin.logError(message, null);
 			}
 		}
 		else
 		{
-			copyFile(sourceLocation, targetLocation);
+			copyFile(source, destination);
 		}
 	}
 
-	public static void copyFile(File sourceLocation, File targetLocation) throws IOException
+	/**
+	 * copyFile
+	 * 
+	 * @param source
+	 * @param destination
+	 * @throws IOException
+	 */
+	public static void copyFile(File source, File destination) throws IOException
 	{
-		InputStream in = null;
-		OutputStream out = null;
+		InputStream iStream = null;
+		OutputStream oStream = null;
+		byte[] buffer = new byte[1024];
+
 		try
 		{
-			in = new FileInputStream(sourceLocation);
-			out = new FileOutputStream(targetLocation);
+			iStream = new FileInputStream(source);
+			oStream = new FileOutputStream(destination);
 
-			// Copy the bits from instream to outstream
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0)
+			int readCount = iStream.read(buffer);
+
+			while (readCount > 0)
 			{
-				out.write(buf, 0, len);
+				oStream.write(buffer, 0, readCount);
+				readCount = iStream.read(buffer);
 			}
 		}
 		finally
 		{
 			try
 			{
-				if (in != null)
-					in.close();
+				if (iStream != null)
+				{
+					iStream.close();
+				}
 			}
 			catch (Exception e)
 			{
 				// ignore
 			}
+
 			try
 			{
-				if (out != null)
-					out.close();
+				if (oStream != null)
+				{
+					oStream.close();
+				}
 			}
 			catch (Exception e)
 			{
@@ -239,7 +294,7 @@ public abstract class IOUtil
 		{
 			return;
 		}
-		
+
 		Writer writer = null;
 		try
 		{
