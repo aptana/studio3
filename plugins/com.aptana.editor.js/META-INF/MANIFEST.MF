@@ -24,6 +24,5 @@ Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
  com.aptana.editor.js.outline,
- com.aptana.editor.js.parsing,
- com.aptana.editor.js.text.rules;x-friends:="com.aptana.editor.json"
+ com.aptana.editor.js.parsing
 Eclipse-ExtensibleAPI: true
