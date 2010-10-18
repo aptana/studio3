@@ -42,7 +42,6 @@ import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -98,8 +97,20 @@ public class ConnectionPointLabelDecorator implements ILabelDecorator
 						&& currentName.equals(connection.getName()))
 				{
 					// there are remote connections with the same name, so adds the compressed path to distinguish
+					String decoratedText = null;
+					IPath path = ((IBaseRemoteConnectionPoint) connection).getPath();
+					int count = currentPath.segmentCount();
+					for (int i = 0; i < count; ++i)
+					{
+						// finds the first segment in the path that does not match
+						if (!currentPath.segment(i).equals(path.segment(i)))
+						{
+							decoratedText = ".../" + currentPath.removeFirstSegments(i).toPortableString(); //$NON-NLS-1$
+							break;
+						}
+					}
 					return MessageFormat.format("{0} ({1})", text, //$NON-NLS-1$
-							FileUtil.compressLeadingPath(currentPath.toPortableString(), 20));
+							decoratedText == null ? currentPath.toPortableString() : decoratedText);
 				}
 			}
 		}
