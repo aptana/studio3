@@ -39,7 +39,6 @@ import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.List;
 
-
 /**
  * A custom list viewer that allows setting an external listener to be notified when the input is changed.<br>
  * Note that only changes that are made through the content-provider will be reflected here. Other, direct changes, will
@@ -101,7 +100,7 @@ public class CListViewer extends ListViewer
 		Object[] allListeners = listeners.getListeners();
 		for (Object listener : allListeners)
 		{
-			((IListDataChangeListener)listener).inputChanged(input, oldInput);
+			((IListDataChangeListener) listener).inputChanged(input, oldInput);
 		}
 	}
 

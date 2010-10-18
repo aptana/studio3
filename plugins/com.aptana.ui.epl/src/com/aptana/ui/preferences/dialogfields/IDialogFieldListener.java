@@ -12,8 +12,9 @@ package com.aptana.ui.preferences.dialogfields;
 /**
  * Change listener used by <code>DialogField</code>
  */
-public interface IDialogFieldListener {
-	
+public interface IDialogFieldListener
+{
+
 	/**
 	 * The dialog field has changed.
 	 */

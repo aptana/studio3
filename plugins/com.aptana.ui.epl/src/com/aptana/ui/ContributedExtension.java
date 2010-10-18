@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package com.aptana.ui;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -15,7 +25,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	private int priority;
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getDescription()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getDescription()
 	 */
 	public String getDescription()
 	{
@@ -23,7 +34,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getId()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getId()
 	 */
 	public String getId()
 	{
@@ -31,7 +43,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getName()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getName()
 	 */
 	public String getName()
 	{
@@ -39,7 +52,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getNatureId()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getContentType()
 	 */
 	public String getContentType()
 	{
@@ -47,7 +61,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getPreferencePageId()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getPreferencePageId()
 	 */
 	public String getPreferencePageId()
 	{
@@ -55,7 +70,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ast.parser.IDLTKContributedExtension#getPriority()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getPriority()
 	 */
 	public int getPriority()
 	{
@@ -63,7 +79,8 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
-	 * @see org.eclipse.dltk.core.IDLTKContributedExtension#getPropertyPageId()
+	 * (non-Javadoc)
+	 * @see com.aptana.ui.IContributedExtension#getPropertyPageId()
 	 */
 	public String getPropertyPageId()
 	{
@@ -71,6 +88,7 @@ public abstract class ContributedExtension implements IContributedExtension, IEx
 	}
 
 	/*
+	 * (non-Javadoc)
 	 * @see
 	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement
 	 * , java.lang.String, java.lang.Object)

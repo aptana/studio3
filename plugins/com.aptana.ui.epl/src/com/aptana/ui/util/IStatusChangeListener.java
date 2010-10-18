@@ -11,12 +11,14 @@ package com.aptana.ui.util;
 
 import org.eclipse.core.runtime.IStatus;
 
-public interface IStatusChangeListener {
-	
+public interface IStatusChangeListener
+{
+
 	/**
 	 * Notifies this listener that the given status has changed.
 	 * 
-	 * @param	status	the new status
+	 * @param status
+	 *            the new status
 	 */
 	void statusChanged(IStatus status);
 }

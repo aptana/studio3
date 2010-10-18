@@ -43,8 +43,7 @@ import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.util.StatusInfo;
 
 /**
- * 
- *
+ * ProjectSelectionDialog
  */
 public class ProjectSelectionDialog extends SelectionStatusDialog
 {

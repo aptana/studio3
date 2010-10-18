@@ -25,7 +25,8 @@ import com.aptana.ui.util.Util;
 /**
  * Dialog field containing a label and a text control.
  */
-public class StringDialogField extends DialogField {
+public class StringDialogField extends DialogField
+{
 
 	private String fText;
 	private String fMessage;
@@ -34,16 +35,19 @@ public class StringDialogField extends DialogField {
 
 	// private IContentAssistProcessor fContentAssistProcessor;
 
-	public StringDialogField() {
+	public StringDialogField()
+	{
 		super();
-		if (UIEplPlugin.DEBUG) {
+		if (UIEplPlugin.DEBUG)
+		{
 			System.err.println("StringDialogField: Add content assist here."); //$NON-NLS-1$
 		}
 		fText = Util.EMPTY_STRING;
 		fMessage = Util.EMPTY_STRING;
 	}
 
-	public void setContentAssistProcessor(IContentAssistProcessor processor) {
+	public void setContentAssistProcessor(IContentAssistProcessor processor)
+	{
 		// fContentAssistProcessor= processor;
 		// if (fContentAssistProcessor != null && isOkToUse(fTextControl)) {
 		// ControlContentAssistHelper.createTextContentAssistant(fTextControl,
@@ -51,14 +55,16 @@ public class StringDialogField extends DialogField {
 		// }
 	}
 
-	public IContentAssistProcessor getContentAssistProcessor() {
+	public IContentAssistProcessor getContentAssistProcessor()
+	{
 		return null;// fContentAssistProcessor;
 	}
 
 	// ------- layout helpers
 
 	@Override
-	public Control[] doFillIntoGrid(Composite parent, int nColumns) {
+	public Control[] doFillIntoGrid(Composite parent, int nColumns)
+	{
 		assertEnoughColumns(nColumns);
 
 		Label label = getLabelControl(parent);
@@ -70,11 +76,13 @@ public class StringDialogField extends DialogField {
 	}
 
 	@Override
-	public int getNumberOfControls() {
+	public int getNumberOfControls()
+	{
 		return 2;
 	}
 
-	public static GridData gridDataForText(int span) {
+	public static GridData gridDataForText(int span)
+	{
 		GridData gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = false;
@@ -85,15 +93,18 @@ public class StringDialogField extends DialogField {
 	// ------- focus methods
 
 	@Override
-	public boolean setFocus() {
-		if (isOkToUse(fTextControl)) {
+	public boolean setFocus()
+	{
+		if (isOkToUse(fTextControl))
+		{
 			fTextControl.setFocus();
 			fTextControl.setSelection(0, fTextControl.getText().length());
 		}
 		return true;
 	}
 
-	public Text getTextControl() {
+	public Text getTextControl()
+	{
 		return getTextControl(null);
 	}
 
@@ -103,14 +114,17 @@ public class StringDialogField extends DialogField {
 	 * Creates or returns the created text control.
 	 * 
 	 * @param parent
-	 *            The parent composite or <code>null</code> when the widget has
-	 *            already been created.
+	 *            The parent composite or <code>null</code> when the widget has already been created.
 	 */
-	public Text getTextControl(Composite parent) {
-		if (fTextControl == null) {
+	public Text getTextControl(Composite parent)
+	{
+		if (fTextControl == null)
+		{
 			assertCompositeNotNull(parent);
-			fModifyListener = new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
+			fModifyListener = new ModifyListener()
+			{
+				public void modifyText(ModifyEvent e)
+				{
 					doModifyText(e);
 				}
 			};
@@ -131,8 +145,10 @@ public class StringDialogField extends DialogField {
 		return fTextControl;
 	}
 
-	private void doModifyText(ModifyEvent e) {
-		if (isOkToUse(fTextControl)) {
+	private void doModifyText(ModifyEvent e)
+	{
+		if (isOkToUse(fTextControl))
+		{
 			fText = fTextControl.getText();
 		}
 		dialogFieldChanged();
@@ -143,9 +159,11 @@ public class StringDialogField extends DialogField {
 	/*
 	 * @see DialogField#updateEnableState
 	 */
-	protected void updateEnableState() {
+	protected void updateEnableState()
+	{
 		super.updateEnableState();
-		if (isOkToUse(fTextControl)) {
+		if (isOkToUse(fTextControl))
+		{
 			fTextControl.setEnabled(isEnabled());
 		}
 	}
@@ -155,29 +173,37 @@ public class StringDialogField extends DialogField {
 	/**
 	 * Gets the text. Can not be <code>null</code>
 	 */
-	public String getText() {
+	public String getText()
+	{
 		return fText;
 	}
 
 	/**
 	 * Sets the text. Triggers a dialog-changed event.
 	 */
-	public void setText(String text) {
+	public void setText(String text)
+	{
 		fText = text;
-		if (isOkToUse(fTextControl)) {
+		if (isOkToUse(fTextControl))
+		{
 			fTextControl.setText(text);
-		} else {
+		}
+		else
+		{
 			dialogFieldChanged();
 		}
 	}
 
-	public String getMessage() {
+	public String getMessage()
+	{
 		return fMessage;
 	}
 
-	public void setMessage(String value) {
+	public void setMessage(String value)
+	{
 		fMessage = value;
-		if (isOkToUse(fTextControl)) {
+		if (isOkToUse(fTextControl))
+		{
 			fTextControl.setMessage(value);
 		}
 	}
@@ -185,9 +211,11 @@ public class StringDialogField extends DialogField {
 	/**
 	 * Sets the text without triggering a dialog-changed event.
 	 */
-	public void setTextWithoutUpdate(String text) {
+	public void setTextWithoutUpdate(String text)
+	{
 		fText = text;
-		if (isOkToUse(fTextControl)) {
+		if (isOkToUse(fTextControl))
+		{
 			fTextControl.removeModifyListener(fModifyListener);
 			fTextControl.setText(text);
 			fTextControl.addModifyListener(fModifyListener);
@@ -195,9 +223,11 @@ public class StringDialogField extends DialogField {
 	}
 
 	@Override
-	public void refresh() {
+	public void refresh()
+	{
 		super.refresh();
-		if (isOkToUse(fTextControl)) {
+		if (isOkToUse(fTextControl))
+		{
 			setTextWithoutUpdate(fText);
 			fTextControl.setMessage(fMessage);
 		}
