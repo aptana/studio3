@@ -115,8 +115,8 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 		});
 		new TabOptionHandler(manager, tabOptions, indentationSize);
 
-		group = SWTFactory.createGroup(parent,
-				Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1, GridData.FILL_BOTH);
+		group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1,
+				GridData.FILL_BOTH);
 		Label exclutionLabel = new Label(group, SWT.WRAP);
 		exclutionLabel.setText(Messages.HTMLFormatterIndentationTabPage_exclusionsMessage);
 		manager.createManagedList(group, HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);

@@ -223,7 +223,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int endSpecial = getEndWithoutWhiteSpaces(endNode.getNameRange().getStartingOffset() - 1, document) + 1;
 			int beginSpecial = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
 			specialNode.setBegin(createTextNode(document, beginSpecial, endSpecial));
-			specialNode.setEnd(createTextNode(document, endSpecial, endSpecial)); // empty end 
+			specialNode.setEnd(createTextNode(document, endSpecial, endSpecial)); // empty end
 			push(specialNode);
 			checkedPop(specialNode, -1);
 		}
