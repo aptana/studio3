@@ -44,10 +44,6 @@ public interface IScopeSelector
 	 * 
 	 * @return
 	 */
-
-	/**
-	 * getMatchFragments
-	 */
 	int getMatchFragments();
 
 	/**
