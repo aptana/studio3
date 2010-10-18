@@ -50,8 +50,8 @@ import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.js.text.rules.JSNumberRule;
 import com.aptana.editor.json.parsing.lexer.JSONTokenType;
+import com.aptana.editor.json.text.rules.JSONNumberRule;
 
 @SuppressWarnings("nls")
 public class JSONSourceScanner extends RuleBasedScanner
@@ -100,7 +100,7 @@ public class JSONSourceScanner extends RuleBasedScanner
 		rules.add(cmRule);
 
 		// Numbers
-		rules.add(new JSNumberRule(createToken(JSONTokenType.NUMBER)));
+		rules.add(new JSONNumberRule(createToken(JSONTokenType.NUMBER)));
 
 		this.setRules(rules.toArray(new IRule[rules.size()]));
 		// this.setDefaultReturnToken(this.createToken("text"));
