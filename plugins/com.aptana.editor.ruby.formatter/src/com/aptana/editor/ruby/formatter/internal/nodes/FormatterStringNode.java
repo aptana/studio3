@@ -16,21 +16,21 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterTextNode;
 
-
-public class FormatterStringNode extends FormatterTextNode {
+public class FormatterStringNode extends FormatterTextNode
+{
 
 	/**
 	 * @param document
 	 * @param startOffset
 	 * @param endOffset
 	 */
-	public FormatterStringNode(IFormatterDocument document, int startOffset,
-			int endOffset) {
+	public FormatterStringNode(IFormatterDocument document, int startOffset, int endOffset)
+	{
 		super(document, startOffset, endOffset);
 	}
 
-	public void accept(IFormatterContext context, IFormatterWriter visitor)
-			throws Exception {
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
 		visitor.ensureLineStarted(context);
 		IFormatterContext strContext = context.copy();
 		strContext.setIndenting(false);

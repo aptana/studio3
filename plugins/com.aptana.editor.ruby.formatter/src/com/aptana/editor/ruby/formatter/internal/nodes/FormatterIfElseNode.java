@@ -15,16 +15,19 @@ import com.aptana.editor.ruby.formatter.RubyFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
-public class FormatterIfElseNode extends FormatterBlockWithBeginNode {
+public class FormatterIfElseNode extends FormatterBlockWithBeginNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterIfElseNode(IFormatterDocument document) {
+	public FormatterIfElseNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
-	protected boolean isIndenting() {
+	protected boolean isIndenting()
+	{
 		return getDocument().getBoolean(RubyFormatterConstants.INDENT_IF);
 	}
 

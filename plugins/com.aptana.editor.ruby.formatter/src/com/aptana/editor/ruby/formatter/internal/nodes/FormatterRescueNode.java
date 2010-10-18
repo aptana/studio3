@@ -17,32 +17,37 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
-public class FormatterRescueNode extends FormatterBlockWithBeginNode {
+public class FormatterRescueNode extends FormatterBlockWithBeginNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterRescueNode(IFormatterDocument document) {
+	public FormatterRescueNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
-	public void accept(IFormatterContext context, IFormatterWriter visitor)
-			throws Exception {
-		if (getBegin() != null) {
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
+		if (getBegin() != null)
+		{
 			final boolean indenting = isIndenting();
-			if (indenting) {
+			if (indenting)
+			{
 				context.decIndent();
 			}
-			visitor.write(context, getBegin().getStartOffset(), getBegin()
-					.getEndOffset());
-			if (indenting) {
+			visitor.write(context, getBegin().getStartOffset(), getBegin().getEndOffset());
+			if (indenting)
+			{
 				context.incIndent();
 			}
 		}
 		acceptBody(context, visitor);
 	}
 
-	protected boolean isIndenting() {
+	protected boolean isIndenting()
+	{
 		return getDocument().getBoolean(RubyFormatterConstants.INDENT_BLOCKS);
 	}
 

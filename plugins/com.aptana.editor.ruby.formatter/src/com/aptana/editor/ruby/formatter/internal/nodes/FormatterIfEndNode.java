@@ -16,16 +16,16 @@ import org.jrubyparser.SourcePosition;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterTextNode;
 
-
-public class FormatterIfEndNode extends FormatterTextNode {
+public class FormatterIfEndNode extends FormatterTextNode
+{
 
 	/**
 	 * @param document
 	 * @param startOffset
 	 * @param endOffset
 	 */
-	public FormatterIfEndNode(IFormatterDocument document, int startOffset,
-			int endOffset) {
+	public FormatterIfEndNode(IFormatterDocument document, int startOffset, int endOffset)
+	{
 		super(document, startOffset, endOffset);
 	}
 
@@ -33,9 +33,9 @@ public class FormatterIfEndNode extends FormatterTextNode {
 	 * @param document
 	 * @param position
 	 */
-	public FormatterIfEndNode(IFormatterDocument document,
-			SourcePosition position) {
-		
+	public FormatterIfEndNode(IFormatterDocument document, SourcePosition position)
+	{
+
 		this(document, position.getStartOffset(), position.getEndOffset());
 	}
 

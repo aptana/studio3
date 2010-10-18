@@ -15,14 +15,14 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.IFormatterCommentableNode;
 
-
-public class FormatterAtEndNode extends FormatterBlockWithBeginEndNode
-		implements IFormatterCommentableNode {
+public class FormatterAtEndNode extends FormatterBlockWithBeginEndNode implements IFormatterCommentableNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterAtEndNode(IFormatterDocument document) {
+	public FormatterAtEndNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 

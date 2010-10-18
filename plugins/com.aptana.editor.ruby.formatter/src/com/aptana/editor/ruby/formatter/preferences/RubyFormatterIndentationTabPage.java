@@ -46,7 +46,7 @@ public class RubyFormatterIndentationTabPage extends FormatterModifyTabPage
 	private Text indentSize;
 	private Text tabSize;
 	private TabPolicyListener tabPolicyListener;
-	
+
 	private final String[] tabPolicyItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
 			CodeFormatterConstants.MIXED };
 
@@ -79,10 +79,11 @@ public class RubyFormatterIndentationTabPage extends FormatterModifyTabPage
 
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void createOptions(final IFormatterControlManager manager, Composite parent)
 	{
-		Group tabPolicyGroup = SWTFactory.createGroup(parent,
-				FormatterMessages.FormatterModifyTabPage_generalSettings, 2, 1, GridData.FILL_HORIZONTAL);
+		Group tabPolicyGroup = SWTFactory.createGroup(parent, FormatterMessages.FormatterModifyTabPage_generalSettings,
+				2, 1, GridData.FILL_HORIZONTAL);
 		tabPolicy = manager.createCombo(tabPolicyGroup, RubyFormatterConstants.FORMATTER_TAB_CHAR,
 				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, tabPolicyItems);
 		tabPolicyListener = new TabPolicyListener(manager);

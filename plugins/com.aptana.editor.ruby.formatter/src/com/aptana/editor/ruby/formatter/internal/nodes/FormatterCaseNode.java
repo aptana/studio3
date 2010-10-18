@@ -15,16 +15,19 @@ import com.aptana.editor.ruby.formatter.RubyFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
-public class FormatterCaseNode extends FormatterBlockWithBeginEndNode {
+public class FormatterCaseNode extends FormatterBlockWithBeginEndNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterCaseNode(IFormatterDocument document) {
+	public FormatterCaseNode(IFormatterDocument document)
+	{
 		super(document);
 	}
 
-	protected boolean isIndenting() {
+	protected boolean isIndenting()
+	{
 		return getDocument().getBoolean(RubyFormatterConstants.INDENT_CASE);
 	}
 

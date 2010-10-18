@@ -15,9 +15,9 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * @author Alexey
- *
  */
-public class Messages extends NLS {
+public class Messages extends NLS
+{
 	private static final String BUNDLE_NAME = "com.aptana.editor.ruby.formatter.preferences.messages"; //$NON-NLS-1$
 	public static String RubyFormatterBlankLinesPage_afterRequire;
 	public static String RubyFormatterBlankLinesPage_beforeFirstDeclare;
@@ -39,11 +39,13 @@ public class Messages extends NLS {
 	public static String RubyFormatterModifyDialog_indentationTabTitle;
 	public static String RubyFormatterModifyDialog_rubyFormatterTitle;
 	public static String RubyFormatterPreferencePage_description;
-	static {
+	static
+	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages() {
+	private Messages()
+	{
 	}
 }

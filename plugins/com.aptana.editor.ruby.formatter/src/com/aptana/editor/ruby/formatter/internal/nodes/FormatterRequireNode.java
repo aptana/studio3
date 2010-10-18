@@ -14,13 +14,14 @@ package com.aptana.editor.ruby.formatter.internal.nodes;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterTextNode;
 
-
-public class FormatterRequireNode extends FormatterTextNode {
+public class FormatterRequireNode extends FormatterTextNode
+{
 
 	/**
 	 * @param document
 	 */
-	public FormatterRequireNode(IFormatterDocument document, int start, int end) {
+	public FormatterRequireNode(IFormatterDocument document, int start, int end)
+	{
 		super(document, start, end);
 	}
 
