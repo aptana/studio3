@@ -113,7 +113,8 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 		});
 		new TabOptionHandler(manager, tabOptions, indentationSize);
 
-		group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_indentGroupLabel, 1, 1, GridData.FILL_HORIZONTAL);
+		group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_indentGroupLabel, 1, 1,
+				GridData.FILL_HORIZONTAL);
 		manager.createCheckbox(group, JSFormatterConstants.INDENT_BLOCKS,
 				Messages.JSFormatterIndentationTabPage_statementsWithinBlocks);
 		manager.createCheckbox(group, JSFormatterConstants.INDENT_FUNCTION_BODY,

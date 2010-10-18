@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.js.formatter;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterContext;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;

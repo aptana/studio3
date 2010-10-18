@@ -37,7 +37,6 @@ package com.aptana.editor.js.formatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -47,17 +46,13 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
 
-	private final FormatterDocument document;
-	private final IParseNode parseResult;
-
 	/**
 	 * @param parseResult
 	 * @param document
 	 */
 	public JSFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
 	{
-		this.parseResult = parseResult;
-		this.document = document;
+		// TODO
 	}
 
 	/*
@@ -69,7 +64,6 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object)
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 

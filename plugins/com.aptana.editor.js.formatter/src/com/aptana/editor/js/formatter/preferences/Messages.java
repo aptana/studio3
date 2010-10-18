@@ -46,6 +46,10 @@ public class Messages extends NLS
 	public static String JSFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesToPreserve;
+	public static String JSFormatterBracesPage_blocks;
+	public static String JSFormatterBracesPage_caseStateMent;
+	public static String JSFormatterBracesPage_functionDeclaraion;
+	public static String JSFormatterBracesPage_switchStatement;
 	public static String JSFormatterCommentsPage_enableWrapping;
 	public static String JSFormatterCommentsPage_formattingGroupLabel;
 	public static String JSFormatterCommentsPage_maxLineWidth;
@@ -57,7 +61,7 @@ public class Messages extends NLS
 	public static String JSFormatterModifyDialog_jsFormatterTitle;
 	public static String JSFormatterModifyDialog_intentationTabName;
 	public static String JSFormatterModifyDialog_bracesTabName;
-	
+
 	public static String JSFormatterModifyDialog_newLinesTabName;
 	public static String JSFormatterNewLinesPage_newLineBeforeBlocks;
 	public static String JSFormatterNewLinesPage_newLineBeforeCatch;
@@ -66,7 +70,7 @@ public class Messages extends NLS
 	public static String JSFormatterNewLinesPage_newLineBeforeFinally;
 	public static String JSFormatterNewLinesPage_newLineBeforeIf;
 	public static String JSFormatterNewLinesPage_newLineBeforeWhileInDo;
-	
+
 	public static String JSFormatterIndentationTabPage_statementsWithinBlocks;
 	public static String JSFormatterIndentationTabPage_statementsWithinSwitch;
 	public static String JSFormatterIndentationTabPage_statementsWithinCase;

@@ -37,7 +37,6 @@ package com.aptana.editor.js.formatter.preferences;
 import java.net.URL;
 
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
@@ -85,16 +84,16 @@ public class JSFormatterBracesPage extends FormatterModifyTabPage
 	@Override
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group group = SWTFactory.createGroup(parent, FormatterMessages.BracesTabPage_group_braces_positions, 2, 1,
+		Group group = SWTFactory.createGroup(parent, "Braces positions", 2, 1, //$NON-NLS-1$
 				GridData.FILL_HORIZONTAL);
-		Combo braceOption = manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK, "Blocks:",
+		manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK, Messages.JSFormatterBracesPage_blocks,
 				bracesOptionKeys, bracesOptionNames);
-		braceOption = manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION,
-				"Function declaration:", bracesOptionKeys, bracesOptionNames);
-		braceOption = manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
-				"'switch' statement", bracesOptionKeys, bracesOptionNames);
-		braceOption = manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE, "'case' statement",
-				bracesOptionKeys, bracesOptionNames);
+		manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION,
+				Messages.JSFormatterBracesPage_functionDeclaraion, bracesOptionKeys, bracesOptionNames);
+		manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
+				Messages.JSFormatterBracesPage_switchStatement, bracesOptionKeys, bracesOptionNames);
+		manager.createCombo(group, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE,
+				Messages.JSFormatterBracesPage_caseStateMent, bracesOptionKeys, bracesOptionNames);
 	}
 
 	/*
