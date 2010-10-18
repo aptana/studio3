@@ -43,6 +43,25 @@ public class DTDEditor extends AbstractThemeableEditor
 {
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
+	protected FileService createFileService()
+	{
+		return new FileService(DTDParserConstants.LANGUAGE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
+	@Override
+	protected CommonOutlinePage createOutlinePage()
+	{
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	protected void initializeEditor()
@@ -51,23 +70,5 @@ public class DTDEditor extends AbstractThemeableEditor
 
 		this.setSourceViewerConfiguration(new DTDSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new DTDDocumentProvider());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(DTDParserConstants.LANGUAGE);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
-	@Override
-	protected CommonOutlinePage createOutlinePage()
-	{
-		return null;
 	}
 }

@@ -56,6 +56,7 @@ import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 /**
@@ -82,7 +83,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getScopeAtOffset(doc, region.getOffset());
 			// Match scope against source.css
-			ScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
+			IScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
 			if (!selector.matches(scope))
 			{
 				return null;

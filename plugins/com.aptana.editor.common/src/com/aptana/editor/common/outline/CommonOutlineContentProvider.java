@@ -49,7 +49,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	private IParseListener fListener;
 	protected IPathResolver resolver;
 
-	private IParseNode fRootNode;
+	private boolean autoExpanded;
 
 	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
@@ -64,10 +64,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
-			fRootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
-			if (fRootNode != null)
+			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
+			if (rootNode != null)
 			{
-				return filter(fRootNode.getChildren());
+				return filter(rootNode.getChildren());
 			}
 		}
 		else if (parentElement instanceof IParseNode)
@@ -136,12 +136,12 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 							IParseNode node = editor.getFileService().getParseResult();
 							if (node != null)
 							{
-								boolean shouldAutoExpand = (fRootNode == null);
 								CommonOutlinePage page = editor.getOutlinePage();
 								page.refresh();
-								if (shouldAutoExpand)
+								if (!autoExpanded)
 								{
 									page.expandToLevel(2);
+									autoExpanded = true;
 								}
 							}
 						}
@@ -155,6 +155,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
 			editor.getFileService().removeListener(fListener);
+			autoExpanded = false;
 			fListener = null;
 			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}

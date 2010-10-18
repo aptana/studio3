@@ -201,7 +201,7 @@ public class ScopeSelectorTests extends TestCase
 	{
 		ScopeSelector entity = new ScopeSelector("entity");
 		ScopeSelector metaTagEntity = new ScopeSelector("meta.tag entity");
-		List<ScopeSelector> selectors = new ArrayList<ScopeSelector>();
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		selectors.add(entity);
 		selectors.add(metaTagEntity);
 		assertEquals(metaTagEntity, ScopeSelector.bestMatch(selectors,
@@ -213,7 +213,7 @@ public class ScopeSelectorTests extends TestCase
 		ScopeSelector string = new ScopeSelector(
 				"string - string.unquoted.old-plist - string.unquoted.heredoc, string.unquoted.heredoc string");
 		ScopeSelector metaTag = new ScopeSelector("meta.tag");
-		List<ScopeSelector> selectors = new ArrayList<ScopeSelector>();
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		selectors.add(string);
 		selectors.add(metaTag);
 		assertEquals(
@@ -230,7 +230,7 @@ public class ScopeSelectorTests extends TestCase
 	{
 		ScopeSelector string = new ScopeSelector("string");
 		ScopeSelector source = new ScopeSelector("source.php");
-		List<ScopeSelector> selectors = new ArrayList<ScopeSelector>();
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		selectors.add(string);
 		selectors.add(source);
 		assertEquals(string, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));
@@ -240,7 +240,7 @@ public class ScopeSelectorTests extends TestCase
 	{
 		ScopeSelector string = new ScopeSelector("string");
 		ScopeSelector quoted = new ScopeSelector("string.quoted");
-		List<ScopeSelector> selectors = new ArrayList<ScopeSelector>();
+		List<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		selectors.add(string);
 		selectors.add(quoted);
 		assertEquals(quoted, ScopeSelector.bestMatch(selectors, "source.php string.quoted"));

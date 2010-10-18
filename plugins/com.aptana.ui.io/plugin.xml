@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="decorator" name="%extensions.decorator.name" schema="schema/decorator.exsd"/>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
@@ -433,6 +432,18 @@
                      value="true">
                </objectState>
             </and>
+         </enablement>
+      </decorator>
+      <decorator
+            class="com.aptana.ide.ui.io.navigator.ConnectionPointLabelDecorator"
+            id="com.aptana.ui.io.decorators.connectionPointDecorator"
+            label="%decorator.remote.label"
+            lightweight="false"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
+            </objectClass>
          </enablement>
       </decorator>
    </extension>
