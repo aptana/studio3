@@ -67,7 +67,6 @@ public class IDLScanner extends Scanner
 			@Override
 			protected IToken createToken(IDLTokenType type)
 			{
-				// TODO Auto-generated method stub
 				return new Token(type);
 			}
 		};
