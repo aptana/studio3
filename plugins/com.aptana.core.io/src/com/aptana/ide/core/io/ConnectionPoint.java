@@ -57,13 +57,13 @@ import com.aptana.ide.core.io.vfs.VirtualConnectionManager;
  */
 public abstract class ConnectionPoint extends PlatformObject implements IConnectionPoint, IExecutableExtension {
 
-	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
+	private static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
 	private String id;
 	private String type;
 	private boolean dirty;
 	
-	protected String name;
+	private String name;
 	
 	/**
 	 * 
@@ -128,7 +128,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * @param type the type to set
 	 */
-	protected final void setType(String type) {
+	private final void setType(String type) {
 		this.type = type;
 	}	
 	

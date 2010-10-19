@@ -58,15 +58,4 @@ public class PermissionDeniedException extends Exception
 		super(message, e);
 	}
 
-	/**
-	 * Create a new instance of PermissionDeniedException
-	 * 
-	 * @param message
-	 *            The message associated with this exception
-	 */
-	public PermissionDeniedException(String message)
-	{
-		super(message);
-	}
-
 }
