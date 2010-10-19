@@ -5,8 +5,7 @@ Bundle-SymbolicName: com.aptana.libraries
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-ClassPath: derby.jar,
- uuid.jar,
- jtidy-r938.jar
+ uuid.jar
 Export-Package: com.eaio.uuid,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
