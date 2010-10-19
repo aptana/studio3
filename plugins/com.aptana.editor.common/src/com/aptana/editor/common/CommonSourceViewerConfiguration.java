@@ -75,7 +75,7 @@ import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
-import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 

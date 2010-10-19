@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.ui.preferences.IPreferenceDelegate;
+import com.aptana.formatter.preferences.IPreferenceDelegate;
 
 public interface IFormatterControlManager extends IPreferenceDelegate
 {

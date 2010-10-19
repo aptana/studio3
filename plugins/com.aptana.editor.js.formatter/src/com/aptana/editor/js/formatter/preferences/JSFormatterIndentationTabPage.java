@@ -49,10 +49,10 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
-import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
-import com.aptana.ui.util.SWTFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
 
 /**
  * JS formatter indentation tab.

@@ -11,9 +11,9 @@
  *******************************************************************************/
 package com.aptana.editor.ruby.formatter.preferences;
 
-import com.aptana.formatter.ui.FormatterModifyDialog;
+import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.IScriptFormatterFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 
 public class RubyFormatterModifyDialog extends FormatterModifyDialog
 {

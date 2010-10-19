@@ -14,10 +14,10 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.QualifiedContentType;
-import com.aptana.formatter.ui.IScriptFormatterFactory;
-import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ScriptFormatterManager;
+import com.aptana.formatter.ScriptFormattingStrategy;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-import com.aptana.formatter.ui.ScriptFormattingStrategy;
 
 /**
  * A common multi-pass content formatter.<br>

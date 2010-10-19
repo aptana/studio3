@@ -20,19 +20,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.preferences.IPreferencesLookupDelegate;
+import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
+import com.aptana.formatter.preferences.PreferenceKey;
+import com.aptana.formatter.preferences.profile.IProfile;
+import com.aptana.formatter.preferences.profile.IProfileManager;
+import com.aptana.formatter.preferences.profile.IProfileStore;
+import com.aptana.formatter.preferences.profile.ProfileManager;
+import com.aptana.formatter.preferences.profile.ProfileStore;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.IProfile;
-import com.aptana.formatter.ui.IProfileManager;
-import com.aptana.formatter.ui.IProfileStore;
-import com.aptana.formatter.ui.IScriptFormatterFactory;
-import com.aptana.formatter.ui.ScriptFormatterManager;
-import com.aptana.formatter.ui.profile.ProfileManager;
-import com.aptana.formatter.ui.profile.ProfileStore;
-import com.aptana.ui.ContributedExtension;
-import com.aptana.ui.preferences.IPreferencesLookupDelegate;
-import com.aptana.ui.preferences.IPreferencesSaveDelegate;
-import com.aptana.ui.preferences.PreferenceKey;
 
 /**
  * Abstract base class for the {@link IScriptFormatterFactory} implementations.

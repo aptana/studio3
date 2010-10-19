@@ -41,10 +41,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
-import com.aptana.ui.util.SWTFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
 
 /**
  * Blank-lines configuration tab for the JS code formatter.

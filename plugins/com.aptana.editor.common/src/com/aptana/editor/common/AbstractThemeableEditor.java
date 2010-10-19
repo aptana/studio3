@@ -92,15 +92,15 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
-import com.aptana.formatter.ui.IScriptFormatterFactory;
-import com.aptana.formatter.ui.ScriptFormatterManager;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ScriptFormatterManager;
+import com.aptana.formatter.preferences.PreferencesLookupDelegate;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.preferences.PreferencesLookupDelegate;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor

@@ -83,7 +83,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.aptana.formatter.ui.IScriptFormatter"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.formatter.IScriptFormatter"/>
                </appinfo>
             </annotation>
          </attribute>

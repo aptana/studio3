@@ -37,8 +37,8 @@ package com.aptana.editor.html.formatter;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.CodeFormatterConstants;
-import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * HTML formatter preference initializer.

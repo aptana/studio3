@@ -51,17 +51,17 @@ import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
-import com.aptana.formatter.ui.IScriptFormatter;
 import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.ui.preferences.IPreferenceDelegate;
 
 /**
  * HTML code formatter.

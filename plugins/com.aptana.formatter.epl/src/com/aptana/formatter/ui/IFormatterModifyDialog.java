@@ -13,6 +13,9 @@ package com.aptana.formatter.ui;
 
 import java.util.Map;
 
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.preferences.profile.IProfileManager;
+
 public interface IFormatterModifyDialog
 {
 

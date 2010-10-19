@@ -34,9 +34,9 @@
  */
 package com.aptana.editor.css.formatter.preferences;
 
-import com.aptana.formatter.ui.FormatterModifyDialog;
+import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.IScriptFormatterFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 
 /**
  * CSS formatter settings dialog.

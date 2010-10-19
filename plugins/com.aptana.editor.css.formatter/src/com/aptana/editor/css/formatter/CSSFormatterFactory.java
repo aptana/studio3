@@ -46,10 +46,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.css.CSSSourceViewerConfiguration;
 import com.aptana.editor.css.formatter.preferences.CSSFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
+import com.aptana.formatter.IScriptFormatter;
+import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.IScriptFormatter;
-import com.aptana.ui.preferences.PreferenceKey;
 
 public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 {

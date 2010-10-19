@@ -35,6 +35,14 @@
 package com.aptana.editor.css.formatter;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSRuleNode;
+import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSNode;
+import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
+import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
@@ -42,10 +50,6 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSRuleNode;
-import com.aptana.editor.css.parsing.ast.*;
 
 /**
  * CSS formatter node builder.<br>

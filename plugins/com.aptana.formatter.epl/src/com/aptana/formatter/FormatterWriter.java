@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
 
-import com.aptana.formatter.ui.internal.ExcludeRegionList;
 import com.aptana.formatter.util.TextUtils;
 
 public class FormatterWriter implements IFormatterWriter

@@ -22,9 +22,6 @@ import java.util.Set;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.formatter.ui.CodeFormatterConstants;
-import com.aptana.formatter.ui.IScriptFormatter;
-import com.aptana.formatter.ui.internal.FormatterIndentGenerator;
-import com.aptana.formatter.ui.internal.FormatterMixedIndentGenerator;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;

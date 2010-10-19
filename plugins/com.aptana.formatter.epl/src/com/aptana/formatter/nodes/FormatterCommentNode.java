@@ -14,7 +14,6 @@ package com.aptana.formatter.nodes;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
-import com.aptana.formatter.nodes.FormatterTextNode;
 
 /**
  * Base class for formatter comment nodes.

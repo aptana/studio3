@@ -41,10 +41,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
-import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
-import com.aptana.ui.util.SWTFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterCommentsPage extends FormatterModifyTabPage
 {

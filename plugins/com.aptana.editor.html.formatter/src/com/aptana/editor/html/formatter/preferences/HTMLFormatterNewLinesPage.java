@@ -43,10 +43,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
-import com.aptana.formatter.ui.FormatterModifyDialog;
-import com.aptana.formatter.ui.FormatterModifyTabPage;
 import com.aptana.formatter.ui.IFormatterControlManager;
-import com.aptana.ui.util.SWTFactory;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
 
 /**
  * A HTML formatter tab for new-lines insertions.

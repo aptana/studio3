@@ -11,10 +11,10 @@
  *******************************************************************************/
 package com.aptana.formatter.nodes;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
-import com.aptana.ui.util.Util;
 
 public class FormatterEmptyNode extends AbstractFormatterNode implements IFormatterTextNode
 {
@@ -32,7 +32,7 @@ public class FormatterEmptyNode extends AbstractFormatterNode implements IFormat
 
 	public String getText()
 	{
-		return Util.EMPTY_STRING;
+		return StringUtil.EMPTY;
 	}
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
@@ -58,7 +58,7 @@ public class FormatterEmptyNode extends AbstractFormatterNode implements IFormat
 	@Override
 	public String toString()
 	{
-		return Util.EMPTY_STRING;
+		return StringUtil.EMPTY;
 	}
 
 }

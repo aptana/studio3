@@ -10,13 +10,10 @@
 package com.aptana.ui.epl;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -69,64 +66,12 @@ public class UIEplPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static IWorkbenchWindow getActiveWorkbenchWindow()
+	public static void logError(String msg, Throwable e)
 	{
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
-	public static Shell getActiveWorkbenchShell()
-	{
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null)
-		{
-			return window.getShell();
-		}
-		return null;
-	}
-
-	public static void log(IStatus status)
-	{
-		UIEplPlugin.getDefault().getLog().log(status);
-	}
-
-	public static void logError(String message)
-	{
-		logError(message, null);
-	}
-
-	public static void warn(String message)
-	{
-		warn(message, null);
-	}
-
-	public static void warn(String message, Throwable throwable)
-	{
-		log(new Status(IStatus.WARNING, PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logError(String message, Throwable throwable)
-	{
-		UIEplPlugin.log(new Status(IStatus.ERROR, UIEplPlugin.PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logErrorStatus(String message, IStatus status)
-	{
-		if (status == null)
-		{
-			UIEplPlugin.logError(message);
-			return;
-		}
-		MultiStatus multi = new MultiStatus(UIEplPlugin.PLUGIN_ID, INTERNAL_ERROR, message, null);
-		multi.add(status);
-		UIEplPlugin.log(multi);
-	}
-
-	public static void logError(Throwable t)
-	{
-		logError(t.getMessage(), t);
-	}
-
-    public static Image getImage(String string)
+	public static Image getImage(String string)
 	{
 		if (getDefault().getImageRegistry().get(string) == null)
 		{

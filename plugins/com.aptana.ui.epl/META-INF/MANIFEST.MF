@@ -10,20 +10,14 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
  org.eclipse.ui,
  org.eclipse.jface.text,
- org.eclipse.ui.ide,
- org.eclipse.ui.forms
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.scripting.snippets,
- com.aptana.ui,
- com.aptana.ui.dialogs,
  com.aptana.ui.epl,
  com.aptana.ui.preferences,
- com.aptana.ui.preferences.dialogfields,
- com.aptana.ui.properties,
- com.aptana.ui.util,
- com.aptana.ui.widgets
+ com.aptana.ui.properties
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin
 
