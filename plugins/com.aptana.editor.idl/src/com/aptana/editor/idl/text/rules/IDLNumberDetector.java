@@ -44,7 +44,7 @@ class IDLNumberDetector implements IWordDetector
 	 */
 	public boolean isWordStart(char c)
 	{
-		return Character.isDigit(c) || c == '-';
+		return Character.isDigit(c) || c == '-' || c == '.';
 	}
 
 	/*
@@ -53,10 +53,13 @@ class IDLNumberDetector implements IWordDetector
 	 */
 	public boolean isWordPart(char c)
 	{
-		if (isWordStart(c) || c == '.')
+		if (isWordStart(c))
+		{
 			return true;
+		}
 
 		char lower = Character.toLowerCase(c);
-		return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
+		
+		return ('a'<= lower && lower <= 'f') || lower == 'x' || lower == '+';
 	}
 }
