@@ -51,6 +51,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -83,9 +84,24 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public IStatus runInUIThread(IProgressMonitor monitor)
 	{
 		// TODO Listen for window open/closes and page add/removal; then register for every window, for every page
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null)
-			window.getActivePage().addPartListener(this);
+		IWorkbench workbench = null;
+		try
+		{
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
+		if (workbench != null)
+		{
+			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				window.getActivePage().addPartListener(this);
+			}
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -243,10 +259,23 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 
 	public void dispose()
 	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null)
+		IWorkbench workbench = null;
+		try
 		{
-			window.getActivePage().removePartListener(this);
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
+		if (workbench != null)
+		{
+			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				window.getActivePage().removePartListener(this);
+			}
 		}
 		baseNames.clear();
 		baseNames = null;
