@@ -71,7 +71,7 @@ import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
-public class S3FileStore extends FileStore
+class S3FileStore extends FileStore
 {
 
 	private static final String DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss z"; //$NON-NLS-1$
@@ -84,19 +84,19 @@ public class S3FileStore extends FileStore
 	private Path path;
 	private String accessKey;
 
-	public S3FileStore(URI uri)
+	protected S3FileStore(URI uri)
 	{
 		this.uri = uri;
 		this.path = new Path(uri.getPath().replaceAll("%2F", SEPARATOR)); //$NON-NLS-1$
 	}
 
 	@Override
-	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException
+	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException // NO_UCD
 	{
 		return childNames(options, false, monitor);
 	}
 
-	public String[] childNames(int options, boolean includeHackFolderFiles, IProgressMonitor monitor)
+	private String[] childNames(int options, boolean includeHackFolderFiles, IProgressMonitor monitor)
 			throws CoreException
 	{
 		try
@@ -164,7 +164,7 @@ public class S3FileStore extends FileStore
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	private @SuppressWarnings("unchecked")
 	String[] getBuckets() throws MalformedURLException, IOException
 	{
 		// We're outside any buckets. List the buckets!
@@ -180,7 +180,7 @@ public class S3FileStore extends FileStore
 		return keys.toArray(new String[keys.size()]);
 	}
 
-	boolean isRoot()
+	private boolean isRoot()
 	{
 		return getBucket() == null;
 	}
