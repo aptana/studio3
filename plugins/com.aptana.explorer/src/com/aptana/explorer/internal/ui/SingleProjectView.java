@@ -109,6 +109,7 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.deploy.dialogs.FTPDeployPropertyDialog;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
@@ -123,7 +124,6 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
-import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -201,10 +201,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 	// private static final String[] animationImage = {
-	private static final String[] animationImageUp = {
-			"icons/full/elcl16/arrow_up.png"};
-	private static final String[] animationImageDown = {
-			"icons/full/elcl16/arrow_down.png"};
+	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
+	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
 	
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
@@ -686,8 +684,9 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
-								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+						FTPDeployPropertyDialog settingsDialog = new FTPDeployPropertyDialog(PlatformUI.getWorkbench()
+								.getActiveWorkbenchWindow().getShell());
+						settingsDialog.setProject(selectedProject);
 						if (lastSiteConnection != null)
 						{
 							settingsDialog.setPropertySource(lastSiteConnection.getDestination());
