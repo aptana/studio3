@@ -116,13 +116,4 @@ public final class PreferenceKey
 	{
 		return fQualifier;
 	}
-
-	/**
-	 * @since 2.0
-	 */
-	public boolean belongsTo(String qualifier)
-	{
-		return fQualifier.equals(qualifier);
-	}
-
 }

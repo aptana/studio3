@@ -140,7 +140,7 @@ public class ProfileManager implements IProfileManager
 		listeners = new ListenerList();
 	}
 
-	public Map<String, String> loadDefaultSettings()
+	private Map<String, String> loadDefaultSettings()
 	{
 		Map<String, String> settings = new HashMap<String, String>();
 		PreferenceKey[] keys = getPreferenceKeys();
@@ -203,7 +203,7 @@ public class ProfileManager implements IProfileManager
 		return new PreferenceKey(FormatterPlugin.PLUGIN_ID, APTANA_CODE_FORMATTER_ID);
 	}
 
-	protected PreferenceKey[] getPreferenceKeys()
+	private PreferenceKey[] getPreferenceKeys()
 	{
 		if (preferenceKeys == null)
 		{
@@ -282,18 +282,6 @@ public class ProfileManager implements IProfileManager
 			sortedNames[i++] = curr.getName();
 		}
 		return sortedNames;
-	}
-
-	/**
-	 * Get the profile for this profile id.
-	 * 
-	 * @param ID
-	 *            The profile ID
-	 * @return The profile with the given ID or <code>null</code>
-	 */
-	public IProfile getProfile(String ID)
-	{
-		return fProfiles.get(ID);
 	}
 
 	public IProfile getSelected()
@@ -419,17 +407,6 @@ public class ProfileManager implements IProfileManager
 		}
 	}
 
-	public void profileReplaced(CustomProfile oldProfile, CustomProfile newProfile)
-	{
-		fProfiles.remove(oldProfile.getID());
-		fProfiles.put(newProfile.getID(), newProfile);
-		fProfilesByName.remove(oldProfile);
-		fProfilesByName.add(newProfile);
-		Collections.sort(fProfilesByName);
-
-		setSelected(newProfile);
-	}
-
 	public IProfile create(ProfileKind kind, String profileName, Map<String, String> settings, int version)
 	{
 		CustomProfile profile = new CustomProfile(profileName, settings, version);
@@ -480,7 +457,7 @@ public class ProfileManager implements IProfileManager
 	 * 
 	 * @return A new profile versioner
 	 */
-	protected IProfileVersioner createProfileVersioner()
+	private IProfileVersioner createProfileVersioner()
 	{
 		return new GeneralProfileVersioner(APTANA_CODE_FORMATTER_ID);
 	}

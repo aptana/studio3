@@ -12,7 +12,6 @@
 package com.aptana.formatter;
 
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -20,10 +19,9 @@ import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.formatter.preferences.IPreferencesLookupDelegate;
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
 import com.aptana.formatter.preferences.PreferenceKey;
-import com.aptana.formatter.preferences.profile.IProfile;
+import com.aptana.formatter.preferences.PreferencesLookupDelegate;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 
@@ -39,16 +37,7 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @param delegate
 	 * @return
 	 */
-	Map<String, String> retrievePreferences(IPreferencesLookupDelegate delegate);
-
-	/**
-	 * Change the preferences to perform only indenting. Preferences affecting the number of lines will be disabled.
-	 * 
-	 * @param preferences
-	 * @return
-	 * @since 2.0
-	 */
-	Map<String, String> changeToIndentingOnly(Map<String, String> preferences);
+	Map<String, String> retrievePreferences(PreferencesLookupDelegate delegate);
 
 	PreferenceKey[] getPreferenceKeys();
 
@@ -65,8 +54,6 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 *            The language this formatter is going to work on
 	 */
 	IScriptFormatter createFormatter(String lineDelimiter, Map<String, String> preferences);
-
-	void saveCustomProfiles(List<IProfile> profiles);
 
 	/**
 	 * Returns the contribution id

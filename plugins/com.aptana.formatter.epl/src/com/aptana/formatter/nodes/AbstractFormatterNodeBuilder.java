@@ -110,14 +110,6 @@ public class AbstractFormatterNodeBuilder
 	protected void checkedPop(IFormatterContainerNode expected, int bodyEnd)
 	{
 		IFormatterContainerNode top = stack.pop();
-		if (top instanceof IFormatterNodeProxy)
-		{
-			final IFormatterNode target = ((IFormatterNodeProxy) top).getTargetNode();
-			if (target instanceof IFormatterContainerNode)
-			{
-				top = (IFormatterContainerNode) target;
-			}
-		}
 		if (top != expected)
 		{
 			throw new IllegalStateException();

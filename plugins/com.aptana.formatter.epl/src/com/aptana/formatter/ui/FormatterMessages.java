@@ -16,7 +16,6 @@ import org.eclipse.osgi.util.NLS;
 public class FormatterMessages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.formatter.ui.FormatterMessages"; //$NON-NLS-1$
-	public static String AbstractFormatterSelectionBlock_activeProfileName;
 	public static String AbstractScriptFormatterFactory_defaultProfileName;
 	public static String AbstractFormatterSelectionBlock_activeProfile;
 	public static String AbstractFormatterSelectionBlock_confirmDefaultsMessage;
@@ -25,18 +24,15 @@ public class FormatterMessages extends NLS
 	public static String AbstractFormatterSelectionBlock_confirmRemoveMessage;
 	public static String AbstractFormatterSelectionBlock_defaults;
 	public static String AbstractFormatterSelectionBlock_edit;
-	public static String AbstractFormatterSelectionBlock_editProfile;
 	public static String AbstractFormatterSelectionBlock_importingProfile;
 	public static String AbstractFormatterSelectionBlock_importProfile;
 	public static String AbstractFormatterSelectionBlock_importProfileLabel;
 	public static String AbstractFormatterSelectionBlock_moreRecentVersion;
 	public static String AbstractFormatterSelectionBlock_newProfile;
 	public static String AbstractFormatterSelectionBlock_noBuiltInProfiles;
-	public static String AbstractFormatterSelectionBlock_notValidFormatter;
 	public static String AbstractFormatterSelectionBlock_notValidProfile;
 	public static String AbstractFormatterSelectionBlock_preview;
 	public static String AbstractFormatterSelectionBlock_removeProfile;
-	public static String AbstractFormatterSelectionBlock_formatterLabel;
 	public static String AbstractFormatterSelectionBlock_profilesGroup;
 	public static String AlreadyExistsDialog_loadProfile;
 	public static String AlreadyExistsDialog_nameEmpty;
@@ -48,7 +44,6 @@ public class FormatterMessages extends NLS
 	public static String CreateProfileDialog_nameEmpty;
 	public static String CreateProfileDialog_nameExists;
 	public static String CreateProfileDialog_newProfile;
-	public static String CreateProfileDialog_openEditDialog;
 	public static String CreateProfileDialog_profileName;
 	public static String FormatterModifyDialog_changeBuiltInProfileName;
 	public static String FormatterModifyDialog_createNewProfile;
@@ -62,17 +57,12 @@ public class FormatterMessages extends NLS
 	public static String FormatterModifyDialog_replaceFileQuestion;
 	public static String FormatterModifyTabPage_showInvisible;
 	public static String FormatterModifyTabPage_preview_label_text;
-	public static String FormatterPreferencePage_edit;
-	public static String FormatterPreferencePage_preview;
-	public static String FormatterPreferencePage_groupName;
-	public static String FormatterPreferencePage_selectionLabel;
 	public static String FormatterPreferencePage_settingsLink;
 	public static String ScriptFormattingStrategy_formattingError;
 	public static String ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError;
 	public static String ScriptFormattingStrategy_unexpectedFormatterError;
 
 	public static String IndentationTabPage_generalSettings;
-	public static String IndentationTabPage_preview_header;
 
 	public static String IndentationTabPage_general_group_option_tab_policy;
 	public static String IndentationTabPage_general_group_option_tab_policy_SPACE;
@@ -81,7 +71,6 @@ public class FormatterMessages extends NLS
 	public static String IndentationTabPage_general_group_option_tab_size;
 	public static String BracesTabPage_position_option_SAME_LINE;
 	public static String BracesTabPage_position_option_NEW_LINE;
-	public static String BracesTabPage_group_braces_positions;
 
 	public static String IndentationTabPage_general_group_option_indent_size;
 

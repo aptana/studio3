@@ -22,10 +22,7 @@ import org.osgi.framework.BundleContext;
 public class FormatterPlugin extends AbstractUIPlugin
 {
 
-	public static final int INTERNAL_ERROR = 10001;
-
-	public static final boolean DEBUG = Boolean
-			.valueOf(Platform.getDebugOption("com.aptana.formatter.epl/debug")).booleanValue(); //$NON-NLS-1$
+	private static final int INTERNAL_ERROR = 10001;
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.formatter.epl"; //$NON-NLS-1$
@@ -80,11 +77,6 @@ public class FormatterPlugin extends AbstractUIPlugin
 		logError(message, null);
 	}
 
-	public static void warn(String message)
-	{
-		warn(message, null);
-	}
-
 	public static void warn(String message, Throwable throwable)
 	{
 		log(new Status(IStatus.WARNING, PLUGIN_ID, INTERNAL_ERROR, message, throwable));
@@ -93,18 +85,6 @@ public class FormatterPlugin extends AbstractUIPlugin
 	public static void logError(String message, Throwable throwable)
 	{
 		log(new Status(IStatus.ERROR, PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logErrorStatus(String message, IStatus status)
-	{
-		if (status == null)
-		{
-			logError(message);
-			return;
-		}
-		MultiStatus multi = new MultiStatus(PLUGIN_ID, INTERNAL_ERROR, message, null);
-		multi.add(status);
-		log(multi);
 	}
 
 	public static void logError(Throwable t)

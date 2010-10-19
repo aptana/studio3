@@ -37,16 +37,11 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
  * has been properly initialized.
  * </p>
  */
-public class PreferencesLookupDelegate implements IPreferencesLookupDelegate
+public class PreferencesLookupDelegate
 {
 
 	private IPreferencesService service;
 	private IScopeContext[] contexts;
-
-	protected IScopeContext getTopScopeContext()
-	{
-		return contexts[0];
-	}
 
 	/**
 	 * Creates a new delegate instance

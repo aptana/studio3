@@ -20,30 +20,4 @@ public class FormatterSyntaxProblemException extends FormatterException
 	{
 		// empty
 	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public FormatterSyntaxProblemException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	/**
-	 * @param message
-	 */
-	public FormatterSyntaxProblemException(String message)
-	{
-		super(message);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public FormatterSyntaxProblemException(Throwable cause)
-	{
-		super(cause);
-	}
-
 }

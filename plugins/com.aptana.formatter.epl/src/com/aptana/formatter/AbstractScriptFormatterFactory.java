@@ -13,23 +13,13 @@ package com.aptana.formatter;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-
-import com.aptana.formatter.epl.FormatterPlugin;
-import com.aptana.formatter.preferences.IPreferencesLookupDelegate;
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
 import com.aptana.formatter.preferences.PreferenceKey;
+import com.aptana.formatter.preferences.PreferencesLookupDelegate;
 import com.aptana.formatter.preferences.profile.IProfile;
-import com.aptana.formatter.preferences.profile.IProfileManager;
-import com.aptana.formatter.preferences.profile.IProfileStore;
 import com.aptana.formatter.preferences.profile.ProfileManager;
-import com.aptana.formatter.preferences.profile.ProfileStore;
-import com.aptana.formatter.ui.IFormatterModifyDialog;
-import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 
 /**
  * Abstract base class for the {@link IScriptFormatterFactory} implementations.
@@ -62,30 +52,7 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		this.mainContentType = mainContentType;
 	}
 
-	protected PreferenceKey getProfilesKey()
-	{
-		return null;
-	}
-
-	public void saveCustomProfiles(List<IProfile> profiles)
-	{
-		final PreferenceKey profilesKey = getProfilesKey();
-		if (profilesKey != null)
-		{
-			final IProfileStore store = ProfileManager.getInstance().getProfileStore();
-			try
-			{
-				String value = ((ProfileStore) store).writeProfiles(profiles);
-				profilesKey.setStoredValue(new InstanceScope(), value);
-			}
-			catch (CoreException e)
-			{
-				FormatterPlugin.logError(e);
-			}
-		}
-	}
-
-	public Map<String, String> retrievePreferences(IPreferencesLookupDelegate delegate)
+	public Map<String, String> retrievePreferences(PreferencesLookupDelegate delegate)
 	{
 		ProfileManager profileManager = ProfileManager.getInstance();
 		final PreferenceKey activeProfileKey = profileManager.getActiveProfileKey();
@@ -124,14 +91,6 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		return result;
 	}
 
-	/**
-	 * @since 2.0
-	 */
-	public Map<String, String> changeToIndentingOnly(Map<String, String> preferences)
-	{
-		return preferences;
-	}
-
 	public void savePreferences(Map<String, String> preferences, IPreferencesSaveDelegate delegate)
 	{
 		final PreferenceKey[] keys = getPreferenceKeys();
@@ -163,11 +122,6 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	}
 
 	public URL getPreviewContent()
-	{
-		return null;
-	}
-
-	public IFormatterModifyDialog createDialog(IFormatterModifyDialogOwner dialogOwner, IProfileManager manager)
 	{
 		return null;
 	}

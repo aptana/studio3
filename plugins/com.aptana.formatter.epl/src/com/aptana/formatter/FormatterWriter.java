@@ -26,7 +26,7 @@ public class FormatterWriter implements IFormatterWriter
 	/**
 	 * @since 2.0
 	 */
-	protected final StringBuilder callbackBuffer = new StringBuilder();
+	private final StringBuilder callbackBuffer = new StringBuilder();
 	private final StringBuilder emptyLines = new StringBuilder();
 
 	private boolean lineStarted = false;
@@ -163,7 +163,7 @@ public class FormatterWriter implements IFormatterWriter
 		canAppendToPreviousLine = false;
 	}
 
-	protected void write(IFormatterContext context, String text)
+	private void write(IFormatterContext context, String text)
 	{
 		if (!context.isWrapping())
 		{
@@ -271,7 +271,7 @@ public class FormatterWriter implements IFormatterWriter
 	 * @param context
 	 * @param charAt
 	 */
-	protected void write(IFormatterContext context, char ch)
+	private void write(IFormatterContext context, char ch)
 	{
 		if (ch == '\n' || ch == '\r')
 		{
@@ -436,7 +436,7 @@ public class FormatterWriter implements IFormatterWriter
 	/**
 	 * @param context
 	 */
-	protected void writeIndent(IFormatterContext context)
+	private void writeIndent(IFormatterContext context)
 	{
 		writeIndent(context, writer);
 	}
@@ -444,7 +444,7 @@ public class FormatterWriter implements IFormatterWriter
 	/**
 	 * @since 2.0
 	 */
-	protected void writeIndent(IFormatterContext context, StringBuilder buffer)
+	private void writeIndent(IFormatterContext context, StringBuilder buffer)
 	{
 		indentGenerator.generateIndent(context.getIndent(), buffer);
 	}

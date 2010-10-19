@@ -41,7 +41,7 @@ public abstract class ContributionExtensionManager
 	private static final String CONTENT_TYPE = "contentType"; //$NON-NLS-1$
 
 	private static final String SELECTOR_TAG = "selector"; //$NON-NLS-1$
-	public static final String CLASS_TAG = "class"; //$NON-NLS-1$
+	private static final String CLASS_TAG = "class"; //$NON-NLS-1$
 
 	private IContributionSelector defaultSelector;
 
