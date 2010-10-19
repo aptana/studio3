@@ -440,11 +440,109 @@ public class IDLSouceScannerTests extends TestCase
 
 		this.typeTests(source, IDLTokenType.NUMBER);
 	}
+	
+	public void testNegativeIntegerNumber()
+	{
+		String source = "-10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testHexNumber()
+	{
+		String source = "0x10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeHexNumber()
+	{
+		String source = "-0x10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testOctalNumber()
+	{
+		String source = "007";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testOctalHexNumber()
+	{
+		String source = "-007";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
 
 	public void testDoubleNumber()
 	{
 		String source = "10.10";
 
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testDoubleNumber2()
+	{
+		String source = ".10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeDoubleNumber()
+	{
+		String source = "-10.10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeDoubleNumber2()
+	{
+		String source = "-.10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testScientificNotation()
+	{
+		String source = "1.10e10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testScientificNotation2()
+	{
+		String source = "1.10e-10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testScientificNotation3()
+	{
+		String source = "1.10e+10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeScientificNotation()
+	{
+		String source = "1.10e10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeScientificNotation2()
+	{
+		String source = "1.10e-10";
+		
+		this.typeTests(source, IDLTokenType.NUMBER);
+	}
+	
+	public void testNegativeScientificNotation3()
+	{
+		String source = "1.10e+10";
+		
 		this.typeTests(source, IDLTokenType.NUMBER);
 	}
 }
