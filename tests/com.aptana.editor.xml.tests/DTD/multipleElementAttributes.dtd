@@ -1,0 +1,6 @@
+<!ELEMENT svg EMPTY>
+<!ATTLIST	svg
+			x CDATA #IMPLIED
+			y CDATA #IMPLIED
+			width CDATA #IMPLIED
+			height CDATA #IMPLIED>
