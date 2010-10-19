@@ -43,6 +43,16 @@ public class JSDocumentProvider extends SimpleDocumentProvider
 {
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
+	 */
+	@Override
+	public IPartitionTokenScanner createPartitionScanner()
+	{
+		return new JSSourcePartitionScanner();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
 	protected String getDefaultContentType(String filename)
@@ -58,15 +68,5 @@ public class JSDocumentProvider extends SimpleDocumentProvider
 	public IPartitioningConfiguration getPartitioningConfiguration()
 	{
 		return JSSourceConfiguration.getDefault();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
-	 */
-	@Override
-	public IPartitionTokenScanner getPartitionScanner()
-	{
-		return new JSSourcePartitionScanner();
 	}
 }

@@ -43,6 +43,16 @@ public class DiffDocumentProvider extends SimpleDocumentProvider
 {
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
+	 */
+	@Override
+	public IPartitionTokenScanner createPartitionScanner()
+	{
+		return new DiffSourcePartitionScanner();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
 	protected String getDefaultContentType(String filename)
@@ -58,15 +68,5 @@ public class DiffDocumentProvider extends SimpleDocumentProvider
 	public IPartitioningConfiguration getPartitioningConfiguration()
 	{
 		return DiffSourceConfiguration.getDefault();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
-	 */
-	@Override
-	public IPartitionTokenScanner getPartitionScanner()
-	{
-		return new DiffSourcePartitionScanner();
 	}
 }

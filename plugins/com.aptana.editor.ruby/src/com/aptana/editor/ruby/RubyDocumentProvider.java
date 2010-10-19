@@ -43,6 +43,16 @@ public class RubyDocumentProvider extends SimpleDocumentProvider
 {
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
+	 */
+	@Override
+	public IPartitionTokenScanner createPartitionScanner()
+	{
+		return new MergingPartitionScanner(new RubySourcePartitionScanner());
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
 	protected String getDefaultContentType(String filename)
@@ -58,15 +68,5 @@ public class RubyDocumentProvider extends SimpleDocumentProvider
 	public IPartitioningConfiguration getPartitioningConfiguration()
 	{
 		return RubySourceConfiguration.getDefault();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
-	 */
-	@Override
-	public IPartitionTokenScanner getPartitionScanner()
-	{
-		return new MergingPartitionScanner(new RubySourcePartitionScanner());
 	}
 }

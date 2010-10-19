@@ -59,10 +59,7 @@ public abstract class SimpleDocumentProvider extends CommonDocumentProvider
 		if (document != null)
 		{
 			IPartitioningConfiguration configuration = this.getPartitioningConfiguration();
-			IDocumentPartitioner partitioner = new FastPartitioner( //
-				this.getPartitionScanner(), //
-				configuration.getContentTypes() //
-			);
+			IDocumentPartitioner partitioner = new FastPartitioner(this.createPartitionScanner(), configuration.getContentTypes());
 
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
@@ -72,16 +69,16 @@ public abstract class SimpleDocumentProvider extends CommonDocumentProvider
 	}
 
 	/**
+	 * Create a partition scanner for this editor's top-level language
+	 * 
+	 * @return
+	 */
+	public abstract IPartitionTokenScanner createPartitionScanner();
+
+	/**
 	 * Get the language's partition configuration
 	 * 
 	 * @return
 	 */
 	public abstract IPartitioningConfiguration getPartitioningConfiguration();
-
-	/**
-	 * Get the partition scanner for this editor's top-level language
-	 * 
-	 * @return
-	 */
-	public abstract IPartitionTokenScanner getPartitionScanner();
 }
