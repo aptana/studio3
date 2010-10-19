@@ -40,16 +40,19 @@ public class SVGSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	{
 		return TextUtils.combine( //
 			new String[][] { //
-				{ IDocument.DEFAULT_CONTENT_TYPE }, //
+			{ IDocument.DEFAULT_CONTENT_TYPE }, //
 				SVGSourceConfiguration.CONTENT_TYPES, //
 				JSSourceConfiguration.CONTENT_TYPES, //
-				CSSSourceConfiguration.CONTENT_TYPES
-			}
+				CSSSourceConfiguration.CONTENT_TYPES //
+			} //
 		);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source
+	 * .ISourceViewer, java.lang.String)
 	 */
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
@@ -66,7 +69,8 @@ public class SVGSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 		}
 		else
 		{
-			return new SVGContentAssistProcessor(editor);
+			return null;
+			// return new SVGContentAssistProcessor(editor);
 		}
 	}
 
