@@ -101,14 +101,18 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			cachedProperties = new Properties();
 			String propertiesFile = System.getProperty("junit.properties"); //$NON-NLS-1$
+			System.out.println("Received pointer to connection test properties file: " + propertiesFile);
 			if (propertiesFile != null && new File(propertiesFile).length() > 0)
 			{
 				try
 				{
 					cachedProperties.load(new FileInputStream(propertiesFile));
+					System.out.println("loaded test properties: ");
+					cachedProperties.list(System.out);
 				}
 				catch (IOException ignore)
 				{
+					ignore.printStackTrace();
 				}
 			}
 		}
