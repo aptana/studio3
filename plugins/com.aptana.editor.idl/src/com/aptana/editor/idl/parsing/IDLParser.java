@@ -50,6 +50,34 @@ public class IDLParser extends Parser implements IParser {
 		"0jsPpDi9N8Xk66CE8pr6O3yYbAucha4VV7SDgsnHJIK0lzN8$iXHoE4X0lSVEH1LN50BtV4" +
 		"n03c0yO7m1Y9TnJKOdSDescL8XzwCzw3V0qxbTosTpiS=");
 
+    // suppress parser error reporting and let the custom error recovery mechanism handle it
+    private static class IDLEvents extends Events
+    {
+        public void scannerError(Scanner.Exception e)
+        {
+        }
+
+        public void syntaxError(Symbol token)
+        {
+        }
+
+        public void unexpectedTokenRemoved(Symbol token)
+        {
+        }
+
+        public void missingTokenInserted(Symbol token)
+        {
+        }
+
+        public void misspelledTokenReplaced(Symbol token)
+        {
+        }
+
+        public void errorPhraseRemoved(Symbol error)
+        {
+        }
+    }
+    
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
@@ -78,6 +106,9 @@ public class IDLParser extends Parser implements IParser {
 
 	public IDLParser() {
 		super(PARSING_TABLES);
+
+
+        report = new IDLEvents();
 	}
 
 	protected Symbol invokeReduceAction(int rule_num, int offset) {

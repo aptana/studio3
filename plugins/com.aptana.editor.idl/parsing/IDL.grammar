@@ -10,6 +10,34 @@
 %implements "IParser";
 
 %embed {:
+    // suppress parser error reporting and let the custom error recovery mechanism handle it
+    private static class IDLEvents extends Events
+    {
+        public void scannerError(Scanner.Exception e)
+        {
+        }
+
+        public void syntaxError(Symbol token)
+        {
+        }
+
+        public void unexpectedTokenRemoved(Symbol token)
+        {
+        }
+
+        public void missingTokenInserted(Symbol token)
+        {
+        }
+
+        public void misspelledTokenReplaced(Symbol token)
+        {
+        }
+
+        public void errorPhraseRemoved(Symbol error)
+        {
+        }
+    }
+    
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
@@ -35,6 +63,10 @@
 		
 		return result;
 	}
+:};
+
+%init {:
+        report = new IDLEvents();
 :};
 
 %terminals ANY, ATTRIBUTE, BOOLEAN, CONST, DOMSTRING, EXCEPTION, FLOAT, GETRAISES, IN, INTERFACE, LONG;
