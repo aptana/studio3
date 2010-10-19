@@ -133,11 +133,14 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 	private List<ProjectionAnnotation> findDeletedAnnotations(Map<ProjectionAnnotation, Position> newAnnotationMap)
 	{
 		List<ProjectionAnnotation> toDelete = new ArrayList<ProjectionAnnotation>();
-		for (ProjectionAnnotation old : oldAnnotations.keySet())
+		if (oldAnnotations != null)
 		{
-			if (!newAnnotationMap.containsKey(old)) // old isn't in new set, needs to be deleted
+			for (ProjectionAnnotation old : oldAnnotations.keySet())
 			{
-				toDelete.add(old);
+				if (!newAnnotationMap.containsKey(old)) // old isn't in new set, needs to be deleted
+				{
+					toDelete.add(old);
+				}
 			}
 		}
 		return toDelete;
