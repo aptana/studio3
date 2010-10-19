@@ -32,85 +32,44 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.widgets;
+package com.aptana.editor.idl.parsing.ast;
 
-import org.eclipse.swt.graphics.Image;
+import beaver.Symbol;
 
-/**
- * An item in the popup
- * @author ingo
- *
- */
-public class PopupItem
+import com.aptana.editor.idl.parsing.IDLParserConstants;
+import com.aptana.parsing.ast.ParseRootNode;
+
+public class IDLParseRootNode extends ParseRootNode
 {
-	private Image _image;
-	private String _text;
-	private Object _data;
-	
 	/**
-	 * 
-	 * @param text
-	 * @param image
-	 * @param data
+	 * IDLParseRootNode
 	 */
-	public PopupItem(String text, Image image, Object data)
+	public IDLParseRootNode()
 	{
-		this._text = text;
-		this._image = image;
-		this._data = data;
+		this(new Symbol[0]);
 	}
 
 	/**
+	 * IDLParseRootNode
 	 * 
-	 * @return
+	 * @param children
 	 */
-	public Image getImage()
+	public IDLParseRootNode(Symbol[] children)
 	{
-		return _image;
+		super( //
+			IDLParserConstants.LANGUAGE, //
+			children, //
+			(children != null && children.length > 0) ? children[0].getStart() : 0, //
+			(children != null && children.length > 0) ? children[0].getEnd() : 0 //
+		);
 	}
-	
-	/**
-	 * 
-	 * @param image
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.dtd.parsing.ast.DTDNode#accept(com.aptana.editor.dtd.parsing.ast.DTDTreeWalker)
 	 */
-	public void setImage(Image image)
+	public void accept(IDLTreeWalker walker)
 	{
-		this._image = image;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public String getText()
-	{
-		return _text;
-	}
-	
-	/**
-	 * 
-	 * @param text
-	 */
-	public void setText(String text)
-	{
-		this._text = text;
-	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Object getData()
-	{
-		return _data;
-	}
-	
-	/**
-	 * 
-	 * @param data
-	 */
-	public void setData(Object data)
-	{
-		this._data = data;
+		walker.visit(this);
 	}
 }

@@ -83,7 +83,7 @@ public class GitRepositoryProvider extends org.eclipse.team.core.RepositoryProvi
 		}
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

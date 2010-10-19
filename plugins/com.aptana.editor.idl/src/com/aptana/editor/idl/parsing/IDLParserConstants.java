@@ -32,23 +32,13 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.widgets;
+package com.aptana.editor.idl.parsing;
 
-import org.eclipse.swt.graphics.Color;
-
-/**
- * Interface for widgets that have configurable background color
- * 
- * @author Kevin Sawicki (ksawicki@aptana.com)
- */
-public interface IBackgroundColorWidget
+public class IDLParserConstants
 {
+	public static final String LANGUAGE = "text/idl"; //$NON-NLS-1$
 
-	/**
-	 * Sets the background color
-	 * 
-	 * @param color
-	 */
-	void setBackground(Color color);
-
+	private IDLParserConstants()
+	{
+	}
 }

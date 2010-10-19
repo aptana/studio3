@@ -32,38 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.git.core.model;
+package com.aptana.editor.idl.text.rules;
 
-interface GitEnv
+import org.eclipse.jface.text.rules.IWordDetector;
+
+class IDLNumberDetector implements IWordDetector
 {
-	/**
-	 * Environment variable we check for possible location of git binary (when we have no pref value or it's pointing to
-	 * a bad version).
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
 	 */
-	static final String GIT_PATH = "GIT_PATH"; //$NON-NLS-1$
+	public boolean isWordStart(char c)
+	{
+		return Character.isDigit(c) || c == '-' || c == '.';
+	}
 
-	/**
-	 * Env var to hold the author name of the original commit when amending.
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	static final String GIT_AUTHOR_NAME = "GIT_AUTHOR_NAME"; //$NON-NLS-1$
+	public boolean isWordPart(char c)
+	{
+		if (isWordStart(c))
+		{
+			return true;
+		}
 
-	/**
-	 * Env var to hold the author email of the original commit when amending.
-	 */
-	static final String GIT_AUTHOR_EMAIL = "GIT_AUTHOR_EMAIL"; //$NON-NLS-1$
-
-	/**
-	 * Env var to hold the timestamp of the original commit when amending.
-	 */
-	static final String GIT_AUTHOR_DATE = "GIT_AUTHOR_DATE"; //$NON-NLS-1$
-
-	/**
-	 * Location of .git for repo. Used for launches of hooks.
-	 */
-	static final String GIT_DIR = "GIT_DIR"; //$NON-NLS-1$
-
-	/**
-	 * Location of .git/index file for repo. Used for launches of hooks.
-	 */
-	static final String GIT_INDEX_FILE = "GIT_INDEX_FILE"; //$NON-NLS-1$
+		char lower = Character.toLowerCase(c);
+		
+		return ('a'<= lower && lower <= 'f') || lower == 'x' || lower == '+';
+	}
 }

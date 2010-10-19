@@ -32,24 +32,60 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.actions;
+package com.aptana.editor.idl.text.rules;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.text.rules.IWordDetector;
 
-/**
- * @author Paul Colton
- */
-public class CheckBoxAction extends Action
+public class IDLOperatorDetector implements IWordDetector
 {
-	// private TreeViewer treeViewer;
+	private int _position;
 
-	/**
-	 * CheckBoxAction
-	 * 
-	 * @param text
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordPart(char)
 	 */
-	public CheckBoxAction(String text)
+	public boolean isWordPart(char c)
 	{
-		super(text, Action.AS_CHECK_BOX);
+		this._position++;
+
+		switch (this._position)
+		{
+			case 1:
+				switch (c)
+				{
+					case ':':
+					case '.':
+						return true;
+
+					default:
+						return false;
+				}
+
+			case 2:
+				return (c == '.');
+
+			default:
+				return false;
+		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IWordDetector#isWordStart(char)
+	 */
+	public boolean isWordStart(char c)
+	{
+		this._position = 0;
+
+		switch (c)
+		{
+			case ':':
+			case '.':
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
 }

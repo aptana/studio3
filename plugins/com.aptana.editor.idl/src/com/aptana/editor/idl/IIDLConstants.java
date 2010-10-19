@@ -32,31 +32,10 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.xml.parsing.lexer;
 
-import java.util.HashMap;
-import java.util.Map;
+package com.aptana.editor.idl;
 
-public enum XMLToken
+public interface IIDLConstants
 {
-	EOF, COMMENT, STRING, CDATA, DECLARATION, START_TAG, END_TAG, TEXT;
-
-	private static Map<Short, XMLToken> fTokens = new HashMap<Short, XMLToken>();
-	static
-	{
-		for (XMLToken token : XMLToken.values())
-		{
-			fTokens.put(token.getIndex(), token);
-		}
-	}
-
-	public short getIndex()
-	{
-		return (short) ordinal();
-	}
-
-	public static XMLToken getToken(short index)
-	{
-		return fTokens.get(index);
-	}
+	public String CONTENT_TYPE_IDL = "com.aptana.contenttype.idl"; //$NON-NLS-1$
 }

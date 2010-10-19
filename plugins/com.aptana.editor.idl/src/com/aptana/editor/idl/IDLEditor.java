@@ -32,73 +32,32 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.text.rules;
+package com.aptana.editor.idl;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.idl.parsing.IDLParserConstants;
 
-import org.eclipse.jface.text.rules.ICharacterScanner;
-import org.eclipse.jface.text.rules.IPredicateRule;
-import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.Token;
-
-public class CharacterMapRule implements IPredicateRule
+public class IDLEditor extends AbstractThemeableEditor
 {
-	private Map<Character, IToken> characterTokenMap;
-	private IToken successToken;
-
-	/**
-	 * CharacterMapRule
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
 	 */
-	public CharacterMapRule()
+	protected FileService createFileService()
 	{
-		characterTokenMap = new HashMap<Character, IToken>();
-	}
-
-	/**
-	 * add
-	 * 
-	 * @param c
-	 * @param token
-	 */
-	public void add(char c, IToken token)
-	{
-		characterTokenMap.put(c, token);
+		return new FileService(IDLParserConstants.LANGUAGE);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner,
-	 * boolean)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
-	public IToken evaluate(ICharacterScanner scanner, boolean resume)
+	protected void initializeEditor()
 	{
-		successToken = characterTokenMap.get((char) scanner.read());
+		super.initializeEditor();
 
-		if (successToken == null)
-		{
-			scanner.unread();
-			successToken = Token.UNDEFINED;
-		}
-
-		return successToken;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
-	 */
-	public IToken getSuccessToken()
-	{
-		return successToken;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
-	 */
-	public IToken evaluate(ICharacterScanner scanner)
-	{
-		return evaluate(scanner, false);
+		this.setSourceViewerConfiguration(new IDLSourceViewerConfiguration(this.getPreferenceStore(), this));
+		this.setDocumentProvider(new IDLDocumentProvider());
 	}
 }

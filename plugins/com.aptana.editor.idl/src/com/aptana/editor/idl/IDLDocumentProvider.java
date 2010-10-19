@@ -32,31 +32,45 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.widgets;
+package com.aptana.editor.idl;
 
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 
-/**
- * A generic interface for selectable widgets
- *
- */
-public interface ISelectableWidget extends IBackgroundColorWidget
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
+
+public class IDLDocumentProvider extends CommonDocumentProvider
 {
-	/**
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
 	 */
-	int getSelectionIndex();
+	public void connect(Object element) throws CoreException
+	{
+		super.connect(element);
 
-	/**
-	 * 
-	 * @return
-	 */
-	Object getText();
+		IDocument document = this.getDocument(element);
 
-	/**
-	 * 
-	 * @param ml
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new IDLPartitionScanner(), IDLSourceConfiguration.CONTENT_TYPES);
+
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, IDLSourceConfiguration.getDefault());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
 	 */
-	void addModifyListener(ModifyListener ml);
+	protected String getDefaultContentType(String filename)
+	{
+		return IIDLConstants.CONTENT_TYPE_IDL;
+	}
 }

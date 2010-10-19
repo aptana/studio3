@@ -23,6 +23,7 @@ import java.util.TreeMap;
  * can be used to do the same thing.  These parameters include an expiration date, so that
  * if you hand them off to someone else, they will only work for a limited amount of time.
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class QueryStringAuthGenerator {
 
     private String awsAccessKeyId;

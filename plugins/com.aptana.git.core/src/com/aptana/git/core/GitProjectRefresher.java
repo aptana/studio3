@@ -87,7 +87,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		refreshResources(e.getFilesWithChanges(), IResource.DEPTH_ZERO);
 	}
 
-	protected void refreshAffectedProjects(GitRepository repo)
+	private void refreshAffectedProjects(GitRepository repo)
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
@@ -100,7 +100,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		refreshResources(affectedProjects, IResource.DEPTH_INFINITE);
 	}
 
-	protected IGitRepositoryManager getRepositoryManager()
+	private IGitRepositoryManager getRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

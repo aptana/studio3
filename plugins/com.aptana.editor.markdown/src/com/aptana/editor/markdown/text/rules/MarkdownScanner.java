@@ -48,8 +48,8 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 
@@ -84,8 +84,10 @@ public class MarkdownScanner extends RuleBasedScanner
 
 		// Parens. Report what they are in links, add special hack in nextToken to set it to "" when it's not in the
 		// right place
-		rules.add(new SingleCharacterRule('(', getToken("punctuation.definition.metadata.markdown"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule(')', getToken("punctuation.definition.metadata.markdown"))); //$NON-NLS-1$
+		CharacterMapRule cmRule = new CharacterMapRule();
+		cmRule.add('(', getToken("punctuation.definition.metadata.markdown")); //$NON-NLS-1$
+		cmRule.add(')', getToken("punctuation.definition.metadata.markdown")); //$NON-NLS-1$
+		rules.add(cmRule);
 
 		// Bold
 		rules.add(new SingleLineRule("**", "**", getToken("markup.bold.markdown"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
