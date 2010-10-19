@@ -77,7 +77,7 @@ public class IDLParser extends Parser implements IParser {
         {
         }
     }
-    
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
@@ -85,7 +85,7 @@ public class IDLParser extends Parser implements IParser {
 	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		IDLScanner scanner = new IDLScanner();
-		
+
 		// grab source
 		char[] characters = parseState.getSource();
 
@@ -97,16 +97,15 @@ public class IDLParser extends Parser implements IParser {
 
 		// parse
 		IParseRootNode result = (IParseRootNode) parse(scanner);
-		
+
 		// save reference to result
 		parseState.setParseResult(result);
-		
+
 		return result;
 	}
 
 	public IDLParser() {
 		super(PARSING_TABLES);
-
 
         report = new IDLEvents();
 	}

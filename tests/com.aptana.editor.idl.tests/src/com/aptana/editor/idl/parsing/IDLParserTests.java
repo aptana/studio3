@@ -22,14 +22,14 @@ public class IDLParserTests extends TestCase
 	{
 		// create parser
 		IDLParser parser = new IDLParser();
-		
+
 		// create scanner and associate source
 		IDLScanner scanner = new IDLScanner();
 		scanner.setSource(source);
 
 		// parse it
 		IParseNode result = null;
-		
+
 		try
 		{
 			result = (IParseNode) parser.parse(scanner);
@@ -42,21 +42,21 @@ public class IDLParserTests extends TestCase
 		{
 			fail(e.getMessage());
 		}
-		
+
 		// make sure we got something
 		assertNotNull(result);
-		
+
 		IParseNode current = result;
-		
+
 		// check node types
 		for (IDLNodeType type : types)
 		{
 			current = current.getNextNode();
-		
+
 			assertNotNull(current);
 			assertEquals(type.getIndex(), current.getNodeType());
 		}
-		
+
 		return result;
 	}
 }
