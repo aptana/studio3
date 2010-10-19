@@ -50,8 +50,8 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
@@ -63,13 +63,19 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	public static final String IDL_MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public final static String IDL_DOC_COMMENT = PREFIX + "doc_comment"; //$NON-NLS-1$
 
-	// TODO: add other content types
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, IDL_MULTILINE_COMMENT, IDL_SINGLELINE_COMMENT, IDL_DOC_COMMENT };
+	public static final String[] CONTENT_TYPES = new String[] { //
+		DEFAULT, //
+		IDL_MULTILINE_COMMENT, //
+		IDL_SINGLELINE_COMMENT, //
+		IDL_DOC_COMMENT //
+	};
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IIDLConstants.CONTENT_TYPE_IDL } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { new EndOfLineRule("//", new Token(IDL_SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new MultiLineRule("/**", "*/", new Token(IDL_DOC_COMMENT), '\0', true), new MultiLineRule("/*", "*/", new Token(IDL_MULTILINE_COMMENT), '\0', true) }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	private IDLSourceScanner idlScanner;
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
+		new EndOfLineRule("//", new Token(IDL_SINGLELINE_COMMENT)), //$NON-NLS-1$
+		new MultiLineRule("/**", "*/", new Token(IDL_DOC_COMMENT), '\0', true), //$NON-NLS-1$ //$NON-NLS-2$
+		new MultiLineRule("/*", "*/", new Token(IDL_MULTILINE_COMMENT), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
+	};
 
 	private static IDLSourceConfiguration instance;
 
@@ -127,21 +133,6 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return null;
 	}
 
-	/**
-	 * getDTDScanner
-	 * 
-	 * @return
-	 */
-	protected ITokenScanner getDTDScanner()
-	{
-		if (idlScanner == null)
-		{
-			idlScanner = new IDLSourceScanner();
-		}
-
-		return idlScanner;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
@@ -179,22 +170,22 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getDTDScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(new IDLSourceScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		NonRuleBasedDamagerRepairer docCommentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.block.documentation.idl")); //$NON-NLS-1$
+		DefaultDamagerRepairer docCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.documentation.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(docCommentDR, IDL_DOC_COMMENT);
 		reconciler.setRepairer(docCommentDR, IDL_DOC_COMMENT);
 
-		NonRuleBasedDamagerRepairer multilineCommentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.block.idl")); //$NON-NLS-1$
+		DefaultDamagerRepairer multilineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(multilineCommentDR, IDL_MULTILINE_COMMENT);
 		reconciler.setRepairer(multilineCommentDR, IDL_MULTILINE_COMMENT);
 
-		NonRuleBasedDamagerRepairer singlelineCommentDR = new NonRuleBasedDamagerRepairer(this.getToken("comment.line.double-slash.idl")); //$NON-NLS-1$
+		DefaultDamagerRepairer singlelineCommentDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.line.double-slash.idl"))); //$NON-NLS-1$
 		reconciler.setDamager(singlelineCommentDR, IDL_SINGLELINE_COMMENT);
 		reconciler.setRepairer(singlelineCommentDR, IDL_SINGLELINE_COMMENT);
 	}
