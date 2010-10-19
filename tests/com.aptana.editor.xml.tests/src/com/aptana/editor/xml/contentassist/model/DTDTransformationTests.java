@@ -143,6 +143,8 @@ public class DTDTransformationTests extends TestCase
 	{
 		DTDTransformer transformer = new DTDTransformer();
 		
+		transformer.transform(source);
+		
 		// gather element names for easy lookup
 		Set<String> names = new HashSet<String>();
 		
