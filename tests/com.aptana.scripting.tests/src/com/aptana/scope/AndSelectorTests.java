@@ -43,7 +43,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testNamesArePrefixes()
 	{
-		ScopeSelector selector = new ScopeSelector("source string.quoted");
+		IScopeSelector selector = new ScopeSelector("source string.quoted");
 
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -53,7 +53,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testPrefixThenExact()
 	{
-		ScopeSelector selector = new ScopeSelector("source string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source string.quoted.double.ruby");
 
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -63,7 +63,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testExactThenPrefix()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted");
 
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -73,7 +73,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testNamesAreExact()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -83,7 +83,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testFirstNonMatching()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 
 		assertFalse(selector.matches("source.php string.quoted.double.ruby"));
 	}
@@ -93,7 +93,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testSecondNonMatching()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 
 		assertFalse(selector.matches("source.ruby string.quoted.double.php"));
 	}
@@ -103,7 +103,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testEmptySelector()
 	{
-		ScopeSelector selector = new ScopeSelector("");
+		IScopeSelector selector = new ScopeSelector("");
 
 		assertFalse(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -113,7 +113,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testEmptyScope()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 
 		assertFalse(selector.matches(""));
 	}
@@ -123,7 +123,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testNullSelector()
 	{
-		ScopeSelector selector = new ScopeSelector((String) null);
+		IScopeSelector selector = new ScopeSelector((String) null);
 
 		assertFalse(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -133,7 +133,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testNullScope()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby string.quoted.double.ruby");
 
 		assertFalse(selector.matches((String) null));
 	}
@@ -143,7 +143,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testBeginsWith()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby");
 
 		assertTrue(selector.matches("source.ruby string.quoted.double.ruby"));
 	}
@@ -153,7 +153,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testWithin()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby");
 
 		assertTrue(selector.matches("text.html.ruby source.ruby.rails.embedded.html string.quoted.double.ruby punctuation.definition.string.end.ruby"));
 	}
@@ -163,7 +163,7 @@ public class AndSelectorTests extends TestCase
 	 */
 	public void testEndsWith()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby");
 
 		assertTrue(selector.matches("text.html.ruby source.ruby.rails.embedded.html"));
 	}

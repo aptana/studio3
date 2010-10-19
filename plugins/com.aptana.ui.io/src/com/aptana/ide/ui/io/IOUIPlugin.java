@@ -45,11 +45,13 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
@@ -70,7 +72,6 @@ import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
 import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
-import com.aptana.ide.ui.io.navigator.internal.NavigatorDecoratorLoader;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.UIUtils;
@@ -168,7 +169,6 @@ public class IOUIPlugin extends AbstractUIPlugin {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
         CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
-        NavigatorDecoratorLoader.init();
     }
 
     /**
@@ -202,6 +202,30 @@ public class IOUIPlugin extends AbstractUIPlugin {
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
+
+	/**
+	 * Returns an image for the image file at the given plug-in relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image object
+	 */
+	public static Image getImage(String path)
+	{
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+			if (id == null)
+			{
+				return null;
+			}
+			registry.put(path, id);
+			image = registry.get(path);
+		}
+		return image;
+	}
 
     /**
      * Returns the active workbench window

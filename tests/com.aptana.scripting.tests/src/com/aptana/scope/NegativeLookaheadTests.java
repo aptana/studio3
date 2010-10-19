@@ -43,7 +43,7 @@ public class NegativeLookaheadTests extends TestCase
 	 */
 	public void testLookaheadMatches()
 	{
-		ScopeSelector selector = new ScopeSelector("A B - C");
+		IScopeSelector selector = new ScopeSelector("A B - C");
 
 		assertFalse(selector.matches("A B C"));
 	}
@@ -53,7 +53,7 @@ public class NegativeLookaheadTests extends TestCase
 	 */
 	public void testLookaheadDoesNotMatch()
 	{
-		ScopeSelector selector = new ScopeSelector("A B - C");
+		IScopeSelector selector = new ScopeSelector("A B - C");
 
 		assertTrue(selector.matches("A B D"));
 	}
@@ -63,26 +63,26 @@ public class NegativeLookaheadTests extends TestCase
 	 */
 	public void testLookaheadAgainstNothing()
 	{
-		ScopeSelector selector = new ScopeSelector("A B - C");
+		IScopeSelector selector = new ScopeSelector("A B - C");
 
 		assertTrue(selector.matches("A B"));
 	}
-	
+
 	/**
 	 * testMultipleLookahead
 	 */
 	public void testMultipleLookahead()
 	{
-		ScopeSelector selector = new ScopeSelector("A B - C D");
-		
+		IScopeSelector selector = new ScopeSelector("A B - C D");
+
 		assertTrue(selector.matches("A B"));
 		assertTrue(selector.matches("A B C"));
 		assertFalse(selector.matches("A B C D"));
 	}
-	
+
 	public void testAS3_894()
 	{
-		ScopeSelector selector = new ScopeSelector("source -meta.source.embedded");
+		IScopeSelector selector = new ScopeSelector("source -meta.source.embedded");
 
 		assertTrue(selector.matches("text.html.basic source.css.embedded.html"));
 	}

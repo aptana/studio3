@@ -334,7 +334,7 @@ public class GitIndex
 		addFilesFromDictionary(dic, false, true);
 	}
 
-	List<String> linesFromNotification(String string)
+	private List<String> linesFromNotification(String string)
 	{
 		// FIXME: throw an error?
 		if (string == null)
@@ -447,16 +447,17 @@ public class GitIndex
 			{
 				List<String> fileStatus = dictionary.get(path);
 
-				ChangedFile file = new ChangedFile(path);
+				ChangedFile.Status status = ChangedFile.Status.MODIFIED;
 				if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.DELETED;
+					status = ChangedFile.Status.DELETED;
 				else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.UNMERGED;
+					status = ChangedFile.Status.UNMERGED;
 				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.NEW;
+					status = ChangedFile.Status.NEW;
 				else
-					file.status = ChangedFile.Status.MODIFIED;
+					status = ChangedFile.Status.MODIFIED;
 
+				ChangedFile file = new ChangedFile(path, status);
 				if (tracked)
 				{
 					file.commitBlobMode = fileStatus.get(0).substring(1);
@@ -629,8 +630,8 @@ public class GitIndex
 	private boolean doCommit(String commitMessage)
 	{
 		int exitCode = 1;
-		commitMessage = commitMessage.replace("\"", "\\\"");
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage);
+		commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && !result.isEmpty())
 		{
 			exitCode = result.keySet().iterator().next();
@@ -726,7 +727,7 @@ public class GitIndex
 	 * @param changedFiles
 	 * @return
 	 */
-	public boolean resourceOrChildHasChanges(IResource resource)
+	protected boolean resourceOrChildHasChanges(IResource resource)
 	{
 		synchronized (changedFiles)
 		{
@@ -753,7 +754,7 @@ public class GitIndex
 		}
 	}
 
-	public boolean hasUnresolvedMergeConflicts()
+	protected boolean hasUnresolvedMergeConflicts()
 	{
 		synchronized (changedFiles)
 		{
@@ -789,7 +790,7 @@ public class GitIndex
 		.getFileForLocation(workingDirectory.append(changedFile.getPath()));
 	}
 
-	public ChangedFile getChangedFileForResource(IResource resource)
+	protected ChangedFile getChangedFileForResource(IResource resource)
 	{
 		if (resource == null || resource.getLocationURI() == null)
 			return null;
@@ -814,7 +815,7 @@ public class GitIndex
 	 * @param container
 	 * @return
 	 */
-	public List<ChangedFile> getChangedFilesForContainer(IContainer container)
+	protected List<ChangedFile> getChangedFilesForContainer(IContainer container)
 	{
 		if (container == null || container.getLocationURI() == null)
 			return Collections.emptyList();
@@ -835,26 +836,5 @@ public class GitIndex
 			}
 		}
 		return filtered;
-	}
-
-	/**
-	 * Find the changed file that corresponds to the repo relative path argument.
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public ChangedFile findChangedFile(String path)
-	{
-		synchronized (changedFiles)
-		{
-			for (ChangedFile changedFile : changedFiles)
-			{
-				if (changedFile.getPath().equals(path))
-				{
-					return changedFile;
-				}
-			}
-		}
-		return null;
 	}
 }

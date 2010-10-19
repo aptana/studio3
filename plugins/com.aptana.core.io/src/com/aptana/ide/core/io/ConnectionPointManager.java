@@ -68,14 +68,14 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	protected static final String STATE_FILENAME = "connections"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = CoreIOPlugin.PLUGIN_ID + ".connectionPoint"; //$NON-NLS-1$
-	protected static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
-	protected static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
+	private static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
+	private static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
 	protected static final String ATT_ID = "id"; //$NON-NLS-1$
-	protected static final String ATT_NAME = "name"; //$NON-NLS-1$
-	protected static final String ATT_ORDER = "order"; //$NON-NLS-1$
-	protected static final String ATT_REMOTE = "remote"; //$NON-NLS-1$
-	protected static final String ATT_CLASS = "class"; //$NON-NLS-1$
-	protected static final String ATT_CATEGORY = "category"; //$NON-NLS-1$
+	private static final String ATT_NAME = "name"; //$NON-NLS-1$
+	private static final String ATT_ORDER = "order"; //$NON-NLS-1$
+	private static final String ATT_REMOTE = "remote"; //$NON-NLS-1$
+	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATT_CATEGORY = "category"; //$NON-NLS-1$
 
 	private static final String ELEMENT_ROOT = "connections"; //$NON-NLS-1$
 	private static final String ELEMENT_CONNECTION = "connection"; //$NON-NLS-1$

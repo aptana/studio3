@@ -36,12 +36,12 @@ package com.aptana.git.core;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS
+public class Messages extends NLS // NO_UCD
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.core.messages"; //$NON-NLS-1$
-	public static String GitMoveDeleteHook_CannotModifyRepository_ErrorMessage;
-	public static String GitRepositoryProviderType_AttachingProject_Message;
-	public static String GitRepositoryProviderType_AutoShareJob_Title;
+	public static String GitMoveDeleteHook_CannotModifyRepository_ErrorMessage; // NO_UCD
+	public static String GitRepositoryProviderType_AttachingProject_Message; // NO_UCD
+	public static String GitRepositoryProviderType_AutoShareJob_Title; // NO_UCD
 	static
 	{
 		// initialize resource bundle

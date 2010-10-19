@@ -49,6 +49,16 @@ public class Messages extends NLS
 	{
 	}
 
+	public static String IOUtil_Destination_Directory_Not_Writable;
+
+	public static String IOUtil_Destination_Directory_Uncreatable;
+
+	public static String IOUtil_Destination_Is_Not_A_Directory;
+
+	public static String IOUtil_Source_Directory_Not_Readable;
+
+	public static String IOUtil_Unable_To_Copy_Because;
+
 	public static String ResourceUtils_File_URL_To_URI_Conversion_Error;
 
 	public static String ResourceUtils_URL_To_File_URL_Conversion_Error;

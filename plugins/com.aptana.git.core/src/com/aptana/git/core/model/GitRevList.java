@@ -55,7 +55,7 @@ public class GitRevList
 	private GitRepository repository;
 	private List<GitCommit> commits;
 
-	public static final int NO_LIMIT = -1;
+	private static final int NO_LIMIT = -1;
 
 	public GitRevList(GitRepository repo)
 	{

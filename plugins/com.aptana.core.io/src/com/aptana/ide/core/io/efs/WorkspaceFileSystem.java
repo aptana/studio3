@@ -52,7 +52,7 @@ import org.eclipse.core.runtime.Path;
  */
 public class WorkspaceFileSystem extends FileSystem {
 
-	public static final String SCHEME_WORKSPACE = "workspace"; //$NON-NLS-1$
+	protected static final String SCHEME_WORKSPACE = "workspace"; //$NON-NLS-1$
 
 	private static WorkspaceFileSystem instance;
 	
@@ -79,7 +79,7 @@ public class WorkspaceFileSystem extends FileSystem {
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#attributes()
 	 */
 	@Override
-	public int attributes() {
+	public int attributes() { // NO_UCD
 		return EFS.getLocalFileSystem().attributes();
 	}
 
@@ -87,7 +87,7 @@ public class WorkspaceFileSystem extends FileSystem {
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canDelete()
 	 */
 	@Override
-	public boolean canDelete() {
+	public boolean canDelete() { // NO_UCD
 		return EFS.getLocalFileSystem().canDelete();
 	}
 
@@ -95,7 +95,7 @@ public class WorkspaceFileSystem extends FileSystem {
 	 * @see org.eclipse.core.filesystem.provider.FileSystem#canWrite()
 	 */
 	@Override
-	public boolean canWrite() {
+	public boolean canWrite() { // NO_UCD
 		return EFS.getLocalFileSystem().canWrite();
 	}
 

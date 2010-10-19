@@ -43,7 +43,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testPrefixThenNonMatch()
 	{
-		ScopeSelector selector = new ScopeSelector("source, string.quoted.single.ruby");
+		IScopeSelector selector = new ScopeSelector("source, string.quoted.single.ruby");
 
 		assertTrue(selector.matches("source.ruby"));
 		assertFalse(selector.matches("string.quoted.double.ruby"));
@@ -54,7 +54,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testNonMatchThenPrefix()
 	{
-		ScopeSelector selector = new ScopeSelector("source.php, string.quoted");
+		IScopeSelector selector = new ScopeSelector("source.php, string.quoted");
 
 		assertFalse(selector.matches("source.ruby"));
 		assertTrue(selector.matches("string.quoted.double.ruby"));
@@ -65,7 +65,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testNamesArePrefixes()
 	{
-		ScopeSelector selector = new ScopeSelector("source, string.quoted");
+		IScopeSelector selector = new ScopeSelector("source, string.quoted");
 
 		assertTrue(selector.matches("source.ruby"));
 		assertTrue(selector.matches("string.quoted.double.ruby"));
@@ -76,7 +76,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testExactThenNonMatch()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.single.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.single.ruby");
 
 		assertTrue(selector.matches("source.ruby"));
 		assertFalse(selector.matches("string.quoted.double.ruby"));
@@ -87,7 +87,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testNonMatchThenExact()
 	{
-		ScopeSelector selector = new ScopeSelector("source.php, string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.php, string.quoted.double.ruby");
 
 		assertFalse(selector.matches("source.ruby"));
 		assertTrue(selector.matches("string.quoted.double.ruby"));
@@ -98,7 +98,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testNamesAreExact()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.double.ruby");
+		IScopeSelector selector = new ScopeSelector("source.ruby, string.quoted.double.ruby");
 
 		assertTrue(selector.matches("source.ruby"));
 		assertTrue(selector.matches("string.quoted.double.ruby"));
@@ -109,7 +109,7 @@ public class OrSelectorTests extends TestCase
 	 */
 	public void testMixedMatch()
 	{
-		ScopeSelector selector = new ScopeSelector("source.ruby string, source.php string");
+		IScopeSelector selector = new ScopeSelector("source.ruby string, source.php string");
 
 		assertTrue(selector.matches("source.ruby string"));
 		assertTrue(selector.matches("source.php string"));

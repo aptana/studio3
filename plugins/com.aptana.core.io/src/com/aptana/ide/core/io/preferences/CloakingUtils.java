@@ -92,14 +92,6 @@ public class CloakingUtils {
 
         setCloakedFileTypes(newList.toArray(new String[newList.size()]));
     }
-
-    /**
-     * Cloaks any files with this particular name
-     * @param fileStore
-     */
-    public static void cloakFileName(IFileStore fileStore) {
-    	addCloakFileType(fileStore.getName());
-    }
     
     /**
      * @param fileStore
@@ -120,7 +112,7 @@ public class CloakingUtils {
     /**
      * @return the array of filetypes being cloaked in regular expression
      */
-    public static String[] getCloakedExpressions() {
+    private static String[] getCloakedExpressions() {
         String[] filetypes = getCloakedFileTypes();
         String[] expressions = new String[filetypes.length];
         for (int i = 0; i < expressions.length; ++i) {

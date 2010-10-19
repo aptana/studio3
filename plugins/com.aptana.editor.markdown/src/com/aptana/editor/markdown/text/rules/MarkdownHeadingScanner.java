@@ -39,17 +39,18 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 
 public class MarkdownHeadingScanner extends RuleBasedScanner
 {
 	public MarkdownHeadingScanner()
 	{
-		IRule[] rules = new IRule[] {
-				new SingleCharacterRule('#', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
-				new SingleCharacterRule('=', getToken("punctuation.definition.heading.markdown")), //$NON-NLS-1$
-				new SingleCharacterRule('-', getToken("punctuation.definition.heading.markdown")) //$NON-NLS-1$
-		};
+		CharacterMapRule rule = new CharacterMapRule();
+		IToken token = getToken("punctuation.definition.heading.markdown"); //$NON-NLS-1$
+		rule.add('#', token);
+		rule.add('=', token);
+		rule.add('-', token);
+		IRule[] rules = new IRule[] { rule };
 		setRules(rules);
 		setDefaultReturnToken(getToken("entity.name.section.markdown")); //$NON-NLS-1$
 	}

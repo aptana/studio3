@@ -65,6 +65,7 @@ import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
@@ -366,7 +367,7 @@ public class BundleManager
 	 * @param matchedPattern
 	 * @return
 	 */
-	private boolean betterMatch(ScopeSelector matchedScope, String scope, String matchedPattern)
+	private boolean betterMatch(IScopeSelector matchedScope, String scope, String matchedPattern)
 	{
 		if (matchedScope.matches(scope) == false)
 		{

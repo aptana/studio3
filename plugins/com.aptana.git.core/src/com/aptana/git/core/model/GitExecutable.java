@@ -62,7 +62,7 @@ import com.aptana.git.core.IPreferenceConstants;
 
 public class GitExecutable
 {
-	protected static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
+	private static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
 	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE+".exe"; //$NON-NLS-1$
 	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
 	private static ArrayList<IPath> fgLocations;
@@ -248,7 +248,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public String outputForCommand(IPath workingDir, String... args)
+	protected String outputForCommand(IPath workingDir, String... args)
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
@@ -279,7 +279,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
+	protected Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}

@@ -246,11 +246,22 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		if (installed.compareAndSet(false, true))
 		{
-			IWorkbench workbench = PlatformUI.getWorkbench();
-			INSTANCE = new KeybindingsManager(workbench);
+			IWorkbench workbench = null;
+			try
+			{
+				workbench = PlatformUI.getWorkbench();
+			}
+			catch (Exception e)
+			{
+				// ignore, may be running headless, like in tests
+			}
+			if (workbench != null)
+			{
+				INSTANCE = new KeybindingsManager(workbench);
 
-			// Load initial bindings
-			INSTANCE.initBindings();
+				// Load initial bindings
+				INSTANCE.initBindings();
+			}
 		}
 	}
 

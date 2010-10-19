@@ -222,7 +222,12 @@ public class EditorUtils {
             return fileStore;
         }
         try {
-            file = File.createTempFile(fileStore.getFileSystem().getScheme(), fileStore.getName());
+        	String prefix = fileStore.getFileSystem().getScheme();
+        	while (prefix.length() < 3)
+        	{
+        		prefix += "_"; //$NON-NLS-1$
+        	}
+            file = File.createTempFile(prefix, fileStore.getName());
         } catch (IOException e) {
             return fileStore;
         }
