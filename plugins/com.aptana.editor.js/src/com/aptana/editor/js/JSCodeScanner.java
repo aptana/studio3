@@ -45,7 +45,6 @@ import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.js.parsing.lexer.JSScopeType;
 import com.aptana.editor.js.text.rules.JSFunctionCallDetector;
@@ -136,10 +135,12 @@ public class JSCodeScanner extends RuleBasedScanner
 		addWordRules(wordRule, createToken(JSScopeType.OPERATOR), JSLanguageConstants.OPERATORS);
 		rules.add(wordRule);
 
+		CharacterMapRule rule = new CharacterMapRule();
 		for (char operator : JSLanguageConstants.SINGLE_CHARACTER_OPERATORS)
 		{
-			rules.add(new SingleCharacterRule(operator, createToken(JSScopeType.KEYWORD)));
+			rule.add(operator, createToken(JSScopeType.KEYWORD));
 		}
+		rules.add(rule);
 
 		// Add word rule for keywords, types, and constants.
 		wordRule = new WordRule(new JSIdentifierDetector(), createToken(JSScopeType.SOURCE));

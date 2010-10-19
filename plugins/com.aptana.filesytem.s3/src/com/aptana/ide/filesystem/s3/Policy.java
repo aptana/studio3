@@ -57,7 +57,7 @@ public final class Policy
 		return generateAuthId(proto, connectionPoint.getLogin(), connectionPoint.getHost());
 	}
 
-	public static String generateAuthId(String proto, String login, String host)
+	protected static String generateAuthId(String proto, String login, String host)
 	{
 		if (host != null && host.length() > 0 && login != null && login.length() > 0)
 		{

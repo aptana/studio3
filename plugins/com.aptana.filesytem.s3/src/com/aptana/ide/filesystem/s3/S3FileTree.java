@@ -54,21 +54,21 @@ import com.amazon.s3.ListEntry;
  * 
  * @author cwilliams
  */
-public class S3FileTree extends FileTree
+class S3FileTree extends FileTree
 {
 
 	private static final String SEPARATOR = "/"; //$NON-NLS-1$
 
 	private List<ListEntry> entries;
 
-	public S3FileTree(IFileStore treeRoot, List<ListEntry> entries)
+	protected S3FileTree(IFileStore treeRoot, List<ListEntry> entries)
 	{
 		super(treeRoot);
 		this.entries = entries;
 	}
 
 	@Override
-	public IFileInfo[] getChildInfos(IFileStore store)
+	public IFileInfo[] getChildInfos(IFileStore store) // NO_UCD
 	{
 		if (!(store instanceof S3FileStore))
 		{
@@ -188,7 +188,7 @@ public class S3FileTree extends FileTree
 	}
 
 	@Override
-	public IFileStore[] getChildStores(IFileStore store)
+	public IFileStore[] getChildStores(IFileStore store) // NO_UCD
 	{
 		if (!(store instanceof S3FileStore))
 		{

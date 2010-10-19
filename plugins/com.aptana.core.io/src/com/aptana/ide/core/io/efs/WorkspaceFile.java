@@ -86,9 +86,8 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	/**
 	 * 
 	 */
-	public WorkspaceFile(IResource resource) {
+	private WorkspaceFile(IResource resource) {
 		this(resource, resource.getFullPath());
-		
 	}
 
 	/**

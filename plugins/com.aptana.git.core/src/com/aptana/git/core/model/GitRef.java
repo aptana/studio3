@@ -77,7 +77,7 @@ public class GitRef
 	 * 
 	 * @return
 	 */
-	public String ref()
+	protected String ref()
 	{
 		return ref;
 	}

@@ -46,8 +46,8 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IWordDetector;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.css.CSSCodeScanner;
 
 /**
@@ -77,12 +77,12 @@ public class SassCodeScanner extends CSSCodeScanner
 	}
 
 	@Override
-	protected List<IRule> createPunctuationRules()
+	protected CharacterMapRule createPunctuationRules()
 	{
-		List<IRule> rules = super.createPunctuationRules();
-		rules.remove(rules.size() - 1);
-		rules.add(new SingleCharacterRule('=', createToken("punctuation.definition.entity.sass"))); //$NON-NLS-1$
-		return rules;
+		CharacterMapRule rule = super.createPunctuationRules();
+		// Override equals
+		rule.add('=', createToken("punctuation.definition.entity.sass")); //$NON-NLS-1$
+		return rule;
 	}
 
 	/**
