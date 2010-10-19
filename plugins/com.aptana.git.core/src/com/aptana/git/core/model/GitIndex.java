@@ -447,16 +447,17 @@ public class GitIndex
 			{
 				List<String> fileStatus = dictionary.get(path);
 
-				ChangedFile file = new ChangedFile(path);
+				ChangedFile.Status status = ChangedFile.Status.MODIFIED;
 				if (fileStatus.get(4).equals("D")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.DELETED;
+					status = ChangedFile.Status.DELETED;
 				else if (fileStatus.get(4).equals("U")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.UNMERGED;
+					status = ChangedFile.Status.UNMERGED;
 				else if (fileStatus.get(0).equals(":000000")) //$NON-NLS-1$
-					file.status = ChangedFile.Status.NEW;
+					status = ChangedFile.Status.NEW;
 				else
-					file.status = ChangedFile.Status.MODIFIED;
+					status = ChangedFile.Status.MODIFIED;
 
+				ChangedFile file = new ChangedFile(path, status);
 				if (tracked)
 				{
 					file.commitBlobMode = fileStatus.get(0).substring(1);
