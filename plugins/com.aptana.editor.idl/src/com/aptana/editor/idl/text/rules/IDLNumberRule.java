@@ -43,7 +43,11 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 
 public class IDLNumberRule extends ExtendedWordRule
 {
-	private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|([0-9]+(\\.[0-9]+)?(?:[eE]\\d+)?)"; //$NON-NLS-1$
+	// NOTE: The following regular expression is a combined form of the integer
+	// and float definitions from the WebIDL specification (http://dev.w3.org/2006/webapi/WebIDL/#idl-grammar).
+	// This corrects those patterns to allow negation in a few cases where they
+	// fail using the spec's patterns
+	private static final String REGEXP = "-?( 0 ([0-7]* | [Xx][0-9A-Fa-f]+) | [1-9][0-9]* | ([0-9]+\\.[0-9]* | [0-9]*\\.[0-9]+)([Ee][+-]?[0-9]+)? | [0-9]+[Ee][+-]?[0-9]+ )"; //$NON-NLS-1$
 	private static Pattern pattern;
 
 	public IDLNumberRule(IToken token)
@@ -61,7 +65,7 @@ public class IDLNumberRule extends ExtendedWordRule
 	{
 		if (pattern == null)
 		{
-			pattern = Pattern.compile(REGEXP);
+			pattern = Pattern.compile(REGEXP, Pattern.COMMENTS);
 		}
 		return pattern;
 	}
