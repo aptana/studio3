@@ -42,13 +42,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 
+import com.aptana.core.Identifiable;
 import com.aptana.core.epl.IMemento;
 
 /**
  * @author Max Stepanov
  *
  */
-public abstract class AbstractWebServerConfiguration implements IExecutableExtension {
+public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable {
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 	
@@ -88,6 +89,14 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	}
 
 	/* package */ final String getType() {
+		return type;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.core.Identifiable#getId()
+	 */
+	@Override
+	public final String getId() {
 		return type;
 	}
 

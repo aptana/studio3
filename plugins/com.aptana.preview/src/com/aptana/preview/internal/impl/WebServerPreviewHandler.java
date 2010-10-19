@@ -66,6 +66,8 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 					return new PreviewConfig(url);
 				}
 			}
+		} else {
+			// find the first server matching 
 		}
 		return null;
 	}

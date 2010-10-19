@@ -44,6 +44,15 @@
       </editor>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.preview.ui.preferences.ServersPreferencePage"
+            id="com.aptana.preview.preferences.previewServers"
+            name="Preview Servers">
+      </page>
+   </extension>
+   <extension
          point="org.eclipse.ui.propertyPages">
       <page
             class="com.aptana.preview.ui.properties.ProjectPreviewPropertyPage"
@@ -81,8 +90,16 @@
          point="com.aptana.preview.webServerTypes">
       <type
             class="com.aptana.preview.server.SimpleWebServerConfiguration"
-            id="com.aptana.preview.server.simple">
+            id="com.aptana.preview.server.simple"
+            name="Simple Web Server">
       </type>
+   </extension>
+   <extension
+         point="com.aptana.ui.imageAssociations">
+      <image
+            icon="icons/obj16/server.png"
+            id="com.aptana.preview.server.simple">
+      </image>
    </extension>
 
 </plugin>

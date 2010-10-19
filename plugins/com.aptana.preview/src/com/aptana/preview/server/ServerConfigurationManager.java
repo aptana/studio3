@@ -58,7 +58,7 @@ import com.aptana.preview.Activator;
  * @author Max Stepanov
  *
  */
-public class ServerConfigurationManager {
+public final class ServerConfigurationManager {
 
 	public static final String STATE_FILENAME = "webservers"; //$NON-NLS-1$
 
@@ -66,6 +66,7 @@ public class ServerConfigurationManager {
 	private static final String TAG_TYPE = "type"; //$NON-NLS-1$
 	protected static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATT_NAME = "name"; //$NON-NLS-1$
 
 	private static final String ELEMENT_ROOT = "servers"; //$NON-NLS-1$
 	private static final String ELEMENT_SERVER = "server"; //$NON-NLS-1$
@@ -73,8 +74,27 @@ public class ServerConfigurationManager {
 
 	private static ServerConfigurationManager instance;
 	private Map<String, IConfigurationElement> configurationElements = new HashMap<String, IConfigurationElement>();
+	private List<ConfigurationType> types = new ArrayList<ConfigurationType>();
 	private List<AbstractWebServerConfiguration> serverConfigurations = Collections.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
-	private List<IMemento> unresolvedElements = Collections.synchronizedList(new ArrayList<IMemento>());
+	private List<IMemento> unresolvedElements = new ArrayList<IMemento>();
+	
+	public final class ConfigurationType {
+		private String id;
+		private String name;
+		
+		private ConfigurationType(String id, String name) {
+			this.id = id;
+			this.name = name;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getName() {
+			return name;
+		}
+	}
 	
 	/**
 	 * 
@@ -106,11 +126,16 @@ public class ServerConfigurationManager {
 			if (id == null || id.length() == 0) {
 				return;
 			}
+			String name = element.getAttribute(ATT_NAME);
+			if (name == null || name.length() == 0) {
+				return;
+			}
 			String clazz = element.getAttribute(ATT_CLASS);
 			if (clazz == null || clazz.length() == 0) {
 				return;
 			}
-			configurationElements.put(id, element);			
+			configurationElements.put(id, element);
+			types.add(new ConfigurationType(id, name));
 		}
 	}
 
@@ -180,6 +205,10 @@ public class ServerConfigurationManager {
                 }
 		    }
 		}
+	}
+	
+	public List<ConfigurationType> getConfigurationTypes() {
+		return Collections.unmodifiableList(types);
 	}
 
 	public AbstractWebServerConfiguration createServerConfiguration(String typeId) throws CoreException {
