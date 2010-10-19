@@ -560,6 +560,12 @@ public class CommitDialog extends StatusDialog
 						@Override
 						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
 						{
+							// need to make a copy because operation will actually change input files.
+							final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
+							for (ChangedFile cf : changedFiles)
+							{
+								copy.add(new ChangedFile(cf));
+							}
 							super.doOperation(repo, changedFiles);
 							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 							{
@@ -569,7 +575,7 @@ public class CommitDialog extends StatusDialog
 									// If this file was shown in diff area, we need to blank the diff area!
 									if (fLastDiffFile != null)
 									{
-										for (ChangedFile file : changedFiles)
+										for (ChangedFile file : copy)
 										{
 											if (file != null && file.equals(fLastDiffFile))
 											{
@@ -577,7 +583,7 @@ public class CommitDialog extends StatusDialog
 											}
 										}
 									}
-									removeDraggedFilesFromSource(unstagedTable, changedFiles);
+									removeDraggedFilesFromSource(unstagedTable, copy);
 								}
 							});
 						}
@@ -603,7 +609,10 @@ public class CommitDialog extends StatusDialog
 		unstagedTable.setEnabled(false);
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
-		Collections.copy(copy, new ArrayList<ChangedFile>(files));
+		for (ChangedFile cf : files)
+		{
+			copy.add(new ChangedFile(cf));
+		}
 		if (gitRepository.index().unstageFiles(files))
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()
@@ -631,7 +640,10 @@ public class CommitDialog extends StatusDialog
 		unstagedTable.setEnabled(false);
 		// make a copy so we can erase from original table correctly since their flags get changed by operation
 		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
-		Collections.copy(copy, new ArrayList<ChangedFile>(files));
+		for (ChangedFile cf : files)
+		{
+			copy.add(new ChangedFile(cf));
+		}
 		if (gitRepository.index().stageFiles(files))
 		{
 			getParentShell().getDisplay().asyncExec(new Runnable()

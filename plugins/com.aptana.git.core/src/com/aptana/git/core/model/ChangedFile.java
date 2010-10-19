@@ -45,7 +45,13 @@ public class ChangedFile implements Comparable<ChangedFile>
 		NEW, DELETED, MODIFIED, UNMERGED
 	}
 
-	ChangedFile(ChangedFile other)
+	/**
+	 * Used to make copies of a changed file, particularly when existing changed files are going to get modified by an
+	 * operation and we need to refer to their original state.
+	 * 
+	 * @param other
+	 */
+	public ChangedFile(ChangedFile other)
 	{
 		this.path = other.path;
 		this.status = other.status;
