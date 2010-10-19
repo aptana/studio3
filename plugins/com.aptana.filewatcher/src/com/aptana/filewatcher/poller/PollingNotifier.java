@@ -151,7 +151,13 @@ public class PollingNotifier implements IJNotify
 
 	public boolean removeWatch(int wd) throws JNotifyException
 	{
-		return watchers.remove(wd) != null;
+		DirectoryWatcher watcher = watchers.remove(wd);
+		if (watcher  == null)
+		{
+			return false;
+		}
+		watcher.dispose();
+		return true;
 	}
 
 }
