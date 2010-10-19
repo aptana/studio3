@@ -89,7 +89,6 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 
 		autoSyncCheckbox = new Button(sync, SWT.CHECK);
 		autoSyncCheckbox.setText(Messages.FTPDeployComposite_AutoSync);
-		autoSyncCheckbox.setSelection(true);
 		autoSyncCheckbox.addSelectionListener(this);
 
 		uploadButton = new Button(sync, SWT.RADIO);
