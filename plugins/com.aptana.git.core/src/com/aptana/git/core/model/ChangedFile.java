@@ -74,6 +74,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 	String commitBlobSHA;
 	String commitBlobMode;
 
+	// FIXME Use IPath
 	public String getPath()
 	{
 		return new Path(path).toOSString();

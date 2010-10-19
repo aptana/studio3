@@ -46,6 +46,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.GitPlugin;
@@ -158,12 +159,12 @@ public class CommitFileRevisionTest extends TestCase
 		index.commit("Initial commit");
 
 		GitCommit gitCommit = new GitCommit(repo, "HEAD");
-		CommitFileRevision revision = new CommitFileRevision(gitCommit, filename);
+		CommitFileRevision revision = new CommitFileRevision(gitCommit, Path.fromPortableString(filename));
 		assertTrue(revision.exists());
 		assertEquals(filename, revision.getName());
 		assertFalse(revision.isPropertyMissing());
 		assertSame(revision, revision.withAllProperties(null));
-		assertEquals(filename, revision.getURI().getPath());
+		assertEquals(repo.workingDirectory().append(filename).toPortableString(), revision.getURI().getPath());
 		IStorage storage = revision.getStorage(new NullProgressMonitor());
 		assertEquals(contents, IOUtil.read(storage.getContents()));
 	}
@@ -200,7 +201,7 @@ public class CommitFileRevisionTest extends TestCase
 		List<GitCommit> commits = revList.getCommits();
 		for (GitCommit commit : commits)
 		{
-			CommitFileRevision revision = new CommitFileRevision(commit, filename);
+			CommitFileRevision revision = new CommitFileRevision(commit, Path.fromPortableString(filename));
 			assertTrue(revision.exists());
 			assertEquals(commit.getAuthor(), revision.getAuthor());
 			assertEquals(commit.getComment(), revision.getComment());
