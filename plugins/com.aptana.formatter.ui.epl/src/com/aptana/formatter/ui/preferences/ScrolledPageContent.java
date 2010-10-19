@@ -21,11 +21,6 @@ public class ScrolledPageContent extends SharedScrolledComposite
 
 	private FormToolkit fToolkit;
 
-	public ScrolledPageContent(Composite parent)
-	{
-		this(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-	}
-
 	public ScrolledPageContent(Composite parent, int style)
 	{
 		super(parent, style);

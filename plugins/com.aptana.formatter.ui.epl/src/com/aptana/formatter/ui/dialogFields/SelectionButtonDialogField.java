@@ -42,15 +42,6 @@ public class SelectionButtonDialogField extends DialogField
 	}
 
 	/**
-	 * Attaches a field to the selection state of the selection button. The attached field will be disabled if the
-	 * selection button is not selected.
-	 */
-	public void attachDialogField(DialogField dialogField)
-	{
-		attachDialogFields(new DialogField[] { dialogField });
-	}
-
-	/**
 	 * Attaches fields to the selection state of the selection button. The attached fields will be disabled if the
 	 * selection button is not selected.
 	 */
@@ -61,24 +52,6 @@ public class SelectionButtonDialogField extends DialogField
 		{
 			dialogFields[i].setEnabled(fIsSelected);
 		}
-	}
-
-	/**
-	 * Returns <code>true</code> is teh gived field is attached to the selection button.
-	 */
-	public boolean isAttached(DialogField editor)
-	{
-		if (fAttachedDialogFields != null)
-		{
-			for (int i = 0; i < fAttachedDialogFields.length; i++)
-			{
-				if (fAttachedDialogFields[i] == editor)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 
 	// ------- layout helpers

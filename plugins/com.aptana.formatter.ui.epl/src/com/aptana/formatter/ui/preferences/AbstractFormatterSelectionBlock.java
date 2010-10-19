@@ -142,33 +142,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		return profileManager;
 	}
 
-	protected String getProfileName(List<IProfile> profiles, String prefix)
-	{
-		HashSet<String> names = new HashSet<String>(profiles.size());
-		for (IProfile profile : profiles)
-		{
-			names.add(profile.getName());
-		}
-		if (!names.contains(prefix))
-			return prefix;
-		for (int i = 2;; i++)
-		{
-			String name = prefix + " " + i; //$NON-NLS-1$
-			if (!names.contains(name))
-				return name;
-		}
-	}
-
-	protected IProfile findProfile(Map<String, String> preferences, List<IProfile> profiles)
-	{
-		for (IProfile profile : profiles)
-		{
-			if (profile.equalsTo(preferences))
-				return profile;
-		}
-		return null;
-	}
-
 	/**
 	 * Saves the values for all the profiles.
 	 */
@@ -232,37 +205,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	public final Control createOptionsBlock(Composite parent)
 	{
 		return createSelectorBlock(parent);
-	}
-
-	protected Composite createDescription(Composite parent, IContributedExtension contrib)
-	{
-		Composite composite = SWTFactory.createComposite(parent, parent.getFont(), 1, 1, GridData.FILL);
-
-		String desc = contrib.getDescription();
-		if (desc == null)
-		{
-			desc = Util.EMPTY_STRING;
-		}
-		SWTFactory.createLabel(composite, desc, 1);
-
-		String prefPageId = contrib.getPreferencePageId();
-		String propPageId = contrib.getPropertyPageId();
-
-		// we're a property page
-		if (isProjectPreferencePage() && hasValidId(propPageId))
-		{
-			new PropertyLinkArea(composite, SWT.NONE, propPageId, fProject, getPreferenceLinkMessage(),
-					getPreferenceContainer());
-		}
-
-		// we're a preference page
-		if (!isProjectPreferencePage() && hasValidId(prefPageId))
-		{
-			new PreferenceLinkArea(composite, SWT.NONE, prefPageId, getPreferenceLinkMessage(),
-					getPreferenceContainer(), null);
-		}
-
-		return composite;
 	}
 
 	protected Composite createSelectorBlock(Composite parent)
@@ -484,30 +426,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			message = FormatterMessages.FormatterModifyDialog_exportProblem;
 			ExceptionHandler.handle(e, getShell(), title, message);
 		}
-	}
-
-	/**
-	 * Sets the formatter's profile.
-	 * 
-	 * @param index
-	 */
-	protected void doSetProfile(int index)
-	{
-		selectedFormatter = index;
-		setValue(factories[index].getFormatterPreferenceKey(), factories[index].getId());
-		String desc = getSelectedFormatter().getDescription();
-		if (desc != null && desc.length() != 0)
-		{
-			fFactoryDescription.setText(desc);
-		}
-		else
-		{
-			fFactoryDescription.setVisible(false);
-			GridData data = (GridData) fFactoryDescription.getLayoutData();
-			data.exclude = true;
-		}
-		updateComboFromProfiles();
-		applyPreferences();
 	}
 
 	protected void configurePreview(Composite composite, int numColumns)
@@ -855,10 +773,5 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		label.setText(text);
 		label.setLayoutData(gd);
 		return label;
-	}
-
-	private boolean hasValidId(String id)
-	{
-		return (id != null && !"".equals(id)); //$NON-NLS-1$
 	}
 }

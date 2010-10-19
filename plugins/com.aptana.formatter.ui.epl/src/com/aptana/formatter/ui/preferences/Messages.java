@@ -15,9 +15,6 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.formatter.ui.preferences.messages"; //$NON-NLS-1$
 
-	public static String GenericRootPage_genericPerferencesPageMessage;
-	public static String GenericRootPage_noAvailablePages;
-	public static String GenericRootPage_preferences;
 	public static String PropertyAndPreferencePage_configureProjectSettings;
 	public static String PropertyAndPreferencePage_configureWorkspaceSettings;
 	public static String PropertyAndPreferencePage_enableProjectSpecific;
@@ -26,14 +23,6 @@ public class Messages extends NLS
 	public static String AddRemoveList_inputMessageErrorInfo;
 	public static String AddRemoveList_inputMessageTitle;
 	public static String AddRemoveList_inputMessageText;
-	public static String FileNameIsEmpty;
-	// Path validator
-	public static String FilePathIsEmpty;
-	public static String FilePathNotExists;
-	public static String FilePathIsInvalid;
-	public static String DirPathIsEmpty;
-	public static String DirPathNotExists;
-	public static String DirPathIsInvalid;
 	// Positive number validator
 	public static String PositiveNumberIsEmpty;
 	public static String PositiveNumberIsInvalid;

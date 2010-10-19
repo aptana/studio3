@@ -85,11 +85,6 @@ public class Activator extends AbstractUIPlugin
 		logError(message, null);
 	}
 
-	public static void warn(String message)
-	{
-		warn(message, null);
-	}
-
 	public static void warn(String message, Throwable throwable)
 	{
 		log(new Status(IStatus.WARNING, PLUGIN_ID, INTERNAL_ERROR, message, throwable));
@@ -98,18 +93,6 @@ public class Activator extends AbstractUIPlugin
 	public static void logError(String message, Throwable throwable)
 	{
 		Activator.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, INTERNAL_ERROR, message, throwable));
-	}
-
-	public static void logErrorStatus(String message, IStatus status)
-	{
-		if (status == null)
-		{
-			Activator.logError(message);
-			return;
-		}
-		MultiStatus multi = new MultiStatus(Activator.PLUGIN_ID, INTERNAL_ERROR, message, null);
-		multi.add(status);
-		Activator.log(multi);
 	}
 
 	public static void logError(Throwable t)

@@ -36,17 +36,6 @@ public class LayoutUtil
 	 * 
 	 * @param labelOnTop
 	 *            Defines if the label of all fields should be on top of the fields
-	 */
-	public static void doDefaultLayout(Composite parent, DialogField[] editors, boolean labelOnTop)
-	{
-		doDefaultLayout(parent, editors, labelOnTop, 0, 0);
-	}
-
-	/**
-	 * Creates a composite and fills in the given editors.
-	 * 
-	 * @param labelOnTop
-	 *            Defines if the label of all fields should be on top of the fields
 	 * @param marginWidth
 	 *            The margin width to be used by the composite
 	 * @param marginHeight

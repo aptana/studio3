@@ -66,17 +66,6 @@ public class ProjectSelectionDialog extends SelectionStatusDialog
 	 * 
 	 * @param parentShell
 	 * @param projectsWithSpecifics
-	 */
-	public ProjectSelectionDialog(Shell parentShell, Set<IProject> projectsWithSpecifics)
-	{
-		this(parentShell, projectsWithSpecifics, null);
-	}
-
-	/**
-	 * Constructs a new ProjectSelectionDialog.
-	 * 
-	 * @param parentShell
-	 * @param projectsWithSpecifics
 	 * @param natureId
 	 */
 	public ProjectSelectionDialog(Shell parentShell, Set<IProject> projectsWithSpecifics, String natureId)

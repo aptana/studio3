@@ -308,11 +308,6 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 		};
 	}
 
-	protected IStatus getPreferenceContentStatus()
-	{
-		return fBlockStatus;
-	}
-
 	protected void doStatusChanged()
 	{
 		if (!isProjectPreferencePage() || useProjectSettings())
@@ -403,10 +398,4 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 			}
 		}
 	}
-
-	protected Map<?, ?> getData()
-	{
-		return fData;
-	}
-
 }

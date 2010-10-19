@@ -112,11 +112,6 @@ public abstract class OptionsConfigurationBlock
 		return fContainer;
 	}
 
-	protected static PreferenceKey getKey(String plugin, String key)
-	{
-		return new PreferenceKey(plugin, key);
-	}
-
 	private void testIfOptionsComplete(PreferenceKey[] allKeys)
 	{
 		for (PreferenceKey key : allKeys)
@@ -174,11 +169,6 @@ public abstract class OptionsConfigurationBlock
 
 	protected abstract Control createContents(Composite parent);
 
-	protected boolean checkValue(PreferenceKey key, String value)
-	{
-		return value.equals(getValue(key));
-	}
-
 	protected String getValue(PreferenceKey key)
 	{
 		if (fDisabledProjectSettings != null)
@@ -191,18 +181,6 @@ public abstract class OptionsConfigurationBlock
 	protected boolean getBooleanValue(PreferenceKey key)
 	{
 		return Boolean.valueOf(getValue(key)).booleanValue();
-	}
-
-	protected int getIntValue(PreferenceKey key)
-	{
-		try
-		{
-			return Integer.parseInt(getValue(key));
-		}
-		catch (NumberFormatException e)
-		{
-			return 0;
-		}
 	}
 
 	protected String setValue(PreferenceKey key, String value)
@@ -297,11 +275,6 @@ public abstract class OptionsConfigurationBlock
 				}
 			}
 		}
-	}
-
-	public boolean areSettingsEnabled()
-	{
-		return fDisabledProjectSettings == null || fProject == null;
 	}
 
 	public boolean performOk()
