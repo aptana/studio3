@@ -32,76 +32,76 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.deploy.dialogs;
 
-package com.aptana.ide.ui.secureftp.dialogs;
-
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.deploy.internal.wizard.FTPDeployComposite;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
+import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
-import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
+import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 
 /**
- * @author Max Stepanov
- *
+ * @author Michael Xia (mxia@aptana.com)
  */
 @SuppressWarnings("restriction")
-public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPropertyDialog {
+public class FTPDeployPropertyDialog extends CommonFTPConnectionPointPropertyDialog
+{
 
-	private ConnectionPointType connectionType;
+	private IProject fProject;
 
-	/**
-	 * @param parentShell
-	 */
-	public CommonFTPConnectionPointPropertyDialog(Shell parentShell) {
-		super(parentShell);	
+	public FTPDeployPropertyDialog(Shell parentShell)
+	{
+		super(parentShell);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#getConnectionPointType()
-	 */
-	@Override
-	protected ConnectionPointType getConnectionPointType() {
-		CommonFTPConnectionPropertyComposite connectionComposite = (CommonFTPConnectionPropertyComposite) getConnectionComposite();
-		if (connectionComposite != null) {
-			return connectionComposite.getConnectionPointType();
-		}
-		if (connectionType != null) {
-			return connectionType;
-		}
-		return super.getConnectionPointType();
+	public IProject getProject()
+	{
+		return fProject;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#setPropertySource(java.lang.Object)
-	 */
-	@Override
-	public void setPropertySource(Object element) {
-		super.setPropertySource(element);
-		if (element instanceof ConnectionPointType) {
-			connectionType = (ConnectionPointType) element;
-			CommonFTPConnectionPropertyComposite connectionComposite = (CommonFTPConnectionPropertyComposite) getConnectionComposite();
-			if (connectionComposite != null) {
-				connectionComposite.setConnectionPointType((ConnectionPointType) element);
-			}
-		}
+	public void setProject(IProject project)
+	{
+		fProject = project;
 	}
 
 	@Override
-	protected Control createDialogArea(Composite parent) {
+	protected Control createDialogArea(Composite parent)
+	{
 		Control control = super.createDialogArea(parent);
-		((CommonFTPConnectionPropertyComposite) getConnectionComposite()).setConnectionPointType(connectionType);
-
+		FTPDeployComposite deployComposite = (FTPDeployComposite) getConnectionComposite();
+		boolean autoSync = SyncPreferenceUtil.isAutoSync(fProject);
+		deployComposite.setAutoSyncSelected(autoSync);
+		if (autoSync)
+		{
+			deployComposite.setSyncDirection(SyncPreferenceUtil.getAutoSyncDirection(fProject));
+		}
 		return control;
 	}
 
 	@Override
-	protected FTPConnectionPropertyComposite createConnectionComposite(Composite parent, IBaseRemoteConnectionPoint connectionPoint) {
-		return new CommonFTPConnectionPropertyComposite(parent, SWT.NONE, connectionPoint, this);
+	protected void okPressed()
+	{
+		// persists the auto-sync setting
+		FTPDeployComposite deployComposite = (FTPDeployComposite) getConnectionComposite();
+		boolean autoSync = deployComposite.isAutoSyncSelected();
+		SyncPreferenceUtil.setAutoSync(fProject, autoSync);
+		if (autoSync)
+		{
+			SyncPreferenceUtil.setAutoSyncDirection(fProject, deployComposite.getSyncDirection());
+		}
+		super.okPressed();
+	}
+
+	@Override
+	protected FTPConnectionPropertyComposite createConnectionComposite(Composite parent,
+			IBaseRemoteConnectionPoint connectionPoint)
+	{
+		return new FTPDeployComposite(parent, SWT.NONE, connectionPoint, this);
 	}
 }

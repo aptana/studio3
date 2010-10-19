@@ -49,7 +49,7 @@ import com.aptana.editor.xml.parsing.ast.XMLNode;
  */
 public class SVGOutlineLabelProvider extends CompositeOutlineLabelProvider
 {
-	private static final Image ELEMENT = SVGPlugin.getImage("icons/element.png");
+	private static final Image ELEMENT = SVGPlugin.getImage("icons/element.png"); //$NON-NLS-1$
 
 	/**
 	 * SVGOutlineLabelProvider

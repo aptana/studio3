@@ -32,16 +32,25 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.svg.parsing;
+package com.aptana.editor.svg;
+
+import org.eclipse.osgi.util.NLS;
 
 /**
- * SVGParserConstants
+ * @author klindsey
+ *
  */
-public class SVGParserConstants
+public class Messages extends NLS
 {
-	public static final String LANGUAGE = "image/svg+xml"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.editor.svg.messages"; //$NON-NLS-1$
+	public static String MetadataLoader_Loading_SVG_Metadata;
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-	private SVGParserConstants()
+	private Messages()
 	{
 	}
 }
