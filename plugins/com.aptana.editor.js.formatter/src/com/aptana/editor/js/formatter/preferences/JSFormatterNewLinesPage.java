@@ -78,10 +78,6 @@ public class JSFormatterNewLinesPage extends FormatterModifyTabPage
 	{
 		Group group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_newLinesGroupLabel, 1, 1,
 				GridData.FILL_HORIZONTAL);
-		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-				Messages.JSFormatterNewLinesPage_newLineBeforeBlocks);
-		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT,
-				Messages.JSFormatterNewLinesPage_newLineBeforeIf);
 		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
 				Messages.JSFormatterNewLinesPage_newLineBeforeElse);
 		manager.createCheckbox(group, JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,

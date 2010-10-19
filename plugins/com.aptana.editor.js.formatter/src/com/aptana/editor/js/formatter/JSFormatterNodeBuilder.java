@@ -35,6 +35,7 @@
 package com.aptana.editor.js.formatter;
 
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDeclarationNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSDefaultLineNode;
@@ -628,12 +629,30 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void visitCaseOrDefaultNode(JSNode node, int colonOffset)
 		{
+			boolean hasBlockedChild = (node.getChildCount() > 0 && node.getLastChild().getNodeType() == JSNodeTypes.STATEMENTS);
 			// push the case/default node till the colon
-			FormatterJSCaseNode switchNode = new FormatterJSCaseNode(document);
-			switchNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset));
-			push(switchNode);
-			visitChildren(node);
-			checkedPop(switchNode, node.getEndingOffset() + 1);
+			FormatterJSCaseNode caseNode = new FormatterJSCaseNode(document, hasBlockedChild);
+			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset));
+			push(caseNode);
+			if (hasBlockedChild)
+			{
+				// we have a 'case' with a curly-block
+				JSNode lastChild = (JSNode) node.getLastChild();
+				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document);
+				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(), lastChild
+						.getStartingOffset() + 1));
+				push(caseBodyNode);
+				visitChildren(lastChild);
+				int endingOffset = lastChild.getEndingOffset();
+				checkedPop(caseBodyNode, endingOffset);
+				int end = locateColonOrSemicolonInLine(endingOffset + 1, document);
+				caseBodyNode.setEnd(createTextNode(document, endingOffset, end));
+			}
+			else
+			{
+				visitChildren(node);
+			}
+			checkedPop(caseNode, node.getEndingOffset() + 1);
 		}
 
 		/**

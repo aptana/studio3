@@ -39,51 +39,36 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
- * A JS function body formatter node.<br>
- * This node represents the body part of the function (everything between the curly-brackets).
+ * Formatter node for 'case' that contains a block (in curly braces).
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
+public class FormatterJSCaseBodyNode extends FormatterJSBlockNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document)
+	public FormatterJSCaseBodyNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
-	 */
-	@Override
-	protected boolean isAddingBeginNewLine()
-	{
-		// adds a new line before the start curly bracket
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isIndenting()
 	 */
 	@Override
 	protected boolean isIndenting()
 	{
-		return getDocument().getBoolean(JSFormatterConstants.INDENT_FUNCTION_BODY);
+		return getDocument().getBoolean(JSFormatterConstants.INDENT_CASE_BODY);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#shouldConsumePreviousWhiteSpaces()
-	 */
 	@Override
-	public boolean shouldConsumePreviousWhiteSpaces()
+	protected boolean isAddingBeginNewLine()
 	{
-		return !isAddingBeginNewLine();
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE));
 	}
+
 }

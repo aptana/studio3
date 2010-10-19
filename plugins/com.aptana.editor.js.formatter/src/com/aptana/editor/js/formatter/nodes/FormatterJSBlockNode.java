@@ -73,7 +73,7 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		return true;
+		return !isAddingBeginNewLine();
 	}
 
 	/*
@@ -84,7 +84,7 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingBeginNewLine()
 	{
 		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
+				JSFormatterConstants.BRACE_POSITION_BLOCK));
 	}
 
 	/*

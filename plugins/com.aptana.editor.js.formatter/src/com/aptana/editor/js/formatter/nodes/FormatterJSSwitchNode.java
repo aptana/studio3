@@ -36,6 +36,7 @@ package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
  * Formatter node for Switch block.
@@ -55,22 +56,19 @@ public class FormatterJSSwitchNode extends FormatterJSBlockNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingBeginNewLine()
-	 */
-	@Override
-	protected boolean isAddingBeginNewLine()
-	{
-		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isIndenting()
 	 */
 	@Override
 	protected boolean isIndenting()
 	{
 		return getDocument().getBoolean(JSFormatterConstants.INDENT_SWITCH_BODY);
+	}
+
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH));
 	}
 
 }

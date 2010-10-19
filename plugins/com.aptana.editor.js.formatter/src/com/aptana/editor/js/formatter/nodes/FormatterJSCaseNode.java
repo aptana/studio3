@@ -47,13 +47,16 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 {
 
+	private final boolean hasBlockedChild;
+
 	/**
 	 * @param document
 	 * @param hasBlockedChild
 	 */
-	public FormatterJSCaseNode(IFormatterDocument document)
+	public FormatterJSCaseNode(IFormatterDocument document, boolean hasBlockedChild)
 	{
 		super(document);
+		this.hasBlockedChild = hasBlockedChild;
 	}
 
 	/*
@@ -82,6 +85,6 @@ public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isIndenting()
 	{
-		return getDocument().getBoolean(JSFormatterConstants.INDENT_CASE_BODY);
+		return !hasBlockedChild && getDocument().getBoolean(JSFormatterConstants.INDENT_CASE_BODY);
 	}
 }

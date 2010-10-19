@@ -110,7 +110,6 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
 			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION, JSFormatterConstants.PRESERVED_LINES,
 			JSFormatterConstants.BRACE_POSITION_BLOCK, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE,
 			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,

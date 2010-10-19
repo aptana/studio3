@@ -66,8 +66,6 @@ public interface JSFormatterConstants
 			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
 
 	// New lines
-	public static final String NEW_LINES_BEFORE_BLOCKS = FORMATTER_ID + ".newline.before.block"; //$NON-NLS-1$
-	public static final String NEW_LINES_BEFORE_IF_STATEMENT = FORMATTER_ID + ".newline.before.if"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_ELSE_STATEMENT = FORMATTER_ID + ".newline.before.else"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT = FORMATTER_ID + ".newline.before.if.in.elseif"; //$NON-NLS-1$
 	public static final String NEW_LINES_BEFORE_CATCH_STATEMENT = FORMATTER_ID + ".newline.before.catch"; //$NON-NLS-1$

@@ -84,8 +84,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.NEW_LINES_BEFORE_DO_WHILE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
-			JSFormatterConstants.NEW_LINES_BEFORE_IF_STATEMENT, JSFormatterConstants.NEW_LINES_BEFORE_BLOCKS };
+			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT };
 
 	/**
 	 * Indentation constants
