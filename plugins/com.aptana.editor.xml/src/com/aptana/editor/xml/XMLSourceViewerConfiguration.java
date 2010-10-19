@@ -75,14 +75,4 @@ public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 		XMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		return reconciler;
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
-	 */
-	@Override
-	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
-	{
-		//return new XMLContentAssistProcessor(this.getAbstractThemeableEditor());
-		return null;
-	}
 }
