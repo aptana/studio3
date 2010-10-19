@@ -19,6 +19,7 @@ import org.eclipse.tm.terminal.model.Style;
 /**
  *
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class VT100EmulatorBackend implements IVT100EmulatorBackend {
 
 	/**

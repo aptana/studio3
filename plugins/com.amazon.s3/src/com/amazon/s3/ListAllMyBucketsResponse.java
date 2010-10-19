@@ -26,12 +26,13 @@ import org.xml.sax.XMLReader;
 /**
  * Returned by AWSAuthConnection.listAllMyBuckets().
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class ListAllMyBucketsResponse extends Response {
     /**
      * A list of Bucket objects, one for each of this account's buckets.  Will be null if
      * the request fails.
      */
-    public List entries;
+	public List entries;
 
     public ListAllMyBucketsResponse(HttpURLConnection connection) throws IOException {
         super(connection);
