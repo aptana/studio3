@@ -100,7 +100,7 @@ public abstract class CommonConnectionTest extends TestCase
 		if (cachedProperties == null)
 		{
 			cachedProperties = new Properties();
-			String propertiesFile = System.getenv("junit.properties"); //$NON-NLS-1$
+			String propertiesFile = System.getProperty("junit.properties"); //$NON-NLS-1$
 			if (propertiesFile != null && new File(propertiesFile).length() > 0)
 			{
 				try
