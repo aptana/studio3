@@ -38,6 +38,11 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class IDLTreeWalker
 {
+	/**
+	 * visit
+	 * 
+	 * @param node
+	 */
 	public void visit(IDLParseRootNode node)
 	{
 		for (IParseNode child : node)
@@ -48,11 +53,6 @@ public class IDLTreeWalker
 			}
 		}
 	}
-
-	// public void visit(IDLNode node)
-	// {
-	// this.visitChildren(node);
-	// }
 
 	/**
 	 * visitChildren
