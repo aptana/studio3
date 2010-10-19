@@ -9,7 +9,7 @@
             default="true"
             extensions="idl"
             id="com.aptana.editor.idl"
-            name="Aptana IDL Editor">
+            name="%editor.name">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.idl">
          </contentTypeBinding>
@@ -21,7 +21,7 @@
             base-type="org.eclipse.core.runtime.text"
             file-extensions="idl"
             id="com.aptana.contenttype.idl"
-            name="IDL Source"
+            name="%content-type.name"
             priority="normal">
       </content-type>
    </extension>
