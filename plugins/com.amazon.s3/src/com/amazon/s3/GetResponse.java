@@ -21,6 +21,7 @@ import java.io.InputStream;
  * A Response object returned from AWSAuthConnection.get().  Exposes the attribute object, which
  * represents the retrieved object.
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class GetResponse extends Response {
     public S3Object object;
 

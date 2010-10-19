@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import com.amazon.thirdparty.Base64;
 
+@SuppressWarnings({"unchecked","rawtypes"})
 public class Utils {
     static final String METADATA_PREFIX = "x-amz-meta-";
     static final String AMAZON_HEADER_PREFIX = "x-amz-";

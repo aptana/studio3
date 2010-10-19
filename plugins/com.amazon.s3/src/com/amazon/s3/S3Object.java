@@ -14,6 +14,7 @@ import java.util.Map;
 /**
  * A representation of a single object stored in S3.
  */
+@SuppressWarnings("rawtypes")
 public class S3Object {
 
     public byte[] data;
@@ -21,7 +22,7 @@ public class S3Object {
     /**
      * A Map from String to List of Strings representing the object's metadata
      */
-    public Map metadata;
+	public Map metadata;
 
     public S3Object(byte[] data, Map metadata) {
         this.data = data;
