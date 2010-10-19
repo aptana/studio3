@@ -248,7 +248,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public String outputForCommand(IPath workingDir, String... args)
+	protected String outputForCommand(IPath workingDir, String... args)
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
@@ -279,7 +279,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
+	protected Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}
