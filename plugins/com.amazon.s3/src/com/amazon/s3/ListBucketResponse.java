@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 /**
  * Returned by AWSAuthConnection.listBucket()
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class ListBucketResponse extends Response {
 
     /**

@@ -37,6 +37,7 @@ package com.aptana.git.ui.internal;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.Document;
@@ -106,7 +107,7 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider
 					{
 						return null;
 					}
-					String fileName = repo.relativePath(file).toPortableString();
+					IPath fileName = repo.relativePath(file);
 					// TODO allow user to specify the revision/SHA/branch to compare against
 					IFileRevision revision = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), fileName); //$NON-NLS-1$
 					IStorage storage = revision.getStorage(monitor);

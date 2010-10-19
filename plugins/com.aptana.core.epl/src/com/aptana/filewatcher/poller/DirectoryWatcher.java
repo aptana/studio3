@@ -23,13 +23,13 @@ import com.aptana.core.epl.CoreEPLPlugin;
 class DirectoryWatcher
 {
 
-	public class WatcherThread extends Thread
+	private class WatcherThread extends Thread
 	{
 
 		private final long pollFrequency;
 		private boolean done = false;
 
-		public WatcherThread(long frequency)
+		private WatcherThread(long frequency)
 		{
 			super("Directory Watcher"); //$NON-NLS-1$
 			this.pollFrequency = frequency;
@@ -60,7 +60,7 @@ class DirectoryWatcher
 			while (!done);
 		}
 
-		public synchronized void done()
+		private synchronized void done()
 		{
 			done = true;
 			notify();
@@ -74,7 +74,7 @@ class DirectoryWatcher
 		CoreEPLPlugin.log(string, e);
 	}
 
-	final File[] directories;
+	private final File[] directories;
 	private Set<DirectoryChangeListener> listeners = new HashSet<DirectoryChangeListener>();
 	private Set<File> scannedFiles = new HashSet<File>();
 	private Set<File> removals;
@@ -105,14 +105,14 @@ class DirectoryWatcher
 		start(DEFAULT_POLL_FREQUENCY);
 	}
 
-	synchronized void poll()
+	private synchronized void poll()
 	{
 		startPoll();
 		scanDirectories();
 		stopPoll();
 	}
 
-	synchronized void start(final long pollFrequency)
+	private synchronized void start(final long pollFrequency)
 	{
 		if (watcher != null)
 			throw new IllegalStateException(Messages.thread_started);
@@ -130,9 +130,19 @@ class DirectoryWatcher
 		watcher = null;
 	}
 
-	File[] getDirectories()
+	synchronized void dispose()
 	{
-		return directories;
+		if (watcher != null)
+		{
+			stop();
+		}
+		if (listeners != null)
+		{
+			for (DirectoryChangeListener listener : listeners)
+			{
+				removeListener(listener);
+			}
+		}
 	}
 
 	private void startPoll()

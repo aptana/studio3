@@ -28,6 +28,7 @@ import java.util.TimeZone;
  * authentication and connection parameters and exposes methods to access and
  * manipulate S3 data.
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class AWSAuthConnection {
     public static final String LOCATION_DEFAULT = null;
     public static final String LOCATION_EU = "EU";

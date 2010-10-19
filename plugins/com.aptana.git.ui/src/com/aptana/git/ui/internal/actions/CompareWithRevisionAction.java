@@ -115,7 +115,7 @@ public class CompareWithRevisionAction extends GitAction
 		// GitCommit commit = new GitCommit(repo, sha);
 
 		ITypedElement base = SaveableCompareEditorInput.createFileElement((IFile) resource);
-		final IFileRevision nextFile = GitPlugin.revisionForCommit(commit, resourcePath.toPortableString());
+		final IFileRevision nextFile = GitPlugin.revisionForCommit(commit, resourcePath);
 		final ITypedElement next = new FileRevisionTypedElement(nextFile);
 		final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
 		CompareUI.openCompareEditor(in);

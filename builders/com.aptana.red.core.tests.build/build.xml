@@ -266,7 +266,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
 		</ant>
 	</target>
 
@@ -282,7 +282,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar" />
+			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
 </project>

@@ -36,6 +36,7 @@ package com.aptana.git.ui.internal.history;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -73,7 +74,7 @@ class OpenRevisionAction extends Action
 		TableItem[] selected = table.getSelection();
 		final Diff d = (Diff) selected[0].getData();
 		final GitCommit c = d.commit();
-		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, d.newName());
+		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, Path.fromPortableString(d.newName()));
 		try
 		{
 			Utils.openEditor(page, nextFile, new NullProgressMonitor());

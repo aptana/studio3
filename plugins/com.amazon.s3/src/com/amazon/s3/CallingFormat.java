@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+@SuppressWarnings("rawtypes")
 public abstract class CallingFormat {
     
     protected static CallingFormat pathCallingFormat = new PathCallingFormat();
