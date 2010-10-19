@@ -629,7 +629,21 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void visitCaseOrDefaultNode(JSNode node, int colonOffset)
 		{
-			boolean hasBlockedChild = (node.getChildCount() > 0 && node.getLastChild().getNodeType() == JSNodeTypes.STATEMENTS);
+
+			boolean hasBlockedChild = false;
+			JSNode lastChild = null;
+			if (node.getChildCount() > 0)
+			{
+				lastChild = (JSNode) node.getLastChild();
+				while (lastChild.getNodeType() == JSNodeTypes.EMPTY && lastChild.getSemicolonIncluded()) {
+					// get the previous one to the semicolon node
+					lastChild = (JSNode) lastChild.getPreviousSibling();
+				}
+				if (lastChild != null && lastChild.getNodeType() == JSNodeTypes.STATEMENTS)
+				{
+					hasBlockedChild = true;
+				}
+			}
 			// push the case/default node till the colon
 			FormatterJSCaseNode caseNode = new FormatterJSCaseNode(document, hasBlockedChild);
 			caseNode.setBegin(createTextNode(document, node.getStartingOffset(), colonOffset));
@@ -637,7 +651,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (hasBlockedChild)
 			{
 				// we have a 'case' with a curly-block
-				JSNode lastChild = (JSNode) node.getLastChild();
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document);
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(), lastChild
 						.getStartingOffset() + 1));
