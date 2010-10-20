@@ -53,7 +53,7 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		store.setDefault(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
 		store.setDefault(CSSFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
 		store.setDefault(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(CSSFormatterConstants.WRAP_COMMENTS, true);
+		store.setDefault(CSSFormatterConstants.WRAP_COMMENTS, false);
 		store.setDefault(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 10);
 		store.setDefault(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);
 		store.setDefault(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
