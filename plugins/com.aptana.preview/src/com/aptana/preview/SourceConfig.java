@@ -44,7 +44,7 @@ import org.eclipse.ui.IEditorInput;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class SourceConfig {
 
@@ -53,7 +53,7 @@ public final class SourceConfig {
 	private IPath location;
 	private String content;
 	private IFileStore fileStore;
-	
+
 	/**
 	 * 
 	 */

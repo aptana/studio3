@@ -48,18 +48,23 @@ import com.aptana.preview.server.ServerConfigurationManager;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class WebServerPreviewHandler implements IPreviewHandler {
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig
+	 * )
 	 */
-	@Override
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		String serverConfigurationName = config.getProject().getPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER);
+		String serverConfigurationName = config.getProject().getPersistentProperty(
+				IPreviewConstants.PROJECT_PREVIEW_SERVER);
 		if (serverConfigurationName != null && serverConfigurationName.length() > 0) {
-			AbstractWebServerConfiguration serverConfiguration = ServerConfigurationManager.getInstance().findServerConfiguration(serverConfigurationName);
+			AbstractWebServerConfiguration serverConfiguration = ServerConfigurationManager.getInstance()
+					.findServerConfiguration(serverConfigurationName);
 			if (serverConfiguration != null) {
 				URL url = serverConfiguration.resolve(config.getFileStore());
 				if (url != null) {
@@ -67,11 +72,12 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 				}
 			}
 		} else {
-			for (AbstractWebServerConfiguration serverConfiguration : ServerConfigurationManager.getInstance().getServerConfigurations()) {
+			for (AbstractWebServerConfiguration serverConfiguration : ServerConfigurationManager.getInstance()
+					.getServerConfigurations()) {
 				URL url = serverConfiguration.resolve(config.getFileStore());
 				if (url != null) {
 					return new PreviewConfig(url);
-				}				
+				}
 			}
 		}
 		return null;

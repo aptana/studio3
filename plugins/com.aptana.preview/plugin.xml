@@ -6,7 +6,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="org.eclipse.ui.category.views"
+            categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.preview.ui.handlers.ShowPreviewHandler"
             description="Show Preview Editor"
             id="com.aptana.preview.commands.showPreview"

@@ -75,21 +75,25 @@ import com.aptana.ui.UIUtils;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class ServersPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private ListViewer viewer;
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setFont(parent.getFont());
 		composite.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
-		
+
 		viewer = new ListViewer(composite, SWT.SINGLE | SWT.BORDER);
 		viewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		viewer.setContentProvider(new ArrayContentProvider() {
@@ -100,7 +104,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				}
 				return super.getElements(inputElement);
 			}
-			
+
 		});
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
@@ -115,19 +119,18 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				}
 				return super.getText(element);
 			}
-			
+
 		});
 		viewer.setInput(ServerConfigurationManager.getInstance());
-		
+
 		Composite buttonContainer = new Composite(composite, SWT.NONE);
 		buttonContainer.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
 		buttonContainer.setLayout(GridLayoutFactory.swtDefaults().create());
-		
+
 		Button newButton = new Button(buttonContainer, SWT.PUSH);
 		newButton.setText(CoreStrings.NEW);
-		newButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER)
-				.hint(Math.max(
-						newButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
+		newButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).hint(
+				Math.max(newButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
 						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 
 		final Button editButton = new Button(buttonContainer, SWT.PUSH);
@@ -137,7 +140,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		final Button deleteButton = new Button(buttonContainer, SWT.PUSH);
 		deleteButton.setText(CoreStrings.DELETE);
 		deleteButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).create());
-		
+
 		newButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -163,7 +166,8 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) {
 					String typeId = ((ConfigurationType) result[0]).getId();
 					try {
-						AbstractWebServerConfiguration newConfiguration = ServerConfigurationManager.getInstance().createServerConfiguration(typeId);
+						AbstractWebServerConfiguration newConfiguration = ServerConfigurationManager.getInstance()
+								.createServerConfiguration(typeId);
 						if (newConfiguration != null) {
 							if (editServerConfiguration(newConfiguration)) {
 								ServerConfigurationManager.getInstance().addServerConfiguration(newConfiguration);
@@ -175,41 +179,44 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 					}
 				}
 			}
-			
+
 		});
 		editButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
+						.getSelection()).getFirstElement();
 				if (selection != null && editServerConfiguration(selection)) {
 					viewer.refresh();
 				}
 			}
-			
+
 		});
 		deleteButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-				if (selection != null && MessageDialog.openQuestion(getShell(), "Delete Confirmation", "The selected server configuration will be permanently removed. Continue?")) {
+				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
+						.getSelection()).getFirstElement();
+				if (selection != null
+						&& MessageDialog.openQuestion(getShell(), "Delete Confirmation",
+								"The selected server configuration will be permanently removed. Continue?")) {
 					ServerConfigurationManager.getInstance().removeServerConfiguration(selection);
 					viewer.refresh();
 				}
 			}
-			
+
 		});
-		
+
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
 			public void doubleClick(DoubleClickEvent event) {
-				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
+						.getSelection()).getFirstElement();
 				if (selection != null && editServerConfiguration(selection)) {
 					viewer.refresh();
 				}
 			}
 		});
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				boolean hasSelection = !event.getSelection().isEmpty();
 				editButton.setEnabled(hasSelection);
@@ -220,10 +227,11 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 
 		return composite;
 	}
-	
+
 	private boolean editServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
 		try {
-			Dialog dlg = PropertyDialogsRegistry.getInstance().createPropertyDialog(serverConfiguration, new SameShellProvider(getShell()));
+			Dialog dlg = PropertyDialogsRegistry.getInstance().createPropertyDialog(serverConfiguration,
+					new SameShellProvider(getShell()));
 			if (dlg != null) {
 				if (dlg instanceof IPropertyDialog) {
 					((IPropertyDialog) dlg).setPropertySource(serverConfiguration);
@@ -235,11 +243,13 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		}
 		return false;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
-	@Override
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}

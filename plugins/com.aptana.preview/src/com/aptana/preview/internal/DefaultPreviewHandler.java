@@ -52,20 +52,20 @@ import com.aptana.preview.SourceConfig;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class DefaultPreviewHandler implements IPreviewHandler {
-	
+
 	private static DefaultPreviewHandler instance;
 	private IContentType contentTypeHTML;
-	
+
 	/**
 	 * 
 	 */
 	private DefaultPreviewHandler() {
 		contentTypeHTML = Platform.getContentTypeManager().findContentTypeFor("index.html");
 	}
-	
+
 	public static DefaultPreviewHandler getInstance() {
 		if (instance == null) {
 			instance = new DefaultPreviewHandler();
@@ -73,10 +73,13 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 		return instance;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig
+	 * )
 	 */
-	@Override
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
 		if (contentTypeHTML != null && contentTypeHTML.isAssociatedWith(config.getLocation().lastSegment())) {
 			try {
@@ -87,7 +90,7 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 				return new PreviewConfig(location.toFile().toURI().toURL());
 			} catch (MalformedURLException e) {
 				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e));
-			}			
+			}
 		}
 		return null;
 	}

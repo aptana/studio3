@@ -1,9 +1,9 @@
 package com.aptana.preview.internal;
+
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorMatchingStrategy;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PartInitException;
-
 
 /**
  * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
@@ -42,14 +42,16 @@ import org.eclipse.ui.PartInitException;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class PreviewEditorMatchingStrategy implements IEditorMatchingStrategy {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IEditorMatchingStrategy#matches(org.eclipse.ui.IEditorReference, org.eclipse.ui.IEditorInput)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.IEditorMatchingStrategy#matches(org.eclipse.ui.
+	 * IEditorReference, org.eclipse.ui.IEditorInput)
 	 */
-	@Override
 	public boolean matches(IEditorReference editorRef, IEditorInput input) {
 		if (input instanceof PreviewEditorInput) {
 			PreviewEditorInput pei = (PreviewEditorInput) input;

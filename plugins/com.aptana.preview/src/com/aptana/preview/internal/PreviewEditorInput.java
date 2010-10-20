@@ -45,7 +45,7 @@ import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class PreviewEditorInput implements IEditorInput {
 
@@ -53,7 +53,7 @@ public final class PreviewEditorInput implements IEditorInput {
 	private String name;
 	private String tooltip;
 	private boolean fixed;
-	
+
 	/**
 	 * 
 	 */
@@ -63,55 +63,61 @@ public final class PreviewEditorInput implements IEditorInput {
 		this.tooltip = tooltip;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IEditorInput#exists()
 	 */
-	@Override
 	public boolean exists() {
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/obj16/preview.png");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
-	
+
 	public URL getURL() {
 		return url;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IEditorInput#getPersistable()
 	 */
-	@Override
 	public IPersistableElement getPersistable() {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
 	 */
-	@Override
 	public String getToolTipText() {
 		return tooltip != null ? tooltip : url.toExternalForm();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
-	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
@@ -124,7 +130,8 @@ public final class PreviewEditorInput implements IEditorInput {
 	}
 
 	/**
-	 * @param fixed the fixed to set
+	 * @param fixed
+	 *            the fixed to set
 	 */
 	public void setFixed(boolean fixed) {
 		this.fixed = fixed;

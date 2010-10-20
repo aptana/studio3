@@ -62,18 +62,18 @@ import com.aptana.preview.internal.PreviewHandlers;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class PreviewManager {
 
 	private static PreviewManager instance;
-	
+
 	/**
 	 * 
 	 */
 	private PreviewManager() {
 	}
-	
+
 	public static PreviewManager getInstance() {
 		if (instance == null) {
 			instance = new PreviewManager();
@@ -103,7 +103,7 @@ public final class PreviewManager {
 			}
 		}
 	}
-	
+
 	public void openPreviewForEditorInput(IEditorInput editorInput) {
 		try {
 			openPreview(editorInput, null);
@@ -111,7 +111,7 @@ public final class PreviewManager {
 			Activator.log(e);
 		}
 	}
-	
+
 	private void openPreview(IEditorInput editorInput, String content) throws CoreException {
 		String fileName = null;
 		IProject project = null;
@@ -128,9 +128,9 @@ public final class PreviewManager {
 				}
 			}
 		} else if (editorInput instanceof IStorageEditorInput) {
-			
+
 		} else if (editorInput instanceof IURIEditorInput) {
-			
+
 		} else if (editorInput instanceof PreviewEditorInput) {
 			return;
 		}
@@ -142,7 +142,8 @@ public final class PreviewManager {
 		if (handler == null) {
 			handler = DefaultPreviewHandler.getInstance();
 		}
-		SourceConfig sourceConfig = new SourceConfig(editorInput, project, project != null ? workspacePath : path, content);
+		SourceConfig sourceConfig = new SourceConfig(editorInput, project, project != null ? workspacePath : path,
+				content);
 		PreviewConfig previewConfig = handler.handle(sourceConfig);
 		if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
 			previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
@@ -151,7 +152,7 @@ public final class PreviewManager {
 			showEditor(sourceConfig, previewConfig);
 		}
 	}
-	
+
 	private void showEditor(SourceConfig sourceConfig, PreviewConfig previewConfig) throws CoreException {
 		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage workbenchPage = null;
@@ -161,7 +162,8 @@ public final class PreviewManager {
 		if (workbenchPage == null) {
 			throw new PartInitException("Cannot get Workbench page");
 		}
-		PreviewEditorInput input = new PreviewEditorInput(previewConfig.getURL(), sourceConfig.getEditorInput().getName(), sourceConfig.getEditorInput().getToolTipText());
+		PreviewEditorInput input = new PreviewEditorInput(previewConfig.getURL(), sourceConfig.getEditorInput()
+				.getName(), sourceConfig.getEditorInput().getToolTipText());
 		workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
 	}
 

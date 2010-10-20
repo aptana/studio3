@@ -48,7 +48,7 @@ import com.aptana.preview.IPreviewHandler;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class PreviewHandlers {
 
@@ -59,23 +59,24 @@ public final class PreviewHandlers {
 
 	private static PreviewHandlers instance = null;
 	private Map<IContentType, IConfigurationElement> configurations = new HashMap<IContentType, IConfigurationElement>();
-	
+
 	/**
 	 * 
 	 */
 	private PreviewHandlers() {
 		readExtensionRegistry();
 	}
-	
+
 	public static PreviewHandlers getInstance() {
 		if (instance == null) {
 			instance = new PreviewHandlers();
 		}
-		return instance;		
+		return instance;
 	}
 
 	private void readExtensionRegistry() {
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
+		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
+				EXTENSION_POINT_ID);
 		for (int i = 0; i < elements.length; ++i) {
 			readElement(elements[i], TAG_HANDLER);
 		}
@@ -101,10 +102,10 @@ public final class PreviewHandlers {
 			configurations.put(contentType, element);
 		}
 	}
-	
+
 	public IPreviewHandler getHandler(IContentType contentType) throws CoreException {
 		IConfigurationElement element = null;
-		while(contentType != null && element == null) {
+		while (contentType != null && element == null) {
 			element = configurations.get(contentType);
 			contentType = contentType.getBaseType();
 		}
@@ -113,5 +114,5 @@ public final class PreviewHandlers {
 		}
 		return null;
 	}
-		
+
 }

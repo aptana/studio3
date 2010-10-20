@@ -52,35 +52,38 @@ import com.aptana.core.CoreStrings;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
+	 * .swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
-		
+
 		Label label = new Label(container, SWT.LEAD);
 		label.setText("Preview Server:");
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
-		
+
 		ComboViewer comboViewer = new ComboViewer(container, SWT.DROP_DOWN);
 		comboViewer.getControl().setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
-		
+
 		Button editButton = new Button(container, SWT.PUSH);
 		editButton.setText(CoreStrings.EDIT);
 		editButton.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(editButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
 				SWT.DEFAULT).create());
-		
-		
+
 		return container;
 	}
-	
+
 	// TODO: load/save project properties
 
 }

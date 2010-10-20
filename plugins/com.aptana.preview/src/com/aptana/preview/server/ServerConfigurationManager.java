@@ -56,7 +56,7 @@ import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class ServerConfigurationManager {
 
@@ -75,13 +75,14 @@ public final class ServerConfigurationManager {
 	private static ServerConfigurationManager instance;
 	private Map<String, IConfigurationElement> configurationElements = new HashMap<String, IConfigurationElement>();
 	private List<ConfigurationType> types = new ArrayList<ConfigurationType>();
-	private List<AbstractWebServerConfiguration> serverConfigurations = Collections.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
+	private List<AbstractWebServerConfiguration> serverConfigurations = Collections
+			.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
 	private List<IMemento> unresolvedElements = new ArrayList<IMemento>();
-	
+
 	public final class ConfigurationType {
 		private String id;
 		private String name;
-		
+
 		private ConfigurationType(String id, String name) {
 			this.id = id;
 			this.name = name;
@@ -95,14 +96,14 @@ public final class ServerConfigurationManager {
 			return name;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
 	private ServerConfigurationManager() {
 		readExtensionRegistry();
 	}
-	
+
 	public static ServerConfigurationManager getInstance() {
 		if (instance == null) {
 			instance = new ServerConfigurationManager();
@@ -111,12 +112,13 @@ public final class ServerConfigurationManager {
 	}
 
 	private void readExtensionRegistry() {
-		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
+		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(
+				EXTENSION_POINT_ID);
 		for (int i = 0; i < elements.length; ++i) {
 			readElement(elements[i], TAG_TYPE);
 		}
 	}
-	
+
 	private void readElement(IConfigurationElement element, String elementName) {
 		if (!elementName.equals(element.getName())) {
 			return;
@@ -141,14 +143,15 @@ public final class ServerConfigurationManager {
 
 	/**
 	 * loadState
+	 * 
 	 * @param path
 	 */
 	public void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
-		    serverConfigurations.clear();
+			serverConfigurations.clear();
 
-		    FileReader reader = null;
+			FileReader reader = null;
 			try {
 				reader = new FileReader(file);
 				XMLMemento memento = XMLMemento.createReadRoot(reader);
@@ -163,56 +166,58 @@ public final class ServerConfigurationManager {
 			} catch (IOException e) {
 			} catch (CoreException e) {
 			} finally {
-			    if (reader != null) {
-			        try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
-			    }
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
 	}
 
 	/**
 	 * saveState
+	 * 
 	 * @param path
 	 */
 	public void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
-        synchronized (serverConfigurations) {
-            for (AbstractWebServerConfiguration serverConfiguration : serverConfigurations) {
-                if (serverConfiguration.isPersistent() && configurationElements.containsKey(serverConfiguration.getType())) {
-                    IMemento child = memento.createChild(ELEMENT_SERVER);
-                    child.putMemento(storeServerConfiguration(serverConfiguration));
-                }
-            }
-        }
-        synchronized (unresolvedElements) {
-            for (IMemento child : unresolvedElements) {
-                memento.copyChild(child);
-            }
-        }
-        FileWriter writer = null;
+		synchronized (serverConfigurations) {
+			for (AbstractWebServerConfiguration serverConfiguration : serverConfigurations) {
+				if (serverConfiguration.isPersistent()
+						&& configurationElements.containsKey(serverConfiguration.getType())) {
+					IMemento child = memento.createChild(ELEMENT_SERVER);
+					child.putMemento(storeServerConfiguration(serverConfiguration));
+				}
+			}
+		}
+		synchronized (unresolvedElements) {
+			for (IMemento child : unresolvedElements) {
+				memento.copyChild(child);
+			}
+		}
+		FileWriter writer = null;
 		try {
 			writer = new FileWriter(path.toFile());
 			memento.save(writer);
 		} catch (IOException e) {
 		} finally {
-		    if (writer != null) {
-		        try {
-                    writer.close();
-                } catch (IOException e) {
-                }
-		    }
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 	}
-	
+
 	public List<ConfigurationType> getConfigurationTypes() {
 		return Collections.unmodifiableList(types);
 	}
 
 	public AbstractWebServerConfiguration createServerConfiguration(String typeId) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration  = null;		
+		AbstractWebServerConfiguration serverConfiguration = null;
 		IConfigurationElement element = configurationElements.get(typeId);
 		if (element != null) {
 			Object object = element.createExecutableExtension(ATT_CLASS);
@@ -222,7 +227,7 @@ public final class ServerConfigurationManager {
 		}
 		return serverConfiguration;
 	}
-	
+
 	public void addServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
 		if (serverConfiguration == null) {
 			throw new IllegalArgumentException();
@@ -231,17 +236,17 @@ public final class ServerConfigurationManager {
 			serverConfigurations.add(serverConfiguration);
 		}
 	}
-	
+
 	public void removeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
 		if (serverConfigurations.contains(serverConfiguration)) {
 			serverConfigurations.remove(serverConfiguration);
-		}		
+		}
 	}
-	
+
 	public List<AbstractWebServerConfiguration> getServerConfigurations() {
 		return Collections.unmodifiableList(serverConfigurations);
 	}
-	
+
 	public AbstractWebServerConfiguration findServerConfiguration(String name) {
 		synchronized (serverConfigurations) {
 			for (AbstractWebServerConfiguration i : serverConfigurations) {
@@ -254,15 +259,14 @@ public final class ServerConfigurationManager {
 	}
 
 	private IMemento storeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
-		IMemento saveMemento = XMLMemento.createWriteRoot(ELEMENT_ROOT)
-									.createChild(ELEMENT_SERVER);
+		IMemento saveMemento = XMLMemento.createWriteRoot(ELEMENT_ROOT).createChild(ELEMENT_SERVER);
 		serverConfiguration.saveState(saveMemento);
 		saveMemento.putString(ATTR_TYPE, serverConfiguration.getType());
 		return saveMemento;
 	}
-	
+
 	private AbstractWebServerConfiguration restoreServerConfiguration(IMemento memento, String id) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration  = null;
+		AbstractWebServerConfiguration serverConfiguration = null;
 		String typeId = memento.getString(ATTR_TYPE);
 		if (typeId != null) {
 			IConfigurationElement element = configurationElements.get(typeId);

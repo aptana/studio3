@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.QualifiedName;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public interface IPreviewConstants {
 

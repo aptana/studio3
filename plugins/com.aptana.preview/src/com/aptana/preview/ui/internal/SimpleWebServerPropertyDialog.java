@@ -69,19 +69,19 @@ import com.aptana.ui.IPropertyDialogProvider;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IPropertyDialog {
 
 	private static final int LABEL_WIDTH = 70;
 
 	private SimpleWebServerConfiguration source;
-	
+
 	private Text nameText;
 	private Text baseUrlText;
 	private Text documentRootText;
 	private ModifyListener modifyListener;
-	
+
 	/**
 	 * @param parentShell
 	 */
@@ -90,18 +90,20 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		setHelpAvailable(false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aptana.ui.IPropertyDialog#getPropertySource()
 	 */
-	@Override
 	public Object getPropertySource() {
 		return source;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aptana.ui.IPropertyDialog#setPropertySource(java.lang.Object)
 	 */
-	@Override
 	public void setPropertySource(Object element) {
 		source = null;
 		if (element instanceof SimpleWebServerConfiguration) {
@@ -115,59 +117,54 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 
 		setTitle("Edit External Web Server Configuration");
 		getShell().setText("Edit");
-		
+
 		Composite composite = new Composite(dialogArea, SWT.NONE);
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		PixelConverter converter = new PixelConverter(composite);
-		composite.setLayout(GridLayoutFactory
-				.swtDefaults()
-				.margins(converter.convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN),
-						converter.convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN))
-				.spacing(converter.convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING),
-						converter.convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING)).numColumns(3)
-				.create());
+		composite.setLayout(GridLayoutFactory.swtDefaults().margins(
+				converter.convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN),
+				converter.convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN)).spacing(
+				converter.convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING),
+				converter.convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING)).numColumns(3).create());
 
 		/* row 1 */
 		Label label = new Label(composite, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
-				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH),
-				SWT.DEFAULT).create());
+				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
 		label.setText(StringUtil.makeFormLabel("Name"));
-		
+
 		nameText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		nameText.setLayoutData(GridDataFactory.fillDefaults()
-				.hint(convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH), SWT.DEFAULT)
-				.span(2, 1).grab(true, false).create());
+		nameText.setLayoutData(GridDataFactory.fillDefaults().hint(
+				convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH), SWT.DEFAULT).span(2, 1).grab(true,
+				false).create());
 
 		/* row 1 */
 		label = new Label(composite, SWT.NONE);
-		label.setLayoutData(GridDataFactory.swtDefaults()
-				.hint(new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
+		label.setLayoutData(GridDataFactory.swtDefaults().hint(
+				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
 		label.setText(StringUtil.makeFormLabel("Base URL"));
 
 		baseUrlText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		baseUrlText.setLayoutData(GridDataFactory.swtDefaults()
-				.hint(new PixelConverter(baseUrlText).convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH),
-						SWT.DEFAULT).span(2, 1).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
+		baseUrlText.setLayoutData(GridDataFactory.swtDefaults().hint(
+				new PixelConverter(baseUrlText).convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH),
+				SWT.DEFAULT).span(2, 1).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
 		baseUrlText.setText("http://");
 
 		/* row 2 */
 		label = new Label(composite, SWT.NONE);
-		label.setLayoutData(GridDataFactory.swtDefaults()
-				.hint(new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
+		label.setLayoutData(GridDataFactory.swtDefaults().hint(
+				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
 		label.setText(StringUtil.makeFormLabel("Document Root"));
 
 		documentRootText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		documentRootText.setLayoutData(GridDataFactory.swtDefaults()
-				.hint(new PixelConverter(documentRootText)
-						.convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH), SWT.DEFAULT)
-				.grab(true, false).create());
-		
+		documentRootText.setLayoutData(GridDataFactory.swtDefaults().hint(
+				new PixelConverter(documentRootText).convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH),
+				SWT.DEFAULT).grab(true, false).create());
+
 		Button browseButton = new Button(composite, SWT.PUSH);
 		browseButton.setText('&' + StringUtil.ellipsify(CoreStrings.BROWSE));
-		browseButton.setLayoutData(GridDataFactory.fillDefaults()
-				.hint(Math.max(
-						new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
+		browseButton.setLayoutData(GridDataFactory.fillDefaults().hint(
+				Math.max(new PixelConverter(browseButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
 						browseButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x), SWT.DEFAULT).create());
 
 		/* -- */
@@ -177,7 +174,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 				browseFileSystem();
 			}
 		});
-		
+
 		if (source != null) {
 			String name = source.getName();
 			nameText.setText(name != null ? name : StringUtil.EMPTY);
@@ -196,8 +193,12 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		return dialogArea;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createContents(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.TitleAreaDialog#createContents(org.eclipse.
+	 * swt.widgets.Composite)
 	 */
 	@Override
 	protected Control createContents(Composite parent) {
@@ -208,7 +209,9 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
 	@Override
@@ -274,7 +277,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		baseUrlText.addModifyListener(modifyListener);
 		documentRootText.addModifyListener(modifyListener);
 	}
-	
+
 	protected void removeListeners() {
 		if (modifyListener != null) {
 			nameText.removeModifyListener(modifyListener);
@@ -294,10 +297,13 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 
 	public static class Provider implements IPropertyDialogProvider {
 
-		/* (non-Javadoc)
-		 * @see com.aptana.ui.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * com.aptana.ui.IPropertyDialogProvider#createPropertyDialog(org.eclipse
+		 * .jface.window.IShellProvider)
 		 */
-		@Override
 		public Dialog createPropertyDialog(IShellProvider shellProvider) {
 			return new SimpleWebServerPropertyDialog(shellProvider.getShell());
 		}

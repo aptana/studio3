@@ -59,7 +59,7 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class PreviewEditorPart extends EditorPart implements IShowEditorInput {
 
@@ -71,22 +71,30 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 	private Image image;
 	private boolean disposed;
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.
+	 * IProgressMonitor)
 	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
 	 */
 	@Override
 	public void doSaveAs() {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
+	 * org.eclipse.ui.IEditorInput)
 	 */
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -95,7 +103,9 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		showEditorInput();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
@@ -112,7 +122,9 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		return disposed;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isDirty()
 	 */
 	@Override
@@ -120,7 +132,9 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
 	 */
 	@Override
@@ -128,8 +142,12 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
 	@Override
 	public void createPartControl(Composite parent) {
@@ -148,11 +166,11 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 					progressWorked = 0;
 				}
 				if (progressWorked < event.current) {
-					getStatusBarProgressMonitor().worked(event.current-progressWorked);
+					getStatusBarProgressMonitor().worked(event.current - progressWorked);
 					progressWorked = event.current;
 				}
 			}
-			
+
 			public void completed(ProgressEvent event) {
 				getStatusBarProgressMonitor().done();
 			}
@@ -165,7 +183,9 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		webBrowser.setURL(initialURL);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
 	 */
 	@Override
@@ -175,16 +195,19 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IShowEditorInput#showEditorInput(org.eclipse.ui.IEditorInput)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.IShowEditorInput#showEditorInput(org.eclipse.ui.IEditorInput
+	 * )
 	 */
-	@Override
 	public void showEditorInput(IEditorInput editorInput) {
 		setInput(editorInput);
 		showEditorInput();
 		firePropertyChange(PROP_INPUT);
 	}
-	
+
 	private void showEditorInput() {
 		PreviewEditorInput pei = getPreviewEditorInput();
 		if (pei != null) {
@@ -196,7 +219,7 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 				webBrowser.setURL(initialURL);
 				getSite().getWorkbenchWindow().getActivePage().activate(this);
 			}
-	
+
 			setPartName(MessageFormat.format("Preview: {0}", pei.getName()));
 			setTitleToolTip(pei.getToolTipText());
 			Image oldImage = image;
@@ -215,13 +238,13 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 	}
 
 	public boolean close() {
-        final boolean [] result = new boolean[1];
+		final boolean[] result = new boolean[1];
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				result[0] = getEditorSite().getPage().closeEditor(PreviewEditorPart.this, false);
 			}
 		});
-        return result[0];
+		return result[0];
 	}
 
 	protected PreviewEditorInput getPreviewEditorInput() {

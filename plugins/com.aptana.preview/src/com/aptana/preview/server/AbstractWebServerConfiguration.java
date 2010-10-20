@@ -47,15 +47,15 @@ import com.aptana.core.epl.IMemento;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable {
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
-	
+
 	private String type;
 	private String name;
-	
+
 	/**
 	 * 
 	 */
@@ -63,39 +63,46 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	}
 
 	public abstract URL resolve(IFileStore file);
+
 	public abstract IFileStore resolve(URL url);
-	
+
 	protected void loadState(IMemento memento) {
 		IMemento child = memento.getChild(ELEMENT_NAME);
 		if (child != null) {
 			name = child.getTextData();
-		}		
+		}
 	}
-	
+
 	protected void saveState(IMemento memento) {
 		memento.createChild(ELEMENT_NAME).putTextData(name);
 	}
-	
+
 	protected boolean isPersistent() {
 		return true;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org
+	 * .eclipse.core.runtime.IConfigurationElement, java.lang.String,
+	 * java.lang.Object)
 	 */
-	@Override
-	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException {
 		type = config.getAttribute(ServerConfigurationManager.ATT_ID);
 	}
 
-	/* package */ final String getType() {
+	/* package */final String getType() {
 		return type;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.aptana.core.Identifiable#getId()
 	 */
-	@Override
 	public final String getId() {
 		return type;
 	}
@@ -108,7 +115,8 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
 	public final void setName(String name) {
 		this.name = name;

@@ -52,18 +52,22 @@ import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration {
 
 	private static final String ELEMENT_BASE_URL = "baseURL"; //$NON-NLS-1$
 	private static final String ELEMENT_DOCUMENT_ROOT = "documentRoot"; //$NON-NLS-1$
-	
+
 	private URL baseURL;
 	private IPath documentRoot;
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.server.AbstractWebServerConfiguration#resolve(org.eclipse.core.filesystem.IFileStore)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.server.AbstractWebServerConfiguration#resolve(org.
+	 * eclipse.core.filesystem.IFileStore)
 	 */
 	@Override
 	public URL resolve(IFileStore file) {
@@ -84,19 +88,28 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.server.AbstractWebServerConfiguration#resolve(java.net.URL)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.server.AbstractWebServerConfiguration#resolve(java
+	 * .net.URL)
 	 */
 	@Override
 	public IFileStore resolve(URL url) {
 		if (!isValid()) {
 			return null;
 		}
+		// TODO
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.server.AbstractWebServerConfiguration#loadState(com.aptana.core.epl.IMemento)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.server.AbstractWebServerConfiguration#loadState(com
+	 * .aptana.core.epl.IMemento)
 	 */
 	@Override
 	protected void loadState(IMemento memento) {
@@ -118,8 +131,12 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.preview.server.AbstractWebServerConfiguration#saveState(com.aptana.core.epl.IMemento)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.preview.server.AbstractWebServerConfiguration#saveState(com
+	 * .aptana.core.epl.IMemento)
 	 */
 	@Override
 	protected void saveState(IMemento memento) {
@@ -131,7 +148,7 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 			memento.createChild(ELEMENT_DOCUMENT_ROOT).putTextData(documentRoot.toPortableString());
 		}
 	}
-	
+
 	private boolean isValid() {
 		return baseURL != null && documentRoot != null;
 	}
@@ -144,7 +161,8 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 	}
 
 	/**
-	 * @param baseURL the baseURL to set
+	 * @param baseURL
+	 *            the baseURL to set
 	 */
 	public void setBaseURL(URL baseURL) {
 		this.baseURL = baseURL;
@@ -158,7 +176,8 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 	}
 
 	/**
-	 * @param documentRoot the documentRoot to set
+	 * @param documentRoot
+	 *            the documentRoot to set
 	 */
 	public void setDocumentRoot(IPath documentRoot) {
 		this.documentRoot = documentRoot;

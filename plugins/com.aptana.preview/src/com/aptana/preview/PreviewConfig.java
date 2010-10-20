@@ -39,12 +39,12 @@ import java.net.URL;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public final class PreviewConfig {
 
 	private URL url;
-	
+
 	/**
 	 * 
 	 */

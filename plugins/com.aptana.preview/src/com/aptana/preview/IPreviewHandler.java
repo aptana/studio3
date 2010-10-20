@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * @author Max Stepanov
- *
+ * 
  */
 public interface IPreviewHandler {
 
