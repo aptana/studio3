@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -56,6 +57,7 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
@@ -111,18 +113,27 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		IParser parser = getParser();
-		IParseState parseState = new ParseState();
-		String source = document.get();
-		parseState.setEditState(source, null, 0, 0);
+		// detect the indentation offset with the parser, only if the given offset is not the first one in the current
+		// partition.
 		int indent = 0;
 		try
 		{
+			ITypedRegion partition = document.getPartition(offset);
+			if (partition != null && partition.getOffset() == offset)
+			{
+				indent = alternativeDetectIndentationLevel(document, offset);
+				return indent;
+			}
+			IParser parser = getParser();
+			IParseState parseState = new ParseState();
+			String source = document.get();
+			parseState.setEditState(source, null, 0, 0);
+
 			IParseNode parseResult = parser.parse(parseState);
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
-				final FormatterDocument formatterDocument = createFormatterDocument(source);
+				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
 				new JSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
 				IFormatterContext context = new JSFormatterContext(0);
@@ -229,7 +240,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			IParseNode parseResult = parser.parse(parseState);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel);
+				final String output = format(input, parseResult, indentationLevel, offset);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -297,10 +308,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 *            The indentation level to start from
 	 * @return A formatted string
 	 */
-	private String format(String input, IParseNode parseResult, int indentationLevel)
+	private String format(String input, IParseNode parseResult, int indentationLevel, int offset)
 	{
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
-		final FormatterDocument document = createFormatterDocument(input);
+		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new JSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new JSFormatterContext(indentationLevel);
@@ -320,13 +331,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 	}
 
-	private FormatterDocument createFormatterDocument(String input)
+	private FormatterDocument createFormatterDocument(String input, int offset)
 	{
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(JSFormatterConstants.FORMATTER_TAB_SIZE, getInt(JSFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(JSFormatterConstants.WRAP_COMMENTS, getBoolean(JSFormatterConstants.WRAP_COMMENTS));
 		document.setInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
 				getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION));
+		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
+
 		// Set the indentation values
 		for (String key : INDENTATIONS)
 		{

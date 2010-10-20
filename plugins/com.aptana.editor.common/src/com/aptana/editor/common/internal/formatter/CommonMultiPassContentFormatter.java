@@ -156,7 +156,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 			int start = -1;
 			int contentLength = 0;
 			String lastContentType = null;
-			boolean slaveFormatted = false;
 			// Note: This loop is traversing backwards
 			for (int index = partitions.length - 1; index >= 0; index--)
 			{
@@ -187,7 +186,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 						// take the last qualified content type and format it
 						updateContex(context, lastContentType, start, contentLength);
 						formatSlave(context, document, start, contentLength, lastContentType);
-						slaveFormatted = true;
 					}
 					start = -1;
 					contentLength = 0;
@@ -201,17 +199,8 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 					// take the last qualified content type and format it
 					updateContex(context, lastContentType, start, contentLength);
 					formatSlave(context, document, start, contentLength, lastContentType);
-					slaveFormatted = true;
 				}
 			}
-			// if (slaveFormatted)
-			// {
-			// // In case we formatted a slave, we need to run the master formatter again to fix any
-			// // indentation distortions that the slave formatter introduced.
-			// updateContex(context, masterContentType);
-			// context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.FALSE);
-			// formatMaster(context, document.getLength(), masterOffset, masterLength);
-			// }
 		}
 		catch (BadLocationException exception)
 		{

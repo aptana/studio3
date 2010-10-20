@@ -41,6 +41,7 @@ import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
 /**
  * A JavaScript formatter root node.<br>
@@ -68,7 +69,7 @@ public class FormatterJSRootNode extends FormatterBlockNode
 	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
 			throws Exception
 	{
-		if (!visitor.endsWithNewLine())
+		if (!visitor.endsWithNewLine() && getDocument().getInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET) > 0)
 		{
 			visitor.ensureLineStarted(context);
 			visitor.writeLineBreak(context);
