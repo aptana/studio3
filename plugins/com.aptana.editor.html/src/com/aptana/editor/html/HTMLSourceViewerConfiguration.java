@@ -87,22 +87,6 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		return HTMLSourceConfiguration.getDefault().getTopContentTypes();
 	}
 
-//	/**
-//	 * Returns a {@link MultiPassContentFormatter} with {@link HTMLFormattingStrategy} as a master formatter.<br>
-//	 * Subclasses may override the master strategy, or add slave strategies.
-//	 * 
-//	 * @return An {@link IContentFormatter}.
-//	 * @see com.aptana.editor.common.CommonSourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.
-//	 *      ISourceViewer)
-//	 */
-//	@Override
-//	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
-//	{
-//		MultiPassContentFormatter formatter = (MultiPassContentFormatter) super.getContentFormatter(sourceViewer);
-//		formatter.setMasterStrategy(new HTMLFormattingStrategy());
-//		return formatter;
-//	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see
@@ -149,7 +133,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
 		return getContentAssistProcessor(contentType, editor);
 	}
-	
+
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
