@@ -80,6 +80,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
 	private static final Object RUBY_LANGUAGE = "text/ruby"; //$NON-NLS-1$
+	private static final Object PHP_LANGUAGE = "text/php"; //$NON-NLS-1$
 
 	private FormatterDocument document;
 
@@ -179,6 +180,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatterNode);
 			int startSpecial = formatterNode.getBegin()[0].getEndOffset();
 			int endSpecial = formatterNode.getEnd().getStartOffset();
+			startSpecial = getBeginWithoutWhiteSpaces(startSpecial, document);
+			endSpecial = Math.max(startSpecial, getEndWithoutWhiteSpaces(endSpecial, document));
 			// push a special node
 			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
 			specialNode.setBegin(createTextNode(document, startSpecial, endSpecial));
@@ -190,7 +193,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		else
 		{
-			// add it as a single chunk of a special node only
+			// A fall-back - add it as a single chunk of a special node only
 			// push a special node
 			FormatterSpecialElementNode specialNode = new FormatterSpecialElementNode(document, StringUtil.EMPTY);
 			specialNode.setBegin(createTextNode(document, nodeStart, nodeEnd));
@@ -209,19 +212,28 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	{
 		int offset = node.getStartingOffset();
 		String language = node.getLanguage();
+		FormatterForeignElementNode elementNode = new FormatterForeignElementNode(document);
+		int startLength = 2;
 		if (RUBY_LANGUAGE.equals(language))
 		{
-			FormatterForeignElementNode elementNode = new FormatterForeignElementNode(document);
-			int startLength = 2;
 			if (text.startsWith("<%=")) { //$NON-NLS-1$
 				startLength = 3;
 			}
-			elementNode.setBegin(createTextNode(document, offset, offset + startLength));
-			int end = offset + text.length();
-			elementNode.setEnd(createTextNode(document, end - 2, end));
-			return elementNode;
 		}
-		return null;
+		else if (PHP_LANGUAGE.equals(language))
+		{
+			if (text.startsWith("<?php")) { //$NON-NLS-1$
+				startLength = 5;
+			}
+		}
+		else
+		{
+			return null;
+		}
+		elementNode.setBegin(createTextNode(document, offset, offset + startLength));
+		int end = offset + text.length();
+		elementNode.setEnd(createTextNode(document, end - 2, end));
+		return elementNode;
 	}
 
 	/**
@@ -293,5 +305,42 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		checkedPop(formatterNode, endOffset);
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
+	}
+	
+	/**
+	 * @param i
+	 * @param document2
+	 * @return
+	 */
+	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
+	{
+		int length = document.getLength();
+		while (offset < length)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)))
+			{
+				break;
+			}
+			offset++;
+		}
+		return offset;
+	}
+
+	/**
+	 * @param startingOffset
+	 * @param document2
+	 * @return
+	 */
+	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
+	{
+		while (offset > 0)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)))
+			{
+				break;
+			}
+			offset--;
+		}
+		return offset;
 	}
 }

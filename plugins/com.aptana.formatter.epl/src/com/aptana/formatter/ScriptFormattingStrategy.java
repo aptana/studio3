@@ -126,8 +126,20 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 					}
 					formatter.setIsSlave(job.isSlave);
 					final int indentationLevel = (offset != 0) ? formatter.detectIndentationLevel(document, offset) : 0;
-					final TextEdit edit = formatter.format(document.get(), offset, partition.getLength(),
-							indentationLevel);
+					int length = partition.getLength();
+					if (job.isSlave)
+					{
+						for (; length + offset > partition.offset; length--)
+						{
+							char c = document.getChar(offset + length - 1);
+							if (c == ' ' || c == '\t')
+							{
+								continue;
+							}
+							break;
+						}
+					}
+					final TextEdit edit = formatter.format(document.get(), offset, length, indentationLevel);
 					if (edit != null)
 					{
 						if (edit.getChildrenSize() > 20)

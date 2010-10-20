@@ -81,6 +81,6 @@ public class FormatterJSRootNode extends FormatterBlockNode
 		{
 			context.decIndent();
 		}
-		visitor.writeIndent(context);
+		// visitor.writeIndent(context);
 	}
 }
