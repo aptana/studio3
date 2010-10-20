@@ -215,9 +215,9 @@ public class ProfileStore implements IProfileStore
 				List<IProfile> res = readProfilesFromStream(new InputSource(is));
 				if (res != null)
 				{
-					for (int i = 0; i < res.size(); i++)
+					for (IProfile profile : res)
 					{
-						versioner.update(res.get(i));
+						versioner.update(profile);
 					}
 				}
 				return res;

@@ -105,7 +105,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new HTMLFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
+				new HTMLFormatterNodeRewriter().rewrite(root);
 				IFormatterContext context = new HTMLFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
@@ -214,7 +214,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new HTMLFormatterNodeRewriter(parseResult, document).rewrite(root);
+		new HTMLFormatterNodeRewriter().rewrite(root);
 		IFormatterContext context = new HTMLFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH));

@@ -197,14 +197,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			final String outputLine = readLine(output);
 			if (inputLine == null)
 			{
-				if (outputLine == null)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return (outputLine == null);
 			}
 			else if (outputLine == null)
 			{
@@ -227,13 +220,9 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 */
 	protected boolean equalsIgnoreWhitespaces(String in, String out)
 	{
-		if (in == null)
+		if (in == null || out == null)
 		{
-			return out == null;
-		}
-		if (out == null)
-		{
-			return false;
+			return in == out;
 		}
 		in = in.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		out = out.replaceAll("\\s", ""); //$NON-NLS-1$ //$NON-NLS-2$
@@ -242,26 +231,22 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 
 	private String readLine(LineNumberReader reader)
 	{
-		String line;
-		do
+		String line = null;
+		try
 		{
-			try
+			while ((line = reader.readLine()) != null)
 			{
-				line = reader.readLine();
+				line = line.trim();
+				if (line.length() > 0)
+				{
+					return line;
+				}
 			}
-			catch (IOException e)
-			{
-				// should not happen
-				return null;
-			}
-			if (line == null)
-			{
-				return line;
-			}
-			line = line.trim();
 		}
-		while (line.length() == 0);
-		return line;
+		catch (IOException e)
+		{
+		}
+		return null;
 	}
 
 	/**

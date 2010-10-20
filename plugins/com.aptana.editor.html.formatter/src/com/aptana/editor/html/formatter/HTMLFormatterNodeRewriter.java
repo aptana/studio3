@@ -34,25 +34,15 @@
  */
 package com.aptana.editor.html.formatter;
 
-import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterNode;
-import com.aptana.parsing.ast.IParseNode;
 
 /**
  * @author Shalom Gibly <sgibly@aptana.com>
  */
 public class HTMLFormatterNodeRewriter extends FormatterNodeRewriter
 {
-
-	/**
-	 * @param parseResult
-	 * @param document
-	 */
-	public HTMLFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
-	{
-	}
 
 	/*
 	 * (non-Javadoc)
