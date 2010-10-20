@@ -359,15 +359,20 @@ class S3FileStore extends FileStore
 
 	AWSAuthConnection getAWSConnection()
 	{
+		boolean secure = true;
 		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
-			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false, uri.getHost(),
-					CallingFormat.getPathCallingFormat());
-		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), true, uri.getHost(),
+		{
+			secure = false; // Work around weird bug? Do we need subdomain calling format?
+		}
+		String secretAccessKey = getSecretAccessKey();
+		System.out.println("*** Using secret key: " + secretAccessKey); // FIXME Clean this up!
+		return new AWSAuthConnection(getAccessKey(), secretAccessKey, secure, uri.getHost(),
 				CallingFormat.getPathCallingFormat());
 	}
 
 	private char[] promptPassword(String title, String message)
 	{
+		System.out.println("*** Prompting for secret key!");
 		char[] password = CoreIOPlugin.getAuthenticationManager().promptPassword(getAuthId(), getAccessKey(), title,
 				message);
 		if (password == null)
@@ -380,6 +385,7 @@ class S3FileStore extends FileStore
 
 	private char[] getOrPromptPassword(String title, String message)
 	{
+		System.out.println("*** asking for secret key from auth manager");
 		char[] password = CoreIOPlugin.getAuthenticationManager().getPassword(getAuthId());
 		if (password == null)
 		{
