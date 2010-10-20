@@ -32,55 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter.nodes;
+package com.aptana.editor.html.formatter.nodes;
 
-import java.util.List;
-
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterWriter;
-import com.aptana.formatter.nodes.FormatterBlockNode;
-import com.aptana.formatter.nodes.IFormatterNode;
-import com.aptana.formatter.ui.ScriptFormattingContextProperties;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
- * A JavaScript formatter root node.<br>
- * This node will make sure that in case the JS partition is nested in HTML, we prefix the formatted output with a new
- * line on the top.
+ * A foreign (non-HTML) node with a begin and end tags (such as <%= %>, etc.)
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSRootNode extends FormatterBlockNode
+public class FormatterForeignElementNode extends FormatterBlockWithBeginEndNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterJSRootNode(IFormatterDocument document)
+	public FormatterForeignElementNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptNodes(java.util.List,
-	 * com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
 	 */
-	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
-			throws Exception
+	@Override
+	protected boolean isIndenting()
 	{
-		int indent = context.getIndent();
-		if (!visitor.endsWithNewLine()
-				&& getDocument().getInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET) > 0)
-		{
-			visitor.ensureLineStarted(context);
-			visitor.writeLineBreak(context);
-		}
-		super.acceptNodes(nodes, context, visitor);
-		if (indent > 0)
-		{
-			context.decIndent();
-		}
-		visitor.writeIndent(context);
+		return true;
 	}
+
 }

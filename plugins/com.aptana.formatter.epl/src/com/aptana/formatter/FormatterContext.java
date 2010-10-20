@@ -41,7 +41,6 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	private boolean wrapping = false;
 	private int blankLines = 0;
 	private final List<PathEntry> path = new ArrayList<PathEntry>();
-	private boolean isInForeignNode;
 
 	public FormatterContext(int indent)
 	{
@@ -193,19 +192,5 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	public void setWrapping(boolean value)
 	{
 		this.wrapping = value;
-	}
-
-	public void setInForeignNode(boolean isForeign)
-	{
-		this.isInForeignNode = isForeign;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#isInSpecialNode()
-	 */
-	public boolean isInForeignNode()
-	{
-		return this.isInForeignNode;
 	}
 }

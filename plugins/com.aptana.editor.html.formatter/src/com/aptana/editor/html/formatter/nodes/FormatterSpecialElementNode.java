@@ -58,16 +58,27 @@ public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#accept(com.aptana.formatter.IFormatterContext,
 	 * com.aptana.formatter.IFormatterWriter)
 	 */
 	@Override
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		boolean prevValue = context.isInForeignNode();
-		context.setInForeignNode(true);
-		super.accept(context, visitor);
-		context.setInForeignNode(prevValue);
+		// boolean prevValue = context.isInForeignNode();
+		visitor.write(context, getStartOffset(), getEndOffset());
+		// context.setInForeignNode(true);
+		// super.accept(context, visitor);
+		// context.setInForeignNode(prevValue);
 	}
 
 	/*

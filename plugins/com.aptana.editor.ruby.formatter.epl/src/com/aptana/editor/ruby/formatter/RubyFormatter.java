@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -67,6 +68,11 @@ public class RubyFormatter extends AbstractScriptFormatter
 	{
 		try
 		{
+			ITypedRegion partition = document.getPartition(offset);
+			if (partition != null && partition.getOffset() == offset)
+			{
+				return super.detectIndentationLevel(document, offset);
+			}
 			final String source = document.get();
 			final ParserResult result;
 
@@ -170,9 +176,14 @@ public class RubyFormatter extends AbstractScriptFormatter
 		ParserResult result = sourceParser.parse(input);
 		if (!(result instanceof NullParserResult))
 		{
-			final String output = format(input, result, indent);
+			String output = format(input, result, indent);
 			if (output != null)
 			{
+				output = trimLeft(output);
+				if (offset > 0)
+				{
+					output = ' ' + output;
+				}
 				if (!input.equals(output))
 				{
 					if (!isValidation() || equalLinesIgnoreBlanks(new StringReader(input), new StringReader(output)))
@@ -193,6 +204,27 @@ public class RubyFormatter extends AbstractScriptFormatter
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @param output
+	 * @return
+	 */
+	private static String trimLeft(String output)
+	{
+		int offset = 0;
+		for (; offset < output.length(); offset++)
+		{
+			if (!Character.isWhitespace(output.charAt(offset)))
+			{
+				break;
+			}
+		}
+		if (offset != 0)
+		{
+			return output.substring(offset);
+		}
+		return output;
 	}
 
 	/**

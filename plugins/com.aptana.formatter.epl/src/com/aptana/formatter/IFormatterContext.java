@@ -76,21 +76,4 @@ public interface IFormatterContext
 	 * @return A comment prefix to append when wrapping a long comment (may be empty).
 	 */
 	String getWrappingCommentPrefix();
-
-	/**
-	 * Set the context to indicate it's in a foreign node.
-	 * 
-	 * @param isForeign
-	 * @see #isInForeignNode()
-	 */
-	void setInForeignNode(boolean isForeign);
-
-	/**
-	 * Returns true is the context is in a foreign node at the moment. This will be true when a master formetter is
-	 * writing nodes that should be processed by a slave formatter.
-	 * 
-	 * @return True if the current context is of a special node which should not be processed by this formatter.
-	 * @see #setInForeignNode(boolean)
-	 */
-	boolean isInForeignNode();
 }

@@ -19,8 +19,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
@@ -261,8 +264,74 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		return line;
 	}
 
+	/**
+	 * Returns the indentation level by looking at the previous line and the formatter settings for the tabs and spaces.
+	 * This is the default way it's computed, unless a subclass override it. In case the subclass involves a parsing to
+	 * get valid AST to compute the indentation, it might fail. Subclass that fail on the AST creation should call this
+	 * method as a fall-back option.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
+		try
+		{
+			int lineNumber = document.getLineOfOffset(offset + 1);
+			if (lineNumber > 0)
+			{
+				IRegion previousLineRegion = document.getLineInformation(lineNumber - 1);
+				String text = document.get(previousLineRegion.getOffset(), previousLineRegion.getLength());
+				// grab the empty string at the beginning of the text.
+				int spaceChars = 0;
+				int tabChars = 0;
+				for (int i = 0; i < text.length(); i++)
+				{
+					char c = text.charAt(i);
+					if (!Character.isWhitespace(c))
+					{
+						break;
+					}
+					if (c == '\n' || c == '\r')
+					{
+						// ignore it
+						continue;
+					}
+					if (c == ' ')
+					{
+						spaceChars++;
+					}
+					else if (c == '\t')
+					{
+						tabChars++;
+					}
+				}
+				String indentType = getIndentType();
+				int indentSize = getIndentSize();
+				int tabSize = getTabSize();
+				if (CodeFormatterConstants.TAB.equals(indentType))
+				{
+					// treat the whitespace-chars as tabs
+					return (spaceChars / tabSize) + tabChars + 1;
+				}
+				else if (CodeFormatterConstants.SPACE.equals(indentType))
+				{
+					// treat the tabs as spaces
+					return (spaceChars + (tabSize * tabChars)) / indentSize + 1;
+				}
+				else
+				{
+					// it's Mixed
+					return (spaceChars + tabChars) / indentSize + 1;
+				}
+
+			}
+		}
+		catch (BadLocationException e)
+		{
+			FormatterPlugin.logError(e);
+		}
 		return 0;
 	}
 
