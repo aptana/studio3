@@ -1,10 +1,8 @@
 package com.aptana.formatter.ui.epl;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -63,16 +61,6 @@ public class Activator extends AbstractUIPlugin
 	public static IWorkbenchWindow getActiveWorkbenchWindow()
 	{
 		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-
-	public static Shell getActiveWorkbenchShell()
-	{
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null)
-		{
-			return window.getShell();
-		}
-		return null;
 	}
 
 	public static void log(IStatus status)

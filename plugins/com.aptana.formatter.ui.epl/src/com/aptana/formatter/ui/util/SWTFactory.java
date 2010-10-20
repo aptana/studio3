@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
-import com.aptana.formatter.ui.epl.Activator;
 import com.aptana.formatter.ui.preferences.ScrolledPageContent;
+import com.aptana.ui.UIUtils;
 
 /**
  * Factory class to create SWT resources.
@@ -439,7 +439,7 @@ public class SWTFactory
 	 */
 	public static void showPreferencePage(String page_id, String[] page_filters)
 	{
-		PreferencesUtil.createPreferenceDialogOn(Activator.getActiveWorkbenchShell(), page_id, page_filters, null)
+		PreferencesUtil.createPreferenceDialogOn(UIUtils.getActiveShell(), page_id, page_filters, null)
 				.open();
 	}
 

@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -54,11 +53,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.dialogs.PreferenceLinkArea;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 import com.aptana.formatter.ContributionExtensionManager;
-import com.aptana.formatter.IContributedExtension;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
@@ -73,12 +70,10 @@ import com.aptana.formatter.preferences.profile.ProfileStore;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.dialogs.PropertyLinkArea;
 import com.aptana.formatter.ui.util.ExceptionHandler;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
 import com.aptana.formatter.ui.util.SWTFactory;
 import com.aptana.formatter.ui.util.SWTUtil;
-import com.aptana.formatter.ui.util.Util;
 
 /**
  * Abstract formatter option block that displays multiple languages and let the user select a profile and a language to
@@ -92,7 +87,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 	private Composite fComposite;
 	private Combo fProfileCombo;
-	private Label fFactoryDescription;
 	private Button fDeleteButton;
 	private Button fNewButton;
 	private Button fLoadButton;

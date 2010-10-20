@@ -41,10 +41,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+
+import com.aptana.ui.UIUtils;
 
 /**
  * Utility class to simplify access to some SWT resources.
@@ -58,12 +58,7 @@ public class SWTUtil
 	 */
 	public static Display getStandardDisplay()
 	{
-		Display display = null;
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench != null)
-		{
-			display = workbench.getDisplay();
-		}
+		Display display = UIUtils.getDisplay();
 		if (display == null)
 		{
 			display = Display.getCurrent();
@@ -145,7 +140,7 @@ public class SWTUtil
 		final IPreferenceNode targetNode = new PreferenceNode(id, page);
 		PreferenceManager manager = new PreferenceManager();
 		manager.addToRoot(targetNode);
-		final PreferenceDialog dialog = new PreferenceDialog(getShell(), manager);
+		final PreferenceDialog dialog = new PreferenceDialog(UIUtils.getActiveShell(), manager);
 		BusyIndicator.showWhile(getStandardDisplay(), new Runnable()
 		{
 			public void run()
@@ -155,29 +150,6 @@ public class SWTUtil
 				dialog.open();
 			}
 		});
-	}
-
-	/**
-	 * Returns the currently active workbench window shell or <code>null</code> if none.
-	 * 
-	 * @return the currently active workbench window shell or <code>null</code>
-	 */
-	public static Shell getShell()
-	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null)
-		{
-			IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-			if (windows.length > 0)
-			{
-				return windows[0].getShell();
-			}
-		}
-		else
-		{
-			return window.getShell();
-		}
-		return null;
 	}
 
 	/**

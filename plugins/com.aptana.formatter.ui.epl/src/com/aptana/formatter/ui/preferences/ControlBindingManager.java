@@ -483,9 +483,9 @@ public class ControlBindingManager
 	{
 		private Map<Text, IFieldValidator> map = new HashMap<Text, IFieldValidator>();
 
-		public IFieldValidator getValidator(Control control)
+		public IFieldValidator getValidator(Text text)
 		{
-			return (IFieldValidator) map.get(control);
+			return map.get(text);
 		}
 
 		public void registerValidator(Text text, IFieldValidator validator)

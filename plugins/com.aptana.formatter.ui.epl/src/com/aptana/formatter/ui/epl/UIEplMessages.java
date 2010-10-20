@@ -13,7 +13,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class UIEplMessages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.ui.epl.UIEplMessages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.formatter.ui.epl.UIEplMessages"; //$NON-NLS-1$
 	public static String ExceptionHandler_seeErrorLogMessage;
 	static
 	{

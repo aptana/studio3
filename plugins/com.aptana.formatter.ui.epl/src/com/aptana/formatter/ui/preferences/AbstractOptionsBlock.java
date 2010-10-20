@@ -43,6 +43,11 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 		this.bindManager = new ControlBindingManager(this, context);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.preferences.OptionsConfigurationBlock#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	public Control createContents(Composite parent)
 	{
 		setShell(parent.getShell());
@@ -139,7 +144,8 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 	}
 
 	/*
-	 * @seeorg.eclipse.dltk.internal.ui.preferences.OptionsConfigurationBlock# performDefaults()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.preferences.OptionsConfigurationBlock#performDefaults()
 	 */
 	public void performDefaults()
 	{
@@ -171,7 +177,8 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.preferences.IPreferenceDelegate#getBoolean(java.lang .Object)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.IPreferenceDelegate#getBoolean(java.lang.Object)
 	 */
 	public final boolean getBoolean(Object key)
 	{
@@ -179,7 +186,8 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.preferences.IPreferenceDelegate#getString(java.lang .Object)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.IPreferenceDelegate#getString(java.lang.Object)
 	 */
 	public final String getString(Object key)
 	{
@@ -187,7 +195,8 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.preferences.IPreferenceDelegate#setBoolean(java.lang .Object, boolean)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.IPreferenceDelegate#setBoolean(java.lang.Object, boolean)
 	 */
 	public final void setBoolean(Object key, boolean value)
 	{
@@ -195,7 +204,8 @@ public abstract class AbstractOptionsBlock extends OptionsConfigurationBlock imp
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.preferences.IPreferenceDelegate#setString(java.lang .Object, java.lang.String)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.IPreferenceDelegate#setString(java.lang.Object, java.lang.String)
 	 */
 	public final void setString(Object key, String value)
 	{
