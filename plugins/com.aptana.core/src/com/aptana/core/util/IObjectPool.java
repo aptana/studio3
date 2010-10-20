@@ -37,16 +37,39 @@ package com.aptana.core.util;
 public interface IObjectPool<T>
 {
 
+	/**
+	 * Create a new instance of a managed object in the pool.
+	 * 
+	 * @return
+	 */
 	public abstract T create();
 
 	public abstract boolean validate(T o);
 
+	/**
+	 * Expire the object. This means the object is "stale" in the pool, and the object should be disposed of.
+	 * 
+	 * @param o
+	 */
 	public abstract void expire(T o);
 
+	/**
+	 * Ask for an instance of an item managed by the pool. When done, remember to {@link #checkIn(Object)}
+	 * 
+	 * @return
+	 */
 	public abstract T checkOut();
 
+	/**
+	 * Return an object back to the pool.
+	 * 
+	 * @param t
+	 */
 	public abstract void checkIn(T t);
 
+	/**
+	 * Cleans up the pool.
+	 */
 	public abstract void dispose();
 
 }

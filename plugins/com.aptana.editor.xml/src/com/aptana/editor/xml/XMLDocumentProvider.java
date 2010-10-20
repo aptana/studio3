@@ -34,36 +34,39 @@
  */
 package com.aptana.editor.xml;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.SimpleDocumentProvider;
 
-public class XMLDocumentProvider extends CommonDocumentProvider
+public class XMLDocumentProvider extends SimpleDocumentProvider
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
+	 */
 	@Override
-	public void connect(Object element) throws CoreException
+	public IPartitionTokenScanner createPartitionScanner()
 	{
-		super.connect(element);
-
-		IDocument document = getDocument(element);
-		if (document != null)
-		{
-			IDocumentPartitioner partitioner = new FastPartitioner(new XMLPartitionScanner(),
-					XMLSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
-					XMLSourceConfiguration.getDefault());
-		}
+		return new XMLPartitionScanner();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
 	protected String getDefaultContentType(String filename)
 	{
 		return IXMLConstants.CONTENT_TYPE_XML;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
+	 */
+	@Override
+	public IPartitioningConfiguration getPartitioningConfiguration()
+	{
+		return XMLSourceConfiguration.getDefault();
 	}
 }

@@ -217,7 +217,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
+		PeerCharacterCloser.install(getSourceViewer());
 		fCursorChangeListened = true;
 
 		fSelectionChangedListener = new SelectionChangedListener();
@@ -407,22 +407,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return DEFAULT_PAIR_MATCHING_CHARS;
 	}
 
-	/**
-	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
-	 * the end. Defaults to using the same characters as the pair matching.
-	 * 
-	 * @return
-	 */
-	protected char[] getAutoClosePairCharacters()
-	{
-		return getPairMatchingCharacters();
-	}
-
 	@Override
 	public void dispose()
 	{
 		try
 		{
+			if (getSourceViewer() instanceof CommonSourceViewerConfiguration)
+			{
+				((CommonSourceViewerConfiguration) getSourceViewer()).dispose();
+			}
 			if (fKeyListener != null)
 			{
 				ISourceViewer viewer = this.getSourceViewer();

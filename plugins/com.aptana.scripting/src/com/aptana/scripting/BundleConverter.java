@@ -104,9 +104,9 @@ public class BundleConverter
 		if (args == null || args.length == 0)
 		{
 			// User bundles
-			args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
+			// args = new String[] { userHome + "/Library/Application Support/TextMate/Bundles" };
 			// Pre-installed TM bundle
-			// args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
+			args = new String[] { "/Applications/TextMate.app/Contents/SharedSupport/Bundles" };
 		}
 
 		String outputDir = userHome + "/Documents/Aptana Rubles";
@@ -116,7 +116,7 @@ public class BundleConverter
 		}
 
 		// Only convert the following bundles
-		String[] bundleFilter = new String[] { "json" };
+		String[] bundleFilter = new String[] { "Property List" };
 		File[] bundles = gatherBundles(new File(args[0]));
 		if (bundles == null)
 		{
@@ -235,7 +235,8 @@ public class BundleConverter
 		buffer.append("  bundle.description =  <<END\n").append((String) properties.get("description"))
 				.append("\nEND\n");
 
-		buffer.append(addIndents(new File(plistFile.getParentFile(), "Preferences")));
+		File prefsDir = new File(plistFile.getParentFile(), "Preferences");
+		buffer.append(addIndents(prefsDir));
 
 		File syntaxesDir = new File(plistFile.getParentFile(), "Syntaxes");
 		buffer.append(addFolding(syntaxesDir));
@@ -260,6 +261,8 @@ public class BundleConverter
 		// end menu
 
 		buffer.append("end\n");
+		buffer.append(addEnv(prefsDir));
+		buffer.append(addSmartTypingPairs(prefsDir));
 		return buffer.toString();
 	}
 
@@ -388,6 +391,90 @@ public class BundleConverter
 			if (hasStart && hasStop)
 			{
 				builder.append("  bundle.folding['").append(scope).append("'] = start_folding, end_folding\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static String addEnv(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			Map<String, Object> properties = parse(syntaxFile);
+			String scope = (String) properties.get("scope");
+			Map<String, Object> settings = (Map<String, Object>) properties.get("settings");
+			boolean hasStart = settings.containsKey("shellVariables");
+			if (hasStart)
+			{
+				List<Map<String, Object>> variables = (List<Map<String, Object>>) settings.get("shellVariables");
+				builder.append("env '").append(scope).append("' do |e|\n");
+				for (Map<String, Object> var : variables)
+				{
+					builder.append("  e['").append(var.get("name")).append("'] = ");
+					builder.append("'").append(var.get("value")).append("'\n");
+				}
+				builder.append("end\n");
+			}
+		}
+		return builder.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static String addSmartTypingPairs(File syntaxesDir)
+	{
+		StringBuilder builder = new StringBuilder();
+		if (syntaxesDir == null || !syntaxesDir.isDirectory())
+			return builder.toString();
+		File[] files = syntaxesDir.listFiles(new FilenameFilter()
+		{
+
+			public boolean accept(File dir, String name)
+			{
+				return name.endsWith(".tmLanguage") || name.endsWith(".plist");
+			}
+		});
+		if (files == null || files.length < 1)
+			return builder.toString();
+
+		for (File syntaxFile : files)
+		{
+			Map<String, Object> properties = parse(syntaxFile);
+			String scope = (String) properties.get("scope");
+			Map<String, Object> settings = (Map<String, Object>) properties.get("settings");
+			boolean hasStart = settings.containsKey("smartTypingPairs");
+			if (hasStart)
+			{
+				builder.append("smart_typing_pairs['").append(scope).append("'] = [");
+				List<List<String>> pairs = (List<List<String>>) settings.get("smartTypingPairs");
+				for (List<String> pair : pairs)
+				{
+					for (String pairChar : pair)
+					{
+						if (pairChar.equals("'"))
+						{
+							pairChar = "\\'";
+						}
+						builder.append("'").append(pairChar).append("', ");
+					}
+				}
+				builder.deleteCharAt(builder.length() - 1);
+				builder.deleteCharAt(builder.length() - 1);
+				builder.append("]\n");
 			}
 		}
 		return builder.toString();

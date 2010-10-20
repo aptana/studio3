@@ -106,7 +106,7 @@ public class OpenTagCloser implements VerifyKeyListener
 				return;
 
 			// Check to see if this tag is already closed...
-			if (tagClosed(document, offset, openTag))
+			if (tagClosed(document, openTag))
 			{
 				return;
 			}
@@ -175,7 +175,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
 	}
 
-	public static boolean tagClosed(IDocument document, int offset, String openTag)
+	public static boolean tagClosed(IDocument document, String openTag)
 	{
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
 		String tagName = getTagName(openTag);

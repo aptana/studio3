@@ -39,7 +39,7 @@ public class CSSSelectorNode extends CSSNode
 
 	public CSSSelectorNode(CSSRuleNode parent, CSSSimpleSelectorNode[] simpleSelectors, int start, int end)
 	{
-		super(start, end);
+		super(CSSNodeTypes.SELECTOR, start, end);
 		setParent(parent);
 		setChildren(simpleSelectors);
 	}

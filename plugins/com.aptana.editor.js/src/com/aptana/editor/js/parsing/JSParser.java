@@ -6,9 +6,12 @@ import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.io.IOException;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
+import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.js.parsing.ast.*;
+import java.util.Comparator;
 import beaver.*;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
@@ -309,7 +312,7 @@ public class JSParser extends Parser implements IParser {
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
 		char[] characters = parseState.getSource();
@@ -324,8 +327,11 @@ public class JSParser extends Parser implements IParser {
 		try
 		{
 			// parse
-			IParseNode result = (IParseNode) parse(fScanner);
-	
+			ParseRootNode result = (ParseRootNode) parse(fScanner);
+			int start = parseState.getStartingOffset();
+			int end = start + source.length();
+			result.setLocation(start, end);
+
 			// store results in the parse state
 			parseState.setParseResult(result);
 	
@@ -341,6 +347,31 @@ public class JSParser extends Parser implements IParser {
 	
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
+				
+				// create a list of all comments and attach to root node
+				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
+				
+				for (Symbol symbol : fScanner.getSDocComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getVSDocComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getSingleLineComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                for (Symbol symbol : fScanner.getMultiLineComments())
+                {
+                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
+                }
+                
+                root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
 			
 			return result;

@@ -53,8 +53,8 @@ import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CaseInsensitiveMultiLineRule;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
-import com.aptana.editor.common.text.rules.NonRuleBasedDamagerRepairer;
 import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -62,6 +62,8 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.svg.ISVGConstants;
+import com.aptana.editor.svg.SVGSourceConfiguration;
 
 /**
  * @author Max Stepanov
@@ -76,20 +78,25 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_DOCTYPE = PREFIX + "doctype"; //$NON-NLS-1$
 	public final static String HTML_SCRIPT = PREFIX + "script"; //$NON-NLS-1$
 	public final static String HTML_STYLE = PREFIX + "style"; //$NON-NLS-1$
+	public final static String HTML_SVG = PREFIX + "svg"; //$NON-NLS-1$
 	public final static String HTML_TAG = PREFIX + "tag"; //$NON-NLS-1$
 
 	protected static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, CDATA, HTML_DOCTYPE,
-			HTML_SCRIPT, HTML_STYLE, HTML_TAG };
+			HTML_SCRIPT, HTML_STYLE, HTML_SVG, HTML_TAG };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IHTMLConstants.CONTENT_TYPE_HTML },
 			{ IHTMLConstants.CONTENT_TYPE_HTML, IJSConstants.CONTENT_TYPE_JS },
-			{ IHTMLConstants.CONTENT_TYPE_HTML, ICSSConstants.CONTENT_TYPE_CSS }, };
+			{ IHTMLConstants.CONTENT_TYPE_HTML, ICSSConstants.CONTENT_TYPE_CSS },
+			{ IHTMLConstants.CONTENT_TYPE_HTML, ISVGConstants.CONTENT_TYPE_SVG } };
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new CaseInsensitiveMultiLineRule("<!DOCTYPE ", ">", new Token(HTML_DOCTYPE)), //$NON-NLS-1$ //$NON-NLS-2$
-			new DocTypeRule(new Token(CDATA)), new PartitionerSwitchingIgnoreRule(new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
+			new DocTypeRule(new Token(CDATA)),
+			new PartitionerSwitchingIgnoreRule(
+					new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new TagRule("script", new Token(HTML_SCRIPT), true), //$NON-NLS-1$
 			new TagRule("style", new Token(HTML_STYLE), true), //$NON-NLS-1$
+			new TagRule("svg", new Token(HTML_SVG), true), //$NON-NLS-1$
 			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(HTML_TAG)) };
 
@@ -111,13 +118,17 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				new QualifiedContentType("text.html.basic", "source.css.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML, IJSConstants.CONTENT_TYPE_JS),
 				new QualifiedContentType("text.html.basic", "source.js.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(IHTMLConstants.CONTENT_TYPE_HTML, ISVGConstants.CONTENT_TYPE_SVG),
+				new QualifiedContentType("text.html.basic", "source.svg.embedded.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		// Partitions
 		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType("comment.block.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_TAG), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_SCRIPT), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(HTML_STYLE), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(HTML_SVG), new QualifiedContentType("meta.tag.block.any.html")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(CDATA), new QualifiedContentType("string.unquoted.cdata.xml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType("meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
+		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType(
+				"meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public static HTMLSourceConfiguration getDefault()
@@ -136,7 +147,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public String[] getContentTypes()
 	{
 		return TextUtils.combine(new String[][] { CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES,
-				CSSSourceConfiguration.CONTENT_TYPES });
+				CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
@@ -186,6 +197,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		{
 			return result;
 		}
+		result = SVGSourceConfiguration.getDefault().getDocumentContentType(contentType);
+		if (result != null)
+		{
+			return result;
+		}
 		return null;
 	}
 
@@ -199,6 +215,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		SVGSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
 		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getHTMLScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
@@ -214,12 +231,15 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_STYLE);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_STYLE);
 
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_SVG);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_SVG);
+
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_TAG);
 		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_TAG);
 
-		NonRuleBasedDamagerRepairer ndr = new NonRuleBasedDamagerRepairer(getToken("comment.block.html")); //$NON-NLS-1$
-		reconciler.setDamager(ndr, HTMLSourceConfiguration.HTML_COMMENT);
-		reconciler.setRepairer(ndr, HTMLSourceConfiguration.HTML_COMMENT);
+		dr = new ThemeingDamagerRepairer(getHTMLCommentScanner());
+		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_COMMENT);
+		reconciler.setRepairer(dr, HTMLSourceConfiguration.HTML_COMMENT);
 
 		dr = new ThemeingDamagerRepairer(getDoctypeScanner());
 		reconciler.setDamager(dr, HTMLSourceConfiguration.HTML_DOCTYPE);
@@ -228,6 +248,11 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		dr = new ThemeingDamagerRepairer(getCDATAScanner());
 		reconciler.setDamager(dr, CDATA);
 		reconciler.setRepairer(dr, CDATA);
+	}
+
+	protected ITokenScanner getHTMLCommentScanner()
+	{
+		return new CommentScanner(getToken("comment.block.html")); //$NON-NLS-1$
 	}
 
 	protected ITokenScanner getHTMLScanner()
@@ -257,7 +282,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		}
 		return tagScanner;
 	}
-	
+
 	protected ITokenScanner getDoctypeScanner()
 	{
 		if (docTypeScanner == null)
@@ -265,7 +290,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			docTypeScanner = new HTMLDoctypeScanner();
 		}
 		return docTypeScanner;
-	}	
+	}
 
 	protected IToken getToken(String tokenName)
 	{

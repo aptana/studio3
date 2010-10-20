@@ -34,7 +34,7 @@
  */
 package com.aptana.git.core.model;
 
-public abstract class RepositoryEvent
+abstract class RepositoryEvent
 {
 	private GitRepository repository;
 

@@ -127,4 +127,8 @@ public interface JSNodeTypes
 	public static final short DO = 87;
 	public static final short FOR = 88;
 	public static final short FOR_IN = 89;
+	public static final short SDOC_COMMENT = 90;
+	public static final short VSDOC_COMMENT = 91;
+	public static final short SINGLE_LINE_COMMENT = 92;
+	public static final short MULTI_LINE_COMMENT = 93;
 }

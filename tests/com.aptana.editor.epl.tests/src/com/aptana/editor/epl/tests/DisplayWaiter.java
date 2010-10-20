@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
  *
  * @since 3.1
  */
+@SuppressWarnings("deprecation")
 final class DisplayWaiter {
 	/**
 	 * Timeout state of a display waiter thread.

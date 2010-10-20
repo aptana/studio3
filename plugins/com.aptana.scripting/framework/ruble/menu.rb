@@ -5,9 +5,9 @@ require "ruble/scope_selector"
 module Ruble
   
   class Menu < BaseElement
-    def initialize(name)
+    def initialize(name, path)
       if name.kind_of? String
-        super(name)
+        super(name, path)
         
         @jobj.command_name = name;
         
@@ -26,7 +26,7 @@ module Ruble
     def command(name, &block)
       Ruble::Command.define_command(name, &block) if block_given?
     
-      child_menu = Menu.new(name)
+      child_menu = Menu.new(name, path)
       add_menu(child_menu)
     end
     
@@ -39,7 +39,7 @@ module Ruble
     end
     
     def menu(name, &block)
-      child_menu = Menu.new(name)
+      child_menu = Menu.new(name, path)
       
       block.call(child_menu) if block_given?
       
@@ -62,7 +62,9 @@ module Ruble
       def define_menu(name, &block)
         log_info("loading menu #{name}")
         
-        new_menu = Menu.new(name)
+        path = $0
+        path = block.binding.eval("__FILE__") if block
+        new_menu = Menu.new(name, path)
         block.call(new_menu) if block_given?
         
         # add command to bundle
@@ -74,7 +76,7 @@ module Ruble
     private
     
     def create_java_object
-      com.aptana.scripting.model.MenuElement.new($fullpath)
+      com.aptana.scripting.model.MenuElement.new(path)
     end
   end
   

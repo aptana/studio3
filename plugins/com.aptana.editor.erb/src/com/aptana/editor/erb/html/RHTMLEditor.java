@@ -45,21 +45,22 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 
 /**
  * @author Max Stepanov
- *
  */
-public class RHTMLEditor extends HTMLEditor {
-
-	/* (non-Javadoc)
+public class RHTMLEditor extends HTMLEditor
+{
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new RHTMLDocumentProvider());
-    }
-	
+		setSourceViewerConfiguration(new RHTMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new RHTMLDocumentProvider());
+	}
+
 	@Override
 	protected FileService createFileService()
 	{
@@ -75,15 +76,15 @@ public class RHTMLEditor extends HTMLEditor {
 
 		return outline;
 	}
-	
+
 	@Override
 	protected char[] getPairMatchingCharacters()
 	{
 		char[] orig = super.getPairMatchingCharacters();
 		char[] modified = new char[orig.length + 2];
 		System.arraycopy(orig, 0, modified, 0, orig.length);
-		modified[orig.length] ='%';
-		modified[orig.length + 1] ='%';
+		modified[orig.length] = '%';
+		modified[orig.length + 1] = '%';
 		return modified;
 	}
 }

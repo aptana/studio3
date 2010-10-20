@@ -51,6 +51,7 @@ import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
  * </li>
  *
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class CommandInputFieldWithHistory implements ICommandInputField {
 	private class FieldAssist implements IContentProposalProvider {
 

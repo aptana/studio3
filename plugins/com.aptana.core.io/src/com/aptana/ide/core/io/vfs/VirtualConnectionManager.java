@@ -112,7 +112,7 @@ public class VirtualConnectionManager {
 		return uri;
 	}
 	
-	public IConnectionPoint getConnectionPoint(URI uri) {
+	private IConnectionPoint getConnectionPoint(URI uri) {
 		uri = getVirtualRootURI(uri);
 		IConnectionPoint connectionPoint = null;
 		WeakReference<ConnectionPoint> weakReference = uris.get(uri);

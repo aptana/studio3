@@ -49,7 +49,7 @@ public class CSSImportNode extends CSSNode
 
 	public CSSImportNode(String uri, String[] mediaList, int start, int end)
 	{
-		super(start, end);
+		super(CSSNodeTypes.IMPORT, start, end);
 		fUriStr = uri;
 		fMediaList = mediaList;
 	}

@@ -200,6 +200,7 @@ class KeyboardProbe {
 
 	}
 
+	@SuppressWarnings("unused")
 	private char getContent(Text text) {
 		String content= text.getText();
 		char c;

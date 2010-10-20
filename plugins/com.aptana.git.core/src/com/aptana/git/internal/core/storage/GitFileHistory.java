@@ -87,7 +87,7 @@ public class GitFileHistory extends FileHistory
 			List<GitCommit> commits = list.getCommits();
 			for (GitCommit gitCommit : commits)
 			{
-				revisions.add(new CommitFileRevision(gitCommit, resource.getProjectRelativePath().toPortableString()));
+				revisions.add(new CommitFileRevision(gitCommit, resource.getProjectRelativePath()));
 			}
 			return revisions.toArray(new CommitFileRevision[revisions.size()]);
 		}
