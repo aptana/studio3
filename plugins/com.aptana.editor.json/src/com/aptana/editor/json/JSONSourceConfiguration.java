@@ -51,6 +51,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.text.rules.EmptyCommentRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -68,6 +69,7 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
 		new EndOfLineRule("//", new Token(SINGLELINE_COMMENT)), //$NON-NLS-1$
+		new EmptyCommentRule(new Token(MULTILINE_COMMENT)),
 		new MultiLineRule("/*", "*/", new Token(MULTILINE_COMMENT), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	private JSONSourceScanner beaverScanner;
