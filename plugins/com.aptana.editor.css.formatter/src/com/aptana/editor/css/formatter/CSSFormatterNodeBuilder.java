@@ -34,15 +34,6 @@
  */
 package com.aptana.editor.css.formatter;
 
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
-import com.aptana.editor.css.formatter.nodes.FormatterCSSRuleNode;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSNode;
-import com.aptana.editor.css.parsing.ast.CSSNodeTypes;
-import com.aptana.editor.css.parsing.ast.CSSRuleNode;
-import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
@@ -50,6 +41,10 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
+import com.aptana.editor.css.parsing.ast.*;
 
 /**
  * CSS formatter node builder.<br>
@@ -120,19 +115,24 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void pushFormatterNode(CSSNode node)
 	{
 		CSSRuleNode ruleNode = (CSSRuleNode) node;
-		FormatterBlockWithBeginNode formatterRuleNode = new FormatterCSSRuleNode(document, ruleNode.getNameNode()
-				.getName().toLowerCase());
 
 		CSSSelectorNode[] selectors = ruleNode.getSelectors();
+		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
 		int blockStartOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1, document);
 
-		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
-		formatterRuleNode.setBegin(createTextNode(document, ruleNode.getStartingOffset(), blockStartOffset));
-		push(formatterRuleNode);
+		for (int i = 0; i < selectors.length; i++)
+		{
+			CSSSelectorNode selectorNode = selectors[i];
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
+			formatterSelectorNode.setBegin(createTextNode(document,
+					getSelectorNodeBegin(selectorNode.getStartingOffset(), document),
+					getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1));
+			push(formatterSelectorNode);
 
-		checkedPop(formatterRuleNode, -1);
+			checkedPop(formatterSelectorNode, -1);
+		}
 
-		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, StringUtil.EMPTY);
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
@@ -151,8 +151,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 
 			CSSDeclarationNode declarationNode = declarations[i];
-			String type = declarationNode.getNameNode().getName().toLowerCase();
-			FormatterBlockWithBeginNode formatterDeclarationNode = new FormatterCSSDeclarationNode(document, type);
+			FormatterBlockWithBeginNode formatterDeclarationNode = new FormatterCSSDeclarationNode(document);
 
 			formatterDeclarationNode.setBegin(createTextNode(document, declarationNode.getStartingOffset(),
 					declarationNode.getEndingOffset() + 1));
@@ -186,6 +185,57 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				break;
 			}
 			offset++;
+		}
+		return offset;
+	}
+
+	/**
+	 * @param i
+	 * @param document2
+	 * @return
+	 */
+	private int getSelectorNodeBegin(int offset, FormatterDocument document)
+	{
+		int length = document.getLength();
+		while (offset < length)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n'))
+			{
+				break;
+			}
+			offset++;
+		}
+		return offset;
+	}
+
+	/**
+	 * @param startingOffset
+	 * @param document2
+	 * @return
+	 */
+	private int getSelectorNodeEnd(int offset, FormatterDocument document)
+	{
+		int original = offset;
+
+		while (Character.isWhitespace(document.charAt(offset)))
+		{
+			offset++;
+		}
+
+		if (document.charAt(offset) == ',')
+		{
+			return offset;
+		}
+
+		offset = original;
+		while (offset > 0)
+		{
+			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n')
+					&& (document.charAt(offset) != '{'))
+			{
+				break;
+			}
+			offset--;
 		}
 		return offset;
 	}

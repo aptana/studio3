@@ -4,9 +4,6 @@ import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterCommentNode;
 
-/**
- * An HTML formatter comment node
- */
 public class FormatterCSSCommentNode extends FormatterCommentNode
 {
 
