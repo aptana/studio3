@@ -35,6 +35,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -85,5 +86,17 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		return !isAddingBeginNewLine();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
+	 * )
+	 */
+	@Override
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return getDocument().getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION);
 	}
 }

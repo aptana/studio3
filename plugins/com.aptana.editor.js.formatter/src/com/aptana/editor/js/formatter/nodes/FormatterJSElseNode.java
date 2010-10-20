@@ -35,7 +35,9 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
@@ -89,6 +91,61 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	protected boolean isAddingBeginNewLine()
 	{
 		return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT);
+	}
+
+	/**
+	 * Override the default accept method to provide a unique support for the if-else indentation. We want to make sure
+	 * that the indentation of the if-else blocks stays in one level as much as possible.
+	 * 
+	 * @see com.aptana.formatter.nodes.FormatterBlockWithBeginNode#accept(com.aptana.formatter.IFormatterContext,
+	 *      com.aptana.formatter.IFormatterWriter)
+	 */
+	@Override
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
+	{
+		if (getBegin() != null)
+		{
+			boolean isIndenting = isIndenting();
+			if (getSpacesCountBefore() > 0 && shouldConsumePreviousWhiteSpaces())
+			{
+				writeSpaces(visitor, context, getSpacesCountBefore());
+			}
+			if (isAddingBeginNewLine())
+			{
+				if (!visitor.endsWithNewLine())
+				{
+					visitor.writeLineBreak(context);
+
+				}
+				if (isElseIf)
+				{
+					visitor.writeIndent(context);
+				}
+			}
+			else if (visitor.endsWithNewLine())
+			{
+				visitor.writeIndent(context);
+			}
+
+			if (isIndenting)
+			{
+				context.decIndent();
+			}
+			visitor.write(context, getBegin().getStartOffset(), getBegin().getEndOffset());
+			if (isIndenting)
+			{
+				context.incIndent();
+			}
+		}
+		if (!hasBlock && !isElseIf)
+		{
+			context.incIndent();
+		}
+		acceptBody(context, visitor);
+		if (!hasBlock && !isElseIf)
+		{
+			context.decIndent();
+		}
 	}
 
 	/*

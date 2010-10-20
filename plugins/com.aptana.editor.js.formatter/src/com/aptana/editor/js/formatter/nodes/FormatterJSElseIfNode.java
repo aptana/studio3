@@ -35,9 +35,7 @@
 package com.aptana.editor.js.formatter.nodes;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
@@ -81,32 +79,12 @@ public class FormatterJSElseIfNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptBody(com.aptana.formatter.IFormatterContext,
-	 * com.aptana.formatter.IFormatterWriter)
-	 */
-	@Override
-	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
-	{
-		int indent = context.getIndent();
-		if (indent > 0)
-		{
-			context.decIndent();
-		}
-		super.acceptBody(context, visitor);
-		if (indent > 0)
-		{
-			context.incIndent();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
 	 */
 	@Override
 	protected boolean isIndenting()
 	{
-		return true;
+		return false;
 	}
 
 	/*

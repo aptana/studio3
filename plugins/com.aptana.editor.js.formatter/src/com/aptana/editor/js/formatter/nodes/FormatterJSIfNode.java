@@ -37,9 +37,7 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterWriter;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -113,32 +111,5 @@ public class FormatterJSIfNode extends FormatterJSDeclarationNode
 			return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT);
 		}
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptBody(com.aptana.formatter.IFormatterContext,
-	 * com.aptana.formatter.IFormatterWriter)
-	 */
-	@Override
-	protected void acceptBody(IFormatterContext context, IFormatterWriter visitor) throws Exception
-	{
-		if (inElseIf && getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT))
-		{
-			int indent = context.getIndent();
-			if (indent > 0)
-			{
-				context.decIndent();
-			}
-			super.acceptBody(context, visitor);
-			if (indent > 0)
-			{
-				context.incIndent();
-			}
-		}
-		else
-		{
-			super.acceptBody(context, visitor);
-		}
 	}
 }

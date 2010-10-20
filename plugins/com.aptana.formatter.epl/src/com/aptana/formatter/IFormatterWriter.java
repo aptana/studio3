@@ -34,6 +34,8 @@ public interface IFormatterWriter
 	 * @throws Exception
 	 */
 	void writeLineBreak(IFormatterContext context);
+	
+	void writeIndent(IFormatterContext context);
 
 	void skipNextLineBreaks(IFormatterContext context);
 

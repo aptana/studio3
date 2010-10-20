@@ -83,8 +83,8 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.BRACE_POSITION_BLOCK));
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument()
+				.getString(JSFormatterConstants.BRACE_POSITION_BLOCK));
 	}
 
 	/*

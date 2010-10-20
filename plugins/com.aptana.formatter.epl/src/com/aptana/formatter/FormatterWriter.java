@@ -436,7 +436,7 @@ public class FormatterWriter implements IFormatterWriter
 	/**
 	 * @param context
 	 */
-	private void writeIndent(IFormatterContext context)
+	public void writeIndent(IFormatterContext context)
 	{
 		writeIndent(context, writer);
 	}
