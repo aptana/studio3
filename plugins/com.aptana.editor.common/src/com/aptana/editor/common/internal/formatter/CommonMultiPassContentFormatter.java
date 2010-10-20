@@ -41,6 +41,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.TypedPosition;
+import org.eclipse.jface.text.formatter.FormattingContextProperties;
 import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 
@@ -52,7 +54,6 @@ import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.ScriptFormattingStrategy;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-
 
 /**
  * A common multi-pass content formatter.<br>
@@ -184,7 +185,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 					if (ScriptFormatterManager.hasFormatterFor(lastContentType))
 					{
 						// take the last qualified content type and format it
-						updateContex(context, lastContentType);
+						updateContex(context, lastContentType, start, contentLength);
 						formatSlave(context, document, start, contentLength, lastContentType);
 						slaveFormatted = true;
 					}
@@ -198,19 +199,19 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				if (ScriptFormatterManager.hasFormatterFor(lastContentType))
 				{
 					// take the last qualified content type and format it
-					updateContex(context, lastContentType);
+					updateContex(context, lastContentType, start, contentLength);
 					formatSlave(context, document, start, contentLength, lastContentType);
 					slaveFormatted = true;
 				}
 			}
-			if (slaveFormatted)
-			{
-				// In case we formatted a slave, we need to run the master formatter again to fix any
-				// indentation distortions that the slave formatter introduced.
-				updateContex(context, masterContentType);
-				context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.FALSE);
-				formatMaster(context, document, 0, document.getLength());
-			}
+			// if (slaveFormatted)
+			// {
+			// // In case we formatted a slave, we need to run the master formatter again to fix any
+			// // indentation distortions that the slave formatter introduced.
+			// updateContex(context, masterContentType);
+			// context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE, Boolean.FALSE);
+			// formatMaster(context, document.getLength(), masterOffset, masterLength);
+			// }
 		}
 		catch (BadLocationException exception)
 		{
@@ -223,15 +224,18 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	 * Update the fomatting context to reflect to the script formatter that should be used with the given content-type.
 	 * 
 	 * @param context
+	 * @param region
 	 * @param lastContentType
 	 */
-	private void updateContex(IFormattingContext context, String contentType)
+	private void updateContex(IFormattingContext context, String contentType, int offset, int length)
 	{
 		IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(contentType);
 		factory.setMainContentType(contentType);
 		if (factory != null && context != null)
 		{
 			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+			context.setProperty(FormattingContextProperties.CONTEXT_PARTITION, new TypedPosition(offset, length,
+					contentType));
 		}
 	}
 

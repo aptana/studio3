@@ -100,4 +100,12 @@ public class FormatterIndentDetector implements IFormatterWriter
 	{
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#writeIndent(com.aptana.formatter.IFormatterContext)
+	 */
+	public void writeIndent(IFormatterContext context)
+	{
+		// empty
+	}
 }

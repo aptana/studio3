@@ -157,7 +157,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	{
 		try
 		{
-			int lineNumber = document.getLineOfOffset(offset);
+			int lineNumber = document.getLineOfOffset(offset + 1);
 			if (lineNumber > 0)
 			{
 				IRegion previousLineRegion = document.getLineInformation(lineNumber - 1);

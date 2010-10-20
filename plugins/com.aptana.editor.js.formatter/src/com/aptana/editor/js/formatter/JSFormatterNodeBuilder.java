@@ -46,6 +46,7 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSIfNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSObjectNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSRootNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSSwitchNode;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryArithmeticOperatorNode;
@@ -101,7 +102,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	public IFormatterContainerNode build(IParseNode parseResult, FormatterDocument document)
 	{
 		this.document = document;
-		final IFormatterContainerNode rootNode = new FormatterBlockNode(document);
+		final IFormatterContainerNode rootNode = new FormatterJSRootNode(document);
 		start(rootNode);
 		JSParseRootNode jsRootNode = (JSParseRootNode) parseResult;
 		jsRootNode.accept(new JSFormatterTreeWalker());
