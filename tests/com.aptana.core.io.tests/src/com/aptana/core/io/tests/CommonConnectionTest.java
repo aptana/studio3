@@ -678,7 +678,7 @@ public abstract class CommonConnectionTest extends TestCase
 	{
 		return false;
 	}
-	
+
 	protected boolean verifyTeardownDeletion()
 	{
 		return true;
@@ -720,21 +720,22 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
 
-		long lastModified = fi.getLastModified();
 		if (supportsSetModificationTime())
 		{
+			long lastModified = fi.getLastModified();
 			lastModified -= new Random().nextInt(7 * 24) * 60000;
 			lastModified -= lastModified % 60000; // remove seconds/milliseconds
-		}
-		IFileInfo pfi = new FileInfo();
-		pfi.setLastModified(lastModified);
-		fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
 
-		fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
-		assertNotNull(fi);
-		assertTrue(fi.exists());
-		assertTrue(fi.isDirectory());
-		assertEquals(lastModified, fi.getLastModified());
+			IFileInfo pfi = new FileInfo();
+			pfi.setLastModified(lastModified);
+			fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
+
+			fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertTrue(fi.isDirectory());
+			assertEquals(lastModified, fi.getLastModified());
+		}
 	}
 
 	protected boolean supportsChangePermissions()
