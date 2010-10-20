@@ -32,34 +32,74 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.dtd;
+package com.aptana.editor.common;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.source.ISourceViewer;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.SimpleSourceViewerConfiguration;
-
-public class DTDSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+/**
+ * SimpleSourceViewerConfiguration
+ */
+public abstract class SimpleSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
 	/**
-	 * DTDSourceViewerConfiguration
+	 * SimpleSourceViewerConfiguration
 	 * 
-	 * @param preferences
+	 * @param preferenceStore
 	 * @param editor
 	 */
-	public DTDSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	public SimpleSourceViewerConfiguration(IPreferenceStore preferenceStore, AbstractThemeableEditor editor)
 	{
-		super(preferences, editor);
+		super(preferenceStore, editor);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return DTDSourceConfiguration.getDefault();
+		return TextUtils.combine( //
+			new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, this.getSourceViewerConfiguration().getContentTypes() } //
+		);
+	}
+
+	/**
+	 * Return the source viewer configuration for this language
+	 * 
+	 * @return
+	 */
+	public abstract ISourceViewerConfiguration getSourceViewerConfiguration();
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
+		ISourceViewerConfiguration configuration = this.getSourceViewerConfiguration();
+
+		configuration.setupPresentationReconciler(reconciler, sourceViewer);
+
+		return reconciler;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes()
+	{
+		return this.getSourceViewerConfiguration().getTopContentTypes();
 	}
 }
