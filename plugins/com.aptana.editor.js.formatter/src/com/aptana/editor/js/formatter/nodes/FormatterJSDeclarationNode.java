@@ -70,7 +70,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	}
 
 	/**
-	 * For a declaration, when this call returns true, a new line is added before the declaration.
+	 * For a declaration, when this call returns true, a new line is added <b>before</b> the declaration.
 	 * 
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
@@ -80,6 +80,39 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 		// To change this behavior, it's recommended to create a designated subclass and override this method to return
 		// the value set in the preferences.
 		if (node instanceof JSBinaryOperatorNode)
+		{
+			return false;
+		}
+		if (isPartOfExpression(node))
+		{
+			return false;
+		}
+		switch (node.getNodeType())
+		{
+			case JSNodeTypes.CATCH:
+				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
+			case JSNodeTypes.FINALLY:
+				return !hasBlockedChild
+						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
+			case JSNodeTypes.FUNCTION:
+				if (isPartOfExpression(node.getParent()))
+				{
+					return false;
+				}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns true id the given node has a type that is part of an expression. This will help us avoid breaking the
+	 * line that it is located at and keep the 'declaration' in original expression code.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private boolean isPartOfExpression(IParseNode node)
+	{
+		if (node == null)
 		{
 			return false;
 		}
@@ -93,15 +126,30 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 			case JSNodeTypes.ARGUMENTS:
 			case JSNodeTypes.CONDITIONAL:
 			case JSNodeTypes.NAME_VALUE_PAIR:
-			case JSNodeTypes.TRY:
-				return false;
-			case JSNodeTypes.CATCH:
-				return getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_CATCH_STATEMENT);
-			case JSNodeTypes.FINALLY:
-				return !hasBlockedChild
-						|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT);
+				return true;
 		}
-		return true;
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
+	 */
+	@Override
+	public int getSpacesCountBefore()
+	{
+		// TODO preferences?
+		return 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !isAddingBeginNewLine();
 	}
 
 	/*
