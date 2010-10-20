@@ -33,7 +33,7 @@ public class FormatterCSSSelectorNode extends FormatterBlockWithBeginNode
 	 */
 	protected boolean isAddingBeginNewLine()
 	{
-		return false;
+		return firstElement;
 	}
 
 	/*
