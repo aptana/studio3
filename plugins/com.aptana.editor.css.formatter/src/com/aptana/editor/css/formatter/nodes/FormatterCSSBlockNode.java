@@ -5,21 +5,15 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
-/**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
- */
 public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 {
-	private String element;
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSBlockNode(IFormatterDocument document, String element)
+	public FormatterCSSBlockNode(IFormatterDocument document)
 	{
 		super(document);
-		this.element = element;
 	}
 
 	/*
@@ -52,6 +46,16 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !isAddingBeginNewLine();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see
 	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
 	 * )
@@ -59,5 +63,14 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
 		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
+	 */
+	public int getSpacesCountBefore()
+	{
+		return 1;
 	}
 }

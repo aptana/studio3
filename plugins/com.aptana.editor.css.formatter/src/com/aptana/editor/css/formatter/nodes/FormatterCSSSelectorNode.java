@@ -1,29 +1,21 @@
 package com.aptana.editor.css.formatter.nodes;
 
-import java.util.Set;
-
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
-/**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class FormatterCSSRuleNode extends FormatterBlockWithBeginNode
+public class FormatterCSSSelectorNode extends FormatterBlockWithBeginNode
 {
-	private String element;
+	private boolean firstElement;
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSRuleNode(IFormatterDocument document, String element)
+	public FormatterCSSSelectorNode(IFormatterDocument document, boolean isFirstElement)
 	{
 		super(document);
-		this.element = element;
+		firstElement = isFirstElement;
 	}
 
 	/*
@@ -46,6 +38,15 @@ public class FormatterCSSRuleNode extends FormatterBlockWithBeginNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 */
+	protected boolean isAddingEndNewLine()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see
 	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
 	 * )
@@ -53,5 +54,23 @@ public class FormatterCSSRuleNode extends FormatterBlockWithBeginNode
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
 		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !firstElement;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
+	 */
+	public int getSpacesCountBefore()
+	{
+		return 1;
 	}
 }

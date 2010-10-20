@@ -1,27 +1,19 @@
 package com.aptana.editor.css.formatter.nodes;
 
-import java.util.Set;
-
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
-/**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
- */
 public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
 {
-	private String element;
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSDeclarationNode(IFormatterDocument document, String element)
+	public FormatterCSSDeclarationNode(IFormatterDocument document)
 	{
 		super(document);
-		this.element = element;
 	}
 
 	/*
