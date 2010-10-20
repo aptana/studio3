@@ -80,5 +80,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 		
 		return container;
 	}
+	
+	// TODO: load/save project properties
 
 }

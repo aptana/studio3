@@ -35,8 +35,10 @@
 
 package com.aptana.preview;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorInput;
 
@@ -60,6 +62,11 @@ public final class SourceConfig {
 		this.project = project;
 		this.location = location;
 		this.content = content;
+		IPath path = location;
+		if (project != null) {
+			path = ResourcesPlugin.getWorkspace().getRoot().getFile(location).getLocation();
+		}
+		this.fileStore = EFS.getLocalFileSystem().getStore(path);
 	}
 
 	/**

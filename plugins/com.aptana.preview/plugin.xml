@@ -81,10 +81,6 @@
             class="com.aptana.preview.internal.impl.WebServerPreviewHandler"
             contentType="com.aptana.contenttype.html">
       </handler>
-      <handler
-            class="com.aptana.preview.internal.impl.PHPPreviewHandler"
-            contentType="com.aptana.contenttype.html.php">
-      </handler>
    </extension>
    <extension
          point="com.aptana.preview.webServerTypes">

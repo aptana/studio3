@@ -43,6 +43,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -61,7 +63,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.ListDialog;
-import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.preview.Activator;
@@ -198,6 +199,15 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 			
 		});
 		
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+				if (selection != null && editServerConfiguration(selection)) {
+					viewer.refresh();
+				}
+			}
+		});
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {

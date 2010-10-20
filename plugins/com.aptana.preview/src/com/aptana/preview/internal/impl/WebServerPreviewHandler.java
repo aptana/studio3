@@ -67,7 +67,12 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 				}
 			}
 		} else {
-			// find the first server matching 
+			for (AbstractWebServerConfiguration serverConfiguration : ServerConfigurationManager.getInstance().getServerConfigurations()) {
+				URL url = serverConfiguration.resolve(config.getFileStore());
+				if (url != null) {
+					return new PreviewConfig(url);
+				}				
+			}
 		}
 		return null;
 	}

@@ -42,8 +42,8 @@ import java.net.URL;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.epl.IMemento;
@@ -60,7 +60,7 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 	private static final String ELEMENT_DOCUMENT_ROOT = "documentRoot"; //$NON-NLS-1$
 	
 	private URL baseURL;
-	private IFileStore documentRoot;
+	private IPath documentRoot;
 
 	/* (non-Javadoc)
 	 * @see com.aptana.preview.server.AbstractWebServerConfiguration#resolve(org.eclipse.core.filesystem.IFileStore)
@@ -70,7 +70,7 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 		if (!isValid()) {
 			return null;
 		}
-		IPath relativePath = EFSUtils.getRelativePath(documentRoot, file);
+		IPath relativePath = EFSUtils.getRelativePath(EFS.getLocalFileSystem().getStore(documentRoot), file);
 		if (relativePath != null) {
 			try {
 				URI uri = URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
@@ -113,11 +113,7 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 		if (child != null) {
 			String text = child.getTextData();
 			if (text != null) {
-				try {
-					documentRoot = EFS.getStore(URI.create(text));
-				} catch (CoreException e) {
-					Activator.log(e);
-				}
+				documentRoot = Path.fromPortableString(text);
 			}
 		}
 	}
@@ -132,7 +128,7 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 			memento.createChild(ELEMENT_BASE_URL).putTextData(baseURL.toExternalForm());
 		}
 		if (documentRoot != null) {
-			memento.createChild(ELEMENT_DOCUMENT_ROOT).putTextData(documentRoot.toURI().toString());
+			memento.createChild(ELEMENT_DOCUMENT_ROOT).putTextData(documentRoot.toPortableString());
 		}
 	}
 	
@@ -157,14 +153,14 @@ public class SimpleWebServerConfiguration extends AbstractWebServerConfiguration
 	/**
 	 * @return the documentRoot
 	 */
-	public IFileStore getDocumentRoot() {
+	public IPath getDocumentRoot() {
 		return documentRoot;
 	}
 
 	/**
 	 * @param documentRoot the documentRoot to set
 	 */
-	public void setDocumentRoot(IFileStore documentRoot) {
+	public void setDocumentRoot(IPath documentRoot) {
 		this.documentRoot = documentRoot;
 	}
 
