@@ -35,22 +35,24 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.css.text.CSSTextHover;
 
-public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguration
+public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
-
+	/**
+	 * CSSSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
+	 */
 	public CSSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -59,45 +61,31 @@ public class CSSSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source
+	 * .ISourceViewer, java.lang.String)
 	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				CSSSourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return CSSSourceConfiguration.getDefault().getTopContentTypes();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		CSSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
-
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
 		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 */
+	@Override
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return CSSSourceConfiguration.getDefault();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer
+	 * , java.lang.String)
+	 */
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
