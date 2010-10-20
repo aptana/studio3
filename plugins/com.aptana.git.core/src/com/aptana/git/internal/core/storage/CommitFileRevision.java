@@ -93,7 +93,7 @@ public class CommitFileRevision extends FileRevision
 
 			public IPath getFullPath()
 			{
-				return getFullPath();
+				return CommitFileRevision.this.getFullPath();
 			}
 
 			public InputStream getContents() throws CoreException
