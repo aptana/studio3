@@ -365,6 +365,7 @@ class S3FileStore extends FileStore
 			secure = false; // Work around weird bug? Do we need subdomain calling format?
 		}
 		String secretAccessKey = getSecretAccessKey();
+		System.out.println("*** Using access key: " + getAccessKey()); // FIXME Clean this up!
 		System.out.println("*** Using secret key: " + secretAccessKey); // FIXME Clean this up!
 		return new AWSAuthConnection(getAccessKey(), secretAccessKey, secure, uri.getHost(),
 				CallingFormat.getPathCallingFormat());
@@ -565,6 +566,11 @@ class S3FileStore extends FileStore
 				connection.getOutputStream().write(new byte[] {});
 			}
 			int responseCode = connection.getResponseCode();
+			if (responseCode == 403)
+			{
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
+						"Authentication failed with credentials: " + getAccessKey() + ", " + getSecretAccessKey()));
+			}
 			if (responseCode >= 400)
 			{
 				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
