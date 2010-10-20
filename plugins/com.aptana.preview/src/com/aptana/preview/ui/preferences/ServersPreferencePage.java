@@ -36,6 +36,7 @@
 package com.aptana.preview.ui.preferences;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -48,6 +49,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -58,6 +60,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.ListDialog;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import com.aptana.core.CoreStrings;
@@ -65,6 +68,9 @@ import com.aptana.preview.Activator;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
 import com.aptana.preview.server.ServerConfigurationManager;
 import com.aptana.preview.server.ServerConfigurationManager.ConfigurationType;
+import com.aptana.ui.IPropertyDialog;
+import com.aptana.ui.PropertyDialogsRegistry;
+import com.aptana.ui.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -134,26 +140,26 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		newButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				ListSelectionDialog dlg = new ListSelectionDialog(getShell(),
-						ServerConfigurationManager.getInstance().getConfigurationTypes(),
-						new ArrayContentProvider(),
-						new LabelProvider() {
-							@Override
-							public Image getImage(Object element) {
-								return null; // TODO: use ImageAssociations
-							}
+				ListDialog dlg = new ListDialog(getShell());
+				dlg.setContentProvider(new ArrayContentProvider());
+				dlg.setLabelProvider(new LabelProvider() {
+					@Override
+					public Image getImage(Object element) {
+						return null; // TODO: use ImageAssociations
+					}
 
-							@Override
-							public String getText(Object element) {
-								if (element instanceof ConfigurationType) {
-									return ((ConfigurationType) element).getName();
-								}
-								return super.getText(element);
-							}
-					
-				}, "Choose server type");
-				Object[] result = dlg.getResult();
-				if (dlg.open() == Window.OK && result != null && result.length == 1) {
+					@Override
+					public String getText(Object element) {
+						if (element instanceof ConfigurationType) {
+							return ((ConfigurationType) element).getName();
+						}
+						return super.getText(element);
+					}
+				});
+				dlg.setInput(ServerConfigurationManager.getInstance().getConfigurationTypes());
+				dlg.setTitle("Choose server type");
+				Object[] result;
+				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) {
 					String typeId = ((ConfigurationType) result[0]).getId();
 					try {
 						AbstractWebServerConfiguration newConfiguration = ServerConfigurationManager.getInstance().createServerConfiguration(typeId);
@@ -206,7 +212,18 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 	
 	private boolean editServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
-		return true;
+		try {
+			Dialog dlg = PropertyDialogsRegistry.getInstance().createPropertyDialog(serverConfiguration, new SameShellProvider(getShell()));
+			if (dlg != null) {
+				if (dlg instanceof IPropertyDialog) {
+					((IPropertyDialog) dlg).setPropertySource(serverConfiguration);
+				}
+				return dlg.open() == Window.OK;
+			}
+		} catch (CoreException e) {
+			UIUtils.showErrorMessage("Failed to open server preferences dialog", e);
+		}
+		return false;
 	}
 	
 	/* (non-Javadoc)

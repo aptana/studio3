@@ -101,5 +101,13 @@
             id="com.aptana.preview.server.simple">
       </image>
    </extension>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.preview.ui.internal.SimpleWebServerPropertyDialog$Provider"
+            id="com.aptana.preview.dialogs.simpleServer"
+            objectClass="com.aptana.preview.server.SimpleWebServerConfiguration">
+      </dialog>
+   </extension>
 
 </plugin>
