@@ -4,6 +4,7 @@ import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 {
@@ -31,7 +32,8 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingBeginNewLine()
 	{
-		return getDocument().getBoolean(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS);
+		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 	}
 
 	/*

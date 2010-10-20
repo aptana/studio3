@@ -300,8 +300,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(CSSFormatterConstants.FORMATTER_TAB_SIZE, getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(CSSFormatterConstants.WRAP_COMMENTS, getBoolean(CSSFormatterConstants.WRAP_COMMENTS));
-		document.setBoolean(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-				getBoolean(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
+		document.setString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
+				getString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 		document.setInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS));
 
 		return document;
