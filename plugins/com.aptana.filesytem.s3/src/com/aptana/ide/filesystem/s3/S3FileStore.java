@@ -69,6 +69,7 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 class S3FileStore extends FileStore
@@ -344,8 +345,8 @@ class S3FileStore extends FileStore
 			{
 				return connection.getInputStream();
 			}
-			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception("Failed to open inputstream on "
-					+ path.toPortableString() + ". Error code: " + responseCode));
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+					new Exception(errorMessage(responseCode, connection)));
 		}
 		catch (MalformedURLException e)
 		{
@@ -364,16 +365,12 @@ class S3FileStore extends FileStore
 		{
 			secure = false; // Work around weird bug? Do we need subdomain calling format?
 		}
-		String secretAccessKey = getSecretAccessKey();
-		System.out.println("*** Using access key: " + getAccessKey()); // FIXME Clean this up!
-		System.out.println("*** Using secret key: " + secretAccessKey); // FIXME Clean this up!
-		return new AWSAuthConnection(getAccessKey(), secretAccessKey, secure, uri.getHost(),
+		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), secure, uri.getHost(),
 				CallingFormat.getPathCallingFormat());
 	}
 
 	private char[] promptPassword(String title, String message)
 	{
-		System.out.println("*** Prompting for secret key!");
 		char[] password = CoreIOPlugin.getAuthenticationManager().promptPassword(getAuthId(), getAccessKey(), title,
 				message);
 		if (password == null)
@@ -386,7 +383,6 @@ class S3FileStore extends FileStore
 
 	private char[] getOrPromptPassword(String title, String message)
 	{
-		System.out.println("*** asking for secret key from auth manager");
 		char[] password = CoreIOPlugin.getAuthenticationManager().getPassword(getAuthId());
 		if (password == null)
 		{
@@ -566,15 +562,10 @@ class S3FileStore extends FileStore
 				connection.getOutputStream().write(new byte[] {});
 			}
 			int responseCode = connection.getResponseCode();
-			if (responseCode == 403)
-			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
-						"Authentication failed with credentials: " + getAccessKey() + ", " + getSecretAccessKey()));
-			}
 			if (responseCode >= 400)
 			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
-						"Failed to create folder/bucket with error code: " + responseCode));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+						new Exception(errorMessage(responseCode, connection)));
 			}
 		}
 		catch (MalformedURLException e)
@@ -586,6 +577,30 @@ class S3FileStore extends FileStore
 			throw S3FileSystemPlugin.coreException(e);
 		}
 		return this;
+	}
+
+	private String errorMessage(int responseCode, HttpURLConnection connection) throws CoreException
+	{
+		String msg = ""; //$NON-NLS-1$
+		try
+		{
+			msg = IOUtil.read(connection.getErrorStream());
+			int index = msg.indexOf("<Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(index + 9);
+			}
+			index = msg.indexOf("</Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(0, index);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		return MessageFormat.format("({0}) {1}", responseCode, msg); //$NON-NLS-1$
 	}
 
 	@Override
