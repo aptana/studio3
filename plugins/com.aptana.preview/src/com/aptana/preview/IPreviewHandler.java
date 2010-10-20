@@ -43,5 +43,11 @@ import org.eclipse.core.runtime.CoreException;
  */
 public interface IPreviewHandler {
 
+	/**
+	 * The function does a translation from a source file to a preview request
+	 * @param config
+	 * @return PreviewConfig null if sources are not supported by this handler
+	 * @throws CoreException
+	 */
 	public PreviewConfig handle(SourceConfig config) throws CoreException;
 }

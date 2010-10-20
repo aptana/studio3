@@ -150,6 +150,8 @@ public final class PreviewManager {
 		}
 		if (previewConfig != null) {
 			showEditor(sourceConfig, previewConfig);
+		} else {
+			// TODO: add some user notification
 		}
 	}
 

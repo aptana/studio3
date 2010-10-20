@@ -123,6 +123,7 @@ public final class PreviewEditorInput implements IEditorInput {
 	}
 
 	/**
+	 * Returns true if the preview editor should be dedicated(fixed) for this editor input
 	 * @return the fixed
 	 */
 	public boolean isFixed() {
