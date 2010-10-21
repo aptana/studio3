@@ -281,13 +281,13 @@ public class RubyFormatter extends AbstractScriptFormatter
 	private FormatterDocument createDocument(String input)
 	{
 		FormatterDocument document = new FormatterDocument(input);
-		for (int i = 0; i < INDENTING.length; ++i)
+		for (String key : INDENTING)
 		{
-			document.setBoolean(INDENTING[i], getBoolean(INDENTING[i]));
+			document.setBoolean(key, getBoolean(key));
 		}
-		for (int i = 0; i < BLANK_LINES.length; ++i)
+		for (String key : BLANK_LINES)
 		{
-			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
+			document.setInt(key, getInt(key));
 		}
 		document.setInt(RubyFormatterConstants.FORMATTER_TAB_SIZE, getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(RubyFormatterConstants.WRAP_COMMENTS, getBoolean(RubyFormatterConstants.WRAP_COMMENTS));
