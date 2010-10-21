@@ -29,7 +29,7 @@
             base-type="org.eclipse.core.runtime.xml"
             file-extensions="sdocml"
             id="com.aptana.contenttype.sdocml"
-            name="SDocML Source"
+            name="%content-type.sdocml.name"
             priority="normal">
       </content-type>
    </extension>
