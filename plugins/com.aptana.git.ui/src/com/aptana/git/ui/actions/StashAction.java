@@ -34,6 +34,7 @@
  */
 package com.aptana.git.ui.actions;
 
+import com.aptana.git.core.model.GitRepository;
 
 public class StashAction extends SimpleGitCommandAction
 {
@@ -47,9 +48,9 @@ public class StashAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
-		refreshAffectedProjects();
+		refreshAffectedProjects(repo);
 	}
 	// TODO Only enable if there are staged or unstaged files (but not untracked/new ones!)
 
