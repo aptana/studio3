@@ -1,17 +1,21 @@
 package com.aptana.git.ui.internal.actions;
 
-import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.git.ui.actions.AddRemoteAction;
 import com.aptana.git.ui.actions.DeleteBranchAction;
@@ -42,7 +46,6 @@ public class GitActionHandler extends AbstractHandler
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	protected void setupAction(ExecutionEvent event, IAction action)
 	{
 		if (action instanceof IActionDelegate)
@@ -52,16 +55,17 @@ public class GitActionHandler extends AbstractHandler
 			Object context = event.getApplicationContext();
 			if (context instanceof IEvaluationContext)
 			{
+				ISelection selection = null;
 				IEvaluationContext duh = (IEvaluationContext) context;
-				Object var = duh.getDefaultVariable();
-				StructuredSelection selection = null;
-				if (var instanceof List)
+				IWorkbenchPart activePart = (IWorkbenchPart) duh.getVariable(ISources.ACTIVE_PART_NAME);
+				if (activePart instanceof IEditorPart)
 				{
-					selection = new StructuredSelection((List) var);
+					IEditorInput input = (IEditorInput) duh.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
+					selection = new StructuredSelection(input.getAdapter(IResource.class));
 				}
 				else
 				{
-					selection = new StructuredSelection(var);
+					selection = (ISelection) duh.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 				}
 				d.selectionChanged(action, selection);
 			}
