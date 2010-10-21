@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Aptana CSS Formatter
+Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.css.formatter;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.css.formatter.CSSFormatterPlugin
-Bundle-Vendor: Aptana Inc.
+Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.ui,
  beaver
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Bundle-Localization: plugin

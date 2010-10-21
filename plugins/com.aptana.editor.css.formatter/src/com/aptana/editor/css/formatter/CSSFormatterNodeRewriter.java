@@ -35,7 +35,6 @@
 package com.aptana.editor.css.formatter;
 
 import com.aptana.editor.css.formatter.nodes.FormatterCSSCommentNode;
-import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
@@ -46,7 +45,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class CSSFormatterNodeRewriter extends FormatterNodeRewriter
 {
 
-	public CSSFormatterNodeRewriter(IParseRootNode parseResult, FormatterDocument document)
+	public CSSFormatterNodeRewriter(IParseRootNode parseResult)
 	{
 		for (IParseNode commentNode : parseResult.getCommentNodes())
 		{
