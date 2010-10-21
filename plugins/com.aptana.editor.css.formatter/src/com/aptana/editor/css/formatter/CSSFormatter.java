@@ -140,7 +140,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
-		String input = source.substring(offset, offset + length);
+		String input = new String(source.substring(offset, offset + length));
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
