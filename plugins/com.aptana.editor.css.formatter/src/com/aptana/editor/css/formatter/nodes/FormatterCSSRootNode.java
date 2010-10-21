@@ -34,48 +34,51 @@
  */
 package com.aptana.editor.css.formatter.nodes;
 
-import com.aptana.editor.css.formatter.CSSFormatterConstants;
+import java.util.List;
+
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
-public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
+/**
+ * A CSS formatter root node.<br>
+ * This node will make sure that in case the CSS partition is nested in HTML, we prefix the formatted output with a new
+ * line on the top.
+ * 
+ */
+public class FormatterCSSRootNode extends FormatterBlockNode
 {
 
 	/**
 	 * @param document
 	 */
-	public FormatterCSSDeclarationNode(IFormatterDocument document)
+	public FormatterCSSRootNode(IFormatterDocument document)
 	{
 		super(document);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptNodes(java.util.List,
+	 * com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
 	 */
-	protected boolean isIndenting()
+	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
+			throws Exception
 	{
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
-	 */
-	protected boolean isAddingBeginNewLine()
-	{
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
-	 * )
-	 */
-	protected int getBlankLinesAfter(IFormatterContext context)
-	{
-		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		int indent = context.getIndent();
+		if (!visitor.endsWithNewLine()
+				&& getDocument().getInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET) > 0)
+		{
+			visitor.ensureLineStarted(context);
+			visitor.writeLineBreak(context);
+		}
+		super.acceptNodes(nodes, context, visitor);
+		if (indent > 0)
+		{
+			context.decIndent();
+		}
 	}
 }

@@ -38,9 +38,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -53,9 +52,9 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
@@ -86,18 +85,30 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		IParser parser = getParser();
-		IParseState parseState = new ParseState();
-		String source = document.get();
-		parseState.setEditState(source, null, 0, 0);
+
 		int indent = 0;
 		try
 		{
+
+			// detect the indentation offset with the parser, only if the given offset is not the first one in the
+			// current
+			// partition.
+			ITypedRegion partition = document.getPartition(offset);
+			if (partition != null && partition.getOffset() == offset)
+			{
+				return super.detectIndentationLevel(document, offset);
+			}
+
+			IParser parser = getParser();
+			IParseState parseState = new ParseState();
+			String source = document.get();
+			parseState.setEditState(source, null, 0, 0);
+
 			IParseRootNode parseResult = parser.parse(parseState);
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
-				final FormatterDocument formatterDocument = createFormatterDocument(source);
+				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
 				new CSSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
 				IFormatterContext context = new CSSFormatterContext(0);
@@ -115,78 +126,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (Throwable t)
 		{
-			indent = alternativeDetectIndentationLevel(document, offset);
+			return super.detectIndentationLevel(document, offset);
 		}
 		return indent;
-	}
-
-	/**
-	 * Returns the indentation level by looking at the previous line and the formatter settings for the tabs and spaces.
-	 * This is an alternative way that is invoked if the parser fails to parse the CSS content.
-	 * 
-	 * @param document
-	 * @param offset
-	 * @return
-	 */
-	private int alternativeDetectIndentationLevel(IDocument document, int offset)
-	{
-		try
-		{
-			int lineNumber = document.getLineOfOffset(offset);
-			if (lineNumber > 0)
-			{
-				IRegion previousLineRegion = document.getLineInformation(lineNumber - 1);
-				String text = document.get(previousLineRegion.getOffset(), previousLineRegion.getLength());
-				// grab the empty string at the beginning of the text.
-				int spaceChars = 0;
-				int tabChars = 0;
-				for (int i = 0; i < text.length(); i++)
-				{
-					char c = text.charAt(i);
-					if (!Character.isWhitespace(c))
-					{
-						break;
-					}
-					if (c == '\n' || c == '\r')
-					{
-						// ignore it
-						continue;
-					}
-					if (c == ' ')
-					{
-						spaceChars++;
-					}
-					else if (c == '\t')
-					{
-						tabChars++;
-					}
-				}
-				String indentType = getIndentType();
-				int indentSize = getIndentSize();
-				int tabSize = getTabSize();
-				if (CodeFormatterConstants.TAB.equals(indentType))
-				{
-					// treat the whitespace-chars as tabs
-					return (spaceChars / tabSize) + tabChars + 1;
-				}
-				else if (CodeFormatterConstants.SPACE.equals(indentType))
-				{
-					// treat the tabs as spaces
-					return (spaceChars + (tabSize * tabChars)) / indentSize + 1;
-				}
-				else
-				{
-					// it's Mixed
-					return (spaceChars + tabChars) / indentSize + 1;
-				}
-
-			}
-		}
-		catch (BadLocationException e)
-		{
-			FormatterPlugin.logError(e);
-		}
-		return 0;
 	}
 
 	/*
@@ -204,7 +146,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			IParseRootNode parseResult = parser.parse(parseState);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel);
+				final String output = format(input, parseResult, indentationLevel, offset);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -272,10 +214,10 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 *            The indentation level to start from
 	 * @return A formatted string
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel)
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset)
 	{
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
-		final FormatterDocument document = createFormatterDocument(input);
+		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new CSSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new CSSFormatterContext(indentationLevel);
@@ -295,7 +237,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 	}
 
-	private FormatterDocument createFormatterDocument(String input)
+	private FormatterDocument createFormatterDocument(String input, int offset)
 	{
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(CSSFormatterConstants.FORMATTER_TAB_SIZE, getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE));
@@ -303,6 +245,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
 				getString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 		document.setInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS));
+		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;
 	}
