@@ -9,7 +9,6 @@
  *******************************************************************************/
 package com.aptana.formatter.ui.dialogFields;
 
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -40,24 +39,10 @@ public class StringDialogField extends DialogField
 		super();
 		if (Activator.DEBUG)
 		{
-			System.err.println("StringDialogField: Add content assist here."); //$NON-NLS-1$
+			// TODO Add content assist here
 		}
 		fText = Util.EMPTY_STRING;
 		fMessage = Util.EMPTY_STRING;
-	}
-
-	public void setContentAssistProcessor(IContentAssistProcessor processor)
-	{
-		// fContentAssistProcessor= processor;
-		// if (fContentAssistProcessor != null && isOkToUse(fTextControl)) {
-		// ControlContentAssistHelper.createTextContentAssistant(fTextControl,
-		// fContentAssistProcessor);
-		// }
-	}
-
-	public IContentAssistProcessor getContentAssistProcessor()
-	{
-		return null;// fContentAssistProcessor;
 	}
 
 	// ------- layout helpers
@@ -137,10 +122,6 @@ public class StringDialogField extends DialogField
 			fTextControl.addModifyListener(fModifyListener);
 
 			fTextControl.setEnabled(isEnabled());
-			// if (fContentAssistProcessor != null) {
-			// ControlContentAssistHelper.createTextContentAssistant(fTextControl,
-			// fContentAssistProcessor);
-			// }
 		}
 		return fTextControl;
 	}

@@ -430,7 +430,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 		if (viewer instanceof ITextViewerExtension)
 		{
-			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this);
+			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this, viewer);
 			// add listener to our viewer
 			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
 		}

@@ -16,8 +16,7 @@ public class Activator extends AbstractUIPlugin
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.formatter.ui.epl"; //$NON-NLS-1$
 	public static final int INTERNAL_ERROR = 10001;
-	public static final boolean DEBUG = Boolean
-			.valueOf(Platform.getDebugOption("com.aptana.formatter.ui.epl/debug")).booleanValue(); //$NON-NLS-1$
+	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
 	// The shared instance
 	private static Activator plugin;
 

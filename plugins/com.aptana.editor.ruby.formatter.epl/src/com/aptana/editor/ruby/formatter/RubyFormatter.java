@@ -76,8 +76,10 @@ public class RubyFormatter extends AbstractScriptFormatter
 			final String source = document.get();
 			final ParserResult result;
 
-			RubySourceParser sourceParser = getSourceParser();
+			IParser parser = super.checkoutParser();
+			RubySourceParser sourceParser = getSourceParser(parser);
 			result = sourceParser.parse(source);
+			checkinParser(parser);
 			if (!(result instanceof NullParserResult))
 			{
 				final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
@@ -172,8 +174,10 @@ public class RubyFormatter extends AbstractScriptFormatter
 				length -= toTrim;
 			}
 		}
-		RubySourceParser sourceParser = getSourceParser();
+		IParser parser = super.checkoutParser();
+		RubySourceParser sourceParser = getSourceParser(parser);
 		ParserResult result = sourceParser.parse(input);
+		checkinParser(parser);
 		if (!(result instanceof NullParserResult))
 		{
 			String output = format(input, result, indent);
@@ -230,10 +234,9 @@ public class RubyFormatter extends AbstractScriptFormatter
 	/**
 	 * @return RubySourceParser
 	 */
-	protected RubySourceParser getSourceParser()
+	protected RubySourceParser getSourceParser(IParser parser)
 	{
 		RubySourceParser sourceParser = null;
-		IParser parser = super.getParser();
 		if (parser instanceof RubyParser)
 		{
 			sourceParser = ((RubyParser) parser).getSourceParser();
@@ -273,7 +276,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			FormatterPlugin.logError(e);
 			return null;
 		}
 	}
@@ -281,13 +284,13 @@ public class RubyFormatter extends AbstractScriptFormatter
 	private FormatterDocument createDocument(String input)
 	{
 		FormatterDocument document = new FormatterDocument(input);
-		for (int i = 0; i < INDENTING.length; ++i)
+		for (String key : INDENTING)
 		{
-			document.setBoolean(INDENTING[i], getBoolean(INDENTING[i]));
+			document.setBoolean(key, getBoolean(key));
 		}
-		for (int i = 0; i < BLANK_LINES.length; ++i)
+		for (String key : BLANK_LINES)
 		{
-			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));
+			document.setInt(key, getInt(key));
 		}
 		document.setInt(RubyFormatterConstants.FORMATTER_TAB_SIZE, getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(RubyFormatterConstants.WRAP_COMMENTS, getBoolean(RubyFormatterConstants.WRAP_COMMENTS));

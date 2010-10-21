@@ -7,9 +7,9 @@
             contentType="com.aptana.contenttype.html">
          <formatterFactory
                class="com.aptana.editor.html.formatter.HTMLFormatterFactory"
-               description="HTML Code Formatter"
+               description="%html_code_formatter_description"
                id="com.aptana.editor.html.formatterFactory"
-               name="HTML"
+               name="%html_code_formatter"
                priority="10">
          </formatterFactory>
       </engineContribution>
@@ -17,7 +17,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.editor.html.formatter.HTMLFormatterPreferenceInitializer">
+            class="com.aptana.editor.html.formatter.preferences.HTMLFormatterPreferenceInitializer">
       </initializer>
    </extension>
 </plugin>

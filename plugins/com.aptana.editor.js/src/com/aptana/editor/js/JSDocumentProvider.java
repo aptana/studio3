@@ -34,33 +34,21 @@
  */
 package com.aptana.editor.js;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.SimpleDocumentProvider;
 
-public class JSDocumentProvider extends CommonDocumentProvider
+public class JSDocumentProvider extends SimpleDocumentProvider
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
 	 */
 	@Override
-	public void connect(Object element) throws CoreException
+	public IPartitionTokenScanner createPartitionScanner()
 	{
-		super.connect(element);
-
-		IDocument document = getDocument(element);
-		if (document != null)
-		{
-			IDocumentPartitioner partitioner = new FastPartitioner(new JSSourcePartitionScanner(), JSSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, JSSourceConfiguration.getDefault());
-		}
+		return new JSSourcePartitionScanner();
 	}
 
 	/*
@@ -70,5 +58,15 @@ public class JSDocumentProvider extends CommonDocumentProvider
 	protected String getDefaultContentType(String filename)
 	{
 		return IJSConstants.CONTENT_TYPE_JS;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
+	 */
+	@Override
+	public IPartitioningConfiguration getPartitioningConfiguration()
+	{
+		return JSSourceConfiguration.getDefault();
 	}
 }

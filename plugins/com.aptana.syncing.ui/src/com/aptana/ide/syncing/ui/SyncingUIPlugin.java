@@ -264,10 +264,6 @@ public class SyncingUIPlugin extends AbstractUIPlugin {
         log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
     }
 
-    public static void logError(String msg, Error e) {
-        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-    }
-
     private static void log(IStatus status) {
         getDefault().getLog().log(status);
     }

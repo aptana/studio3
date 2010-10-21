@@ -69,30 +69,16 @@ public class JSFormatterContext extends FormatterContext
 	}
 
 	/**
-	 * Check if the char sequence starts with a '&lt!' sequence or a '&lt!--' sequence. If so, return the length of the
+	 * TODO
+	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
 	 * sequence; Otherwise, return 0.
 	 * 
 	 * @see IFormatterContext#getCommentStartLength(CharSequence, int)
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{
-		// FIXME - Fix this for JS
-		int count = 0;
-		if (chars.length() > offset + 1)
-		{
-			if (chars.charAt(offset) == '<' && chars.charAt(offset + 1) == '!')
-			{
-				count = 2;
-			}
-			if (chars.length() > offset + 3)
-			{
-				if (chars.charAt(offset + 2) == '-' && chars.charAt(offset + 3) == '-')
-				{
-					count += 2;
-				}
-			}
-		}
-		return count;
+		// TODO - Implement this for JS once we have the comments support in.
+		return 2;
 	}
 
 	/*

@@ -52,17 +52,36 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 * Returns an {@link IParser} which was assigned to the mainContentType that was set on this formatter.
 	 * 
 	 * @return IParser (can be null in case there is no assigned parser for the given mainContentType)
+	 * @see #checkinParser(IParser)
 	 */
-	protected IParser getParser()
+	protected IParser checkoutParser()
 	{
 		IParser parser = null;
 		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(getMainContentType());
 		if (pool != null)
 		{
 			parser = pool.checkOut();
-			pool.checkIn(parser);
 		}
 		return parser;
+	}
+
+	/**
+	 * Check in the parser back into the parser pool.
+	 * 
+	 * @param IParser
+	 *            - The parser to check-in
+	 * @see #checkoutParser()
+	 */
+	protected void checkinParser(IParser parser)
+	{
+		if (parser != null)
+		{
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(getMainContentType());
+			if (pool != null)
+			{
+				pool.checkIn(parser);
+			}
+		}
 	}
 
 	/**

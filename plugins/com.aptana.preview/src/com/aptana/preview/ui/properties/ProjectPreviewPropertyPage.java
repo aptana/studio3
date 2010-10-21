@@ -32,23 +32,58 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.git.ui.internal;
 
-import org.eclipse.osgi.util.NLS;
+package com.aptana.preview.ui.properties;
 
-public class Messages extends NLS
-{
-	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.messages"; //$NON-NLS-1$
-	public static String QuickDiffReferenceProvider_Error_NotEnoughBytesForBOM;
-	public static String QuickDiffReferenceProvider_Error_WrongByteOrderMark;
-	public static String QuickDiffReferenceProvider_ReadJob_label;
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IWorkbenchPropertyPage;
+import org.eclipse.ui.dialogs.PropertyPage;
+
+import com.aptana.core.CoreStrings;
+
+/**
+ * @author Max Stepanov
+ * 
+ */
+public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkbenchPropertyPage {
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
+	@Override
+	protected Control createContents(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
+
+		Label label = new Label(container, SWT.LEAD);
+		label.setText(Messages.ProjectPreviewPropertyPage_Server_Label);
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
+		ComboViewer comboViewer = new ComboViewer(container, SWT.DROP_DOWN);
+		comboViewer.getControl().setLayoutData(GridDataFactory.swtDefaults().grab(true, false).create());
+
+		Button editButton = new Button(container, SWT.PUSH);
+		editButton.setText(CoreStrings.EDIT);
+		editButton.setLayoutData(GridDataFactory.swtDefaults().hint(
+				new PixelConverter(editButton).convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH),
+				SWT.DEFAULT).create());
+
+		return container;
 	}
 
-	private Messages()
-	{
-	}
+	// TODO: load/save project properties
+
 }

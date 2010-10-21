@@ -52,7 +52,7 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 	 */
 	public JSFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
 	{
-		// TODO
+		// TODO - call super and set up the re-writer to handle JS comments.
 	}
 
 	/*

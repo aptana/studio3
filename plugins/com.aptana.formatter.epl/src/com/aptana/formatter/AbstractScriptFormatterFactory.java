@@ -95,9 +95,8 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 		final PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
 		{
-			for (int i = 0; i < keys.length; ++i)
+			for (PreferenceKey prefKey : keys)
 			{
-				final PreferenceKey prefKey = keys[i];
 				final String key = prefKey.getName();
 				if (preferences.containsKey(key))
 				{

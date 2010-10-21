@@ -26,18 +26,18 @@ public class AbstractFormatterNodeBuilder
 		stack.push(root);
 	}
 
-	protected IFormatterContainerNode peek()
+	public IFormatterContainerNode peek()
 	{
 		return stack.peek();
 	}
 
-	protected void push(IFormatterContainerNode node)
+	public void push(IFormatterContainerNode node)
 	{
 		addChild(node);
 		stack.push(node);
 	}
 
-	protected IFormatterNode addChild(IFormatterNode node)
+	public IFormatterNode addChild(IFormatterNode node)
 	{
 		IFormatterContainerNode parentNode = peek();
 		if (!node.isEmpty())
@@ -116,7 +116,7 @@ public class AbstractFormatterNodeBuilder
 		return startOffset;
 	}
 
-	protected void checkedPop(IFormatterContainerNode expected, int bodyEnd)
+	public void checkedPop(IFormatterContainerNode expected, int bodyEnd)
 	{
 		IFormatterContainerNode top = stack.pop();
 		if (top != expected)
@@ -132,7 +132,7 @@ public class AbstractFormatterNodeBuilder
 	/**
 	 * @return
 	 */
-	protected IFormatterTextNode createTextNode(IFormatterDocument document, int startIndex, int endIndex)
+	public IFormatterTextNode createTextNode(IFormatterDocument document, int startIndex, int endIndex)
 	{
 		return new FormatterTextNode(document, startIndex, endIndex);
 	}

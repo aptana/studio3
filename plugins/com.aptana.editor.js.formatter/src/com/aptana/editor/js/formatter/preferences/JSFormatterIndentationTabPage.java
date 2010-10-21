@@ -62,9 +62,9 @@ import com.aptana.formatter.ui.util.SWTFactory;
 public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 {
 	private static final String INDENTATION_PREVIEW_FILE = "indentation-preview.js"; //$NON-NLS-1$
-	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
+	private final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
 			CodeFormatterConstants.MIXED };
-	private final String[] tabOptionNames = new String[] {
+	private final String[] TAB_OPTION_NAMES = new String[] {
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB,
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_MIXED };
@@ -91,7 +91,8 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 		Group group = SWTFactory.createGroup(parent,
 				Messages.JSFormatterIndentationTabPage_indentationGeneralGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
 		final Combo tabOptions = manager.createCombo(group, JSFormatterConstants.FORMATTER_TAB_CHAR,
-				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, tabOptionItems, tabOptionNames);
+				FormatterMessages.IndentationTabPage_general_group_option_tab_policy, TAB_OPTION_ITEMS,
+				TAB_OPTION_NAMES);
 		final Text indentationSize = manager.createNumber(group, JSFormatterConstants.FORMATTER_INDENTATION_SIZE,
 				FormatterMessages.IndentationTabPage_general_group_option_indent_size);
 		final Text tabSize = manager.createNumber(group, JSFormatterConstants.FORMATTER_TAB_SIZE,
@@ -103,7 +104,7 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 				int index = tabOptions.getSelectionIndex();
 				if (index >= 0)
 				{
-					final boolean tabMode = CodeFormatterConstants.TAB.equals(tabOptionItems[index]);
+					final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
 					if (tabMode)
 					{
 						indentationSize.setText(tabSize.getText());
@@ -160,7 +161,7 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 			int index = tabOptions.getSelectionIndex();
 			if (index >= 0)
 			{
-				final boolean tabMode = CodeFormatterConstants.TAB.equals(tabOptionItems[index]);
+				final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
 				manager.enableControl(indentationSize, !tabMode);
 			}
 		}
