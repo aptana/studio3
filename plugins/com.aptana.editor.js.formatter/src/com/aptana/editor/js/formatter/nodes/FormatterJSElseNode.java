@@ -56,9 +56,11 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	 * @param document
 	 * @param b
 	 * @param hasBlock
-	 * @param previousIfHasBlock Indicate that the previous 'if' block (the 'true' part) has a blocked body in curly-braces.
+	 * @param previousIfHasBlock
+	 *            Indicate that the previous 'if' block (the 'true' part) has a blocked body in curly-braces.
 	 */
-	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock, boolean isElseIf, boolean previousIfHasBlock)
+	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock, boolean isElseIf,
+			boolean previousIfHasBlock)
 	{
 		super(document);
 		this.hasBlock = hasBlock;
@@ -162,7 +164,7 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 		// the non-blocked child is not an else-if. In case it is, we check if this else-if should be
 		// broken into two lines. If so, we indent anyway.
 		return !hasBlock
-				&& (!isElseIf || isElseIf
-						&& !getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT));
+				&& (!isElseIf || !getDocument()
+						.getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT));
 	}
 }
