@@ -23,6 +23,8 @@ public interface IFormatterContext
 	void decIndent();
 
 	void resetIndent();
+	
+	void setIndent(int indent);
 
 	IFormatterContext copy();
 
