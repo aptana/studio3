@@ -48,7 +48,7 @@ public class AbstractFormatterNodeBuilder
 		return node;
 	}
 
-	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, final int pos)
+	private void advanceParent(IFormatterNode node, IFormatterContainerNode parentNode, int pos)
 	{
 		if (parentNode.getEndOffset() < pos)
 		{
@@ -61,6 +61,15 @@ public class AbstractFormatterNodeBuilder
 				{
 					return;
 				}
+				int rightPos = text.length() - 1;
+				for (; rightPos > 0; rightPos--)
+				{
+					if (!Character.isWhitespace(text.charAt(rightPos)))
+					{
+						break;
+					}
+				}
+				pos = pos - (text.length() - rightPos) + 1;
 			}
 			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
 

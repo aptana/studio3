@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.formatter.ui.epl.Activator;
 import com.aptana.formatter.ui.epl.UIEplMessages;
+import com.aptana.ui.UIUtils;
 
 /**
  * The default exception handler shows an error dialog when one of its handle methods is called. If the passed exception
@@ -57,7 +58,7 @@ public class ExceptionHandler
 	 */
 	public static void handle(CoreException e, String title, String message)
 	{
-		handle(e, Activator.getActiveWorkbenchShell(), title, message);
+		handle(e, UIUtils.getActiveShell(), title, message);
 	}
 
 	/**
@@ -90,7 +91,7 @@ public class ExceptionHandler
 	 */
 	public static void handle(InvocationTargetException e, String title, String message)
 	{
-		handle(e, Activator.getActiveWorkbenchShell(), title, message);
+		handle(e, UIUtils.getActiveShell(), title, message);
 	}
 
 	/**

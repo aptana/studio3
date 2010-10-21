@@ -277,9 +277,9 @@ public abstract class ContributionExtensionManager
 
 	private void loadChildren(String contentType, IConfigurationElement[] innerElements)
 	{
-		for (int j = 0; j < innerElements.length; j++)
+
+		for (IConfigurationElement innerElement : innerElements)
 		{
-			IConfigurationElement innerElement = innerElements[j];
 			String name = innerElement.getName();
 
 			if (name.equals(getContributionElementName()))

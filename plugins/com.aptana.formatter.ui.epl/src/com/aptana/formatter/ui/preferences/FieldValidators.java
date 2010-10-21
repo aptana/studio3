@@ -19,6 +19,10 @@ import com.aptana.formatter.ui.util.StatusInfo;
 
 public final class FieldValidators
 {
+	// Available validators
+	public static final IFieldValidator POSITIVE_NUMBER_VALIDATOR = new PositiveNumberValidator();
+	public static final IFieldValidator PORT_VALIDATOR = new PortValidator();
+
 	public static class PositiveNumberValidator implements IFieldValidator
 	{
 		public IStatus validate(String text)
@@ -36,14 +40,12 @@ public final class FieldValidators
 					int value = Integer.parseInt(text);
 					if (value < 0)
 					{
-						status.setError(MessageFormat.format(Messages.PositiveNumberIsInvalid,
-								new Object[] { text }));
+						status.setError(MessageFormat.format(Messages.PositiveNumberIsInvalid, new Object[] { text }));
 					}
 				}
 				catch (NumberFormatException e)
 				{
-					status.setError(MessageFormat.format(Messages.PositiveNumberIsInvalid,
-							new Object[] { text }));
+					status.setError(MessageFormat.format(Messages.PositiveNumberIsInvalid, new Object[] { text }));
 				}
 			}
 
@@ -72,8 +74,8 @@ public final class FieldValidators
 			int value = Integer.parseInt(text);
 			if (value < minValue)
 			{
-				status.setError(MessageFormat.format(Messages.MinValueInvalid, new Object[] { String
-						.valueOf(minValue) }));
+				status.setError(MessageFormat.format(Messages.MinValueInvalid,
+						new Object[] { String.valueOf(minValue) }));
 			}
 
 			return status;
@@ -97,8 +99,7 @@ public final class FieldValidators
 					int value = Integer.parseInt(text);
 					if (value < 1000 || value > 65535)
 					{
-						status.setError(MessageFormat.format(Messages.PortShouldBeInRange,
-								new Object[] { text }));
+						status.setError(MessageFormat.format(Messages.PortShouldBeInRange, new Object[] { text }));
 					}
 				}
 				catch (NumberFormatException e)
@@ -110,8 +111,4 @@ public final class FieldValidators
 			return status;
 		}
 	}
-
-	// Available validators
-	public static IFieldValidator POSITIVE_NUMBER_VALIDATOR = new PositiveNumberValidator();
-	public static IFieldValidator PORT_VALIDATOR = new PortValidator();
 }

@@ -49,7 +49,7 @@ import com.aptana.formatter.ui.util.StatusUtil;
 /**
  * Direct port from the jdt ui, this class should not be extended by anyone but the internal dltk ui.
  * 
- * @see org.eclipse.dltk.ui.preferences.AbstractConfigurationBlockPropertyAndPreferencePage
+ * @see AbstractConfigurationBlockPropertyAndPreferencePage
  */
 public abstract class PropertyAndPreferencePage extends PreferencePage implements IWorkbenchPreferencePage,
 		IWorkbenchPropertyPage

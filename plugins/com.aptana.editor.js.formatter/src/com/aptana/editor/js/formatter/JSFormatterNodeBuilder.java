@@ -194,7 +194,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
 				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
-				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf);
+				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf, isCurlyTrueBlock);
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)

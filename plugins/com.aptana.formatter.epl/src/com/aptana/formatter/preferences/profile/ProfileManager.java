@@ -75,11 +75,14 @@ public class ProfileManager implements IProfileManager
 	 */
 	public static ProfileManager getInstance()
 	{
-		synchronized (ProfileManager.class)
+		if (instance == null)
 		{
-			if (instance == null)
+			synchronized (ProfileManager.class)
 			{
-				instance = new ProfileManager();
+				if (instance == null)
+				{
+					instance = new ProfileManager();
+				}
 			}
 		}
 		return instance;
@@ -222,9 +225,9 @@ public class ProfileManager implements IProfileManager
 		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
 		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
 		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
-		for (int i = 0; i < extensions.length; ++i)
+		for (IContributedExtension extension : extensions)
 		{
-			IScriptFormatterFactory factory = (IScriptFormatterFactory) extensions[i];
+			IScriptFormatterFactory factory = (IScriptFormatterFactory) extension;
 			if (!factoriesClasses.contains(factory.getClass()))
 			{
 				factoriesClasses.add(factory.getClass());

@@ -38,7 +38,8 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
-	 * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse .swt.widgets.Composite)
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public final void createControl(Composite parent)
 	{
@@ -54,6 +55,7 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
 	 */
 	public final void dispose()
@@ -67,6 +69,7 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
+	 * /(non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performApply()
 	 */
 	public final void performApply()
@@ -78,6 +81,7 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
 	 */
 	public final boolean performOk()
@@ -91,8 +95,9 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
-	 * @see org.eclipse.dltk.internal.ui.preferences.PropertyAndPreferencePage#setElement
-	 * (org.eclipse.core.runtime.IAdaptable)
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.preferences.PropertyAndPreferencePage#setElement(org.eclipse.core.runtime.IAdaptable)
 	 */
 	public final void setElement(IAdaptable element)
 	{
@@ -136,8 +141,10 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	protected abstract void setPreferenceStore();
 
 	/*
-	 * @seeorg.eclipse.dltk.internal.ui.preferences.PropertyAndPreferencePage#
-	 * createPreferenceContent(org.eclipse.swt.widgets.Composite)
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.preferences.PropertyAndPreferencePage#createPreferenceContent(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
 	protected final Control createPreferenceContent(Composite composite)
 	{
@@ -145,7 +152,8 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
-	 * @seeorg.eclipse.dltk.internal.ui.preferences.PropertyAndPreferencePage# enableProjectSpecificSettings(boolean)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.preferences.PropertyAndPreferencePage#enableProjectSpecificSettings(boolean)
 	 */
 	protected final void enableProjectSpecificSettings(boolean useProjectSpecificSettings)
 	{
@@ -157,8 +165,10 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
-	 * @seeorg.eclipse.dltk.internal.ui.preferences.PropertyAndPreferencePage#
-	 * hasProjectSpecificOptions(org.eclipse.core.resources.IProject)
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.ui.preferences.PropertyAndPreferencePage#hasProjectSpecificOptions(org.eclipse.core.resources
+	 * .IProject)
 	 */
 	protected final boolean hasProjectSpecificOptions(IProject project)
 	{
@@ -166,7 +176,8 @@ public abstract class AbstractConfigurationBlockPropertyAndPreferencePage extend
 	}
 
 	/*
-	 * @seeorg.eclipse.dltk.internal.ui.preferences.PropertyAndPreferencePage# performDefaults()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.preferences.PropertyAndPreferencePage#performDefaults()
 	 */
 	protected final void performDefaults()
 	{
