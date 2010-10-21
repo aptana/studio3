@@ -39,6 +39,7 @@ import java.text.MessageFormat;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.window.Window;
 
+import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.dialogs.AddRemoteDialog;
 
 public class AddRemoteAction extends SimpleGitCommandAction
@@ -72,7 +73,7 @@ public class AddRemoteAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
 		// do nothing
 	}

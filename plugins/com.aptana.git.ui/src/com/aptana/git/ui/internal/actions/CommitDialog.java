@@ -560,6 +560,12 @@ public class CommitDialog extends StatusDialog
 						@Override
 						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
 						{
+							// need to make a copy because operation will actually change input files.
+							final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
+							for (ChangedFile cf : changedFiles)
+							{
+								copy.add(new ChangedFile(cf));
+							}
 							super.doOperation(repo, changedFiles);
 							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 							{
@@ -569,7 +575,7 @@ public class CommitDialog extends StatusDialog
 									// If this file was shown in diff area, we need to blank the diff area!
 									if (fLastDiffFile != null)
 									{
-										for (ChangedFile file : changedFiles)
+										for (ChangedFile file : copy)
 										{
 											if (file != null && file.equals(fLastDiffFile))
 											{
@@ -577,7 +583,7 @@ public class CommitDialog extends StatusDialog
 											}
 										}
 									}
-									removeDraggedFilesFromSource(unstagedTable, changedFiles);
+									removeDraggedFilesFromSource(unstagedTable, copy);
 								}
 							});
 						}
@@ -595,7 +601,7 @@ public class CommitDialog extends StatusDialog
 		return table;
 	}
 
-	protected synchronized void unstageFiles(final Collection<ChangedFile> files)
+	private synchronized void unstageFiles(final Collection<ChangedFile> files)
 	{
 		// TODO Add a listener to the repo on creation and have toggleStageStatus get invoked with diff!
 		// Temporarily disable the tables
@@ -624,7 +630,7 @@ public class CommitDialog extends StatusDialog
 		}
 	}
 
-	protected synchronized void stageFiles(final Collection<ChangedFile> files)
+	private synchronized void stageFiles(final Collection<ChangedFile> files)
 	{
 		// Temporarily disable the tables
 		stagedTable.setEnabled(false);
@@ -722,7 +728,7 @@ public class CommitDialog extends StatusDialog
 	 * @param diff
 	 * @see #updateDiff(boolean, String)
 	 */
-	protected void updateDiff(ChangedFile file, String diff)
+	private void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
 		{
@@ -737,7 +743,7 @@ public class CommitDialog extends StatusDialog
 	 * @param table
 	 * @param file
 	 */
-	protected void createTableItem(Table table, ChangedFile file, boolean sort)
+	private void createTableItem(Table table, ChangedFile file, boolean sort)
 	{
 		TableItem item = null;
 		if (sort)
@@ -792,7 +798,7 @@ public class CommitDialog extends StatusDialog
 		}
 	}
 
-	protected void validate()
+	private void validate()
 	{
 		if (commitMessage.getText().length() < 1)
 		{
@@ -835,7 +841,7 @@ public class CommitDialog extends StatusDialog
 	 * @param sourceTable
 	 * @param draggedFiles
 	 */
-	protected void removeDraggedFilesFromSource(Table sourceTable, Collection<ChangedFile> draggedFiles)
+	private void removeDraggedFilesFromSource(Table sourceTable, Collection<ChangedFile> draggedFiles)
 	{
 		if (draggedFiles == null || draggedFiles.isEmpty())
 		{

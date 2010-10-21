@@ -37,16 +37,14 @@ package com.aptana.editor.js;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
-public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
+public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
 	/**
 	 * JSSourceViewerConfiguration
@@ -57,43 +55,6 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 	public JSSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, JSSourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return JSSourceConfiguration.getDefault().getTopContentTypes();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		
-		JSSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		
-		return reconciler;
 	}
 
 	/*
@@ -113,5 +74,15 @@ public class JSSourceViewerConfiguration extends CommonSourceViewerConfiguration
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 */
+	@Override
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return JSSourceConfiguration.getDefault();
 	}
 }

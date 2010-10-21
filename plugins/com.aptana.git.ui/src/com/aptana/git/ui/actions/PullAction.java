@@ -34,6 +34,7 @@
  */
 package com.aptana.git.ui.actions;
 
+import com.aptana.git.core.model.GitRepository;
 
 public class PullAction extends SimpleGitCommandAction
 {
@@ -45,11 +46,16 @@ public class PullAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
-		getSelectedRepository().firePullEvent();
+		repo.firePullEvent();
 		// Refresh the in-memory index of the repo!
-		refreshRepoIndex();		
-//		refreshAffectedProjects(); Handled by GitProjectRefresher
+		refreshRepoIndex(repo);
+		// refreshAffectedProjects(); Handled by GitProjectRefresher
+	}
+
+	protected boolean supportsMultipleRepoOperation()
+	{
+		return true;
 	}
 }

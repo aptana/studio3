@@ -48,19 +48,32 @@ public class PushAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
-		getSelectedRepository().firePushEvent();
-		refreshRepoIndex();
+		repo.firePushEvent();
+		refreshRepoIndex(repo);
 	}
 
 	@Override
 	public boolean isEnabled()
 	{
-		GitRepository repo = getSelectedRepository();
-		if (repo == null)
-			return false;
-		String[] commits = repo.commitsAhead(repo.currentBranch());
-		return commits != null && commits.length > 0;
+		for (GitRepository repo : getSelectedRepositories())
+		{
+			if (repo == null)
+			{
+				continue;
+			}
+			String[] commits = repo.commitsAhead(repo.currentBranch());
+			if (commits != null && commits.length > 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected boolean supportsMultipleRepoOperation()
+	{
+		return true;
 	}
 }

@@ -233,7 +233,7 @@ public abstract class MetadataReader extends ValidatingReader
 		
 		if (text != null)
 		{
-			result = text.replaceAll("\\s+", " ").trim();
+			result = text.replaceAll("\\s+", " ").trim();  //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
 		return result;

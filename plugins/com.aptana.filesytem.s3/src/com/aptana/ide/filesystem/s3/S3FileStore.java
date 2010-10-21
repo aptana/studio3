@@ -69,9 +69,10 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
-public class S3FileStore extends FileStore
+class S3FileStore extends FileStore
 {
 
 	private static final String DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss z"; //$NON-NLS-1$
@@ -84,19 +85,19 @@ public class S3FileStore extends FileStore
 	private Path path;
 	private String accessKey;
 
-	public S3FileStore(URI uri)
+	protected S3FileStore(URI uri)
 	{
 		this.uri = uri;
 		this.path = new Path(uri.getPath().replaceAll("%2F", SEPARATOR)); //$NON-NLS-1$
 	}
 
 	@Override
-	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException
+	public String[] childNames(int options, IProgressMonitor monitor) throws CoreException // NO_UCD
 	{
 		return childNames(options, false, monitor);
 	}
 
-	public String[] childNames(int options, boolean includeHackFolderFiles, IProgressMonitor monitor)
+	private String[] childNames(int options, boolean includeHackFolderFiles, IProgressMonitor monitor)
 			throws CoreException
 	{
 		try
@@ -164,7 +165,7 @@ public class S3FileStore extends FileStore
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	private @SuppressWarnings("unchecked")
 	String[] getBuckets() throws MalformedURLException, IOException
 	{
 		// We're outside any buckets. List the buckets!
@@ -180,7 +181,7 @@ public class S3FileStore extends FileStore
 		return keys.toArray(new String[keys.size()]);
 	}
 
-	boolean isRoot()
+	private boolean isRoot()
 	{
 		return getBucket() == null;
 	}
@@ -344,8 +345,8 @@ public class S3FileStore extends FileStore
 			{
 				return connection.getInputStream();
 			}
-			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception("Failed to open inputstream on "
-					+ path.toPortableString() + ". Error code: " + responseCode));
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+					new Exception(errorMessage(responseCode, connection)));
 		}
 		catch (MalformedURLException e)
 		{
@@ -359,10 +360,12 @@ public class S3FileStore extends FileStore
 
 	AWSAuthConnection getAWSConnection()
 	{
+		boolean secure = true;
 		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
-			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false, uri.getHost(),
-					CallingFormat.getPathCallingFormat());
-		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), true, uri.getHost(),
+		{
+			secure = false; // Work around weird bug? Do we need subdomain calling format?
+		}
+		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), secure, uri.getHost(),
 				CallingFormat.getPathCallingFormat());
 	}
 
@@ -561,8 +564,8 @@ public class S3FileStore extends FileStore
 			int responseCode = connection.getResponseCode();
 			if (responseCode >= 400)
 			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
-						"Failed to create folder/bucket with error code: " + responseCode));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+						new Exception(errorMessage(responseCode, connection)));
 			}
 		}
 		catch (MalformedURLException e)
@@ -574,6 +577,30 @@ public class S3FileStore extends FileStore
 			throw S3FileSystemPlugin.coreException(e);
 		}
 		return this;
+	}
+
+	private String errorMessage(int responseCode, HttpURLConnection connection) throws CoreException
+	{
+		String msg = ""; //$NON-NLS-1$
+		try
+		{
+			msg = IOUtil.read(connection.getErrorStream());
+			int index = msg.indexOf("<Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(index + 9);
+			}
+			index = msg.indexOf("</Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(0, index);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		return MessageFormat.format("({0}) {1}", responseCode, msg); //$NON-NLS-1$
 	}
 
 	@Override

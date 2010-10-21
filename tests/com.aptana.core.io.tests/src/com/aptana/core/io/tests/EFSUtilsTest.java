@@ -77,10 +77,10 @@ public class EFSUtilsTest extends TestCase
 	{
 		File f = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
 		File f2 = File.createTempFile("test", "txt"); //$NON-NLS-1$ //$NON-NLS-2$
-		assertEquals("/" + f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile( //$NON-NLS-1$
-				f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)));
+		assertEquals(f.getName(), EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(
+				f.getParentFile()), EFS.getLocalFileSystem().fromLocalFile(f)).toPortableString());
 
-		assertEquals("", EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS //$NON-NLS-1$
+		assertNull(EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f.getParentFile()), EFS
 				.getLocalFileSystem().fromLocalFile(f.getParentFile())));
 
 		assertNull(EFSUtils.getRelativePath(EFS.getLocalFileSystem().fromLocalFile(f), EFS.getLocalFileSystem()

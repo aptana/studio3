@@ -638,5 +638,14 @@
          </visibility>
       </objectContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ide.ui.io.preferences.PermissionPreferencePage"
+            id="com.aptana.ui.io.preferences.PermissionPreferencePage"
+            name="%PreferencePage.permissions.label">
+      </page>
+   </extension>
 
 </plugin>

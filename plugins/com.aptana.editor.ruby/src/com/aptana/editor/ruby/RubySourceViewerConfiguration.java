@@ -36,24 +36,26 @@ package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.ruby.core.RubyDoubleClickStrategy;
 
-public class RubySourceViewerConfiguration extends CommonSourceViewerConfiguration
+public class RubySourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
-
 	private RubyDoubleClickStrategy fDoubleClickStrategy;
 
+	/**
+	 * RubySourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
+	 */
 	public RubySourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -61,53 +63,31 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @seecom.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistant(org.eclipse.jface.text.source.
+	 * ISourceViewer)
 	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
-	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				RubySourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return RubySourceConfiguration.getDefault().getTopContentTypes();
-	}
-
 	@Override
 	public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
 	{
 		IContentAssistant assistant = super.getContentAssistant(sourceViewer);
+		
 		if (assistant instanceof ContentAssistant)
 		{
-			// Turn on prefix completion (complete partially if all proposals share same prefix), and auto insert if only one proposal
+			// Turn on prefix completion (complete partially if all proposals share same prefix), and auto insert if
+			// only one proposal
 			((ContentAssistant) assistant).enableAutoInsert(true);
 			((ContentAssistant) assistant).enablePrefixCompletion(true);
 		}
+		
 		return assistant;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getDoubleClickStrategy(org.eclipse.jface.text.source
+	 * .ISourceViewer, java.lang.String)
 	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
-
 	@Override
 	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType)
 	{
@@ -115,12 +95,29 @@ public class RubySourceViewerConfiguration extends CommonSourceViewerConfigurati
 		{
 			fDoubleClickStrategy = new RubyDoubleClickStrategy();
 		}
+		
 		return fDoubleClickStrategy;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getAutoEditStrategies(org.eclipse.jface.text.source.
+	 * ISourceViewer, java.lang.String)
+	 */
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
 		return new IAutoEditStrategy[] { new RubyAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 */
+	@Override
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return RubySourceConfiguration.getDefault();
 	}
 }

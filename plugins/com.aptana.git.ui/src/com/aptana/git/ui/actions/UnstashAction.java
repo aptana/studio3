@@ -34,6 +34,7 @@
  */
 package com.aptana.git.ui.actions;
 
+import com.aptana.git.core.model.GitRepository;
 
 public class UnstashAction extends SimpleGitCommandAction
 {
@@ -45,9 +46,9 @@ public class UnstashAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
-		refreshAffectedProjects();
+		refreshAffectedProjects(repo);
 	}
 	// TODO Only enable if there's a "ref/stash" ref!
 }

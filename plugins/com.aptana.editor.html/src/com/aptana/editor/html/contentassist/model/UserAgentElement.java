@@ -38,8 +38,6 @@ import com.aptana.core.util.StringUtil;
 
 public class UserAgentElement
 {
-	private static final String EMPTY = "";
-
 	private String _platform;
 	private String _version;
 
@@ -82,7 +80,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return (this._platform != null) ? this._platform : EMPTY;
+		return (this._platform != null) ? this._platform : StringUtil.EMPTY;
 	}
 
 	/**
@@ -92,7 +90,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return (this._version != null) ? this._version : EMPTY;
+		return (this._version != null) ? this._version : StringUtil.EMPTY;
 	}
 
 	/*

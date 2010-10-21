@@ -93,7 +93,7 @@ public class CommitFileRevision extends FileRevision
 
 			public IPath getFullPath()
 			{
-				return getFullPath();
+				return CommitFileRevision.this.getFullPath();
 			}
 
 			public InputStream getContents() throws CoreException
@@ -130,7 +130,7 @@ public class CommitFileRevision extends FileRevision
 		return false;
 	}
 
-	public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException
+	public IFileRevision withAllProperties(IProgressMonitor monitor) throws CoreException // NO_UCD
 	{
 		return this;
 	}
@@ -177,9 +177,9 @@ public class CommitFileRevision extends FileRevision
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.team.core.history.IFileState#exists()
+	 * @see org.eclipse.team.core.history.provider.FileRevision#exists()
 	 */
-	public boolean exists()
+	public boolean exists() // NO_UCD
 	{
 		return !path.equals(DEV_NULL);
 	}
@@ -223,7 +223,7 @@ public class CommitFileRevision extends FileRevision
 		return commit.getComment();
 	}
 
-	public boolean isDescendantOf(IFileRevision revision)
+	protected boolean isDescendantOf(IFileRevision revision)
 	{
 		if (!(revision instanceof CommitFileRevision))
 		{

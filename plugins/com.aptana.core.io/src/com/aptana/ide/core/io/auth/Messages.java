@@ -36,13 +36,13 @@ package com.aptana.ide.core.io.auth;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS
+public class Messages extends NLS // NO_UCD
 {
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.auth.messages"; //$NON-NLS-1$
 
-	public static String AuthenticationManager_FailedGetSecurePreference;
-	public static String AuthenticationManager_FailedSaveSecurePreference;
+	public static String AuthenticationManager_FailedGetSecurePreference; // NO_UCD
+	public static String AuthenticationManager_FailedSaveSecurePreference; // NO_UCD
 
 	static
 	{

@@ -66,7 +66,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	private static final boolean I_AM_DONE = true;
 	private static final boolean FINISH_FOR_ME = false;
 
-	public boolean deleteFile(final IResourceTree tree, final IFile file, final int updateFlags,
+	public boolean deleteFile(final IResourceTree tree, final IFile file, final int updateFlags, // NO_UCD
 			final IProgressMonitor monitor)
 	{
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
@@ -98,7 +98,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
-	public boolean deleteFolder(final IResourceTree tree, final IFolder folder, final int updateFlags,
+	public boolean deleteFolder(final IResourceTree tree, final IFolder folder, final int updateFlags, // NO_UCD
 			final IProgressMonitor monitor)
 	{
 		final boolean force = (updateFlags & IResource.FORCE) == IResource.FORCE;
@@ -140,7 +140,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return true;
 	}
 
-	public boolean deleteProject(final IResourceTree tree, final IProject project, int updateFlags,
+	public boolean deleteProject(final IResourceTree tree, final IProject project, int updateFlags, // NO_UCD
 			final IProgressMonitor monitor)
 	{
 		final GitRepository repo = getAttachedGitRepository(project);
@@ -304,7 +304,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return I_AM_DONE;
 	}
 
-	protected IPath getRepoRelativePath(final IResource file, GitRepository repo)
+	private IPath getRepoRelativePath(final IResource file, GitRepository repo)
 	{
 		IPath workingDir = repo.workingDirectory();
 		IPath filePath = file.getLocation();
@@ -320,7 +320,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		return getGitRepositoryManager().getAttached(project);
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

@@ -34,35 +34,21 @@
  */
 package com.aptana.editor.dtd;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.SimpleDocumentProvider;
 
-public class DTDDocumentProvider extends CommonDocumentProvider
+public class DTDDocumentProvider extends SimpleDocumentProvider
 {
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonDocumentProvider#connect(java.lang.Object)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
 	 */
-	public void connect(Object element) throws CoreException
+	@Override
+	public IPartitionTokenScanner createPartitionScanner()
 	{
-		super.connect(element);
-
-		IDocument document = this.getDocument(element);
-
-		if (document != null)
-		{
-			IDocumentPartitioner partitioner = new FastPartitioner(new DTDPartitionScanner(), DTDSourceConfiguration.CONTENT_TYPES);
-
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, DTDSourceConfiguration.getDefault());
-		}
+		return new DTDPartitionScanner();
 	}
 
 	/*
@@ -72,5 +58,15 @@ public class DTDDocumentProvider extends CommonDocumentProvider
 	protected String getDefaultContentType(String filename)
 	{
 		return IDTDConstants.CONTENT_TYPE_DTD;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
+	 */
+	@Override
+	public IPartitioningConfiguration getPartitioningConfiguration()
+	{
+		return DTDSourceConfiguration.getDefault();
 	}
 }
