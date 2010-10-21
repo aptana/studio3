@@ -36,8 +36,6 @@ package com.aptana.editor.html.formatter;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -56,7 +54,6 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
-import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
@@ -159,9 +156,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 						}
 						else
 						{
-							FormatterPlugin.log(new Status(IStatus.ERROR, HTMLFormatterPlugin.PLUGIN_ID, IStatus.OK,
-									FormatterMessages.Formatter_formatterError, new DumpContentException(input
-											+ "\n=========================\n" + output))); //$NON-NLS-1$
+							logError(input, output);
 						}
 					}
 					else

@@ -36,8 +36,6 @@ package com.aptana.editor.css.formatter;
 
 import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -53,9 +51,7 @@ import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
-import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
-import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
@@ -159,9 +155,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 						}
 						else
 						{
-							FormatterPlugin.log(new Status(IStatus.ERROR, CSSFormatterPlugin.PLUGIN_ID, IStatus.OK,
-									FormatterMessages.Formatter_formatterError, new DumpContentException(input
-											+ "\n=========================\n" + output))); //$NON-NLS-1$
+							logError(input, output);
 						}
 					}
 					else

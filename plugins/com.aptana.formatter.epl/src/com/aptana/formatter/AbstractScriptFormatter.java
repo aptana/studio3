@@ -19,15 +19,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
+import com.aptana.formatter.ui.FormatterMessages;
+import com.aptana.formatter.util.DumpContentException;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
+import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
  * Abstract base class for the {@link IScriptFormatter} implementations.
@@ -141,6 +146,31 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	protected int getInt(String key)
 	{
 		return toInt(preferences.get(key));
+	}
+
+	/**
+	 * Logs an error and notify the user through a status line message and a beep.
+	 * 
+	 * @param input
+	 * @param output
+	 */
+	protected void logError(String input, String output)
+	{
+		// Display a status error
+		StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus, 3000L, true);
+		if (FormatterPlugin.DEBUG)
+		{
+			// Log complete
+			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
+					FormatterMessages.Formatter_formatterError, new DumpContentException(input
+							+ "\n<!----------------------------!>\n" + output))); //$NON-NLS-1$
+		}
+		else
+		{
+			// Log basic
+			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
+					FormatterMessages.Formatter_basicLogFormatterError, null));
+		}
 	}
 
 	private static int toInt(Object value)

@@ -10,6 +10,7 @@
 package com.aptana.formatter.epl;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -24,6 +25,7 @@ public class FormatterPlugin extends AbstractUIPlugin
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.formatter.epl"; //$NON-NLS-1$
+	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
 
 	// The shared instance
 	private static FormatterPlugin plugin;
