@@ -48,6 +48,8 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterCommentsPage extends FormatterModifyTabPage
 {
+	private static final String COMMENTS_PREVIEW_NAME = "comments-preview.css";
+	
 	public CSSFormatterCommentsPage(IFormatterModifyDialog dialog)
 	{
 		super(dialog);
@@ -66,7 +68,7 @@ public class CSSFormatterCommentsPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("comments-preview.css"); //$NON-NLS-1$
+		return getClass().getResource(COMMENTS_PREVIEW_NAME);
 	}
 
 }

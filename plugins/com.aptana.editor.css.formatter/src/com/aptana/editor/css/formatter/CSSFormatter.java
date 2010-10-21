@@ -35,6 +35,7 @@
 package com.aptana.editor.css.formatter;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -67,6 +68,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class CSSFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
 
+	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]");
 	private String lineSeparator;
 
 	/**
@@ -110,7 +112,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new CSSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
+				new CSSFormatterNodeRewriter(parseResult).rewrite(root);
 				IFormatterContext context = new CSSFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
@@ -137,7 +139,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
-		String input = source.substring(offset, offset + length);
+		String input = new String(source.substring(offset, offset + length));
 		IParser parser = getParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
@@ -219,7 +221,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new CSSFormatterNodeRewriter(parseResult, document).rewrite(root);
+		new CSSFormatterNodeRewriter(parseResult).rewrite(root);
 		IFormatterContext context = new CSSFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH));
@@ -252,16 +254,13 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 
 	private boolean equalsIgnoreWhiteSpaceAndAsterisk(String in, String out)
 	{
-		if (in == null)
+		if (in == null || out == null)
 		{
-			return out == null;
+			return in == out;
 		}
-		if (out == null)
-		{
-			return false;
-		}
-		in = in.replaceAll("[\\s\\*]", "");
-		out = out.replaceAll("[\\s\\*]", "");
+		
+		in = whiteSpaceAsterisk.matcher(in).replaceAll("");
+		out = whiteSpaceAsterisk.matcher(out).replaceAll("");
 		return in.equals(out);
 	}
 

@@ -7,9 +7,9 @@
             contentType="com.aptana.contenttype.css">
          <formatterFactory
                class="com.aptana.editor.css.formatter.CSSFormatterFactory"
-               description="CSS Code Formatter"
+               description="%editor.css.formatter.description"
                id="com.aptana.editor.css.formatterFactory"
-               name="CSS"
+               name="%editor.css.formatter.name"
                priority="10">
          </formatterFactory>
       </engineContribution>
@@ -17,7 +17,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.editor.css.formatter.CSSFormatterPreferenceInitializer">
+            class="com.aptana.editor.css.formatter.preferences.CSSFormatterPreferenceInitializer">
       </initializer>
    </extension>
 

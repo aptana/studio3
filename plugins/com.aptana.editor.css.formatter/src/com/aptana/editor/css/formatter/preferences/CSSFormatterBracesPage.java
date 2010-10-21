@@ -50,9 +50,11 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterBracesPage extends FormatterModifyTabPage
 {
-	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SAME_LINE,
+	private static final String BRACES_PREVIEW_NAME = "braces-preview.css";
+	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SAME_LINE,
 			CodeFormatterConstants.NEW_LINE };
-	private final String[] tabOptionNames = new String[] { FormatterMessages.BracesTabPage_position_option_SAME_LINE,
+	private static final String[] TAB_OPTION_NAMES = new String[] {
+			FormatterMessages.BracesTabPage_position_option_SAME_LINE,
 			FormatterMessages.BracesTabPage_position_option_NEW_LINE };
 
 	public CSSFormatterBracesPage(IFormatterModifyDialog dialog)
@@ -65,12 +67,12 @@ public class CSSFormatterBracesPage extends FormatterModifyTabPage
 		Group bracesGroup = SWTFactory.createGroup(parent, Messages.CSSFormatterBracesPage_braces_group_label, 1, 2,
 				GridData.FILL_HORIZONTAL);
 		manager.createCombo(bracesGroup, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-				Messages.CSSFormatterBracesPage_blocks, tabOptionItems, tabOptionNames);
+				Messages.CSSFormatterBracesPage_blocks, TAB_OPTION_ITEMS, TAB_OPTION_NAMES);
 	}
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("braces-preview.css"); //$NON-NLS-1$
+		return getClass().getResource(BRACES_PREVIEW_NAME);
 	}
 
 }

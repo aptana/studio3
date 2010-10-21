@@ -56,8 +56,10 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 {
-	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB };
-	private final String[] tabOptionNames = new String[] {
+	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "control-statements-preview.css";
+	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE,
+			CodeFormatterConstants.TAB };
+	private static final String[] TAB_OPTION_NAMES = new String[] {
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB };
 
@@ -71,7 +73,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 		Group generalGroup = SWTFactory.createGroup(parent,
 				Messages.CSSFormatterControlStatementsPage_general_group_label, 2, 1, GridData.FILL_HORIZONTAL);
 		final Combo tabOptions = manager.createCombo(generalGroup, CSSFormatterConstants.FORMATTER_TAB_CHAR,
-				Messages.CSSFormatterControlStatementsPage_tab_policy_group_option, tabOptionItems, tabOptionNames);
+				Messages.CSSFormatterControlStatementsPage_tab_policy_group_option, TAB_OPTION_ITEMS, TAB_OPTION_NAMES);
 		final Text indentationSize = manager.createNumber(generalGroup,
 				CSSFormatterConstants.FORMATTER_INDENTATION_SIZE,
 				Messages.CSSFormatterControlStatementsPage_indentation_size_group_option);
@@ -86,7 +88,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 				int index = tabOptions.getSelectionIndex();
 				if (index >= 0)
 				{
-					final boolean tabMode = CodeFormatterConstants.TAB.equals(tabOptionItems[index]);
+					final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
 					if (tabMode)
 					{
 						indentationSize.setText(tabSize.getText());
@@ -132,7 +134,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 			int index = tabOptions.getSelectionIndex();
 			if (index >= 0)
 			{
-				final boolean tabMode = CodeFormatterConstants.TAB.equals(tabOptionItems[index]);
+				final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
 				manager.enableControl(indentationSize, !tabMode);
 			}
 		}
@@ -147,6 +149,6 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("control-statements-preview.css"); //$NON-NLS-1$
+		return getClass().getResource(CONTROL_STATEMENTS_PREVIEW_NAME);
 	}
 }

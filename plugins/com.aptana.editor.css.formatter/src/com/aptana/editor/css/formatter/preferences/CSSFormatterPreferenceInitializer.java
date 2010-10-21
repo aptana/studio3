@@ -32,11 +32,14 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.formatter;
+package com.aptana.editor.css.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.editor.css.formatter.CSSFormatterConstants;
+import com.aptana.editor.css.formatter.CSSFormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitializer
@@ -49,14 +52,15 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = CSSFormatterPlugin.getDefault().getPreferenceStore();
-		store.setDefault(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		store.setDefault(CSSFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(CSSFormatterConstants.WRAP_COMMENTS, false);
-		store.setDefault(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 10);
-		store.setDefault(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);
-		store.setDefault(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
-		store.setDefault(CSSFormatterConstants.PRESERVED_LINES, 1);
+		IEclipsePreferences pref = new DefaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
+		
+		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
+		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		pref.putBoolean(CSSFormatterConstants.WRAP_COMMENTS, false);
+		pref.putInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
+		pref.put(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);
+		pref.putInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
+		pref.putInt(CSSFormatterConstants.PRESERVED_LINES, 1);
 	}
 }
