@@ -162,7 +162,7 @@ public final class PreviewManager {
 			workbenchPage = workbenchWindow.getActivePage();
 		}
 		if (workbenchPage == null) {
-			throw new PartInitException("Cannot get Workbench page");
+			throw new PartInitException("Cannot get Workbench page"); //$NON-NLS-1$
 		}
 		PreviewEditorInput input = new PreviewEditorInput(previewConfig.getURL(), sourceConfig.getEditorInput()
 				.getName(), sourceConfig.getEditorInput().getToolTipText());

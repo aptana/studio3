@@ -43,5 +43,5 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public interface IPreviewConstants {
 
-	public QualifiedName PROJECT_PREVIEW_SERVER = new QualifiedName(Activator.PLUGIN_ID, "projectPreviewServer");
+	public QualifiedName PROJECT_PREVIEW_SERVER = new QualifiedName(Activator.PLUGIN_ID, "projectPreviewServer"); //$NON-NLS-1$
 }

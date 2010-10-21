@@ -63,7 +63,7 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 	 * 
 	 */
 	private DefaultPreviewHandler() {
-		contentTypeHTML = Platform.getContentTypeManager().findContentTypeFor("index.html");
+		contentTypeHTML = Platform.getContentTypeManager().findContentTypeFor("index.html"); //$NON-NLS-1$
 	}
 
 	public static DefaultPreviewHandler getInstance() {
@@ -89,7 +89,7 @@ public final class DefaultPreviewHandler implements IPreviewHandler {
 				}
 				return new PreviewConfig(location.toFile().toURI().toURL());
 			} catch (MalformedURLException e) {
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e));
+				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "", e)); //$NON-NLS-1$
 			}
 		}
 		return null;

@@ -161,7 +161,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 					}
 				});
 				dlg.setInput(ServerConfigurationManager.getInstance().getConfigurationTypes());
-				dlg.setTitle("Choose server type");
+				dlg.setTitle(Messages.ServersPreferencePage_Title);
 				Object[] result;
 				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) {
 					String typeId = ((ConfigurationType) result[0]).getId();
@@ -198,8 +198,8 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				AbstractWebServerConfiguration selection = (AbstractWebServerConfiguration) ((IStructuredSelection) viewer
 						.getSelection()).getFirstElement();
 				if (selection != null
-						&& MessageDialog.openQuestion(getShell(), "Delete Confirmation",
-								"The selected server configuration will be permanently removed. Continue?")) {
+						&& MessageDialog.openQuestion(getShell(), Messages.ServersPreferencePage_DeletePrompt_Title,
+								Messages.ServersPreferencePage_DeletePrompt_Message)) {
 					ServerConfigurationManager.getInstance().removeServerConfiguration(selection);
 					viewer.refresh();
 				}
@@ -239,7 +239,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				return dlg.open() == Window.OK;
 			}
 		} catch (CoreException e) {
-			UIUtils.showErrorMessage("Failed to open server preferences dialog", e);
+			UIUtils.showErrorMessage("Failed to open server preferences dialog", e); //$NON-NLS-1$
 		}
 		return false;
 	}

@@ -78,7 +78,7 @@ public final class PreviewEditorInput implements IEditorInput {
 	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
 	 */
 	public ImageDescriptor getImageDescriptor() {
-		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/obj16/preview.png");
+		return Activator.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/obj16/preview.png"); //$NON-NLS-1$
 	}
 
 	/*

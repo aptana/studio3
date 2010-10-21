@@ -69,7 +69,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 		container.setLayout(GridLayoutFactory.swtDefaults().numColumns(3).create());
 
 		Label label = new Label(container, SWT.LEAD);
-		label.setText("Preview Server:");
+		label.setText(Messages.ProjectPreviewPropertyPage_Server_Label);
 		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		ComboViewer comboViewer = new ComboViewer(container, SWT.DROP_DOWN);

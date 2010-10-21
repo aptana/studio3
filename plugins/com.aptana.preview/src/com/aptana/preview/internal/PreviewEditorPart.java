@@ -220,7 +220,7 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 				getSite().getWorkbenchWindow().getActivePage().activate(this);
 			}
 
-			setPartName(MessageFormat.format("Preview: {0}", pei.getName()));
+			setPartName(MessageFormat.format(Messages.PreviewEditorPart_Title, pei.getName()));
 			setTitleToolTip(pei.getToolTipText());
 			Image oldImage = image;
 			ImageDescriptor id = pei.getImageDescriptor();

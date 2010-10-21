@@ -115,8 +115,8 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 
-		setTitle("Edit External Web Server Configuration");
-		getShell().setText("Edit");
+		setTitle(Messages.SimpleWebServerPropertyDialog_Title);
+		getShell().setText(Messages.SimpleWebServerPropertyDialog_ShellTitle);
 
 		Composite composite = new Composite(dialogArea, SWT.NONE);
 		composite.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
@@ -131,7 +131,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		Label label = new Label(composite, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
-		label.setText(StringUtil.makeFormLabel("Name"));
+		label.setText(StringUtil.makeFormLabel(Messages.SimpleWebServerPropertyDialog_Name_Label));
 
 		nameText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		nameText.setLayoutData(GridDataFactory.fillDefaults().hint(
@@ -142,19 +142,19 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 		label = new Label(composite, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
-		label.setText(StringUtil.makeFormLabel("Base URL"));
+		label.setText(StringUtil.makeFormLabel(Messages.SimpleWebServerPropertyDialog_BaseURL_Label));
 
 		baseUrlText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		baseUrlText.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(baseUrlText).convertHorizontalDLUsToPixels(IDialogConstants.ENTRY_FIELD_WIDTH),
 				SWT.DEFAULT).span(2, 1).align(SWT.FILL, SWT.CENTER).grab(true, false).create());
-		baseUrlText.setText("http://");
+		baseUrlText.setText("http://"); //$NON-NLS-1$
 
 		/* row 2 */
 		label = new Label(composite, SWT.NONE);
 		label.setLayoutData(GridDataFactory.swtDefaults().hint(
 				new PixelConverter(label).convertHorizontalDLUsToPixels(LABEL_WIDTH), SWT.DEFAULT).create());
-		label.setText(StringUtil.makeFormLabel("Document Root"));
+		label.setText(StringUtil.makeFormLabel(Messages.SimpleWebServerPropertyDialog_DocRoot_Label));
 
 		documentRootText = new Text(composite, SWT.SINGLE | SWT.BORDER);
 		documentRootText.setLayoutData(GridDataFactory.swtDefaults().hint(
@@ -234,20 +234,20 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 	private boolean isValid() {
 		String message = null;
 		if (nameText.getText().length() == 0) {
-			message = "Specify configuration name";
+			message = Messages.SimpleWebServerPropertyDialog_EmptyNameError;
 		} else {
 			try {
 				if (new URL(baseUrlText.getText()).getHost().length() == 0) {
-					message = "Invalid URL";
+					message = Messages.SimpleWebServerPropertyDialog_InvalidURLError;
 				}
 			} catch (MalformedURLException e) {
-				message = "Invalid URL";
+				message = Messages.SimpleWebServerPropertyDialog_InvalidURLError;
 			}
 		}
 		if (message == null) {
 			File file = Path.fromOSString(documentRootText.getText()).toFile();
 			if (!file.exists() || !file.isDirectory()) {
-				message = "Document Root location doesn't exist";
+				message = Messages.SimpleWebServerPropertyDialog_DocumentRootError;
 			}
 		}
 		if (message != null) {

@@ -54,7 +54,7 @@ import com.aptana.preview.server.ServerConfigurationManager;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.preview";
+	public static final String PLUGIN_ID = "com.aptana.preview"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
