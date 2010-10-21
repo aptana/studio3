@@ -54,6 +54,8 @@ import com.aptana.formatter.ui.util.SWTFactory;
 public class JSFormatterBlankLinesPage extends FormatterModifyTabPage
 {
 
+	private static final String BLANK_LINES_PREVIEW_FILE = "blank-lines-preview.js"; //$NON-NLS-1$
+
 	/**
 	 * @param dialog
 	 */
@@ -77,7 +79,7 @@ public class JSFormatterBlankLinesPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("blank-lines-preview.js"); //$NON-NLS-1$
+		return getClass().getResource(BLANK_LINES_PREVIEW_FILE);
 	}
 
 }

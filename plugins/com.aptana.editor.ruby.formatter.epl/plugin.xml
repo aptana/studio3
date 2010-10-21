@@ -30,7 +30,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.editor.ruby.formatter.internal.RubyFormatterPreferenceInitializer">
+            class="com.aptana.editor.ruby.formatter.preferences.RubyFormatterPreferenceInitializer">
       </initializer>
    </extension>
 

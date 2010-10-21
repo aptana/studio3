@@ -76,8 +76,10 @@ public class RubyFormatter extends AbstractScriptFormatter
 			final String source = document.get();
 			final ParserResult result;
 
-			RubySourceParser sourceParser = getSourceParser();
+			IParser parser = super.checkoutParser();
+			RubySourceParser sourceParser = getSourceParser(parser);
 			result = sourceParser.parse(source);
+			checkinParser(parser);
 			if (!(result instanceof NullParserResult))
 			{
 				final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
@@ -172,8 +174,10 @@ public class RubyFormatter extends AbstractScriptFormatter
 				length -= toTrim;
 			}
 		}
-		RubySourceParser sourceParser = getSourceParser();
+		IParser parser = super.checkoutParser();
+		RubySourceParser sourceParser = getSourceParser(parser);
 		ParserResult result = sourceParser.parse(input);
+		checkinParser(parser);
 		if (!(result instanceof NullParserResult))
 		{
 			String output = format(input, result, indent);
@@ -230,10 +234,9 @@ public class RubyFormatter extends AbstractScriptFormatter
 	/**
 	 * @return RubySourceParser
 	 */
-	protected RubySourceParser getSourceParser()
+	protected RubySourceParser getSourceParser(IParser parser)
 	{
 		RubySourceParser sourceParser = null;
-		IParser parser = super.getParser();
 		if (parser instanceof RubyParser)
 		{
 			sourceParser = ((RubyParser) parser).getSourceParser();
@@ -273,7 +276,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			FormatterPlugin.logError(e);
 			return null;
 		}
 	}

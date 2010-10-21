@@ -99,12 +99,13 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				return super.detectIndentationLevel(document, offset);
 			}
 
-			IParser parser = getParser();
+			IParser parser = checkoutParser();
 			IParseState parseState = new ParseState();
 			String source = document.get();
 			parseState.setEditState(source, null, 0, 0);
 
 			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
 			if (parseResult != null)
 			{
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
@@ -138,12 +139,13 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
-		IParser parser = getParser();
+		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
 		try
 		{
 			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, offset);

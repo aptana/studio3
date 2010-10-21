@@ -53,6 +53,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
  */
 public class JSFormatterCommentsPage extends FormatterModifyTabPage
 {
+	private static final String WRAPPING_PREVIEW_FILE = "wrapping-preview.js"; //$NON-NLS-1$
 
 	/**
 	 * @param dialog
@@ -81,6 +82,6 @@ public class JSFormatterCommentsPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("wrapping-preview.js"); //$NON-NLS-1$
+		return getClass().getResource(WRAPPING_PREVIEW_FILE);
 	}
 }

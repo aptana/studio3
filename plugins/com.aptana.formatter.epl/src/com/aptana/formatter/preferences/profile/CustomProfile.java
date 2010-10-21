@@ -14,7 +14,6 @@ package com.aptana.formatter.preferences.profile;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Represents a user-defined profile. A custom profile can be modified after instantiation.
  */
@@ -22,7 +21,6 @@ public class CustomProfile extends Profile implements IProfile.ICustomProfile
 {
 	String fName;
 	private Map<String, String> fSettings;
-	// protected ProfileManager fManager;
 	private int fVersion;
 
 	public CustomProfile(String name, Map<String, String> settings, int version)
@@ -45,7 +43,9 @@ public class CustomProfile extends Profile implements IProfile.ICustomProfile
 	public void setSettings(Map<String, String> settings)
 	{
 		if (settings == null)
+		{
 			throw new IllegalArgumentException();
+		}
 		fSettings = settings;
 	}
 
@@ -53,14 +53,6 @@ public class CustomProfile extends Profile implements IProfile.ICustomProfile
 	{
 		return fName;
 	}
-
-	// public void setManager(ProfileManager profileManager) {
-	// fManager = profileManager;
-	// }
-	//
-	// public ProfileManager getManager() {
-	// return fManager;
-	// }
 
 	public int getVersion()
 	{

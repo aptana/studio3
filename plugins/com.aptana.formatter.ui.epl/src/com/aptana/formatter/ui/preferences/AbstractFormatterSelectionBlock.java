@@ -351,15 +351,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 		IProfileVersioner versioner = profileManager.getProfileVersioner();
 
-		// if (!versioner.getFormatterId().equals(profile.getFormatterId()))
-		// {
-		// final String title = FormatterMessages.AbstractFormatterSelectionBlock_importProfileLabel;
-		// final String message = NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_notValidFormatter,
-		// versioner.getFormatterId(), profile.getFormatterId());
-		// MessageDialog.openError(group.getShell(), title, message);
-		// return;
-		// }
-
 		if (profile.getVersion() > versioner.getCurrentVersion())
 		{
 			final String title = FormatterMessages.AbstractFormatterSelectionBlock_importingProfile;

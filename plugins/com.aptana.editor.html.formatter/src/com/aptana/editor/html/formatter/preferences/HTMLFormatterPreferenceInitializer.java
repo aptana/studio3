@@ -32,11 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.formatter;
+package com.aptana.editor.html.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.html.formatter.HTMLFormatterConstants;
+import com.aptana.editor.html.formatter.HTMLFormatterPlugin;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -55,24 +59,32 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IPreferenceStore store = HTMLFormatterPlugin.getDefault().getPreferenceStore();
-		store.setDefault(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		store.setDefault(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
-		store.setDefault(HTMLFormatterConstants.WRAP_COMMENTS, false);
-		store.setDefault(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
+		IEclipsePreferences store = new DefaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
+		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);
+		store.putInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		// We add all the 'Void' html tags here as well. They should not trigger an indent increase.
 		store
-				.setDefault(
+				.put(
 						HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
 						"br,a,i,b,em,strong,h1,h2,h3,h4,h5,h6,area,base,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr,td,th" //$NON-NLS-1$
 						.replaceAll(",", IPreferenceDelegate.PREFERECE_DELIMITER)); //$NON-NLS-1$
-		store.setDefault(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+		store.put(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
 				"a,span,i,b,em,strong,h1,h2,h3,h4,h5,h6,title,option,meta,td,th".replaceAll(",", //$NON-NLS-1$//$NON-NLS-2$
 						IPreferenceDelegate.PREFERECE_DELIMITER));
-		store.setDefault(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
-		store.setDefault(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
-		store.setDefault(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);
-		store.setDefault(HTMLFormatterConstants.PRESERVED_LINES, 1);
+		store.putInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
+		store.putInt(HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, 1);
+		store.putInt(HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, 1);
+		store.putInt(HTMLFormatterConstants.PRESERVED_LINES, 1);
+
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+		}
 	}
 }

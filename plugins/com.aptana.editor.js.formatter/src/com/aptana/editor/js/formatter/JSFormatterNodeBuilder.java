@@ -71,7 +71,6 @@ import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSSwitchNode;
-import com.aptana.editor.js.parsing.ast.JSThrowNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
 import com.aptana.editor.js.parsing.ast.JSTryNode;
 import com.aptana.editor.js.parsing.ast.JSVarNode;
@@ -194,7 +193,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elseBlockStart = elsePos + trueBlockEnd + 1;
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
 				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
-				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf, isCurlyTrueBlock);
+				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf,
+						isCurlyTrueBlock);
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -510,16 +510,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				super.visit(node);
 			}
-			// FormatterJSInvokeNode invokeNode = new FormatterJSInvokeNode(document);
-			// IParseNode arguments = node.getArguments();
-			// int beginOffset = node.getStartingOffset();
-			// invokeNode.setBegin(createTextNode(document, beginOffset, arguments.getStartingOffset() + 1));
-			// push(invokeNode);
-			// visitChildren(node);
-			// int invokeEnd = invokeNode.getEndOffset();
-			// checkedPop(invokeNode, invokeEnd);
-			// int endOffset = locateColonOrSemicolonInLine(arguments.getEndingOffset() + 1, document);
-			// invokeNode.setEnd(createTextNode(document, invokeEnd, endOffset));
 		}
 
 		/*
@@ -539,17 +529,6 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				super.visit(node);
 			}
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSThrowNode)
-		 */
-		@Override
-		public void visit(JSThrowNode node)
-		{
-			// TODO Auto-generated method stub
-			super.visit(node);
 		}
 
 		/*
@@ -635,7 +614,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			if (node.getChildCount() > 0)
 			{
 				lastChild = (JSNode) node.getLastChild();
-				while (lastChild.getNodeType() == JSNodeTypes.EMPTY && lastChild.getSemicolonIncluded()) {
+				while (lastChild.getNodeType() == JSNodeTypes.EMPTY && lastChild.getSemicolonIncluded())
+				{
 					// get the previous one to the semicolon node
 					lastChild = (JSNode) lastChild.getPreviousSibling();
 				}

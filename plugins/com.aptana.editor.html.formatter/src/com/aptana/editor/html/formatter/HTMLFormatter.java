@@ -93,7 +93,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
-		IParser parser = getParser();
+		IParser parser = checkoutParser();
 		IParseState parseState = new HTMLParseState();
 		String source = document.get();
 		parseState.setEditState(source, null, 0, 0);
@@ -101,6 +101,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		try
 		{
 			IParseNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
 			if (parseResult != null)
 			{
 				final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
@@ -138,12 +139,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			throw new FormatterException(FormatterMessages.Formatter_contentErrorMessage);
 		}
 		String input = source.substring(offset, offset + length);
-		IParser parser = getParser();
+		IParser parser = checkoutParser();
 		IParseState parseState = new HTMLParseState();
 		parseState.setEditState(input, null, 0, 0);
 		try
 		{
 			IParseNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel);

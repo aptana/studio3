@@ -7,9 +7,9 @@
             contentType="com.aptana.contenttype.js">
          <formatterFactory
                class="com.aptana.editor.js.formatter.JSFormatterFactory"
-               description="JavaScript Code Formatter"
+               description="%js_code_formatter_description"
                id="com.aptana.editor.js.formatterFactory"
-               name="JavaScript"
+               name="%js_code_formatter"
                priority="10">
          </formatterFactory>
       </engineContribution>
@@ -17,7 +17,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.editor.js.formatter.JSFormatterPreferenceInitializer">
+            class="com.aptana.editor.js.formatter.preferences.JSFormatterPreferenceInitializer">
       </initializer>
    </extension>
 </plugin>
