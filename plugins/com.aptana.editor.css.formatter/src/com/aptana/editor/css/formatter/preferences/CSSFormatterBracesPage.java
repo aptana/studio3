@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Group;
 
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
+import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
@@ -51,7 +52,8 @@ public class CSSFormatterBracesPage extends FormatterModifyTabPage
 {
 	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SAME_LINE,
 			CodeFormatterConstants.NEW_LINE };
-	private final String[] tabOptionNames = new String[] { "Same line", "Next line" };
+	private final String[] tabOptionNames = new String[] { FormatterMessages.BracesTabPage_position_option_SAME_LINE,
+			FormatterMessages.BracesTabPage_position_option_NEW_LINE };
 
 	public CSSFormatterBracesPage(IFormatterModifyDialog dialog)
 	{
@@ -60,14 +62,15 @@ public class CSSFormatterBracesPage extends FormatterModifyTabPage
 
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group bracesGroup = SWTFactory.createGroup(parent, "Brace positions", 1, 2, GridData.FILL_HORIZONTAL);
-		manager.createCombo(bracesGroup, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, "Blocks", tabOptionItems,
-				tabOptionNames);
+		Group bracesGroup = SWTFactory.createGroup(parent, Messages.CSSFormatterBracesPage_braces_group_label, 1, 2,
+				GridData.FILL_HORIZONTAL);
+		manager.createCombo(bracesGroup, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
+				Messages.CSSFormatterBracesPage_blocks, tabOptionItems, tabOptionNames);
 	}
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("braces-preview.css");
+		return getClass().getResource("braces-preview.css"); //$NON-NLS-1$
 	}
 
 }

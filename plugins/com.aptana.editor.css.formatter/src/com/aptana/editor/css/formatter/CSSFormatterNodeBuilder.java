@@ -36,13 +36,13 @@ package com.aptana.editor.css.formatter;
 
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
-import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
+import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSSelectorNode;
 import com.aptana.editor.css.parsing.ast.*;
 
@@ -64,7 +64,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	public IFormatterContainerNode build(IParseNode parseResult, FormatterDocument document)
 	{
 		this.document = document;
-		final IFormatterContainerNode rootNode = new FormatterBlockNode(document);
+		final IFormatterContainerNode rootNode = new FormatterCSSRootNode(document);
 		start(rootNode);
 		IParseNode[] children = parseResult.getChildren();
 		addNodes(children);

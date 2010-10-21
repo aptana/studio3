@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
+import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterControlManager;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
@@ -56,7 +57,9 @@ import com.aptana.formatter.ui.util.SWTFactory;
 public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 {
 	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB };
-	private final String[] tabOptionNames = new String[] { "Spaces only", "Tabs only" };
+	private final String[] tabOptionNames = new String[] {
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB };
 
 	public CSSFormatterControlStatementsPage(IFormatterModifyDialog dialog)
 	{
@@ -65,12 +68,15 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 
 	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		Group generalGroup = SWTFactory.createGroup(parent, "General Settings", 2, 1, GridData.FILL_HORIZONTAL);
+		Group generalGroup = SWTFactory.createGroup(parent,
+				Messages.CSSFormatterControlStatementsPage_general_group_label, 2, 1, GridData.FILL_HORIZONTAL);
 		final Combo tabOptions = manager.createCombo(generalGroup, CSSFormatterConstants.FORMATTER_TAB_CHAR,
-				"Tab policy", tabOptionItems, tabOptionNames);
+				Messages.CSSFormatterControlStatementsPage_tab_policy_group_option, tabOptionItems, tabOptionNames);
 		final Text indentationSize = manager.createNumber(generalGroup,
-				CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "Indentation size:");
-		final Text tabSize = manager.createNumber(generalGroup, CSSFormatterConstants.FORMATTER_TAB_SIZE, "Tab size:");
+				CSSFormatterConstants.FORMATTER_INDENTATION_SIZE,
+				Messages.CSSFormatterControlStatementsPage_indentation_size_group_option);
+		final Text tabSize = manager.createNumber(generalGroup, CSSFormatterConstants.FORMATTER_TAB_SIZE,
+				Messages.CSSFormatterControlStatementsPage_tab_size_group_option);
 
 		tabSize.addModifyListener(new ModifyListener()
 		{
@@ -141,6 +147,6 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource("control-statements-preview.css");
+		return getClass().getResource("control-statements-preview.css"); //$NON-NLS-1$
 	}
 }

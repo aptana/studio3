@@ -52,13 +52,14 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 	public CSSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle("CSS Formatter");
+		setTitle(Messages.CSSFormatterModifyDialog_CSS_formater_title);
 	}
 
 	protected void addPages()
 	{
-		addTabPage("Control Statements", new CSSFormatterControlStatementsPage(this));
-		addTabPage("Braces", new CSSFormatterBracesPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_control_statements_page_tab_name,
+				new CSSFormatterControlStatementsPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_braces_, new CSSFormatterBracesPage(this));
 
 		// TODO: Fix issue with comments not wrapping correctly with newlines
 		// Something like: /*
