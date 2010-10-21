@@ -138,6 +138,7 @@ import com.aptana.ui.widgets.SearchComposite;
  * @author Kevin Sawicki (ksawicki@aptana.com)
  * @author Michael Xia (mxia@aptana.com)
  */
+@SuppressWarnings("deprecation")
 public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener,
 		DirectionToolBar.Client, OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {

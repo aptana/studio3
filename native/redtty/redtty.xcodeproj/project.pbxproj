@@ -173,7 +173,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = "i386 x86_64 ppc ppc64";
 			};
 			name = Release;
 		};

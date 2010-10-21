@@ -35,6 +35,7 @@
 package com.aptana.explorer.internal.ui;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -383,7 +384,7 @@ class PathFilter extends ViewerFilter
 		}
 		else
 		{
-			regexp = Pattern.compile("\\b(" + patternString + "|" + Inflector.pluralize(patternString) + ")\\b");
+			regexp = Pattern.compile(MessageFormat.format("\\b({0}|{1})\\b", patternString, Inflector.pluralize(patternString))); //$NON-NLS-1$
 		}
 	}
 

@@ -38,7 +38,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.IPartitioningConfiguration;
-import com.aptana.scripting.model.BundleElement;
 
 public interface IDocumentScopeManager
 {
@@ -51,7 +50,7 @@ public interface IDocumentScopeManager
 	 * Performs dynamic scope determination at given offset for document. This will lookup the default scope we assigned
 	 * as well as the partition at the offset. We'll then translate from partition names to scope names. Lastly we'll do
 	 * any overrides of the top level scope by trying to match the filename patterns contributed by bundles to the
-	 * override scopes (See {@link BundleElement#associateScope(String, String)}.
+	 * override scopes (See {@link com.aptana.scripting.model.BundleElement#associateScope(String, String)}.
 	 * 
 	 * @param document
 	 * @param offset

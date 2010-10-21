@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.deploy;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.deploy.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
@@ -11,15 +11,15 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.ui.browser,
  org.eclipse.ui.forms,
- com.aptana.core;bundle-version="3.0.0",
- com.aptana.git.core;bundle-version="1.0.0",
- com.aptana.usage;bundle-version="3.0.0",
- com.aptana.scripting;bundle-version="1.0.0",
+ com.aptana.core,
+ com.aptana.git.core,
+ com.aptana.usage,
+ com.aptana.scripting,
  com.aptana.core.io,
  com.aptana.ui,
  com.aptana.ui.ftp,
  com.aptana.ui.secureftp,
- com.aptana.terminal;bundle-version="1.0.0",
+ com.aptana.terminal,
  com.aptana.syncing.core,
  com.aptana.syncing.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

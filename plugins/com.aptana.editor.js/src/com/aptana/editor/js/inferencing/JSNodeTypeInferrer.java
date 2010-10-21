@@ -459,13 +459,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		// build function type, including return values
 		if (types.isEmpty() == false)
 		{
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(",", types); //$NON-NLS-1$ //$NON-NLS-2$
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + StringUtil.join(",", types); //$NON-NLS-1$
 		}
 		else if (foundReturnExpression)
 		{
 			// If we couldn't infer a return type and we had a return
 			// expression, then have it return Object
-			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + JSTypeConstants.OBJECT_TYPE; //$NON-NLS-1$
+			type = JSTypeConstants.FUNCTION_TYPE + JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER + JSTypeConstants.OBJECT_TYPE;
 		}
 		else
 		{

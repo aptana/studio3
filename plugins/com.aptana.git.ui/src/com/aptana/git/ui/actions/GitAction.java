@@ -35,6 +35,7 @@
 package com.aptana.git.ui.actions;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -235,10 +236,17 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 
 	protected GitRepository getSelectedRepository()
 	{
+		Set<GitRepository> repos = getSelectedRepositories();
+		if (repos.isEmpty())
+			return null;
+		return repos.iterator().next();
+	}
+
+	protected Set<GitRepository> getSelectedRepositories()
+	{
 		IResource[] resources = getSelectedResources();
 		if (resources == null || resources.length == 0)
-			return null;
-		// Actions can handle multiple selections if they share the same repo
+			return Collections.emptySet();
 		Set<GitRepository> repos = new HashSet<GitRepository>();
 		for (IResource resource : resources)
 		{
@@ -247,18 +255,16 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			IProject project = resource.getProject();
 			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null)
+			{
 				repos.add(repo);
+			}
 		}
-		if (repos.isEmpty() || repos.size() != 1)
-			return null;
-		return repos.iterator().next();
-
+		return repos;
 	}
 
-	protected void refreshAffectedProjects()
+	protected void refreshAffectedProjects(GitRepository repo)
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
-		GitRepository repo = getSelectedRepository();
 		if (repo != null)
 		{
 			affectedProjects.addAll(getAssociatedProjects(repo));
@@ -352,7 +358,7 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 		}
 		return targetPart;
 	}
-	
+
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();

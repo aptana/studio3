@@ -34,7 +34,7 @@
  */
 package com.aptana.git.ui.actions;
 
-
+import com.aptana.git.core.model.GitRepository;
 
 public class StatusAction extends SimpleGitCommandAction
 {
@@ -46,7 +46,7 @@ public class StatusAction extends SimpleGitCommandAction
 	}
 
 	@Override
-	protected void postLaunch()
+	protected void postLaunch(GitRepository repo)
 	{
 		// do nothing
 	}

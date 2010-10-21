@@ -61,6 +61,7 @@ public final class SyncModelBuilder
 	 * @param pairs
 	 * @return - the root of the syncing model
 	 */
+	@SuppressWarnings("deprecation")
 	public static SyncFolder buildSyncFolder(IConnectionPoint sourceConnectionPoint, IConnectionPoint destConnectionPoint, VirtualFileSyncPair[] pairs)
 	{
 		SyncFolder root = new SyncFolder(new Path("/"), null, null); //$NON-NLS-1$

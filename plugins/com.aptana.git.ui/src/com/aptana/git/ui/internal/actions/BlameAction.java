@@ -43,7 +43,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.internal.text.revisions.Colors;
 import org.eclipse.jface.text.revisions.Revision;
 import org.eclipse.jface.text.revisions.RevisionInformation;
@@ -53,13 +52,12 @@ import org.eclipse.team.ui.TeamUI;
 import org.eclipse.team.ui.history.IHistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.team.ui.history.RevisionAnnotationController;
-import org.eclipse.ui.IEditorActionDelegate;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
 import com.aptana.git.core.GitPlugin;
@@ -72,15 +70,8 @@ import com.aptana.git.ui.internal.QuickDiffReferenceProvider;
 import com.aptana.git.ui.internal.history.GitHistoryPage;
 
 @SuppressWarnings("restriction")
-public class BlameAction extends GitAction implements IEditorActionDelegate
+public class BlameAction extends GitAction
 {
-
-	private IEditorPart fEditor;
-
-	public void setActiveEditor(IAction action, IEditorPart targetEditor)
-	{
-		this.fEditor = targetEditor;
-	}
 
 	@Override
 	public void run()
@@ -96,35 +87,34 @@ public class BlameAction extends GitAction implements IEditorActionDelegate
 			final GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(file.getProject());
 			RevisionInformation info = createRevisionInformation(repo, repo.relativePath(file));
 
-			if (fEditor == null && getTargetPart() instanceof AbstractDecoratedTextEditor)
+			AbstractDecoratedTextEditor fEditor = null;
+			if (getTargetPart() instanceof AbstractDecoratedTextEditor)
 			{
 				fEditor = (AbstractDecoratedTextEditor) getTargetPart();
 			}
-
-			if (fEditor != null)
-			{
-				((AbstractDecoratedTextEditor) fEditor).showRevisionInformation(info, QuickDiffReferenceProvider.ID);
-				IWorkbenchPage page = getActivePage();
-				if (page != null)
-				{
-					attachHistorySyncher(file, repo, page);
-				}
-			}
-			else
+			if (fEditor == null)
 			{
 				IWorkbenchPage page = getActivePage();
 				if (page != null)
 				{
 					try
 					{
-						AbstractDecoratedTextEditor editor = RevisionAnnotationController.openEditor(page, file);
-						editor.showRevisionInformation(info, QuickDiffReferenceProvider.ID);
-						attachHistorySyncher(file, repo, page);
+						fEditor = (AbstractDecoratedTextEditor) IDE.openEditor(page, file);
 					}
 					catch (PartInitException e)
 					{
 						GitUIPlugin.logError(e);
 					}
+				}
+			}
+
+			if (fEditor != null)
+			{
+				fEditor.showRevisionInformation(info, QuickDiffReferenceProvider.ID);
+				IWorkbenchPage page = getActivePage();
+				if (page != null)
+				{
+					attachHistorySyncher(file, repo, page);
 				}
 			}
 		}
