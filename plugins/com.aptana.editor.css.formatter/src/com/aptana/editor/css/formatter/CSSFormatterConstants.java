@@ -62,7 +62,7 @@ public interface CSSFormatterConstants
 			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
 
 	// New lines
-	public static final String NEW_LINES_BEFORE_BLOCKS = FORMATTER_ID + ".indent.blocks";
+	public static final String NEW_LINES_BEFORE_BLOCKS = FORMATTER_ID + ".indent.blocks"; //$NON-NLS-1$
 
 	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$

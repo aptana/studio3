@@ -46,6 +46,11 @@ public class CSSFormatterContext extends FormatterContext
 {
 
 	/**
+	 * 
+	 */
+	private static final String WRAPPING_COMMENT_PREFIX = " * "; //$NON-NLS-1$
+
+	/**
 	 * @param indent
 	 */
 	public CSSFormatterContext(int indent)
@@ -87,6 +92,6 @@ public class CSSFormatterContext extends FormatterContext
 	 */
 	public String getWrappingCommentPrefix()
 	{
-		return " * ";
+		return WRAPPING_COMMENT_PREFIX;
 	}
 }

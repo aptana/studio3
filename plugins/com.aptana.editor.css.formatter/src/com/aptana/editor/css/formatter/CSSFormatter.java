@@ -43,6 +43,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -64,7 +65,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 public class CSSFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
 
-	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]");
+	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]"); //$NON-NLS-1$
 	private String lineSeparator;
 
 	/**
@@ -254,9 +255,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		{
 			return in == out;
 		}
-		
-		in = whiteSpaceAsterisk.matcher(in).replaceAll("");
-		out = whiteSpaceAsterisk.matcher(out).replaceAll("");
+
+		in = whiteSpaceAsterisk.matcher(in).replaceAll(StringUtil.EMPTY);
+		out = whiteSpaceAsterisk.matcher(out).replaceAll(StringUtil.EMPTY);
 		return in.equals(out);
 	}
 

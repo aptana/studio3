@@ -48,7 +48,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterCommentsPage extends FormatterModifyTabPage
 {
-	private static final String COMMENTS_PREVIEW_NAME = "comments-preview.css";
+	private static final String COMMENTS_PREVIEW_NAME = "comments-preview.css"; //$NON-NLS-1$
 	
 	public CSSFormatterCommentsPage(IFormatterModifyDialog dialog)
 	{
