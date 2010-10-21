@@ -120,7 +120,6 @@ public class BlameAction extends GitAction
 		}
 	}
 
-	@SuppressWarnings("unused")
 	protected IHistoryView attachHistorySyncher(final IFile file, final GitRepository repo, IWorkbenchPage page)
 	{
 		IHistoryView historyView = TeamUI.getHistoryView();
