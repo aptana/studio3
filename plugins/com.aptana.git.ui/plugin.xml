@@ -256,86 +256,103 @@
       </category>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.add_remote"
             name="%AddRemoteAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.push"
             name="%PushAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.github.network"
             name="%GithubNetworkAction_label">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.pull"
             name="%PullAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.commit"
             name="%CommitAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.status"
             name="%StatusAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.revert"
             name="%RevertAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.stage"
             name="%StageAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.unstage"
             name="%UnstageAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.create_branch"
             name="%CreateBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.switch_branch"
             name="%SwitchBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.merge_branch"
             name="%MergeBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.delete_branch"
             name="%DeleteBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.compare_with_HEAD"
             name="%CompareWithHEADAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
             id="com.aptana.git.ui.command.blame"
             name="%BlameAction_label">
       </command>
@@ -351,97 +368,97 @@
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.add_remote"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.github.network"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.pull"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.status"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.revert"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.stage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.create_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.switch_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.delete_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_conflicts"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_HEAD"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_revision"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="CTRL+COMMAND+G">
       </key>
    </extension>
    <extension

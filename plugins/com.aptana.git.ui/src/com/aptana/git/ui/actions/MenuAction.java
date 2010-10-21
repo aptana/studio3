@@ -36,6 +36,7 @@ package com.aptana.git.ui.actions;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.viewers.ISelection;
@@ -56,7 +57,7 @@ import com.aptana.git.core.model.IGitRepositoryManager;
  * 
  * @author cwilliams
  */
-public abstract class MenuAction implements IObjectActionDelegate, IMenuCreator
+public abstract class MenuAction extends Action implements IObjectActionDelegate, IMenuCreator
 {
 
 	private ISelection selection;
