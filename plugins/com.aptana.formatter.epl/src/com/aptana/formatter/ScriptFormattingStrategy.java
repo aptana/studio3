@@ -103,7 +103,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 	/**
 	 * @since 2.0
 	 */
-	@SuppressWarnings( { "unchecked" })
+	@SuppressWarnings( { "unchecked", "rawtypes" })
 	protected void doFormat(final FormatJob job)
 	{
 		final IDocument document = job.document;

@@ -10,14 +10,12 @@
  *******************************************************************************/
 package com.aptana.formatter.preferences;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 /**
  * Interface that acts as a bridge to allow preference pages and shared preference/property control blocks to use the
  * {@link ControlBindingManager}.
  * <p>
  * When implementing this interface, the <code>key</code> parameter should be cast to one of two objects, depending upon
- * the preference implementation used - interfacing with the {@link IPreferenceStore} directly, or using a
+ * the preference implementation used - interfacing with the {@link org.eclipse.jface.preference.IPreferenceStore} directly, or using a
  * {@link PreferenceKey}.
  * </p>
  * 

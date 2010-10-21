@@ -11,8 +11,6 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-import com.aptana.formatter.FormatterDocument;
-
 public class ScriptFormattingContextProperties
 {
 
@@ -42,7 +40,7 @@ public class ScriptFormattingContextProperties
 	/**
 	 * A key that indicates the original offset for the context. Since we lose the real offset during a slave
 	 * formatting, we can maintain the original offset in this key and retrieve it later when needed. This can be set on
-	 * the {@link FormatterDocument} for an easy access when formatting the nodes that want to know about this offset.
+	 * the {@link com.aptana.formatter.FormatterDocument} for an easy access when formatting the nodes that want to know about this offset.
 	 */
 	public static String CONTEXT_ORIGINAL_OFFSET = "formatting.context.originalOffset"; //$NON-NLS-1$
 

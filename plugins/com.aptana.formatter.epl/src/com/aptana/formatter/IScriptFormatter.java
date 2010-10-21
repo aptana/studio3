@@ -14,7 +14,6 @@ package com.aptana.formatter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
 
-import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 
 /**
@@ -84,8 +83,9 @@ public interface IScriptFormatter
 	/**
 	 * Returns the indentation type, as defined in the formatter preferences.
 	 * 
-	 * @return The indentation type - One of {@link CodeFormatterConstants#TAB}, {@link CodeFormatterConstants#SPACE} or
-	 *         {@link CodeFormatterConstants#MIXED}
+	 * @return The indentation type - One of {@link com.aptana.formatter.ui.CodeFormatterConstants#TAB},
+	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#SPACE} or
+	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#MIXED}
 	 */
 	String getIndentType();
 }

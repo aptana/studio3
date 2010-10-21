@@ -69,7 +69,7 @@ public class PropertyLinkArea
 		return pageLink;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private IPreferenceNode getPreferenceNode(String pageId)
 	{
 		/*

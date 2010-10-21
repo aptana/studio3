@@ -13,7 +13,6 @@ package com.aptana.editor.ruby.formatter.internal;
 
 import com.aptana.editor.ruby.formatter.internal.nodes.FormatterRequireNode;
 import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 
@@ -33,7 +32,7 @@ public class RubyFormatterContext extends FormatterContext
 	/**
 	 * Check if the char sequence starts with a '#' sign. If so, return 1. Otherwise, return 0.
 	 * 
-	 * @see IFormatterContext#getCommentStartLength(CharSequence, int)
+	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{

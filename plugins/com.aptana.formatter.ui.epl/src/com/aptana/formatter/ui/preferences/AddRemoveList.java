@@ -22,7 +22,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
@@ -77,7 +76,7 @@ public class AddRemoveList implements Listener
 	/**
 	 * Returns the inner list that is held by this instance.
 	 * 
-	 * @return A {@link ListViewer}
+	 * @return A {@link org.eclipse.jface.viewers.ListViewer}
 	 */
 	public CListViewer getList()
 	{
