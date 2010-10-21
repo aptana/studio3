@@ -77,7 +77,7 @@ public class PropToPrefLinkArea
 		return pageLink;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private IPreferenceNode getPreferenceNode(String pageId)
 	{
 		Iterator iterator = PlatformUI.getWorkbench().getPreferenceManager().getElements(PreferenceManager.PRE_ORDER)

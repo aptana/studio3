@@ -383,7 +383,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				}
 			}
 
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			@Override
 			public IFormattingContext createFormattingContext()
 			{

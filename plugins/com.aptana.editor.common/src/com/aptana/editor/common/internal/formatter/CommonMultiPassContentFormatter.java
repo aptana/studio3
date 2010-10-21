@@ -122,7 +122,6 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	 * @see org.eclipse.jface.text.formatter.MultiPassContentFormatter#formatSlaves(org.eclipse.jface.text.formatter.
 	 *      IFormattingContext, org.eclipse.jface.text.IDocument, int, int)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void formatSlaves(IFormattingContext context, IDocument document, int offset, int length)
 	{
