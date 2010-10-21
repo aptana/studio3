@@ -328,8 +328,8 @@ public class JSIndexWriter
 			// calculate key value and add to index
 			String value = StringUtil.join(JSIndexConstants.DELIMITER, type.getName(), (parentTypes != null && parentTypes.isEmpty() == false) ? StringUtil
 				.join(",", parentTypes) //$NON-NLS-1$
-				: (type.equals(JSTypeConstants.OBJECT_TYPE) == false) //$NON-NLS-1$
-				? JSTypeConstants.OBJECT_TYPE //$NON-NLS-1$
+				: (type.equals(JSTypeConstants.OBJECT_TYPE) == false)
+				? JSTypeConstants.OBJECT_TYPE
 					: "", //$NON-NLS-1$
 				descriptionKey);
 

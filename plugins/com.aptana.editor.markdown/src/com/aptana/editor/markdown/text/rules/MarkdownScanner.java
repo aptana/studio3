@@ -137,17 +137,17 @@ public class MarkdownScanner extends RuleBasedScanner
 		try
 		{
 			// [id]: http://example.com "optional title"
-			if (tokenIs(token, "constant.other.reference.link.markdown"))
+			if (tokenIs(token, "constant.other.reference.link.markdown")) //$NON-NLS-1$
 			{
 				nextMayBeLink = true;
 			}
 			else if (nextMayBeLink)
 			{
-				if (token.equals(Token.WHITESPACE) || tokenIs(token, "markup.underline.link.markdown"))
+				if (token.equals(Token.WHITESPACE) || tokenIs(token, "markup.underline.link.markdown")) //$NON-NLS-1$
 				{
 					return token;
 				}
-				else if (tokenIs(token, "") && getTokenLength() == 1) // is it the ':'?
+				else if (tokenIs(token, "") && getTokenLength() == 1) // is it the ':'? //$NON-NLS-1$
 				{
 					// OK, ignore once
 				}
@@ -158,18 +158,18 @@ public class MarkdownScanner extends RuleBasedScanner
 			}
 
 			// Parens are special, but only as part of links
-			if (tokenIs(token, "punctuation.definition.metadata.markdown")
-					&& !lastTokenIs("string.other.link.description.title.markdown", "string.other.link.title.markdown",
-							"markup.underline.link.markdown"))
+			if (tokenIs(token, "punctuation.definition.metadata.markdown") //$NON-NLS-1$
+					&& !lastTokenIs("string.other.link.description.title.markdown", "string.other.link.title.markdown", //$NON-NLS-1$ //$NON-NLS-2$
+							"markup.underline.link.markdown")) //$NON-NLS-1$
 			{
-				token = getToken("");
+				token = getToken(""); //$NON-NLS-1$
 			}
 			// URLS are special, but only inside links
-			else if (tokenIs(token, "markup.underline.link.markdown"))
+			else if (tokenIs(token, "markup.underline.link.markdown")) //$NON-NLS-1$
 			{
-				if (!lastTokenIs("punctuation.definition.metadata.markdown"))
+				if (!lastTokenIs("punctuation.definition.metadata.markdown")) //$NON-NLS-1$
 				{
-					token = getToken("");
+					token = getToken(""); //$NON-NLS-1$
 				}
 			}
 		}

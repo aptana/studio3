@@ -42,7 +42,7 @@ import com.aptana.core.CorePlugin;
 /**
  *
  */
-@SuppressWarnings({"restriction", "unchecked", "rawtypes"})
+@SuppressWarnings({"restriction", "rawtypes"})
 public class MarkerInfo extends org.eclipse.core.internal.resources.MarkerInfo {
 
 	/** UNDEFINED_ID */

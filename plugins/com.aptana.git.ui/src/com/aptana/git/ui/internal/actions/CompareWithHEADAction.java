@@ -69,7 +69,7 @@ public class CompareWithHEADAction extends GitAction
 		String name = repo.getChangedFileForResource(blah).getPath();
 		IFile file = (IFile) blah;
 		ITypedElement base = SaveableCompareEditorInput.createFileElement(file);
-		final IFileRevision nextFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), Path.fromOSString(name));
+		final IFileRevision nextFile = GitPlugin.revisionForCommit(new GitCommit(repo, "HEAD"), Path.fromOSString(name)); //$NON-NLS-1$
 		final ITypedElement next = new FileRevisionTypedElement(nextFile);
 		final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
 		CompareUI.openCompareEditor(in);
