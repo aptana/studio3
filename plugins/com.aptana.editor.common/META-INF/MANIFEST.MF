@@ -28,7 +28,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.ui,
  com.aptana.theme,
  com.aptana.terminal,
- com.aptana.org.eclipse.tm.terminal
+ com.aptana.org.eclipse.tm.terminal,
  com.aptana.formatter.epl;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
