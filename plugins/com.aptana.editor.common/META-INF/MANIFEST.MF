@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.common;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
@@ -14,22 +14,21 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
  org.eclipse.ui.views,
- com.aptana.editor.findbar;bundle-version="1.0.0",
- com.aptana.scripting,
  org.eclipse.ui.workbench.texteditor,
- com.aptana.core;bundle-version="3.0.0",
- com.aptana.ui.epl;bundle-version="1.0.0",
- com.aptana.parsing,
- org.jruby;bundle-version="1.4.0",
- com.aptana.git.core;bundle-version="1.0.0",
- com.aptana.usage,
+ com.aptana.scripting,
  com.aptana.core,
- com.aptana.index.core;bundle-version="2.0.0",
- com.aptana.ui;bundle-version="3.0.0",
- beaver;bundle-version="1.0.0",
+ com.aptana.ui.epl,
+ beaver,
+ com.aptana.parsing,
+ com.aptana.editor.findbar,
+ org.jruby,
+ com.aptana.git.core,
+ com.aptana.usage,
+ com.aptana.index.core,
+ com.aptana.ui,
  com.aptana.theme,
- com.aptana.terminal;bundle-version="1.0.0",
- com.aptana.org.eclipse.tm.terminal;bundle-version="3.0.100"
+ com.aptana.terminal,
+ com.aptana.org.eclipse.tm.terminal
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

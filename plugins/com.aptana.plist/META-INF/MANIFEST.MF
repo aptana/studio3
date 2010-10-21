@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Plist Reader
+Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.plist
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.plist.PListPlugin
-Bundle-Vendor: Aptana, Inc.
+Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- com.aptana.core;bundle-version="3.0.0"
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.plist
