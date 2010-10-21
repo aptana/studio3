@@ -50,6 +50,7 @@ import com.aptana.formatter.FormatterIndentDetector;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
+import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
@@ -132,6 +133,10 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
+		if (!ScriptFormatterManager.hasFormatterFor(getMainContentType()))
+		{
+			throw new FormatterException(FormatterMessages.Formatter_contentErrorMessage);
+		}
 		String input = source.substring(offset, offset + length);
 		IParser parser = getParser();
 		IParseState parseState = new HTMLParseState();

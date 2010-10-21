@@ -29,9 +29,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
 
 import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.FormatterSyntaxProblemException;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
+import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
  * Formatting strategy for a source code.
@@ -174,6 +176,10 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 			{
 				// Can only happen on concurrent document modification
 				FormatterPlugin.warn(FormatterMessages.ScriptFormattingStrategy_formattingError, e);
+			}
+			catch (FormatterException fe)
+			{
+				StatusLineMessageTimerManager.setErrorMessage(fe.getMessage(), 3000L, true);
 			}
 			catch (Exception e)
 			{
