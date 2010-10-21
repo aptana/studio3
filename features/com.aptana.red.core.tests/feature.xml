@@ -85,6 +85,8 @@
       <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.plist"/>
       <import plugin="com.aptana.editor.markdown"/>
+      <import plugin="com.aptana.editor.dtd"/>
+      <import plugin="com.aptana.filesystem.s3"/>
    </requires>
 
    <plugin
