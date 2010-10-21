@@ -37,6 +37,7 @@ package com.aptana.editor.css.formatter.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.editor.css.formatter.CSSFormatterPlugin;
@@ -53,7 +54,7 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences pref = new DefaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
-		
+
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
 		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
@@ -62,5 +63,13 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		pref.put(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);
 		pref.putInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
 		pref.putInt(CSSFormatterConstants.PRESERVED_LINES, 1);
+
+		try
+		{
+			pref.flush();
+		}
+		catch (BackingStoreException e)
+		{
+		}
 	}
 }
