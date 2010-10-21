@@ -53,7 +53,6 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
-import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -226,8 +225,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	}
 
 	/**
-	 * Collects the code formatters by the supported content-types and returns a new {@link MultiPassContentFormatter}
-	 * that holds them.<br>
+	 * Collects the code formatters by the supported content-types and returns a new {@link import
+	 * org.eclipse.jface.text.formatter.MultiPassContentFormatter} that holds them.<br>
 	 * The returned content formatter is computed from the result of {@link #getTopContentTypes()}. The first element in
 	 * the returned array should define the 'master' formatter. While the rest of the elements should contain the
 	 * 'slave' formatter. <br>
