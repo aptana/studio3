@@ -89,6 +89,15 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#setIndent(int)
+	 */
+	public void setIndent(int indent)
+	{
+		this.indent = indent;
+	}
+
+	/*
 	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#getIndent()
 	 */
 	public int getIndent()

@@ -111,6 +111,7 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 		if (getBegin() != null)
 		{
 			boolean isIndenting = isIndenting();
+			boolean wroteIndent = false;
 			if (getSpacesCountBefore() > 0 && shouldConsumePreviousWhiteSpaces())
 			{
 				writeSpaces(visitor, context, getSpacesCountBefore());
@@ -122,9 +123,10 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 					visitor.writeLineBreak(context);
 
 				}
-				if (isElseIf)
+				if (isElseIf || !previousIfHasBlock)
 				{
 					visitor.writeIndent(context);
+					wroteIndent = true;
 				}
 			}
 			else if (visitor.endsWithNewLine())
@@ -132,12 +134,21 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 				visitor.writeIndent(context);
 			}
 
-			if (isIndenting)
+			int indent = context.getIndent();
+			if (wroteIndent)
+			{
+				context.resetIndent();
+			}
+			else if (isIndenting)
 			{
 				context.decIndent();
 			}
 			visitor.write(context, getBegin().getStartOffset(), getBegin().getEndOffset());
-			if (isIndenting)
+			if (wroteIndent)
+			{
+				context.setIndent(indent);
+			}
+			else if (isIndenting)
 			{
 				context.incIndent();
 			}
