@@ -69,6 +69,7 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.core.util.IOUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 
 class S3FileStore extends FileStore
@@ -344,8 +345,8 @@ class S3FileStore extends FileStore
 			{
 				return connection.getInputStream();
 			}
-			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception("Failed to open inputstream on "
-					+ path.toPortableString() + ". Error code: " + responseCode));
+			throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+					new Exception(errorMessage(responseCode, connection)));
 		}
 		catch (MalformedURLException e)
 		{
@@ -359,10 +360,12 @@ class S3FileStore extends FileStore
 
 	AWSAuthConnection getAWSConnection()
 	{
+		boolean secure = true;
 		if (getBucket() != null && getBucket().indexOf(".") != -1) //$NON-NLS-1$
-			return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), false, uri.getHost(),
-					CallingFormat.getPathCallingFormat());
-		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), true, uri.getHost(),
+		{
+			secure = false; // Work around weird bug? Do we need subdomain calling format?
+		}
+		return new AWSAuthConnection(getAccessKey(), getSecretAccessKey(), secure, uri.getHost(),
 				CallingFormat.getPathCallingFormat());
 	}
 
@@ -561,8 +564,8 @@ class S3FileStore extends FileStore
 			int responseCode = connection.getResponseCode();
 			if (responseCode >= 400)
 			{
-				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL, new Exception(
-						"Failed to create folder/bucket with error code: " + responseCode));
+				throw S3FileSystemPlugin.coreException(EFS.ERROR_INTERNAL,
+						new Exception(errorMessage(responseCode, connection)));
 			}
 		}
 		catch (MalformedURLException e)
@@ -574,6 +577,30 @@ class S3FileStore extends FileStore
 			throw S3FileSystemPlugin.coreException(e);
 		}
 		return this;
+	}
+
+	private String errorMessage(int responseCode, HttpURLConnection connection) throws CoreException
+	{
+		String msg = ""; //$NON-NLS-1$
+		try
+		{
+			msg = IOUtil.read(connection.getErrorStream());
+			int index = msg.indexOf("<Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(index + 9);
+			}
+			index = msg.indexOf("</Message>"); //$NON-NLS-1$
+			if (index != -1)
+			{
+				msg = msg.substring(0, index);
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		return MessageFormat.format("({0}) {1}", responseCode, msg); //$NON-NLS-1$
 	}
 
 	@Override

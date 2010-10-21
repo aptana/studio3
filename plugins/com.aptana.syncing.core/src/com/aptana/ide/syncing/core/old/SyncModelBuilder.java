@@ -150,7 +150,7 @@ public final class SyncModelBuilder
 		boolean found;
 		for (IFileStore file : ignoredFiles)
 		{
-			realPath = new Path(EFSUtils.getRelativePath(sourceConnectionPoint, file));
+			realPath = new Path(EFSUtils.getRelativePath(sourceConnectionPoint, file, null));
 			parent = root;
 			found = true;
 			for (int i = 0; i < realPath.segmentCount(); i++)

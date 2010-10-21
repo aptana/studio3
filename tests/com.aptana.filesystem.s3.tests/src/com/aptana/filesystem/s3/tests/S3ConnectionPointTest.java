@@ -12,9 +12,8 @@ public class S3ConnectionPointTest extends CommonConnectionTest
 	{
 		S3ConnectionPoint ftpcp = new S3ConnectionPoint();
 		ftpcp.setHost(getConfig().getProperty("s3.host", S3ConnectionPoint.DEFAULT_HOST)); //$NON-NLS-1$
-		ftpcp.setLogin(getConfig().getProperty("s3.accessKey", "0ZA7YV7DBK6JCYAV77G2")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setLogin(getConfig().getProperty("s3.accessKey", "")); //$NON-NLS-1$ //$NON-NLS-2$
 		String password = getConfig().getProperty("s3.secretAccessKey", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		System.out.println("**************S3 secret access key: " + password); //$NON-NLS-1$
 		ftpcp.setPassword(password.toCharArray());
 		ftpcp.setPath(new Path(getConfig().getProperty("s3.path", "/"))); //$NON-NLS-1$ //$NON-NLS-2$
 		cp = ftpcp;
@@ -26,5 +25,11 @@ public class S3ConnectionPointTest extends CommonConnectionTest
 	protected boolean persistentConnection()
 	{
 		return false;
+	}
+	
+	@Override
+	protected boolean verifyTeardownDeletion()
+	{
+		return true;
 	}
 }
