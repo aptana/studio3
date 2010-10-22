@@ -133,7 +133,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.SwitchBranchHandler"
             id="com.aptana.git.ui.command.switch_branch"
             name="%SwitchBranchAction_tooltip">
       </command>
