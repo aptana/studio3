@@ -179,7 +179,7 @@
             name="%command.showin.resource.name">
       </command>
       <command
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.DisconnectHandler"
             id="com.aptana.git.ui.command.disconnect"
             name="%DisconnectAction_label">
       </command>
@@ -193,7 +193,7 @@
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.actions.AttachGitRepoHandler"
             id="com.aptana.git.ui.command.attach"
-            name="Attach">
+            name="Initialize Git repository">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"

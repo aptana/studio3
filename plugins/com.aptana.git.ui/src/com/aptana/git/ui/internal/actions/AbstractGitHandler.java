@@ -142,7 +142,7 @@ abstract class AbstractGitHandler extends AbstractHandler
 		return resources;
 	}
 
-	private IGitRepositoryManager getGitRepositoryManager()
+	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
