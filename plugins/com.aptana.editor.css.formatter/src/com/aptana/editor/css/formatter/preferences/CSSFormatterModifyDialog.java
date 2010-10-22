@@ -57,7 +57,7 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 
 	protected void addPages()
 	{
-		addTabPage(Messages.CSSFormatterModifyDialog_control_statements_page_tab_name,
+		addTabPage(Messages.CSSFormatterModifyDialog_indentation_page_tab_name,
 				new CSSFormatterControlStatementsPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_braces_, new CSSFormatterBracesPage(this));
 
