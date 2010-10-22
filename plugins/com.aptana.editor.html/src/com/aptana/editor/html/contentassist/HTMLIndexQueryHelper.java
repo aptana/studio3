@@ -218,7 +218,7 @@ public class HTMLIndexQueryHelper
 					}
 					catch (Throwable t)
 					{
-						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata + ": " + resource, t);
+						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata + ": " + resource, t); //$NON-NLS-1$
 					}
 					finally
 					{

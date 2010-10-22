@@ -2,18 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.scripting;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.scripting.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.core.expressions,
- com.aptana.filewatcher;bundle-version="1.0.0",
- com.aptana.core;bundle-version="3.0.0",
- com.aptana.parsing;bundle-version="1.0.0",
- org.jruby;bundle-version="1.4.0",
- com.aptana.plist;bundle-version="1.0.0"
+ com.aptana.filewatcher,
+ com.aptana.core,
+ com.aptana.parsing,
+ org.jruby,
+ com.aptana.plist
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -62,7 +62,7 @@ public class CSSPageNode extends CSSNode
 	@SuppressWarnings("unchecked")
 	public CSSPageNode(String pageSelector, Object declarations, int start, int end)
 	{
-		super(start, end);
+		super(CSSNodeTypes.PAGE, start, end);
 		fPageSelector = pageSelector;
 		if (declarations instanceof CSSDeclarationNode)
 		{

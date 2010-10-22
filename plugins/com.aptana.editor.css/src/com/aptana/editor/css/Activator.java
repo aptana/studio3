@@ -120,28 +120,11 @@ public class Activator extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
-	private CSSCodeScanner _codeScanner;
-
 	/**
 	 * The constructor
 	 */
 	public Activator()
 	{
-	}
-
-	/**
-	 * getCodeScanner
-	 * 
-	 * @return
-	 */
-	public CSSCodeScanner getCodeScanner()
-	{
-		if (this._codeScanner == null)
-		{
-			this._codeScanner = new CSSCodeScanner();
-		}
-
-		return this._codeScanner;
 	}
 
 	/*

@@ -860,7 +860,7 @@ public class JSIndexReader
 	{
 		List<UserAgentElement> result = Collections.emptyList();
 		Index index = JSIndexQueryHelper.getIndex();
-		List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, "*", SearchPattern.PATTERN_MATCH);
+		List<QueryResult> items = index.query(new String[] { JSIndexConstants.USER_AGENT }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 
 		if (items != null && items.isEmpty() == false)
 		{

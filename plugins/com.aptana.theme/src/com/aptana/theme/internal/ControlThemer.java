@@ -160,6 +160,10 @@ class ControlThemer implements IControlThemer
 	protected void addSelectionColorOverride()
 	{
 		final Control control = getControl();
+		if (control == null || control.isDisposed())
+		{
+			return;
+		}
 		// Override selection color to match what is set in theme
 		selectionOverride = new Listener()
 		{

@@ -384,7 +384,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		fTransferLeftButton.addSelectionListener(this);
 
 		fTransferSyncButton = new Button(directions, SWT.NONE);
-		fTransferSyncButton.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
+		fTransferSyncButton.setImage(SyncingUIPlugin.getImage("icons/full/elcl16/arrow_up_down.png")); //$NON-NLS-1$
 		fTransferSyncButton.setToolTipText(Messages.FTPManagerComposite_TTP_Synchronize);
 		fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
 		fTransferSyncButton.addSelectionListener(this);

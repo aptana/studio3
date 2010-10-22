@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: XML Editor Tests
+Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.xml.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: Aptana, Inc.
+Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.editor.xml;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit,

@@ -36,6 +36,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnect
  * team.
  * </p>
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TerminalConnectorExtension {
 	static private ITerminalConnector makeConnector(final IConfigurationElement config) {
 		String id = config.getAttribute("id"); //$NON-NLS-1$

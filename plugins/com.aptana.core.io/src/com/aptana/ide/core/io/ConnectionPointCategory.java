@@ -41,65 +41,93 @@ import java.util.List;
 
 /**
  * @author Max Stepanov
- *
  */
-/* package */ class ConnectionPointCategory implements IConnectionPointCategory {
+/* package */class ConnectionPointCategory implements IConnectionPointCategory
+{
 
 	private final String id;
 	private final String name;
 	private final int order;
+	private final boolean remote;
 	private List<ConnectionPointType> types = new ArrayList<ConnectionPointType>();
-	
+
 	/**
 	 * 
 	 */
-	public ConnectionPointCategory(String id, String name, int order) {
+	public ConnectionPointCategory(String id, String name, int order)
+	{
+		this(id, name, order, false);
+	}
+
+	/**
+	 * 
+	 */
+	public ConnectionPointCategory(String id, String name, int order, boolean remote)
+	{
 		this.id = id;
 		this.name = name;
 		this.order = order;
+		this.remote = remote;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object o) {
-		if (order != ((ConnectionPointCategory) o).order) {
+	public int compareTo(Object o)
+	{
+		if (order != ((ConnectionPointCategory) o).order)
+		{
 			return order - ((ConnectionPointCategory) o).order;
 		}
 		return name.compareTo(((ConnectionPointCategory) o).name);
 	}
 
-	/* package */ void addType(ConnectionPointType type) {
+	/* package */void addType(ConnectionPointType type)
+	{
 		types.add(type);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.Identifiable#getId()
 	 */
-	public String getId() {
+	public String getId()
+	{
 		return id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPointCategory#getName()
 	 */
-	public String getName() {
+	public String getName()
+	{
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.ide.core.io.IConnectionPointCategory#getConnectionPoints()
 	 */
-	public IConnectionPoint[] getConnectionPoints() {
+	public IConnectionPoint[] getConnectionPoints()
+	{
 		List<IConnectionPoint> list = new ArrayList<IConnectionPoint>();
-		for (ConnectionPointType type : types) {
+		for (ConnectionPointType type : types)
+		{
 			list.addAll(Arrays.asList(ConnectionPointManager.getInstance().getConnectionPointsForType(type.getType())));
 		}
 		return list.toArray(new IConnectionPoint[list.size()]);
 	}
 
+	public boolean isRemote()
+	{
+		return remote;
+	}
+
 	@Override
-	public String toString() {
-	    return getName();
+	public String toString()
+	{
+		return getName();
 	}
 }

@@ -55,6 +55,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.put(IPreferenceConstants.CHARACTER_PAIR_COLOR, "128,128,128"); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 
+		// Tasks
+		prefs.put(IPreferenceConstants.TASK_TAG_NAMES, "TODO,FIXME,XXX"); //$NON-NLS-1$
+		prefs.put(IPreferenceConstants.TASK_TAG_PRIORITIES, "NORMAL,HIGH,NORMAL"); //$NON-NLS-1$
+		prefs.putBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
+
 		IPreferenceStore store = EditorsPlugin.getDefault().getPreferenceStore();
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);

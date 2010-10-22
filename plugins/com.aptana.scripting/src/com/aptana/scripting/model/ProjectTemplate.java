@@ -94,7 +94,6 @@ public final class ProjectTemplate
 		int hash = 31 + getType().hashCode();
 		hash = 31 * hash + getName().hashCode();
 		hash = 31 * hash + getSourceLocation().hashCode();
-		hash = 31 * hash + getDirectory().hashCode();
 		return hash;
 	}
 
@@ -107,7 +106,7 @@ public final class ProjectTemplate
 		}
 		ProjectTemplate other = (ProjectTemplate) obj;
 		return getType() == other.getType() && getName().equals(other.getName())
-				&& getSourceLocation().equals(other.getSourceLocation()) && getDirectory().equals(other.getDirectory());
+				&& getSourceLocation().equals(other.getSourceLocation());
 	}
 
 	@Override

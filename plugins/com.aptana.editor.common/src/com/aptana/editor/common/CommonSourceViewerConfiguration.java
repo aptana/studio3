@@ -34,7 +34,9 @@
  */
 package com.aptana.editor.common;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -51,7 +53,6 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
-import org.eclipse.jface.text.formatter.MultiPassContentFormatter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -68,10 +69,12 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
+import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
+import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
 
@@ -82,6 +85,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
+	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 
 	/**
 	 * CommonSourceViewerConfiguration
@@ -94,6 +98,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		super(preferenceStore);
 
 		fTextEditor = editor;
+	}
+
+	/**
+	 * dispose
+	 */
+	public void dispose()
+	{
+		fTextEditor = null;
+		fDoubleClickStrategy = null;
+		if (fThemeChangeListener != null)
+		{
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
+			fThemeChangeListener = null;
+		}
 	}
 
 	/**
@@ -206,16 +224,56 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getContentFormatter(org.eclipse.jface.text.source.
-	 * ISourceViewer)
+	/**
+	 * Collects the code formatters by the supported content-types and returns a new {@link import
+	 * org.eclipse.jface.text.formatter.MultiPassContentFormatter} that holds them.<br>
+	 * The returned content formatter is computed from the result of {@link #getTopContentTypes()}. The first element in
+	 * the returned array should define the 'master' formatter. While the rest of the elements should contain the
+	 * 'slave' formatter. <br>
+	 * Note that each slave formatter is located in the last element of each inner-array that was returned from the
+	 * getTopContentTypes call.
 	 */
-	@Override
 	public IContentFormatter getContentFormatter(ISourceViewer sourceViewer)
 	{
-		return new MultiPassContentFormatter(getConfiguredDocumentPartitioning(sourceViewer),
-				IDocument.DEFAULT_CONTENT_TYPE);
+		final String[][] contentTypes = getTopContentTypes();
+		final CommonMultiPassContentFormatter formatter = new CommonMultiPassContentFormatter(
+				getConfiguredDocumentPartitioning(sourceViewer), IDocument.DEFAULT_CONTENT_TYPE);
+		boolean masterSet = false;
+		Set<String> addedFormatters = new HashSet<String>();
+		for (String contentTypeArr[] : contentTypes)
+		{
+			// The first item in the array should contain the master formatter strategy
+			// In case it starts with the HTML prefix (like in PHP, ERB etc.), we try to set
+			// the master to the HTML formatter.
+			if (!masterSet && contentTypeArr[0].startsWith(CONTENTTYPE_HTML_PREFIX))
+			{
+				if (ScriptFormatterManager.hasFormatterFor(CONTENTTYPE_HTML_PREFIX))
+				{
+					formatter.setMasterStrategy(CONTENTTYPE_HTML_PREFIX);
+					masterSet = true;
+					addedFormatters.add(CONTENTTYPE_HTML_PREFIX);
+				}
+				else
+				{
+					CommonEditorPlugin
+							.logWarning("Could not located an expected code formatter for '" + CONTENTTYPE_HTML_PREFIX + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+			}
+			String contentType = contentTypeArr[contentTypeArr.length - 1];
+			if (!addedFormatters.contains(contentType) && ScriptFormatterManager.hasFormatterFor(contentType))
+			{
+				if (!masterSet)
+				{
+					formatter.setMasterStrategy(contentType);
+					masterSet = true;
+				}
+				else
+				{
+					formatter.setSlaveStrategy(contentType);
+				}
+			}
+		}
+		return formatter;
 	}
 
 	/*
@@ -241,7 +299,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.
 	 * source.ISourceViewer)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings( { "unchecked", "rawtypes" })
 	@Override
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{

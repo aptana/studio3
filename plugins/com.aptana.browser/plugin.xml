@@ -9,7 +9,7 @@
             class="com.aptana.browser.parts.WebBrowserView"
             icon="icons/obj16/browser.png"
             id="com.aptana.browser.views.webbrowser"
-            name="Web Browser"
+            name="%view.browser.name"
             restorable="true">
       </view>
    </extension>
@@ -20,7 +20,7 @@
             default="false"
             icon="icons/obj16/browser.png"
             id="com.aptana.browser.editors.webbrowser"
-            name="Web Browser">
+            name="%editor.browser.name">
       </editor>
    </extension>
    <extension
@@ -36,13 +36,13 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.browser.actionSet"
-            label="Show WebBrowser ActionSet"
+            label="%actionSet.show.browser.label"
             visible="true">
          <action
                class="com.aptana.browser.actions.ShowBrowserEditorAction"
                icon="icons/obj16/browser.png"
                id="com.aptana.browser.ShowBrowserEditorAction"
-               label="WebBrowser Editor"
+               label="%action.browser.editor.label"
                menubarPath="window/showView/additions"
                style="push">
          </action>

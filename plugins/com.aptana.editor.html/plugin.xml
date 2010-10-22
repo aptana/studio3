@@ -63,7 +63,7 @@
             activate="true"
             class="com.aptana.editor.html.text.hyperlink.CSSClassHyperlinkDetector"
             id="com.aptana.editor.html.hyperlinkDetector"
-            name="CSS Class Hyperlinks"
+            name="%hyperlinkDetector.cssclass.name"
             targetId="com.aptana.editor.html">
       </hyperlinkDetector>
    </extension>

@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.xml.parsing.ast;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.aptana.parsing.ast.INameNode;
@@ -42,18 +44,47 @@ import com.aptana.parsing.lexer.IRange;
 
 public class XMLElementNode extends XMLNode
 {
+	/**
+	 * getTagName
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	private static String getTagName(String tag)
+	{
+		// the first element is the tag name
+		StringTokenizer token = new StringTokenizer(tag);
+		return token.nextToken();
+	}
 
 	private INameNode fNameNode;
 	private boolean fIsSelfClosing;
+	private Map<String, String> fAttributes;
 
+	/**
+	 * XMLElementNode
+	 * 
+	 * @param tag
+	 * @param start
+	 * @param end
+	 */
 	public XMLElementNode(String tag, int start, int end)
 	{
 		this(tag, new XMLNode[0], start, end);
 	}
 
+	/**
+	 * XMLElementNode
+	 * 
+	 * @param tag
+	 * @param children
+	 * @param start
+	 * @param end
+	 */
 	public XMLElementNode(String tag, XMLNode[] children, int start, int end)
 	{
-		super(XMLNodeTypes.ELEMENT.getIndex(), children, start, end);
+		super(XMLNodeType.ELEMENT, children, start, end);
+
 		if (tag.length() > 0)
 		{
 			try
@@ -73,40 +104,28 @@ public class XMLElementNode extends XMLNode
 			{
 			}
 		}
+
 		fNameNode = new NameNode(tag, start, end);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#addOffset(int)
+	 */
 	@Override
 	public void addOffset(int offset)
 	{
 		IRange range = fNameNode.getNameRange();
-		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
-				+ offset);
+
+		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset() + offset);
+
 		super.addOffset(offset);
 	}
 
-	public String getName()
-	{
-		return fNameNode.getName();
-	}
-
-	@Override
-	public INameNode getNameNode()
-	{
-		return fNameNode;
-	}
-
-	@Override
-	public String getText()
-	{
-		return fNameNode.getName();
-	}
-
-	public boolean isSelfClosing()
-	{
-		return fIsSelfClosing;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -114,6 +133,7 @@ public class XMLElementNode extends XMLNode
 		{
 			return false;
 		}
+
 		if (!(obj instanceof XMLElementNode))
 		{
 			return false;
@@ -122,35 +142,115 @@ public class XMLElementNode extends XMLNode
 		return getName().equals(((XMLElementNode) obj).getName());
 	}
 
+	/**
+	 * getAttribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public String getAttibute(String name)
+	{
+		String result = ""; //$NON-NLS-1$
+
+		if (fAttributes != null)
+		{
+			result = fAttributes.get(name);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return fNameNode.getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getNameNode()
+	 */
+	@Override
+	public INameNode getNameNode()
+	{
+		return fNameNode;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getText()
+	 */
+	@Override
+	public String getText()
+	{
+		return fNameNode.getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return 31 * super.hashCode() + getName().hashCode();
 	}
 
+	/**
+	 * isSelfClosing
+	 * 
+	 * @return
+	 */
+	public boolean isSelfClosing()
+	{
+		return fIsSelfClosing;
+	}
+
+	/**
+	 * setAttribute
+	 * 
+	 * @param name
+	 * @param value
+	 */
+	public void setAttribute(String name, String value)
+	{
+		if (fAttributes == null)
+		{
+			fAttributes = new HashMap<String, String>();
+		}
+
+		fAttributes.put(name, value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
 		String name = getName();
+
 		if (name.length() > 0)
 		{
 			text.append("<").append(name); //$NON-NLS-1$
 			text.append(">"); //$NON-NLS-1$
+
 			IParseNode[] children = getChildren();
+
 			for (IParseNode child : children)
 			{
 				text.append(child);
 			}
+
 			text.append("</").append(name).append(">"); //$NON-NLS-1$//$NON-NLS-2$
 		}
-		return text.toString();
-	}
 
-	private static String getTagName(String tag)
-	{
-		// the first element is the tag name
-		StringTokenizer token = new StringTokenizer(tag);
-		return token.nextToken();
+		return text.toString();
 	}
 }

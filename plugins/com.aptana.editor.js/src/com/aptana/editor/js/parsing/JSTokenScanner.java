@@ -48,12 +48,12 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.js.IJSTokenScanner;
 import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
-import com.aptana.editor.js.text.rules.CharacterMapRule;
 import com.aptana.editor.js.text.rules.JSIdentifierDetector;
 import com.aptana.editor.js.text.rules.JSNumberRule;
 import com.aptana.editor.js.text.rules.JSRegExpRule;
