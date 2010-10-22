@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
+import java.util.Arrays;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -504,6 +505,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					Logger.log("sending ESC + '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					getOutputStream().write('\u001b');
 					getOutputStream().write(byteToSend);
+				} else if (byteToSend > 127) {
+					byte[] bytesToSend = String.valueOf(chKey).getBytes(fEncoding);
+					Logger.log("sending '" + Arrays.asList(bytesToSend) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					getOutputStream().write(bytesToSend);
 				} else {
 					Logger.log("sending '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					getOutputStream().write(byteToSend);
