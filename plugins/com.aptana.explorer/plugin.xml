@@ -631,6 +631,13 @@
                </and>
             </visibleWhen>
          </command>
+         <command
+               commandId="com.aptana.git.ui.command.attach"
+               style="push">
+            <visibleWhen
+                  checkEnabled="true">
+            </visibleWhen>
+         </command>
       </menuContribution>
       <menuContribution
             locationURI="menu:com.aptana.explorer.gear?endof=group.git.branching">
