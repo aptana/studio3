@@ -96,6 +96,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
@@ -203,7 +204,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	// private static final String[] animationImage = {
 	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
 	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
-	
+
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
 	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
@@ -280,9 +281,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
 				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
-				fillCommandsMenu(commandsMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
+				menuService.populateContributionManager(commandsMenuManager,
+						MenuUtil.menuUri(commandsMenuManager.getId()));
+				fillCommandsMenu(commandsMenuManager);
 				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
@@ -379,10 +381,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		// Git branching
 		// Git misc
 		// Misc project/properties
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_FILTERING));
-		menuManager.add(new Separator(GROUP_RUN));
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_ADDITIONS));
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
 
 		// Add run related items
 		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
@@ -484,10 +482,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				Point toolbarLocation = deployToolBar.getLocation();
 				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = deployToolBar.getSize();
+				// FIXME Move declaration/filling of menu to ext pt, that means removing fillDeployMenu!
 				final MenuManager deployMenuManager = new MenuManager(null, DEPLOY_MENU_ID);
 				fillDeployMenu(deployMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(deployMenuManager, "toolbar:" + deployMenuManager.getId()); //$NON-NLS-1$
+				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
 				final Menu commandsMenu = deployMenuManager.createContextMenu(deployToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);

@@ -183,6 +183,30 @@
             id="com.aptana.git.ui.command.disconnect"
             name="%DisconnectAction_label">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.actions.DiffHandler"
+            id="com.aptana.git.ui.command.diff"
+            name="Diff">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.actions.AttachGitRepoHandler"
+            id="com.aptana.git.ui.command.attach"
+            name="Attach">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            id="com.aptana.git.ui.command.stash"
+            name="Stash">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            id="com.aptana.git.ui.command.unstash"
+            name="Unstash">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -419,7 +443,6 @@
             locationURI="popup:team.main?endof=group1">
          <command
                commandId="com.aptana.git.ui.command.github.network"
-               icon="icons/obj16/github.gif"
                id="com.aptana.git.ui.actions.GithubNetworkAction"
                label="%GithubNetworkAction_label"
                tooltip="%GithubNetworkAction_tooltip">
@@ -758,7 +781,6 @@
             locationURI="popup:team.main?endof=targetGroup">
          <command
                commandId="com.aptana.git.ui.command.commit"
-               icon="icons/elcl16/disk.png"
                id="com.aptana.git.ui.actions.CommitAction"
                label="%CommitAction_label"
                tooltip="%CommitAction_tooltip">
@@ -812,7 +834,6 @@
          </command>
          <command
                commandId="com.aptana.git.ui.command.stage"
-               icon="icons/elcl16/add.gif"
                id="com.aptana.git.ui.actions.StageAction"
                label="%StageAction_label"
                tooltip="%StageAction_tooltip">
@@ -866,7 +887,6 @@
          </command>
          <command
                commandId="com.aptana.git.ui.command.unstage"
-               icon="icons/elcl16/subtract.gif"
                id="com.aptana.git.ui.actions.UnstageAction"
                label="%UnstageAction_label"
                tooltip="%UnstageAction_tooltip">
@@ -1136,7 +1156,6 @@
           </command>
           <command
                 commandId="com.aptana.git.ui.command.pull"
-                icon="icons/elcl16/arrow_down.png"
                 id="com.aptana.git.ui.actions.PullAction"
                 label="%PullAction_label"
                 tooltip="%PullAction_tooltip">
@@ -1190,7 +1209,6 @@
           </command>
           <command
                 commandId="com.aptana.git.ui.command.push"
-                icon="icons/elcl16/arrow_up.png"
                 id="com.aptana.git.ui.actions.PushAction"
                 label="%PushAction_label"
                 style="push"
@@ -1462,5 +1480,40 @@
               </visibleWhen>
          </command>
        </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.git.ui.command.stage"
+            icon="icons/elcl16/add.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.unstage"
+            icon="icons/elcl16/subtract.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.commit"
+            icon="icons/elcl16/disk.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.github.network"
+            icon="icons/obj16/github.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.pull"
+            icon="icons/elcl16/arrow_down.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.push"
+            icon="icons/elcl16/arrow_up.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.stash"
+            icon="icons/elcl16/arrow_left.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.unstash"
+            icon="icons/elcl16/arrow_right.png">
+      </image>
    </extension>
 </plugin>
