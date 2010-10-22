@@ -139,7 +139,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.MergeBranchHandler"
             id="com.aptana.git.ui.command.merge_branch"
             name="%MergeBranchAction_tooltip">
       </command>
