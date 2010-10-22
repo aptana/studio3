@@ -97,6 +97,9 @@
          <actionSet
                id="com.aptana.terminal.actionSet">
          </actionSet>
+         <showInPart
+               id="org.eclipse.ui.navigator.ProjectExplorer">
+         </showInPart>
       </perspectiveExtension>
    </extension>
    <extension
