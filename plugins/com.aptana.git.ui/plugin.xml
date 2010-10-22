@@ -109,19 +109,19 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.RevertHandler"
             id="com.aptana.git.ui.command.revert"
             name="%RevertAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.StageHandler"
             id="com.aptana.git.ui.command.stage"
             name="%StageAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.UnstageHandler"
             id="com.aptana.git.ui.command.unstage"
             name="%UnstageAction_tooltip">
       </command>
@@ -174,11 +174,13 @@
             name="%BlameAction_label">
       </command>
       <command
+            categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
             id="com.aptana.git.ui.command.showInResourceHistory"
             name="%command.showin.resource.name">
       </command>
       <command
+            categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.DisconnectHandler"
             id="com.aptana.git.ui.command.disconnect"
             name="%DisconnectAction_label">

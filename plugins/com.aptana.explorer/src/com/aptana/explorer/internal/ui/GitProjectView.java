@@ -34,10 +34,8 @@
  */
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.commands.Command;
@@ -45,25 +43,18 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
@@ -93,7 +84,6 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
-import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -103,8 +93,6 @@ import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
-import com.aptana.git.ui.actions.DeleteBranchAction;
-import com.aptana.git.ui.actions.MergeBranchAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 /**
@@ -343,99 +331,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			fChangedFilesFilterProjects.remove(selectedProject);
 		}
 		super.removeFilter();
-	}
-
-	protected Set<IResource> getSelectedStagedFiles()
-	{
-		// Limit to only those changed files which have staged changes
-		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		final Set<IResource> selected = new HashSet<IResource>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
-				for (ChangedFile changedFile : changedFiles)
-				{
-					if (changedFile == null)
-						continue;
-					if (changedFile.hasStagedChanges())
-					{
-						selected.add(resource);
-						break;
-					}
-				}
-			}
-		}
-		return selected;
-	}
-
-	protected Set<IResource> getSelectedUnstagedFiles()
-	{
-		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		final Set<IResource> selected = new HashSet<IResource>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
-				for (ChangedFile changedFile : changedFiles)
-				{
-					if (changedFile == null)
-						continue;
-					if (changedFile.hasUnstagedChanges())
-					{
-						selected.add(resource);
-						break;
-					}
-				}
-			}
-		}
-		return selected;
-	}
-
-	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
-	{
-		List<ChangedFile> files = new ArrayList<ChangedFile>();
-		if (resource instanceof IContainer)
-		{
-			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
-		}
-		else
-		{
-			ChangedFile changedFile = repo.getChangedFileForResource(resource);
-			if (changedFile != null)
-				files.add(changedFile);
-		}
-		return files;
-	}
-
-	private Set<IResource> getSelectedFiles()
-	{
-		ISelection sel = getCommonViewer().getSelection();
-		Set<IResource> resources = new HashSet<IResource>();
-		if (sel == null || sel.isEmpty())
-			return resources;
-		if (!(sel instanceof IStructuredSelection))
-			return resources;
-		IStructuredSelection structured = (IStructuredSelection) sel;
-		for (Object element : structured.toList())
-		{
-			if (element == null)
-				continue;
-
-			if (element instanceof IResource)
-				resources.add((IResource) element);
-
-			if (element instanceof IAdaptable)
-			{
-				IAdaptable adapt = (IAdaptable) element;
-				IResource resource = (IResource) adapt.getAdapter(IResource.class);
-				if (resource != null)
-					resources.add(resource);
-			}
-		}
-		return resources;
 	}
 
 	protected boolean setNewBranch(String branchName)
@@ -847,84 +742,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 			}
 		}
-	}
-
-	protected void addCreateBranchMenuItem(Menu menu)
-	{
-		// Create branch
-		final MenuItem branchNameMenuItem = new MenuItem(menu, SWT.PUSH);
-		branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
-		branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-				setNewBranch(branchNameMenuItem.getText());
-			}
-		});
-	}
-
-	protected void addSwitchBranchSubMenu(GitRepository repository, Menu menu)
-	{
-		// Switch to branch
-		MenuItem switchBranchesMenuItem = new MenuItem(menu, SWT.CASCADE);
-		switchBranchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
-		Menu switchBranchesSubMenu = new Menu(switchBranchesMenuItem);
-		String currentBranchName = repository.currentBranch();
-		for (String branchName : repository.localBranches())
-		{
-			// Construct the menu item to for this branch
-			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
-			if (branchName.equals(currentBranchName) && repository.isDirty())
-			{
-				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX);
-			}
-			else
-			{
-				branchNameMenuItem.setText(branchName);
-			}
-			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
-			branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-			{
-				public void widgetSelected(SelectionEvent e)
-				{
-					setNewBranch(branchNameMenuItem.getText());
-				}
-			});
-		}
-		// only 1 branch, no need to switch
-		switchBranchesMenuItem.setEnabled(repository.localBranches().size() > 1);
-		switchBranchesMenuItem.setMenu(switchBranchesSubMenu);
-	}
-
-	protected void addMergeBranchSubMenu(final GitRepository repository, Menu menu)
-	{
-		// Merge branch
-		MenuItem mergeBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
-		mergeBranchMenuItem.setText(Messages.GitProjectView_MergeBranch);
-		Menu mergeBranchSubmenu = new Menu(mergeBranchMenuItem);
-
-		MergeBranchAction action = new MergeBranchAction();
-		action.selectionChanged(new Action()
-		{
-		}, new StructuredSelection(selectedProject));
-		action.fillMenu(mergeBranchSubmenu);
-		mergeBranchMenuItem.setEnabled(repository.allBranches().size() > 1);
-		mergeBranchMenuItem.setMenu(mergeBranchSubmenu);
-	}
-
-	protected void addDeleteBranchSubMenu(final GitRepository repository, Menu menu)
-	{
-		// Delete branch
-		MenuItem deleteBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
-		deleteBranchMenuItem.setText(Messages.GitProjectView_DeleteBranch);
-		Menu deleteBranchSubmenu = new Menu(deleteBranchMenuItem);
-		DeleteBranchAction action = new DeleteBranchAction();
-		action.selectionChanged(new Action()
-		{
-		}, new StructuredSelection(selectedProject));
-		action.fillMenu(deleteBranchSubmenu);
-		deleteBranchMenuItem.setEnabled(repository.localBranches().size() > 1);
-		deleteBranchMenuItem.setMenu(deleteBranchSubmenu);
 	}
 
 	@Override
