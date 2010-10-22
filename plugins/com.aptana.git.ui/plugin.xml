@@ -97,7 +97,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.CommitHandler"
             id="com.aptana.git.ui.command.commit"
             name="%CommitAction_tooltip">
       </command>
