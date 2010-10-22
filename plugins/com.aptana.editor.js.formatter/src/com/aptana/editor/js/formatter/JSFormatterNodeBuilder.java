@@ -69,6 +69,8 @@ import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
+import com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode;
+import com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSReturnNode;
 import com.aptana.editor.js.parsing.ast.JSSwitchNode;
 import com.aptana.editor.js.parsing.ast.JSTreeWalker;
@@ -147,6 +149,44 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSErrorNode node)
 		{
 			// do nothing. Avoid visiting the children.
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
+		 */
+		@Override
+		public void visit(JSPostUnaryOperatorNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode)
+		 */
+		@Override
+		public void visit(JSPreUnaryOperatorNode node)
+		{
+			if (node.getSemicolonIncluded())
+			{
+				IFormatterContainerNode lineNode = pushLineNode(node);
+				super.visit(node);
+				checkedPop(lineNode, lineNode.getEndOffset());
+			}
+			else
+			{
+				super.visit(node);
+			}
 		}
 
 		/*
