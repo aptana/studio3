@@ -19,7 +19,7 @@ import com.aptana.formatter.preferences.profile.IProfileManager;
 public interface IFormatterModifyDialog
 {
 
-	void setProfileManager(IProfileManager manager);
+	void setProfileManager(IProfileManager manager, String title);
 
 	/**
 	 * Sets the preferences the dialog should use

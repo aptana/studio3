@@ -34,6 +34,8 @@
  */
 package com.aptana.terminal.internal.emulator;
 
+import java.io.UnsupportedEncodingException;
+
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -66,6 +68,17 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 			}
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#setEncoding(java.lang.String)
+	 */
+	@Override
+	public void setEncoding(String encoding) throws UnsupportedEncodingException {
+		if (encoding == null) {
+			encoding = "UTF-8"; //$NON-NLS-1$
+		}
+		super.setEncoding(encoding);
 	}
 
 	/* (non-Javadoc)

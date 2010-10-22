@@ -436,6 +436,36 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		layout.marginWidth = 0;
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		// Buttons panel
+		Composite buttons = new Composite(rightPanel, SWT.NONE);
+		layout = new GridLayout(2, true);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		buttons.setLayout(layout);
+		final Button editBt = new Button(buttons, SWT.PUSH);
+		editBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_edit);
+		GridData editLayoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		editBt.setLayoutData(editLayoutData);
+		final Button defaultsBt = new Button(buttons, SWT.PUSH);
+		defaultsBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_defaults);
+		GridData defaultLauoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
+		defaultsBt.setLayoutData(defaultLauoutData);
+
+		Point defaultSize = defaultsBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		Point editSize = editBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		if (defaultSize.x > editSize.x)
+		{
+			editLayoutData.widthHint = defaultSize.x;
+		}
+		else
+		{
+			defaultLauoutData.widthHint = editSize.x;
+		}
+		IProfileManager profileManager = getProfileManager();
+		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
+		
+		// Previews area
 		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
 		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
 		previewStackLayout = new StackLayout();
@@ -479,33 +509,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			previewPane.layout();
 		}
 
-		// Buttons panel
-		Composite buttons = new Composite(rightPanel, SWT.NONE);
-		layout = new GridLayout(2, true);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		buttons.setLayout(layout);
-		final Button editBt = new Button(buttons, SWT.PUSH);
-		editBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_edit);
-		GridData editLayoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		editBt.setLayoutData(editLayoutData);
-		final Button defaultsBt = new Button(buttons, SWT.PUSH);
-		defaultsBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_defaults);
-		GridData defaultLauoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		defaultsBt.setLayoutData(defaultLauoutData);
-
-		Point defaultSize = defaultsBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		Point editSize = editBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		if (defaultSize.x > editSize.x)
-		{
-			editLayoutData.widthHint = defaultSize.x;
-		}
-		else
-		{
-			defaultLauoutData.widthHint = editSize.x;
-		}
-		IProfileManager profileManager = getProfileManager();
-		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
 		sashForm.setWeights(new int[] { 1, 3 });
 
 		// Attach the listeners
@@ -633,8 +636,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			final IFormatterModifyDialog dialog = factory.createDialog(createDialogOwner(factory));
 			if (dialog != null)
 			{
-				dialog.setProfileManager(manager);
 				IProfile profile = manager.getSelected();
+				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile.getName());
+				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
 				{
