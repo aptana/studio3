@@ -145,7 +145,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.DeleteBranchHandler"
             id="com.aptana.git.ui.command.delete_branch"
             name="%DeleteBranchAction_tooltip">
       </command>
