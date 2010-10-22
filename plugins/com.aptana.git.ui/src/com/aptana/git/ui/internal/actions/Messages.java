@@ -39,7 +39,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.actions.messages"; //$NON-NLS-1$
-	public static String AbstractOperationAction_GenericFailed_Message;
+
 	public static String CommitAction_MultipleRepos_Message;
 	public static String CommitAction_MultipleRepos_Title;
 	public static String CommitAction_NoRepo_Message;
