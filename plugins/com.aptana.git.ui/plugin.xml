@@ -151,7 +151,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.MergeConflictsHandler"
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
