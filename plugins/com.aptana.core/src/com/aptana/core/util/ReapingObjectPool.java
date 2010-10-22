@@ -66,7 +66,8 @@ class ConnectionReaper extends Thread
 			}
 			pool.reap();
 		}
-		CorePlugin.trace("Reaping thread stopped"); //$NON-NLS-1$
+		// Not logging the trace message until we have the verbosity to log at different levels
+		// CorePlugin.trace("Reaping thread stopped"); //$NON-NLS-1$
 	}
 }
 
