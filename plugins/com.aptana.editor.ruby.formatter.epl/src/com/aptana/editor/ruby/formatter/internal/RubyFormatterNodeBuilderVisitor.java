@@ -114,7 +114,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 				.getEndOffset()));
 		builder.push(classNode);
 		visitChildren(visited);
-		// builder.checkedPop(classNode, visited.getEnd().getPosition().getStartOffset());
 		Node bodyNode = visited.getBodyNode();
 		int bodyEndOffset;
 		if (NodeType.NILNODE.equals(bodyNode.getNodeType()))
@@ -135,10 +134,8 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		FormatterClassNode classNode = new FormatterClassNode(document);
 		SourcePosition position = visited.getPosition();
 		classNode.setBegin(createTextNode(document, visited));
-		// .getClassKeyword()));
 		builder.push(classNode);
 		visitChildren(visited);
-		// builder.checkedPop(classNode, visited.getEnd().getPosition().getStartOffset());
 		Node bodyNode = visited.getBodyNode();
 		int bodyEndOffset = bodyNode.getPosition().getEndOffset();
 		builder.checkedPop(classNode, bodyEndOffset);
@@ -153,7 +150,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		moduleNode.setBegin(createTextNode(document, pathNode));
 		builder.push(moduleNode);
 		visitChildren(visited);
-		// builder.checkedPop(moduleNode, visited.getEnd().getPosition().getStartOffset());
 		SourcePosition position = visited.getPosition();
 		Node bodyNode = visited.getBodyNode();
 		int bodyEndOffset = bodyNode.getPosition().getEndOffset();
@@ -181,7 +177,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		builder.push(methodNode);
 		visitChildren(visited);
 		Node bodyNode = visited.getBodyNode();
-		// builder.checkedPop(methodNode, visited.getEnd().getPosition().getStartOffset());
 		int bodyEndOffset;
 		if (bodyNode != null)
 		{
@@ -256,7 +251,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		forNode.setBegin(builder.createTextNode(document, position.getStartOffset(), beginEndOffset));
 		builder.push(forNode);
 		visitChildren(visited);
-		// builder.checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
 		int bodyEndOffset;
 		if (bodyNode != null)
 		{
@@ -279,7 +273,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 				.getPosition().getStartOffset() - 1));
 		builder.push(forNode);
 		visitChildren(visited);
-		// builder.checkedPop(forNode, visited.getEnd().getPosition().getStartOffset());
 		SourcePosition position = visited.getPosition();
 		int bodyEndOffset = bodyNode.getPosition().getEndOffset();
 		builder.checkedPop(forNode, bodyEndOffset);
@@ -293,7 +286,6 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		untilNode.setBegin(createTextNode(document, visited));
 		builder.push(untilNode);
 		visitChildren(visited);
-		// builder.checkedPop(untilNode, visited.getEnd().getPosition().getStartOffset());
 		SourcePosition position = visited.getPosition();
 		Node bodyNode = visited.getBodyNode();
 		int bodyEndOffset = bodyNode.getPosition().getEndOffset();
@@ -732,6 +724,14 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 			FormatterRequireNode requireNode = new FormatterRequireNode(document, position.getStartOffset(), position
 					.getEndOffset());
 			builder.addChild(requireNode);
+		}
+		else if (visited.getIterNode() != null)
+		{
+			// it's a block iteration node
+			int iterStart = visited.getIterNode().getPosition().getStartOffset();
+			FormatterStringNode strNode = new FormatterStringNode(document, visited.getPosition().getStartOffset(), iterStart);
+			builder.addChild(strNode);
+			visitChildren(visited);
 		}
 		else
 		{
