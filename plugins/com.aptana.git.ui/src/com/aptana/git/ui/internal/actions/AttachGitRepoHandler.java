@@ -1,4 +1,4 @@
-package com.aptana.git.ui.actions;
+package com.aptana.git.ui.internal.actions;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -22,6 +22,7 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.git.ui.actions.Messages;
 
 public class AttachGitRepoHandler extends AbstractHandler
 {

@@ -185,13 +185,13 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.actions.DiffHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.DiffHandler"
             id="com.aptana.git.ui.command.diff"
             name="Diff">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.actions.AttachGitRepoHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.AttachGitRepoHandler"
             id="com.aptana.git.ui.command.attach"
             name="Initialize Git repository">
       </command>

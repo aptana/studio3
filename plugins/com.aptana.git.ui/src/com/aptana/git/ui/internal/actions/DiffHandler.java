@@ -1,4 +1,4 @@
-package com.aptana.git.ui.actions;
+package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +33,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
+import com.aptana.git.ui.actions.Messages;
 
 public class DiffHandler extends AbstractHandler
 {
