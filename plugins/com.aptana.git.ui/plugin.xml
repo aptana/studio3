@@ -127,7 +127,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.CreateBranchHandler"
             id="com.aptana.git.ui.command.create_branch"
             name="%CreateBranchAction_tooltip">
       </command>
