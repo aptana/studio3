@@ -20,6 +20,12 @@ package com.aptana.editor.common.contentassist;
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
+import org.eclipse.jface.internal.text.DelayedInputChangeListener;
+import org.eclipse.jface.internal.text.InformationControlReplacer;
+import org.eclipse.jface.text.IDelayedInputChangeProvider;
+import org.eclipse.jface.text.IInformationControl;
+import org.eclipse.jface.text.IInformationControlExtension5;
+import org.eclipse.jface.text.IInputChangedListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -34,14 +40,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-
-import org.eclipse.jface.internal.text.DelayedInputChangeListener;
-import org.eclipse.jface.internal.text.InformationControlReplacer;
-
-import org.eclipse.jface.text.IDelayedInputChangeProvider;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlExtension5;
-import org.eclipse.jface.text.IInputChangedListener;
 
 /**
  * A generic closer class used to monitor various interface events in order to determine whether a content assistant

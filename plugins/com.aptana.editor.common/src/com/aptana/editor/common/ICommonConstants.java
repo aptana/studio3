@@ -37,11 +37,21 @@ package com.aptana.editor.common;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface ICommonConstants {
+public interface ICommonConstants
+{
 
 	public String CONTENT_TYPE_UKNOWN = "com.aptana.contenttype.unknown"; //$NON-NLS-1$
 
 	public String DEFAULT_PARTITIONING = "com.aptana.editor.default_partitioning"; //$NON-NLS-1$
+
+	/**
+	 * Code formatter action definition ID, as defined in the plugin.xml ("com.aptana.editor.commands.Format")
+	 */
+	public String FORMATTER_ACTION_DEFINITION_ID = "com.aptana.editor.commands.Format"; //$NON-NLS-1$
+
+	/**
+	 * Code-formatter action ID ("com.aptana.editor.action.Format")
+	 */
+	public String FORMATTER_ACTION_ID = "com.aptana.editor.action.Format"; //$NON-NLS-1$
 }

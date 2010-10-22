@@ -60,7 +60,7 @@
          point="org.eclipse.ui.commands">
       <category
             id="com.aptana.ui.ftp.category"
-            name="FTP">
+            name="%category.ftp.name">
       </category>
       <command
             categoryId="com.aptana.ui.ftp.category"

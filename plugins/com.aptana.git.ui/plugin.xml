@@ -176,7 +176,7 @@
       <command
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
             id="com.aptana.git.ui.command.showInResourceHistory"
-            name="%ShowResourceInHistoryAction_label">
+            name="%command.showin.resource.name">
       </command>
       <command
             defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
@@ -289,7 +289,7 @@
             category="org.eclipse.team.ui.TeamPreferences"
             class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
             id="com.aptana.git.ui.GitExecutableLocationPage"
-            name="Git">
+            name="%page.git.name">
       </page>
    </extension>
    <extension
@@ -297,7 +297,7 @@
       <referenceprovider
             class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
             id="com.aptana.git.ui.quickdiff"
-            label="Git Quick Diff">
+            label="%referenceprovider.quickdiff.label">
       </referenceprovider>
    </extension>
    <extension

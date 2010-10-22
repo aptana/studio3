@@ -31,7 +31,7 @@
             describer="com.aptana.editor.ruby.RubyTextContentDescriber"
             file-names="plugin,server,runner,generate,dbconsole,about,console,destroy,autospec,spec,rails"
             id="com.aptana.contenttype.ruby.ambiguous"
-            name="Ambiguously Ruby"
+            name="%content-type.ruby.ambiguous.name"
             priority="normal">
       </content-type>
    </extension>

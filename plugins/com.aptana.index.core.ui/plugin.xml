@@ -29,7 +29,7 @@
       <command
             categoryId="com.aptana.ui.category"
             id="com.aptana.index.core.ui.commands.rebuild"
-            name="Rebuild index">
+            name="%command.rebuild.name">
       </command>
    </extension>
    <extension
