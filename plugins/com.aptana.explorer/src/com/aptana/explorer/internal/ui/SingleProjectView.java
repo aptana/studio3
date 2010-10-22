@@ -205,7 +205,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
 	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
 
-	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
 	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
 	protected static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
@@ -381,55 +380,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		// Git branching
 		// Git misc
 		// Misc project/properties
-
-		// Add run related items
-		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				if (projects.length > 0)
-				{
-					new MenuItem(menu, SWT.SEPARATOR);
-
-					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
-					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication);
-
-					Menu projectsMenu = new Menu(menu);
-					for (IProject iProject : projects)
-					{
-						// hide closed projects
-						if (!iProject.isAccessible())
-						{
-							continue;
-						}
-						// Construct the menu to attach to the above button.
-						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
-						projectNameMenuItem.setText(iProject.getName());
-						projectNameMenuItem.setSelection(selectedProject != null
-								&& iProject.getName().equals(selectedProject.getName()));
-						projectNameMenuItem.addSelectionListener(new SelectionAdapter()
-						{
-							public void widgetSelected(SelectionEvent e)
-							{
-								String projectName = projectNameMenuItem.getText();
-								projectToolItem.setText(projectName);
-								setActiveProject(projectName);
-							}
-						});
-					}
-					projectsMenuItem.setMenu(projectsMenu);
-				}
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
+		
 		// Stick Delete in Properties area
 		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
 		{

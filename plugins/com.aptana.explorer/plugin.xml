@@ -209,7 +209,6 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="true"
             locationURI="popup:com.aptana.explorer.view?before=group.edit">
          <menu
                id="appExplorerShowIn"
@@ -229,7 +228,6 @@
          </menu>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="menu:com.aptana.explorer.gear">
          <separator
                name="group.filtering"
@@ -237,6 +235,14 @@
          </separator>
          <separator
                name="group.run"
+               visible="true">
+         </separator>
+         <separator
+               name="group.open"
+               visible="true">
+         </separator>
+         <separator
+               name="group.goto"
                visible="true">
          </separator>
          <separator
@@ -269,7 +275,6 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="menu:com.aptana.explorer.gear?endof=group.git.files">
          <command
                commandId="com.aptana.git.ui.command.stage"
@@ -390,7 +395,6 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="popup:com.aptana.explorer.view?before=additions">
          <command
                commandId="com.aptana.git.ui.command.stage"
@@ -510,7 +514,6 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="menu:com.aptana.explorer.gear?endof=group.git.project">
          <command
                commandId="com.aptana.git.ui.command.commit"
@@ -630,7 +633,6 @@
          </command>
       </menuContribution>
       <menuContribution
-            allPopups="false"
             locationURI="menu:com.aptana.explorer.gear?endof=group.git.branching">
          <menu
                id="com.aptana.explorer.branch.menu"
@@ -965,6 +967,16 @@
                   </and>
                </visibleWhen>
             </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.gear?endof=group.goto">
+         <menu
+               label="Switch to Application">
+            <dynamic
+                  class="com.aptana.explorer.internal.handlers.SwitchProjectMenuItem"
+                  id="com.aptana.explorer.switch_application.items">
+            </dynamic>
          </menu>
       </menuContribution>
    </extension>
