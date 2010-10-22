@@ -52,7 +52,6 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 	public CSSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle(Messages.CSSFormatterModifyDialog_CSS_formater_title);
 	}
 
 	protected void addPages()

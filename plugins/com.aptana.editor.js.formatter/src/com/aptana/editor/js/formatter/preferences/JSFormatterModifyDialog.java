@@ -54,7 +54,6 @@ public class JSFormatterModifyDialog extends FormatterModifyDialog
 	public JSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle(Messages.JSFormatterModifyDialog_jsFormatterTitle);
 	}
 
 	protected void addPages()

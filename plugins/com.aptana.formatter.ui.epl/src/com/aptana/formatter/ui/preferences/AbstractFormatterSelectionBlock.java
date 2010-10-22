@@ -636,8 +636,9 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			final IFormatterModifyDialog dialog = factory.createDialog(createDialogOwner(factory));
 			if (dialog != null)
 			{
-				dialog.setProfileManager(manager);
 				IProfile profile = manager.getSelected();
+				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile.getName());
+				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
 				{

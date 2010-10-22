@@ -54,7 +54,6 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 	public HTMLFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle(Messages.HTMLFormatterModifyDialog_htmlFormatterTitle);
 	}
 
 	protected void addPages()
