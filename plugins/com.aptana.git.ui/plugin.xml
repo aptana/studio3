@@ -73,25 +73,25 @@
       </category>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.AddRemoteHandler"
             id="com.aptana.git.ui.command.add_remote"
             name="%AddRemoteAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.PushHandler"
             id="com.aptana.git.ui.command.push"
             name="%PushAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.GithubNetworkHandler"
             id="com.aptana.git.ui.command.github.network"
             name="%GithubNetworkAction_label">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.PullHandler"
             id="com.aptana.git.ui.command.pull"
             name="%PullAction_tooltip">
       </command>
@@ -103,7 +103,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.StatusHandler"
             id="com.aptana.git.ui.command.status"
             name="%StatusAction_tooltip">
       </command>
@@ -169,7 +169,7 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.BlameHandler"
             id="com.aptana.git.ui.command.blame"
             name="%BlameAction_label">
       </command>
@@ -197,13 +197,13 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.StashHandler"
             id="com.aptana.git.ui.command.stash"
             name="Stash">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.UnstashHandler"
             id="com.aptana.git.ui.command.unstash"
             name="Unstash">
       </command>
