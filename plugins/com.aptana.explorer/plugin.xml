@@ -228,58 +228,11 @@
          </menu>
       </menuContribution>
       <menuContribution
-            locationURI="menu:com.aptana.explorer.gear">
-         <separator
-               name="group.filtering"
-               visible="true">
-         </separator>
-         <separator
-               name="group.run"
-               visible="true">
-         </separator>
-         <separator
-               name="group.open"
-               visible="true">
-         </separator>
-         <separator
-               name="group.goto"
-               visible="true">
-         </separator>
-         <separator
-               name="group.git.files"
-               visible="true">
-         </separator>
-         <separator
-               name="group.git.project"
-               visible="true">
-         </separator>
-         <separator
-               name="group.git.branching"
-               visible="true">
-         </separator>
-         <separator
-               name="additions">
-         </separator>
-         <separator
-               name="group.properties"
-               visible="true">
-         </separator>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.gear?after=group.run">
-         <command
-               commandId="com.aptana.explorer.commands.openTerminal"
-               icon="icons/full/obj16/terminal.png"
-               label="%command.openTerminal.name"
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.gear?endof=group.git.files">
+            locationURI="popup:com.aptana.explorer.view?before=additions">
          <command
                commandId="com.aptana.git.ui.command.stage"
                style="push">
-             <visibleWhen
+            <visibleWhen
                   checkEnabled="false">
                <and>
                   <with
@@ -296,13 +249,12 @@
                         </adapt>
                      </iterate>
                   </with>
-               
-               <with
-                     variable="activePartId">
-                  <equals
-                        value="com.aptana.explorer.view">
-                  </equals>
-               </with>
+                  <with
+                        variable="activePartId">
+                     <equals
+                           value="com.aptana.explorer.view">
+                     </equals>
+                  </with>
                </and>
             </visibleWhen>
          </command>
@@ -395,11 +347,58 @@
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="popup:com.aptana.explorer.view?before=additions">
+            locationURI="menu:com.aptana.explorer.gear">
+         <separator
+               name="group.filtering"
+               visible="true">
+         </separator>
+         <separator
+               name="group.run"
+               visible="true">
+         </separator>
+         <separator
+               name="group.open"
+               visible="true">
+         </separator>
+         <separator
+               name="group.goto"
+               visible="true">
+         </separator>
+         <separator
+               name="group.git.files"
+               visible="true">
+         </separator>
+         <separator
+               name="group.git.project"
+               visible="true">
+         </separator>
+         <separator
+               name="group.git.branching"
+               visible="true">
+         </separator>
+         <separator
+               name="additions">
+         </separator>
+         <separator
+               name="group.properties"
+               visible="true">
+         </separator>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.gear?endof=group.open">
+         <command
+               commandId="com.aptana.explorer.commands.openTerminal"
+               icon="icons/full/obj16/terminal.png"
+               label="%command.openTerminal.name"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.gear?endof=group.git.files">
          <command
                commandId="com.aptana.git.ui.command.stage"
                style="push">
-            <visibleWhen
+             <visibleWhen
                   checkEnabled="false">
                <and>
                   <with
@@ -416,12 +415,13 @@
                         </adapt>
                      </iterate>
                   </with>
-                  <with
-                        variable="activePartId">
-                     <equals
-                           value="com.aptana.explorer.view">
-                     </equals>
-                  </with>
+               
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="com.aptana.explorer.view">
+                  </equals>
+               </with>
                </and>
             </visibleWhen>
          </command>
