@@ -503,7 +503,7 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.TasksPreferencePage"
             id="com.aptana.editor.common.preferences.TasksPreferencePage"
-            name="Tasks">
+            name="%page.tasks.name">
       </page>            
    </extension>
    <extension

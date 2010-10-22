@@ -12,7 +12,7 @@
       <page
             class="com.aptana.ui.properties.ProjectNaturesPage"
             id="com.aptana.ui.propertyPages.projectnatures"
-            name="Project Natures">
+            name="%page.projectnatures.name">
          <enabledWhen>
             <and>
                <adapt

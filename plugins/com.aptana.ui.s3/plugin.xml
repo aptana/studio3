@@ -42,7 +42,7 @@
          point="org.eclipse.ui.commands">
       <category
             id="com.aptana.ui.s3.category"
-            name="S3">
+            name="%category.s3.name">
       </category>
       <command
             categoryId="com.aptana.ui.s3.category"

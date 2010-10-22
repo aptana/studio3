@@ -29,7 +29,7 @@
       <content-type
             base-type="org.eclipse.core.runtime.text"
             id="com.aptana.editor.text.content-type.generic"
-            name="Generic Content Type"
+            name="%content-type.generic.name"
             priority="normal">
       </content-type>
    </extension>

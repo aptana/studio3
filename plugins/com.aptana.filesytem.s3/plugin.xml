@@ -14,7 +14,7 @@
          point="com.aptana.core.io.connectionPoint">
       <connectionPointCategory
             id="com.aptana.ide.filesystem.s3.s3Category"
-            name="S3"
+            name="%connectionPointCategory.s3.name"
             order="100"
             remote="true">
       </connectionPointCategory>
@@ -22,7 +22,7 @@
             category="com.aptana.ide.filesystem.s3.s3Category"
             class="com.aptana.ide.filesystem.s3.S3ConnectionPoint"
             id="s3"
-            name="S3">
+            name="%connectionPointType.s3.name">
       </connectionPointType>
    </extension>
 </plugin>

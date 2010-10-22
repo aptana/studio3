@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="propertyDialogs" name="propertyDialogs" schema="schema/propertyDialogs.exsd"/>
-   <extension-point id="imageAssociations" name="imageAssociations" schema="schema/imageAssociations.exsd"/>
+   <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
+   <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
