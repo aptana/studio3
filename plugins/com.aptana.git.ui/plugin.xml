@@ -157,13 +157,13 @@
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.CompareWithHEADHandler"
             id="com.aptana.git.ui.command.compare_with_HEAD"
             name="%CompareWithHEADAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
-            defaultHandler="com.aptana.git.ui.internal.actions.GitActionHandler"
+            defaultHandler="com.aptana.git.ui.internal.actions.CompareWithRevisionHandler"
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
       </command>
