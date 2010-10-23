@@ -34,7 +34,7 @@ public interface IFormatterWriter
 	 * @throws Exception
 	 */
 	void writeLineBreak(IFormatterContext context);
-	
+
 	void writeIndent(IFormatterContext context);
 
 	void skipNextLineBreaks(IFormatterContext context);
@@ -53,5 +53,9 @@ public interface IFormatterWriter
 	 * @return True, if the buffer ends with a line-terminator; False, otherwise.
 	 */
 	boolean endsWithNewLine();
+
+	boolean isPreserveSpaces();
+
+	void setPreserveSpaces(boolean preserve);
 
 }

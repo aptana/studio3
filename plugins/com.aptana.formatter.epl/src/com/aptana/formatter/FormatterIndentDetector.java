@@ -101,10 +101,29 @@ public class FormatterIndentDetector implements IFormatterWriter
 		return false;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.IFormatterWriter#writeIndent(com.aptana.formatter.IFormatterContext)
 	 */
 	public void writeIndent(IFormatterContext context)
+	{
+		// empty
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#isPreserveSpaces()
+	 */
+	public boolean isPreserveSpaces()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#setPreserveSpaces(boolean)
+	 */
+	public void setPreserveSpaces(boolean preserve)
 	{
 		// empty
 	}
