@@ -346,18 +346,25 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 				int tabSize = getTabSize();
 				if (CodeFormatterConstants.TAB.equals(indentType))
 				{
+					if (tabSize == 0)
+					{
+						return 0;
+					}
 					// treat the whitespace-chars as tabs
 					return (spaceChars / tabSize) + tabChars + 1;
 				}
-				else if (CodeFormatterConstants.SPACE.equals(indentType))
+				else if (indentSize > 0)
 				{
-					// treat the tabs as spaces
-					return (spaceChars + (tabSize * tabChars)) / indentSize + 1;
-				}
-				else
-				{
-					// it's Mixed
-					return (spaceChars + tabChars) / indentSize + 1;
+					if (CodeFormatterConstants.SPACE.equals(indentType))
+					{
+						// treat the tabs as spaces
+						return (spaceChars + (tabSize * tabChars)) / indentSize + 1;
+					}
+					else
+					{
+						// it's Mixed
+						return (spaceChars + tabChars) / indentSize + 1;
+					}
 				}
 
 			}
