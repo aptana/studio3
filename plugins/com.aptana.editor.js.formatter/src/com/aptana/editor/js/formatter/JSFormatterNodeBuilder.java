@@ -44,6 +44,7 @@ import com.aptana.editor.js.formatter.nodes.FormatterJSElseNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSFunctionBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSGroupNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSIfNode;
+import com.aptana.editor.js.formatter.nodes.FormatterJSLoopNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSNonBlockedWhileNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSObjectNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSRootNode;
@@ -153,7 +154,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		/*
 		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
+		 * @see
+		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPostUnaryOperatorNode)
 		 */
 		@Override
 		public void visit(JSPostUnaryOperatorNode node)
@@ -169,10 +171,11 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				super.visit(node);
 			}
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode)
+		 * @see
+		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSPreUnaryOperatorNode)
 		 */
 		@Override
 		public void visit(JSPreUnaryOperatorNode node)
@@ -309,7 +312,27 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSWhileNode node)
 		{
-			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
+			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForNode)
+		 */
+		@Override
+		public void visit(JSForNode node)
+		{
+			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForInNode)
+		 */
+		@Override
+		public void visit(JSForInNode node)
+		{
+			visitCommonLoopBlock(node, node.getRightParenthesis().getStart(), (JSNode) node.getBody());
 		}
 
 		/*
@@ -322,24 +345,29 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForInNode)
+		/**
+		 * @param node
+		 * @param declarationEndOffset
+		 * @param body
 		 */
-		@Override
-		public void visit(JSForInNode node)
+		private void visitCommonLoopBlock(JSNode node, int declarationEndOffset, JSNode body)
 		{
-			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSForNode)
-		 */
-		@Override
-		public void visit(JSForNode node)
-		{
-			visitCommonBlock(node, node.getRightParenthesis().getStart(), node.getBody());
+			pushCommonDeclaration(node, declarationEndOffset, body);
+			short nodeType = body.getNodeType();
+			boolean hasBody = (nodeType != JSNodeTypes.EMPTY);
+			if (hasBody)
+			{
+				boolean hasCurlyBlock = nodeType == JSNodeTypes.STATEMENTS;
+				FormatterJSLoopNode loopNode = new FormatterJSLoopNode(document, hasCurlyBlock);
+				int blockLength = hasCurlyBlock ? 1 : 0;
+				int bodyStart = body.getStartingOffset();
+				int bodyEnd = body.getEndingOffset() + 1 - blockLength;
+				loopNode.setBegin(createTextNode(document, bodyStart, bodyStart + blockLength));
+				push(loopNode);
+				body.accept(this);
+				checkedPop(loopNode, bodyEnd);
+				loopNode.setEnd(createTextNode(document, bodyEnd, bodyEnd + blockLength));
+			}
 		}
 
 		/*
@@ -719,24 +747,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void visitCommonBlock(JSNode node, int declarationEndOffset, IParseNode body)
 		{
+			pushCommonDeclaration(node, declarationEndOffset, body);
 			boolean hasBody = (body.getNodeType() != JSNodeTypes.EMPTY);
-			// First, push the declaration part
-			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
-			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
-					(body.getNodeType() == JSNodeTypes.STATEMENTS), node);
-			int endDeclarationOffset;
-			if (hasBody)
-			{
-				endDeclarationOffset = declarationEndOffset + 1;
-			}
-			else
-			{
-				endDeclarationOffset = body.getEndingOffset() + 1;
-			}
-			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), endDeclarationOffset));
-			push(declarationNode);
-			checkedPop(declarationNode, -1);
-
 			if (hasBody)
 			{
 				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
@@ -764,6 +776,26 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					blockNode.setEnd(createTextNode(document, blockEnd, blockEnd));
 				}
 			}
+		}
+
+		private void pushCommonDeclaration(JSNode node, int declarationEndOffset, IParseNode body)
+		{
+			// First, push the declaration part
+			// In some cases, the body is empty (like in a 'while' with no body). Those cases get a special treatment.
+			FormatterJSDeclarationNode declarationNode = new FormatterJSDeclarationNode(document,
+					(body.getNodeType() == JSNodeTypes.STATEMENTS), node);
+			int endDeclarationOffset;
+			if (body.getNodeType() != JSNodeTypes.EMPTY)
+			{
+				endDeclarationOffset = declarationEndOffset + 1;
+			}
+			else
+			{
+				endDeclarationOffset = body.getEndingOffset() + 1;
+			}
+			declarationNode.setBegin(createTextNode(document, node.getStartingOffset(), endDeclarationOffset));
+			push(declarationNode);
+			checkedPop(declarationNode, -1);
 		}
 
 		/**
