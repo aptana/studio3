@@ -82,6 +82,7 @@ import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.ui.FormatterSyntaxProblemException;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -149,7 +150,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSErrorNode node)
 		{
-			// do nothing. Avoid visiting the children.
+			// Stop the formatting
+			throw new FormatterSyntaxProblemException(Messages.JSFormatterNodeBuilder_parsingError);
 		}
 
 		/*

@@ -38,6 +38,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -51,12 +52,14 @@ import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
+import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
+import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
  * Javascript code formatter.
@@ -188,8 +191,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				}
 			}
 		}
+		catch (FormatterException e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
+		}
 		catch (Exception e)
 		{
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
 			FormatterPlugin.logError(e);
 		}
 		return null;
@@ -232,8 +243,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @return A formatted string
+	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset)
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
 	{
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
@@ -243,17 +255,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(JSFormatterConstants.WRAP_COMMENTS_LENGTH));
 		writer.setLinesPreserve(getInt(JSFormatterConstants.PRESERVED_LINES));
-		try
-		{
-			root.accept(context, writer);
-			writer.flush(context);
-			return writer.getOutput();
-		}
-		catch (Exception e)
-		{
-			FormatterPlugin.logError(e);
-			return null;
-		}
+		root.accept(context, writer);
+		writer.flush(context);
+		return writer.getOutput();
 	}
 
 	private FormatterDocument createFormatterDocument(String input, int offset)

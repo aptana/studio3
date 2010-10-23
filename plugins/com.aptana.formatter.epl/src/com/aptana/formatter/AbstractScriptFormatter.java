@@ -40,6 +40,7 @@ import com.aptana.ui.util.StatusLineMessageTimerManager;
 public abstract class AbstractScriptFormatter implements IScriptFormatter
 {
 
+	protected static final long ERROR_DISPLAY_TIMEOUT = 3000L;
 	private final Map<String, ? extends Object> preferences;
 	private boolean isSlave;
 	private String mainContentType;

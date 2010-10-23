@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -36,7 +37,9 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.ui.FormatterException;
+import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.parsing.IParser;
+import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 public class RubyFormatter extends AbstractScriptFormatter
 {
@@ -174,32 +177,48 @@ public class RubyFormatter extends AbstractScriptFormatter
 		RubySourceParser sourceParser = getSourceParser(parser);
 		ParserResult result = sourceParser.parse(input);
 		checkinParser(parser);
-		if (!(result instanceof NullParserResult))
+		try
 		{
-			String output = format(input, result, indent);
-			if (output != null)
+			if (!(result instanceof NullParserResult))
 			{
-				output = trimLeft(output);
-				if (offset > 0)
+				String output = format(input, result, indent);
+				if (output != null)
 				{
-					output = ' ' + output;
-				}
-				if (!input.equals(output))
-				{
-					if (!isValidation() || equalLinesIgnoreBlanks(new StringReader(input), new StringReader(output)))
+					output = trimLeft(output);
+					if (offset > 0)
 					{
-						return new ReplaceEdit(offset, length, output);
+						output = ' ' + output;
+					}
+					if (!input.equals(output))
+					{
+						if (!isValidation()
+								|| equalLinesIgnoreBlanks(new StringReader(input), new StringReader(output)))
+						{
+							return new ReplaceEdit(offset, length, output);
+						}
+						else
+						{
+							logError(input, output);
+						}
 					}
 					else
 					{
-						logError(input, output);
+						return new MultiTextEdit(); // NOP
 					}
 				}
-				else
-				{
-					return new MultiTextEdit(); // NOP
-				}
 			}
+			else
+			{
+				StatusLineMessageTimerManager.setErrorMessage(NLS
+						.bind(FormatterMessages.Formatter_formatterParsingErrorStatus,
+								Messages.RubyFormatter_rubyParserError), ERROR_DISPLAY_TIMEOUT, true);
+			}
+		}
+		catch (Throwable t)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(t);
 		}
 		return null;
 	}
@@ -251,8 +270,9 @@ public class RubyFormatter extends AbstractScriptFormatter
 	 * @param input
 	 * @param result
 	 * @return
+	 * @throws Exception
 	 */
-	private String format(String input, ParserResult result, int indent)
+	private String format(String input, ParserResult result, int indent) throws Exception
 	{
 		final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
 		final FormatterDocument document = createDocument(input);
@@ -262,17 +282,9 @@ public class RubyFormatter extends AbstractScriptFormatter
 		FormatterWriter writer = new FormatterWriter(document, lineDelimiter, createIndentGenerator());
 		writer.setWrapLength(getInt(RubyFormatterConstants.WRAP_COMMENTS_LENGTH));
 		writer.setLinesPreserve(getInt(RubyFormatterConstants.LINES_PRESERVE));
-		try
-		{
-			root.accept(context, writer);
-			writer.flush(context);
-			return writer.getOutput();
-		}
-		catch (Exception e)
-		{
-			FormatterPlugin.logError(e);
-			return null;
-		}
+		root.accept(context, writer);
+		writer.flush(context);
+		return writer.getOutput();
 	}
 
 	private FormatterDocument createDocument(String input)

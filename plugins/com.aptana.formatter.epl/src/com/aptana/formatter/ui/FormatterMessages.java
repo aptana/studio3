@@ -58,6 +58,7 @@ public class FormatterMessages extends NLS
 	public static String FormatterModifyTabPage_showInvisible;
 	public static String FormatterModifyTabPage_preview_label_text;
 	public static String FormatterPreferencePage_settingsLink;
+	public static String Formatter_formatterParsingErrorStatus;
 	public static String ScriptFormattingStrategy_formattingError;
 	public static String ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError;
 	public static String ScriptFormattingStrategy_unexpectedFormatterError;
