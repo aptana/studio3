@@ -34,25 +34,44 @@
  */
 package com.aptana.editor.js.formatter;
 
-import com.aptana.formatter.FormatterDocument;
+import com.aptana.editor.js.formatter.nodes.FormatterJSCommentNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 /**
- * @author Shalom
+ * JavaScript Formatter node rewriter
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
  */
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
-
 	/**
-	 * @param parseResult
-	 * @param document
+	 * Constructs a new JSFormatterNodeRewriter
+	 * 
+	 * @param parseResultRoot
 	 */
-	public JSFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
+	public JSFormatterNodeRewriter(IParseRootNode parseResultRoot)
 	{
-		// TODO - call super and set up the re-writer to handle JS comments.
+		IParseNode[] comments = parseResultRoot.getCommentNodes();
+		for (IParseNode node : comments)
+		{
+			addComment(node.getStartingOffset(), node.getEndingOffset() + 1, node);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#rewrite(com.aptana.formatter.nodes.IFormatterContainerNode)
+	 */
+	@Override
+	public void rewrite(IFormatterContainerNode root)
+	{
+		super.rewrite(root);
+		attachComments(root);
 	}
 
 	/*
@@ -64,7 +83,7 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object)
 	{
-		return null;
+		return new FormatterJSCommentNode(document, startOffset, endOffset);
 	}
 
 }

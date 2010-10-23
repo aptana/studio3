@@ -56,6 +56,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 /**
  * Javascript code formatter.
@@ -109,7 +110,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		int indent = 0;
 		try
 		{
-			// detect the indentation offset with the parser, only if the given offset is not the first one in the current
+			// detect the indentation offset with the parser, only if the given offset is not the first one in the
+			// current
 			// partition.
 			ITypedRegion partition = document.getPartition(offset);
 			if (partition != null && partition.getOffset() == offset)
@@ -121,14 +123,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			String source = document.get();
 			parseState.setEditState(source, null, 0, 0);
 
-			IParseNode parseResult = parser.parse(parseState);
+			IParseRootNode parseResult = parser.parse(parseState);
 			checkinParser(parser);
 			if (parseResult != null)
 			{
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new JSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
+				new JSFormatterNodeRewriter(parseResult).rewrite(root);
 				IFormatterContext context = new JSFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
@@ -161,7 +163,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		parseState.setEditState(input, null, 0, 0);
 		try
 		{
-			IParseNode parseResult = parser.parse(parseState);
+			IParseRootNode parseResult = parser.parse(parseState);
 			checkinParser(parser);
 			if (parseResult != null)
 			{
@@ -231,12 +233,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 *            The indentation level to start from
 	 * @return A formatted string
 	 */
-	private String format(String input, IParseNode parseResult, int indentationLevel, int offset)
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset)
 	{
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new JSFormatterNodeRewriter(parseResult, document).rewrite(root);
+		new JSFormatterNodeRewriter(parseResult).rewrite(root);
 		IFormatterContext context = new JSFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(JSFormatterConstants.WRAP_COMMENTS_LENGTH));
