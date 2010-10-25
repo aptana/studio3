@@ -1,3 +1,0 @@
-<!ELEMENT svg EMPTY>
-<!ATTLIST	svg
-			x CDATA #IMPLIED>

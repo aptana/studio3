@@ -36,19 +36,19 @@ package com.aptana.internal.parsing;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 
-import com.aptana.core.util.ReapingObjectPool;
+import com.aptana.core.util.ObjectPool;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParsingPlugin;
 
-public class ParserPool extends ReapingObjectPool<IParser> implements IParserPool
+public class ParserPool extends ObjectPool<IParser> implements IParserPool
 {
 
 	private IConfigurationElement parserExtension;
 
 	public ParserPool(IConfigurationElement parserExtension)
 	{
-		super();
+		super(-1);
 		this.parserExtension = parserExtension;
 	}
 
@@ -69,8 +69,7 @@ public class ParserPool extends ReapingObjectPool<IParser> implements IParserPoo
 	@Override
 	public boolean validate(IParser o)
 	{
-		// Always keep one available parser
-		return unlockedItems() == 1;
+		return true;
 	}
 
 	@Override

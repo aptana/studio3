@@ -35,19 +35,18 @@
 package com.aptana.editor.diff;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.TextUtils;
 
-public class DiffSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+public class DiffSourceViewerConfiguration extends CommonSourceViewerConfiguration
 {
-	/**
-	 * DiffSourceViewerConfiguration
-	 * 
-	 * @param preferences
-	 * @param editor
-	 */
+
 	public DiffSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -55,11 +54,37 @@ public class DiffSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
+	 * .ISourceViewer)
 	 */
 	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return DiffSourceConfiguration.getDefault();
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				DiffSourceConfiguration.CONTENT_TYPES });
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
+	 */
+	public String[][] getTopContentTypes()
+	{
+		return DiffSourceConfiguration.getDefault().getTopContentTypes();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
+	{
+		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
+		DiffSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
+		return reconciler;
 	}
 }

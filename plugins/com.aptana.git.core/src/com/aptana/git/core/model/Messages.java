@@ -36,12 +36,12 @@ package com.aptana.git.core.model;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS // NO_UCD
+public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.core.model.messages"; //$NON-NLS-1$
 	
-	public static String GitIndex_BinaryDiff_Message; // NO_UCD
-	public static String GitRepositoryManager_UnableToFindGitExecutableError; // NO_UCD
+	public static String GitIndex_BinaryDiff_Message;
+	public static String GitRepositoryManager_UnableToFindGitExecutableError;
 
 	static
 	{

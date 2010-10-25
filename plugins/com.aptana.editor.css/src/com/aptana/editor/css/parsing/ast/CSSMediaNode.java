@@ -44,7 +44,7 @@ public class CSSMediaNode extends CSSNode
 
 	public CSSMediaNode(String[] medias, int start, int end)
 	{
-		super(CSSNodeTypes.MEDIA, start, end);
+		super(start, end);
 		fMedias = medias;
 	}
 

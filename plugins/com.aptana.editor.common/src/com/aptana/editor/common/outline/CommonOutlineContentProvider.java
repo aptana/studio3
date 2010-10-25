@@ -49,7 +49,7 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	private IParseListener fListener;
 	protected IPathResolver resolver;
 
-	private boolean autoExpanded;
+	private IParseNode fRootNode;
 
 	public CommonOutlineItem getOutlineItem(IParseNode node)
 	{
@@ -64,10 +64,10 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof AbstractThemeableEditor)
 		{
-			IParseNode rootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
-			if (rootNode != null)
+			fRootNode = ((AbstractThemeableEditor) parentElement).getFileService().getParseResult();
+			if (fRootNode != null)
 			{
-				return filter(rootNode.getChildren());
+				return filter(fRootNode.getChildren());
 			}
 		}
 		else if (parentElement instanceof IParseNode)
@@ -126,22 +126,17 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 
 						public void run()
 						{
-							if (!editor.hasOutlinePageCreated())
-							{
-								return;
-							}
-
+							CommonOutlinePage page = editor.getOutlinePage();
 							// FIXME What if the parse failed! We don't really want to wipe the existing results! This
 							// is just a hack!
 							IParseNode node = editor.getFileService().getParseResult();
 							if (node != null)
 							{
-								CommonOutlinePage page = editor.getOutlinePage();
+								boolean shouldAutoExpand = (fRootNode == null);
 								page.refresh();
-								if (!autoExpanded)
+								if (shouldAutoExpand)
 								{
 									page.expandToLevel(2);
-									autoExpanded = true;
 								}
 							}
 						}
@@ -155,7 +150,6 @@ public class CommonOutlineContentProvider implements ITreeContentProvider
 		{
 			AbstractThemeableEditor editor = (AbstractThemeableEditor) oldInput;
 			editor.getFileService().removeListener(fListener);
-			autoExpanded = false;
 			fListener = null;
 			this.resolver = PathResolverProvider.getResolver(editor.getEditorInput());
 		}

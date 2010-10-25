@@ -5,9 +5,9 @@ require "ruble/scope_selector"
 module Ruble
   
   class Snippet < Command
-    def initialize(name, path = nil)
+    def initialize(name)
       if name.kind_of? String
-        super(name, path)
+        super(name)
       else
         # hack to pass in java object...should test type
         @jobj = name
@@ -47,9 +47,7 @@ module Ruble
       def define_snippet(name, &block)
         log_info("loading snippet #{name}")
         
-        path = $0
-        path = block.binding.eval("__FILE__") if block
-        snippet = Snippet.new(name, path)
+        snippet = Snippet.new(name)
         block.call(snippet) if block_given?
         
         # add snippet to bundle
@@ -66,7 +64,7 @@ module Ruble
     private
     
     def create_java_object
-      com.aptana.scripting.model.SnippetElement.new(path)
+      com.aptana.scripting.model.SnippetElement.new($fullpath)
     end
     
   end

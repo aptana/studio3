@@ -51,7 +51,7 @@ public class FunctionType extends Type
 	 */
 	public FunctionType()
 	{
-		super(JSTypeConstants.FUNCTION_TYPE);
+		super(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class FunctionType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(JSTypeConstants.FUNCTION_TYPE);
+		writer.print(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
 
 		boolean first;
 

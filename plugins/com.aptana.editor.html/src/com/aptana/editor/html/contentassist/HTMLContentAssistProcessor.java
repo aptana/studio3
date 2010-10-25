@@ -39,11 +39,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -98,7 +96,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
@@ -385,10 +383,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 
 			HTMLParseState state = null;
+
 			for (ElementElement element : elements)
 			{
+				String[] userAgents = element.getUserAgentNames();
+				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
-				List<Integer> positions = new ArrayList<Integer>();
+
 				int cursorPosition = replaceString.length();
 				if (close)
 				{
@@ -406,9 +407,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					else if (state.isEmptyTagType(element.getName()))
 					{
 						replaceString += " />"; //$NON-NLS-1$
-						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
-						// now it's stuck at end of tag
-						positions.add(cursorPosition + 3);
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
+						cursorPosition += 3;
 					}
 					else
 					{
@@ -423,22 +423,25 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!OpenTagCloser.tagClosed(doc, element.getName()))
+						if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-							positions.add(cursorPosition + 1);
-							positions.add(cursorPosition + 4 + element.getName().length());
+							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
+							cursorPosition += 1;
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
-							positions.add(cursorPosition + 1);
+							cursorPosition += 1;
 						}
 					}
 				}
-				positions.add(0, cursorPosition);
-				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, offset, replaceLength, element,
-						positions.toArray(new Integer[positions.size()]));
+
+				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
+
+				proposal.setFileLocation(HTMLIndexConstants.CORE);
+				proposal.setUserAgentImages(userAgentIcons);
 				proposals.add(proposal);
 			}
 		}
@@ -553,117 +556,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * addCloseTagProposals
-	 * 
-	 * @param lexemeProvider
-	 * @param offset
-	 * @param result
-	 */
-	private List<ICompletionProposal> addCloseTagProposals(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
-	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-		HTMLParseState state = null;
-		// First see if there are any unclosed tags, suggest them first
-		Set<String> unclosedElements = getUnclosedTagNames(offset);
-		if (unclosedElements != null && !unclosedElements.isEmpty())
-		{
-			for (String unclosedElement : unclosedElements)
-			{
-
-				ElementElement element = this._queryHelper.getElement(unclosedElement);
-
-				if (state == null)
-				{
-					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
-				}
-				if (state.isEmptyTagType(element.getName()))
-				{
-					continue;
-				}
-				proposals.add(createCloseTagProposal(element, offset));
-			}
-			if (!proposals.isEmpty())
-			{
-				return proposals;
-			}
-		}
-
-		// Looks like no unclosed tags that make sense. Suggest every non-self-closing tag.
-		List<ElementElement> elements = this._queryHelper.getElements();
-		if (elements != null)
-		{
-			for (ElementElement element : elements)
-			{
-				if (state == null)
-				{
-					state = new HTMLParseState();
-					state.setEditState(_document.get(), null, 0, 0);
-				}
-				if (state.isEmptyTagType(element.getName()))
-				{
-					continue;
-				}
-				proposals.add(createCloseTagProposal(element, offset));
-			}
-		}
-		return proposals;
-	}
-
-	private CommonCompletionProposal createCloseTagProposal(ElementElement element, int offset)
-	{
-		String[] userAgents = element.getUserAgentNames();
-		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-		String replaceString = element.getName();
-
-		int cursorPosition = replaceString.length();
-		int replaceLength = 0;
-		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-				cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-		proposal.setFileLocation(HTMLIndexConstants.CORE);
-		proposal.setUserAgentImages(userAgentIcons);
-		return proposal;
-	}
-
-	protected Set<String> getUnclosedTagNames(int offset)
-	{
-		Set<String> unclosedElements = new HashSet<String>();
-		try
-		{
-			ITypedRegion[] partitions = _document.computePartitioning(0, offset);
-			for (ITypedRegion partition : partitions)
-			{
-				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
-				{
-					String src = _document.get(partition.getOffset(), partition.getLength());
-					int lessThanIndex = src.indexOf('<');
-					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
-					{
-						continue;
-					}
-					src = src.substring(lessThanIndex + 1).trim();
-					String[] parts = src.split("\\W"); //$NON-NLS-1$
-					if (parts == null || parts.length == 0)
-					{
-						continue;
-					}
-					String elementName = parts[0].toLowerCase();
-					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
-					{
-						unclosedElements.add(elementName);
-					}
-				}
-			}
-		}
-		catch (BadLocationException e)
-		{
-			// ignore
-		}
-		return unclosedElements;
-	}
-
-	/**
 	 * addProposal
 	 * 
 	 * @param proposals
@@ -754,7 +646,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 
 			case IN_CLOSE_TAG:
-				result.addAll(this.addCloseTagProposals(lexemeProvider, offset));
 				break;
 
 			case IN_TEXT:
@@ -951,8 +842,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
-									// We should report in open tag still!
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes? We should report in open tag still!
 									if (offset == 0)
 									{
 										result = LocationType.IN_TEXT;
@@ -960,8 +850,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(),
-												previousPartition.getLength()).trim();
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
 										if (src.charAt(src.length() - 1) == '>')
 										{
 											result = LocationType.IN_TEXT;

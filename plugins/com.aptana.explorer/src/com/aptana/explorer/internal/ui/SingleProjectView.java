@@ -109,7 +109,6 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.deploy.dialogs.FTPDeployPropertyDialog;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
@@ -124,6 +123,7 @@ import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
+import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -197,13 +197,15 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
-	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
-	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
+	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/direction_upload.png"; //$NON-NLS-1$
+	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/direction_download.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 	// private static final String[] animationImage = {
-	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
-	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
-	
+	private static final String[] animationImageUp = {
+			"icons/full/elcl16/network_arrow_up.png", "icons/full/elcl16/network_arrow_up_20.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_80.png", "icons/full/elcl16/network_arrow_up_60.png", "icons/full/elcl16/network_arrow_up_40.png", "icons/full/elcl16/network_arrow_up_20.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+	private static final String[] animationImageDown = {
+			"icons/full/elcl16/network_arrow_down.png", "icons/full/elcl16/network_arrow_down_20.png", "icons/full/elcl16/network_arrow_down_40.png", "icons/full/elcl16/network_arrow_down_60.png", "icons/full/elcl16/network_arrow_down_80.png", "icons/full/elcl16/network_arrow_down_60.png", "icons/full/elcl16/network_arrow_down_40.png", "icons/full/elcl16/network_arrow_down_20.png" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+
 	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
 	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
 	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
@@ -684,9 +686,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						FTPDeployPropertyDialog settingsDialog = new FTPDeployPropertyDialog(PlatformUI.getWorkbench()
-								.getActiveWorkbenchWindow().getShell());
-						settingsDialog.setProject(selectedProject);
+						CommonFTPConnectionPointPropertyDialog settingsDialog = new CommonFTPConnectionPointPropertyDialog(
+								PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 						if (lastSiteConnection != null)
 						{
 							settingsDialog.setPropertySource(lastSiteConnection.getDestination());

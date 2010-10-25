@@ -60,6 +60,7 @@ import com.aptana.editor.common.IFoldingEditor;
 public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implements IFoldingEditor
 {
 
+	private ProjectionAnnotationModel annotationModel;
 	private Map<ProjectionAnnotation, Position> oldAnnotations = new HashMap<ProjectionAnnotation, Position>(3);
 
 	/**
@@ -81,6 +82,8 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		projectionSupport.install();
 
 		viewer.doOperation(ProjectionViewer.TOGGLE);
+
+		annotationModel = viewer.getProjectionAnnotationModel();
 	}
 
 	protected ISourceViewer createSourceViewer(Composite parent, IVerticalRuler ruler, int styles)
@@ -113,14 +116,9 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 		}
 
 		List<ProjectionAnnotation> toDelete = findDeletedAnnotations(newAnnotationMap);
-		getAnnotationModel().modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd,
+		annotationModel.modifyAnnotations(toDelete.toArray(new ProjectionAnnotation[toDelete.size()]), toAdd,
 				new ProjectionAnnotation[0]);
 		oldAnnotations = newAnnotationMap;
-	}
-
-	protected ProjectionAnnotationModel getAnnotationModel()
-	{
-		return ((ProjectionViewer) getSourceViewer()).getProjectionAnnotationModel();
 	}
 
 	/**
@@ -130,27 +128,24 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 	 * @param newAnnotationMap
 	 * @return
 	 */
-	private List<ProjectionAnnotation> findDeletedAnnotations(Map<ProjectionAnnotation, Position> newAnnotationMap)
+	protected List<ProjectionAnnotation> findDeletedAnnotations(Map<ProjectionAnnotation, Position> newAnnotationMap)
 	{
 		List<ProjectionAnnotation> toDelete = new ArrayList<ProjectionAnnotation>();
-		if (oldAnnotations != null)
+		for (ProjectionAnnotation old : oldAnnotations.keySet())
 		{
-			for (ProjectionAnnotation old : oldAnnotations.keySet())
+			if (!newAnnotationMap.containsKey(old)) // old isn't in new set, needs to be deleted
 			{
-				if (!newAnnotationMap.containsKey(old)) // old isn't in new set, needs to be deleted
-				{
-					toDelete.add(old);
-				}
+				toDelete.add(old);
 			}
 		}
 		return toDelete;
 	}
 
-	private ProjectionAnnotation findAnnotationWithPosition(Position position)
+	protected ProjectionAnnotation findAnnotationWithPosition(Position position)
 	{
 		for (Map.Entry<ProjectionAnnotation, Position> oldEntry : oldAnnotations.entrySet())
 		{
-			Position oldPosition = getAnnotationModel().getPosition(oldEntry.getKey());
+			Position oldPosition = annotationModel.getPosition(oldEntry.getKey());
 			if (oldPosition == null)
 			{
 				continue;
@@ -212,18 +207,5 @@ public class AbstractFoldingEditor extends AbstractDecoratedTextEditor implement
 			}
 		}
 		super.handleEditorInputChanged();
-	}
-
-	@Override
-	public void dispose()
-	{
-		try
-		{
-			oldAnnotations = null;
-		}
-		finally
-		{
-			super.dispose();
-		}
 	}
 }

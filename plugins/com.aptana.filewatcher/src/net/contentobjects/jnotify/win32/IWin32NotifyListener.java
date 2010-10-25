@@ -28,6 +28,7 @@
  ******************************************************************************
  * Author : Omry Yadan
  ******************************************************************************/
+ 
 package net.contentobjects.jnotify.win32;
 
 public interface IWin32NotifyListener

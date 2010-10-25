@@ -37,7 +37,6 @@ package com.aptana.editor.css;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.ICharacterScanner;
@@ -48,7 +47,6 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
@@ -224,16 +222,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		}, createToken(CSSTokenType.IMPORTANT), false)
 		{
 
-			private Pattern pattern;
-
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("!\\s*important"); //$NON-NLS-1$
-				}
-				return pattern.matcher(word).matches();
+				return word.matches("!\\s*important"); //$NON-NLS-1$
 			}
 		});
 
@@ -251,7 +243,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord(WORD_DASHMATCH, createToken(CSSTokenType.DASHMATCH));
 		rules.add(wordRule);
 
-		rules.add(createPunctuationRules());
+		rules.addAll(createPunctuationRules());
 
 		// rgb values
 		rules.add(createRGBRule());
@@ -383,51 +375,45 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		}, createToken(CSSTokenType.NUMBER), false)
 		{
 
-			private Pattern pattern;
-
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
-				}
-				return pattern.matcher(word).matches();
+				return word.matches("(-|\\+)?\\s*[0-9]+(\\.[0-9]+)?"); //$NON-NLS-1$
 			}
 		};
 	}
 
-	protected CharacterMapRule createPunctuationRules()
+	protected List<IRule> createPunctuationRules()
 	{
-		CharacterMapRule rule = new CharacterMapRule();
+		List<IRule> rules = new ArrayList<IRule>();
 		// curly braces
-		rule.add('{', createToken(CSSTokenType.LCURLY));
-		rule.add('}', createToken(CSSTokenType.RCURLY));
+		rules.add(new SingleCharacterRule('{', createToken(CSSTokenType.LCURLY)));
+		rules.add(new SingleCharacterRule('}', createToken(CSSTokenType.RCURLY)));
 		// colon
-		rule.add(':', createToken(CSSTokenType.COLON));
+		rules.add(new SingleCharacterRule(':', createToken(CSSTokenType.COLON)));
 		// semicolon
-		rule.add(';', createToken(CSSTokenType.SEMICOLON));
+		rules.add(new SingleCharacterRule(';', createToken(CSSTokenType.SEMICOLON)));
 		// %
-		rule.add('%', createToken(CSSTokenType.PERCENTAGE));
+		rules.add(new SingleCharacterRule('%', createToken(CSSTokenType.PERCENTAGE)));
 		// comma
-		rule.add(',', createToken(CSSTokenType.COMMA));
+		rules.add(new SingleCharacterRule(',', createToken(CSSTokenType.COMMA)));
 		// parens
-		rule.add('(', createToken(CSSTokenType.LPAREN));
-		rule.add(')', createToken(CSSTokenType.RPAREN));
+		rules.add(new SingleCharacterRule('(', createToken(CSSTokenType.LPAREN)));
+		rules.add(new SingleCharacterRule(')', createToken(CSSTokenType.RPAREN)));
 		// brackets
-		rule.add('[', createToken(CSSTokenType.LBRACKET));
-		rule.add(']', createToken(CSSTokenType.RBRACKET));
+		rules.add(new SingleCharacterRule('[', createToken(CSSTokenType.LBRACKET)));
+		rules.add(new SingleCharacterRule(']', createToken(CSSTokenType.RBRACKET)));
 		// plus
-		rule.add('+', createToken(CSSTokenType.PLUS));
+		rules.add(new SingleCharacterRule('+', createToken(CSSTokenType.PLUS)));
 		// star
-		rule.add('*', createToken(CSSTokenType.STAR));
+		rules.add(new SingleCharacterRule('*', createToken(CSSTokenType.STAR)));
 		// greater
-		rule.add('>', createToken(CSSTokenType.GREATER));
+		rules.add(new SingleCharacterRule('>', createToken(CSSTokenType.GREATER)));
 		// forward slash
-		rule.add('/', createToken(CSSTokenType.SLASH));
+		rules.add(new SingleCharacterRule('/', createToken(CSSTokenType.SLASH)));
 		// equal
-		rule.add('=', createToken(CSSTokenType.EQUAL));
-		return rule;
+		rules.add(new SingleCharacterRule('=', createToken(CSSTokenType.EQUAL)));
+		return rules;
 	}
 
 	/**

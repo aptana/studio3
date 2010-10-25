@@ -310,7 +310,7 @@ public class FunctionElement extends PropertyElement
 		// include return types
 		for (ReturnTypeElement returnType : this.getReturnTypes())
 		{
-			buffer.append(first ? JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER : JSTypeConstants.RETURN_TYPE_DELIMITER);
+			buffer.append(first ? JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER : JSTypeConstants.RETURN_TYPE_DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
 			buffer.append(returnType.getType());
 			first = false;
 		}
@@ -409,16 +409,16 @@ public class FunctionElement extends PropertyElement
 		printer.print(this.getName());
 
 		// print parameter types
-		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		// print return types
 		List<String> returnTypes = this.getReturnTypeNames();
 
-		printer.print(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER);
+		printer.print(JSTypeConstants.FUNCTION_SIGNATURE_DELIMITER); //$NON-NLS-1$
 
 		if (returnTypes != null && returnTypes.isEmpty() == false)
 		{
-			printer.print(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes));
+			printer.print(StringUtil.join(JSTypeConstants.RETURN_TYPE_DELIMITER, returnTypes)); //$NON-NLS-1$
 		}
 		else
 		{

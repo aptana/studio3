@@ -74,12 +74,12 @@ public class DelayedTextAttribute
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder.append("Foreground: ").append(getForeground()); //$NON-NLS-1$
+		builder.append("Foreground: ").append(getForeground());
 		if (getBackground() != null)
 		{
-			builder.append(", Background: ").append(getBackground()); //$NON-NLS-1$
+			builder.append(", Background: ").append(getBackground());
 		}
-		builder.append(", Style: ").append(getStyle()); //$NON-NLS-1$
+		builder.append(", Style: ").append(getStyle());
 		return builder.toString();
 	}
 

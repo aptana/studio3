@@ -3,8 +3,7 @@ require "java"
 module Ruble
   
   class BaseElement
-  	def initialize(name, path)
-  	  @path = path
+  	def initialize(name)
   	  @jobj = create_java_object
       @jobj.display_name = name;
   	end
@@ -32,7 +31,7 @@ module Ruble
     end
     
     def path
-      @path ||= @jobj.path
+      @jobj.path
     end
     
     def to_env

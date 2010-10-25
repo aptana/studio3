@@ -44,24 +44,21 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.css.parsing.ast.CSSAttributeSelectorNode;
-import com.aptana.editor.css.parsing.ast.CSSCommentNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
-import com.aptana.index.core.AbstractFileIndexingParticipant;
+import com.aptana.index.core.IFileStoreIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.IParseRootNode;
 
-public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
+public class CSSFileIndexingParticipant implements IFileStoreIndexingParticipant
 {
 
 	public void index(Set<IFileStore> files, Index index, IProgressMonitor monitor) throws CoreException
@@ -90,8 +87,6 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			sub.subTask(file.getName());
 
-			removeTasks(file, sub.newChild(10));
-
 			String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
 			if (fileContents != null && fileContents.trim().length() > 0)
 			{
@@ -101,13 +96,10 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				if (pool != null)
 				{
 					IParser cssParser = pool.checkOut();
-					cssParser.parse(parseState);
+					IParseNode parseNode = cssParser.parse(parseState);
 					pool.checkIn(cssParser);
 					sub.worked(50);
-
-					// process results
-					IParseNode ast = parseState.getParseResult();
-					this.processParseResults(file, index, ast, sub.newChild(20));
+					walkNode(index, file, parseNode);
 				}
 			}
 		}
@@ -130,38 +122,7 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 	}
 
-	public void processParseResults(IFileStore file, Index index, IParseNode ast, IProgressMonitor monitor)
-	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		walkNode(index, file, ast);
-		sub.worked(70);
-		if (ast instanceof IParseRootNode)
-		{
-			processComments(file, ast, sub.newChild(30));
-		}
-		sub.done();
-	}
-
-	private void processComments(IFileStore file, IParseNode parseResult, IProgressMonitor monitor)
-	{
-		if (parseResult instanceof IParseRootNode)
-		{
-			IParseRootNode rootNode = (IParseRootNode) parseResult;
-			IParseNode[] comments = rootNode.getCommentNodes();
-			SubMonitor sub = SubMonitor.convert(monitor, comments.length);
-			for (IParseNode commentNode : comments)
-			{
-				if (commentNode instanceof CSSCommentNode)
-				{
-					processCommentNode(file, rootNode.getStartingOffset(), (CSSCommentNode) commentNode);
-				}
-				sub.worked(1);
-			}
-			sub.done();
-		}
-	}
-
-	private void walkNode(Index index, IFileStore file, IParseNode parent)
+	public static void walkNode(Index index, IFileStore file, IParseNode parent)
 	{
 		if (parent == null)
 			return;
@@ -212,44 +173,6 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 	}
 
-	private void processCommentNode(IFileStore store, int initialOffset, CSSCommentNode commentNode)
-	{
-		String text = commentNode.getText();
-		if (!TaskTag.isCaseSensitive())
-		{
-			text = text.toLowerCase();
-		}
-		int offset = initialOffset;
-		String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
-		for (String line : lines)
-		{
-			for (TaskTag entry : TaskTag.getTaskTags())
-			{
-				String tag = entry.getName();
-				if (!TaskTag.isCaseSensitive())
-				{
-					tag = tag.toLowerCase();
-				}
-				int index = line.indexOf(tag);
-				if (index == -1)
-				{
-					continue;
-				}
-
-				String message = line.substring(index).trim();
-				// Remove "*/" from the end of the line!
-				if (message.endsWith("*/")) //$NON-NLS-1$
-				{
-					message = message.substring(0, message.length() - 2).trim();
-				}
-				int start = commentNode.getStartingOffset() + offset + index;
-				createTask(store, message, entry.getPriority(), -1, start, start + message.length());
-			}
-			// FIXME This doesn't take the newline into account from split!
-			offset += line.length();
-		}
-	}
-
 	private static boolean isColor(String value)
 	{
 		if (value == null || value.trim().length() == 0)
@@ -260,4 +183,10 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			return true; // FIXME Check to make sure it's hex values!
 		return false;
 	}
+
+	private static void addIndex(Index index, IFileStore file, String category, String word)
+	{
+		index.addEntry(category, word, file.toURI());
+	}
+
 }

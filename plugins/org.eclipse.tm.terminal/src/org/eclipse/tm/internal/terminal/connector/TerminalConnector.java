@@ -196,7 +196,6 @@ public class TerminalConnector implements ITerminalConnector {
 			fConnector.setTerminalSize(newWidth, newHeight);
 		}
 	}
-	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		TerminalConnectorImpl connector=null;
 		if(isInitialized())

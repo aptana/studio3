@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+* This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -56,7 +56,6 @@ import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
-import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 /**
@@ -83,7 +82,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getScopeAtOffset(doc, region.getOffset());
 			// Match scope against source.css
-			IScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
+			ScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
 			if (!selector.matches(scope))
 			{
 				return null;

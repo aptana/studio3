@@ -139,8 +139,7 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		}
 		if (locked != null && locked.size() > 0)
 		{
-			CorePlugin.logWarning(MessageFormat.format(
-					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
+			CorePlugin.logWarning(MessageFormat.format("Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 		}
 		try
 		{
@@ -190,18 +189,5 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	{
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
-	}
-
-	/**
-	 * Returns the number of "available" items held in the pool (waiting to expire or get re-used).
-	 * 
-	 * @return
-	 */
-	protected int unlockedItems()
-	{
-		synchronized (unlocked)
-		{
-			return unlocked.size();
-		}
 	}
 }

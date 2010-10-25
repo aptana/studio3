@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.parsing;
 
 import com.aptana.editor.js.vsdoc.parsing.VSDocReader;
@@ -6,10 +40,8 @@ import java.util.List;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import java.io.IOException;
-import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
-import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.js.parsing.ast.*;
 import beaver.*;
 import com.aptana.parsing.IParser;
@@ -22,7 +54,7 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
@@ -311,7 +343,7 @@ public class JSParser extends Parser implements IParser {
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
 		char[] characters = parseState.getSource();
@@ -319,67 +351,30 @@ public class JSParser extends Parser implements IParser {
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
 
-		// create scanner and send source to it
-		fScanner = new JSScanner();
+		// send source to the scanner
 		fScanner.setSource(source);
-	
-		try
-		{
-			// parse
-			ParseRootNode result = (ParseRootNode) parse(fScanner);
-			int start = parseState.getStartingOffset();
-			int end = start + source.length();
-			result.setLocation(start, end);
 
-			// store results in the parse state
-			parseState.setParseResult(result);
-	
-			// TODO: We probably don't need documentation nodes in all cases. For
-			// example, the outline view probably doesn't rely on them. We should
-			// include a flag (maybe in the parseState) that makes this step
-			// optional.
-	
-			// attach documentation
-			if (result instanceof JSParseRootNode)
-			{
-				JSParseRootNode root = (JSParseRootNode) result;
-	
-				attachPreDocumentationBlocks(root, source);
-				attachPostDocumentationBlocks(root, source);
-				
-				// create a list of all comments and attach to root node
-				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
-				
-				for (Symbol symbol : fScanner.getSDocComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getVSDocComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getSingleLineComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getMultiLineComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
-			}
-			
-			return result;
-		}
-		finally
+		// parse
+		IParseNode result = (IParseNode) parse(fScanner);
+
+		// store results in the parse state
+		parseState.setParseResult(result);
+
+		// TODO: We probably don't need documentation nodes in all cases. For
+		// example, the outline view probably doesn't rely on them. We should
+		// include a flag (maybe in the parseState) that makes this step
+		// optional.
+
+		// attach documentation
+		if (result instanceof JSParseRootNode)
 		{
-			// clear scanner for garbage collection
-			fScanner = null;
+			JSParseRootNode root = (JSParseRootNode) result;
+
+			attachPreDocumentationBlocks(root, source);
+			attachPostDocumentationBlocks(root, source);
 		}
+
+		return result;
 	}
 
 	/**
@@ -503,6 +498,7 @@ public class JSParser extends Parser implements IParser {
 		super(PARSING_TABLES);
 
 
+		fScanner = new JSScanner();
 		report = new JSEvents();
 
 		recoveryStrategies = new IRecoveryStrategy[] {

@@ -53,7 +53,6 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
-import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -220,7 +219,8 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		if (multiLineCommentScanner == null)
 		{
-			multiLineCommentScanner = new CommentScanner(getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
+			multiLineCommentScanner = new RuleBasedScanner();
+			multiLineCommentScanner.setDefaultReturnToken(getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -229,7 +229,8 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		if (singleLineCommentScanner == null)
 		{
-			singleLineCommentScanner = new CommentScanner(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
+			singleLineCommentScanner = new RuleBasedScanner();
+			singleLineCommentScanner.setDefaultReturnToken(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}

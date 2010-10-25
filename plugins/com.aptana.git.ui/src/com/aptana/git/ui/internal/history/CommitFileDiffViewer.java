@@ -10,7 +10,6 @@ package com.aptana.git.ui.internal.history;
 
 import org.eclipse.compare.CompareUI;
 import org.eclipse.compare.ITypedElement;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -95,8 +94,8 @@ class CommitFileDiffViewer extends TableViewer
 			return;
 		// TODO What about files that are really big? When a file is created/deleted?
 		final GitCommit c = d.commit();
-		final IFileRevision baseFile = GitPlugin.revisionForCommit(c.getFirstParent(), Path.fromPortableString(d.oldName()));
-		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, Path.fromPortableString(d.newName()));
+		final IFileRevision baseFile = GitPlugin.revisionForCommit(c.getFirstParent(), d.oldName());
+		final IFileRevision nextFile = GitPlugin.revisionForCommit(c, d.newName());
 		final ITypedElement base = new FileRevisionTypedElement(baseFile);
 		final ITypedElement next = new FileRevisionTypedElement(nextFile);
 		final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);

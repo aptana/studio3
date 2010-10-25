@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -117,7 +116,6 @@ public class EditorUtils {
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     final IFileStore localFileStore = toLocalFileStore(fileStore, monitor);
-                    final IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
 
                     if (localFileStore != null) {
                         UIJob openEditor = new UIJob("Opening editor") { //$NON-NLS-1$
@@ -135,7 +133,7 @@ public class EditorUtils {
                                                 .getEditorDescriptor(localFileStore.getName())
                                                 .getId());
                                         if (!opened && editorPart != null) {
-                                            attachSaveListener(fileStore, remoteFileInfo, localFileStore,
+                                            attachSaveListener(fileStore, localFileStore,
                                                     editorPart);
                                         }
                                     }
@@ -171,7 +169,7 @@ public class EditorUtils {
      * @param editorPart
      *            the editor part the file is opened on
      */
-    public static void attachSaveListener(final IFileStore originalFile, final IFileInfo originalFileInfo,
+    public static void attachSaveListener(final IFileStore originalFile,
             final IFileStore localCacheFile, final IEditorPart editorPart) {
         if (originalFile == localCacheFile) {
             // the original is a local file; no need to re-save it
@@ -191,14 +189,6 @@ public class EditorUtils {
 
                         protected IStatus run(IProgressMonitor monitor) {
                             try {
-                            	IFileInfo currentFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
-                            	if (currentFileInfo.getLastModified() != originalFileInfo.getLastModified()
-                            			|| currentFileInfo.getLength() != originalFileInfo.getLength()) {
-                            		if (!UIUtils.showPromptDialog(Messages.EditorUtils_OverwritePrompt_Title,
-                            				MessageFormat.format(Messages.EditorUtils_OverwritePrompt_Message, originalFile.getName()))) {
-                            			return Status.CANCEL_STATUS;
-                            		}
-                            	}
                                 localCacheFile.copy(originalFile, EFS.OVERWRITE, monitor);
                             } catch (CoreException e) {
                                 UIUtils.showErrorMessage(MessageFormat.format(
@@ -232,12 +222,7 @@ public class EditorUtils {
             return fileStore;
         }
         try {
-        	String prefix = fileStore.getFileSystem().getScheme();
-        	while (prefix.length() < 3)
-        	{
-        		prefix += "_"; //$NON-NLS-1$
-        	}
-            file = File.createTempFile(prefix, fileStore.getName());
+            file = File.createTempFile(fileStore.getFileSystem().getScheme(), fileStore.getName());
         } catch (IOException e) {
             return fileStore;
         }

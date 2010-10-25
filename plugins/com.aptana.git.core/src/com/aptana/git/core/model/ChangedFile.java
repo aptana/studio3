@@ -45,13 +45,12 @@ public class ChangedFile implements Comparable<ChangedFile>
 		NEW, DELETED, MODIFIED, UNMERGED
 	}
 
-	/**
-	 * Used to make copies of a changed file, particularly when existing changed files are going to get modified by an
-	 * operation and we need to refer to their original state.
-	 * 
-	 * @param other
-	 */
-	public ChangedFile(ChangedFile other)
+	public ChangedFile(String path)
+	{
+		this.path = path;
+	}
+
+	ChangedFile(ChangedFile other)
 	{
 		this.path = other.path;
 		this.status = other.status;
@@ -61,6 +60,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		this.commitBlobSHA = other.commitBlobSHA;
 	}
 
+	// Used for unit tests!
 	public ChangedFile(String path, Status status)
 	{
 		this.path = path;
@@ -74,7 +74,6 @@ public class ChangedFile implements Comparable<ChangedFile>
 	String commitBlobSHA;
 	String commitBlobMode;
 
-	// FIXME Use IPath
 	public String getPath()
 	{
 		return new Path(path).toOSString();
@@ -105,7 +104,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		return commitBlobMode;
 	}
 
-	protected String indexInfo()
+	public String indexInfo()
 	{
 		Assert.isTrue(status == Status.NEW || commitBlobSHA != null,
 				"File is not new, but doesn't have an index entry!"); //$NON-NLS-1$
@@ -138,7 +137,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		{
 			ChangedFile other = (ChangedFile) obj;
 			return (hasStagedChanges == other.hasStagedChanges) && (hasUnstagedChanges == other.hasUnstagedChanges)
-					&& status.equals(other.status) && getPath().equals(other.getPath());
+					&& status.equals(other.status) && getPath().equals(getPath());
 		}
 		return false;
 	}

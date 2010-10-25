@@ -258,12 +258,6 @@ class TreeThemer extends ControlThemer
 			}
 			return null;
 		}
-
-		@Override
-		public String getToolTipText(Object element)
-		{
-			return cellProvider.getToolTipText(element);
-		}
 	}
 
 	private void revertLabelProvider()

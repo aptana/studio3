@@ -45,12 +45,12 @@ public class CSSDeclarationNode extends CSSNode
 
 	public CSSDeclarationNode(int start, int end)
 	{
-		super(CSSNodeTypes.DECLARATION, start, end);
+		super(start, end);
 	}
 
 	public CSSDeclarationNode(Symbol semicolon)
 	{
-		super(CSSNodeTypes.DECLARATION, semicolon.getStart(), semicolon.getEnd());
+		super(semicolon.getStart(), semicolon.getEnd());
 		fHasSemicolon = true;
 	}
 
@@ -61,7 +61,6 @@ public class CSSDeclarationNode extends CSSNode
 
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value, Symbol status)
 	{
-		super(CSSNodeTypes.DECLARATION);
 		fIdentifier = identifier.value.toString();
 		fStatus = (status == null) ? null : status.value.toString();
 		setChildren(new CSSNode[] { value });
@@ -111,12 +110,11 @@ public class CSSDeclarationNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSDeclarationNode))
+		if (!super.equals(obj))
 		{
 			return false;
 		}
-
-		if (!super.equals(obj))
+		if (!(obj instanceof CSSDeclarationNode))
 		{
 			return false;
 		}

@@ -36,7 +36,7 @@ package com.aptana.git.core.model;
 
 import org.eclipse.core.resources.IProject;
 
-abstract class ProjectRepositoryEvent extends RepositoryEvent
+public abstract class ProjectRepositoryEvent extends RepositoryEvent
 {
 	private IProject project;
 

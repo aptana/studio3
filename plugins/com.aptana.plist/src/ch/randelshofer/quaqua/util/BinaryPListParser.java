@@ -1,4 +1,6 @@
 /*
+ * @(#)BinaryPListParser.java
+ *
  * Copyright (c) 2005-2010 Werner Randelshofer
  * Hausmatt 10, Immensee, CH-6405, Switzerland.
  * All rights reserved.
@@ -193,7 +195,7 @@ public class BinaryPListParser implements IPListParser {
 		@Override
 		public String toString()
 		{
-			StringBuffer buf = new StringBuffer("Array{"); //$NON-NLS-1$
+			StringBuffer buf = new StringBuffer("Array{");
 			for (int i = 0; i < objref.length; i++)
 			{
 				if (i > 0)
@@ -206,7 +208,7 @@ public class BinaryPListParser implements IPListParser {
 				}
 				else
 				{
-					buf.append("*" + objref[i]); //$NON-NLS-1$
+					buf.append("*" + objref[i]);
 				}
 			}
 			buf.append('}');
@@ -247,7 +249,7 @@ public class BinaryPListParser implements IPListParser {
 		@Override
 		public String toString()
 		{
-			StringBuffer buf = new StringBuffer("BPLDict{"); //$NON-NLS-1$
+			StringBuffer buf = new StringBuffer("BPLDict{");
 			for (int i = 0; i < keyref.length; i++)
 			{
 				if (i > 0)
@@ -256,25 +258,25 @@ public class BinaryPListParser implements IPListParser {
 				}
 				if (keyref[i] < 0 || keyref[i] >= objectTable.size())
 				{
-					buf.append("#" + keyref[i]); //$NON-NLS-1$
+					buf.append("#" + keyref[i]);
 				}
 				else if (objectTable.get(keyref[i]) == this)
 				{
-					buf.append("*" + keyref[i]); //$NON-NLS-1$
+					buf.append("*" + keyref[i]);
 				}
 				else
 				{
 					buf.append(objectTable.get(keyref[i]));
 					// buf.append(keyref[i]);
 				}
-				buf.append(":"); //$NON-NLS-1$
+				buf.append(":");
 				if (objref[i] < 0 || objref[i] >= objectTable.size())
 				{
-					buf.append("#" + objref[i]); //$NON-NLS-1$
+					buf.append("#" + objref[i]);
 				}
 				else if (objectTable.get(objref[i]) == this)
 				{
-					buf.append("*" + objref[i]); //$NON-NLS-1$
+					buf.append("*" + objref[i]);
 				}
 				else
 				{
@@ -331,7 +333,7 @@ public class BinaryPListParser implements IPListParser {
 		byte[] buf = null;
 		try
 		{
-			raf = new RandomAccessFile(file, "r"); //$NON-NLS-1$
+			raf = new RandomAccessFile(file, "r");
 
 			// Parse the HEADER
 			// ----------------
@@ -341,7 +343,7 @@ public class BinaryPListParser implements IPListParser {
 			int st00 = raf.readInt();
 			if (bpli != 0x62706c69 || st00 != 0x73743030)
 			{
-				throw new IOException("parseHeader: File does not start with 'bplist00' magic."); //$NON-NLS-1$
+				throw new IOException("parseHeader: File does not start with 'bplist00' magic.");
 			}
 
 			// Parse the TRAILER
@@ -443,7 +445,7 @@ public class BinaryPListParser implements IPListParser {
 				{
 					if ((marker & 0xf) != 3)
 					{
-						throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+						throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					}
 					parseDate(in);
 					break;
@@ -482,7 +484,7 @@ public class BinaryPListParser implements IPListParser {
 				{
 					if (DEBUG)
 					{
-						System.out.println("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+						System.out.println("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					}
 					return;
 					// throw new IOException("parseObjectTable: illegal marker "+Integer.toBinaryString(marker));
@@ -493,14 +495,14 @@ public class BinaryPListParser implements IPListParser {
 					int count = (marker & 0xf) + 1;
 					if (DEBUG)
 					{
-						System.out.println("uid " + count); //$NON-NLS-1$
+						System.out.println("uid " + count);
 					}
 					parseUID(in, count);
 					break;
 				}
 				case 9:
 				{
-					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					// break;
 				}
 				case 10:
@@ -522,12 +524,12 @@ public class BinaryPListParser implements IPListParser {
 				}
 				case 11:
 				{
-					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					// break;
 				}
 				case 12:
 				{
-					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					// break;
 				}
 				case 13:
@@ -549,12 +551,12 @@ public class BinaryPListParser implements IPListParser {
 				}
 				case 14:
 				{
-					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					// break;
 				}
 				case 15:
 				{
-					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+					throw new IOException("parseObjectTable: illegal marker " + Integer.toBinaryString(marker));
 					// break;
 				}
 			}
@@ -572,11 +574,11 @@ public class BinaryPListParser implements IPListParser {
 		int marker = in.read();
 		if (marker == -1)
 		{
-			throw new IOException("variableLengthInt: Illegal EOF in marker"); //$NON-NLS-1$
+			throw new IOException("variableLengthInt: Illegal EOF in marker");
 		}
 		if (((marker & 0xf0) >> 4) != 1)
 		{
-			throw new IOException("variableLengthInt: Illegal marker " + Integer.toBinaryString(marker)); //$NON-NLS-1$
+			throw new IOException("variableLengthInt: Illegal marker " + Integer.toBinaryString(marker));
 		}
 		int count = 1 << (marker & 0xf);
 		int value = 0;
@@ -585,7 +587,7 @@ public class BinaryPListParser implements IPListParser {
 			int b = in.read();
 			if (b == -1)
 			{
-				throw new IOException("variableLengthInt: Illegal EOF in value"); //$NON-NLS-1$
+				throw new IOException("variableLengthInt: Illegal EOF in value");
 			}
 			value = (value << 8) | b;
 		}
@@ -615,7 +617,7 @@ public class BinaryPListParser implements IPListParser {
 				// fill byte: don't add to object table
 				break;
 			default:
-				throw new IOException("parsePrimitive: illegal primitive " + Integer.toBinaryString(primitive)); //$NON-NLS-1$
+				throw new IOException("parsePrimitive: illegal primitive " + Integer.toBinaryString(primitive));
 		}
 	}
 
@@ -633,7 +635,7 @@ public class BinaryPListParser implements IPListParser {
 			arr.objref[i] = in.readByte() & 0xff;
 			if (arr.objref[i] == -1)
 			{
-				throw new IOException("parseByteArray: illegal EOF in objref*"); //$NON-NLS-1$
+				throw new IOException("parseByteArray: illegal EOF in objref*");
 			}
 		}
 
@@ -654,7 +656,7 @@ public class BinaryPListParser implements IPListParser {
 			arr.objref[i] = in.readShort() & 0xffff;
 			if (arr.objref[i] == -1)
 			{
-				throw new IOException("parseShortArray: illegal EOF in objref*"); //$NON-NLS-1$
+				throw new IOException("parseShortArray: illegal EOF in objref*");
 			}
 		}
 
@@ -720,7 +722,7 @@ public class BinaryPListParser implements IPListParser {
 	{
 		byte[] buf = new byte[count];
 		in.readFully(buf);
-		String str = new String(buf, "ASCII"); //$NON-NLS-1$
+		String str = new String(buf, "ASCII");
 		objectTable.add(str);
 	}
 
@@ -728,7 +730,7 @@ public class BinaryPListParser implements IPListParser {
 	{
 		if (count > 4)
 		{
-			throw new IOException("parseUID: unsupported byte count: " + count); //$NON-NLS-1$
+			throw new IOException("parseUID: unsupported byte count: " + count);
 		}
 		byte[] uid = new byte[count];
 		in.readFully(uid);
@@ -742,7 +744,7 @@ public class BinaryPListParser implements IPListParser {
 	{
 		if (count > 8)
 		{
-			throw new IOException("parseInt: unsupported byte count: " + count); //$NON-NLS-1$
+			throw new IOException("parseInt: unsupported byte count: " + count);
 		}
 		long value = 0;
 		for (int i = 0; i < count; i++)
@@ -750,7 +752,7 @@ public class BinaryPListParser implements IPListParser {
 			int b = in.read();
 			if (b == -1)
 			{
-				throw new IOException("parseInt: Illegal EOF in value"); //$NON-NLS-1$
+				throw new IOException("parseInt: Illegal EOF in value");
 			}
 			value = (value << 8) | b;
 		}
@@ -771,7 +773,7 @@ public class BinaryPListParser implements IPListParser {
 				objectTable.add(new Double(in.readDouble()));
 				break;
 			default:
-				throw new IOException("parseReal: unsupported byte count:" + count); //$NON-NLS-1$
+				throw new IOException("parseReal: unsupported byte count:" + count);
 		}
 	}
 

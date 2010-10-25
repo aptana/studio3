@@ -288,11 +288,7 @@ public abstract class Parser
 			{
 				try
 				{
-					Symbol s = scanner.nextToken();
-					
-//					System.out.println(s.value);
-					
-					return s;
+					return scanner.nextToken();
 				}
 				catch (Scanner.Exception e)
 				{

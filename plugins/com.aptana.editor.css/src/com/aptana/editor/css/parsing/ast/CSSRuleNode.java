@@ -52,7 +52,6 @@ public class CSSRuleNode extends CSSNode
 	@SuppressWarnings("unchecked")
 	public CSSRuleNode(Symbol[] selectors, Object declarations, int end)
 	{
-		super(CSSNodeTypes.RULE);
 		fSelectors = new CSSSelectorNode[selectors.length];
 		List<CSSSimpleSelectorNode> simpleSelectors;
 		for (int i = 0; i < selectors.length; ++i)
@@ -122,49 +121,18 @@ public class CSSRuleNode extends CSSNode
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof CSSRuleNode) || !super.equals(obj))
+		if (!super.equals(obj) || !(obj instanceof CSSRuleNode))
 		{
 			return false;
 		}
 		CSSRuleNode other = (CSSRuleNode) obj;
-		if (fDeclarations.length != other.fDeclarations.length)
-		{
-			return false;
-		}
-		if (fSelectors.length != other.fSelectors.length)
-		{
-			return false;
-		}
-		for (int i = 0; i < fSelectors.length; i++)
-		{
-			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
-			CSSSelectorNode otherSelector = other.fSelectors[i];
-			if (fSelectors[i].getNodeType() != otherSelector.getNodeType())
-				return false;
-		}
-		for (int i = 0; i < fDeclarations.length; i++)
-		{
-			// Can't call equals() on this, because it compares parents, which is this, which results in infinite loop!
-			CSSDeclarationNode otherDecl = other.fDeclarations[i];
-			if (fDeclarations[i].getNodeType() != otherDecl.getNodeType())
-				return false;
-		}
-		return true;
+		return toString().equals(other.toString());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		int hash = super.hashCode();
-		for (CSSSelectorNode node : fSelectors)
-		{
-			hash = hash * 31 + node.hashCode();
-		}
-		for (CSSDeclarationNode node : fDeclarations)
-		{
-			hash = hash * 31 + node.hashCode();
-		}
-		return hash;
+		return super.hashCode() * 31 + toString().hashCode();
 	}
 
 	@Override

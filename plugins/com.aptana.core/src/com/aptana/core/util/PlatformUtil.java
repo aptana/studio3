@@ -384,6 +384,11 @@ public final class PlatformUtil
 				if (docsDirectory != null) {
 					path = docsDirectory + path.substring(DOCUMENTS_DIRECTORY.length());
 				}
+			} else if (path.startsWith(HOME_DIRECTORY)) {
+				String homeDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kCurrentUserFolderType);
+				if (homeDirectory != null) {
+					path = homeDirectory + path.substring(HOME_DIRECTORY.length());
+				}
 			}
 		}
 		if (path.startsWith("~")) { //$NON-NLS-1$

@@ -74,7 +74,7 @@ public final class WorkspaceConnectionPoint extends ConnectionPoint {
 	/**
 	 * 
 	 */
-	protected WorkspaceConnectionPoint(IContainer resource) {
+	public WorkspaceConnectionPoint(IContainer resource) {
 		super(TYPE);
 		this.path = resource.getFullPath();
 	}

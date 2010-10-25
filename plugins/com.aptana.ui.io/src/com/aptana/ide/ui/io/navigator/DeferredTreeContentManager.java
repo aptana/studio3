@@ -102,7 +102,7 @@ public class DeferredTreeContentManager extends org.eclipse.ui.progress.Deferred
 		if (!PlatformUI.isWorkbenchRunning() || !(placeholder instanceof CustomPendingUpdateAdapter)) {
 			return;
 		}
-		WorkbenchJob parentUpdateJob = new WorkbenchJob("Rerent Update") { //$NON-NLS-1$
+		WorkbenchJob parentUpdateJob = new WorkbenchJob("Rerent Update") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				Control control = treeViewer.getControl();

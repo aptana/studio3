@@ -56,7 +56,6 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -400,59 +399,35 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private void addPartListener()
 	{
-		IWorkbench workbench = null;
-		try
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
 		{
-			workbench = PlatformUI.getWorkbench();
-		}
-		catch (Exception e)
-		{
-			// ignore, may be running headless, like in tests
-		}
-		if (workbench != null)
-		{
-			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-			IPartService partService;
-			for (IWorkbenchWindow window : windows)
+			partService = window.getPartService();
+			if (partService != null)
 			{
-				partService = window.getPartService();
-				if (partService != null)
-				{
-					partService.addPartListener(fPartListener);
-				}
-				window.addPerspectiveListener(fPerspectiveListener);
+				partService.addPartListener(fPartListener);
 			}
-
-			// Listen on any future windows
-			PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+			window.addPerspectiveListener(fPerspectiveListener);
 		}
+
+		// Listen on any future windows
+		PlatformUI.getWorkbench().addWindowListener(fWindowListener);
 	}
 
 	private void removePartListener()
 	{
-		IWorkbench workbench = null;
-		try
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
 		{
-			workbench = PlatformUI.getWorkbench();
-		}
-		catch (Exception e)
-		{
-			// ignore, may be running headless, like in tests
-		}
-		if (workbench != null)
-		{
-			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-			IPartService partService;
-			for (IWorkbenchWindow window : windows)
+			partService = window.getPartService();
+			if (partService != null)
 			{
-				partService = window.getPartService();
-				if (partService != null)
-				{
-					partService.removePartListener(fPartListener);
-				}
-				window.removePerspectiveListener(fPerspectiveListener);
+				partService.removePartListener(fPartListener);
 			}
-			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
+			window.removePerspectiveListener(fPerspectiveListener);
 		}
+		PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
 	}
 }

@@ -35,16 +35,14 @@
 package com.aptana.scripting.model;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.scope.IScopeSelector;
-import com.aptana.scope.MatchAnyScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 public abstract class AbstractBundleElement extends AbstractElement
 {
 	private static final String ALL_SCOPES = "all"; //$NON-NLS-1$
-
+	
 	private String _scope;
-	private IScopeSelector _scopeSelector;
+	private ScopeSelector _scopeSelector;
 	protected BundleElement owningBundle;
 
 	/**
@@ -82,23 +80,16 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public IScopeSelector getScopeSelector()
+	public ScopeSelector getScopeSelector()
 	{
-		if (this._scopeSelector == null)
+		if (this._scopeSelector == null && this._scope != null && this._scope.length() > 0)
 		{
-			if (this._scope == null || this._scope.length() == 0)
-			{
-				this._scopeSelector = new MatchAnyScopeSelector();
-			}
-			else
-			{
-				this._scopeSelector = new ScopeSelector(this._scope);
-			}
+			this._scopeSelector = new ScopeSelector(this._scope);
 		}
-
+		
 		return this._scopeSelector;
 	}
-
+	
 	/**
 	 * matches
 	 * 
@@ -107,17 +98,17 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String scope)
 	{
-		IScopeSelector selector = this.getScopeSelector();
+		ScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
-
+		
 		if (selector != null)
 		{
 			result = selector.matches(scope);
 		}
-
+		
 		return result;
 	}
-
+	
 	/**
 	 * matches
 	 * 
@@ -126,17 +117,17 @@ public abstract class AbstractBundleElement extends AbstractElement
 	 */
 	public boolean matches(String[] scopes)
 	{
-		IScopeSelector selector = this.getScopeSelector();
+		ScopeSelector selector = this.getScopeSelector();
 		boolean result = true;
-
+		
 		if (selector != null)
 		{
 			result = selector.matches(scopes);
 		}
-
+		
 		return result;
 	}
-
+	
 	/**
 	 * setOwningBundle
 	 * 
@@ -161,7 +152,7 @@ public abstract class AbstractBundleElement extends AbstractElement
 		{
 			scope = null;
 		}
-
+		
 		if (StringUtil.areNotEqual(this._scope, scope))
 		{
 			this._scope = scope;

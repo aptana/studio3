@@ -58,6 +58,15 @@ public class GenericConnectionPoint extends ConnectionPoint {
 	}
 
 	/**
+	 * 
+	 * @param uri
+	 */
+	public GenericConnectionPoint(URI uri) {
+		super(TYPE);
+		this.uri = uri;
+	}
+
+	/**
 	 * @return the URI
 	 */
 	public URI getURI() {

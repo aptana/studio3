@@ -37,65 +37,88 @@ package com.aptana.editor.xml.parsing;
 import java.io.IOException;
 import java.util.Stack;
 
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.rules.IToken;
+import beaver.Symbol;
+import beaver.Scanner.Exception;
 
-import com.aptana.editor.xml.parsing.ast.XMLCommentNode;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
-import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
+import com.aptana.editor.xml.parsing.lexer.XMLToken;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseRootNode;
-import com.aptana.parsing.lexer.Lexeme;
 
 public class XMLParser implements IParser
 {
+
 	private XMLParserScanner fScanner;
-	private XMLAttributeScanner fAttributeScanner;
 	private Stack<IParseNode> fElementStack;
 
-	protected IParseNode fCurrentElement;
-	protected Lexeme<XMLTokenType> fCurrentLexeme;
+	private IParseNode fCurrentElement;
 
-	/**
-	 * advance
-	 * 
-	 * @throws Exception
-	 * @throws IOException
-	 */
-	protected void advance() throws IOException, Exception
+	public XMLParser()
 	{
-		fCurrentLexeme = fScanner.nextLexeme();
+		this(new XMLParserScanner());
 	}
 
-	/**
-	 * Closes the element that is on the top of the stack.
-	 */
-	protected void closeElement()
+	protected XMLParser(XMLParserScanner scanner)
 	{
-		if (fElementStack.size() > 0)
+		fScanner = scanner;
+		fElementStack = new Stack<IParseNode>();
+	}
+
+	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	{
+		String source = new String(parseState.getSource());
+		fScanner.setSource(source);
+
+		int startingOffset = parseState.getStartingOffset();
+		// creates the root node
+		IParseNode root = new ParseRootNode(IXMLParserConstants.LANGUAGE, new XMLNode[0], startingOffset,
+				startingOffset + source.length());
+		parseAll(root);
+		// stores the result
+		parseState.setParseResult(root);
+
+		return root;
+	}
+
+	private void parseAll(IParseNode root) throws IOException, Exception
+	{
+		fElementStack.clear();
+		fCurrentElement = root;
+
+		Symbol symbol;
+		while (XMLToken.getToken((symbol = fScanner.nextToken()).getId()) != XMLToken.EOF)
 		{
-			fCurrentElement = fElementStack.pop();
-		}
-		else
-		{
-			fCurrentElement = null;
+			switch (XMLToken.getToken(symbol.getId()))
+			{
+				case START_TAG:
+					processStartTag(symbol);
+					break;
+				case END_TAG:
+					processEndTag(symbol);
+					break;
+			}
 		}
 	}
 
-	/**
-	 * getSource
-	 * 
-	 * @param offset
-	 * @param length
-	 * @return
-	 */
-	protected String getSource(int offset, int length)
+	private void processStartTag(Symbol symbol)
 	{
-		return fScanner.getSource(offset, length);
+		XMLElementNode element = new XMLElementNode(symbol.value.toString(), symbol.getStart(), symbol.getEnd());
+		// pushes the element onto the stack
+		openElement(element);
+		if (element.isSelfClosing())
+		{
+			closeElement();
+		}
+	}
+
+	private void processEndTag(Symbol symbol)
+	{
+		// adjusts the ending offset of current element to include the entire block
+		((XMLElementNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), symbol.getEnd());
+		closeElement();
 	}
 
 	/**
@@ -103,7 +126,7 @@ public class XMLParser implements IParser
 	 * 
 	 * @param element
 	 */
-	protected void openElement(XMLElementNode element)
+	private void openElement(XMLElementNode element)
 	{
 		// adds the new parent as a child of the current parent
 		if (fCurrentElement != null)
@@ -116,184 +139,17 @@ public class XMLParser implements IParser
 	}
 
 	/**
-	 * parse
-	 * 
-	 * @throws Exception
+	 * Closes the element that is on the top of the stack.
 	 */
-	public IParseRootNode parse(IParseState parseState) throws Exception
+	private void closeElement()
 	{
-		fScanner = new XMLParserScanner();
-		fAttributeScanner = new XMLAttributeScanner();
-		fElementStack = new Stack<IParseNode>();
-
-		// create scanner and apply source
-		String source = new String(parseState.getSource());
-		fScanner.setSource(source);
-
-		int startingOffset = parseState.getStartingOffset();
-
-		// creates the root node
-		IParseRootNode root = new ParseRootNode( //
-			IXMLParserConstants.LANGUAGE, //
-			new XMLNode[0], //
-			startingOffset, //
-			startingOffset + source.length() //
-		);
-
-		try
+		if (fElementStack.size() > 0)
 		{
-			fCurrentElement = root;
-
-			parseAll(root);
-
-			parseState.setParseResult(root);
+			fCurrentElement = fElementStack.pop();
 		}
-		finally
+		else
 		{
-			fScanner = null;
-			fAttributeScanner = null;
-			fElementStack = null;
 			fCurrentElement = null;
-			fCurrentLexeme = null;
-		}
-
-		return root;
-	}
-
-	/**
-	 * parseAll
-	 * 
-	 * @param root
-	 * @throws Exception
-	 * @throws IOException
-	 */
-	protected void parseAll(IParseNode root) throws IOException, Exception
-	{
-		this.advance();
-
-		while (fCurrentLexeme.getType() != XMLTokenType.EOF)
-		{
-			processStatement();
-
-			this.advance();
-		}
-	}
-
-	/**
-	 * parseAttributes
-	 * 
-	 * @param element
-	 */
-	protected void parseAttributes(XMLElementNode element)
-	{
-		String rawText = fCurrentLexeme.getText();
-
-		fAttributeScanner.setRange(new Document(rawText), 0, rawText.length());
-
-		IToken token = fAttributeScanner.nextToken();
-		String name = null;
-		String value = null;
-
-		while (token.isEOF() == false)
-		{
-			Object data = token.getData();
-
-			if (data instanceof XMLTokenType)
-			{
-				switch ((XMLTokenType) data)
-				{
-					case ATTRIBUTE:
-						name = fAttributeScanner.getText();
-						break;
-
-					case VALUE:
-						if (name != null)
-						{
-							value = fAttributeScanner.getText();
-							value = value.substring(1, value.length() - 1);
-
-							element.setAttribute(name, value);
-
-							name = null;
-							value = null;
-						}
-						break;
-				}
-			}
-
-			token = fAttributeScanner.nextToken();
-		}
-	}
-
-	/**
-	 * processComment
-	 */
-	protected void processComment()
-	{
-		if (fCurrentElement != null)
-		{
-			XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getStartingOffset(), fCurrentLexeme.getEndingOffset());
-
-			fCurrentElement.addChild(comment);
-		}
-	}
-
-	/**
-	 * processEndTag
-	 */
-	protected void processEndTag()
-	{
-		// adjusts the ending offset of current element to include the entire block
-		((XMLElementNode) fCurrentElement).setLocation( //
-			fCurrentElement.getStartingOffset(), //
-			fCurrentLexeme.getEndingOffset() //
-			);
-
-		this.closeElement();
-	}
-
-	/**
-	 * processStartTag
-	 * 
-	 * @param symbol
-	 */
-	protected void processStartTag()
-	{
-		XMLElementNode element = new XMLElementNode( //
-			fCurrentLexeme.getText(), //
-			fCurrentLexeme.getStartingOffset(), //
-			fCurrentLexeme.getEndingOffset() //
-		);
-
-		this.parseAttributes(element);
-
-		// pushes the element onto the stack
-		this.openElement(element);
-
-		if (element.isSelfClosing())
-		{
-			this.closeElement();
-		}
-	}
-
-	/**
-	 * processStatement
-	 */
-	protected void processStatement()
-	{
-		switch (fCurrentLexeme.getType())
-		{
-			case COMMENT:
-				processComment();
-				break;
-
-			case START_TAG:
-				processStartTag();
-				break;
-
-			case END_TAG:
-				processEndTag();
-				break;
 		}
 	}
 }

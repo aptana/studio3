@@ -47,7 +47,6 @@ import java.util.Set;
 import org.jruby.RubyRegexp;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleEntry
 {
@@ -270,38 +269,6 @@ public class BundleEntry
 		});
 
 		return result.toArray(new EnvironmentElement[result.size()]);
-	}
-
-	/**
-	 * getPairs
-	 * 
-	 * @return
-	 */
-	public SmartTypingPairsElement[] getPairs()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (SmartTypingPairsElement command : bundle.getPairs())
-				{
-					String name = command.getDisplayName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(command);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new SmartTypingPairsElement[result.size()]);
 	}
 
 	/**
@@ -540,60 +507,6 @@ public class BundleEntry
 		});
 
 		return result.toArray(new MenuElement[result.size()]);
-	}
-
-	public ProjectTemplate[] getProjectTemplates()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (ProjectTemplate template : bundle.getProjectTemplates())
-				{
-					String name = template.getName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(template);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new ProjectTemplate[result.size()]);
-	}
-
-	public ProjectTemplate[] getProjectTemplatesByType(final Type type)
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (ProjectTemplate template : bundle.getProjectTemplatesByType(type))
-				{
-					String name = template.getName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(template);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
 	/**

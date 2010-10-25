@@ -36,6 +36,8 @@
 package com.aptana.ide.core.io.vfs;
 
 import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * @author Max Stepanov
@@ -59,7 +61,7 @@ public interface IExtendedFileInfo extends IFileInfo {
 	 * Option flag constant (value 1 &lt;&lt;16) indicating that a
 	 * file's permissions should be updated.
 	 * 
-	 * @see org.eclipse.core.filesystem.IFileStore#putInfo(IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see IFileStore#putInfo(IFileInfo, int, IProgressMonitor)
 	 */
 	public static final int SET_PERMISSIONS = 1 << 16;
 
@@ -67,7 +69,7 @@ public interface IExtendedFileInfo extends IFileInfo {
 	 * Option flag constant (value 1 &lt;&lt;17) indicating that a
 	 * file's group should be updated.
 	 * 
-	 * @see org.eclipse.core.filesystem.IFileStore#putInfo(IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see IFileStore#putInfo(IFileInfo, int, IProgressMonitor)
 	 */
 	public static final int SET_GROUP = 1 << 17;
 

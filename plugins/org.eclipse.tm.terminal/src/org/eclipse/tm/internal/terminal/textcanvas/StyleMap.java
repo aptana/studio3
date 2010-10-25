@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tm.terminal.model.Style;
 import org.eclipse.tm.terminal.model.StyleColor;
 
-@SuppressWarnings({"unchecked","rawtypes"})
 public class StyleMap {
 	protected static final String BLACK = "black"; //$NON-NLS-1$
 	protected static final String WHITE = "white"; //$NON-NLS-1$

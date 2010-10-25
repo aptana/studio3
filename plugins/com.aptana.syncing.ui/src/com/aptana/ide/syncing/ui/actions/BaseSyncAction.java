@@ -270,7 +270,7 @@ public abstract class BaseSyncAction implements IObjectActionDelegate, IViewActi
      *         their source locations
      */
     @SuppressWarnings("unchecked")
-	private ISiteConnection[] getSiteConnections() {
+	protected ISiteConnection[] getSiteConnections() {
         List<Set<ISiteConnection>> sitesList = new ArrayList<Set<ISiteConnection>>();
         Set<ISiteConnection> sitesSet = new HashSet<ISiteConnection>();
         ISiteConnection[] sites;

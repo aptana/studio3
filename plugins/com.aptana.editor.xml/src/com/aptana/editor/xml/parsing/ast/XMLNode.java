@@ -39,46 +39,26 @@ import com.aptana.parsing.ast.ParseNode;
 
 public class XMLNode extends ParseNode
 {
-	private XMLNodeType fType;
 
-	/**
-	 * XMLNode
-	 * 
-	 * @param type
-	 * @param start
-	 * @param end
-	 */
-	public XMLNode(XMLNodeType type, int start, int end)
+	private short fType;
+
+	public XMLNode(short type, int start, int end)
 	{
 		super(IXMLParserConstants.LANGUAGE);
-
 		fType = type;
 		this.start = start;
 		this.end = end;
 	}
 
-	/**
-	 * XMLNode
-	 * 
-	 * @param type
-	 * @param children
-	 * @param start
-	 * @param end
-	 */
-	public XMLNode(XMLNodeType type, XMLNode[] children, int start, int end)
+	public XMLNode(short type, XMLNode[] children, int start, int end)
 	{
 		this(type, start, end);
-
 		setChildren(children);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
 	@Override
 	public short getNodeType()
 	{
-		return fType.getIndex();
+		return fType;
 	}
 }

@@ -39,13 +39,12 @@ import com.aptana.core.Identifiable;
 
 /**
  * @author Max Stepanov
+ *
  */
-public interface IConnectionPointCategory extends Identifiable, Comparable<Object>
-{
+public interface IConnectionPointCategory extends Identifiable, Comparable<Object> {
 
 	public String getName();
-
+	
 	public IConnectionPoint[] getConnectionPoints();
-
-	public boolean isRemote();
+	
 }

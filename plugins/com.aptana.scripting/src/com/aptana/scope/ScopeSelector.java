@@ -40,78 +40,15 @@ import java.util.List;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
-public class ScopeSelector implements IScopeSelector
+public class ScopeSelector
 {
 	private static final String NEGATIVE_LOOKAHEAD = "-"; //$NON-NLS-1$
 	private static final Pattern or_split = Pattern.compile("\\s*,\\s*"); //$NON-NLS-1$
 	private static final Pattern and_split = Pattern.compile("\\s+"); //$NON-NLS-1$
 
-	/**
-	 * http://manual.macromates.com/en/scope_selectors
-	 * <ol>
-	 * <li>1. Match the element deepest down in the scope e.g. string wins over source.php when the scope is source.php
-	 * string.quoted.</li>
-	 * <li>2. Match most of the deepest element e.g. string.quoted wins over string.</li>
-	 * <li>3. Rules 1 and 2 applied again to the scope selector when removing the deepest element (in the case of a
-	 * tie), e.g. text source string wins over source string.</li>
-	 * </ol>
-	 * 
-	 * @param selectors
-	 * @param scope
-	 * @return
-	 */
-	public static IScopeSelector bestMatch(Collection<IScopeSelector> selectors, String scope)
-	{
-		if (selectors == null || selectors.isEmpty())
-		{
-			return null;
-		}
-		int bestOffset = -1;
-		int bestLength = 0;
-		IScopeSelector bestMatch = null;
-
-		for (IScopeSelector selector : selectors)
-		{
-			if (selector == null)
-			{
-				continue;
-			}
-			if (selector.matches(scope))
-			{
-				int offset = selector.getMatchOffset(); // This offset is the fragment of scope (counting spaces,
-				// basically)
-				int fragments = selector.getMatchFragments();
-				offset += fragments - 1;
-
-				if (offset > bestOffset)
-				{
-					bestOffset = offset;
-					bestMatch = selector;
-					bestLength = selector.getMatchLength();
-				}
-				else if (offset == bestOffset)
-				{
-					int length = selector.getMatchLength();
-
-					if (length > bestLength)
-					{
-						bestMatch = selector;
-					}
-					else if (length == bestLength)
-					{
-						// FIXME Need to match higher up steps?
-					}
-				}
-			}
-		}
-
-		return bestMatch;
-	}
-
 	private ISelectorNode _root;
 	private int matchOffset;
 	private int matchLength;
-
 	private int matchFragments;
 
 	/**
@@ -134,43 +71,6 @@ public class ScopeSelector implements IScopeSelector
 		this.parse(selector);
 	}
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj instanceof ScopeSelector)
-		{
-			return this.toString().equals(obj.toString());
-		}
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchFragments()
-	 */
-	public int getMatchFragments()
-	{
-		return this.matchFragments;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchLength()
-	 */
-	public int getMatchLength()
-	{
-		return this.matchLength;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#getMatchOffset()
-	 */
-	public int getMatchOffset()
-	{
-		return this.matchOffset;
-	}
-
 	/**
 	 * getRoot
 	 * 
@@ -181,15 +81,11 @@ public class ScopeSelector implements IScopeSelector
 		return this._root;
 	}
 
-	@Override
-	public int hashCode()
-	{
-		return toString().hashCode();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#matches(java.lang.String)
+	/**
+	 * matches
+	 * 
+	 * @param scope
+	 * @return
 	 */
 	public boolean matches(String scope)
 	{
@@ -227,9 +123,64 @@ public class ScopeSelector implements IScopeSelector
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scope.IScopeSelector#matches(java.lang.String[])
+	/**
+	 * http://manual.macromates.com/en/scope_selectors
+	 * <ol>
+	 * <li>1. Match the element deepest down in the scope e.g. string wins over source.php when the scope is source.php
+	 * string.quoted.</li>
+	 * <li>2. Match most of the deepest element e.g. string.quoted wins over string.</li>
+	 * <li>3. Rules 1 and 2 applied again to the scope selector when removing the deepest element (in the case of a
+	 * tie), e.g. text source string wins over source string.</li>
+	 * </ol>
+	 * 
+	 * @param selectors
+	 * @param scope
+	 * @return
+	 */
+	public static ScopeSelector bestMatch(Collection<ScopeSelector> selectors, String scope)
+	{
+		int bestOffset = -1;
+		int bestLength = 0;
+		ScopeSelector bestMatch = null;
+
+		for (ScopeSelector selector : selectors)
+		{
+			if (selector.matches(scope))
+			{
+				int offset = selector.matchOffset; // This offset is the fragment of scope (counting spaces, basically)
+				int fragments = selector.matchFragments;
+				offset += fragments - 1;
+				
+				if (offset > bestOffset)
+				{
+					bestOffset = offset;
+					bestMatch = selector;
+					bestLength = selector.matchLength;
+				}
+				else if (offset == bestOffset)
+				{
+					int length = selector.matchLength;
+
+					if (length > bestLength)
+					{
+						bestMatch = selector;
+					}
+					else if (length == bestLength)
+					{
+						// FIXME Need to match higher up steps?
+					}
+				}
+			}
+		}
+
+		return bestMatch;
+	}
+
+	/**
+	 * matches
+	 * 
+	 * @param scopes
+	 * @return
 	 */
 	public boolean matches(String[] scopes)
 	{
@@ -380,5 +331,21 @@ public class ScopeSelector implements IScopeSelector
 	public String toString()
 	{
 		return (this._root == null) ? "null" : this._root.toString(); //$NON-NLS-1$
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof ScopeSelector)
+		{
+			return this.toString().equals(obj.toString());
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
 	}
 }

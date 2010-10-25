@@ -53,12 +53,6 @@ public class CommonReconciler extends MonoReconciler
 
 	private LoadCycleListener listener;
 
-	/**
-	 * Used for performance testing purposes so we can see if we've finished our first reconcile!
-	 */
-	@SuppressWarnings("unused")
-	private boolean fIninitalProcessDone = false;
-
 	public CommonReconciler(ITextEditor editor, IReconcilingStrategy strategy, boolean isIncremental)
 	{
 		super(strategy, isIncremental);
@@ -130,12 +124,5 @@ public class CommonReconciler extends MonoReconciler
 		{
 			super.uninstall();
 		}
-	}
-
-	@Override
-	protected void initialProcess()
-	{
-		super.initialProcess();
-		fIninitalProcessDone = true;
 	}
 }

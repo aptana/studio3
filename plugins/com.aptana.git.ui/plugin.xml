@@ -22,7 +22,6 @@
          <action
                class="com.aptana.git.ui.actions.UnstageAction"
                definitionId="com.aptana.git.ui.command.unstage"
-               icon="icons/elcl16/subtract.gif"
                id="com.aptana.git.ui.actions.UnstageAction"
                label="%UnstageAction_label"
                menubarPath="team.main/targetGroup"
@@ -31,7 +30,6 @@
          <action
                class="com.aptana.git.ui.actions.StageAction"
                definitionId="com.aptana.git.ui.command.stage"
-               icon="icons/elcl16/add.gif"
                id="com.aptana.git.ui.actions.StageAction"
                label="%StageAction_label"
                menubarPath="team.main/targetGroup"
@@ -64,7 +62,6 @@
          <action
                class="com.aptana.git.ui.actions.PushAction"
                definitionId="com.aptana.git.ui.command.push"
-               icon="icons/elcl16/arrow_up.png"
                id="com.aptana.git.ui.actions.PushAction"
                label="%PushAction_label"
                menubarPath="team.main/projectGroup"
@@ -73,7 +70,6 @@
          <action
                class="com.aptana.git.ui.actions.PullAction"
                definitionId="com.aptana.git.ui.command.pull"
-               icon="icons/elcl16/arrow_down.png"
                id="com.aptana.git.ui.actions.PullAction"
                label="%PullAction_label"
                menubarPath="team.main/projectGroup"
@@ -97,7 +93,6 @@
          <action
                class="com.aptana.git.ui.actions.CommitAction"
                definitionId="com.aptana.git.ui.command.commit"
-               icon="icons/elcl16/disk.png"
                id="com.aptana.git.ui.actions.CommitAction"
                label="%CommitAction_label"
                menubarPath="team.main/targetGroup"
@@ -342,7 +337,7 @@
       <command
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
             id="com.aptana.git.ui.command.showInResourceHistory"
-            name="%command.showin.resource.name">
+            name="Show in Resource History">
       </command>
    </extension>
    <extension
@@ -450,7 +445,7 @@
             category="org.eclipse.team.ui.TeamPreferences"
             class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
             id="com.aptana.git.ui.GitExecutableLocationPage"
-            name="%page.git.name">
+            name="Git">
       </page>
    </extension>
    <extension
@@ -458,7 +453,7 @@
       <referenceprovider
             class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
             id="com.aptana.git.ui.quickdiff"
-            label="%referenceprovider.quickdiff.label">
+            label="Git Quick Diff">
       </referenceprovider>
    </extension>
    <extension

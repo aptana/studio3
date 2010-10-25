@@ -339,10 +339,4 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		// close element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
-	
-	@Override
-	public String toString()
-	{
-		return toSource();
-	}
 }

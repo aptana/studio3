@@ -7,9 +7,9 @@ module Ruble
   class Bundle < BaseElement
     @@defaults = {}
 
-    def initialize(name, path = nil)
+    def initialize(name)
       if name.kind_of? String
-        super(name, path)
+        super(name)
       else
         # hack to pass in java object...should test type
         @jobj = name
@@ -22,10 +22,6 @@ module Ruble
 
     def add_env(env)
       @jobj.add_env env.java_object
-    end
-    
-    def add_smart_typing_pairs(p)
-      @jobj.add_smart_typing_pairs p.java_object
     end
 
     def add_menu(menu)
@@ -199,19 +195,18 @@ module Ruble
     class << self
       def define_bundle(name="", values={}, &block)
         log_info("loading bundle #{name}")
-        path = $0
-        path = block.binding.eval("__FILE__") if block
-        if File.basename(path) != "bundle.rb" || File.basename(File.dirname(path)) =~ /^(?:commands|snippets|templates)$/
-          log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{path}")
+
+        if File.basename($fullpath) != "bundle.rb" || File.basename(File.dirname($fullpath)) =~ /^(?:commands|snippets|templates)$/
+          log_error("Attempted to define a bundle in a file other than the bundle's bundle.rb file: #{$fullpath}")
         else
           # try to grab a cached bundle
-          bundle = Ruble::BundleManager.bundle_from_path(File.dirname(path))
+          bundle = Ruble::BundleManager.bundle_from_path(File.dirname($fullpath))
           
           # flag if we're using a cached bundle or not
           add_bundle = bundle.nil?
           
           # create a new bundle if we didn't have a cached one
-          bundle = Bundle.new(name, path) if bundle.nil?
+          bundle = Bundle.new(name) if bundle.nil?
 
           # associate default values
           bundle.push_defaults values
@@ -237,7 +232,7 @@ module Ruble
   private
 
     def create_java_object
-      com.aptana.scripting.model.BundleElement.new(path)
+      com.aptana.scripting.model.BundleElement.new($fullpath)
     end
   end
 
@@ -250,8 +245,7 @@ def bundle(name="", &block)
 end
 
 def with_defaults(values, &block)
-  path = block.binding.eval("__FILE__")
-  bundle = Ruble::BundleManager.bundle_from_path(File.dirname(path))
+  bundle = Ruble::BundleManager.bundle_from_path(File.dirname($fullpath))
 
   if bundle.nil?
     Ruble::Bundle.define_bundle("", values, &block)

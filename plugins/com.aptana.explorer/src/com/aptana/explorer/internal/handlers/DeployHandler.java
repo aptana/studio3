@@ -145,18 +145,18 @@ public class DeployHandler extends AbstractHandler
 	private void deployWithCapistrano(){
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
-		terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
+		terminal.sendInput("cap deploy\n");
 	}
 	
 	private void deployWithEngineYard(){
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
-		terminal.sendInput("ey deploy\n"); //$NON-NLS-1$
+		terminal.sendInput("ey deploy\n");
 	}
 	private void deployWithHeroku(){
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
-		terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
+		terminal.sendInput("git push heroku master\n");
 	}
 	
 	private void deployWithFTP(){

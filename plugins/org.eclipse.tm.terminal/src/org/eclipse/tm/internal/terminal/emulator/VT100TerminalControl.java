@@ -815,11 +815,11 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					break;
 
 				case 0x1000005: // PgUp key.
-					sendString("\u001b[5~"); //$NON-NLS-1$
+					sendString("\u001b[I"); //$NON-NLS-1$
 					break;
 
 				case 0x1000006: // PgDn key.
-					sendString("\u001b[6~"); //$NON-NLS-1$
+					sendString("\u001b[G"); //$NON-NLS-1$
 					break;
 
 				case 0x1000007: // Home key.

@@ -37,7 +37,6 @@ package com.aptana.editor.css.parsing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IRule;
@@ -75,7 +74,6 @@ public class CSSTokenScanner extends CSSCodeScanner
 	{
 		List<IRule> rules = new ArrayList<IRule>();
 		// url
-		// FIXME Don't use a RegexpRule here!
 		rules.add(new RegexpRule("url\\([^\\)]*\\)", createToken(CSSTokenType.URL), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$
 		
 		// FIXME These are all really just numbers followed by measurements. Can't we modify scanner/parser to grab number and then a measurement
@@ -114,16 +112,10 @@ public class CSSTokenScanner extends CSSCodeScanner
 		}, createToken(tokenType), false)
 		{
 			
-			private Pattern pattern;
-
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
-				if (pattern == null)
-				{
-					pattern = Pattern.compile(regex);
-				}
-				return pattern.matcher(word).matches();
+				return word.matches(regex);
 			}
 		};
 	}

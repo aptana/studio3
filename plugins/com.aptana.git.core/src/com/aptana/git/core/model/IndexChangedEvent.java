@@ -60,7 +60,7 @@ public class IndexChangedEvent extends RepositoryEvent
 		this.postChangeFiles = postChangeFiles;
 	}
 
-	protected boolean hasDiff()
+	public boolean hasDiff()
 	{
 		return !getDiff().isEmpty();
 	}

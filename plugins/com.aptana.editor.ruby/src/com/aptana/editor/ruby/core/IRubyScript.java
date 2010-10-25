@@ -34,9 +34,7 @@
  */
 package com.aptana.editor.ruby.core;
 
-import com.aptana.parsing.ast.IParseRootNode;
-
-public interface IRubyScript extends IRubyElement, IParseRootNode
+public interface IRubyScript extends IRubyElement
 {
 	public IImportContainer getImportContainer();
 }

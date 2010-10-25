@@ -40,36 +40,21 @@ import com.aptana.parsing.ast.ParseNode;
 public class CSSNode extends ParseNode
 {
 
-	private short fType;
-
-	protected CSSNode(short type)
+	protected CSSNode()
 	{
-		this(type, 0, 0);
+		this(0, 0);
 	}
 
-	public CSSNode(short type, int start, int end)
+	public CSSNode(int start, int end)
 	{
 		super(ICSSParserConstants.LANGUAGE);
-		fType = type;
 		this.start = start;
 		this.end = end;
 	}
-
+	
 	@Override
 	public String getText()
 	{
 		return toString();
-	}
-
-	@Override
-	public short getNodeType()
-	{
-		return fType;
-	}
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		return (obj instanceof CSSNode) && super.equals(obj);
 	}
 }

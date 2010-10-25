@@ -1,3 +1,4 @@
+package com.aptana.core.epl;
 /*******************************************************************************
  * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -8,7 +9,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.core.epl;
+
 
 /**
  * Interface to a memento used for saving the important state of an object

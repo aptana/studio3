@@ -7,7 +7,7 @@
             category="com.aptana.ide.filesystem.ftp.ftpCategory"
             class="com.aptana.filesystem.secureftp.FTPSConnectionPoint"
             id="ftps"
-            name="%connectionPointType.ftps.name">
+            name="FTPS">
       </connectionPointType>
    </extension>
    <extension
@@ -16,7 +16,7 @@
             category="com.aptana.ide.filesystem.ftp.ftpCategory"
             class="com.aptana.filesystem.secureftp.SFTPConnectionPoint"
             id="sftp"
-            name="%connectionPointType.sftp.name">
+            name="SFTP">
       </connectionPointType>
    </extension>
 

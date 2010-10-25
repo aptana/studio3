@@ -28,6 +28,7 @@
  ******************************************************************************
  * Author : Omry Yadan
  ******************************************************************************/
+ 
 package net.contentobjects.jnotify.linux;
 
 import net.contentobjects.jnotify.JNotifyException;

@@ -1,41 +1,6 @@
-/**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.git.ui.actions;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -236,17 +201,10 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 
 	protected GitRepository getSelectedRepository()
 	{
-		Set<GitRepository> repos = getSelectedRepositories();
-		if (repos.isEmpty())
-			return null;
-		return repos.iterator().next();
-	}
-
-	protected Set<GitRepository> getSelectedRepositories()
-	{
 		IResource[] resources = getSelectedResources();
 		if (resources == null || resources.length == 0)
-			return Collections.emptySet();
+			return null;
+		// Actions can handle multiple selections if they share the same repo
 		Set<GitRepository> repos = new HashSet<GitRepository>();
 		for (IResource resource : resources)
 		{
@@ -255,16 +213,18 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 			IProject project = resource.getProject();
 			GitRepository repo = getGitRepositoryManager().getAttached(project);
 			if (repo != null)
-			{
 				repos.add(repo);
-			}
 		}
-		return repos;
+		if (repos.isEmpty() || repos.size() != 1)
+			return null;
+		return repos.iterator().next();
+
 	}
 
-	protected void refreshAffectedProjects(GitRepository repo)
+	protected void refreshAffectedProjects()
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
+		GitRepository repo = getSelectedRepository();
 		if (repo != null)
 		{
 			affectedProjects.addAll(getAssociatedProjects(repo));
@@ -358,7 +318,7 @@ public abstract class GitAction extends Action implements IObjectActionDelegate,
 		}
 		return targetPart;
 	}
-
+	
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();

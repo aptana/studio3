@@ -45,10 +45,7 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 
 public class JSSourceEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
-	 */
+
 	@Override
 	protected void initializeEditor()
 	{
@@ -57,21 +54,13 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new JSDocumentProvider());
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
+	
 	@Override
 	protected FileService createFileService()
 	{
 		return new FileService(IJSParserConstants.LANGUAGE);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
-	 */
 	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
@@ -82,10 +71,6 @@ public class JSSourceEditor extends AbstractThemeableEditor
 		return outline;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
-	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{

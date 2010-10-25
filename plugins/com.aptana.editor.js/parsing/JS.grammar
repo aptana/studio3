@@ -6,7 +6,6 @@
 %import "java.io.ByteArrayInputStream";
 %import "java.io.IOException";
 %import "java.util.ArrayList";
-%import "java.util.Comparator";
 %import "java.util.List";
 
 %import "com.aptana.editor.js.parsing.ast.*";
@@ -18,8 +17,6 @@
 %import "com.aptana.parsing.IParser";
 %import "com.aptana.parsing.IRecoveryStrategy";
 %import "com.aptana.parsing.ast.IParseNode";
-%import "com.aptana.parsing.ast.IParseRootNode";
-%import "com.aptana.parsing.ast.ParseRootNode";
 
 %implements "IParser";
 
@@ -199,7 +196,8 @@
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
 	 */
-	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	@Override
+	public synchronized IParseNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		// grab source
 		char[] characters = parseState.getSource();
@@ -207,67 +205,30 @@
 		// make sure we have some source
 		String source = (characters != null) ? new String(characters) : "";
 
-		// create scanner and send source to it
-		fScanner = new JSScanner();
+		// send source to the scanner
 		fScanner.setSource(source);
-	
-		try
-		{
-			// parse
-			ParseRootNode result = (ParseRootNode) parse(fScanner);
-			int start = parseState.getStartingOffset();
-			int end = start + source.length();
-			result.setLocation(start, end);
 
-			// store results in the parse state
-			parseState.setParseResult(result);
-	
-			// TODO: We probably don't need documentation nodes in all cases. For
-			// example, the outline view probably doesn't rely on them. We should
-			// include a flag (maybe in the parseState) that makes this step
-			// optional.
-	
-			// attach documentation
-			if (result instanceof JSParseRootNode)
-			{
-				JSParseRootNode root = (JSParseRootNode) result;
-	
-				attachPreDocumentationBlocks(root, source);
-				attachPostDocumentationBlocks(root, source);
-				
-				// create a list of all comments and attach to root node
-				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
-				
-				for (Symbol symbol : fScanner.getSDocComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getVSDocComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getSingleLineComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                for (Symbol symbol : fScanner.getMultiLineComments())
-                {
-                    comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
-                }
-                
-                root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
-			}
-			
-			return result;
-		}
-		finally
+		// parse
+		IParseNode result = (IParseNode) parse(fScanner);
+
+		// store results in the parse state
+		parseState.setParseResult(result);
+
+		// TODO: We probably don't need documentation nodes in all cases. For
+		// example, the outline view probably doesn't rely on them. We should
+		// include a flag (maybe in the parseState) that makes this step
+		// optional.
+
+		// attach documentation
+		if (result instanceof JSParseRootNode)
 		{
-			// clear scanner for garbage collection
-			fScanner = null;
+			JSParseRootNode root = (JSParseRootNode) result;
+
+			attachPreDocumentationBlocks(root, source);
+			attachPostDocumentationBlocks(root, source);
 		}
+
+		return result;
 	}
 
 	/**
@@ -389,6 +350,7 @@
 :};
 
 %init {:
+		fScanner = new JSScanner();
 		report = new JSEvents();
 
 		recoveryStrategies = new IRecoveryStrategy[] {

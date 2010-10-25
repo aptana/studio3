@@ -104,7 +104,7 @@ public class MetadataLoader extends Job
 				}
 				catch (Throwable t)
 				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t); //$NON-NLS-1$
+					Activator.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t);
 				}
 				finally
 				{

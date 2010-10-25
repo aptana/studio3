@@ -187,12 +187,12 @@ class GitResourceListener implements IResourceChangeListener
 		}
 	}
 
-	private IGitRepositoryManager getGitRepositoryManager()
+	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
 
-	private GitRepository getRepo(IResource resource)
+	protected GitRepository getRepo(IResource resource)
 	{
 		if (resource == null)
 			return null;

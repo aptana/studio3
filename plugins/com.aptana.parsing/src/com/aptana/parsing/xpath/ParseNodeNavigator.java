@@ -260,7 +260,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	{
 		if (isAttribute(contextNode))
 		{
-			throw new UnsupportedAxisException("Need to add an iterator that supports attributes"); //$NON-NLS-1$
+			throw new UnsupportedAxisException("Need to add an iterator that supports attributes");
 		}
 		else
 		{

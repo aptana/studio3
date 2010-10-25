@@ -34,39 +34,36 @@
  */
 package com.aptana.editor.ruby;
 
-import org.eclipse.jface.text.rules.IPartitionTokenScanner;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 
-import com.aptana.editor.common.IPartitioningConfiguration;
-import com.aptana.editor.common.SimpleDocumentProvider;
+import com.aptana.editor.common.CommonDocumentProvider;
+import com.aptana.editor.common.CommonEditorPlugin;
 
-public class RubyDocumentProvider extends SimpleDocumentProvider
+public class RubyDocumentProvider extends CommonDocumentProvider
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
-	 */
+
 	@Override
-	public IPartitionTokenScanner createPartitionScanner()
+	public void connect(Object element) throws CoreException
 	{
-		return new MergingPartitionScanner(new RubySourcePartitionScanner());
+		super.connect(element);
+
+		IDocument document = getDocument(element);
+		if (document != null)
+		{
+			IDocumentPartitioner partitioner = new FastPartitioner(new MergingPartitionScanner(
+					new RubySourcePartitionScanner()), RubySourceConfiguration.CONTENT_TYPES);
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
+					RubySourceConfiguration.getDefault());
+		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
-	 */
 	protected String getDefaultContentType(String filename)
 	{
 		return IRubyConstants.CONTENT_TYPE_RUBY;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
-	 */
-	@Override
-	public IPartitioningConfiguration getPartitioningConfiguration()
-	{
-		return RubySourceConfiguration.getDefault();
 	}
 }

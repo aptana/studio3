@@ -36,7 +36,6 @@
 package com.aptana.ide.ui.io.navigator;
 
 import org.eclipse.core.filesystem.IFileInfo;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.Viewer;
@@ -63,8 +62,6 @@ public class FileTreeNameSorter extends ViewerSorter {
 	        return 1;
 	    } else if (element instanceof IConnectionPointCategory) {
 			return 2;
-	    } else if (element instanceof IProject) {
-	    	return 3;
 		} else if (element instanceof IResource) {
 		    return ((IResource) element).getLocation().toFile().isDirectory() ? 3 : 4;
 		} else if (element instanceof IAdaptable) {

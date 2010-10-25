@@ -39,10 +39,8 @@ import java.util.List;
 
 import beaver.Symbol;
 
-public class ParseRootNode extends ParseNode implements IParseRootNode
+public class ParseRootNode extends ParseNode
 {
-
-	private IParseNode[] fComments;
 
 	public ParseRootNode(String language, Symbol[] children, int start, int end)
 	{
@@ -59,17 +57,5 @@ public class ParseRootNode extends ParseNode implements IParseRootNode
 			}
 		}
 		setChildren(nodes.toArray(new IParseNode[nodes.size()]));
-
-		fComments = new IParseNode[0];
-	}
-
-	public IParseNode[] getCommentNodes()
-	{
-		return fComments;
-	}
-
-	public void setCommentNodes(IParseNode[] comments)
-	{
-		fComments = comments;
 	}
 }

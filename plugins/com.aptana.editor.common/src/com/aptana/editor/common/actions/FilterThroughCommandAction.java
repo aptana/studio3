@@ -39,7 +39,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.text.ITextOperationTarget;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.TextEditorAction;
@@ -59,11 +62,19 @@ public class FilterThroughCommandAction extends TextEditorAction {
 	
 	public static final String COMMAND_ID = "com.aptana.editor.common.scripting.commands.FilterThroughCommand";	//$NON-NLS-1$
 	
+	private ITextViewer textViewer;
+	private StyledText textWidget;
+
 	private boolean deactivated = false;
 
 	protected FilterThroughCommandAction(ResourceBundle bundle, String prefix, ITextEditor editor) {
 		super(bundle, prefix, editor);
 		setActionDefinitionId(COMMAND_ID);
+		Object adapter = editor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer) {
+			textViewer = (ITextViewer) adapter;
+			textWidget = textViewer.getTextWidget();
+		}
 	}
 	
 	@Override
@@ -95,7 +106,14 @@ public class FilterThroughCommandAction extends TextEditorAction {
 			deactivate();
 			return;
 		}
-		activate();
+		if (textWidget != null) {
+			if (Boolean.TRUE.booleanValue()) {
+				activate();
+				return;
+			} else {
+				deactivate();
+			}
+		}
 	}
 
 	boolean isDeactivated() {

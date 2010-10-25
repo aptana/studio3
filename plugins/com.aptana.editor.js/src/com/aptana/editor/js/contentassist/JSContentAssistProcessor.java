@@ -231,9 +231,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					// TODO: Temporary hack for jQuery CA until we resolve
 					// handling of function properties and derived types
-					if ("jQuery".equals(type)) //$NON-NLS-1$
+					if ("jQuery".equals(type))
 					{
-						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
+						type = "Function<jQuery>:jQuery";
 					}
 					
 					if (JSTypeUtil.isFunctionPrefix(type))

@@ -3,14 +3,14 @@ require "ruble/base_element"
 require "ruble/key_binding"
 require "ruble/invoke"
 require "ruble/scope_selector"
-require "ruble/bundle_manager"
+require "pathname"
 
 module Ruble
 
   class Command < BaseElement
-    def initialize(name, path = nil)
+    def initialize(name)
       if name.kind_of? String
-        super(name, path)
+        super(name)
 
         @key_binding = KeyBinding.new(java_object)
         @invoke = Invoke.new(self, java_object)
@@ -44,7 +44,6 @@ module Ruble
       when Symbol
         @jobj.input_type = input.to_s
       else
-        require "pathname"
         bundle = BundleManager.bundle_from_path(path)
         base_path = Pathname.new(File.dirname(bundle.path))
         @jobj.input_type = "input_from_file"
@@ -93,7 +92,6 @@ module Ruble
       if output.kind_of? Symbol
         @jobj.output_type = output.to_s
       else
-        require "pathname"
         bundle = BundleManager.bundle_from_path(path)
         base_path = Pathname.new(File.dirname(bundle.path))
         @jobj.output_type = "output_to_file"
@@ -158,10 +156,8 @@ module Ruble
     class << self
       def define_command(name, &block)
         log_info("loading command #{name}")
-        
-        path = $0
-        path = block.binding.eval("__FILE__") if block
-        command = Command.new(name, path)
+
+        command = Command.new(name)
         block.call(command) if block_given?
 
         # add command to bundle
@@ -178,7 +174,7 @@ module Ruble
     private
 
     def create_java_object
-      com.aptana.scripting.model.CommandElement.new(path)
+      com.aptana.scripting.model.CommandElement.new($fullpath)
     end
   end
 

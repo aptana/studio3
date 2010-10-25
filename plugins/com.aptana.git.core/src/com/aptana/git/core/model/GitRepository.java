@@ -36,8 +36,11 @@ package com.aptana.git.core.model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -59,7 +62,6 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -70,6 +72,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
@@ -95,7 +98,8 @@ public class GitRepository
 	/**
 	 * A file created when we hit merge conflicts that need to be manually resolved.
 	 */
-	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
@@ -106,7 +110,7 @@ public class GitRepository
 	private GitRevSpecifier _headRef;
 	private GitIndex index;
 	private boolean hasChanged;
-	private GitRevSpecifier currentBranch;
+	GitRevSpecifier currentBranch;
 	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
 	private int remoteDirCreationWatchId = -1;
 	private HashSet<IGitRepositoryListener> listeners;
@@ -332,7 +336,7 @@ public class GitRepository
 	/**
 	 * @throws JNotifyException
 	 */
-	private void addRemotesFileWatcher() throws JNotifyException
+	protected void addRemotesFileWatcher() throws JNotifyException
 	{
 		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY,
 				true, new JNotifyListener()
@@ -571,7 +575,7 @@ public class GitRepository
 		this.currentBranch = addBranch(headRef());
 	}
 
-	protected String parseReference(String parent)
+	public String parseReference(String parent)
 	{
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse", //$NON-NLS-1$
 				"--verify", parent); //$NON-NLS-1$
@@ -705,7 +709,7 @@ public class GitRepository
 		return index;
 	}
 
-	private void fireBranchChangeEvent(String oldBranchName, String newBranchName)
+	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -714,7 +718,7 @@ public class GitRepository
 			listener.branchChanged(e);
 	}
 
-	private void fireBranchRemovedEvent(String oldBranchName)
+	void fireBranchRemovedEvent(String oldBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -723,7 +727,7 @@ public class GitRepository
 			listener.branchRemoved(e);
 	}
 
-	private void fireBranchAddedEvent(String newBranchName)
+	void fireBranchAddedEvent(String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -743,6 +747,83 @@ public class GitRepository
 			return;
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
+	}
+
+	public boolean hasMerges()
+	{
+		return mergeHeadFile().exists();
+	}
+
+	boolean executeHook(String name)
+	{
+		return executeHook(name, new String[0]);
+	}
+
+	boolean executeHook(String name, String... arguments)
+	{
+		IPath hookPath = gitDirPath();
+		hookPath = hookPath.append("hooks").append(name); //$NON-NLS-1$
+		File hook = hookPath.toFile();
+		if (!hook.exists() || !hook.isFile())
+			return true;
+
+		try
+		{
+			Method method = File.class.getMethod("canExecute", (Class[]) null); //$NON-NLS-1$
+			if (method != null)
+			{
+				Boolean canExecute = (Boolean) method.invoke(hook, (Object[]) null);
+				if (!canExecute)
+					return true;
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
+		Map<String, String> env = new HashMap<String, String>();
+		env.put(GitEnv.GIT_DIR, gitDirPath().toOSString());
+		env.put(GitEnv.GIT_INDEX_FILE, gitFile(INDEX).getAbsolutePath());
+
+		int ret = 1;
+		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath.toOSString(), workingDirectory(), env,
+				arguments);
+		ret = result.keySet().iterator().next();
+		return ret == 0;
+	}
+
+	String commitMessageFile()
+	{
+		return gitFile(COMMIT_EDITMSG).getAbsolutePath();
+	}
+
+	void writetoCommitFile(String commitMessage)
+	{
+		File commitMessageFile = new File(commitMessageFile());
+		OutputStream out = null;
+		try
+		{
+			out = new FileOutputStream(commitMessageFile);
+			out.write(commitMessage.getBytes(COMMIT_FILE_ENCODING));
+			out.flush();
+		}
+		catch (IOException ioe)
+		{
+			GitPlugin.logError(ioe.getMessage(), ioe);
+		}
+		finally
+		{
+			try
+			{
+				if (out != null)
+					out.close();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
+		}
 	}
 
 	public void lazyReload()
@@ -883,7 +964,7 @@ public class GitRepository
 	 * @param branchName
 	 * @return
 	 */
-	private GitRef remoteTrackingBranch(String branchName)
+	public GitRef remoteTrackingBranch(String branchName)
 	{
 		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1138,12 +1219,12 @@ public class GitRepository
 		return shas;
 	}
 
-	private File mergeHeadFile()
+	File mergeHeadFile()
 	{
 		return gitFile(MERGE_HEAD_FILENAME);
 	}
 
-	private File gitFile(String string)
+	File gitFile(String string)
 	{
 		return gitDirPath().append(string).toFile();
 	}
@@ -1229,8 +1310,38 @@ public class GitRepository
 		return index().getChangedResources();
 	}
 
-	public IFile getFileForChangedFile(ChangedFile file)
+	public IStatus addRemoteTrackingBranch(String localBranchName, String remoteName)
 	{
-		return index().getResourceForChangedFile(file);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+				"config", MessageFormat.format("branch.{0}.remote", localBranchName), remoteName); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
+					"Failed to set github remote {0} for local branch {1}", remoteName, localBranchName));
+		}
+		// Non-zero exit code!
+		if (result.keySet().iterator().next() != 0)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
+
+		// set merge for our local branch
+		result = GitExecutable
+				.instance()
+				.runInBackground(
+						workingDirectory(),
+						"config", MessageFormat.format("branch.{0}.merge", localBranchName), GitRef.REFS_HEADS + localBranchName); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), MessageFormat.format(
+					"Failed to set merge point for branch {0}", localBranchName));
+		}
+		// Non-zero exit code!
+		if (result.keySet().iterator().next() != 0)
+		{
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
+		return Status.OK_STATUS;
 	}
+
 }

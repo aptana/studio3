@@ -159,7 +159,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 	
 	private static void connectFTPClient(FTPClient ftpClient) throws IOException, FTPException {
-		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPConnectionFileManager.class.getName()); //$NON-NLS-1$
+		PerformanceStats stats = PerformanceStats.getStats("com.aptana.filesystem.ftp/perf/connect", FTPConnectionFileManager.class.getName());
 		stats.startRun(ftpClient.getRemoteHost());
 		try {
 			ftpClient.connect();
@@ -327,7 +327,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 		try {
 	        String[] validCodes = {"214"}; //$NON-NLS-1$
-			FTPReply reply = ftpClient.sendCommand("SITE HELP"); //$NON-NLS-1$
+			FTPReply reply = ftpClient.sendCommand("SITE HELP");
 			ftpClient.validateReply(reply, validCodes);
 			if (serverFeatures == null) {
 				serverFeatures = new ArrayList<String>();
@@ -335,10 +335,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			String[] data = reply.getReplyData();
 			for (int i = 0; i < data.length; ++i) {
 				String cmd = data[i].trim();
-				if (cmd.startsWith("214")) { //$NON-NLS-1$
+				if (cmd.startsWith("214")) {
 					continue;
 				}
-				serverFeatures.add(MessageFormat.format("SITE {0}", cmd)); //$NON-NLS-1$
+				serverFeatures.add(MessageFormat.format("SITE {0}", cmd));
 			}
 		} catch (Exception e) {
 		}
@@ -955,17 +955,17 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			if (serverSupportsFeature("MFMT")) { //$NON-NLS-1$
+			if (serverSupportsFeature("MFMT")) {
 				ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
-			} else if (serverSupportsFeature("SITE UTIME")) { //$NON-NLS-1$
+			} else if (serverSupportsFeature("SITE UTIME")) {
 				Calendar cal = Calendar.getInstance();
 				long localTimezoneShift = cal.get(Calendar.ZONE_OFFSET)+cal.get(Calendar.DST_OFFSET);
 				Date date = new Date(modificationTime-localTimezoneShift);
 				if (utimeFormat == -1) {
 					for (utimeFormat = 0; utimeFormat < UTIME_FORMATS.length; ++utimeFormat) {
 						String format = UTIME_FORMATS[utimeFormat].format(date);
-						FTPReply reply = ftpClient.sendCommand("SITE "+MessageFormat.format(format, path.lastSegment())); //$NON-NLS-1$
-						if (!"500".equals(reply.getReplyCode()) && !"501".equals(reply.getReplyCode())) { //$NON-NLS-1$ //$NON-NLS-2$
+						FTPReply reply = ftpClient.sendCommand("SITE "+MessageFormat.format(format, path.lastSegment()));
+						if (!"500".equals(reply.getReplyCode()) && !"501".equals(reply.getReplyCode())) {
 							break;
 						}
 					}

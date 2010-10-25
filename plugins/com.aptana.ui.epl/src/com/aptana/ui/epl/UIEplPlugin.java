@@ -1,16 +1,6 @@
-/**
- * Copyright (c) 2005-2010 Aptana, Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
- * this entire header must remain intact.
- */
 package com.aptana.ui.epl;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -20,13 +10,8 @@ import org.osgi.framework.BundleContext;
 public class UIEplPlugin extends AbstractUIPlugin
 {
 
-	public static final int INTERNAL_ERROR = 10001;
-
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.ui.epl"; //$NON-NLS-1$
-
-	public static final boolean DEBUG = Boolean
-			.valueOf(Platform.getDebugOption("com.aptana.ui.epl/debug")).booleanValue(); //$NON-NLS-1$
 
 	// The shared instance
 	private static UIEplPlugin plugin;
@@ -66,11 +51,6 @@ public class UIEplPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
 	public static Image getImage(String string)
 	{
 		if (getDefault().getImageRegistry().get(string) == null)
@@ -82,5 +62,10 @@ public class UIEplPlugin extends AbstractUIPlugin
 			}
 		}
 		return getDefault().getImageRegistry().get(string);
+	}
+
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 }

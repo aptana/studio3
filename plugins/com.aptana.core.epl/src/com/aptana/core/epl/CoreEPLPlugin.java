@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
 public class CoreEPLPlugin extends Plugin {
 
     // The plug-in ID
-    protected static final String PLUGIN_ID = "com.aptana.core.epl"; //$NON-NLS-1$
+    public static final String PLUGIN_ID = "com.aptana.core.epl"; //$NON-NLS-1$
 
     // The shared instance
     private static CoreEPLPlugin plugin;
@@ -52,7 +52,7 @@ public class CoreEPLPlugin extends Plugin {
      * 
      * @return the shared instance
      */
-    private static CoreEPLPlugin getDefault() {
+    public static CoreEPLPlugin getDefault() {
         return plugin;
     }
 
@@ -60,7 +60,7 @@ public class CoreEPLPlugin extends Plugin {
         log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e)); 
     }
 
-    private static void log(IStatus status) {
+    public static void log(IStatus status) {
         getDefault().getLog().log(status);
     }
 

@@ -1,6 +1,0 @@
-<!-- adding a comment just for fun -->
-<!ELEMENT svg EMPTY>
-<!ELEMENT circle EMPTY>
-<!ELEMENT ellipse EMPTY>
-<!ELEMENT rectangle EMPTY>
-<!ELEMENT path EMPTY>

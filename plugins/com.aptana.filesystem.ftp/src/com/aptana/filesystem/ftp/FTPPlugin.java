@@ -47,6 +47,7 @@ import org.osgi.framework.BundleContext;
 import com.enterprisedt.util.debug.Level;
 import com.enterprisedt.util.debug.Logger;
 
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -73,7 +74,7 @@ public class FTPPlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		if ("true".equals(Platform.getDebugOption("com.aptana.filesystem.ftp/ftplib_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+		if ("true".equals(Platform.getDebugOption("com.aptana.filesystem.ftp/ftplib_debug"))) {
 			Logger.setLevel(Level.DEBUG);
 		}
 	}

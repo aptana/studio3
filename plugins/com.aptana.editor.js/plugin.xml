@@ -26,10 +26,17 @@
             priority="normal">
       </content-type>
       <content-type
+            base-type="com.aptana.contenttype.js"
+            file-extensions="json"
+            id="com.aptana.contenttype.json"
+            name="%content-type.json.name"
+            priority="normal">
+      </content-type>
+      <content-type
             base-type="org.eclipse.core.runtime.xml"
             file-extensions="sdocml"
             id="com.aptana.contenttype.sdocml"
-            name="%content-type.sdocml.name"
+            name="SDocML Source"
             priority="normal">
       </content-type>
    </extension>

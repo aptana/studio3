@@ -461,7 +461,7 @@ public class JSMetadataReader extends MetadataReader
 			ReturnTypeElement returnType = new ReturnTypeElement();
 
 			// grab and set property values
-			returnType.setType(type);
+			returnType.setType(type); //$NON-NLS-1$
 
 			this._currentReturnType = returnType;
 		}

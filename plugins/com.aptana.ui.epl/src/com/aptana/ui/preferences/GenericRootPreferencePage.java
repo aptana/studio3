@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2005-2010 Aptana, Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
- * this entire header must remain intact.
- */
 package com.aptana.ui.preferences;
 
 import java.util.ArrayList;
@@ -59,7 +50,7 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 	/**
 	 * Creates the links.
 	 */
-	@SuppressWarnings( { "unchecked" })
+	@SuppressWarnings("rawtypes")
 	protected Control createContents(Composite parent)
 	{
 		// pageNameToId = null
@@ -69,10 +60,10 @@ public abstract class GenericRootPreferencePage extends PreferencePage implement
 			String pageId = getPageId();
 			// Locate all the pages that are defined as this page children
 			PreferenceManager manager = PlatformUI.getWorkbench().getPreferenceManager();
-			List<IPreferenceNode> nodes = manager.getElements(PreferenceManager.POST_ORDER);
-			for (Iterator<IPreferenceNode> i = nodes.iterator(); i.hasNext();)
+			List nodes = manager.getElements(PreferenceManager.POST_ORDER);
+			for (Iterator i = nodes.iterator(); i.hasNext();)
 			{
-				IPreferenceNode node = i.next();
+				IPreferenceNode node = (IPreferenceNode) i.next();
 				if (node.getId().equals(pageId))
 				{
 					// we found the node, so take its child nodes and add them to the cache

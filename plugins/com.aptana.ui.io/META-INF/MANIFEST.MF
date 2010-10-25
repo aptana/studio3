@@ -12,12 +12,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.navigator,
  org.eclipse.ui.navigator.resources,
  org.eclipse.ui,
- org.eclipse.ui.ide,
+ org.eclipse.ui.ide;bundle-version="3.4.0",
  com.aptana.ui,
  com.aptana.core,
  com.aptana.core.io,
- com.aptana.ui.io.epl,
- com.aptana.theme
+ com.aptana.ui.io.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ide.ui.io,

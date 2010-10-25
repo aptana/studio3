@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %pluginName
+Bundle-Name: Aptana Theme Tests
 Bundle-SymbolicName: com.aptana.theme.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: %providerName
+Bundle-Vendor: Aptana, Inc.
 Fragment-Host: com.aptana.theme
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit

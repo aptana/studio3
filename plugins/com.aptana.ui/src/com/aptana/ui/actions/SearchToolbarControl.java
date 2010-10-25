@@ -32,6 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+
 package com.aptana.ui.actions;
 
 import org.eclipse.jface.action.ControlContribution;
@@ -64,7 +65,7 @@ public abstract class SearchToolbarControl extends ControlContribution implement
 	protected Control createControl(Composite parent) {
 		SearchComposite searchComposite = new SearchComposite(parent, this);
 		searchComposite.setSearchOnEnter(false);
-		searchComposite.setInitialText(Messages.SearchToolbarControl_InitialText);
+		searchComposite.setInitialText("Type text to filter");
 		return searchComposite;
 	}
 

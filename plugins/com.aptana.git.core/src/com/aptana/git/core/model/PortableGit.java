@@ -79,7 +79,7 @@ public final class PortableGit {
 		return null;
 	}
 	
-	protected static void checkInstallation(IPath location) {
+	public static void checkInstallation(IPath location) {
 		Bundle bundle = getBundle();
 		if (bundle != null) {
 			IPath path = Platform.getStateLocation(bundle);

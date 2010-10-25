@@ -88,13 +88,13 @@ public final class ConnectionPointUtils {
 		return connectionPoint instanceof IBaseRemoteConnectionPoint;
 	}
 
-	private static IConnectionPoint createLocalConnectionPoint(IPath path) {
+	public static IConnectionPoint createLocalConnectionPoint(IPath path) {
 		LocalConnectionPoint connectionPoint = new LocalConnectionPoint(path);
 		connectionPoint.setName(path.toPortableString());
 		return connectionPoint;
 	}
 	
-	private static IConnectionPoint createWorkspaceConnectionPoint(IContainer container) {
+	public static IConnectionPoint createWorkspaceConnectionPoint(IContainer container) {
 		WorkspaceConnectionPoint connectionPoint = new WorkspaceConnectionPoint(container);
 		connectionPoint.setName((container instanceof IProject) ? container.getName() : container.getFullPath().toPortableString());
 		return connectionPoint;

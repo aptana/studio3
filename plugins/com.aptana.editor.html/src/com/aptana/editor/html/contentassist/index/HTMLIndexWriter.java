@@ -94,14 +94,14 @@ public class HTMLIndexWriter
 			attribute.getName(),
 			attribute.getType(),
 			attribute.getElement(),
-			"", // specifications //$NON-NLS-1$
+			"", // specifications
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, attribute.getUserAgents())),
 			attribute.getDeprecated(),
 			attribute.getDescription(),
 			attribute.getHint(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, attribute.getReferences()),
 			attribute.getRemark(),
-			"" // values //$NON-NLS-1$
+			"" // values
 		};
 		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
 
@@ -121,7 +121,7 @@ public class HTMLIndexWriter
 			element.getDisplayName(),
 			element.getRelatedClass(),
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
-			"", // specifications, //$NON-NLS-1$
+			"", // specifications,
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
 			element.getDeprecated(),
 			element.getDescription(),
@@ -146,7 +146,7 @@ public class HTMLIndexWriter
 		String[] columns = new String[] {
 			event.getName(),
 			event.getType(),
-			"", // specifications //$NON-NLS-1$
+			"", // specifications
 			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, event.getUserAgents())),
 			event.getDescription(),
 			event.getRemark()

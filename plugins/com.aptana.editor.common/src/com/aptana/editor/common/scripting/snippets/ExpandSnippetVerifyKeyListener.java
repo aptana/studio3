@@ -36,6 +36,7 @@ package com.aptana.editor.common.scripting.snippets;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
@@ -63,12 +64,15 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 	private ContentAssistant contentAssistant;
 	private boolean canModifyEditor;
 
-	public ExpandSnippetVerifyKeyListener(ITextEditor textEditor, ITextViewer viewer)
+	public ExpandSnippetVerifyKeyListener(ITextEditor textEditor)
 	{
 		this.textEditor = textEditor;
 		this.canModifyEditor = canModifyEditor(textEditor); // Can we cache this value?
-		this.textViewer = viewer;
-
+		Object adapter = textEditor.getAdapter(ITextOperationTarget.class);
+		if (adapter instanceof ITextViewer)
+		{
+			this.textViewer = (ITextViewer) adapter;
+		}
 		document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 
 		contentAssistant = new SnippetsContentAssistant();

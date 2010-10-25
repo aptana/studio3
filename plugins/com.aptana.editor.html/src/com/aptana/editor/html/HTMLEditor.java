@@ -48,8 +48,9 @@ import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
-	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'', '\'', '"', '"', '<', '>', '\u201C',
-		'\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+
+	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
 
 	@Override
 	protected void initializeEditor()

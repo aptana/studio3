@@ -91,7 +91,7 @@ public class ScriptingEngine
 	 * @param scope
 	 * @return
 	 */
-	private ScriptingContainer createScriptingContainer(LocalContextScope scope)
+	public ScriptingContainer createScriptingContainer(LocalContextScope scope)
 	{
 		// ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
 		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.TRANSIENT);
@@ -116,18 +116,11 @@ public class ScriptingEngine
 			}
 
 			result.setHomeDirectory(jrubyHome.getAbsolutePath());
-
-			// TODO Generate two containers? A global one for loading bundles, a threadsafe one for executing commands/snippets/etc?
-			// Pre-load 'ruble' framework files!
-			List<String> loadPaths = result.getLoadPaths();
-			loadPaths.addAll(0, getContributedLoadPaths());
-			result.setLoadPaths(loadPaths);
-			result.runScriptlet("require 'ruble'"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{
-			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
-					new Object[] { e.getMessage() });
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home, new Object[] { e
+					.getMessage() });
 
 			Activator.logError(message, e);
 			ScriptLogger.logError(message);
@@ -197,8 +190,7 @@ public class ScriptingEngine
 	}
 
 	/**
-	 * getFrameworkFiles 
-	 * Used by "ruble.rb" DO NOT REMOVE!
+	 * getFrameworkFiles
 	 * 
 	 * @return
 	 */
@@ -243,7 +235,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public static synchronized ScriptingEngine getInstance()
+	public static ScriptingEngine getInstance()
 	{
 		if (instance == null)
 		{
@@ -258,11 +250,11 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public synchronized ScriptingContainer getScriptingContainer()
+	public ScriptingContainer getScriptingContainer()
 	{
 		if (this._scriptingContainer == null)
 		{
-			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.SINGLETON);
+			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.THREADSAFE);
 		}
 
 		return this._scriptingContainer;
@@ -290,7 +282,7 @@ public class ScriptingEngine
 	{
 		return this.runScript(fullPath, loadPaths, this._runType, async);
 	}
-
+	
 	/**
 	 * runScript
 	 * 

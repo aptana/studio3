@@ -41,26 +41,21 @@ import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 
 /**
  * @author Max Stepanov
+ *
  */
-public class RXMLEditor extends AbstractThemeableEditor
-{
-	/*
-	 * (non-Javadoc)
+public class RXMLEditor extends AbstractThemeableEditor {
+
+	/* (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
 	 */
 	@Override
-	protected void initializeEditor()
-	{
-		super.initializeEditor();
+    protected void initializeEditor() {
+        super.initializeEditor();
 
-		setSourceViewerConfiguration(new RXMLSourceViewerConfiguration(getPreferenceStore(), this));
-		setDocumentProvider(new RXMLDocumentProvider());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
+        setSourceViewerConfiguration(new RXMLSourceViewerConfiguration(getPreferenceStore(), this));
+        setDocumentProvider(new RXMLDocumentProvider());
+    }
+	
 	@Override
 	protected FileService createFileService()
 	{

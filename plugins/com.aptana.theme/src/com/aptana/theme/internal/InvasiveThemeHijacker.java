@@ -65,7 +65,6 @@ import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -206,7 +205,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.remove("org.eclipse.debug.ui.outColor");
 			prefs.remove("org.eclipse.debug.ui.inColor");
 			prefs.remove("org.eclipse.debug.ui.consoleBackground");
-			prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND");
 		}
 		else
 		{
@@ -217,7 +215,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
 					currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
-			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable")));
 		}
 		if (monitor.isCanceled())
 		{
@@ -365,6 +362,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		{
 			IDebugView debug = (IDebugView) view;
 			Viewer viewer = debug.getViewer();
+			// FIXME Highlighted values get their fg messed up so they are unreadable in variables value column
 			hookTheme(viewer, revertToDefaults);
 			return;
 		}
@@ -731,8 +729,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink"); //$NON-NLS-1$
-			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink"); //$NON-NLS-1$
+			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink");
+			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink");
 
 			prefs.put(JFacePreferences.HYPERLINK_COLOR,
 					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
@@ -788,17 +786,12 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("pydevOccurrenceIndicationColor"); //$NON-NLS-1$
-			prefs.remove("currentIPColor"); //$NON-NLS-1$
-			prefs.remove("secondaryIPColor"); //$NON-NLS-1$
 		}
 		else
 		{
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("pydevOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
-			// Override the debug line highlight colors
-			prefs.put("currentIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
-			prefs.put("secondaryIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		try
@@ -935,13 +928,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			return;
 
 		// Force selection color
-		Color existingSelectionBG = sourceViewer.getTextWidget().getSelectionBackground();
-		RGB selectionRGB = getCurrentTheme().getSelectionAgainstBG();
-		if (!existingSelectionBG.getRGB().equals(selectionRGB))
-		{
-			sourceViewer.getTextWidget().setSelectionBackground(
-					ThemePlugin.getDefault().getColorManager().getColor(selectionRGB));
-		}
+		sourceViewer.getTextWidget().setSelectionBackground(
+				ThemePlugin.getDefault().getColorManager().getColor(getCurrentTheme().getSelectionAgainstBG()));
 		if (!Platform.getOS().equals(Platform.OS_MACOSX))
 		{
 			// Linux and windows need selection fg set or we just see a block of color.

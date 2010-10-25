@@ -1,14 +1,37 @@
-/*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
  *
- * Contributors:
- *     Christian Plesner Hansen (plesner@quenta.org) - initial API and implementation
- *     Chris Williams (Aptana)
- *******************************************************************************/
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.peer;
 
 import java.util.HashSet;
@@ -26,7 +49,6 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 /**
@@ -40,8 +62,8 @@ import com.aptana.scope.ScopeSelector;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
-	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
-
+	private static final ScopeSelector fgCommentSelector = new ScopeSelector(
+			Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
@@ -142,9 +164,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 
-		String currentScope = getScopeAtOffset(doc, charOffset);
 		// Drop out if the char is inside a comment
-		if (fgCommentSelector.matches(currentScope))
+		if (fgCommentSelector.matches(getScopeAtOffset(doc, charOffset)))
 		{
 			return null;
 		}

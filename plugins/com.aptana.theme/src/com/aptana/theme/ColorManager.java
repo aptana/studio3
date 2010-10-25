@@ -37,7 +37,6 @@ package com.aptana.theme;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -45,7 +44,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * @author Kevin Lindsey
  */
-public class ColorManager implements ISharedTextColors
+public class ColorManager
 {
 	// TODO Hook an auto dispose like ColorRegistry when display is disposed?
 	protected Map<RGB, Color> _colorsByRGB = new HashMap<RGB, Color>(10);

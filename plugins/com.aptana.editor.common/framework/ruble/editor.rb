@@ -1,4 +1,5 @@
 require "java"
+require "addressable/uri"
 require "ruble/ui"
 
 module Ruble
@@ -10,7 +11,6 @@ module Ruble
       # there's a registered handler for the scheme. Local files should always open.
       def open(absolute_path)
         uri = absolute_path
-        require "addressable/uri"
         # We use Addressable::URI instead of standard URI class to be able to parse windows paths correctly
         uri = Addressable::URI.convert_path(uri) if !uri.respond_to? :scheme
         absolute_path = uri.path

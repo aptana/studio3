@@ -34,8 +34,6 @@
  */
 package com.aptana.parsing.lexer;
 
-import java.text.MessageFormat;
-
 public class Range implements IRange
 {
 	public static final Range EMPTY = new Range(0, -1);
@@ -141,6 +139,6 @@ public class Range implements IRange
 	@Override
 	public String toString()
 	{
-		return MessageFormat.format("[{0},{1}]", fStart, fEnd); //$NON-NLS-1$
+		return "[" + fStart + "," + fEnd + "]";
 	}
 }

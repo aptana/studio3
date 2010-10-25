@@ -186,12 +186,12 @@ public class GitPlugin extends Plugin
 	 * FIXME This doesn't seem like the best place to stick this.
 	 * 
 	 * @param commit
-	 * @param repoRelativePath
+	 * @param fileName
 	 * @return
 	 */
-	public static IFileRevision revisionForCommit(GitCommit commit, IPath repoRelativePath)
+	public static IFileRevision revisionForCommit(GitCommit commit, String fileName)
 	{
-		return new CommitFileRevision(commit, repoRelativePath);
+		return new CommitFileRevision(commit, fileName);
 	}
 
 	public IPath getGIT_SSH()
