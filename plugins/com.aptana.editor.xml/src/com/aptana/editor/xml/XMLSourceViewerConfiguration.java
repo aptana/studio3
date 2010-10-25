@@ -35,43 +35,31 @@
 package com.aptana.editor.xml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-public class XMLSourceViewerConfiguration extends CommonSourceViewerConfiguration {
-
-    public XMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-        super(preferences, editor);
-    }
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
+public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+{
+	/**
+	 * XMLSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
 	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(new String[][] {
-				{ IDocument.DEFAULT_CONTENT_TYPE },
-				XMLSourceConfiguration.CONTENT_TYPES
-			});
+	public XMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
 	}
 
-	public String[][] getTopContentTypes() {
-		return XMLSourceConfiguration.getDefault().getTopContentTypes();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source.ISourceViewer)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
 	 */
 	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		XMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return XMLSourceConfiguration.getDefault();
 	}
 }

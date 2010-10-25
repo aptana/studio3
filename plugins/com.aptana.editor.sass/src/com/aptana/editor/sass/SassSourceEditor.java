@@ -39,7 +39,10 @@ import com.aptana.editor.common.parsing.FileService;
 
 public class SassSourceEditor extends AbstractThemeableEditor
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
@@ -48,7 +51,11 @@ public class SassSourceEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new SassDocumentProvider());
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
 	@Override
 	protected FileService createFileService()
 	{

@@ -10,6 +10,12 @@
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             name="%command.filter.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="%command.format.description"
+            id="com.aptana.editor.commands.Format"
+            name="%command.format.name">
+      </command>
        <command
              categoryId="org.eclipse.ui.category.views"
              defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
@@ -158,6 +164,19 @@
                id="level"
                value="9">
          </parameter>
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.Format"
+            contextId="com.aptana.scripting.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+F">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.Format"
+            contextId="com.aptana.scripting.context"
+            platform="gtk"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC CTRL+F">
       </key>
 
    </extension>
@@ -479,7 +498,13 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="%page.name.0"/>            
+            name="%page.name.0"/>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.TasksPreferencePage"
+            id="com.aptana.editor.common.preferences.TasksPreferencePage"
+            name="%page.tasks.name">
+      </page>            
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">

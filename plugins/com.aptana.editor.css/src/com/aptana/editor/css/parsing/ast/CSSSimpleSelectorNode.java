@@ -58,6 +58,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 
 	public CSSSimpleSelectorNode(Symbol typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
+		super(CSSNodeTypes.SIMPLE_SELECTOR);
 		fTypeSelector = (typeSelector == null) ? null : typeSelector.value.toString();
 		setChildren(attributeSelectors);
 

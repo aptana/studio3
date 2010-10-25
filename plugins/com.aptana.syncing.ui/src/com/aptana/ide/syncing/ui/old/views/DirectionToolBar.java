@@ -207,7 +207,7 @@ public class DirectionToolBar
 		directionBar.setLayout(layout);
 
 		fDirectionDown = new ToolItem(directionBar, SWT.DROP_DOWN);
-		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/sync_both.gif")); //$NON-NLS-1$
+		fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/elcl16/arrow_up_down.png")); //$NON-NLS-1$
 
 		final Menu directionMenu = new Menu(directionBar);
 		fDirectionDown.addSelectionListener(new SelectionAdapter()
@@ -293,27 +293,27 @@ public class DirectionToolBar
 	{
 		if (fBoth.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_both.gif")); //$NON-NLS-1$
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/elcl16/arrow_up_down.png")); //$NON-NLS-1$
 			// fDirectionDown.setText(fBoth.getText());
 		}
 		else if (fUpload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload.gif")); //$NON-NLS-1$
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/elcl16/arrow_up.png")); //$NON-NLS-1$
 			// fDirectionDown.setText(fUpload.getText());
 		}
 		else if (fForceUpload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_upload_force.gif")); //$NON-NLS-1$
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/arrow_up_emphasis.png")); //$NON-NLS-1$
 			// fDirectionDown.setText(fForceUpload.getText());
 		}
 		else if (fDownload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download.gif")); //$NON-NLS-1$
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/elcl16/arrow_down.png")); //$NON-NLS-1$
 			// fDirectionDown.setText(fDownload.getText());
 		}
 		else if (fForceDownload.getSelection())
 		{
-			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/direction_download_force.gif")); //$NON-NLS-1$
+			fDirectionDown.setImage(SyncingUIPlugin.getImage("icons/full/obj16/arrow_down_emphasis.png")); //$NON-NLS-1$
 			// fDirectionDown.setText(fForceDownload.getText());
 		}
 	}

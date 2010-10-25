@@ -95,26 +95,6 @@ public class UIPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
-	/**
-	 * logInfo
-	 * 
-	 * @param string
-	 */
-	public static void logInfo(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
-	}
-
-	/**
-	 * logWarning
-	 * 
-	 * @param msg
-	 */
-	public static void logWarning(String msg)
-	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, msg));
-	}
-
 	public static Image getImage(String string)
 	{
 		if (getDefault().getImageRegistry().get(string) == null)

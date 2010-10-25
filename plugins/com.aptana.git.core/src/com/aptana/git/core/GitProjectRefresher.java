@@ -34,11 +34,13 @@
  */
 package com.aptana.git.core;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -85,7 +87,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		refreshResources(e.getFilesWithChanges(), IResource.DEPTH_ZERO);
 	}
 
-	protected void refreshAffectedProjects(GitRepository repo)
+	private void refreshAffectedProjects(GitRepository repo)
 	{
 		final Set<IProject> affectedProjects = new HashSet<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
@@ -98,7 +100,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		refreshResources(affectedProjects, IResource.DEPTH_INFINITE);
 	}
 
-	protected IGitRepositoryManager getRepositoryManager()
+	private IGitRepositoryManager getRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
@@ -119,6 +121,33 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 				{
 					if (sub.isCanceled())
 						return Status.CANCEL_STATUS;
+					if (resource.getType() == IResource.PROJECT)
+					{
+						// Check to see if this project exists in the new branch! If not, auto-close the project, or
+						// just not refresh it?
+						File dir = resource.getLocation().toFile();
+						if (!dir.exists())
+						{
+							// Close the project, this actually causes the .project file to get generated, though!
+							try
+							{
+								resource.getProject().close(sub.newChild(100));
+							}
+							catch (CoreException e)
+							{
+								if (e.getStatus().getSeverity() > IStatus.WARNING)
+								{
+									throw e;
+								}
+							}
+							File dotProject = new File(dir, IProjectDescription.DESCRIPTION_FILE_NAME);
+							if (dotProject.delete())
+							{
+								dir.delete();
+							}
+							continue;
+						}
+					}
 					resource.refreshLocal(depth, sub.newChild(100));
 				}
 				sub.done();

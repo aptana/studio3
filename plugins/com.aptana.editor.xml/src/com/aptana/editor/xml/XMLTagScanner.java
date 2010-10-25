@@ -47,9 +47,9 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 
 public class XMLTagScanner extends RuleBasedScanner
@@ -93,8 +93,11 @@ public class XMLTagScanner extends RuleBasedScanner
 		};
 		rules.add(wordRule);
 
-		rules.add(new SingleCharacterRule('>', createToken("punctuation.definition.tag.xml"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('=', createToken("punctuation.separator.key-value.xml"))); //$NON-NLS-1$
+		CharacterMapRule rule = new CharacterMapRule();
+		rule.add('>', createToken("punctuation.definition.tag.xml")); //$NON-NLS-1$
+		rule.add('=', createToken("punctuation.separator.key-value.xml")); //$NON-NLS-1$
+		rules.add(rule);
+		// FIXME Use a word/extend word rule here to avoid slow regexp rule?
 		rules.add(new RegexpRule("<(/)?", createToken("punctuation.definition.tag.xml"), true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Tag names

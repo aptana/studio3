@@ -184,6 +184,7 @@ public class TerminalTextData implements ITerminalTextData {
 	 * Removes the snapshot from the @observer@ list
 	 * @param snapshot A snapshot of a terminal model
 	 */
+	@SuppressWarnings({"unchecked","rawtypes"})
 	protected void removeSnapshot(TerminalTextDataSnapshot snapshot) {
 		// poor mans approach to modify the array
 		List list=new ArrayList();
@@ -192,6 +193,7 @@ public class TerminalTextData implements ITerminalTextData {
 		fSnapshots=(TerminalTextDataSnapshot[]) list.toArray(new TerminalTextDataSnapshot[list.size()]);
 	}
 
+	@SuppressWarnings({"unchecked","rawtypes"})
 	public ITerminalTextDataSnapshot makeSnapshot() {
 		// poor mans approach to modify the array
 		TerminalTextDataSnapshot snapshot=new TerminalTextDataSnapshot(this);

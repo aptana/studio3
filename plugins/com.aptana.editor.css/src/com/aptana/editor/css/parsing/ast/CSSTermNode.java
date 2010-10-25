@@ -43,7 +43,7 @@ public class CSSTermNode extends CSSExpressionNode
 
 	public CSSTermNode(Symbol term)
 	{
-		super(term.getStart(), term.getEnd());
+		super(CSSNodeTypes.TERM, term.getStart(), term.getEnd());
 		fTerm = term.value.toString();
 	}
 

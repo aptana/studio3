@@ -12,25 +12,12 @@
       <page
             class="com.aptana.ui.properties.ProjectNaturesPage"
             id="com.aptana.ui.propertyPages.projectnatures"
-            name="Project Natures">
+            name="%page.projectnatures.name">
          <enabledWhen>
             <and>
                <adapt
                      type="org.eclipse.core.resources.IProject">
                </adapt>
-               <or>
-                  <test
-                        property="com.aptana.ui.project.nature">
-                  </test>
-                  <test
-                        args="aptana"
-                        property="com.aptana.ui.project.nature">
-                  </test>
-                  <test
-                        args="org.radrails.rails.core.railsnature"
-                        property="com.aptana.ui.project.nature">
-                  </test>
-               </or>
             </and>
          </enabledWhen>
       </page>

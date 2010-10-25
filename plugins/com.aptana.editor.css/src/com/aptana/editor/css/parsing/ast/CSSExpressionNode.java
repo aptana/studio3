@@ -39,6 +39,11 @@ public class CSSExpressionNode extends CSSNode
 
 	public CSSExpressionNode(int start, int end)
 	{
-		super(start, end);
+		super(CSSNodeTypes.EXPRESSION, start, end);
+	}
+
+	public CSSExpressionNode(short type, int start, int end)
+	{
+		super(type, start, end);
 	}
 }

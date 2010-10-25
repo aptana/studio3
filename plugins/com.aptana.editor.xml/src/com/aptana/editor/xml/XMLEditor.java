@@ -43,22 +43,35 @@ import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
 import com.aptana.editor.xml.parsing.IXMLParserConstants;
 
-public class XMLEditor extends AbstractThemeableEditor {
+public class XMLEditor extends AbstractThemeableEditor
+{
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
+	@Override
+	protected void initializeEditor()
+	{
+		super.initializeEditor();
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new XMLDocumentProvider());
+	}
 
-        setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new XMLDocumentProvider());
-    }
-    
-    @Override
-    protected FileService createFileService()
-    {
-    	return new FileService(IXMLParserConstants.LANGUAGE);
-    }
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
+	@Override
+	protected FileService createFileService()
+	{
+		return new FileService(IXMLParserConstants.LANGUAGE);
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
 	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
@@ -69,6 +82,10 @@ public class XMLEditor extends AbstractThemeableEditor {
 		return outline;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
+	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{

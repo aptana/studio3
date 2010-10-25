@@ -56,6 +56,7 @@ import org.eclipse.tm.terminal.model.Style;
  * It can either be vertically or horizontally scrolled.
  * The CellRenderer is responsible for painting the cell.
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class TextCanvas extends GridCanvas {
 
 	private static final String HYPERLINK_DETECTOR_EXT_PT = TerminalPlugin.PLUGIN_ID + ".terminalHyperlinkDetectors"; //$NON-NLS-1$

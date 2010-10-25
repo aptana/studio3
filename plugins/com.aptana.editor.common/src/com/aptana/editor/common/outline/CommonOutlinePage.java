@@ -75,6 +75,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
@@ -300,13 +301,12 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 					return Status.CANCEL_STATUS;
 				}
 
-				fTreeViewer.getControl().setRedraw(false);
 				fTreeViewer.refresh();
-				if (fSearchBox.getText().length() > 0)
+				String text = fSearchBox.getText();
+				if (!StringUtil.isEmpty(text) && !INITIAL_FILTER_TEXT.equals(text))
 				{
 					fTreeViewer.expandAll();
 				}
-				fTreeViewer.getControl().setRedraw(true);
 				return Status.OK_STATUS;
 			}
 		};

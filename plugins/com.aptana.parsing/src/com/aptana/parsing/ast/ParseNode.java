@@ -85,7 +85,7 @@ public class ParseNode extends Node implements IParseNode
 		fLanguage = language;
 		fChildren = new IParseNode[0];
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see beaver.spec.ast.Node#accept(beaver.spec.ast.TreeWalker)
@@ -155,6 +155,10 @@ public class ParseNode extends Node implements IParseNode
 		if (!getLanguage().equals(other.getLanguage()))
 			return false;
 
+		// Same type
+		if (getNodeType() != other.getNodeType())
+			return false;
+
 		// Must have same parent
 		if (getParent() == null)
 		{
@@ -162,10 +166,6 @@ public class ParseNode extends Node implements IParseNode
 				return false;
 		}
 		else if (!getParent().equals(other.getParent()))
-			return false;
-
-		// Same type
-		if (getNodeType() != other.getNodeType())
 			return false;
 
 		// That's about the best we can check from here, since offsets can change a lot. Should really also check
@@ -202,7 +202,7 @@ public class ParseNode extends Node implements IParseNode
 	public int getChildIndex(IParseNode child)
 	{
 		int result = -1;
-		
+
 		for (int i = 0; i < fChildrenCount; i++)
 		{
 			if (fChildren[i] == child)
@@ -211,10 +211,10 @@ public class ParseNode extends Node implements IParseNode
 				break;
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getIndex()
@@ -225,7 +225,7 @@ public class ParseNode extends Node implements IParseNode
 
 		// grab parent
 		IParseNode parent = getParent();
-		
+
 		// get child index of this node, if parent exists
 		if (parent != null)
 		{
@@ -283,20 +283,20 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode getNextNode()
 	{
 		IParseNode result = this.getFirstChild();
-		
+
 		if (result == null)
 		{
 			result = this.getNextSibling();
 		}
-		
+
 		if (result == null)
 		{
 			IParseNode parent = this.getParent();
-			
+
 			while (parent != null)
 			{
 				IParseNode candidate = parent.getNextSibling();
-				
+
 				if (candidate != null)
 				{
 					result = candidate;
@@ -308,10 +308,10 @@ public class ParseNode extends Node implements IParseNode
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getFirstChild()
@@ -319,15 +319,15 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode getFirstChild()
 	{
 		IParseNode result = null;
-		
+
 		if (this.hasChildren())
 		{
 			result = this.getChild(0);
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getFollowingSibling()
@@ -336,18 +336,18 @@ public class ParseNode extends Node implements IParseNode
 	{
 		IParseNode parent = this.getParent();
 		IParseNode result = null;
-		
+
 		if (parent != null)
 		{
 			// get index of potential sibling
 			int index = this.getIndex() + 1;
-			
+
 			if (index < parent.getChildCount())
 			{
 				result = parent.getChild(index);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -376,15 +376,15 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode getLastChild()
 	{
 		IParseNode result = null;
-		
+
 		if (this.hasChildren())
 		{
 			result = this.getChild(this.getChildCount() - 1);
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getNameNode()
@@ -442,26 +442,26 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode getPreviousNode()
 	{
 		IParseNode result = this.getPreviousSibling();
-		
+
 		if (result != null)
 		{
 			IParseNode candidate = result.getLastChild();
-			
+
 			while (candidate != null)
 			{
 				result = candidate;
 				candidate = candidate.getLastChild();
 			}
 		}
-		
+
 		if (result == null)
 		{
 			result = this.getParent();
 		}
-		
+
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.IParseNode#getPrecedingSibling()
@@ -470,21 +470,21 @@ public class ParseNode extends Node implements IParseNode
 	{
 		IParseNode parent = this.getParent();
 		IParseNode result = null;
-		
+
 		if (parent != null)
 		{
 			// get index of potential sibling
 			int index = this.getIndex() - 1;
-			
+
 			if (index >= 0)
 			{
 				result = parent.getChild(index);
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getRootNode
 	 * 
@@ -493,11 +493,11 @@ public class ParseNode extends Node implements IParseNode
 	public IParseNode getRootNode()
 	{
 		IParseNode root = this;
-		
+
 		while (true)
 		{
 			IParseNode parent = root.getParent();
-			
+
 			if (parent == null)
 			{
 				break;
@@ -507,10 +507,10 @@ public class ParseNode extends Node implements IParseNode
 				root = parent;
 			}
 		}
-		
+
 		return root;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.lexer.IRange#getStartingOffset()
@@ -546,7 +546,7 @@ public class ParseNode extends Node implements IParseNode
 	{
 		return this.getChildCount() > 0;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -555,7 +555,8 @@ public class ParseNode extends Node implements IParseNode
 	{
 		int hash = 31 + getLanguage().hashCode();
 		hash = hash * 31 + getNodeType();
-		hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
+		// TODO Can we do something other than recursively go up the stack asking for hashcodes?
+		// hash = hash * 31 + (getParent() == null ? 0 : getParent().hashCode());
 		return hash;
 	}
 

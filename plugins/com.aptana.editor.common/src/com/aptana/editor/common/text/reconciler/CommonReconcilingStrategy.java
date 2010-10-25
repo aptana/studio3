@@ -127,7 +127,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fPositions.clear();
 		try
 		{
-			fPositions = folder.emitFoldingRegions(fPositions, monitor);
+			fPositions = folder.emitFoldingRegions(monitor);
 		}
 		catch (BadLocationException e)
 		{

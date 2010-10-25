@@ -61,6 +61,7 @@ public final class SyncModelBuilder
 	 * @param pairs
 	 * @return - the root of the syncing model
 	 */
+	@SuppressWarnings("deprecation")
 	public static SyncFolder buildSyncFolder(IConnectionPoint sourceConnectionPoint, IConnectionPoint destConnectionPoint, VirtualFileSyncPair[] pairs)
 	{
 		SyncFolder root = new SyncFolder(new Path("/"), null, null); //$NON-NLS-1$
@@ -150,7 +151,7 @@ public final class SyncModelBuilder
 		boolean found;
 		for (IFileStore file : ignoredFiles)
 		{
-			realPath = new Path(EFSUtils.getRelativePath(sourceConnectionPoint, file));
+			realPath = new Path(EFSUtils.getRelativePath(sourceConnectionPoint, file, null));
 			parent = root;
 			found = true;
 			for (int i = 0; i < realPath.segmentCount(); i++)

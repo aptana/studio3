@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.parsing;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- beaver;bundle-version="1.0.0",
- com.aptana.core;bundle-version="3.0.0"
+ beaver,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.parsing,

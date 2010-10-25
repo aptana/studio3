@@ -52,6 +52,7 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -191,8 +192,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		if (commentScanner == null)
 		{
-			commentScanner = new RuleBasedScanner();
-			commentScanner.setDefaultReturnToken(getToken("comment.sass")); //$NON-NLS-1$
+			commentScanner = new CommentScanner(getToken("comment.sass")); //$NON-NLS-1$
 		}
 		return commentScanner;
 	}

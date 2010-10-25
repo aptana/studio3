@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mocks
+Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.testing.mocks
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: APTANA
+Bundle-Vendor: %providerName
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: lib/cglib-nodep-2.1_3.jar,
  lib/hamcrest-core-1.1.jar,
@@ -47,4 +47,4 @@ Export-Package: net.sf.cglib.asm,
  org.objenesis.instantiator.jrockit,
  org.objenesis.instantiator.sun,
  org.objenesis.strategy
-Require-Bundle: org.eclipse.core.runtime;bundle-version="3.4.0"
+Require-Bundle: org.eclipse.core.runtime

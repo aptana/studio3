@@ -43,7 +43,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +51,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -65,6 +65,7 @@ import org.jruby.RubyRegexp;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
@@ -366,7 +367,7 @@ public class BundleManager
 	 * @param matchedPattern
 	 * @return
 	 */
-	private boolean betterMatch(ScopeSelector matchedScope, String scope, String matchedPattern)
+	private boolean betterMatch(IScopeSelector matchedScope, String scope, String matchedPattern)
 	{
 		if (matchedScope.matches(scope) == false)
 		{
@@ -707,6 +708,30 @@ public class BundleManager
 				BundleEntry entry = this._entriesByName.get(name);
 
 				result = entry.getEnvs();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getBundlePairs
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public SmartTypingPairsElement[] getBundlePairs(String name)
+	{
+		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
+
+		synchronized (entryNamesLock)
+		{
+			if (this._entriesByName != null && this._entriesByName.containsKey(name))
+			{
+				// grab all bundles of the given name
+				BundleEntry entry = this._entriesByName.get(name);
+
+				result = entry.getPairs();
 			}
 		}
 
@@ -1243,32 +1268,38 @@ public class BundleManager
 	public ProjectTemplate[] getProjectTemplates()
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
-		List<BundleElement> bundles;
-		while (iter.hasNext())
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
 		{
-			bundles = iter.next();
-			for (BundleElement bundle : bundles)
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplates();
+			for (ProjectTemplate template : templates)
 			{
-				result.addAll(Arrays.asList(bundle.getProjectTemplates()));
+				result.add(template);
 			}
 		}
+
 		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
 	public ProjectTemplate[] getProjectTemplatesByType(Type type)
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-		Iterator<List<BundleElement>> iter = _bundlesByPath.values().iterator();
-		List<BundleElement> bundles;
-		while (iter.hasNext())
+
+		BundleEntry bundleEntry;
+		ProjectTemplate[] templates;
+		for (String bundleName : this.getBundleNames())
 		{
-			bundles = iter.next();
-			for (BundleElement bundle : bundles)
+			bundleEntry = this.getBundleEntry(bundleName);
+			templates = bundleEntry.getProjectTemplatesByType(type);
+			for (ProjectTemplate template : templates)
 			{
-				result.addAll(Arrays.asList(bundle.getProjectTemplatesByType(type)));
+				result.add(template);
 			}
 		}
+
 		return result.toArray(new ProjectTemplate[result.size()]);
 	}
 
@@ -1537,7 +1568,6 @@ public class BundleManager
 					sub.subTask(script.getAbsolutePath());
 					loadScript(script, true, bundleLoadPaths);
 					sub.worked(1);
-					Thread.yield();
 				}
 			}
 			sub.done();
@@ -1565,7 +1595,13 @@ public class BundleManager
 	{
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			File projectDirectory = project.getLocation().toFile();
+			IPath location = project.getLocation();
+			if (location == null)
+			{
+				// Log that it was null somehow to track down when this occurs?
+				continue;
+			}
+			File projectDirectory = location.toFile();
 			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
 
 			for (File bundle : this.getBundleDirectories(bundlesDirectory))
@@ -1985,6 +2021,41 @@ public class BundleManager
 		for (String name : this.getBundleNames())
 		{
 			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public List<SmartTypingPairsElement> getPairs(IModelFilter filter)
+	{
+
+		IModelFilter caFilter = new IModelFilter()
+		{
+
+			public boolean include(AbstractElement element)
+			{
+				return element instanceof SmartTypingPairsElement;
+			}
+		};
+		if (filter != null)
+		{
+			filter = new AndFilter(filter, caFilter);
+		}
+		else
+		{
+			filter = caFilter;
+		}
+
+		List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
+		for (String name : this.getBundleNames())
+		{
+			for (SmartTypingPairsElement command : this.getBundlePairs(name))
 			{
 				if (filter.include(command))
 				{

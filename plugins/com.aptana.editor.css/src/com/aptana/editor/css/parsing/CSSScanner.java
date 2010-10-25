@@ -35,6 +35,8 @@
 package com.aptana.editor.css.parsing;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -45,6 +47,8 @@ import beaver.Scanner;
 import beaver.Symbol;
 
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.parsing.lexer.IRange;
+import com.aptana.parsing.lexer.Range;
 
 public class CSSScanner extends Scanner
 {
@@ -52,9 +56,12 @@ public class CSSScanner extends Scanner
 	private CSSTokenScanner fTokenScanner;
 	private IDocument fDocument;
 
+	private List<IRange> fComments;
+
 	public CSSScanner()
 	{
 		fTokenScanner = new CSSTokenScanner();
+		fComments = new ArrayList<IRange>();
 	}
 
 	public void setSource(String text)
@@ -66,6 +73,12 @@ public class CSSScanner extends Scanner
 	{
 		fDocument = document;
 		fTokenScanner.setRange(fDocument, 0, fDocument.getLength());
+		fComments.clear();
+	}
+
+	public IRange[] getComments()
+	{
+		return fComments.toArray(new IRange[fComments.size()]);
 	}
 
 	@Override
@@ -75,7 +88,13 @@ public class CSSScanner extends Scanner
 		Object data = token.getData();
 		while (token.isWhitespace() || (data != null && data.equals(CSSTokenType.COMMENT)))
 		{
-			// ignores whitespace and comments
+			// ignores whitespace and keeps a record of the comments
+			if (CSSTokenType.COMMENT.equals(data))
+			{
+				int offset = fTokenScanner.getTokenOffset();
+				int length = fTokenScanner.getTokenLength();
+				fComments.add(new Range(offset, offset + length - 1));
+			}
 			token = fTokenScanner.nextToken();
 			data = token.getData();
 		}
