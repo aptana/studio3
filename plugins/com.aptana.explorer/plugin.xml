@@ -997,6 +997,17 @@
                commandId="com.aptana.explorer.commands.toggleChangedFilesFilter"
                icon="icons/full/elcl16/filter.png"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               
+                  <with
+                        variable="activePartId">
+                     <equals
+                           value="com.aptana.explorer.view">
+                     </equals>
+                  </with>
+               
+            </visibleWhen>
          </command>
       </menuContribution>
    </extension>
