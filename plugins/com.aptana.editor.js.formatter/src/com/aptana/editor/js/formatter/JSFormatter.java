@@ -57,7 +57,6 @@ import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ParseState;
-import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
@@ -239,7 +238,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @param input
 	 *            The String input
 	 * @param parseResult
-	 *            A JavaScript parser result - {@link IParseNode}
+	 *            A JavaScript parser result - {@link com.aptana.parsing.ast.IParseNode}
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @return A formatted string

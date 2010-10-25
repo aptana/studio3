@@ -53,7 +53,7 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
-	private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("(/\\*.*)|(\\*.*)|(\\*/)"); //$NON-NLS-1$
+	private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("(\\S.*)"); //$NON-NLS-1$
 	private static final String MULTI_LINE_COMMENT_PREFIX = "/*"; //$NON-NLS-1$
 
 	/**
