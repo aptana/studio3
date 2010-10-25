@@ -24,7 +24,6 @@ public class RubyFormatterModifyDialog extends FormatterModifyDialog
 	public RubyFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle(Messages.RubyFormatterModifyDialog_rubyFormatterTitle);
 	}
 
 	protected void addPages()

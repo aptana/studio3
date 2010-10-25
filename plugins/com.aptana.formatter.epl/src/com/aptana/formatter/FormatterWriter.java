@@ -523,11 +523,19 @@ public class FormatterWriter implements IFormatterWriter
 		this.wrapLength = wrapLength;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#isPreserveSpaces()
+	 */
 	public boolean isPreserveSpaces()
 	{
 		return preserveSpaces;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#setPreserveSpaces(boolean)
+	 */
 	public void setPreserveSpaces(boolean preserveSpaces)
 	{
 		this.preserveSpaces = preserveSpaces;

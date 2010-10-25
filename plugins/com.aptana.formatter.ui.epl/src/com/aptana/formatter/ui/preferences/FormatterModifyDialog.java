@@ -89,11 +89,11 @@ public abstract class FormatterModifyDialog extends StatusDialog implements IFor
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
-	public void setProfileManager(IProfileManager manager)
+	public void setProfileManager(IProfileManager manager, String title)
 	{
 		this.manager = manager;
 		this.profile = manager.getSelected();
-		setTitle(NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, profile.getName()));
+		setTitle(title);
 	}
 
 	private static IDialogSettings getDialogSettingsSection(IDialogSettings settings, String sectionId)

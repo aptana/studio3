@@ -11,7 +11,7 @@
  *******************************************************************************/
 package com.aptana.formatter.ui;
 
-public class FormatterException extends Exception
+public class FormatterException extends RuntimeException
 {
 
 	private static final long serialVersionUID = -1771588890906618803L;

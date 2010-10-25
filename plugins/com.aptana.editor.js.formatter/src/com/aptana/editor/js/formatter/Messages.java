@@ -32,43 +32,26 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.editor.js.formatter;
 
-package com.aptana.terminal.connector;
-
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * @author Max Stepanov
- *
+ * JS formatter messages
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
  */
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
-
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
-
-	/**
-	 * @throws UnsupportedEncodingException 
-	 * 
-	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) throws UnsupportedEncodingException {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true, LocalTerminalConnector.ENCODING);
-		this.outputFilter = outputFilter;
+public class Messages extends NLS
+{
+	private static final String BUNDLE_NAME = "com.aptana.editor.js.formatter.messages"; //$NON-NLS-1$
+	public static String JSFormatterNodeBuilder_parsingError;
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
-	 */
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
-		}
+	private Messages()
+	{
 	}
-
 }

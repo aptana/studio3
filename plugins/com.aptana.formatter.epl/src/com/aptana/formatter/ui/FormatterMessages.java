@@ -58,6 +58,7 @@ public class FormatterMessages extends NLS
 	public static String FormatterModifyTabPage_showInvisible;
 	public static String FormatterModifyTabPage_preview_label_text;
 	public static String FormatterPreferencePage_settingsLink;
+	public static String Formatter_formatterParsingErrorStatus;
 	public static String ScriptFormattingStrategy_formattingError;
 	public static String ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError;
 	public static String ScriptFormattingStrategy_unexpectedFormatterError;
@@ -77,6 +78,7 @@ public class FormatterMessages extends NLS
 	public static String Formatter_formatterError;
 	public static String Formatter_formatterErrorStatus;
 	public static String Formatter_basicLogFormatterError;
+	public static String Formatter_formatterErrorCompletedWithErrors;
 	public static String RubyFormatterIndentationTabPage_declarationWithinClassBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinMethodBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinModuleBody;

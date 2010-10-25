@@ -19,6 +19,7 @@ import com.aptana.formatter.IFormatterDocument;
 
 public abstract class FormatterNodeRewriter
 {
+	protected final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
 	/**
 	 * @param root
@@ -142,8 +143,6 @@ public abstract class FormatterNodeRewriter
 		}
 
 	}
-
-	private final List<CommentInfo> comments = new ArrayList<CommentInfo>();
 
 	protected void addComment(int startOffset, int endOffset, Object object)
 	{

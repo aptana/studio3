@@ -54,13 +54,12 @@ public class HTMLFormatterModifyDialog extends FormatterModifyDialog
 	public HTMLFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
 		super(dialogOwner, formatterFactory);
-		setTitle(Messages.HTMLFormatterModifyDialog_htmlFormatterTitle);
 	}
 
 	protected void addPages()
 	{
-		addTabPage(Messages.HTMLFormatterModifyDialog_intentationTabName, new HTMLFormatterIndentationTabPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_newLinesTabName, new HTMLFormatterNewLinesPage(this));
+		addTabPage(Messages.HTMLFormatterModifyDialog_intentationTabName, new HTMLFormatterIndentationTabPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_blankLinesTabName, new HTMLFormatterBlankLinesPage(this));
 		addTabPage(Messages.HTMLFormatterModifyDialog_commentsTabName, new HTMLFormatterCommentsPage(this));
 	}

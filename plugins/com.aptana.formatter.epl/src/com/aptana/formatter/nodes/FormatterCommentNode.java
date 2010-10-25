@@ -28,6 +28,8 @@ public abstract class FormatterCommentNode extends FormatterTextNode
 
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
+		boolean currentCommentState = context.isComment();
+		context.setComment(true);
 		if (getDocument().getBoolean(getWrappingKey()))
 		{
 			final boolean savedWrapping = context.isWrapping();
@@ -39,6 +41,7 @@ public abstract class FormatterCommentNode extends FormatterTextNode
 		{
 			visitor.write(context, getStartOffset(), getEndOffset());
 		}
+		context.setComment(currentCommentState);
 	}
 
 	/**

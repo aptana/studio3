@@ -20,4 +20,10 @@ public class FormatterSyntaxProblemException extends FormatterException
 	{
 		// empty
 	}
+
+	public FormatterSyntaxProblemException(String msg)
+	{
+		super(msg);
+	}
+
 }

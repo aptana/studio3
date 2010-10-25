@@ -34,25 +34,77 @@
  */
 package com.aptana.editor.js.formatter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.aptana.editor.js.formatter.nodes.FormatterJSCommentNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 /**
- * @author Shalom
+ * JavaScript Formatter node rewriter
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
  */
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
+	private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("(/\\*.*)|(\\*.*)|(\\*/)"); //$NON-NLS-1$
+	private static final String MULTI_LINE_COMMENT_PREFIX = "/*"; //$NON-NLS-1$
 
 	/**
-	 * @param parseResult
-	 * @param document
+	 * Constructs a new JSFormatterNodeRewriter
+	 * 
+	 * @param parseResultRoot
 	 */
-	public JSFormatterNodeRewriter(IParseNode parseResult, FormatterDocument document)
+	public JSFormatterNodeRewriter(IParseRootNode parseResultRoot, FormatterDocument document)
 	{
-		// TODO - call super and set up the re-writer to handle JS comments.
+		IParseNode[] comments = parseResultRoot.getCommentNodes();
+		insertComments(document, comments);
+	}
+
+	private void insertComments(FormatterDocument document, IParseNode[] comments)
+	{
+		for (IParseNode node : comments)
+		{
+			// in case we have a multi-line block comment, we actually break the comment to its lines and
+			// create a comment node for each line.
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset() + 1;
+			String commentText = document.get(startingOffset, endingOffset);
+			if (commentText.startsWith(MULTI_LINE_COMMENT_PREFIX))
+			{
+				// Push each line as a comment. Mark the first line as a 'first'.
+				Matcher matcher = COMMENT_LINE_PATTERN.matcher(commentText);
+				boolean isFirstLine = true;
+				while (matcher.find())
+				{
+					int start = matcher.start();
+					int end = matcher.end();
+					addComment(startingOffset + start, startingOffset + end, new JSCommentInfo(true, isFirstLine));
+					isFirstLine = false;
+				}
+			}
+			else
+			{
+				addComment(startingOffset, endingOffset, new JSCommentInfo(false, false));
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#rewrite(com.aptana.formatter.nodes.IFormatterContainerNode)
+	 */
+	@Override
+	public void rewrite(IFormatterContainerNode root)
+	{
+		super.rewrite(root);
+		attachComments(root);
 	}
 
 	/*
@@ -64,7 +116,19 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object)
 	{
-		return null;
+		JSCommentInfo info = (JSCommentInfo) object;
+		return new FormatterJSCommentNode(document, startOffset, endOffset, info.isMultiLine, info.isFirstLine);
 	}
 
+	private class JSCommentInfo
+	{
+		boolean isMultiLine;
+		boolean isFirstLine;
+
+		JSCommentInfo(boolean isMultiLine, boolean isFirstLine)
+		{
+			this.isMultiLine = isMultiLine;
+			this.isFirstLine = isFirstLine;
+		}
+	}
 }

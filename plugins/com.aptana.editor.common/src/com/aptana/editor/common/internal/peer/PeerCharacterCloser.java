@@ -268,7 +268,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
-		return yay.getPairs();
+		return yay == null ? NO_PAIRS: yay.getPairs();
 	}
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException

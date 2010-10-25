@@ -126,6 +126,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 			case JSNodeTypes.ARGUMENTS:
 			case JSNodeTypes.CONDITIONAL:
 			case JSNodeTypes.NAME_VALUE_PAIR:
+			case JSNodeTypes.GET_PROPERTY:
 				return true;
 		}
 		return false;

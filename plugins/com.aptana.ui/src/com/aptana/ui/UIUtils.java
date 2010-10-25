@@ -196,4 +196,33 @@ public final class UIUtils
 	{
 		MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
 	}
+	
+	public static boolean showPromptDialog(final String title, final String message) {
+		if (Display.getCurrent() == null) {
+			UIJob job = new UIJob(title) {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (showPromptDialogUI(title, message)) {
+						return Status.OK_STATUS;
+					}
+					return Status.CANCEL_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.setUser(true);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException e) {
+			}
+			return job.getResult() == Status.OK_STATUS;
+		} else {
+			return showPromptDialogUI(title, message);
+		}
+	}
+	
+	private static boolean showPromptDialogUI(String title, String message) {
+		return MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
+	}
+
 }

@@ -32,43 +32,47 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.editor.js.formatter.nodes;
 
-package com.aptana.terminal.connector;
-
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IStreamMonitor;
-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+import com.aptana.formatter.IFormatterDocument;
 
 /**
- * @author Max Stepanov
- *
+ * @author Shalom
  */
-/* package */ class LocalTerminalOutputListener implements IStreamListener {
+public class FormatterJSLoopNode extends FormatterJSBlockNode
+{
 
-	private PrintStream printStream;
-	private IOutputFilter outputFilter;
+	private boolean hasCurlyBlock;
 
 	/**
-	 * @throws UnsupportedEncodingException 
-	 * 
+	 * @param document
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) throws UnsupportedEncodingException {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true, LocalTerminalConnector.ENCODING);
-		this.outputFilter = outputFilter;
+	public FormatterJSLoopNode(IFormatterDocument document, boolean hasCurlyBlock)
+	{
+		super(document);
+		this.hasCurlyBlock = hasCurlyBlock;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isAddingBeginNewLine()
 	 */
-	public void streamAppended(String text, IStreamMonitor monitor) {
-		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
-		} else {
-			printStream.print(text);
-		}
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		// TODO Auto-generated method stub
+		return !hasCurlyBlock || super.isAddingBeginNewLine();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		// TODO Auto-generated method stub
+		return !hasCurlyBlock || super.isIndenting();
 	}
 
 }

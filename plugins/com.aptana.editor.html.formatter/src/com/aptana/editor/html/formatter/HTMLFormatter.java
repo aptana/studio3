@@ -37,6 +37,7 @@ package com.aptana.editor.html.formatter;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -57,6 +58,7 @@ import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
  * HTML code formatter.
@@ -166,9 +168,21 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 				}
 			}
 		}
-		catch (Exception e)
+		catch (beaver.Parser.Exception e)
 		{
-			FormatterPlugin.logError(e);
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
+			if (FormatterPlugin.DEBUG)
+			{
+				FormatterPlugin.logError(e);
+			}
+		}
+		catch (Throwable t)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(t);
 		}
 		return null;
 	}
@@ -210,8 +224,9 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @return A formatted string
+	 * @throws Exception
 	 */
-	private String format(String input, IParseNode parseResult, int indentationLevel)
+	private String format(String input, IParseNode parseResult, int indentationLevel) throws Exception
 	{
 		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input);
@@ -221,17 +236,9 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH));
 		writer.setLinesPreserve(getInt(HTMLFormatterConstants.PRESERVED_LINES));
-		try
-		{
-			root.accept(context, writer);
-			writer.flush(context);
-			return writer.getOutput();
-		}
-		catch (Exception e)
-		{
-			FormatterPlugin.logError(e);
-			return null;
-		}
+		root.accept(context, writer);
+		writer.flush(context);
+		return writer.getOutput();
 	}
 
 	private FormatterDocument createFormatterDocument(String input)
