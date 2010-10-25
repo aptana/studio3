@@ -178,7 +178,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
-	protected ISiteConnection[] siteConnections;
+	private ISiteConnection[] siteConnections;
 	protected IProject selectedProject;
 
 	/**
@@ -205,13 +205,13 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
 	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
 
-	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
-	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
-	protected static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
-	protected static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
-	protected static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
-	protected static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
-	protected static final String GROUP_EY_COMMANDS = "group.ey"; //$NON-NLS-1$
+	private static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
+	private static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
+	private static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
+	private static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
+	private static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
+	private static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
+	private static final String GROUP_EY_COMMANDS = "group.ey"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(final Composite parent)
@@ -371,7 +371,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
 
-	protected void fillCommandsMenu(MenuManager menuManager)
+	private void fillCommandsMenu(MenuManager menuManager)
 	{
 		// Filtering
 		// Run
@@ -445,7 +445,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		});
 	}
 
-	protected void fillDeployMenu(MenuManager menuManager)
+	private void fillDeployMenu(MenuManager menuManager)
 	{
 		if (selectedProject != null && selectedProject.isAccessible())
 		{
@@ -920,7 +920,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return search;
 	}
 
-	protected void createNavigator(Composite myComposite)
+	private void createNavigator(Composite myComposite)
 	{
 		Composite viewer = new Composite(myComposite, SWT.BORDER);
 		viewer.setLayout(new FillLayout());
@@ -962,7 +962,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		};
 	}
 
-	protected void fixNavigatorManager()
+	private void fixNavigatorManager()
 	{
 		// HACK! This is to fix behavior that Eclipse bakes into
 		// CommonNavigatorManager.UpdateActionBarsJob where it
@@ -1038,7 +1038,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return filter;
 	}
 
-	protected void hideFilterLabel()
+	private void hideFilterLabel()
 	{
 		filterLayoutData.exclude = true;
 		filterComp.setVisible(false);
@@ -1111,7 +1111,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return project;
 	}
 
-	protected void setActiveProject(String projectName)
+	private void setActiveProject(String projectName)
 	{
 		IProject newSelectedProject = null;
 		if (projectName != null && projectName.trim().length() > 0)
@@ -1204,25 +1204,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getCommonViewer().refresh(selectedProject, true);
 	}
 
-	protected void updateViewer(Object... elements)
-	{
-		if (getCommonViewer() == null)
-		{
-			return;
-		}
-		// FIXME Need to update the element plus all it's children recursively
-		// if we want to call "update"
-		// List<Object> nonNulls = new ArrayList<Object>();
-		for (Object element : elements)
-		{
-			if (element == null)
-				continue;
-			// nonNulls.add(element);
-			getCommonViewer().refresh(element);
-		}
-		// getCommonViewer().update(nonNulls.toArray(), null);
-	}
-
 	@Override
 	public void dispose()
 	{
@@ -1232,7 +1213,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		super.dispose();
 	}
 
-	protected IControlThemerFactory getControlThemerFactory()
+	private IControlThemerFactory getControlThemerFactory()
 	{
 		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
@@ -1448,7 +1429,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 	}
 
-	protected void forceOurNewFileWizard(Menu menu)
+	private void forceOurNewFileWizard(Menu menu)
 	{
 		// Hack the New > File entry
 		for (MenuItem menuItem : menu.getItems())

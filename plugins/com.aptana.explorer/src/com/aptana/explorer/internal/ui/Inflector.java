@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class Inflector
+abstract class Inflector
 {
 
 	private static class Replacement
@@ -59,7 +59,7 @@ public abstract class Inflector
 	private static List<Replacement> singulars = new ArrayList<Replacement>();
 	private static List<String> uncountables = new ArrayList<String>();
 
-	public static String singularize(String plural)
+	protected static String singularize(String plural)
 	{
 		if (uncountables.contains(plural.toLowerCase()))
 		{
@@ -76,7 +76,7 @@ public abstract class Inflector
 		return plural;
 	}
 
-	public static String pluralize(String singular)
+	protected static String pluralize(String singular)
 	{
 		if (uncountables.contains(singular.toLowerCase()))
 		{

@@ -95,7 +95,7 @@ class PathFilter extends ViewerFilter
 	 *            the element in the tree to check for a match
 	 * @return true if the element matches the filter pattern
 	 */
-	public boolean isElementVisible(Viewer viewer, Object element)
+	private boolean isElementVisible(Viewer viewer, Object element)
 	{
 		// HACK Ignore tmp and vendor for Rails projects
 		IResource resource = (IResource) element;
@@ -117,7 +117,7 @@ class PathFilter extends ViewerFilter
 		return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
 	}
 
-	protected boolean hasRailsNature() throws CoreException
+	private boolean hasRailsNature() throws CoreException
 	{
 		if (fHasRailsNature == null)
 		{
@@ -162,7 +162,7 @@ class PathFilter extends ViewerFilter
 	 *            the tree element to check
 	 * @return true if the given element has children that matches the filter text
 	 */
-	protected boolean isParentMatch(Viewer viewer, Object element)
+	private boolean isParentMatch(Viewer viewer, Object element)
 	{
 		// TODO Also check if name matches the text matchers!
 
@@ -222,7 +222,7 @@ class PathFilter extends ViewerFilter
 	 *            the tree element to check
 	 * @return true if the given element's label matches the filter text
 	 */
-	protected boolean isLeafMatch(Viewer viewer, Object element)
+	private boolean isLeafMatch(Viewer viewer, Object element)
 	{
 		Boolean result = leafCache.get(element);
 		if (result == null)
@@ -233,7 +233,7 @@ class PathFilter extends ViewerFilter
 		return result;
 	}
 
-	protected boolean doIsLeafMatch(Viewer viewer, Object element)
+	private boolean doIsLeafMatch(Viewer viewer, Object element)
 	{
 		IResource resource = (IResource) element;
 		if (resource.equals(filterResource))
@@ -319,7 +319,7 @@ class PathFilter extends ViewerFilter
 		return false;
 	}
 
-	protected String getFilterResourceURI()
+	private String getFilterResourceURI()
 	{
 		if (fFilterResourceURI == null)
 		{
@@ -344,7 +344,7 @@ class PathFilter extends ViewerFilter
 	 *            the text to match
 	 * @return boolean <code>true</code> if one of the words in text satisfies the match criteria.
 	 */
-	protected boolean wordMatches(String text)
+	private boolean wordMatches(String text)
 	{
 		if (text == null)
 		{
@@ -408,7 +408,7 @@ class PathFilter extends ViewerFilter
 		setPattern(createPatternFromResource(resource));
 	}
 
-	protected String createPatternFromResource(IResource resource)
+	private String createPatternFromResource(IResource resource)
 	{
 		String text = resource.getName();
 		// Try and strip filename down to the resource name!

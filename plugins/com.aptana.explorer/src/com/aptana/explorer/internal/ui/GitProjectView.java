@@ -285,7 +285,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		super.removeFilter();
 	}
 
-	protected boolean setNewBranch(String branchName)
+	private boolean setNewBranch(String branchName)
 	{
 		// Strip off the indicators...
 		branchName = stripIndicators(branchName);
@@ -323,7 +323,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		return false;
 	}
 
-	protected String stripIndicators(String branchName)
+	private String stripIndicators(String branchName)
 	{
 		if (branchName.endsWith(" " + getRightArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
@@ -488,7 +488,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		branchesToolbar.pack();
 	}
 
-	protected String getRightArrowChar()
+	private String getRightArrowChar()
 	{
 		if (Platform.getOS().equals(Platform.OS_MACOSX))
 		{
@@ -497,7 +497,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		return "->"; //$NON-NLS-1$
 	}
 
-	protected String getLeftArrowChar()
+	private String getLeftArrowChar()
 	{
 		if (Platform.getOS().equals(Platform.OS_MACOSX))
 		{
@@ -527,7 +527,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		handleBranchEvent(e.getRepository());
 	}
 
-	protected void refreshUI(final GitRepository repository)
+	private void refreshUI(final GitRepository repository)
 	{
 		// If we get multiple requests queuing up, just cancel current and reschedule
 		if (refreshUIJob != null)
@@ -630,7 +630,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		}
 	}
 
-	protected void addGitChangedFilesFilter()
+	private void addGitChangedFilesFilter()
 	{
 		removeFilter();
 		fChangedFilesFilter = new GitChangedFilesFilter();
@@ -779,7 +779,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		});
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
