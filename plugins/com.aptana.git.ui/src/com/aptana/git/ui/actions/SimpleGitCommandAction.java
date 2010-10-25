@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.dialogs.MessageDialog;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
@@ -121,11 +122,10 @@ public abstract class SimpleGitCommandAction extends GitAction
 						int exitValue = launch.getProcesses()[0].getExitValue();
 						if (exitValue != 0)
 						{
-							return new Status(
-									IStatus.ERROR,
-									GitUIPlugin.getPluginId(),
-									MessageFormat
-											.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), command)); //$NON-NLS-1$
+							// This can often be benign! Like when we try to push and need to pull and merge first!
+							String msg = MessageFormat
+									.format("command returned non-zero exit value. wd: {0}, command: {1}", currentRepo.workingDirectory(), StringUtil.join(" ", command)); //$NON-NLS-2$
+							GitUIPlugin.logWarning(msg);
 						}
 					}
 					catch (CoreException e)
