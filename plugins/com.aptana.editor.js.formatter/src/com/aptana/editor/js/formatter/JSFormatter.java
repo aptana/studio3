@@ -133,7 +133,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new JSFormatterNodeRewriter(parseResult).rewrite(root);
+				new JSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
 				IFormatterContext context = new JSFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
