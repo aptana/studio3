@@ -1,3 +1,1 @@
-I had to replace this with a textile version. It now lives here:
-
-https://radrails.tenderapp.com/faqs/radrails-3/ruble-programming-guide
+The most current version lives here: https://aptanastudio.tenderapp.com/faqs/scripting-aptana-studio/ruble-programming-guide
