@@ -2,7 +2,6 @@ package com.aptana.editor.erb.html;
 
 import junit.framework.TestCase;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -21,14 +20,7 @@ public class CharacterPairMatcherTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-
-		matcher = new CharacterPairMatcher(pairs)
-		{
-			protected String getScopeAtOffset(IDocument doc, int charOffset) throws BadLocationException
-			{
-				return "source.ruby";
-			};
-		};
+		matcher = new CharacterPairMatcher(pairs);
 	}
 
 	@Override
