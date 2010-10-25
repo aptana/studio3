@@ -189,25 +189,25 @@
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.DiffHandler"
             id="com.aptana.git.ui.command.diff"
-            name="Diff">
+            name="%command.diff.name">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.AttachGitRepoHandler"
             id="com.aptana.git.ui.command.attach"
-            name="Initialize Git repository">
+            name="%command.attach.name">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.StashHandler"
             id="com.aptana.git.ui.command.stash"
-            name="Stash">
+            name="%command.stash.name">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.UnstashHandler"
             id="com.aptana.git.ui.command.unstash"
-            name="Unstash">
+            name="%command.unstash.name">
       </command>
    </extension>
    <extension
