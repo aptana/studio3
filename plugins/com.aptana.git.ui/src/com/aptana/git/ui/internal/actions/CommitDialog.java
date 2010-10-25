@@ -106,7 +106,7 @@ import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
 
-public class CommitDialog extends StatusDialog
+class CommitDialog extends StatusDialog
 {
 	private static final String CHANGED_FILE_DATA_KEY = "changedFile"; //$NON-NLS-1$
 
@@ -123,7 +123,7 @@ public class CommitDialog extends StatusDialog
 	private Browser diffArea;
 	private ChangedFile fLastDiffFile;
 
-	public CommitDialog(Shell parentShell, GitRepository gitRepository)
+	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
 		Assert.isNotNull(gitRepository, "Must have a non-null git repository!"); //$NON-NLS-1$

@@ -63,8 +63,8 @@ public class CreateBranchDialog extends InputDialog
 	private GitRepository repo;
 	private Text startPointText;
 	private Button trackButton;
-	protected boolean track;
-	protected String startPoint;
+	private boolean track;
+	private String startPoint;
 
 	public CreateBranchDialog(final Shell parentShell, final GitRepository repo)
 	{

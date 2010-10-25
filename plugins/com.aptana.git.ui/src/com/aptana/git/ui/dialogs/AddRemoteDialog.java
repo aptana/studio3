@@ -50,7 +50,7 @@ public class AddRemoteDialog extends InputDialog
 {
 
 	private Text remoteURIText;
-	protected String remoteURI;
+	private String remoteURI;
 
 	public AddRemoteDialog(final Shell parentShell, String remoteName, String defaultURI)
 	{

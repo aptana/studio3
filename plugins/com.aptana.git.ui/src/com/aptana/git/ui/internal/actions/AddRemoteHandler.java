@@ -15,15 +15,15 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 	protected String[] getCommand()
 	{
 		// Pop open a dialog like create branch!
-		String name = "origin";
-		String url = "";
+		String name = "origin"; //$NON-NLS-1$
+		String url = ""; //$NON-NLS-1$
 		String username = System.getProperty("user.name"); //$NON-NLS-1$
 		if (username == null || username.length() == 0)
 			username = "user"; //$NON-NLS-1$
 		String reponame = "repo";
 		IPath wd = getSelectedRepository().workingDirectory();
 		reponame = wd.lastSegment();
-		if (reponame.endsWith(".git"))
+		if (reponame.endsWith(GitRepository.GIT_DIR))
 			reponame = reponame.substring(0, reponame.length() - 4);
 		url = MessageFormat.format("git://github.com/{0}/{1}.git", username, reponame); //$NON-NLS-1$
 
@@ -53,7 +53,7 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		{
 			return null; // don't let command run!
 		}
-		return new String[] { "remote", "add", finalName[0], finalURL[0] };
+		return new String[] { "remote", "add", finalName[0], finalURL[0] }; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	protected void postLaunch(GitRepository repo)

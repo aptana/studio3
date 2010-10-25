@@ -163,7 +163,7 @@ class CommitGraphTable extends TableViewer
 		});
 	}
 
-	void doPaint(final Event event)
+	private void doPaint(final Event event)
 	{
 		if (event.index == 0)
 		{
@@ -180,7 +180,7 @@ class CommitGraphTable extends TableViewer
 		event.gc.drawString(txt, event.x, event.y + texty, true);
 	}
 
-	static class CommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
+	private static class CommitLabelProvider extends BaseLabelProvider implements ITableLabelProvider
 	{
 
 		private static final SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$

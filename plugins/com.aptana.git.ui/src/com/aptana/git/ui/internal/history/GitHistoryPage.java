@@ -162,7 +162,7 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		return true;
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}
@@ -350,7 +350,7 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 		return null;
 	}
 
-	protected String commitToHTML(GitCommit commit)
+	private String commitToHTML(GitCommit commit)
 	{
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("\\{sha\\}", commit.sha()); //$NON-NLS-1$
@@ -407,7 +407,7 @@ public class GitHistoryPage extends HistoryPage implements IAptanaHistory
 	 * @return true if the input is a ResourceList or an IResource of type FILE, FOLDER or PROJECT and we can show it;
 	 *         false otherwise.
 	 */
-	public static boolean canShowHistoryFor(final Object object)
+	protected static boolean canShowHistoryFor(final Object object)
 	{
 		if (object instanceof IResource[])
 		{

@@ -162,7 +162,7 @@ public abstract class DiffFormatter
 		return html.toString();
 	}
 
-	protected static String injectIntoTemplate(String html)
+	private static String injectIntoTemplate(String html)
 	{
 		InputStream stream = null;
 		try
