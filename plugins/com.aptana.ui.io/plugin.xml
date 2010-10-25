@@ -554,6 +554,9 @@
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
             </or>
          </enablement>
          <commonSorter
