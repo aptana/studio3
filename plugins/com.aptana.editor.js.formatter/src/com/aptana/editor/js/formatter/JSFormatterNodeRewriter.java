@@ -35,6 +35,7 @@
 package com.aptana.editor.js.formatter;
 
 import com.aptana.editor.js.formatter.nodes.FormatterJSCommentNode;
+import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
@@ -49,17 +50,87 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
+	private static final String MULTI_LINE_COMMENT_PREFIX = "/*"; //$NON-NLS-1$
+
 	/**
 	 * Constructs a new JSFormatterNodeRewriter
 	 * 
 	 * @param parseResultRoot
 	 */
-	public JSFormatterNodeRewriter(IParseRootNode parseResultRoot)
+	public JSFormatterNodeRewriter(IParseRootNode parseResultRoot, FormatterDocument document)
 	{
 		IParseNode[] comments = parseResultRoot.getCommentNodes();
+		insertComments(document, comments);
+	}
+
+	private void insertComments(FormatterDocument document, IParseNode[] comments)
+	{
 		for (IParseNode node : comments)
 		{
-			addComment(node.getStartingOffset(), node.getEndingOffset() + 1, node);
+			// in case we have a multi-line block comment, we actually break the comment to its lines and
+			// create a comment node for each line.
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset() + 1;
+			String commentText = document.get(startingOffset, endingOffset);
+			if (commentText.startsWith(MULTI_LINE_COMMENT_PREFIX))
+			{
+				// Push each line as a comment. Mark the first line as a 'first'.
+				// Since we have to maintain the correct offsets, we have to scan manually.We will consume any new line
+				// markers in this process, so any empty lines will be consumed.
+				int length = 0;
+				boolean first = true;
+				boolean foundFirstNonWhite = false;
+				int nextLineStartOffset = startingOffset;
+				int commentEndOffset = nextLineStartOffset;
+				for (int commentOffset = 0; commentOffset < commentText.length(); commentOffset++)
+				{
+					char c = commentText.charAt(commentOffset);
+					if ((c == '\n' || c == '\r') && length > 0)
+					{
+						commentEndOffset = commentOffset + startingOffset;
+						addComment(nextLineStartOffset, commentEndOffset, new JSCommentInfo(true, first));
+						nextLineStartOffset = commentEndOffset + 1;
+						length = 0;
+						first = false;
+						foundFirstNonWhite = false;
+					}
+					else
+					{
+						if (c != '\n' && c != '\r')
+						{
+							if (c == ' ' || c == '\t')
+							{
+								if (foundFirstNonWhite)
+								{
+									length++;
+								}
+								else
+								{
+									nextLineStartOffset++;
+								}
+							}
+							else
+							{
+								foundFirstNonWhite = true;
+								length++;
+							}
+						}
+						else
+						{
+							nextLineStartOffset++;
+						}
+					}
+				}
+				// Deal with the last line. Make sure that we trim any initial spaces and mark the start where the
+				// asterisk char is located.
+				int asteriskoffset = startingOffset
+						+ commentText.indexOf('*', commentEndOffset - startingOffset + length);
+				addComment(asteriskoffset, endingOffset, new JSCommentInfo(true, first));
+			}
+			else
+			{
+				addComment(startingOffset, endingOffset, new JSCommentInfo(false, false));
+			}
 		}
 	}
 
@@ -83,7 +154,19 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object)
 	{
-		return new FormatterJSCommentNode(document, startOffset, endOffset);
+		JSCommentInfo info = (JSCommentInfo) object;
+		return new FormatterJSCommentNode(document, startOffset, endOffset, info.isMultiLine, info.isFirstLine);
 	}
 
+	private class JSCommentInfo
+	{
+		boolean isMultiLine;
+		boolean isFirstLine;
+
+		JSCommentInfo(boolean isMultiLine, boolean isFirstLine)
+		{
+			this.isMultiLine = isMultiLine;
+			this.isFirstLine = isFirstLine;
+		}
+	}
 }

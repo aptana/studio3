@@ -250,7 +250,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new JSFormatterNodeRewriter(parseResult).rewrite(root);
+		new JSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new JSFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(JSFormatterConstants.WRAP_COMMENTS_LENGTH));
