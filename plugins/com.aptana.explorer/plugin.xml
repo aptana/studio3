@@ -156,6 +156,11 @@
             id="com.aptana.explorer.deploywizard"
             name="%DeployWizard.label">
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.ToggleChangedFilesFilter"
+            id="com.aptana.explorer.commands.toggleChangedFilesFilter"
+            name="%command.toggleChangedFilesFilter.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -985,6 +990,14 @@
                   id="com.aptana.explorer.switch_application.items">
             </dynamic>
          </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.gear?endof=group.filtering">
+         <command
+               commandId="com.aptana.explorer.commands.toggleChangedFilesFilter"
+               icon="icons/full/elcl16/filter.png"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension

@@ -52,11 +52,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.window.Window;
-import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -100,7 +97,7 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  * 
  * @author cwilliams
  */
-class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
+public class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
 	private static final String TEAM_MAIN = "team.main"; //$NON-NLS-1$
 	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
@@ -252,28 +249,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	}
 
 	@Override
-	protected void fillCommandsMenu(MenuManager menuManager)
-	{
-		super.fillCommandsMenu(menuManager);
-
-		if (selectedProject == null || !selectedProject.isAccessible())
-			return;
-		final GitRepository repository = getGitRepositoryManager().getAttached(selectedProject);
-		if (repository != null)
-		{
-			// Add git filter to filtering group
-			menuManager.appendToGroup(IContextMenuConstants.GROUP_FILTERING, new ContributionItem()
-			{
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createFilterMenuItem(menu);
-				}
-			});
-		}
-	}
-
-	@Override
 	public void dispose()
 	{
 		if (selectedProject != null)
@@ -296,29 +271,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 			refreshUIJob = null;
 		}
 		super.dispose();
-	}
-
-	private void createFilterMenuItem(Menu menu)
-	{
-		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
-		gitFilter.setImage(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH));
-		gitFilter.setSelection(fChangedFilesFilter != null);
-		gitFilter.setText(Messages.GitProjectView_ChangedFilesFilterTooltip);
-		gitFilter.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (fChangedFilesFilter == null)
-				{
-					addGitChangedFilesFilter();
-				}
-				else
-				{
-					removeFilter();
-				}
-			}
-		});
 	}
 
 	@Override
@@ -830,5 +782,17 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	protected IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
+	public void toggleChangedFilesFilter()
+	{
+		if (fChangedFilesFilter == null)
+		{
+			addGitChangedFilesFilter();
+		}
+		else
+		{
+			removeFilter();
+		}
 	}
 }
