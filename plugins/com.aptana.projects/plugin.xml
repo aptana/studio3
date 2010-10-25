@@ -15,7 +15,7 @@
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="icons/webnature.gif"
-            id="com.aptana.ui.webnature.image"
+            id="com.aptana.projects.webnature.image"
             natureId="com.aptana.projects.webnature">
       </image>
    </extension>
