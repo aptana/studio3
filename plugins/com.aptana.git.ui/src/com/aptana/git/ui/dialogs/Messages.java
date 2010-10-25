@@ -46,12 +46,18 @@ public class Messages extends NLS
 	public static String AddRemoteDialog_NonEmptyRemoteNameMessage;
 	public static String AddRemoteDialog_NoWhitespaceRemoteNameMessage;
 	
+	public static String CreateBranchDialog_AdvancedOptions_label;
+
 	public static String CreateBranchDialog_CreateBranchDialog_Message;
 	public static String CreateBranchDialog_CreateBranchDialog_Title;
 	public static String CreateBranchDialog_InvalidBranchNameMessage;
 	public static String CreateBranchDialog_NonEmptyBranchNameMessage;
 	public static String CreateBranchDialog_NoWhitespaceBranchNameMessage;
 	public static String CreateBranchDialog_BranchAlreadyExistsMessage;
+
+	public static String CreateBranchDialog_StartPoint_label;
+
+	public static String CreateBranchDialog_Track_label;
 
 	static
 	{

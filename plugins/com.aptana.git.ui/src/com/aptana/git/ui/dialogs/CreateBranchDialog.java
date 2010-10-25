@@ -89,6 +89,7 @@ public class CreateBranchDialog extends InputDialog
 		this.repo = repo;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
@@ -98,12 +99,12 @@ public class CreateBranchDialog extends InputDialog
 
 		// TODO Add a minimize/maximize button for the advanced section
 		Group group = new Group(composite, SWT.BORDER);
-		group.setText("Advanced");
+		group.setText(Messages.CreateBranchDialog_AdvancedOptions_label);
 		group.setLayout(new GridLayout(1, false));
 		group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
 
 		Label label = new Label(group, SWT.NONE);
-		label.setText("Start point: ");
+		label.setText(Messages.CreateBranchDialog_StartPoint_label);
 
 		startPointText = new Text(group, getInputTextStyle());
 		startPointText.setText(repo.headRef().simpleRef().shortName());
@@ -125,7 +126,7 @@ public class CreateBranchDialog extends InputDialog
 				FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
 
 		trackButton = new Button(group, SWT.CHECK);
-		trackButton.setText("Track");
+		trackButton.setText(Messages.CreateBranchDialog_Track_label);
 		trackButton.addSelectionListener(new SelectionAdapter()
 		{
 
