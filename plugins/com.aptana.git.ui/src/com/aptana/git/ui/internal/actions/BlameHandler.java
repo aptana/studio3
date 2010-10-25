@@ -22,11 +22,8 @@ import org.eclipse.team.ui.history.IHistoryPage;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.team.ui.history.RevisionAnnotationController;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
@@ -38,6 +35,7 @@ import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.QuickDiffReferenceProvider;
 import com.aptana.git.ui.internal.history.GitHistoryPage;
 
+@SuppressWarnings("restriction")
 public class BlameHandler extends AbstractGitHandler
 {
 
