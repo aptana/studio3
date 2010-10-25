@@ -30,7 +30,7 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 
 abstract class AbstractGitHandler extends AbstractHandler
 {
-	protected IEvaluationContext evalContext;
+	private IEvaluationContext evalContext;
 	private boolean enabled;
 
 	protected void openError(final String title, final String msg)

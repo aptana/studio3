@@ -18,7 +18,7 @@ import com.aptana.git.core.model.GitRepository;
 abstract class AbstractStagingHandler extends AbstractGitHandler
 {
 
-	protected ChangedFile getChangedFile(IResource resource)
+	private ChangedFile getChangedFile(IResource resource)
 	{
 		if (!(resource instanceof IFile))
 		{

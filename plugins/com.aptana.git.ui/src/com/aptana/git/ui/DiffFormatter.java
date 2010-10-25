@@ -72,7 +72,7 @@ public abstract class DiffFormatter
 		return injectIntoTemplate(convertDiff(title, diff));
 	}
 
-	protected static String convertDiff(String title, String diff)
+	private static String convertDiff(String title, String diff)
 	{
 		if (title == null)
 			title = ""; //$NON-NLS-1$

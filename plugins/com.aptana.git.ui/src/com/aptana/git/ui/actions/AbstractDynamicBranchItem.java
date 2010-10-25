@@ -20,8 +20,6 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 abstract class AbstractDynamicBranchItem extends CompoundContributionItem implements IWorkbenchContribution
 {
 
-	protected static final int TOOLTIP_LIFETIME = 3000;
-
 	private IServiceLocator serviceLocator;
 
 	protected AbstractDynamicBranchItem()

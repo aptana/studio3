@@ -294,13 +294,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void trace(String string)
-	{
-		if (!getDefault().isDebugging())
-			return;
-		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
-	}
-
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
