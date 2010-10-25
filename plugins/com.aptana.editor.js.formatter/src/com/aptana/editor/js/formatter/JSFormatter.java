@@ -238,7 +238,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @param input
 	 *            The String input
 	 * @param parseResult
-	 *            A JavaScript parser result - {@link IParseNode}
+	 *            A JavaScript parser result - {@link com.aptana.parsing.ast.IParseNode}
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @return A formatted string
