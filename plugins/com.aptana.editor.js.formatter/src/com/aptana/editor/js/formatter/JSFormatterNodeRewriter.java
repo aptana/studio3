@@ -34,6 +34,9 @@
  */
 package com.aptana.editor.js.formatter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.aptana.editor.js.formatter.nodes.FormatterJSCommentNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
@@ -50,6 +53,7 @@ import com.aptana.parsing.ast.IParseRootNode;
  */
 public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 {
+	private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("(/\\*.*)|(\\*.*)|(\\*/)"); //$NON-NLS-1$
 	private static final String MULTI_LINE_COMMENT_PREFIX = "/*"; //$NON-NLS-1$
 
 	/**
@@ -75,57 +79,15 @@ public class JSFormatterNodeRewriter extends FormatterNodeRewriter
 			if (commentText.startsWith(MULTI_LINE_COMMENT_PREFIX))
 			{
 				// Push each line as a comment. Mark the first line as a 'first'.
-				// Since we have to maintain the correct offsets, we have to scan manually.We will consume any new line
-				// markers in this process, so any empty lines will be consumed.
-				int length = 0;
-				boolean first = true;
-				boolean foundFirstNonWhite = false;
-				int nextLineStartOffset = startingOffset;
-				int commentEndOffset = nextLineStartOffset;
-				for (int commentOffset = 0; commentOffset < commentText.length(); commentOffset++)
+				Matcher matcher = COMMENT_LINE_PATTERN.matcher(commentText);
+				boolean isFirstLine = true;
+				while (matcher.find())
 				{
-					char c = commentText.charAt(commentOffset);
-					if ((c == '\n' || c == '\r') && length > 0)
-					{
-						commentEndOffset = commentOffset + startingOffset;
-						addComment(nextLineStartOffset, commentEndOffset, new JSCommentInfo(true, first));
-						nextLineStartOffset = commentEndOffset + 1;
-						length = 0;
-						first = false;
-						foundFirstNonWhite = false;
-					}
-					else
-					{
-						if (c != '\n' && c != '\r')
-						{
-							if (c == ' ' || c == '\t')
-							{
-								if (foundFirstNonWhite)
-								{
-									length++;
-								}
-								else
-								{
-									nextLineStartOffset++;
-								}
-							}
-							else
-							{
-								foundFirstNonWhite = true;
-								length++;
-							}
-						}
-						else
-						{
-							nextLineStartOffset++;
-						}
-					}
+					int start = matcher.start();
+					int end = matcher.end();
+					addComment(startingOffset + start, startingOffset + end, new JSCommentInfo(true, isFirstLine));
+					isFirstLine = false;
 				}
-				// Deal with the last line. Make sure that we trim any initial spaces and mark the start where the
-				// asterisk char is located.
-				int asteriskoffset = startingOffset
-						+ commentText.indexOf('*', commentEndOffset - startingOffset + length);
-				addComment(asteriskoffset, endingOffset, new JSCommentInfo(true, first));
 			}
 			else
 			{
