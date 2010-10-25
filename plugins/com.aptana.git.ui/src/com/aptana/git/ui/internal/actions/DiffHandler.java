@@ -2,103 +2,42 @@ package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.actions.Messages;
 
-public class DiffHandler extends AbstractHandler
+public class DiffHandler extends AbstractGitHandler
 {
-	private boolean enabled;
 
 	@Override
-	public boolean isEnabled()
+	protected boolean calculateEnabled()
 	{
-		return enabled;
+		return !getSelectedChangedFiles().isEmpty();
 	}
 
-	@Override
-	public void setEnabled(Object evaluationContext)
-	{
-		this.enabled = !getSelectedChangedFiles(evaluationContext).isEmpty();
-	}
-
-	private Set<IResource> getSelectedFiles(Object evalContext)
-	{
-		ISelection sel = getSelection(evalContext);
-		Set<IResource> resources = new HashSet<IResource>();
-		if (sel == null || sel.isEmpty())
-			return resources;
-		if (!(sel instanceof IStructuredSelection))
-			return resources;
-		IStructuredSelection structured = (IStructuredSelection) sel;
-		for (Object element : structured.toList())
-		{
-			if (element == null)
-				continue;
-
-			if (element instanceof IResource)
-				resources.add((IResource) element);
-
-			if (element instanceof IAdaptable)
-			{
-				IAdaptable adapt = (IAdaptable) element;
-				IResource resource = (IResource) adapt.getAdapter(IResource.class);
-				if (resource != null)
-					resources.add(resource);
-			}
-		}
-		return resources;
-	}
-
-	private ISelection getSelection(Object evalContext)
-	{
-		if (evalContext instanceof IEvaluationContext)
-		{
-			Object obj = ((IEvaluationContext) evalContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
-			if (obj instanceof ISelection)
-			{
-				return (ISelection) obj;
-			}
-			// TODO Handle list/array/collection!
-			return new StructuredSelection(obj);
-		}
-		return null;
-	}
-
-	private List<ChangedFile> getSelectedChangedFiles(Object evalContext)
+	private List<ChangedFile> getSelectedChangedFiles()
 	{
 		GitRepository repo = null;
 		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
-		for (IResource resource : getSelectedFiles(evalContext))
+		for (IResource resource : getSelectedResources())
 		{
 			if (repo == null)
 			{
@@ -125,21 +64,17 @@ public class DiffHandler extends AbstractHandler
 		return files;
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
-	{
-		return GitPlugin.getDefault().getGitRepositoryManager();
-	}
-
-	public Object execute(ExecutionEvent event) throws ExecutionException
+	@Override
+	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
 		Map<String, String> diffs = new HashMap<String, String>();
-		List<ChangedFile> changedFiles = getSelectedChangedFiles(event.getApplicationContext());
+		List<ChangedFile> changedFiles = getSelectedChangedFiles();
 		if (changedFiles == null || changedFiles.isEmpty())
 		{
 			return null;
 		}
 
-		GitRepository repo = getGitRepository(event.getApplicationContext());
+		GitRepository repo = getSelectedRepository();
 		for (ChangedFile file : changedFiles)
 		{
 			if (file == null)
@@ -171,7 +106,6 @@ public class DiffHandler extends AbstractHandler
 
 			public void run()
 			{
-				// FIXME This freaking dialog won't close!
 				MessageDialog dialog = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 						.getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
 						"", 0, new String[] { IDialogConstants.OK_LABEL }, 0) //$NON-NLS-1$
@@ -198,16 +132,6 @@ public class DiffHandler extends AbstractHandler
 		});
 
 		return null;
-	}
-
-	private GitRepository getGitRepository(Object applicationContext)
-	{
-		Set<IResource> files = getSelectedFiles(applicationContext);
-		if (files == null || files.isEmpty())
-		{
-			return null;
-		}
-		return getGitRepositoryManager().getAttached(files.iterator().next().getProject());
 	}
 
 }

@@ -1,14 +1,11 @@
 package com.aptana.git.ui.internal.actions;
 
-import org.eclipse.core.expressions.IEvaluationContext;
-
 import com.aptana.git.core.model.GitRepository;
 
 public class PushHandler extends AbstractSimpleGitCommandHandler
 {
 
 	private static final String COMMAND = "push"; //$NON-NLS-1$
-	private boolean enabled;
 
 	@Override
 	protected String[] getCommand()
@@ -24,9 +21,8 @@ public class PushHandler extends AbstractSimpleGitCommandHandler
 	}
 
 	@Override
-	public void setEnabled(Object evaluationContext)
+	protected boolean calculateEnabled()
 	{
-		this.evalContext = (IEvaluationContext) evaluationContext;
 		for (GitRepository repo : getSelectedRepositories())
 		{
 			if (repo == null)
@@ -36,18 +32,10 @@ public class PushHandler extends AbstractSimpleGitCommandHandler
 			String[] commits = repo.commitsAhead(repo.currentBranch());
 			if (commits != null && commits.length > 0)
 			{
-				this.enabled = true;
-				return;
+				return true;
 			}
 		}
-		this.enabled = false;
-		this.evalContext = null;
-	}
-
-	@Override
-	public boolean isEnabled()
-	{
-		return this.enabled;
+		return false;
 	}
 
 	protected boolean supportsMultipleRepoOperation()

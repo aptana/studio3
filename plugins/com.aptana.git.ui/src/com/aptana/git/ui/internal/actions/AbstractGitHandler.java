@@ -14,7 +14,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -32,6 +31,7 @@ import com.aptana.git.core.model.IGitRepositoryManager;
 abstract class AbstractGitHandler extends AbstractHandler
 {
 	protected IEvaluationContext evalContext;
+	private boolean enabled;
 
 	protected void openError(final String title, final String msg)
 	{
@@ -44,6 +44,36 @@ abstract class AbstractGitHandler extends AbstractHandler
 						Messages.CommitAction_MultipleRepos_Title, Messages.CommitAction_MultipleRepos_Message);
 			}
 		});
+	}
+
+	@Override
+	public void setEnabled(Object evaluationContext)
+	{
+		this.evalContext = (IEvaluationContext) evaluationContext;
+		try
+		{
+			this.enabled = calculateEnabled();
+		}
+		finally
+		{
+			this.evalContext = null;
+		}
+	}
+
+	/**
+	 * Subclasses should override to determine if the handler is enabled given the evaluation context!
+	 * 
+	 * @return
+	 */
+	protected boolean calculateEnabled()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled()
+	{
+		return this.enabled;
 	}
 
 	protected IWorkbenchPage getActivePage()
@@ -113,7 +143,7 @@ abstract class AbstractGitHandler extends AbstractHandler
 	protected Collection<IResource> getSelectedResources()
 	{
 		Collection<IResource> resources = new ArrayList<IResource>();
-		IWorkbenchPart activePart = (IWorkbenchPart) evalContext.getVariable(ISources.ACTIVE_PART_NAME);
+		Object activePart = evalContext.getVariable(ISources.ACTIVE_PART_NAME);
 		if (activePart instanceof IEditorPart)
 		{
 			IEditorInput input = (IEditorInput) evalContext.getVariable(ISources.ACTIVE_EDITOR_INPUT_NAME);
@@ -121,7 +151,7 @@ abstract class AbstractGitHandler extends AbstractHandler
 		}
 		else
 		{
-			ISelection selection = (ISelection) evalContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			Object selection = evalContext.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
 			if (selection instanceof IStructuredSelection)
 			{
 				IStructuredSelection struct = (IStructuredSelection) selection;

@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -18,8 +17,6 @@ import com.aptana.git.core.model.GitRepository;
 
 abstract class AbstractStagingHandler extends AbstractGitHandler
 {
-
-	private boolean enabled;
 
 	protected ChangedFile getChangedFile(IResource resource)
 	{
@@ -99,37 +96,21 @@ abstract class AbstractStagingHandler extends AbstractGitHandler
 	protected abstract void doOperation(GitRepository repo, List<ChangedFile> changedFiles);
 
 	@Override
-	public void setEnabled(Object evaluationContext)
+	protected boolean calculateEnabled()
 	{
-		this.evalContext = (IEvaluationContext) evaluationContext;
-		try
+		Collection<IResource> resources = getSelectedResources();
+		if (resources.isEmpty())
 		{
-			Collection<IResource> resources = getSelectedResources();
-			if (resources.isEmpty())
-			{
-				this.enabled = false;
-				return;
-			}
-			for (IResource resource : resources)
-			{
-				if (!isEnabledForResource(resource))
-				{
-					this.enabled = false;
-					return;
-				}
-			}
-			this.enabled = true;
+			return true;
 		}
-		finally
+		for (IResource resource : resources)
 		{
-			this.evalContext = null;
+			if (!isEnabledForResource(resource))
+			{
+				return false;
+			}
 		}
-	}
-
-	@Override
-	public boolean isEnabled()
-	{
-		return this.enabled;
+		return true;
 	}
 
 	private boolean isEnabledForResource(IResource resource)

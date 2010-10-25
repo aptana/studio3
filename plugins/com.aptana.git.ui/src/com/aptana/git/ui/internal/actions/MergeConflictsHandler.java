@@ -6,7 +6,6 @@ import org.eclipse.compare.CompareUI;
 import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
@@ -29,8 +28,6 @@ import com.aptana.git.ui.internal.history.GitCompareFileRevisionEditorInput;
 @SuppressWarnings("restriction")
 public class MergeConflictsHandler extends AbstractGitHandler
 {
-
-	private boolean enabled;
 
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
@@ -83,27 +80,7 @@ public class MergeConflictsHandler extends AbstractGitHandler
 		return null;
 	}
 
-	@Override
-	public boolean isEnabled()
-	{
-		return this.enabled;
-	}
-
-	@Override
-	public void setEnabled(Object evaluationContext)
-	{
-		this.evalContext = (IEvaluationContext) evaluationContext;
-		try
-		{
-			this.enabled = calculateEnabled();
-		}
-		finally
-		{
-			this.evalContext = null;
-		}
-	}
-
-	private boolean calculateEnabled()
+	protected boolean calculateEnabled()
 	{
 		Collection<IResource> resources = getSelectedResources();
 		if (resources == null || resources.size() != 1)

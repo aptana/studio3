@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
@@ -23,8 +22,6 @@ import com.aptana.git.ui.GitUIPlugin;
 @SuppressWarnings({ "restriction", "rawtypes" })
 public class GithubNetworkHandler extends AbstractGitHandler
 {
-
-	private boolean enabled;
 
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
@@ -119,23 +116,9 @@ public class GithubNetworkHandler extends AbstractGitHandler
 	}
 
 	@Override
-	public void setEnabled(Object evaluationContext)
+	protected boolean calculateEnabled()
 	{
-		this.evalContext = (IEvaluationContext) evaluationContext;
-		try
-		{
-			this.enabled = getGithubURL() != null;
-		}
-		finally
-		{
-			this.evalContext = null;
-		}
-	}
-
-	@Override
-	public boolean isEnabled()
-	{
-		return this.enabled;
+		return getGithubURL() != null;
 	}
 
 }
