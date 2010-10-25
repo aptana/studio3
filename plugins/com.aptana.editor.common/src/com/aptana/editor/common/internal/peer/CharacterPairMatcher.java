@@ -26,6 +26,7 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
@@ -143,6 +144,7 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		}
 
 		String currentScope = getScopeAtOffset(doc, charOffset);
+		// FIXME if we're inside a string or comment, we should limit our search to just this particular partition!
 		// Drop out if the char is inside a comment
 		if (fgCommentSelector.matches(currentScope))
 		{
@@ -153,17 +155,29 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
 		if (fPairs.isAmbiguous(prevChar))
 		{
-			// Need to look at partition transition to tell if we're at end or beginning!
-			String partitionAhead = TextUtilities.getContentType(doc, fPartitioning, charOffset + 1, false);
-			String partitionBehind = TextUtilities.getContentType(doc, fPartitioning, charOffset - 1, false);
-			if (partition.equals(partitionBehind) && !partition.equals(partitionAhead))
+			// If this is common start tag, look forward, if common end tag look backwards!
+			if (partition.equals(CompositePartitionScanner.START_SWITCH_TAG))
 			{
-				// End because we're transitioning out of a partition on this character
+				isForward = true;
+			}
+			else if (partition.equals(CompositePartitionScanner.END_SWITCH_TAG))
+			{
 				isForward = false;
 			}
-			else if (isUnclosedPair(prevChar, doc, charOffset))
+			else
 			{
-				isForward = false;
+				// Need to look at partition transition to tell if we're at end or beginning!
+				String partitionAhead = TextUtilities.getContentType(doc, fPartitioning, charOffset + 1, false);
+				String partitionBehind = TextUtilities.getContentType(doc, fPartitioning, charOffset - 1, false);
+				if (partition.equals(partitionBehind) && !partition.equals(partitionAhead))
+				{
+					// End because we're transitioning out of a partition on this character
+					isForward = false;
+				}
+				else if (isUnclosedPair(prevChar, doc, charOffset))
+				{
+					isForward = false;
+				}
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
@@ -328,7 +342,13 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		public boolean inPartition(int pos)
 		{
 			final ITypedRegion partition = getPartition(pos);
-			return partition != null && partition.getType().equals(fPartition);
+			return samePartitions(partition);
+		}
+
+		private boolean samePartitions(ITypedRegion partition)
+		{
+			return partition != null
+					&& (partition.getType().equals(fPartition) || areSwitchPartitions(fPartition, partition.getType()));
 		}
 
 		/**
@@ -344,10 +364,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		public int getNextPosition(int pos, boolean searchForward)
 		{
 			final ITypedRegion partition = getPartition(pos);
-			if (partition == null)
+			if (partition == null || samePartitions(partition))
+			{
 				return simpleIncrement(pos, searchForward);
-			if (fPartition.equals(partition.getType()))
-				return simpleIncrement(pos, searchForward);
+			}
 			if (searchForward)
 			{
 				int end = partition.getOffset() + partition.getLength();
@@ -361,6 +381,14 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 					return offset - 1;
 			}
 			return simpleIncrement(pos, searchForward);
+		}
+
+		private boolean areSwitchPartitions(String partition1, String partition2)
+		{
+			return (partition1.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition1
+					.equals(CompositePartitionScanner.END_SWITCH_TAG))
+					&& (partition2.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition2
+							.equals(CompositePartitionScanner.END_SWITCH_TAG));
 		}
 
 		private int simpleIncrement(int pos, boolean searchForward)
