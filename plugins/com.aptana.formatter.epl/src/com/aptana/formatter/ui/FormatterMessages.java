@@ -78,6 +78,7 @@ public class FormatterMessages extends NLS
 	public static String Formatter_formatterError;
 	public static String Formatter_formatterErrorStatus;
 	public static String Formatter_basicLogFormatterError;
+	public static String Formatter_formatterErrorCompletedWithErrors;
 	public static String RubyFormatterIndentationTabPage_declarationWithinClassBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinMethodBody;
 	public static String RubyFormatterIndentationTabPage_declarationWithinModuleBody;

@@ -257,6 +257,13 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		writer.setLinesPreserve(getInt(JSFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
 		writer.flush(context);
+		// Unlike other formatters, we allow errors in the JS AST for now.
+		// We just notify the user that there were errors in the JS file.
+		if (builder.hasErrors())
+		{
+			StatusLineMessageTimerManager.setErrorMessage(
+					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
+		}
 		return writer.getOutput();
 	}
 

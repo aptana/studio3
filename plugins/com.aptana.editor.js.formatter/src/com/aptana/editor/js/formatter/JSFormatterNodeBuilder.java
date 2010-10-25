@@ -82,7 +82,6 @@ import com.aptana.editor.js.parsing.ast.JSWithNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.ui.FormatterSyntaxProblemException;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -95,6 +94,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 	private FormatterDocument document;
+	private boolean hasErrors;
 
 	/**
 	 * @param parseResult
@@ -110,6 +110,16 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		jsRootNode.accept(new JSFormatterTreeWalker());
 		checkedPop(rootNode, document.getLength());
 		return rootNode;
+	}
+
+	/**
+	 * Returns true in case the node building stumble into a JS error node.
+	 * 
+	 * @return True if there are error nodes in the AST.
+	 */
+	public boolean hasErrors()
+	{
+		return hasErrors;
 	}
 
 	/**
@@ -151,7 +161,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		public void visit(JSErrorNode node)
 		{
 			// Stop the formatting
-			throw new FormatterSyntaxProblemException(Messages.JSFormatterNodeBuilder_parsingError);
+			JSFormatterNodeBuilder.this.hasErrors = true;
 		}
 
 		/*
