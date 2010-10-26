@@ -89,7 +89,6 @@ public class CreateBranchDialog extends InputDialog
 		this.repo = repo;
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
