@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
@@ -61,7 +62,7 @@ import com.aptana.swt.webkitbrowser.WebKitBrowser;
  * @author Max Stepanov
  * 
  */
-public final class PreviewEditorPart extends EditorPart implements IShowEditorInput {
+public final class PreviewEditorPart extends EditorPart implements IReusableEditor, IShowEditorInput {
 
 	public static final String EDITOR_ID = "com.aptana.preview.editor"; //$NON-NLS-1$
 
@@ -99,7 +100,7 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		setSite(site);
-		setInput(input);
+		super.setInput(input);
 		showEditorInput();
 	}
 
@@ -195,6 +196,16 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.EditorPart#setInput(org.eclipse.ui.IEditorInput)
+	 */
+	@Override
+	public void setInput(IEditorInput input) {
+		super.setInput(input);
+		showEditorInput();
+		firePropertyChange(PROP_INPUT);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -204,8 +215,6 @@ public final class PreviewEditorPart extends EditorPart implements IShowEditorIn
 	 */
 	public void showEditorInput(IEditorInput editorInput) {
 		setInput(editorInput);
-		showEditorInput();
-		firePropertyChange(PROP_INPUT);
 	}
 
 	private void showEditorInput() {
