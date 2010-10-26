@@ -275,7 +275,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			@Override
 			public void run() {
 				while (ftpClient != null && ftpClient.connected()) {
-					System.out.println("KEEP-ALIVE");
 					try {
 						ftpClient.keepAlive();
 					} catch (Exception e) {
