@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.ui;
+package com.aptana.explorer.ui.filter;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -43,12 +43,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
@@ -56,7 +54,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
 
-class PathFilter extends ViewerFilter
+public class PathFilter extends AbstractResourceBasedViewerFilter
 {
 
 	private static Object[] EMPTY = new Object[0];
@@ -75,13 +73,12 @@ class PathFilter extends ViewerFilter
 
 	private List<QueryResult> queryResults;
 	private IResource filterResource;
-	private Pattern regexp;
+	protected Pattern regexp;
 
 	private String fFilterLocationMinusExtension;
 	private String fFilterResourceURI;
-	private Boolean fHasRailsNature;
 
-	private String patternString;
+	protected String patternString;
 
 	/**
 	 * Answers whether the given element in the given viewer matches the filter pattern. This is a default
@@ -95,35 +92,9 @@ class PathFilter extends ViewerFilter
 	 *            the element in the tree to check for a match
 	 * @return true if the element matches the filter pattern
 	 */
-	private boolean isElementVisible(Viewer viewer, Object element)
+	protected boolean isElementVisible(Viewer viewer, Object element)
 	{
-		// HACK Ignore tmp and vendor for Rails projects
-		IResource resource = (IResource) element;
-		String firstSegment = resource.getProjectRelativePath().segment(0);
-		if (firstSegment.equals("tmp") || firstSegment.equals("vendor")) //$NON-NLS-1$ //$NON-NLS-2$
-		{
-			try
-			{
-				if (hasRailsNature())
-				{
-					return false;
-				}
-			}
-			catch (CoreException e)
-			{
-				// ignore
-			}
-		}
 		return isParentMatch(viewer, element) || isLeafMatch(viewer, element);
-	}
-
-	private boolean hasRailsNature() throws CoreException
-	{
-		if (fHasRailsNature == null)
-		{
-			fHasRailsNature = filterResource.getProject().hasNature("org.radrails.rails.core.railsnature"); //$NON-NLS-1$
-		}
-		return fHasRailsNature;
 	}
 
 	/**
@@ -375,7 +346,7 @@ class PathFilter extends ViewerFilter
 	 * 
 	 * @param patternString
 	 */
-	private void setPattern(String patternString)
+	protected void setPattern(String patternString)
 	{
 		this.patternString = patternString;
 		if (patternString == null || patternString.equals("")) //$NON-NLS-1$
@@ -384,7 +355,7 @@ class PathFilter extends ViewerFilter
 		}
 		else
 		{
-			regexp = Pattern.compile(MessageFormat.format("\\b({0}|{1})\\b", patternString, Inflector.pluralize(patternString))); //$NON-NLS-1$
+			regexp = Pattern.compile(MessageFormat.format("\\b({0})\\b", patternString)); //$NON-NLS-1$
 		}
 	}
 
@@ -397,7 +368,6 @@ class PathFilter extends ViewerFilter
 		}
 		fFilterLocationMinusExtension = null;
 		fFilterResourceURI = null;
-		fHasRailsNature = null;
 		if (resource == null)
 		{
 			filterResource = null;
@@ -408,63 +378,10 @@ class PathFilter extends ViewerFilter
 		setPattern(createPatternFromResource(resource));
 	}
 
-	private String createPatternFromResource(IResource resource)
+	protected String createPatternFromResource(IResource resource)
 	{
-		String text = resource.getName();
-		// Try and strip filename down to the resource name!
-		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith(".yml")) //$NON-NLS-1$
-		{
-			IPath path = resource.getProjectRelativePath();
-			if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
-			{
-				text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
-				text = Inflector.singularize(text);
-			}
-		}
-		else if (text.endsWith(".rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
-		}
-		else
-		{
-			// We need to grab the full path, so we can determine the resource name!
-
-			IPath path = resource.getProjectRelativePath();
-			if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
-			{
-				text = path.segment(2);
-				text = Inflector.singularize(text);
-			}
-		}
-		return text;
+		// TODO Strip off extension!
+		return resource.getName();
 	}
 
 	/*

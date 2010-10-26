@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="com.aptana.explorer.filters" name="App Explorer Filter" schema="schema/com.aptana.explorer.filters.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view
