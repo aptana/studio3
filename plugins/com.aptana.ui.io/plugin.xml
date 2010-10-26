@@ -45,7 +45,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="com.aptana.ide.ui.io.navigator.ProjectExplorerContentProvider"
-            icon="icons/full/obj16/projects.png"
+            icon="icons/full/obj16/drive.png"
             id="com.aptana.ide.ui.io.navigatorContent"
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.default.name"
@@ -535,7 +535,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="com.aptana.ide.ui.io.navigator.RemoteTreeContentProvider"
-            icon="icons/full/obj16/projects.png"
+            icon="icons/full/eview16/remote.png"
             id="com.aptana.ide.ui.io.remoteNavigatorContent"
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.remote.name"
