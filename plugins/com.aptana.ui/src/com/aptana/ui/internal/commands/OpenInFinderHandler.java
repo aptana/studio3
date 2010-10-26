@@ -47,6 +47,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.PlatformUtil;
@@ -65,7 +66,7 @@ public class OpenInFinderHandler extends AbstractHandler
 		if (context instanceof EvaluationContext)
 		{
 			EvaluationContext evContext = (EvaluationContext) event.getApplicationContext();
-			Object input = evContext.getVariable("showInInput"); //$NON-NLS-1$
+			Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 			if (input instanceof IFileEditorInput)
 			{
 				IFileEditorInput fei = (IFileEditorInput) input;
@@ -155,8 +156,7 @@ public class OpenInFinderHandler extends AbstractHandler
 		{
 			subcommand = "reveal"; //$NON-NLS-1$
 		}
-		// FIXME This doesn't necessarily push the window on top!
-		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")\ntell application \"Finder\" to activate"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		Map<Integer, String> result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.keySet().iterator().next() == 0)
 		{
