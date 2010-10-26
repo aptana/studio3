@@ -34,11 +34,15 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 	{
 		IResource resource = getSelectedResource();
 		if (resource == null)
+		{
 			return new IContributionItem[0];
+		}
 
 		final GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
 		if (repo == null)
+		{
 			return new IContributionItem[0];
+		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
 
@@ -50,7 +54,7 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 				@Override
 				public void fill(Menu menu, int index)
 				{
-					MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+					MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index);
 					menuItem.setText(branchName);
 					menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
 					menuItem.addSelectionListener(new SelectionAdapter()

@@ -48,7 +48,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 
 	public static void deleteBranch(final GitRepository repo, final String branchName)
 	{
-		Job job = new Job(NLS.bind("git branch -d {0}", branchName)) //$NON-NLS-1$
+		Job job = new Job(NLS.bind(Messages.DeleteBranchHandler_JobName, branchName))
 		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)

@@ -14,7 +14,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.services.IEvaluationService;
@@ -34,32 +33,35 @@ public class SwitchProjectMenuItem extends CompoundContributionItem implements I
 
 		IEvaluationService evalService = (IEvaluationService) serviceLocator.getService(IEvaluationService.class);
 		IEvaluationContext context = evalService.getCurrentState();
-		IWorkbenchPart part = (IWorkbenchPart) context.getVariable(ISources.ACTIVE_PART_NAME);
-		final SingleProjectView view = (SingleProjectView) part;
-		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-
-		for (final IProject project : projects)
+		Object part = context.getVariable(ISources.ACTIVE_PART_NAME);
+		if (part instanceof SingleProjectView)
 		{
-			if (!project.isAccessible() || project.equals(view.getActiveProject()))
+			final SingleProjectView view = (SingleProjectView) part;
+			IProject viewProject = view.getActiveProject();
+			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+			for (final IProject project : projects)
 			{
-				continue;
-			}
-			contributions.add(new ContributionItem()
-			{
-				public void fill(Menu menu, int index)
+				if (!project.isAccessible() || project.equals(viewProject))
 				{
-					MenuItem item = new MenuItem(menu, SWT.NONE);
-					item.setText(project.getName());
-					item.addSelectionListener(new SelectionAdapter()
-					{
-						@Override
-						public void widgetSelected(SelectionEvent e)
-						{
-							view.setActiveProject(project);
-						}
-					});
+					continue;
 				}
-			});
+				contributions.add(new ContributionItem()
+				{
+					public void fill(Menu menu, int index)
+					{
+						MenuItem item = new MenuItem(menu, SWT.NONE);
+						item.setText(project.getName());
+						item.addSelectionListener(new SelectionAdapter()
+						{
+							@Override
+							public void widgetSelected(SelectionEvent e)
+							{
+								view.setActiveProject(project);
+							}
+						});
+					}
+				});
+			}
 		}
 
 		return contributions.toArray(new IContributionItem[contributions.size()]);

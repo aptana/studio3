@@ -59,7 +59,9 @@ public class DiffHandler extends AbstractGitHandler
 		{
 			ChangedFile changedFile = repo.getChangedFileForResource(resource);
 			if (changedFile != null)
+			{
 				files.add(changedFile);
+			}
 		}
 		return files;
 	}
@@ -78,10 +80,14 @@ public class DiffHandler extends AbstractGitHandler
 		for (ChangedFile file : changedFiles)
 		{
 			if (file == null)
+			{
 				continue;
+			}
 
 			if (diffs.containsKey(file.getPath()))
+			{
 				continue; // already calculated diff...
+			}
 			String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
 			diffs.put(file.getPath(), diff);
 		}

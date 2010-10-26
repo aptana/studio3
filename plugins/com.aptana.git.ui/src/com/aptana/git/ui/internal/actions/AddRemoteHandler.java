@@ -19,12 +19,16 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		String url = ""; //$NON-NLS-1$
 		String username = System.getProperty("user.name"); //$NON-NLS-1$
 		if (username == null || username.length() == 0)
+		{
 			username = "user"; //$NON-NLS-1$
+		}
 		String reponame = "repo";
 		IPath wd = getSelectedRepository().workingDirectory();
 		reponame = wd.lastSegment();
 		if (reponame.endsWith(GitRepository.GIT_DIR))
+		{
 			reponame = reponame.substring(0, reponame.length() - 4);
+		}
 		url = MessageFormat.format("git://github.com/{0}/{1}.git", username, reponame); //$NON-NLS-1$
 
 		final String[] finalURL = new String[] { url };

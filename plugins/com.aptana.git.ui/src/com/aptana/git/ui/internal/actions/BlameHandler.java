@@ -125,7 +125,7 @@ public class BlameHandler extends AbstractGitHandler
 		String output = result.values().iterator().next();
 		Map<String, GitRevision> revisions = new HashMap<String, GitRevision>();
 
-		String[] lines = output.split("\r\n|\r|\n"); //$NON-NLS-1$
+		String[] lines = output.split("\r?\n|\r"); //$NON-NLS-1$
 		GitRevision revision = null;
 		String sha = null;
 		String author = null;

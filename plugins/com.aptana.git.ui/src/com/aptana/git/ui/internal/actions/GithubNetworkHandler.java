@@ -1,5 +1,7 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -8,6 +10,8 @@ import java.util.Set;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.ui.IViewPart;
@@ -16,12 +20,17 @@ import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserView;
 import org.eclipse.ui.part.WorkbenchPart;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 
 @SuppressWarnings({ "restriction", "rawtypes" })
 public class GithubNetworkHandler extends AbstractGitHandler
 {
+
+	private static final String GITHUB_COM = "github.com"; //$NON-NLS-1$
+	private static final String GITHUB_JS = "templates/github.js"; //$NON-NLS-1$
+	private String fgGithubJS;
 
 	@Override
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
@@ -39,18 +48,12 @@ public class GithubNetworkHandler extends AbstractGitHandler
 			{
 				Method m = WorkbenchPart.class.getDeclaredMethod("setPartName", String.class); //$NON-NLS-1$
 				m.setAccessible(true);
-				m.invoke(obj, "Github Network Viewer");
+				m.invoke(obj, Messages.GithubNetworkHandler_ViewName);
 			}
 			catch (Exception e)
 			{
 				GitUIPlugin.logError(e.getMessage(), e);
 			}
-
-			// Use Editor
-			// final String browserViewerFieldName = "webBrowser";
-			// final Class klass = WebBrowserEditor.class;
-			// final Object obj = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
-			// new WebBrowserEditorInput(new URL(networkURL)), WebBrowserEditor.WEB_BROWSER_EDITOR_ID);
 
 			try
 			{
@@ -62,16 +65,7 @@ public class GithubNetworkHandler extends AbstractGitHandler
 
 					public void completed(ProgressEvent event)
 					{
-						String js = "var elements = new Array();\n" //$NON-NLS-1$
-								+ "var ids = new Array('header', 'repo_menu', 'repo_sub_menu', 'repos', 'footer', 'triangle');\n" //$NON-NLS-1$
-								+ "elements.push(document.getElementById('network').children.item(0));\n" //$NON-NLS-1$
-								+ "elements.push(document.getElementById('network').children.item(1));\n" //$NON-NLS-1$
-								+ "elements.push(document.getElementById('network').children.item(2));\n" //$NON-NLS-1$
-								+ "for(i=0; i<ids.length; i++) {\n" //$NON-NLS-1$
-								+ "  elements.push(document.getElementById(ids[i]));\n" + "}\n" //$NON-NLS-1$ //$NON-NLS-2$
-								+ "for(i=0; i<elements.length; i++) {\n" + "  elements[i].style.display = 'none';\n" //$NON-NLS-1$ //$NON-NLS-2$
-								+ "}\n"; //$NON-NLS-1$
-
+						String js = getGithubJS();
 						viewer.getBrowser().execute(js);
 					}
 
@@ -100,13 +94,19 @@ public class GithubNetworkHandler extends AbstractGitHandler
 		Set<String> remoteURLs = repo.remoteURLs();
 		for (String remoteURL : remoteURLs)
 		{
-			if (!remoteURL.contains("github.com")) //$NON-NLS-1$
+			if (!remoteURL.contains(GITHUB_COM))
+			{
 				continue;
-			String remaining = remoteURL.substring(remoteURL.indexOf("github.com") + 10); //$NON-NLS-1$
+			}
+			String remaining = remoteURL.substring(remoteURL.indexOf(GITHUB_COM) + 10);
 			if (remaining.startsWith("/") || remaining.startsWith(":")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
 				remaining = remaining.substring(1);
-			if (remaining.endsWith(".git")) //$NON-NLS-1$
+			}
+			if (remaining.endsWith(GitRepository.GIT_DIR))
+			{
 				remaining = remaining.substring(0, remaining.length() - 4);
+			}
 			int split = remaining.indexOf("/"); //$NON-NLS-1$
 			String userName = remaining.substring(0, split);
 			String repoName = remaining.substring(split + 1);
@@ -119,6 +119,24 @@ public class GithubNetworkHandler extends AbstractGitHandler
 	protected boolean calculateEnabled()
 	{
 		return getGithubURL() != null;
+	}
+
+	protected synchronized String getGithubJS()
+	{
+		if (fgGithubJS == null)
+		{
+			try
+			{
+				InputStream stream = FileLocator.openStream(GitUIPlugin.getDefault().getBundle(),
+						Path.fromPortableString(GITHUB_JS), false);
+				fgGithubJS = IOUtil.read(stream);
+			}
+			catch (IOException e)
+			{
+				GitUIPlugin.logError(e.getMessage(), e);
+			}
+		}
+		return fgGithubJS;
 	}
 
 }
