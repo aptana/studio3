@@ -133,7 +133,8 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 	{
 		FormatterClassNode classNode = new FormatterClassNode(document);
 		SourcePosition position = visited.getPosition();
-		classNode.setBegin(createTextNode(document, visited));
+		classNode.setBegin(builder.createTextNode(document, position.getStartOffset(), visited.getReceiverNode()
+				.getPosition().getStartOffset()));
 		builder.push(classNode);
 		visitChildren(visited);
 		Node bodyNode = visited.getBodyNode();

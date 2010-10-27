@@ -48,12 +48,16 @@ import com.aptana.formatter.ui.CodeFormatterConstants;
 public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 {
 
+	private boolean functionPartOfExpression;
+
 	/**
 	 * @param document
+	 * @param functionPartOfExpression 
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document)
+	public FormatterJSFunctionBodyNode(IFormatterDocument document, boolean functionPartOfExpression)
 	{
 		super(document);
+		this.functionPartOfExpression = functionPartOfExpression;
 	}
 
 	/*
@@ -97,6 +101,10 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	@Override
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
+		if (functionPartOfExpression)
+		{
+			return getDocument().getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION);
+		}
 		return getDocument().getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION);
 	}
 }

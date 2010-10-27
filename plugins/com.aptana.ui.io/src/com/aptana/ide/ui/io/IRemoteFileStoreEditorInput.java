@@ -32,34 +32,12 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.markdown;
+package com.aptana.ide.ui.io;
 
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.filesystem.IFileStore;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.SimpleSourceViewerConfiguration;
-
-class MarkdownSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+public interface IRemoteFileStoreEditorInput
 {
-	/**
-	 * MarkdownSourceViewerConfiguration
-	 * 
-	 * @param preferences
-	 * @param editor
-	 */
-	public MarkdownSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
-	{
-		super(preferences, editor);
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
-	 */
-	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration()
-	{
-		return MarkdownSourceConfiguration.getDefault();
-	}
+	public IFileStore getRemoteFileStore();
 }

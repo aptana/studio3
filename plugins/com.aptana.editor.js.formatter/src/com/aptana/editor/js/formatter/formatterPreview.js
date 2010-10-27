@@ -16,7 +16,7 @@ else
 
 for (var i = Things.length - 1; i >= 0; i--)
 {
-  ${1:Things[i]}
+  // Do something...
 }
 
 do
