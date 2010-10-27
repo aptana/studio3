@@ -64,6 +64,22 @@ public final class SyncUtils {
 	private SyncUtils() {
 	}
 
+	/**
+	 * This method functionally duplicates EFS FileStore.copy() method with the following exceptions:
+	 * 1. it transfers precise datetime
+	 * 2. it transfers file permissions if requested
+	 * 3. it does not delete destination file on failure
+	 *   (FTP implementation always uploads to a temporary file first and always cleans up afterwards)
+	 * 4. it does not ignore exceptions on output stream close (FTP implementation finalizes transfer on close)
+	 * 5. it always works as it EFS.SHALLOW would be set
+	 * 
+	 * @param source
+	 * @param sourceInfo
+	 * @param destination
+	 * @param options
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	public static void copy(IFileStore source, IFileInfo sourceInfo, IFileStore destination, int options,
 			IProgressMonitor monitor) throws CoreException {
 		try {
@@ -89,6 +105,7 @@ public final class SyncUtils {
 					subMonitor
 							.beginTask(MessageFormat.format(Messages.SyncUtils_Copying, source.toString()), totalWork);
 					while (true) {
+						checkCanceled(monitor);
 						int bytesRead = -1;
 						try {
 							bytesRead = in.read(buffer);
@@ -98,6 +115,7 @@ public final class SyncUtils {
 						if (bytesRead == -1) {
 							break;
 						}
+						checkCanceled(monitor);
 						try {
 							out.write(buffer, 0, bytesRead);
 						} catch (IOException e) {
