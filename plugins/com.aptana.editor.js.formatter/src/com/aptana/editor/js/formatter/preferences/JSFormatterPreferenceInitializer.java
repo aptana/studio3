@@ -41,6 +41,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.editor.js.formatter.JSFormatterPlugin;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
@@ -87,6 +88,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 		}
 		catch (BackingStoreException e)
 		{
+			FormatterPlugin.logError(e);
 		}
 	}
 }

@@ -13,6 +13,7 @@ package com.aptana.formatter;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.aptana.formatter.preferences.IPreferencesSaveDelegate;
@@ -75,8 +76,15 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 						return profile.getSettings();
 					}
 				}
+			} else {
+				List<IProfile> builtInProfiles = profileManager.getBuiltInProfiles();
+				if (builtInProfiles != null && !builtInProfiles.isEmpty())
+				{
+					return builtInProfiles.get(0).getSettings();
+				}
 			}
 		}
+		// Last resort - Collect only this formatters' preferences.
 		final Map<String, String> result = new HashMap<String, String>();
 		final PreferenceKey[] keys = getPreferenceKeys();
 		if (keys != null)
