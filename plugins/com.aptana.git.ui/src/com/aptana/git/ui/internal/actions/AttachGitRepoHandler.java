@@ -121,6 +121,10 @@ public class AttachGitRepoHandler extends AbstractHandler
 		if (evalContext instanceof IEvaluationContext)
 		{
 			Object obj = ((IEvaluationContext) evalContext).getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (obj == null)
+			{
+				return null;
+			}
 			if (obj instanceof ISelection)
 			{
 				return (ISelection) obj;

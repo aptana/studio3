@@ -16,6 +16,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.ruby.formatter.RubyFormatterConstants;
 import com.aptana.editor.ruby.formatter.RubyFormatterPlugin;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
 public class RubyFormatterPreferenceInitializer extends AbstractPreferenceInitializer
@@ -59,6 +60,7 @@ public class RubyFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		}
 		catch (BackingStoreException e)
 		{
+			FormatterPlugin.logError(e);
 		}
 	}
 }

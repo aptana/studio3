@@ -36,6 +36,10 @@ public class GithubNetworkHandler extends AbstractGitHandler
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
 		final String networkURL = getGithubURL();
+		if (networkURL == null)
+		{
+			return null;
+		}
 		try
 		{
 			// Use View
@@ -90,6 +94,10 @@ public class GithubNetworkHandler extends AbstractGitHandler
 	private String getGithubURL()
 	{
 		final GitRepository repo = getSelectedRepository();
+		if (repo == null)
+		{
+			return null;
+		}
 		// Check the remote urls for github and use that to determine URL we need!
 		Set<String> remoteURLs = repo.remoteURLs();
 		for (String remoteURL : remoteURLs)
