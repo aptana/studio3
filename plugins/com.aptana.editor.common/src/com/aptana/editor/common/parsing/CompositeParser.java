@@ -39,12 +39,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beaver.Scanner.Exception;
 import beaver.Symbol;
+import beaver.Scanner.Exception;
 
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
@@ -121,26 +120,16 @@ public class CompositeParser implements IParser
 		return result;
 	}
 
+	/**
+	 * primaryParse
+	 * 
+	 * @param parseState
+	 * @return
+	 * @throws java.lang.Exception
+	 */
 	private IParseRootNode primaryParse(IParseState parseState) throws java.lang.Exception
 	{
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fParserLanguage);
-		if (pool != null)
-		{
-			IParser parser = null;
-			try
-			{
-				parser = pool.checkOut();
-				return parser.parse(parseState);
-			}
-			finally
-			{
-				if (parser != null)
-				{
-					pool.checkIn(parser);
-				}
-			}
-		}
-		return null;
+		return ParserPoolFactory.parse(fParserLanguage, parseState);
 	}
 
 	/**
@@ -162,14 +151,12 @@ public class CompositeParser implements IParser
 		return fCurrentSymbol;
 	}
 
-	protected IParseRootNode getParseResult(IParser parser, int start, int end)
+	protected IParseRootNode getParseResult(String language, int start, int end)
 	{
 		try
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
-			ParseState parseState = new ParseState();
-			parseState.setEditState(text, text, 0, 0);
-			IParseRootNode node = parser.parse(parseState);
+			IParseRootNode node = ParserPoolFactory.parse(language, text);
 			addOffset(node, start);
 			return node;
 		}
