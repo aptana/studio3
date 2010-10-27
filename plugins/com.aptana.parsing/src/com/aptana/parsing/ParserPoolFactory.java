@@ -223,7 +223,7 @@ public class ParserPoolFactory
 			else
 			{
 				String message = MessageFormat.format(
-					"Unable to acquire parser for language: '''{0}'''",
+					Messages.ParserPoolFactory_Cannot_Acquire_Parser,
 					language
 				);
 				
@@ -233,7 +233,7 @@ public class ParserPoolFactory
 		else
 		{
 			String message = MessageFormat.format(
-				"Unable to acquire parser pool for language: '''{0}'''",
+				Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
 				language
 			);
 			
