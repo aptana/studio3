@@ -56,135 +56,121 @@ import com.aptana.ide.syncing.core.SyncingPlugin;
 /**
  * @author Max Stepanov
  */
-public final class SyncUtils
-{
+public final class SyncUtils {
 
 	/**
 	 * 
 	 */
-	private SyncUtils()
-	{
+	private SyncUtils() {
 	}
 
+	/**
+	 * This method functionally duplicates EFS FileStore.copy() method with the following exceptions:
+	 * 1. it transfers precise datetime
+	 * 2. it transfers file permissions if requested
+	 * 3. it does not delete destination file on failure
+	 *   (FTP implementation always uploads to a temporary file first and always cleans up afterwards)
+	 * 4. it does not ignore exceptions on output stream close (FTP implementation finalizes transfer on close)
+	 * 5. it always works as it EFS.SHALLOW would be set
+	 * 
+	 * @param source
+	 * @param sourceInfo
+	 * @param destination
+	 * @param options
+	 * @param monitor
+	 * @throws CoreException
+	 */
 	public static void copy(IFileStore source, IFileInfo sourceInfo, IFileStore destination, int options,
-			IProgressMonitor monitor) throws CoreException
-	{
-		try
-		{
+			IProgressMonitor monitor) throws CoreException {
+		try {
 			monitor = (monitor == null) ? new NullProgressMonitor() : monitor;
 			checkCanceled(monitor);
 			monitor.beginTask("", sourceInfo == null ? 3 : 2); //$NON-NLS-1$
-			if (sourceInfo == null)
-			{
+			if (sourceInfo == null) {
 				sourceInfo = source.fetchInfo(IExtendedFileStore.DETAILED, subMonitorFor(monitor, 1));
 			}
 			checkCanceled(monitor);
-			if (sourceInfo.isDirectory())
-			{
+			if (sourceInfo.isDirectory()) {
 				destination.mkdir(EFS.NONE, subMonitorFor(monitor, 2));
-			}
-			else
-			{
+			} else {
 				final byte[] buffer = new byte[8192];
 				long length = sourceInfo.getLength();
 				int totalWork = (length == -1) ? IProgressMonitor.UNKNOWN : 1 + (int) (length / buffer.length);
 				InputStream in = null;
 				OutputStream out = null;
-				try
-				{
+				try {
 					in = source.openInputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					out = destination.openOutputStream(EFS.NONE, subMonitorFor(monitor, 0));
 					IProgressMonitor subMonitor = subMonitorFor(monitor, 2);
-					subMonitor.beginTask(MessageFormat.format(Messages.SyncUtils_Copying, source.toString()), totalWork);
-					while (true)
-					{
+					subMonitor
+							.beginTask(MessageFormat.format(Messages.SyncUtils_Copying, source.toString()), totalWork);
+					while (true) {
+						checkCanceled(monitor);
 						int bytesRead = -1;
-						try
-						{
+						try {
 							bytesRead = in.read(buffer);
-						}
-						catch (IOException e)
-						{
+						} catch (IOException e) {
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Reading, source.toString()), e);
 						}
-						if (bytesRead == -1)
+						if (bytesRead == -1) {
 							break;
-						try
-						{
-							out.write(buffer, 0, bytesRead);
 						}
-						catch (IOException e)
-						{
+						checkCanceled(monitor);
+						try {
+							out.write(buffer, 0, bytesRead);
+						} catch (IOException e) {
 							error(MessageFormat.format(Messages.SyncUtils_ERR_Writing, destination.toString()), e);
 						}
 						subMonitor.worked(1);
 					}
 					subMonitor.done();
-				}
-				finally
-				{
+				} finally {
 					safeClose(in);
 					safeClose(out);
 				}
 			}
 			destination.putInfo(sourceInfo, EFS.SET_ATTRIBUTES | EFS.SET_LAST_MODIFIED | options, subMonitorFor(
 					monitor, 1));
-		}
-		finally
-		{
+		} finally {
 			monitor.done();
 		}
 	}
 
-	private static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks)
-	{
-		if (monitor == null)
-		{
+	private static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks) {
+		if (monitor == null) {
 			return new NullProgressMonitor();
 		}
-		if (monitor instanceof NullProgressMonitor)
-		{
+		if (monitor instanceof NullProgressMonitor) {
 			return monitor;
 		}
 		return new SubProgressMonitor(monitor, ticks);
 	}
 
-	private static void checkCanceled(IProgressMonitor monitor)
-	{
+	private static void checkCanceled(IProgressMonitor monitor) {
 		if (monitor.isCanceled())
 			throw new OperationCanceledException();
 	}
 
-	private static void error(String message, Exception e) throws CoreException
-	{
+	private static void error(String message, Exception e) throws CoreException {
 		throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, message, e));
 	}
 
-	private static void safeClose(InputStream in)
-	{
-		try
-		{
-			if (in != null)
-			{
+	private static void safeClose(InputStream in) {
+		try {
+			if (in != null) {
 				in.close();
 			}
-		}
-		catch (IOException ignore)
-		{
+		} catch (IOException ignore) {
 		}
 	}
 
-	private static void safeClose(OutputStream out)
-	{
-		try
-		{
-			if (out != null)
-			{
+	private static void safeClose(OutputStream out) throws CoreException {
+		try {
+			if (out != null) {
 				out.close();
 			}
-		}
-		catch (IOException ignore)
-		{
+		} catch (IOException e) {
+			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, "Close output stream failed.", e));
 		}
 	}
 
