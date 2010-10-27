@@ -48,56 +48,61 @@ public class JSONPropertyRule implements IRule
 	private IRule _singleQuotedRule;
 	private IRule _doubleQuotedRule;
 	private IToken _token;
-	
+
 	/**
 	 * JSONPropertyRule
+	 * 
+	 * @param singleQuotedToken
+	 * @param doubleQuotedToken
+	 * @param token
 	 */
-	public JSONPropertyRule(IToken singleQuotedToken, IToken doubleQuoteToken, IToken token)
+	public JSONPropertyRule(IToken singleQuotedToken, IToken doubleQuotedToken, IToken token)
 	{
 		this._singleQuotedRule = new SingleLineRule("\"", "\"", singleQuotedToken);
-		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuoteToken);
+		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken);
 		this._token = token;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
 	public IToken evaluate(ICharacterScanner scanner)
 	{
 		// try double-quoted string
 		IToken token = this._doubleQuotedRule.evaluate(scanner);
-		
+
 		// try single-quoted string
 		if (token == Token.UNDEFINED)
 		{
 			token = this._singleQuotedRule.evaluate(scanner);
 		}
-		
+
 		// now perform positive lookahead for colon
 		if (token != Token.UNDEFINED)
 		{
 			char c = (char) scanner.read();
 			int count = 1;
-			
+
 			// skip any whitespace
 			while (Character.isWhitespace(c))
 			{
 				c = (char) scanner.read();
 				count++;
 			}
-			
+
 			if (c == ':')
 			{
 				token = this._token;
 			}
-			
+
 			// rewind from lookahead
 			for (int i = 0; i < count; i++)
 			{
 				scanner.unread();
 			}
 		}
-		
+
 		return token;
 	}
 }
