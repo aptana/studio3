@@ -41,8 +41,6 @@ import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.outline.IParseListener;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
@@ -120,36 +118,21 @@ public class FileService
 			if (force || sourceHash != fLastSourceHash)
 			{
 				fLastSourceHash = sourceHash;
+				fParseState.setEditState(source, null, 0, 0);
 
-				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fLanguage);
-				if (pool != null)
+				try
 				{
-					IParser parser = pool.checkOut();
-					if (parser != null)
+					ParserPoolFactory.parse(fLanguage, fParseState);
+
+					for (IParseListener listener : listeners)
 					{
-						// TODO: at some point, we'll want to use this call to indicate the
-						// actual edit with the theory that we'll be able to perform
-						// incremental lexing and parsing based on that info.
-						fParseState.setEditState(source, null, 0, 0);
-		
-						try
-						{
-							parser.parse(fParseState);
-		
-							for (IParseListener listener : listeners)
-							{
-								listener.parseFinished();
-							}
-						}
-						catch (Exception e)
-						{
-							// not logging the parsing error here since the source could be in an intermediate state of being
-							// edited
-							// by
-							// the user
-						}
-						pool.checkIn(parser);
+						listener.parseFinished();
 					}
+				}
+				catch (Exception e)
+				{
+					// not logging the parsing error here since the source could be in an intermediate state of being
+					// edited by the user
 				}
 			}
 		}
