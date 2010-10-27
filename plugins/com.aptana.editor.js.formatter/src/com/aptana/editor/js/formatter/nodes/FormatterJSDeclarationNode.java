@@ -140,6 +140,10 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	public int getSpacesCountBefore()
 	{
 		// TODO preferences?
+		if (node.getParent().getNodeType() == JSNodeTypes.GROUP)
+		{
+			return 0;
+		}
 		return 1;
 	}
 
