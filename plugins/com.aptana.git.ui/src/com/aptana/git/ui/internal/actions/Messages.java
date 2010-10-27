@@ -59,6 +59,8 @@ public class Messages extends NLS
 	public static String CommitDialog_EnterMessage_Error;
 	public static String CommitDialog_MessageLabel;
 	public static String CommitDialog_PathColumnLabel;
+
+	public static String CommitDialog_RevertLabel;
 	public static String CommitDialog_StageFilesFirst_Error;
 	public static String CommitDialog_StageSelected;
 	public static String CommitDialog_StageSelectedMarker;

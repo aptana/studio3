@@ -58,7 +58,12 @@
             id="com.aptana.projects.filters.projectFilesFilter"
             name="Project Files">
          <filterExpression>
-            <or>
+           <and>
+              <adapt
+                    type="org.eclipse.core.resources.IFile">
+              </adapt>
+             
+             <or>
                <test
                      property="org.eclipse.core.resources.name"
                      value=".project">
@@ -75,7 +80,8 @@
                      property="org.eclipse.core.resources.name"
                      value=".git">
                </test>
-            </or>
+             </or>
+           </and>
          </filterExpression>
       </commonFilter>
    </extension>
