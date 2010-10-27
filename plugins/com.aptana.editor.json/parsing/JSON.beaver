@@ -73,13 +73,13 @@
         report = new JSONEvents();
 :};
 
-%terminals STRING_DOUBLE, STRING_SINGLE;
+%terminals PROPERTY, STRING_DOUBLE, STRING_SINGLE;
 %terminals LCURLY, RCURLY, LBRACKET, RBRACKET;
 %terminals COMMA, COLON;
 %terminals NUMBER, TRUE, FALSE, NULL;
 
 %typeof Entry, Value, String = "JSONNode";
-%typeof STRING_SINGLE, STRING_DOUBLE, NUMBER = "String";
+%typeof PROPERTY, STRING_SINGLE, STRING_DOUBLE, NUMBER = "String";
 
 %goal JSON;
 
@@ -151,11 +151,14 @@ Entries
     ;
 
 Entry
-    =   String.s COLON Value.v
+    =   PROPERTY.p COLON Value.v
         {:
             JSONEntryNode entry = new JSONEntryNode();
+            JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
+            
+            property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());
 
-            entry.addChild(s);
+            entry.addChild(property);
             entry.addChild(v);
 
             return entry;

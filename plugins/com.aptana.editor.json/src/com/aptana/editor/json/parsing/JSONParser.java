@@ -13,15 +13,15 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JSON.beaver".
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JSONParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9oDaKjJ0Z4GX3j41OHr9JnKTBr95GSlL7dmn96$vV#LbszyZZrnG2kbjMRhgqvtJIRP1C1" +
-		"4Fh2B1fheOWjLr51FlGXwPJNmg60REp5lopNzSVGPW0EwJdGU$QW1EVDzd60lhWWun16J5d" +
-		"7ivDbNwxHtwi4LPJKP##RihtcJUw#z$ajxuxvLymPt3t55fcTYegSfhh0PBPsNmJ4m7PcEJ" +
-		"GiIR5uplJJj$zAdzv$zhFOyyHS$vcUcfqdDCF75byYxlCchlCYphEH97kM1sJsv8xUnOaaM" +
-		"P4vcCfKRXXr#Ze2twluaCtBUSyut2n77k$PyYGhnV275eVi9KubDHm==");
+		"U9oDKjbomZ0CN1DeqtB4X90UWVB40pmMlg1Vrl$jHU#M7khQA859OO9dTbQhh6L5De0h#KK" +
+		"BVTHnY117E4RpdnwWWxJILKE01WxGHYmYDyXKd#8C9qXKdIj7w2A6XLizmlZzTV$DrIphcA" +
+		"vcfQl3kfQLNKTWVxbstIQ5MhjY#bhiLjWrCBn6iQOkhWBNIFbIUQOyT$#bSQWyLiwsr4dtE" +
+		"S$1TLlQEzs8ypCkIfv9IGzN93$oBL#ob4$va7TvarVcNeXduiax5iG3SK$SoQqyCfbmjeO0" +
+		"Psbs8b9OtfBbFVKy3ASUSFer8l3l8c4k$GExpay7");
 
     // suppress parser error reporting and let the custom error recovery mechanism handle it
     private static class JSONEvents extends Events
@@ -162,16 +162,19 @@ public class JSONParser extends Parser implements IParser {
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 15: // Entry = String.s COLON Value.v
+			case 15: // Entry = PROPERTY.p COLON Value.v
 			{
-					final Symbol _symbol_s = _symbols[offset + 1];
-					final JSONNode s = (JSONNode) _symbol_s.value;
+					final Symbol _symbol_p = _symbols[offset + 1];
+					final String p = (String) _symbol_p.value;
 					final Symbol _symbol_v = _symbols[offset + 3];
 					final JSONNode v = (JSONNode) _symbol_v.value;
 					
             JSONEntryNode entry = new JSONEntryNode();
+            JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
 
-            entry.addChild(s);
+            property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());
+            
+            entry.addChild(property);
             entry.addChild(v);
 
             return entry;
