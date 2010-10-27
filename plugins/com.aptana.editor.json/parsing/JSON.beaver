@@ -41,7 +41,7 @@
         {
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
@@ -155,7 +155,7 @@ Entry
         {:
             JSONEntryNode entry = new JSONEntryNode();
             JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
-            
+
             property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());
 
             entry.addChild(property);
