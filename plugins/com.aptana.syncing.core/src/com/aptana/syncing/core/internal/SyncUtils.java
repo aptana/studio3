@@ -72,6 +72,7 @@ public final class SyncUtils {
 	 *   (FTP implementation always uploads to a temporary file first and always cleans up afterwards)
 	 * 4. it does not ignore exceptions on output stream close (FTP implementation finalizes transfer on close)
 	 * 5. it always works as it EFS.SHALLOW would be set
+	 * 6. EFS implementation prevent concurrent copying of FileStores due static synchronized buffer (see org.eclipse.core.filesystem.provider.FileStore.transferStreams)
 	 * 
 	 * @param source
 	 * @param sourceInfo
