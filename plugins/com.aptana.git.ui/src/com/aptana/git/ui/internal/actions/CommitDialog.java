@@ -123,6 +123,9 @@ class CommitDialog extends StatusDialog
 	private Browser diffArea;
 	private ChangedFile fLastDiffFile;
 
+	private StagingButtons unstageButtons;
+	private StagingButtons stageButtons;
+
 	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
@@ -177,6 +180,21 @@ class CommitDialog extends StatusDialog
 			{
 				packTable(stagedTable);
 				packTable(unstagedTable);
+				// Select the first item in staged if there is one
+				if (unstagedTable.getItemCount() > 0)
+				{
+					unstagedTable.select(0);
+					ChangedFile file = getChangedFile(unstagedTable.getItem(0));
+					updateDiff(false, file);
+					stageButtons.updateSelectionButton();
+				}
+				else if (stagedTable.getItemCount() > 0)
+				{
+					stagedTable.select(0);
+					ChangedFile file = getChangedFile(stagedTable.getItem(0));
+					updateDiff(true, file);
+					unstageButtons.updateSelectionButton();
+				}
 			}
 		});
 		return container;
@@ -249,6 +267,7 @@ class CommitDialog extends StatusDialog
 					Messages.CommitDialog_UnstageSelected);
 			createTableComposite(composite, staged);
 			buttons.setTable(stagedTable, staged);
+			unstageButtons = buttons;
 		}
 		else
 		{
@@ -257,6 +276,7 @@ class CommitDialog extends StatusDialog
 					Messages.CommitDialog_StageAll, Messages.CommitDialog_StageSelectedMarker,
 					Messages.CommitDialog_StageSelected);
 			buttons.setTable(unstagedTable, staged);
+			stageButtons = buttons;
 		}
 	}
 
@@ -560,7 +580,7 @@ class CommitDialog extends StatusDialog
 					ContributionItem ci = new ContributionItem() {
 						public void fill(Menu menu, int index) {
 							MenuItem item = new MenuItem(menu, SWT.NONE);
-							item.setText("Revert");
+							item.setText(Messages.CommitDialog_RevertLabel);
 							// need to remove the file(s) from staged table once action runs
 							item.addSelectionListener(new SelectionAdapter()
 							{

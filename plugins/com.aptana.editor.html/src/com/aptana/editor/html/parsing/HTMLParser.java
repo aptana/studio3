@@ -42,8 +42,8 @@ import java.util.Stack;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
-import beaver.Scanner.Exception;
 import beaver.Symbol;
+import beaver.Scanner.Exception;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
@@ -55,8 +55,6 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -172,17 +170,7 @@ public class HTMLParser implements IParser
 			id = fCurrentSymbol.getId();
 		}
 
-		IParseNode[] nested = new IParseNode[0];
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
-		if (pool != null)
-		{
-			IParser parser = pool.checkOut();
-			if (parser != null)
-			{
-				nested = getParseResult(parser, start, end);
-			}
-			pool.checkIn(parser);
-		}
+		IParseNode[] nested = getParseResult(language, start, end);
 		if (fCurrentElement != null)
 		{
 			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
@@ -234,14 +222,12 @@ public class HTMLParser implements IParser
 		fCurrentSymbol = fScanner.nextToken();
 	}
 
-	private IParseNode[] getParseResult(IParser parser, int start, int end)
+	private IParseNode[] getParseResult(String language, int start, int end)
 	{
 		try
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
-			ParseState parseState = new ParseState();
-			parseState.setEditState(text, text, 0, 0);
-			IParseNode node = parser.parse(parseState);
+			IParseNode node = ParserPoolFactory.parse(language, text);
 			addOffset(node, start);
 			return new IParseNode[] { node };
 		}

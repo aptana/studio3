@@ -70,6 +70,8 @@ public class JSFormatterBlankLinesPage extends FormatterModifyTabPage
 				2, 1, GridData.FILL_HORIZONTAL);
 		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
 				Messages.JSFormatterBlankLinesPage_afterFunctionDeclaration);
+		manager.createNumber(blankLinesGroup, JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
+				Messages.JSFormatterBlankLinesPage_afterFunctionDeclarationInExpression);
 
 		Group preserveLinesGroup = SWTFactory.createGroup(parent,
 				Messages.JSFormatterBlankLinesPage_existingBlankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);

@@ -66,8 +66,6 @@ import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -291,41 +289,30 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+
 		try
 		{
-			if (file == null)
+			if (file != null)
 			{
-				return;
-			}
+				sub.subTask(file.getName());
 
-			sub.subTask(file.getName());
+				removeTasks(file, sub.newChild(10));
 
-			removeTasks(file, sub.newChild(10));
-
-			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IHTMLParserConstants.LANGUAGE);
-			if (pool != null)
-			{
+				// grab the source of the file we're going to parse
 				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+
+				// minor optimization when creating a new empty file
 				if (fileContents != null && fileContents.trim().length() > 0)
 				{
-					IParser htmlParser = pool.checkOut();
-					if (htmlParser != null)
-					{
+					HTMLParseState parseState = new HTMLParseState();
+					parseState.setEditState(fileContents, null, 0, 0); //$NON-NLS-1$
 
-						HTMLParseState parseState = new HTMLParseState();
-						parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-						IParseNode parseNode = htmlParser.parse(parseState);
-						pool.checkIn(htmlParser);
-						sub.worked(50);
-						walkAST(index, file, fileContents, parseNode, sub.newChild(20));
-					}
+					IParseNode parseNode = ParserPoolFactory.parse(IHTMLParserConstants.LANGUAGE, parseState);
+					sub.worked(50);
+
+					walkAST(index, file, fileContents, parseNode, sub.newChild(20));
 				}
 			}
-		}
-		catch (beaver.Parser.Exception e)
-		{
-			// just like in FileServer ... "not logging the parsing error here since
-			// the source could be in an intermediate state of being edited by the user"
 		}
 		catch (Throwable e)
 		{

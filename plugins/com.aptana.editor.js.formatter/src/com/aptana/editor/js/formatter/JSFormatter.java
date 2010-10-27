@@ -273,6 +273,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		document.setBoolean(JSFormatterConstants.WRAP_COMMENTS, getBoolean(JSFormatterConstants.WRAP_COMMENTS));
 		document.setInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION,
 				getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION));
+		document.setInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
+				getInt(JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		// Set the indentation values
