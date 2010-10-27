@@ -110,7 +110,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	 * @param node
 	 * @return
 	 */
-	private boolean isPartOfExpression(IParseNode node)
+	public static boolean isPartOfExpression(IParseNode node)
 	{
 		if (node == null)
 		{
