@@ -41,6 +41,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.editor.html.formatter.HTMLFormatterPlugin;
+import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 
@@ -85,6 +86,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 		}
 		catch (BackingStoreException e)
 		{
+			FormatterPlugin.logError(e);
 		}
 	}
 }
