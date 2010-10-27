@@ -49,9 +49,6 @@ import com.aptana.editor.dtd.parsing.ast.DTDAttributeNode;
 import com.aptana.editor.dtd.parsing.ast.DTDElementDeclNode;
 import com.aptana.editor.dtd.parsing.ast.DTDParseRootNode;
 import com.aptana.editor.dtd.parsing.ast.DTDTreeWalker;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -187,27 +184,12 @@ public class DTDTransformer
 	{
 		IParseRootNode result = null;
 
-		// create parser and associated parse state
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(DTDParserConstants.LANGUAGE);
-
-		if (pool != null)
+		try
 		{
-			IParser parser = pool.checkOut();
-
-			// apply the source to the parse state and parse
-			ParseState parseState = new ParseState();
-			parseState.setEditState(source, null, 0, 0);
-			try
-			{
-				result = parser.parse(parseState);
-			}
-			catch (Exception e)
-			{
-			}
-			finally
-			{
-				pool.checkIn(parser);
-			}
+			result = ParserPoolFactory.parse(DTDParserConstants.LANGUAGE, source);
+		}
+		catch (Exception e)
+		{
 		}
 
 		return result;
