@@ -22,8 +22,9 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		{
 			username = "user"; //$NON-NLS-1$
 		}
-		String reponame = "repo";
-		IPath wd = getSelectedRepository().workingDirectory();
+		String reponame = "repo"; //$NON-NLS-1$
+		final GitRepository repo = getSelectedRepository();
+		IPath wd = repo.workingDirectory();
 		reponame = wd.lastSegment();
 		if (reponame.endsWith(GitRepository.GIT_DIR))
 		{
@@ -33,6 +34,7 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 
 		final String[] finalURL = new String[] { url };
 		final String[] finalName = new String[] { name };
+		final boolean[] finalTrack = new boolean[] { false };
 
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
 		{
@@ -40,22 +42,28 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 			public void run()
 			{
 				AddRemoteDialog dialog = new AddRemoteDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-						.getShell(), finalName[0], finalURL[0]);
+						.getShell(), repo, finalName[0], finalURL[0]);
 				if (dialog.open() == Window.OK)
 				{
 					finalName[0] = dialog.getValue().trim();
 					finalURL[0] = dialog.getRemoteURL();
+					finalTrack[0] = dialog.track();
 				}
 				else
 				{
 					finalName[0] = null;
 					finalURL[0] = null;
+					finalTrack[0] = false;
 				}
 			}
 		});
 		if (finalName[0] == null)
 		{
 			return null; // don't let command run!
+		}
+		if (finalTrack[0])
+		{
+			return new String[] { "remote", "add", "--track", repo.currentBranch(), finalName[0], finalURL[0] }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		return new String[] { "remote", "add", finalName[0], finalURL[0] }; //$NON-NLS-1$ //$NON-NLS-2$
 	}
