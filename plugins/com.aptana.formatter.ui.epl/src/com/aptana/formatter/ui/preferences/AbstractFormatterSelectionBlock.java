@@ -490,10 +490,14 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
-				fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
-				previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
-				previewPane.layout();
-				updatePreview();
+				
+				if (selectedFormatter != -1)
+				{
+					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
+					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+					previewPane.layout();
+					updatePreview();
+				}
 			}
 		});
 
