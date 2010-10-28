@@ -37,6 +37,7 @@ package com.aptana.editor.json.outline;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.editor.json.parsing.ast.JSONEntryNode;
 import com.aptana.editor.json.parsing.ast.JSONNode;
@@ -95,6 +96,12 @@ public class JSONOutlineLabelProvider extends LabelProvider
 					break;
 			}
 		}
+		else if (element instanceof CommonOutlineItem)
+		{
+			CommonOutlineItem item = (CommonOutlineItem) element;
+			
+			result = this.getImage(item.getReferenceNode());
+		}
 
 		return (result == null) ? super.getImage(element) : result;
 	}
@@ -121,6 +128,12 @@ public class JSONOutlineLabelProvider extends LabelProvider
 			{
 				result = node.getText();
 			}
+		}
+		else if (element instanceof CommonOutlineItem)
+		{
+			CommonOutlineItem item = (CommonOutlineItem) element;
+			
+			result = this.getText(item.getReferenceNode());
 		}
 
 		return (result == null) ? super.getText(element) : result;

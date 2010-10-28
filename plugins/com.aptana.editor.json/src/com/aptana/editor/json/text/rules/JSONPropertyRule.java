@@ -32,83 +32,77 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.parsing;
+package com.aptana.editor.json.text.rules;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.BundleContext;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
 
 /**
- * The activator class controls the plug-in life cycle
+ * JSONPropertyRule
  */
-public class ParsingPlugin extends Plugin
+public class JSONPropertyRule implements IRule
 {
-	public static final String PLUGIN_ID = "com.aptana.parsing"; //$NON-NLS-1$
-	private static ParsingPlugin plugin;
+	private IRule _singleQuotedRule;
+	private IRule _doubleQuotedRule;
+	private IToken _token;
 
 	/**
-	 * Returns the shared instance
+	 * JSONPropertyRule
 	 * 
-	 * @return the shared instance
+	 * @param singleQuotedToken
+	 * @param doubleQuotedToken
+	 * @param token
 	 */
-	public static ParsingPlugin getDefault()
+	public JSONPropertyRule(IToken singleQuotedToken, IToken doubleQuotedToken, IToken token)
 	{
-		return plugin;
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void logError(Exception e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
-	/**
-	 * The constructor
-	 */
-	public ParsingPlugin()
-	{
+		this._singleQuotedRule = new SingleLineRule("\"", "\"", singleQuotedToken);
+		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken);
+		this._token = token;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
-	public void start(BundleContext context) throws Exception
+	public IToken evaluate(ICharacterScanner scanner)
 	{
-		super.start(context);
-		plugin = this;
-	}
+		// try double-quoted string
+		IToken token = this._doubleQuotedRule.evaluate(scanner);
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception
-	{
-		try
+		// try single-quoted string
+		if (token == Token.UNDEFINED)
 		{
-			ParserPoolFactory.getInstance().dispose();
+			token = this._singleQuotedRule.evaluate(scanner);
 		}
-		finally
+
+		// now perform positive lookahead for colon
+		if (token != Token.UNDEFINED)
 		{
-			plugin = null;
-			super.stop(context);
+			char c = (char) scanner.read();
+			int count = 1;
+
+			// skip any whitespace
+			while (Character.isWhitespace(c))
+			{
+				c = (char) scanner.read();
+				count++;
+			}
+
+			if (c == ':')
+			{
+				token = this._token;
+			}
+
+			// rewind from lookahead
+			for (int i = 0; i < count; i++)
+			{
+				scanner.unread();
+			}
 		}
+
+		return token;
 	}
 }

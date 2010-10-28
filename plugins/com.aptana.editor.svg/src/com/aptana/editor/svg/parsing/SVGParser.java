@@ -42,9 +42,6 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
@@ -134,39 +131,29 @@ public class SVGParser extends XMLParser
 	 */
 	private void processLanguage(String language, String elementName)
 	{
+		// grab offset after '>' in open tag
 		int startingOffset = fCurrentLexeme.getEndingOffset() + 1;
+		
+		// advance to the matching close tag
 		this.advanceToCloseTag(elementName);
+		
+		// grab the offset just before '<' in the close tag
 		int endingOffset = fCurrentLexeme.getStartingOffset() - 1;
-
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
-
-		if (pool != null)
+		
+		// grab the source between the open and close tag
+		String source = this.getSource(startingOffset, endingOffset - startingOffset + 1);
+		
+		try
 		{
-			IParser parser = pool.checkOut();
+			IParseNode result = ParserPoolFactory.parse(language, source);
 
-			if (parser != null)
-			{
-				String source = this.getSource(startingOffset, endingOffset - startingOffset + 1);
-				ParseState parseState = new ParseState();
+			// offset to re-align with SVG source offsets
+			offsetNodes(startingOffset, result);
 
-				parseState.setEditState(source, null, 0, 0);
-				IParseNode result;
-				try
-				{
-					result = parser.parse(parseState);
-
-					// offset to re-align with SVG source offsets
-					offsetNodes(startingOffset, result);
-
-					fCurrentElement.addChild(result);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-
-			pool.checkIn(parser);
+			fCurrentElement.addChild(result);
+		}
+		catch (Exception e)
+		{
 		}
 
 		this.processEndTag();

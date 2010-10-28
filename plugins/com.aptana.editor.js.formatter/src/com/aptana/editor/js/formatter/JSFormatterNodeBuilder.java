@@ -144,7 +144,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			// Then, push the body
 			IParseNode body = node.getBody();
-			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document);
+			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document, FormatterJSDeclarationNode.isPartOfExpression(node.getParent()));
 			bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(bodyNode);
 			super.visit(node);

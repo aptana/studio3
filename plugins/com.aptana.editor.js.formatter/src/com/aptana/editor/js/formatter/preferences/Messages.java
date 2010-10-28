@@ -43,6 +43,7 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.js.formatter.preferences.Messages"; //$NON-NLS-1$
 	public static String JSFormatterBlankLinesPage_afterFunctionDeclaration;
+	public static String JSFormatterBlankLinesPage_afterFunctionDeclarationInExpression;
 	public static String JSFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesGroupLabel;
 	public static String JSFormatterBlankLinesPage_existingBlankLinesToPreserve;

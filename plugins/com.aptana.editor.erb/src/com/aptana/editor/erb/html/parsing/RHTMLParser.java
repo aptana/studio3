@@ -44,9 +44,6 @@ import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.ruby.core.IRubyScript;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
 import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -100,19 +97,13 @@ public class RHTMLParser extends CompositeParser
 			id = getCurrentSymbol().getId();
 		}
 
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
-		if (pool != null)
+		IParseNode result = getParseResult(IRubyParserConstants.LANGUAGE, start, end);
+		if (result != null)
 		{
-			IParser parser = pool.checkOut();
-			IParseNode result = getParseResult(parser, start, end);
-			pool.checkIn(parser);
-			if (result != null)
-			{
-				Symbol endTag = getCurrentSymbol();
-				ERBScript erb = new ERBScript((IRubyScript) result, startTag.value.toString(), endTag.value.toString());
-				erb.setLocation(startTag.getStart(), endTag.getEnd());
-				root.addChild(erb);
-			}
+			Symbol endTag = getCurrentSymbol();
+			ERBScript erb = new ERBScript((IRubyScript) result, startTag.value.toString(), endTag.value.toString());
+			erb.setLocation(startTag.getStart(), endTag.getEnd());
+			root.addChild(erb);
 		}
 	}
 }

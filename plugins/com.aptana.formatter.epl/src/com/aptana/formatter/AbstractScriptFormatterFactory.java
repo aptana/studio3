@@ -76,7 +76,9 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 						return profile.getSettings();
 					}
 				}
-			} else {
+			}
+			else
+			{
 				List<IProfile> builtInProfiles = profileManager.getBuiltInProfiles();
 				if (builtInProfiles != null && !builtInProfiles.isEmpty())
 				{

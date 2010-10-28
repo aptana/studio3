@@ -79,6 +79,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String DOCTYPE_PRECEDING_TEXT = "!"; //$NON-NLS-1$
+
 	/**
 	 * LocationType
 	 */
@@ -346,10 +348,45 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean close = true;
 			int replaceLength = 0;
+			int replaceOffset = offset;
+			if (this._currentLexeme.getType() == HTMLTokenType.META) // DOCTYPE?
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength();
 
-			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getEndingOffset() - replaceOffset;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TEXT
+					&& this._currentLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT)) // !
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength(); // replace the '!'
+
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+				if (nextLexeme != null && nextLexeme.getType() == HTMLTokenType.TAG_END)
+				{
+					replaceLength = nextLexeme.getEndingOffset() - replaceOffset;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
 			{
 				replaceLength = 1; // replace the '>'
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength += previousLexeme.getLength();
+				}
 			}
 			else if (this._currentLexeme.getType() != HTMLTokenType.TAG_START) // as long as it's not: "<|<"
 			{
@@ -365,7 +402,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 				{
-					offset = _currentLexeme.getStartingOffset();
+					replaceOffset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
 
 					if (nextLexeme.equals(this._currentLexeme) == false)
@@ -400,8 +437,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
 					{
-						replaceString += " >"; //$NON-NLS-1$
 						cursorPosition += 1;
+						// Don't add ">" unless we know we need it! Look at next Lexeme!
+						int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+						Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+						if (nextLexeme == null || nextLexeme.getType() == HTMLTokenType.TAG_START)
+						{
+							replaceString += " >"; //$NON-NLS-1$
+						}
 					}
 					else if (state.isEmptyTagType(element.getName()))
 					{
@@ -417,7 +460,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						IDocument doc = new Document(_document.get());
 						try
 						{
-							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+							doc.replace(replaceOffset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
 						}
 						catch (BadLocationException e)
 						{
@@ -437,7 +480,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 				}
 				positions.add(0, cursorPosition);
-				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, offset, replaceLength, element,
+				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, replaceOffset, replaceLength, element,
 						positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
@@ -479,6 +522,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			int offset)
 	{
 		this._replaceRange = null;
+		// Replace all the way until we hit the end of the doctype tag!
+		Lexeme<HTMLTokenType> ptr = _currentLexeme;
+		while (ptr != null && ptr.getType() != HTMLTokenType.TAG_END)
+		{
+			int index = lexemeProvider.getLexemeIndex(ptr.getStartingOffset());
+			ptr = lexemeProvider.getLexeme(index + 1);
+		}
+		if (ptr != null)
+		{
+			this._replaceRange = new Range(_currentLexeme.getStartingOffset(), ptr.getStartingOffset() - 1);
+		}
+
 		Image[] userAgentIcons = this.getAllUserAgentIcons();
 		for (Map.Entry<String, String> entry : DOCTYPES.entrySet())
 		{

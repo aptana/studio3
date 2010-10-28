@@ -36,4 +36,14 @@ public class CommitHandler extends AbstractGitHandler
 		return null;
 	}
 
+	@Override
+	protected boolean calculateEnabled()
+	{
+		GitRepository repo = getSelectedRepository();
+		if (repo == null)
+		{
+			return false;
+		}
+		return !repo.index().changedFiles().isEmpty() || repo.hasUnresolvedMergeConflicts();
+	}
 }

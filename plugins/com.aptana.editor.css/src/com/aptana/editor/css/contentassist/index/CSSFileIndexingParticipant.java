@@ -54,9 +54,6 @@ import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSTermNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -82,43 +79,30 @@ public class CSSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
-		if (file == null)
-		{
-			return;
-		}
+		
 		try
 		{
-			sub.subTask(file.getName());
-
-			removeTasks(file, sub.newChild(10));
-
-			String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
-			if (fileContents != null && fileContents.trim().length() > 0)
+			if (file != null)
 			{
-				ParseState parseState = new ParseState();
-				parseState.setEditState(fileContents, "", 0, 0); //$NON-NLS-1$
-				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(ICSSParserConstants.LANGUAGE);
-				if (pool != null)
+				sub.subTask(file.getName());
+	
+				removeTasks(file, sub.newChild(10));
+	
+				// grab the source of the file we're going to parse
+				String fileContents = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+				
+				// minor optimization when creating a new empty file
+				if (fileContents != null && fileContents.trim().length() > 0)
 				{
-					IParser cssParser = pool.checkOut();
-					cssParser.parse(parseState);
-					pool.checkIn(cssParser);
+					IParseNode ast = ParserPoolFactory.parse(ICSSParserConstants.LANGUAGE, fileContents);
 					sub.worked(50);
-
-					// process results
-					IParseNode ast = parseState.getParseResult();
-					this.processParseResults(file, index, ast, sub.newChild(20));
+					
+					if (ast != null)
+					{
+						this.processParseResults(file, index, ast, sub.newChild(20));
+					}
 				}
 			}
-		}
-		catch (beaver.Parser.Exception e)
-		{
-			// just like in FileServer ... "not logging the parsing error here since
-			// the source could be in an intermediate state of being edited by the user"
-		}
-		catch (CoreException e)
-		{
-			Activator.logError(e);
 		}
 		catch (Throwable e)
 		{

@@ -34,81 +34,24 @@
  */
 package com.aptana.parsing;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.BundleContext;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * The activator class controls the plug-in life cycle
+ * @author klindsey
+ *
  */
-public class ParsingPlugin extends Plugin
+public class Messages extends NLS
 {
-	public static final String PLUGIN_ID = "com.aptana.parsing"; //$NON-NLS-1$
-	private static ParsingPlugin plugin;
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static ParsingPlugin getDefault()
+	private static final String BUNDLE_NAME = "com.aptana.parsing.messages"; //$NON-NLS-1$
+	public static String ParserPoolFactory_Cannot_Acquire_Parser;
+	public static String ParserPoolFactory_Cannot_Acquire_Parser_Pool;
+	static
 	{
-		return plugin;
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	/**
-	 * logError
-	 * 
-	 * @param e
-	 */
-	public static void logError(Exception e)
+	private Messages()
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
-
-	/**
-	 * logError
-	 * 
-	 * @param msg
-	 * @param e
-	 */
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
-	}
-
-	/**
-	 * The constructor
-	 */
-	public ParsingPlugin()
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception
-	{
-		super.start(context);
-		plugin = this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception
-	{
-		try
-		{
-			ParserPoolFactory.getInstance().dispose();
-		}
-		finally
-		{
-			plugin = null;
-			super.stop(context);
-		}
 	}
 }
