@@ -34,5 +34,24 @@
             language="text/json">
       </parser>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.json.preferences.JSONPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.json">
+         <formatterFactory
+               class="com.aptana.editor.json.formatter.JSONFormatterFactory"
+               description="JSON Code Formatter"
+               id="com.aptana.editor.json.formatterFactory"
+               name="JSON"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
 
 </plugin>
