@@ -42,19 +42,18 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
  */
 public class JSONObjectFormatNode extends FormatterBlockWithBeginEndNode
 {
-	private boolean _isPropertyValue;
+	private boolean _firstElement;
 	
 	/**
 	 * JSONObjectFormatNode
 	 * 
 	 * @param document
-	 * @param isPropertyValue
 	 */
-	public JSONObjectFormatNode(IFormatterDocument document, boolean isPropertyValue)
+	public JSONObjectFormatNode(IFormatterDocument document, boolean firstElement)
 	{
 		super(document);
 		
-		this._isPropertyValue = isPropertyValue;
+		this._firstElement = firstElement;
 	}
 
 	/*
@@ -64,7 +63,7 @@ public class JSONObjectFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return true; //(this._isPropertyValue == false);
+		return this._firstElement;
 	}
 
 	/*
@@ -74,7 +73,7 @@ public class JSONObjectFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		return true; //(this._isPropertyValue == false);
+		return true;
 	}
 
 	/*
