@@ -112,6 +112,19 @@ public class EditorUtils {
             }
             return false;
         }
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public Object getAdapter(Class adapter)
+		{
+			if (IFileStore.class == adapter) {
+				return fRemoteFileStore;
+			}
+			if (IFileInfo.class == adapter) {
+				return fRemoteFileInfo;
+			}
+			return super.getAdapter(adapter);
+		}
     }
 
     /**

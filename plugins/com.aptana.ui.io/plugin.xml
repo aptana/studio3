@@ -29,6 +29,9 @@
             <contentExtension
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
        <viewerActionBinding
@@ -509,6 +512,9 @@
             <contentExtension
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -649,6 +655,28 @@
             id="com.aptana.ui.io.preferences.PermissionPreferencePage"
             name="%PreferencePage.permissions.label">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.linkHelper">
+      <linkHelper
+            class="com.aptana.ide.ui.io.navigator.FilesystemLinkHelper"
+            id="com.aptana.ui.io.navigator.linkHelper">
+         <editorInputEnablement>
+            <instanceof
+                  value="org.eclipse.ui.ide.FileStoreEditorInput">
+            </instanceof></editorInputEnablement>
+         <selectionEnablement>
+            <and>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <test
+                     property="com.aptana.ide.ui.io.navigator.file.isDirectory"
+                     value="false">
+               </test>
+            </and>
+         </selectionEnablement>
+      </linkHelper>
    </extension>
 
 </plugin>
