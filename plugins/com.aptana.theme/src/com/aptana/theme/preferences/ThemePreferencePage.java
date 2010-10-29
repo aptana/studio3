@@ -258,8 +258,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		label.setText(Messages.ThemePreferencePage_FontNameLabel);
 
 		fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
-		fFontText = new Text(themesComp, SWT.SINGLE | SWT.BORDER);
+		fFontText = new Text(themesComp, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		fFontText.setText(toString(fFont));
+		fFontText.setFont(fFont);
 		fFontText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		Button selectFontButton = new Button(themesComp, SWT.PUSH);
@@ -282,7 +283,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private static String toString(Font font)
 	{
-		if (font == null || font.getFontData() == null || font.getFontData().length > 0)
+		if (font == null || font.getFontData() == null || font.getFontData().length <= 0)
 		{
 			return ""; //$NON-NLS-1$
 		}
@@ -1263,12 +1264,12 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected void setFont(Font font)
 	{
-		final Font oldFont = fFont;
-		if (oldFont.equals(font))
+		if (fFont.equals(font)) // TODO Also same if FontData arrays are equal!
 		{
 			return;
 		}
 		fFont = font;
+		fFontText.setFont(fFont);
 		fFontText.setText(ThemePreferencePage.toString(fFont));
 		// Set the fFont on the table!
 		if (fFonts != null)
@@ -1276,6 +1277,5 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			fFonts.clear();
 		}
 		tableViewer.refresh();
-		oldFont.dispose();
 	}
 }
