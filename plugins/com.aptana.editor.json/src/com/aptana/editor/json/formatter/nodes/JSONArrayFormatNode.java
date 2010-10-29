@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.json.formatter.nodes;
 
+import com.aptana.editor.json.parsing.ast.JSONArrayNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
@@ -42,24 +43,28 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
  */
 public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 {
+	private JSONArrayNode _referenceNode;
+	
 	/**
 	 * JSONObjectFormatNode
 	 * 
 	 * @param document
 	 */
-	public JSONArrayFormatNode(IFormatterDocument document)
+	public JSONArrayFormatNode(IFormatterDocument document, JSONArrayNode referenceNode)
 	{
 		super(document);
+		
+		this._referenceNode = referenceNode;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
 	 */
 	@Override
-	protected boolean isAddingBeginNewLine()
+	public int getSpacesCountBefore()
 	{
-		return false;
+		return 1;
 	}
 
 	/*
@@ -69,7 +74,7 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		return true;
+		return this._referenceNode.hasChildren();
 	}
 
 	/*
@@ -78,6 +83,16 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	 */
 	@Override
 	protected boolean isIndenting()
+	{
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		return true;
 	}
