@@ -45,8 +45,8 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.common.text.rules.WordDetector;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -74,8 +74,11 @@ public class HTMLDoctypeScanner extends RuleBasedScanner
 		wordRule.addWord("DOCTYPE", createToken("entity.name.tag.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 		rules.add(wordRule);
 
-		rules.add(new SingleCharacterRule('>', createToken(HTMLTokenType.TAG_END)));
-		rules.add(new SingleCharacterRule('=', createToken(HTMLTokenType.EQUAL)));
+		CharacterMapRule rule = new CharacterMapRule();
+		rule.add('>', createToken(HTMLTokenType.TAG_END));
+		rule.add('=', createToken(HTMLTokenType.EQUAL));
+		rules.add(rule);
+		// FIXME Use a word/extend word rule here to avoid slow regexp rule?
 		rules.add(new RegexpRule("<(/)?", createToken(HTMLTokenType.TAG_START), true)); //$NON-NLS-1$
 
 		setRules(rules.toArray(new IRule[rules.size()]));

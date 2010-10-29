@@ -81,6 +81,33 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 		return SyncDirection.BOTH;
 	}
 
+	public void setAutoSyncSelected(boolean selected)
+	{
+		autoSyncCheckbox.setSelection(selected);
+		updateEnableState();
+	}
+
+	public void setSyncDirection(SyncDirection direction)
+	{
+		switch (direction)
+		{
+			case UPLOAD:
+				uploadButton.setSelection(true);
+				downloadButton.setSelection(false);
+				syncButton.setSelection(false);
+				break;
+			case DOWNLOAD:
+				downloadButton.setSelection(true);
+				uploadButton.setSelection(false);
+				syncButton.setSelection(false);
+				break;
+			case BOTH:
+				syncButton.setSelection(true);
+				uploadButton.setSelection(false);
+				downloadButton.setSelection(false);
+		}
+	}
+
 	private void createAutoSyncOptions(Composite parent)
 	{
 		Composite sync = new Composite(parent, SWT.NONE);
@@ -89,7 +116,6 @@ public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite imp
 
 		autoSyncCheckbox = new Button(sync, SWT.CHECK);
 		autoSyncCheckbox.setText(Messages.FTPDeployComposite_AutoSync);
-		autoSyncCheckbox.setSelection(true);
 		autoSyncCheckbox.addSelectionListener(this);
 
 		uploadButton = new Button(sync, SWT.RADIO);

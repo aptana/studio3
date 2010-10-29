@@ -37,6 +37,7 @@ package com.aptana.terminal.connector;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 	
-	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
+	protected  static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final char DLE = '\u0010';
 	private static final int PROCESS_LIST_TIMEOUT = 1500;
 
@@ -225,7 +226,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			
 			// Hook up standard input:
 			//
-			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, ENCODING), 1024);
+			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, Charset.defaultCharset().name()), 1024);
 			
 			// Hook up standard output:
 			//

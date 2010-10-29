@@ -45,12 +45,13 @@ public class ChangedFile implements Comparable<ChangedFile>
 		NEW, DELETED, MODIFIED, UNMERGED
 	}
 
-	public ChangedFile(String path)
-	{
-		this.path = path;
-	}
-
-	ChangedFile(ChangedFile other)
+	/**
+	 * Used to make copies of a changed file, particularly when existing changed files are going to get modified by an
+	 * operation and we need to refer to their original state.
+	 * 
+	 * @param other
+	 */
+	public ChangedFile(ChangedFile other)
 	{
 		this.path = other.path;
 		this.status = other.status;
@@ -60,7 +61,6 @@ public class ChangedFile implements Comparable<ChangedFile>
 		this.commitBlobSHA = other.commitBlobSHA;
 	}
 
-	// Used for unit tests!
 	public ChangedFile(String path, Status status)
 	{
 		this.path = path;
@@ -74,6 +74,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 	String commitBlobSHA;
 	String commitBlobMode;
 
+	// FIXME Use IPath
 	public String getPath()
 	{
 		return new Path(path).toOSString();
@@ -104,7 +105,7 @@ public class ChangedFile implements Comparable<ChangedFile>
 		return commitBlobMode;
 	}
 
-	public String indexInfo()
+	protected String indexInfo()
 	{
 		Assert.isTrue(status == Status.NEW || commitBlobSHA != null,
 				"File is not new, but doesn't have an index entry!"); //$NON-NLS-1$

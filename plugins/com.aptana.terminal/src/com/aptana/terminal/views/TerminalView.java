@@ -428,7 +428,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
 		// open view action
-		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				openView(null, getPartName(), getWorkingDirectory());
@@ -437,7 +437,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		fOpenViewAction.setToolTipText(Messages.TerminalView_Create_Terminal_View_Tooltip);
 
 		// open editor action
-		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				Utils.openTerminalEditor(TerminalEditor.ID, true);

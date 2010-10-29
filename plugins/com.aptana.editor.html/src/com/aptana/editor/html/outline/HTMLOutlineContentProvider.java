@@ -62,10 +62,6 @@ import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.parsing.IParseState;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -209,13 +205,6 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 		return super.hasChildren(element);
 	}
 
-	private IParseNode parse(IParser parser, String source) throws Exception
-	{
-		IParseState pState = new ParseState();
-		pState.setEditState(source, source, 0, 0);
-		return parser.parse(pState);
-	}
-
 	private Object[] getExternalChildren(final Object parent, final String srcPathOrURL, final String language)
 	{
 		Object[] cached;
@@ -252,20 +241,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 						throw new Exception(Messages.HTMLOutlineContentProvider_UnableToResolveFile_Error);
 					}
 
-					IParserPool pool = ParserPoolFactory.getInstance().getParserPool(language);
-					if (pool == null)
-					{
-						throw new Exception(MessageFormat.format(
-								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
-					}
-					IParser parser = pool.checkOut();
-					if (parser == null)
-					{
-						throw new Exception(MessageFormat.format(
-								Messages.HTMLOutlineContentProvider_UnableToFindParser_Error, language));
-					}
-					IParseNode node = parse(parser, source);
-					pool.checkIn(parser);
+					IParseNode node = ParserPoolFactory.parse(language, source);
 					sub.worked(90);
 					elements = getChildren(node);
 

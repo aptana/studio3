@@ -50,9 +50,9 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 public class SyncingActionProvider extends CommonActionProvider
 {
 
-	private static final String SYNC_IMAGE = "icons/full/obj16/sync_both.gif"; //$NON-NLS-1$
-	private static final String UPLOAD_IMAGE = "icons/full/obj16/put.gif"; //$NON-NLS-1$
-	private static final String DOWNLOAD_IMAGE = "icons/full/obj16/get.gif"; //$NON-NLS-1$
+	private static final String SYNC_IMAGE = "icons/full/elcl16/arrow_up_down.png"; //$NON-NLS-1$
+	private static final String UPLOAD_IMAGE = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
+	private static final String DOWNLOAD_IMAGE = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 
 	private NavigatorSynchronizeAction fSynchronizeAction;
 	private NavigatorUploadAction fUploadAction;

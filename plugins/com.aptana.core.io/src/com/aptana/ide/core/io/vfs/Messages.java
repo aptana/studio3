@@ -36,12 +36,12 @@ package com.aptana.ide.core.io.vfs;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS
+public class Messages extends NLS // NO_UCD
 {
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.vfs.messages"; //$NON-NLS-1$
 
-	public static String VirtualConnectionManager_NoMatchingConnectionForURI;
+	public static String VirtualConnectionManager_NoMatchingConnectionForURI; // NO_UCD
 
 	static
 	{

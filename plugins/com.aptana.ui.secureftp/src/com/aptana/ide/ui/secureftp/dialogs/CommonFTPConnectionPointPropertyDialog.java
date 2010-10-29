@@ -37,6 +37,7 @@ package com.aptana.ide.ui.secureftp.dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -92,9 +93,15 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 	}
 
 	@Override
+	protected Control createDialogArea(Composite parent) {
+		Control control = super.createDialogArea(parent);
+		((CommonFTPConnectionPropertyComposite) getConnectionComposite()).setConnectionPointType(connectionType);
+
+		return control;
+	}
+
+	@Override
 	protected FTPConnectionPropertyComposite createConnectionComposite(Composite parent, IBaseRemoteConnectionPoint connectionPoint) {
-		CommonFTPConnectionPropertyComposite connectionComposite = new CommonFTPConnectionPropertyComposite(parent, SWT.NONE, connectionPoint, this);
-		connectionComposite.setConnectionPointType(connectionType);
-		return connectionComposite;
+		return new CommonFTPConnectionPropertyComposite(parent, SWT.NONE, connectionPoint, this);
 	}
 }

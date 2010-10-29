@@ -36,14 +36,21 @@ package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.formatter.FormattingContextProperties;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.LineNumberRulerColumn;
@@ -68,6 +75,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
+import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -82,7 +90,12 @@ import com.aptana.editor.common.internal.scripting.CommandElementsProvider;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ScriptFormatterManager;
+import com.aptana.formatter.preferences.PreferencesLookupDelegate;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.Activator;
@@ -217,7 +230,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		PeerCharacterCloser.install(getSourceViewer(), getAutoClosePairCharacters());
+		PeerCharacterCloser.install(getSourceViewer());
 		fCursorChangeListened = true;
 
 		fSelectionChangedListener = new SelectionChangedListener();
@@ -226,7 +239,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext(Activator.CONTEXT_ID);
+		contextService.activateContext(Activator.SCRIPTING_CONTEXT_ID);
+		contextService.activateContext(Activator.EDITOR_CONTEXT_ID);
 	}
 
 	/*
@@ -347,7 +361,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
 
-			@Override
+            @Override
 			protected void handleDispose()
 			{
 				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to report a bug with eclipse to clean this up.
@@ -369,11 +383,55 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 					super.handleDispose();
 				}
 			}
+
+			@SuppressWarnings("rawtypes")
+			@Override
+			public IFormattingContext createFormattingContext()
+			{
+				final IFormattingContext context = super.createFormattingContext();
+				try
+				{
+					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+							.getContentType(getDocument(), 0);
+					if (contentType.getPartCount() > 0)
+					{
+						String mainContentType = contentType.getParts()[0];
+						// We need to make sure that in case the given content type is actually a nested language in
+						// HTML, we look for the HTML formatter factory because it should be the 'Master' formatter.
+						if (mainContentType.startsWith(CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX))
+						{
+							mainContentType = CommonSourceViewerConfiguration.CONTENTTYPE_HTML_PREFIX;
+						}
+						final IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(mainContentType);
+						if (factory != null)
+						{
+							// The code above might change the content type that is used to
+							// get the formatter, but we still need to save the original content-type so that the
+							// IScriptFormatter instance will handle the any required parsing by calling the right IParser.
+							factory.setMainContentType(contentType.getParts()[0]);
+							
+							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
+							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
+									IResource.class);
+							context
+									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
+											.getId());
+							IProject project = (file != null) ? file.getProject() : null;
+							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
+							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
+						}
+					}
+				}
+				catch (BadLocationException e)
+				{
+				}
+				return context;
+			}
 		};
 
 		if (viewer instanceof ITextViewerExtension)
 		{
-			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this);
+			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this, viewer);
 			// add listener to our viewer
 			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
 		}
@@ -407,22 +465,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return DEFAULT_PAIR_MATCHING_CHARS;
 	}
 
-	/**
-	 * Return an array of character pairs used in our auto-closing of pairs. Even number chars are the start, odd are
-	 * the end. Defaults to using the same characters as the pair matching.
-	 * 
-	 * @return
-	 */
-	protected char[] getAutoClosePairCharacters()
-	{
-		return getPairMatchingCharacters();
-	}
-
 	@Override
 	public void dispose()
 	{
 		try
 		{
+			if (getSourceViewer() instanceof CommonSourceViewerConfiguration)
+			{
+				((CommonSourceViewerConfiguration) getSourceViewer()).dispose();
+			}
 			if (fKeyListener != null)
 			{
 				ISourceViewer viewer = this.getSourceViewer();
@@ -574,6 +625,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createActions();
 		setAction(FilterThroughCommandAction.COMMAND_ID, FilterThroughCommandAction.create(this));
 		this.fThemeableEditorFindBarExtension.createFindBarActions();
+
+		// Code formatter setup
+		Action action = new TextOperationAction(Messages.getBundleForConstructedKeys(),
+				"Format.", this, ISourceViewer.FORMAT); //$NON-NLS-1$
+		action.setActionDefinitionId(ICommonConstants.FORMATTER_ACTION_DEFINITION_ID);
+		setAction(ICommonConstants.FORMATTER_ACTION_ID, action);
+		markAsStateDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 	}
 
 	ICommandElementsProvider getCommandElementsProvider()

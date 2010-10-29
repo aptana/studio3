@@ -36,6 +36,9 @@ package com.aptana.ide.syncing.ui.actions;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -75,7 +78,17 @@ public final class Sync
 		}
 		else if (input instanceof IPathEditorInput)
 		{
-			upload(((IPathEditorInput) input).getPath());
+			IPath path = ((IPathEditorInput) input).getPath();
+			IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+			IFile file = workspaceRoot.getFileForLocation(path);
+			if (file != null)
+			{
+				upload(file);
+			}
+			else
+			{
+				upload(path);
+			}
 		}
 		else if (input instanceof IURIEditorInput)
 		{
@@ -90,7 +103,7 @@ public final class Sync
 		}
 	}
 
-	public static void upload(IStructuredSelection selection)
+	private static void upload(IStructuredSelection selection)
 	{
 		UploadAction action = new UploadAction();
 		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
@@ -104,7 +117,7 @@ public final class Sync
 	 * @param file
 	 *            the IAdaptable object
 	 */
-	public static void upload(IAdaptable file)
+	private static void upload(IAdaptable file)
 	{
 		upload(new StructuredSelection(file));
 	}
@@ -115,7 +128,7 @@ public final class Sync
 	 * @param path
 	 *            the IPath object
 	 */
-	public static void upload(IPath path)
+	private static void upload(IPath path)
 	{
 		try
 		{
@@ -159,7 +172,7 @@ public final class Sync
 		}
 	}
 
-	public static void download(IStructuredSelection selection)
+	private static void download(IStructuredSelection selection)
 	{
 		DownloadAction action = new DownloadAction();
 		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
@@ -173,7 +186,7 @@ public final class Sync
 	 * @param file
 	 *            the IAdaptable object
 	 */
-	public static void download(IAdaptable file)
+	private static void download(IAdaptable file)
 	{
 		download(new StructuredSelection(file));
 	}
@@ -184,7 +197,7 @@ public final class Sync
 	 * @param path
 	 *            the IPath object
 	 */
-	public static void download(IPath path)
+	private static void download(IPath path)
 	{
 		try
 		{

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="connectionPoint" name="connectionPoint" schema="schema/connectionPoint.exsd"/>
+   <extension-point id="connectionPoint" name="%extension-point.connectionpoint.name" schema="schema/connectionPoint.exsd"/>
    <extension
          point="com.aptana.core.io.connectionPoint">
       <connectionPointCategory
             id="com.aptana.ide.core.io.localShortcuts"
-            name="Local Shortcuts"
+            name="%connectionPointCategory.localshortcuts.name"
             order="20">
       </connectionPointCategory>
       <connectionPointCategory
             id="com.aptana.ide.core.io.projectShortcuts"
-            name="Project Shortcuts"
+            name="%connectionPointCategory.projectshortcuts.name"
             order="10">
       </connectionPointCategory>
       <connectionPointCategory
             id="com.aptana.ide.core.io.generic"
-            name="Other"
+            name="%connectionPointCategory.other.name"
             order="100">
       </connectionPointCategory>
       <connectionPointType
             category="com.aptana.ide.core.io.localShortcuts"
             class="com.aptana.ide.core.io.LocalConnectionPoint"
             id="local"
-            name="Local">
+            name="%connectionPointType.local.name">
       </connectionPointType>
       <connectionPointType
             category="com.aptana.ide.core.io.projectShortcuts"
             class="com.aptana.ide.core.io.WorkspaceConnectionPoint"
             id="workspace"
-            name="Project">
+            name="%connectionPointType.project.name">
       </connectionPointType>
       <connectionPointType
             category="com.aptana.ide.core.io.generic"
             class="com.aptana.ide.core.io.GenericConnectionPoint"
             id="generic"
-            name="Generic">
+            name="%connectionPointType.generic.name">
       </connectionPointType>
    </extension>
    <extension

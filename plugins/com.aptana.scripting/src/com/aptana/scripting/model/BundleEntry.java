@@ -273,6 +273,38 @@ public class BundleEntry
 	}
 
 	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public SmartTypingPairsElement[] getPairs()
+	{
+		final Set<String> names = new HashSet<String>();
+		final List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				for (SmartTypingPairsElement command : bundle.getPairs())
+				{
+					String name = command.getDisplayName();
+
+					if (names.contains(name) == false)
+					{
+						names.add(name);
+						result.add(command);
+					}
+				}
+
+				return true;
+			}
+		});
+
+		return result.toArray(new SmartTypingPairsElement[result.size()]);
+	}
+
+	/**
 	 * getContributingBundles
 	 * 
 	 * @return

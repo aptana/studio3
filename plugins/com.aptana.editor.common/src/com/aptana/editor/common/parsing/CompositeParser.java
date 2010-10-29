@@ -44,10 +44,9 @@ import beaver.Symbol;
 
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 
 public class CompositeParser implements IParser
@@ -65,7 +64,7 @@ public class CompositeParser implements IParser
 		fParserLanguage = primaryParserLanguage;
 	}
 
-	public IParseNode parse(IParseState parseState) throws java.lang.Exception
+	public IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
 		String source = new String(parseState.getSource());
 		fScanner.setSource(source);
@@ -74,7 +73,7 @@ public class CompositeParser implements IParser
 		// first processes the embedded language
 		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
 		// then processes the source as normal
-		IParseNode result = primaryParse(parseState);
+		IParseRootNode result = primaryParse(parseState);
 
 		if (fEmbeddedlanguageRoot != null)
 		{
@@ -120,26 +119,16 @@ public class CompositeParser implements IParser
 		return result;
 	}
 
-	private IParseNode primaryParse(IParseState parseState) throws java.lang.Exception
+	/**
+	 * primaryParse
+	 * 
+	 * @param parseState
+	 * @return
+	 * @throws java.lang.Exception
+	 */
+	private IParseRootNode primaryParse(IParseState parseState) throws java.lang.Exception
 	{
-		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(fParserLanguage);
-		if (pool != null)
-		{
-			IParser parser = null;
-			try
-			{
-				parser = pool.checkOut();
-				return parser.parse(parseState);
-			}
-			finally
-			{
-				if (parser != null)
-				{
-					pool.checkIn(parser);
-				}
-			}
-		}
-		return null;
+		return ParserPoolFactory.parse(fParserLanguage, parseState);
 	}
 
 	/**
@@ -161,14 +150,12 @@ public class CompositeParser implements IParser
 		return fCurrentSymbol;
 	}
 
-	protected IParseNode getParseResult(IParser parser, int start, int end)
+	protected IParseRootNode getParseResult(String language, int start, int end)
 	{
 		try
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
-			ParseState parseState = new ParseState();
-			parseState.setEditState(text, text, 0, 0);
-			IParseNode node = parser.parse(parseState);
+			IParseRootNode node = ParserPoolFactory.parse(language, text);
 			addOffset(node, start);
 			return node;
 		}

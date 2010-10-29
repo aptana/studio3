@@ -239,6 +239,7 @@ class TerminalTextDataSnapshot implements ITerminalTextDataSnapshot {
 		return fSnapshot.makeSnapshot();
 	}
 
+	@SuppressWarnings({"unchecked","rawtypes"})
 	synchronized public void addListener(SnapshotOutOfDateListener listener) {
 		List list=new ArrayList();
 		list.addAll(Arrays.asList(fListener));
@@ -246,6 +247,7 @@ class TerminalTextDataSnapshot implements ITerminalTextDataSnapshot {
 		fListener=(SnapshotOutOfDateListener[]) list.toArray(new SnapshotOutOfDateListener[list.size()]);
 	}
 
+	@SuppressWarnings({"unchecked","rawtypes"})
 	synchronized public void removeListener(SnapshotOutOfDateListener listener) {
 		List list=new ArrayList();
 		list.addAll(Arrays.asList(fListener));

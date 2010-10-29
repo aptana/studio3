@@ -35,6 +35,7 @@
 package com.aptana.editor.common;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,19 +44,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
+
+import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.ui.io.IRemoteFileStoreEditorInput;
 
 /**
  * This is a special class that listens to editors and makes sure that the tab name is unique. If two tabs share same
@@ -83,9 +92,24 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public IStatus runInUIThread(IProgressMonitor monitor)
 	{
 		// TODO Listen for window open/closes and page add/removal; then register for every window, for every page
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null)
-			window.getActivePage().addPartListener(this);
+		IWorkbench workbench = null;
+		try
+		{
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
+		if (workbench != null)
+		{
+			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				window.getActivePage().addPartListener(this);
+			}
+		}
 		return Status.OK_STATUS;
 	}
 
@@ -102,23 +126,25 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public void partClosed(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
+		{
 			return;
+		}
 		String title = getBaseName(part);
 		synchronized (baseNames)
 		{
-			if (!baseNames.containsKey(title))
-				return;
-			// Remove from map!
-			Set<IEditorPart> parts = baseNames.remove(title);
-			parts.remove(part);
-			if (!parts.isEmpty())
+			Set<IEditorPart> parts = baseNames.get(title);
+			if (parts != null)
 			{
-				baseNames.put(title, parts);
-				if (parts.size() == 1)
+				// Remove from map!
+				parts.remove(part);
+				if (parts.isEmpty())
+				{
+					baseNames.remove(title);
+				}
+				else if (parts.size() == 1)
 				{
 					// If parts is now of size == 1, we can revert the leftover editor title to the basename!
-					IEditorPart leftover = parts.iterator().next();
-					setTitle(leftover, title);
+					setTitle(parts.iterator().next(), title);
 				}
 			}
 		}
@@ -137,22 +163,21 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	private void disambiguate(IWorkbenchPart part)
 	{
 		if (!(part instanceof IEditorPart))
+		{
 			return;
+		}
 		// First we add to list of names
 		String title = getBaseName(part);
 		Set<IEditorPart> list;
 		synchronized (baseNames)
 		{
-			if (baseNames.containsKey(title))
-			{
-				list = baseNames.get(title);
-			}
-			else
+			list = baseNames.get(title);
+			if (list == null)
 			{
 				list = new HashSet<IEditorPart>();
+				baseNames.put(title, list);
 			}
 			list.add((IEditorPart) part);
-			baseNames.put(title, list);
 		}
 		// Now we need to disambiguate between all the entries in the list!
 		if (list.size() > 1)
@@ -183,33 +208,35 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	protected String getBaseName(IWorkbenchPart part)
 	{
 		String title = part.getTitle();
-		title = title.split(Pattern.quote(SEPARATOR))[0];
-		return title;
+		return title.split(Pattern.quote(SEPARATOR))[0];
 	}
 
 	private Map<IEditorPart, String> getUnambiguousTitles(Collection<IEditorPart> list)
 	{
-		Map<IEditorPart, String> returnMap = new HashMap<IEditorPart, String>();
-
 		Map<IEditorPart, IPath> map = new HashMap<IEditorPart, IPath>();
 		int min = Integer.MAX_VALUE;
+		IPath path;
 		for (IEditorPart part : list)
 		{
-			IPath path = getPath(part);
+			path = getPath(part);
 			if (path == null)
+			{
 				continue;
+			}
 			min = Math.min(path.segmentCount(), min);
 			map.put(part, path);
 		}
 
 		// Need to disambiguate the titles!
+		Map<IEditorPart, String> returnMap = new HashMap<IEditorPart, String>();
+		Set<String> curSegments = new HashSet<String>();
 		for (int i = 2; i <= min; i++)
 		{
 			returnMap.clear();
-			Set<String> curSegments = new HashSet<String>();
+			curSegments.clear();
 			for (Map.Entry<IEditorPart, IPath> entry : map.entrySet())
 			{
-				IPath path = entry.getValue();
+				path = entry.getValue();
 				String segment = path.segment(path.segmentCount() - i);
 				if (curSegments.contains(segment))
 				{
@@ -235,21 +262,45 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		IEditorInput input = otherEditor.getEditorInput();
 		if (input instanceof IPathEditorInput)
 		{
-			IPathEditorInput pathInput = (IPathEditorInput) input;
-			return pathInput.getPath();
+			return ((IPathEditorInput) input).getPath();
+		}
+		if (input instanceof IRemoteFileStoreEditorInput)
+		{
+			IFileStore fileStore = ((IRemoteFileStoreEditorInput) input).getRemoteFileStore();
+			if (fileStore instanceof IExtendedFileStore)
+			{
+				URI uri = ((IExtendedFileStore) fileStore).toCanonicalURI();
+				return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
+			}
+		}
+		if (input instanceof IURIEditorInput)
+		{
+			return URIUtil.toPath(((IURIEditorInput) input).getURI());
 		}
 		return null;
 	}
 
 	public void dispose()
 	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null)
+		IWorkbench workbench = null;
+		try
 		{
-			window.getActivePage().removePartListener(this);
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+
+		if (workbench != null)
+		{
+			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				window.getActivePage().removePartListener(this);
+			}
 		}
 		baseNames.clear();
 		baseNames = null;
 	}
-
 }

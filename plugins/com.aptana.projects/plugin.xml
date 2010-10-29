@@ -15,7 +15,7 @@
          point="org.eclipse.ui.ide.projectNatureImages">
       <image
             icon="icons/webnature.gif"
-            id="com.aptana.ui.webnature.image"
+            id="com.aptana.projects.webnature.image"
             natureId="com.aptana.projects.webnature">
       </image>
    </extension>
@@ -43,16 +43,6 @@
       </primaryWizard>
    </extension>
    <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="com.aptana.projects.internal.ProjectPropertyTester"
-            id="com.aptana.ui.ProjectPropertyTester"
-            namespace="com.aptana.ui.project"
-            properties="nature"
-            type="org.eclipse.core.resources.IProject">
-      </propertyTester>
-   </extension>
-   <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
@@ -60,6 +50,59 @@
                id="com.aptana.ui.wizards.NewWebProject">
          </newWizardShortcut>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <commonFilter
+            activeByDefault="true"
+            id="com.aptana.projects.filters.projectFilesFilter"
+            name="Project Files">
+         <filterExpression>
+           <and>
+              <adapt
+                    type="org.eclipse.core.resources.IFile">
+              </adapt>
+             
+             <or>
+               <test
+                     property="org.eclipse.core.resources.name"
+                     value=".project">
+               </test>
+               <test
+                     property="org.eclipse.core.resources.name"
+                     value=".settings">
+               </test>
+               <test
+                     property="org.eclipse.core.resources.name"
+                     value=".classpath">
+               </test>
+               <test
+                     property="org.eclipse.core.resources.name"
+                     value=".git">
+               </test>
+             </or>
+           </and>
+         </filterExpression>
+      </commonFilter>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerContentBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension
+                  pattern="com.aptana.projects.filters.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerContentBinding
+            viewerId="com.aptana.explorer.view">
+         <includes>
+            <contentExtension
+                  pattern="com.aptana.projects.filters.*">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
    </extension>
 
 </plugin>

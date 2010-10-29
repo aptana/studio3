@@ -34,7 +34,6 @@
  */
 package com.aptana.git.core.model;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -43,8 +42,6 @@ import junit.framework.TestCase;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.internal.filesystem.local.LocalFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;

@@ -66,7 +66,8 @@ class ConnectionReaper extends Thread
 			}
 			pool.reap();
 		}
-		CorePlugin.trace("Reaping thread stopped"); //$NON-NLS-1$
+		// Not logging the trace message until we have the verbosity to log at different levels
+		// CorePlugin.trace("Reaping thread stopped"); //$NON-NLS-1$
 	}
 }
 
@@ -138,7 +139,8 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		}
 		if (locked != null && locked.size() > 0)
 		{
-			CorePlugin.logWarning(MessageFormat.format("Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
+			CorePlugin.logWarning(MessageFormat.format(
+					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 		}
 		try
 		{
@@ -188,5 +190,18 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 	{
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
+	}
+
+	/**
+	 * Returns the number of "available" items held in the pool (waiting to expire or get re-used).
+	 * 
+	 * @return
+	 */
+	protected int unlockedItems()
+	{
+		synchronized (unlocked)
+		{
+			return unlocked.size();
+		}
 	}
 }

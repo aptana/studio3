@@ -34,36 +34,39 @@
  */
 package com.aptana.editor.sass;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import com.aptana.editor.common.CommonDocumentProvider;
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.SimpleDocumentProvider;
 
-public class SassDocumentProvider extends CommonDocumentProvider
+public class SassDocumentProvider extends SimpleDocumentProvider
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
+	 */
 	@Override
-	public void connect(Object element) throws CoreException
+	public IPartitionTokenScanner createPartitionScanner()
 	{
-		super.connect(element);
-
-		IDocument document = getDocument(element);
-		if (document != null)
-		{
-			IDocumentPartitioner partitioner = new FastPartitioner(new SassSourcePartitionScanner(),
-					SassSourceConfiguration.CONTENT_TYPES);
-			partitioner.connect(document);
-			document.setDocumentPartitioner(partitioner);
-			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document,
-					SassSourceConfiguration.getDefault());
-		}
+		return new SassSourcePartitionScanner();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
 	protected String getDefaultContentType(String filename)
 	{
 		return ISassConstants.CONTENT_TYPE_SASS;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
+	 */
+	@Override
+	public IPartitioningConfiguration getPartitioningConfiguration()
+	{
+		return SassSourceConfiguration.getDefault();
 	}
 }

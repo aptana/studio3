@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="decorator" name="%extensions.decorator.name" schema="schema/decorator.exsd"/>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
@@ -30,6 +29,9 @@
             <contentExtension
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
        <viewerActionBinding
@@ -45,8 +47,8 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="true"
-            contentProvider="com.aptana.ide.ui.io.navigator.FileTreeContentProvider"
-            icon="icons/full/obj16/projects.png"
+            contentProvider="com.aptana.ide.ui.io.navigator.ProjectExplorerContentProvider"
+            icon="icons/full/obj16/drive.png"
             id="com.aptana.ide.ui.io.navigatorContent"
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.default.name"
@@ -62,6 +64,15 @@
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
             </or>
          </enablement>
          <commonSorter
@@ -73,13 +84,33 @@
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.core.io.LocalRoot">
                   </instanceof></or>
             </parentExpression>
          </commonSorter>
          <possibleChildren>
-            <instanceof
-                  value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
+            </or>
          </possibleChildren>
          <dropAssistant
                class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
@@ -95,6 +126,9 @@
                   <adapt
                         type="org.eclipse.core.resources.IProject">
                   </adapt>
+                  <instanceof
+                        value="com.aptana.ide.core.io.LocalRoot">
+                  </instanceof>
                </or></possibleDropTargets>
          </dropAssistant>
       </navigatorContent>
@@ -115,18 +149,28 @@
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActionProvider"
             id="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActions">
          <enablement>
-            <instanceof
-                  value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
+            </or>
          </enablement>
       </actionProvider>
       <actionProvider
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActionProvider"
             id="com.aptana.ide.ui.io.navigator.actions.FileSystemEditActions">
          <enablement>
-            <instanceof
-                  value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
+            </or>
          </enablement>
       </actionProvider>
       <actionProvider
@@ -142,28 +186,62 @@
             class="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActionProvider"
             id="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActions">
          <enablement>
-            <instanceof
-                  value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-            </instanceof>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.LocalRoot">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPoint">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+               </instanceof>
+            </or>
          </enablement>
       </actionProvider>
       <actionProvider
             class="org.eclipse.ui.navigator.resources.GoIntoActionProvider"
             id="com.aptana.ide.ui.io.navigator.actions.FileSystemGoIntoActions">
          <enablement>
-            <and>
+            <or>
+               <and>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <test
+                        property="com.aptana.ide.ui.io.navigator.file.isDirectory"
+                        value="true">
+                  </test>
+                  <test
+                        property="com.aptana.ide.ui.io.navigator.file.isPrivate"
+                        value="false">
+                  </test>
+               </and>
                <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     value="com.aptana.ide.core.io.LocalRoot">
                </instanceof>
-               <test
-                     property="com.aptana.ide.ui.io.navigator.file.isDirectory"
-                     value="true">
-               </test>
-               <test
-                    property="com.aptana.ide.ui.io.navigator.file.isPrivate"
-                    value="false">
-               </test>
-            </and>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPoint">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
+               </instanceof>
+            </or>
          </enablement>
       </actionProvider>
       <actionProvider
@@ -171,15 +249,35 @@
             id="com.aptana.ide.ui.io.navigator.actions.RemoteNewActions"
             overrides="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActions">
          <enablement>
-            <and>
-               <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
-               </instanceof>
-               <test
-                     property="com.aptana.ide.ui.io.navigator.file.isLocal"
-                     value="false">
-               </test>
-            </and>
+            <or>
+               <and>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <test
+                        property="com.aptana.ide.ui.io.navigator.file.isLocal"
+                        value="false">
+                  </test>
+               </and>
+               <and>
+                  <instanceof
+                        value="com.aptana.ide.core.io.IConnectionPoint">
+                  </instanceof>
+                  <test
+                        property="com.aptana.ide.core.io.connection.canDisconnect"
+                        value="true">
+                  </test>
+               </and>
+            </or>
+         </enablement>
+      </actionProvider>
+      <actionProvider
+            class="com.aptana.ide.ui.io.navigator.actions.ConnectionPointEditActionProvider"
+            id="com.aptana.ide.ui.io.navigator.actions.ConnectionPointEditActions">
+         <enablement>
+            <instanceof
+                  value="com.aptana.ide.core.io.IConnectionPoint">
+            </instanceof>
          </enablement>
       </actionProvider>
       <commonFilter
@@ -303,7 +401,7 @@
             adaptable="true"
             icon="icons/full/ovr16/symlink.png"
             id="com.aptana.ide.ui.io.decorators.fileSystemDecorator"
-            label="FileSystem Decorator"
+            label="%decorator.filesystem.label"
             lightweight="true"
             location="BOTTOM_LEFT"
             state="true">
@@ -323,7 +421,7 @@
             adaptable="true"
             icon="icons/full/ovr16/private.png"
             id="com.aptana.ide.ui.io.decorators.filePrivateDecorator"
-            label="Private Decorator"
+            label="%decorator.private.label"
             lightweight="true"
             location="BOTTOM_RIGHT"
             state="true">
@@ -339,6 +437,246 @@
             </and>
          </enablement>
       </decorator>
+      <decorator
+            class="com.aptana.ide.ui.io.navigator.ConnectionPointLabelDecorator"
+            id="com.aptana.ui.io.decorators.connectionPointDecorator"
+            label="%decorator.remote.label"
+            lightweight="false"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="true"
+            category="com.aptana"
+            class="com.aptana.ide.ui.io.navigator.RemoteNavigatorView"
+            icon="icons/full/eview16/remote.png"
+            id="com.aptana.ui.io.remoteview"
+            name="%view.remote.name">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewer
+            viewerId="com.aptana.ui.io.remoteview">
+         <popupMenu
+               allowsPlatformContributions="true"
+               id="com.aptana.ui.io.remoteview#PopupMenu">
+            <insertionPoint
+                  name="group.new">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.open"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.openWith">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.edit"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.reorganize">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.build"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.studio"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="additions"
+                  separator="true">
+            </insertionPoint>
+            <insertionPoint
+                  name="group.properties"
+                  separator="true">
+            </insertionPoint>
+         </popupMenu>
+      </viewer>
+      <viewerContentBinding
+            viewerId="com.aptana.ui.io.remoteview">
+         <includes>
+            <contentExtension
+                  pattern="com.aptana.ide.ui.io.remoteNavigatorContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ide.ui.io.navigator.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
+      <viewerActionBinding
+            viewerId="com.aptana.ui.io.remoteview">
+         <includes>
+            <actionExtension
+                  pattern="com.aptana.ide.ui.io.navigator.actions.*">
+            </actionExtension>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.PropertiesActionProvider">
+            </actionExtension>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.ResourceMgmtActions">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+      <dragAssistant
+            class="com.aptana.ide.ui.io.navigator.resources.FileDragAdapterAssistant"
+            viewerId="com.aptana.ui.io.remoteview">
+      </dragAssistant>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent
+            activeByDefault="true"
+            contentProvider="com.aptana.ide.ui.io.navigator.RemoteTreeContentProvider"
+            icon="icons/full/eview16/remote.png"
+            id="com.aptana.ide.ui.io.remoteNavigatorContent"
+            labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
+            name="%navigatorContent.remote.name"
+            priority="high">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IWorkspaceRoot">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPoint">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </enablement>
+         <commonSorter
+               class="com.aptana.ide.ui.io.navigator.FileTreeNameSorter">
+            <parentExpression>
+               <or>
+                  <instanceof
+                        value="org.eclipse.core.resources.IWorkspaceRoot">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.core.io.IConnectionPointCategory">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.core.io.IConnectionPoint">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+               </or>
+            </parentExpression>
+         </commonSorter>
+         <possibleChildren>
+            <or>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPoint">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+            </or>
+         </possibleChildren>
+         <dropAssistant
+               class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
+               id="com.aptana.ide.ui.io.navigator.resources.fileDropAdapter">
+            <possibleDropTargets>
+               <or>
+                  <instanceof
+                        value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                  </instanceof>
+                  <instanceof
+                        value="com.aptana.ide.core.io.IConnectionPoint">
+                  </instanceof>
+               </or>
+            </possibleDropTargets>
+         </dropAssistant>
+      </navigatorContent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ide.ui.io.connectionPointContribution"
+            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+         <action
+               class="com.aptana.ide.ui.io.actions.ConnectionPropertiesAction"
+               enablesFor="1"
+               id="com.aptana.ide.ui.io.actions.connectionProperties"
+               label="%connectionPropertiesAction.label"
+               menubarPath="group.properties">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ide.ui.io.disconnectableConnectionPointContribution"
+            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+         <action
+               class="com.aptana.ide.ui.io.actions.DisconnectAction"
+               enablesFor="1"
+               icon="icons/full/etool16/disconnect.png"
+               id="com.aptana.ide.ui.io.actions.DisconnectAction"
+               label="%disconnectAction.label"
+               menubarPath="group.edit">
+         </action>
+         <visibility>
+            <objectState
+                  name="canDisconnect"
+                  value="true">
+            </objectState>
+         </visibility>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ide.ui.io.preferences.PermissionPreferencePage"
+            id="com.aptana.ui.io.preferences.PermissionPreferencePage"
+            name="%PreferencePage.permissions.label">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.linkHelper">
+      <linkHelper
+            class="com.aptana.ide.ui.io.navigator.FilesystemLinkHelper"
+            id="com.aptana.ui.io.navigator.linkHelper">
+         <editorInputEnablement>
+            <instanceof
+                  value="org.eclipse.ui.ide.FileStoreEditorInput">
+            </instanceof></editorInputEnablement>
+         <selectionEnablement>
+            <and>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <test
+                     property="com.aptana.ide.ui.io.navigator.file.isDirectory"
+                     value="false">
+               </test>
+            </and>
+         </selectionEnablement>
+      </linkHelper>
    </extension>
 
 </plugin>

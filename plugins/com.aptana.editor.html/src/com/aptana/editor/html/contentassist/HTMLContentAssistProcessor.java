@@ -39,9 +39,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -77,6 +79,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String DOCTYPE_PRECEDING_TEXT = "!"; //$NON-NLS-1$
+
 	/**
 	 * LocationType
 	 */
@@ -96,7 +100,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
@@ -344,10 +348,45 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean close = true;
 			int replaceLength = 0;
+			int replaceOffset = offset;
+			if (this._currentLexeme.getType() == HTMLTokenType.META) // DOCTYPE?
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength();
 
-			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getEndingOffset() - replaceOffset;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TEXT
+					&& this._currentLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT)) // !
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength(); // replace the '!'
+
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+				if (nextLexeme != null && nextLexeme.getType() == HTMLTokenType.TAG_END)
+				{
+					replaceLength = nextLexeme.getEndingOffset() - replaceOffset;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
 			{
 				replaceLength = 1; // replace the '>'
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength += previousLexeme.getLength();
+				}
 			}
 			else if (this._currentLexeme.getType() != HTMLTokenType.TAG_START) // as long as it's not: "<|<"
 			{
@@ -363,7 +402,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 				{
-					offset = _currentLexeme.getStartingOffset();
+					replaceOffset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
 
 					if (nextLexeme.equals(this._currentLexeme) == false)
@@ -383,13 +422,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 
 			HTMLParseState state = null;
-
 			for (ElementElement element : elements)
 			{
-				String[] userAgents = element.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
-
+				List<Integer> positions = new ArrayList<Integer>();
 				int cursorPosition = replaceString.length();
 				if (close)
 				{
@@ -401,14 +437,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
 					{
-						replaceString += " >"; //$NON-NLS-1$
 						cursorPosition += 1;
+						// Don't add ">" unless we know we need it! Look at next Lexeme!
+						int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+						Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+						if (nextLexeme == null || nextLexeme.getType() == HTMLTokenType.TAG_START)
+						{
+							replaceString += " >"; //$NON-NLS-1$
+						}
 					}
 					else if (state.isEmptyTagType(element.getName()))
 					{
 						replaceString += " />"; //$NON-NLS-1$
-						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
-						cursorPosition += 3;
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
+						// now it's stuck at end of tag
+						positions.add(cursorPosition + 3);
 					}
 					else
 					{
@@ -417,31 +460,28 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						IDocument doc = new Document(_document.get());
 						try
 						{
-							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+							doc.replace(replaceOffset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
 						}
 						catch (BadLocationException e)
 						{
 							// ignore
 						}
-						if (!OpenTagCloser.tagClosed(doc, offset, element.getName()))
+						if (!OpenTagCloser.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
+							positions.add(cursorPosition + 4 + element.getName().length());
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
 						}
 					}
 				}
-
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-				proposal.setFileLocation(HTMLIndexConstants.CORE);
-				proposal.setUserAgentImages(userAgentIcons);
+				positions.add(0, cursorPosition);
+				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, replaceOffset, replaceLength, element,
+						positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}
@@ -482,6 +522,18 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			int offset)
 	{
 		this._replaceRange = null;
+		// Replace all the way until we hit the end of the doctype tag!
+		Lexeme<HTMLTokenType> ptr = _currentLexeme;
+		while (ptr != null && ptr.getType() != HTMLTokenType.TAG_END)
+		{
+			int index = lexemeProvider.getLexemeIndex(ptr.getStartingOffset());
+			ptr = lexemeProvider.getLexeme(index + 1);
+		}
+		if (ptr != null)
+		{
+			this._replaceRange = new Range(_currentLexeme.getStartingOffset(), ptr.getStartingOffset() - 1);
+		}
+
 		Image[] userAgentIcons = this.getAllUserAgentIcons();
 		for (Map.Entry<String, String> entry : DOCTYPES.entrySet())
 		{
@@ -553,6 +605,117 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * addCloseTagProposals
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @param result
+	 */
+	private List<ICompletionProposal> addCloseTagProposals(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		HTMLParseState state = null;
+		// First see if there are any unclosed tags, suggest them first
+		Set<String> unclosedElements = getUnclosedTagNames(offset);
+		if (unclosedElements != null && !unclosedElements.isEmpty())
+		{
+			for (String unclosedElement : unclosedElements)
+			{
+
+				ElementElement element = this._queryHelper.getElement(unclosedElement);
+
+				if (state == null)
+				{
+					state = new HTMLParseState();
+					state.setEditState(_document.get(), null, 0, 0);
+				}
+				if (state.isEmptyTagType(element.getName()))
+				{
+					continue;
+				}
+				proposals.add(createCloseTagProposal(element, offset));
+			}
+			if (!proposals.isEmpty())
+			{
+				return proposals;
+			}
+		}
+
+		// Looks like no unclosed tags that make sense. Suggest every non-self-closing tag.
+		List<ElementElement> elements = this._queryHelper.getElements();
+		if (elements != null)
+		{
+			for (ElementElement element : elements)
+			{
+				if (state == null)
+				{
+					state = new HTMLParseState();
+					state.setEditState(_document.get(), null, 0, 0);
+				}
+				if (state.isEmptyTagType(element.getName()))
+				{
+					continue;
+				}
+				proposals.add(createCloseTagProposal(element, offset));
+			}
+		}
+		return proposals;
+	}
+
+	private CommonCompletionProposal createCloseTagProposal(ElementElement element, int offset)
+	{
+		String[] userAgents = element.getUserAgentNames();
+		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
+		String replaceString = element.getName();
+
+		int cursorPosition = replaceString.length();
+		int replaceLength = 0;
+		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
+				cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
+
+		proposal.setFileLocation(HTMLIndexConstants.CORE);
+		proposal.setUserAgentImages(userAgentIcons);
+		return proposal;
+	}
+
+	protected Set<String> getUnclosedTagNames(int offset)
+	{
+		Set<String> unclosedElements = new HashSet<String>();
+		try
+		{
+			ITypedRegion[] partitions = _document.computePartitioning(0, offset);
+			for (ITypedRegion partition : partitions)
+			{
+				if (partition.getType().equals(HTMLSourceConfiguration.HTML_TAG))
+				{
+					String src = _document.get(partition.getOffset(), partition.getLength());
+					int lessThanIndex = src.indexOf('<');
+					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
+					{
+						continue;
+					}
+					src = src.substring(lessThanIndex + 1).trim();
+					String[] parts = src.split("\\W"); //$NON-NLS-1$
+					if (parts == null || parts.length == 0)
+					{
+						continue;
+					}
+					String elementName = parts[0].toLowerCase();
+					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
+					{
+						unclosedElements.add(elementName);
+					}
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
+		return unclosedElements;
 	}
 
 	/**
@@ -646,6 +809,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				break;
 
 			case IN_CLOSE_TAG:
+				result.addAll(this.addCloseTagProposals(lexemeProvider, offset));
 				break;
 
 			case IN_TEXT:
@@ -842,7 +1006,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes? We should report in open tag still!
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
+									// We should report in open tag still!
 									if (offset == 0)
 									{
 										result = LocationType.IN_TEXT;
@@ -850,7 +1015,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										String src = document.get(previousPartition.getOffset(),
+												previousPartition.getLength()).trim();
 										if (src.charAt(src.length() - 1) == '>')
 										{
 											result = LocationType.IN_TEXT;

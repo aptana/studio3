@@ -3,7 +3,7 @@ require "ruble/command"
 module Ruble
 
   class Template < Command
-    def initialize(name)
+    def initialize(name, path)
       super
     end    
     
@@ -19,7 +19,8 @@ module Ruble
       def define_template(name, &block)
         log_info("loading template #{name}")
 
-        command = Template.new(name)
+        path = block.binding.eval("__FILE__")
+        command = Template.new(name, path)
         block.call(command) if block_given?
 
         # add command to bundle
@@ -36,7 +37,7 @@ module Ruble
     private
 
     def create_java_object
-      com.aptana.scripting.model.TemplateElement.new($fullpath)
+      com.aptana.scripting.model.TemplateElement.new(path)
     end
   end
 

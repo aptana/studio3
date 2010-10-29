@@ -34,7 +34,7 @@
  */
 package com.aptana.parsing;
 
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public interface IParser
 {
@@ -45,5 +45,5 @@ public interface IParser
 	 * @return
 	 * @throws Exception
 	 */
-	public IParseNode parse(IParseState parseState) throws Exception;
+	public IParseRootNode parse(IParseState parseState) throws Exception;
 }

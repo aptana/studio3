@@ -116,6 +116,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="remote" type="boolean">
+            <annotation>
+               <documentation>
+                  true if the category contains remote connection points, false otherwise.  The default is false.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

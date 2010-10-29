@@ -6,7 +6,6 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.ide.syncing.core.SyncingPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.expressions,
  org.eclipse.core.resources,
  com.aptana.core,
  com.aptana.core.epl,

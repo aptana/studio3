@@ -38,7 +38,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class TextEditor extends AbstractThemeableEditor
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{

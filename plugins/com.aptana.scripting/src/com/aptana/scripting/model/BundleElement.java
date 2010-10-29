@@ -63,11 +63,13 @@ public class BundleElement extends AbstractElement
 	private List<MenuElement> _menus;
 	private List<CommandElement> _commands;
 	private List<EnvironmentElement> _envs;
+	private List<SmartTypingPairsElement> _pairs;
 	private boolean _visible;
 
 	private Object menuLock = new Object();
 	private Object commandLock = new Object();
 	private Object envLock = new Object();
+	private Object pairLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
 	private List<String> fileTypes;
@@ -160,6 +162,33 @@ public class BundleElement extends AbstractElement
 
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(env);
+		}
+	}
+
+	/**
+	 * addSmartTypingPairs
+	 * 
+	 * @param pair
+	 */
+	public void addSmartTypingPairs(SmartTypingPairsElement pair)
+	{
+		if (pair != null)
+		{
+			synchronized (pairLock)
+			{
+				if (this._pairs == null)
+				{
+					this._pairs = new ArrayList<SmartTypingPairsElement>();
+				}
+
+				// NOTE: Should we prevent the same element from being added twice?
+				this._pairs.add(pair);
+			}
+
+			pair.setOwningBundle(this);
+
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(pair);
 		}
 	}
 
@@ -332,6 +361,26 @@ public class BundleElement extends AbstractElement
 			if (this._envs != null && this._envs.size() > 0)
 			{
 				result = this._envs.toArray(new EnvironmentElement[this._envs.size()]);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public SmartTypingPairsElement[] getPairs()
+	{
+		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
+
+		synchronized (pairLock)
+		{
+			if (this._pairs != null && this._pairs.size() > 0)
+			{
+				result = this._pairs.toArray(new SmartTypingPairsElement[this._pairs.size()]);
 			}
 		}
 

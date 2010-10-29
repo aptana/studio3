@@ -168,5 +168,11 @@
             class="com.aptana.terminal.internal.URLHyperlinkDetector">
       </detector>
    </extension>
+   <extension
+         point="com.aptana.scripting.frameworkFiles">
+      <file
+            name="ruble/terminal.rb">
+      </file>
+   </extension>
 
 </plugin>

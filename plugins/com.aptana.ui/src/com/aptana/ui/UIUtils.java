@@ -43,22 +43,25 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 /**
  * @author Max Stepanov
- *
  */
-public final class UIUtils {
+public final class UIUtils
+{
 
 	/**
 	 * 
 	 */
-	private UIUtils() {
+	private UIUtils()
+	{
 	}
 
 	/**
@@ -79,11 +82,13 @@ public final class UIUtils {
 	public static Shell getActiveShell()
 	{
 		Shell shell = getDisplay().getActiveShell();
-		if (shell == null) {
-		    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		    if (window != null) {
-		        shell = window.getShell();
-		    }
+		if (shell == null)
+		{
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			if (window != null)
+			{
+				shell = window.getShell();
+			}
 		}
 		return shell;
 	}
@@ -128,20 +133,49 @@ public final class UIUtils {
 		return workbenchPage.getActivePart();
 	}
 
-	public static void showErrorMessage(String title, String message) {
+	/**
+	 * Finds a view with the given ID
+	 * 
+	 * @param viewID
+	 *            the view ID
+	 * @return the view part
+	 * @throws PartInitException
+	 */
+	public static IViewPart findView(String viewID) throws PartInitException
+	{
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (window != null)
+		{
+			IWorkbenchPage page = window.getActivePage();
+			if (page != null)
+			{
+				return page.findView(viewID);
+			}
+		}
+		return null;
+	}
+
+	public static void showErrorMessage(String title, String message)
+	{
 		showErrorMessage(title != null ? title : Messages.UIUtils_Error, message, null);
 	}
 
-	public static void showErrorMessage(String message, Throwable exception) {
+	public static void showErrorMessage(String message, Throwable exception)
+	{
 		showErrorMessage(Messages.UIUtils_Error, message, exception);
 	}
 
-	private static void showErrorMessage(final String title, final String message, final Throwable exception) {
-		if (Display.getCurrent() == null || exception != null) {
-			UIJob job = new UIJob(title) {
+	private static void showErrorMessage(final String title, final String message, final Throwable exception)
+	{
+		if (Display.getCurrent() == null || exception != null)
+		{
+			UIJob job = new UIJob(title)
+			{
 				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if (exception == null) {
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					if (exception == null)
+					{
 						showErrorDialog(title, message);
 						return Status.OK_STATUS;
 					}
@@ -151,14 +185,44 @@ public final class UIUtils {
 			job.setPriority(Job.INTERACTIVE);
 			job.setUser(true);
 			job.schedule();
-		} else {
+		}
+		else
+		{
 			showErrorDialog(title, message);
 		}
 	}
-	
-	private static void showErrorDialog(String title, String message) {
-		MessageDialog.openError(
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-				title, message);
+
+	private static void showErrorDialog(String title, String message)
+	{
+		MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
 	}
+	
+	public static boolean showPromptDialog(final String title, final String message) {
+		if (Display.getCurrent() == null) {
+			UIJob job = new UIJob(title) {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (showPromptDialogUI(title, message)) {
+						return Status.OK_STATUS;
+					}
+					return Status.CANCEL_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.setUser(true);
+			job.schedule();
+			try {
+				job.join();
+			} catch (InterruptedException e) {
+			}
+			return job.getResult() == Status.OK_STATUS;
+		} else {
+			return showPromptDialogUI(title, message);
+		}
+	}
+	
+	private static boolean showPromptDialogUI(String title, String message) {
+		return MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
+	}
+
 }

@@ -12,7 +12,6 @@
 package com.aptana.core.epl.downloader;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,8 +96,8 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 	}
 
 	/**
-	 * A job to handle cancelation when trying to establish a socket connection. At this point we don't have a transfer
-	 * job running yet, so we need a separate job to monitor for cancelation.
+	 * A job to handle cancellation when trying to establish a socket connection. At this point we don't have a transfer
+	 * job running yet, so we need a separate job to monitor for cancellation.
 	 */
 	protected class CancelHandler extends Job
 	{

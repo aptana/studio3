@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Assert;
  *
  * @since 3.1
  */
+@SuppressWarnings("rawtypes")
 public class Accessor {
 
 	/** The class to access. */

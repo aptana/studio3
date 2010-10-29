@@ -40,12 +40,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
@@ -53,10 +52,42 @@ import com.aptana.editor.css.text.CSSTextHover;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
+import com.aptana.editor.svg.SVGSourceConfiguration;
+import com.aptana.editor.svg.contentassist.SVGContentAssistProcessor;
 
-public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfiguration
+public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
+	/**
+	 * getContentAssistProcessor
+	 * 
+	 * @param contentType
+	 * @param editor
+	 * @return
+	 */
+	public static IContentAssistProcessor getContentAssistProcessor(String contentType, AbstractThemeableEditor editor)
+	{
+		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
+		{
+			return new JSContentAssistProcessor(editor);
+		}
+		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
+		{
+			return new CSSContentAssistProcessor(editor);
+		}
+		if (contentType.startsWith(SVGSourceConfiguration.PREFIX))
+		{
+			return new SVGContentAssistProcessor(editor);
+		}
 
+		return new HTMLContentAssistProcessor(editor);
+	}
+
+	/**
+	 * HTMLSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
+	 */
 	public HTMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -71,63 +102,57 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				HTMLSourceConfiguration.CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES,
-				CSSSourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return HTMLSourceConfiguration.getDefault().getTopContentTypes();
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, HTMLSourceConfiguration.CONTENT_TYPES,
+			JSSourceConfiguration.CONTENT_TYPES, CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getContentAssistProcessor(org.eclipse.jface.text.source
+	 * .ISourceViewer, java.lang.String)
 	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		HTMLSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
-	}
-
-	public static IContentAssistProcessor getContentAssistProcessor(String contentType, AbstractThemeableEditor editor)
-	{
-		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
-		{
-			return new JSContentAssistProcessor(editor);
-		}
-		if (contentType.startsWith(CSSSourceConfiguration.PREFIX))
-		{
-			return new CSSContentAssistProcessor(editor);
-		}
-		return new HTMLContentAssistProcessor(editor);
-	}
-
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
-	{
-		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
-		targets.put("com.aptana.editor.html", getEditor()); //$NON-NLS-1$
-		return targets;
-	}
-
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
 		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
+
 		return getContentAssistProcessor(contentType, editor);
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	@Override
+	@SuppressWarnings( { "unchecked", "rawtypes" })
+	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
+	{
+		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
+
+		targets.put("com.aptana.editor.html", getEditor()); //$NON-NLS-1$
+
+		return targets;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 */
+	@Override
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return HTMLSourceConfiguration.getDefault();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer
+	 * , java.lang.String)
+	 */
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
@@ -136,6 +161,7 @@ public class HTMLSourceViewerConfiguration extends CommonSourceViewerConfigurati
 		{
 			return new CSSTextHover();
 		}
+
 		return super.getTextHover(sourceViewer, contentType);
 	}
 }

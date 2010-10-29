@@ -61,12 +61,17 @@ import com.aptana.core.util.StringUtil;
  * @author Max Stepanov
  *
  */
-public class ShellExecutable {
+public final class ShellExecutable {
 
 	private static final String[] POSSIBLE_SHELL_LOCATIONS_WIN32 = new String[] {
 		"%PROGRAMW6432%\\Git\\bin", //$NON-NLS-1$
 		"%PROGRAMFILES%\\Git\\bin", //$NON-NLS-1$
 		"%PROGRAMFILES(X86)%\\Git\\bin" //$NON-NLS-1$
+	};
+	
+	private static final String[] ENV_FILTER = new String[] {
+		"_", //$NON-NLS-1$
+		"TMP" //$NON-NLS-1$
 	};
 	
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
@@ -172,7 +177,9 @@ public class ShellExecutable {
 				env.put(envstring.substring(0,eqlsign), envstring.substring(eqlsign+1));
 			}
 		}
-		env.remove("_"); //$NON-NLS-1$
+		for (String var : ENV_FILTER) {
+			env.remove(var);
+		}
 		return env;
 	}
 	

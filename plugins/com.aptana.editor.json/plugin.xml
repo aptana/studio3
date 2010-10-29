@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.json.JSONEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="true"
+            extensions="json"
+            icon="icons/js.png"
+            id="com.aptana.editor.json"
+            name="%editor.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.json">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="json"
+            id="com.aptana.contenttype.json"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.json.parsing.JSONParser"
+            content-type="com.aptana.contenttype.json"
+            language="text/json">
+      </parser>
+   </extension>
+
+</plugin>

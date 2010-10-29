@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.dialogs;
 
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -5,20 +39,28 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.git.core.model.GitRepository;
+
 public class AddRemoteDialog extends InputDialog
 {
 
 	private Text remoteURIText;
-	protected String remoteURI;
+	private String remoteURI;
+	private Button trackButton;
+	private boolean track;
+	private boolean dontAutoChangeTrack = false;
 
-	public AddRemoteDialog(final Shell parentShell, String remoteName, String defaultURI)
+	public AddRemoteDialog(final Shell parentShell, final GitRepository repo, String remoteName, String defaultURI)
 	{
 		super(parentShell, Messages.AddRemoteDialog_AddRemoteDialog_Title,
 				Messages.AddRemoteDialog_AddRemoteDialog_Message, remoteName, new IInputValidator()
@@ -27,14 +69,34 @@ public class AddRemoteDialog extends InputDialog
 					public String isValid(String newText)
 					{
 						if (newText == null || newText.trim().length() == 0)
+						{
 							return Messages.AddRemoteDialog_NonEmptyRemoteNameMessage;
+						}
 						if (newText.trim().contains(" ") || newText.trim().contains("\t")) //$NON-NLS-1$ //$NON-NLS-2$
+						{
 							return Messages.AddRemoteDialog_NoWhitespaceRemoteNameMessage;
+						}
 						// TODO What else do we need to do to verify the remote name?
+						if (repo.remotes().contains(newText.trim()))
+						{
+							return Messages.AddRemoteDialog_UniqueRemoteNameMessage;
+						}
 						return null;
 					}
 				});
 		remoteURI = defaultURI;
+	}
+
+	@Override
+	protected void validateInput()
+	{
+		super.validateInput();
+		if (dontAutoChangeTrack)
+		{
+			return;
+		}
+		this.track = getText().getText().equals("origin"); //$NON-NLS-1$
+		trackButton.setSelection(this.track);
 	}
 
 	@Override
@@ -57,11 +119,30 @@ public class AddRemoteDialog extends InputDialog
 			}
 		});
 
+		// Add an option to track! Default to "on" for remote of "origin"
+		trackButton = new Button(composite, SWT.CHECK);
+		trackButton.setText(Messages.AddRemoteDialog_TrackButtonLabel);
+		trackButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				super.widgetSelected(e);
+				track = trackButton.getSelection();
+				dontAutoChangeTrack  = true;
+			}
+		});
+
 		return composite;
 	}
 
 	public String getRemoteURL()
 	{
 		return remoteURI;
+	}
+
+	public boolean track()
+	{
+		return track;
 	}
 }

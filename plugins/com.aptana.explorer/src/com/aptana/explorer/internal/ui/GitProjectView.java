@@ -34,41 +34,27 @@
  */
 package com.aptana.explorer.internal.ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
+import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -76,7 +62,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -87,7 +72,8 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.navigator.ICommonMenuConstants;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
@@ -95,7 +81,6 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
-import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryListener;
@@ -105,23 +90,6 @@ import com.aptana.git.core.model.PullEvent;
 import com.aptana.git.core.model.PushEvent;
 import com.aptana.git.core.model.RepositoryAddedEvent;
 import com.aptana.git.core.model.RepositoryRemovedEvent;
-import com.aptana.git.ui.DiffFormatter;
-import com.aptana.git.ui.actions.AddRemoteAction;
-import com.aptana.git.ui.actions.CommitAction;
-import com.aptana.git.ui.actions.DeleteBranchAction;
-import com.aptana.git.ui.actions.DisconnectAction;
-import com.aptana.git.ui.actions.GitAction;
-import com.aptana.git.ui.actions.GithubNetworkAction;
-import com.aptana.git.ui.actions.MergeBranchAction;
-import com.aptana.git.ui.actions.PullAction;
-import com.aptana.git.ui.actions.PushAction;
-import com.aptana.git.ui.actions.RevertAction;
-import com.aptana.git.ui.actions.ShowResourceInHistoryAction;
-import com.aptana.git.ui.actions.StageAction;
-import com.aptana.git.ui.actions.StashAction;
-import com.aptana.git.ui.actions.StatusAction;
-import com.aptana.git.ui.actions.UnstageAction;
-import com.aptana.git.ui.actions.UnstashAction;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
 
 /**
@@ -129,26 +97,15 @@ import com.aptana.git.ui.dialogs.CreateBranchDialog;
  * 
  * @author cwilliams
  */
-class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
+public class GitProjectView extends SingleProjectView implements IGitRepositoryListener, IGitRepositoriesListener
 {
+	private static final String TEAM_MAIN = "team.main"; //$NON-NLS-1$
 	private static final String DIRTY_SUFFIX = "*"; //$NON-NLS-1$
 	private static final String GIT_CHANGED_FILES_FILTER = "GitChangedFilesFilterEnabled"; //$NON-NLS-1$
 	private static final String PROJECT_DELIMITER = "######"; //$NON-NLS-1$
-	private static final String COMMIT_ICON_PATH = "icons/full/elcl16/disk.png"; //$NON-NLS-1$
-	private static final String PUSH_ICON_PATH = "icons/full/elcl16/arrow_right.png"; //$NON-NLS-1$
-	private static final String PULL_ICON_PATH = "icons/full/elcl16/arrow_left.png"; //$NON-NLS-1$
-	private static final String STASH_ICON_PATH = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
-	private static final String UNSTASH_ICON_PATH = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
 	private static final String CHANGED_FILE_FILTER_ICON_PATH = "icons/full/elcl16/filter.png"; //$NON-NLS-1$
 
 	private static final String CREATE_NEW_BRANCH_TEXT = Messages.GitProjectView_createNewBranchOption;
-
-	/**
-	 * Group names for git sections of gear menu
-	 */
-	private static final String GROUP_GIT_SINGLE_FILES = "group.git.files"; //$NON-NLS-1$
-	private static final String GROUP_GIT_PROJECTS = "group.git.project"; //$NON-NLS-1$
-	private static final String GROUP_GIT_BRANCHING = "group.git.branching"; //$NON-NLS-1$
 
 	private Label leftLabel;
 	private GridData leftLabelGridData;
@@ -222,6 +179,9 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 				}
 				for (String branch : repo.localBranches())
 				{
+					if (monitor != null && monitor.isCanceled())
+						return Status.CANCEL_STATUS;
+
 					boolean shouldPull = repo.shouldPull(branch);
 					synchronized (branchToPullIndicator)
 					{
@@ -246,12 +206,12 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	protected void doCreateToolbar(Composite toolbarComposite)
 	{
 		Composite branchComp = new Composite(toolbarComposite, SWT.NONE);
-		
+
 		GridLayout toolbarGridLayout = new GridLayout(3, false);
 		toolbarGridLayout.marginWidth = 2;
 		toolbarGridLayout.marginHeight = 0;
 		toolbarGridLayout.horizontalSpacing = 0;
-		
+
 		branchComp.setLayout(toolbarGridLayout);
 		createGitBranchCombo(branchComp);
 	}
@@ -289,110 +249,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 	}
 
 	@Override
-	protected void fillCommandsMenu(MenuManager menuManager)
-	{
-		super.fillCommandsMenu(menuManager);
-
-		if (selectedProject == null || !selectedProject.isAccessible())
-			return;
-		final GitRepository repository = getGitRepositoryManager().getAttached(selectedProject);
-		if (repository != null)
-		{
-			// Set up Git groups
-			menuManager.insertBefore(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_SINGLE_FILES));
-			menuManager.insertAfter(GROUP_GIT_SINGLE_FILES, new Separator(GROUP_GIT_PROJECTS));
-			menuManager.insertAfter(GROUP_GIT_PROJECTS, new Separator(GROUP_GIT_BRANCHING));
-
-			// Add git filter to filtering group
-			menuManager.appendToGroup(IContextMenuConstants.GROUP_FILTERING, new ContributionItem()
-			{
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createFilterMenuItem(menu);
-				}
-			});
-
-			// Add the git file actions
-			menuManager.appendToGroup(GROUP_GIT_SINGLE_FILES, new ContributionItem()
-			{
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					createStageMenuItem(menu, -1);
-					createUnstageMenuItem(menu, -1);
-					createDiffMenuItem(menu, -1);
-					// TODO Conflicts
-					createRevertMenuItem(menu, -1);
-				}
-			});
-			// Add the git branching/misc items
-			menuManager.appendToGroup(GROUP_GIT_BRANCHING, new ContributionItem()
-			{
-				@Override
-				public void fill(Menu menu, int index)
-				{
-					// Branch submenu, which contains...
-					MenuItem branchMenuItem = new MenuItem(menu, SWT.CASCADE);
-					branchMenuItem.setText(Messages.GitProjectView_BranchSubmenuLabel);
-					Menu branchSubMenu = new Menu(menu);
-					addSwitchBranchSubMenu(repository, branchSubMenu);
-					addMergeBranchSubMenu(repository, branchSubMenu);
-					addCreateBranchMenuItem(branchSubMenu);
-					addDeleteBranchSubMenu(repository, branchSubMenu);
-					branchMenuItem.setMenu(branchSubMenu);
-
-					// More submenu, which contains...
-					MenuItem moreMenuItem = new MenuItem(menu, SWT.CASCADE);
-					moreMenuItem.setText(Messages.GitProjectView_MoreSubmenuLabel);
-					Menu moreSubMenu = new Menu(menu);
-					createStashMenuItem(moreSubMenu);
-					createUnstashMenuItem(moreSubMenu);
-					createAddRemoteMenuItem(moreSubMenu);
-					createShowInHistoryMenuItem(moreSubMenu);
-					createShowGithubNetworkMenuItem(moreSubMenu);
-					createDisconnectMenuItem(moreSubMenu);
-					moreMenuItem.setMenu(moreSubMenu);
-				}
-			});
-		}
-		else
-		{
-			// Set up Git groups
-			menuManager.insertAfter(IContextMenuConstants.GROUP_ADDITIONS, new Separator(GROUP_GIT_PROJECTS));
-		}
-
-		// add the git project actions
-		menuManager.appendToGroup(GROUP_GIT_PROJECTS, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				if (repository == null)
-				{
-					createAttachRepoMenuItem(menu, -1);
-				}
-				else
-				{
-					createCommitMenuItem(menu);
-					String[] commitsAhead = repository.commitsAhead(repository.currentBranch());
-					if (commitsAhead != null && commitsAhead.length > 0)
-					{
-						// FIXME Always add, just don't make enabled unless we've got commits?
-						createPushMenuItem(menu);
-					}
-					if (repository.trackingRemote(repository.currentBranch()))
-					{
-						// FIXME Always add, just don't make enabled unless we're tracking remote?
-						createPullMenuItem(menu);
-					}
-					createGitStatusMenuItem(menu);
-				}
-			}
-		});
-	}
-
-	@Override
 	public void dispose()
 	{
 		if (selectedProject != null)
@@ -403,41 +259,18 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 		getGitRepositoryManager().removeListener(this);
 
-		branchToPullIndicator = null;
 		if (pullCalc != null)
 		{
 			pullCalc.cancel();
 			pullCalc = null;
 		}
+		branchToPullIndicator = null;
 		if (refreshUIJob != null)
 		{
 			refreshUIJob.cancel();
 			refreshUIJob = null;
 		}
 		super.dispose();
-	}
-
-	private void createFilterMenuItem(Menu menu)
-	{
-		MenuItem gitFilter = new MenuItem(menu, SWT.CHECK);
-		gitFilter.setImage(ExplorerPlugin.getImage(CHANGED_FILE_FILTER_ICON_PATH));
-		gitFilter.setSelection(fChangedFilesFilter != null);
-		gitFilter.setText(Messages.GitProjectView_ChangedFilesFilterTooltip);
-		gitFilter.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (fChangedFilesFilter == null)
-				{
-					addGitChangedFilesFilter();
-				}
-				else
-				{
-					removeFilter();
-				}
-			}
-		});
 	}
 
 	@Override
@@ -452,509 +285,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		super.removeFilter();
 	}
 
-	private void createAttachRepoMenuItem(Menu menu, int index)
-	{
-		if (index < 0)
-		{
-			index = menu.getItemCount();
-		}
-		MenuItem createRepo = new MenuItem(menu, SWT.PUSH, index);
-		createRepo.setText(Messages.GitProjectView_AttachGitRepo_button);
-		createRepo.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				Job job = new Job(Messages.GitProjectView_AttachGitRepo_jobTitle)
-				{
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						SubMonitor sub = SubMonitor.convert(monitor, 100);
-						try
-						{
-							getGitRepositoryManager().createOrAttach(selectedProject, sub);
-						}
-						catch (CoreException e)
-						{
-							ExplorerPlugin.logError(e);
-							return e.getStatus();
-						}
-						finally
-						{
-							sub.done();
-						}
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createDiffMenuItem(Menu menu, int index)
-	{
-		if (index < 0)
-		{
-			index = menu.getItemCount();
-		}
-		MenuItem commit = new MenuItem(menu, SWT.PUSH, index);
-		commit.setText(Messages.GitProjectView_DiffTooltip);
-		commit.setEnabled(getGitRepositoryManager().getAttached(selectedProject) != null
-				&& !getSelectedChangedFiles().isEmpty());
-		commit.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-				if (repo == null)
-					return;
-
-				Map<String, String> diffs = new HashMap<String, String>();
-				List<ChangedFile> changedFiles = getSelectedChangedFiles();
-				for (ChangedFile file : changedFiles)
-				{
-					if (file == null)
-						continue;
-
-					if (diffs.containsKey(file.getPath()))
-						continue; // already calculated diff...
-					String diff = repo.index().diffForFile(file, file.hasStagedChanges(), 3);
-					diffs.put(file.getPath(), diff);
-				}
-				if (diffs.isEmpty())
-					return;
-				String diff = ""; //$NON-NLS-1$
-				try
-				{
-					diff = DiffFormatter.toHTML(diffs);
-				}
-				catch (Throwable t)
-				{
-					ExplorerPlugin.logError("Failed to turn diff into HTML", t); //$NON-NLS-1$
-				}
-				final String finalDiff = diff;
-				MessageDialog dialog = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-						.getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
-						"", 0, new String[] { IDialogConstants.OK_LABEL }, 0) //$NON-NLS-1$
-				{
-					@Override
-					protected Control createCustomArea(Composite parent)
-					{
-						Browser diffArea = new Browser(parent, SWT.BORDER);
-						GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-						data.heightHint = 300;
-						diffArea.setLayoutData(data);
-						diffArea.setText(finalDiff);
-						return diffArea;
-					}
-
-					@Override
-					protected boolean isResizable()
-					{
-						return true;
-					}
-				};
-				dialog.open();
-			}
-		});
-	}
-
-	private List<ChangedFile> getSelectedChangedFiles()
-	{
-		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				changedFiles.addAll(getChangedFilesForResource(repo, resource));
-			}
-		}
-		return changedFiles;
-	}
-
-	private void createRevertMenuItem(Menu menu, int index)
-	{
-		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_RevertTooltip,
-				Messages.GitProjectView_RevertJobTitle, new RevertAction());
-	}
-
-	private void createStageMenuItem(Menu menu, int index)
-	{
-		createSimpleGitAction(menu, index, getSelectedUnstagedFiles(), Messages.GitProjectView_StageTooltip,
-				Messages.GitProjectView_StageJobTitle, new StageAction());
-	}
-
-	private void createUnstageMenuItem(Menu menu, int index)
-	{
-		createSimpleGitAction(menu, index, getSelectedStagedFiles(), Messages.GitProjectView_UnstageTooltip,
-				Messages.GitProjectView_UnstageJobTitle, new UnstageAction());
-	}
-
-	protected Set<IResource> getSelectedStagedFiles()
-	{
-		// Limit to only those changed files which have staged changes
-		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		final Set<IResource> selected = new HashSet<IResource>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
-				for (ChangedFile changedFile : changedFiles)
-				{
-					if (changedFile == null)
-						continue;
-					if (changedFile.hasStagedChanges())
-					{
-						selected.add(resource);
-						break;
-					}
-				}
-			}
-		}
-		return selected;
-	}
-
-	protected Set<IResource> getSelectedUnstagedFiles()
-	{
-		GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
-		final Set<IResource> selected = new HashSet<IResource>();
-		if (repo != null)
-		{
-			for (IResource resource : getSelectedFiles())
-			{
-				List<ChangedFile> changedFiles = getChangedFilesForResource(repo, resource);
-				for (ChangedFile changedFile : changedFiles)
-				{
-					if (changedFile == null)
-						continue;
-					if (changedFile.hasUnstagedChanges())
-					{
-						selected.add(resource);
-						break;
-					}
-				}
-			}
-		}
-		return selected;
-	}
-
-	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
-	{
-		List<ChangedFile> files = new ArrayList<ChangedFile>();
-		if (resource instanceof IContainer)
-		{
-			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
-		}
-		else
-		{
-			ChangedFile changedFile = repo.getChangedFileForResource(resource);
-			if (changedFile != null)
-				files.add(changedFile);
-		}
-		return files;
-	}
-
-	private void createSimpleGitAction(Menu menu, int index, final Set<IResource> selected, String tooltip,
-			final String jobTitle, final GitAction action)
-	{
-		if (index < 0)
-		{
-			index = menu.getItemCount();
-		}
-		MenuItem stage = new MenuItem(menu, SWT.PUSH, index);
-		stage.setText(tooltip);
-		stage.setEnabled(!selected.isEmpty());
-		stage.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				action.selectionChanged(null, new StructuredSelection(selected.toArray()));
-				Job job = new Job(jobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private Set<IResource> getSelectedFiles()
-	{
-		ISelection sel = getCommonViewer().getSelection();
-		Set<IResource> resources = new HashSet<IResource>();
-		if (sel == null || sel.isEmpty())
-			return resources;
-		if (!(sel instanceof IStructuredSelection))
-			return resources;
-		IStructuredSelection structured = (IStructuredSelection) sel;
-		for (Object element : structured.toList())
-		{
-			if (element == null)
-				continue;
-
-			if (element instanceof IResource)
-				resources.add((IResource) element);
-
-			if (element instanceof IAdaptable)
-			{
-				IAdaptable adapt = (IAdaptable) element;
-				IResource resource = (IResource) adapt.getAdapter(IResource.class);
-				if (resource != null)
-					resources.add(resource);
-			}
-		}
-		return resources;
-	}
-
-	private void createCommitMenuItem(Menu menu)
-	{
-		MenuItem commit = new MenuItem(menu, SWT.PUSH);
-		commit.setImage(ExplorerPlugin.getImage(COMMIT_ICON_PATH));
-		commit.setText(Messages.GitProjectView_CommitTooltip);
-		commit.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				CommitAction action = new CommitAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				action.run();
-			}
-		});
-	}
-
-	private void createGitStatusMenuItem(Menu menu)
-	{
-		MenuItem commit = new MenuItem(menu, SWT.PUSH);
-		commit.setText(Messages.GitProjectView_StatusTooltip);
-		commit.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				StatusAction action = new StatusAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				action.run();
-			}
-		});
-	}
-
-	private void createAddRemoteMenuItem(Menu menu)
-	{
-		MenuItem commit = new MenuItem(menu, SWT.PUSH);
-		commit.setText(Messages.GitProjectView_AddRemoteTooltip);
-		commit.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				AddRemoteAction action = new AddRemoteAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				action.run();
-			}
-		});
-	}
-
-	private void createPushMenuItem(Menu menu)
-	{
-		createProjectLevelMenuItem(menu, PUSH_ICON_PATH, Messages.GitProjectView_PushTooltip,
-				Messages.GitProjectView_PushJobTitle, new PushAction());
-	}
-
-	private void createPullMenuItem(Menu menu)
-	{
-		createProjectLevelMenuItem(menu, PULL_ICON_PATH, Messages.GitProjectView_PullTooltip,
-				Messages.GitProjectView_PullJobTitle, new PullAction());
-	}
-
-	private void createProjectLevelMenuItem(Menu menu, String imagePath, String tooltip, final String jobTitle,
-			final GitAction action)
-	{
-		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		if (imagePath != null)
-		{
-			item.setImage(ExplorerPlugin.getImage(imagePath));
-		}
-		item.setText(tooltip);
-		item.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(jobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createStashMenuItem(Menu menu)
-	{
-		MenuItem stash = new MenuItem(menu, SWT.PUSH);
-		stash.setImage(ExplorerPlugin.getImage(STASH_ICON_PATH));
-		stash.setText(Messages.GitProjectView_StashTooltip);
-		stash.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final StashAction action = new StashAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_StashJobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createUnstashMenuItem(Menu menu)
-	{
-		MenuItem unstash = new MenuItem(menu, SWT.PUSH);
-		unstash.setImage(ExplorerPlugin.getImage(UNSTASH_ICON_PATH));
-		unstash.setText(Messages.GitProjectView_UnstashTooltip);
-		unstash.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final UnstashAction action = new UnstashAction();
-				action.selectionChanged(null, new StructuredSelection(selectedProject));
-				Job job = new Job(Messages.GitProjectView_UnstashJobTitle)
-				{
-
-					@Override
-					protected IStatus run(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createDisconnectMenuItem(Menu menu)
-	{
-		MenuItem disconnect = new MenuItem(menu, SWT.PUSH);
-		disconnect.setText(Messages.GitProjectView_DisconnectTooltip);
-		disconnect.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final DisconnectAction action = new DisconnectAction();
-				IAction duh = new Action()
-				{
-				};
-				action.setActivePart(duh, GitProjectView.this);
-				UIJob job = new UIJob(Messages.GitProjectView_DisconnectJobTitle)
-				{
-
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(null);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-	}
-
-	private void createShowInHistoryMenuItem(Menu menu)
-	{
-		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
-		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowInHistory);
-		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
-		{
-			@SuppressWarnings("restriction")
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				final ShowResourceInHistoryAction action = new ShowResourceInHistoryAction();
-				action.selectionChanged(null, new StructuredSelection(getSelectedFiles().toArray()));
-				action.run(null);
-			}
-		});
-	}
-
-	private void createShowGithubNetworkMenuItem(Menu menu)
-	{
-		MenuItem showGitHubNetwork = new MenuItem(menu, SWT.PUSH);
-		showGitHubNetwork.setText(Messages.GitProjectView_LBL_ShowGitHubNetwork);
-		final GithubNetworkAction action = new GithubNetworkAction();
-		action.selectionChanged(null, new StructuredSelection(selectedProject));
-		showGitHubNetwork.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-
-				Job job = new UIJob(Messages.GitProjectView_ShowGitHubNetworkJobTitle)
-				{
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor)
-					{
-						action.run();
-						refreshUI(getGitRepositoryManager().getAttached(selectedProject));
-						return Status.OK_STATUS;
-					}
-				};
-				job.setUser(true);
-				job.setPriority(Job.LONG);
-				job.schedule();
-			}
-		});
-		showGitHubNetwork.setEnabled(action.isEnabled());
-	}
-
-	protected boolean setNewBranch(String branchName)
+	private boolean setNewBranch(String branchName)
 	{
 		// Strip off the indicators...
 		branchName = stripIndicators(branchName);
@@ -992,7 +323,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		return false;
 	}
 
-	protected String stripIndicators(String branchName)
+	private String stripIndicators(String branchName)
 	{
 		if (branchName.endsWith(" " + getRightArrowChar())) //$NON-NLS-1$
 			branchName = branchName.substring(0, branchName.length() - 2);
@@ -1157,7 +488,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		branchesToolbar.pack();
 	}
 
-	protected String getRightArrowChar()
+	private String getRightArrowChar()
 	{
 		if (Platform.getOS().equals(Platform.OS_MACOSX))
 		{
@@ -1166,7 +497,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		return "->"; //$NON-NLS-1$
 	}
 
-	protected String getLeftArrowChar()
+	private String getLeftArrowChar()
 	{
 		if (Platform.getOS().equals(Platform.OS_MACOSX))
 		{
@@ -1196,7 +527,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		handleBranchEvent(e.getRepository());
 	}
 
-	protected void refreshUI(final GitRepository repository)
+	private void refreshUI(final GitRepository repository)
 	{
 		// If we get multiple requests queuing up, just cancel current and reschedule
 		if (refreshUIJob != null)
@@ -1299,7 +630,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 	}
 
-	protected void addGitChangedFilesFilter()
+	private void addGitChangedFilesFilter()
 	{
 		removeFilter();
 		fChangedFilesFilter = new GitChangedFilesFilter();
@@ -1365,84 +696,6 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		}
 	}
 
-	protected void addCreateBranchMenuItem(Menu menu)
-	{
-		// Create branch
-		final MenuItem branchNameMenuItem = new MenuItem(menu, SWT.PUSH);
-		branchNameMenuItem.setText(CREATE_NEW_BRANCH_TEXT);
-		branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-				setNewBranch(branchNameMenuItem.getText());
-			}
-		});
-	}
-
-	protected void addSwitchBranchSubMenu(GitRepository repository, Menu menu)
-	{
-		// Switch to branch
-		MenuItem switchBranchesMenuItem = new MenuItem(menu, SWT.CASCADE);
-		switchBranchesMenuItem.setText(Messages.GitProjectView_SwitchToBranch);
-		Menu switchBranchesSubMenu = new Menu(switchBranchesMenuItem);
-		String currentBranchName = repository.currentBranch();
-		for (String branchName : repository.localBranches())
-		{
-			// Construct the menu item to for this branch
-			final MenuItem branchNameMenuItem = new MenuItem(switchBranchesSubMenu, SWT.RADIO);
-			if (branchName.equals(currentBranchName) && repository.isDirty())
-			{
-				branchNameMenuItem.setText(branchName + DIRTY_SUFFIX);
-			}
-			else
-			{
-				branchNameMenuItem.setText(branchName);
-			}
-			branchNameMenuItem.setSelection(branchName.equals(currentBranchName));
-			branchNameMenuItem.addSelectionListener(new SelectionAdapter()
-			{
-				public void widgetSelected(SelectionEvent e)
-				{
-					setNewBranch(branchNameMenuItem.getText());
-				}
-			});
-		}
-		// only 1 branch, no need to switch
-		switchBranchesMenuItem.setEnabled(repository.localBranches().size() > 1);
-		switchBranchesMenuItem.setMenu(switchBranchesSubMenu);
-	}
-
-	protected void addMergeBranchSubMenu(final GitRepository repository, Menu menu)
-	{
-		// Merge branch
-		MenuItem mergeBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
-		mergeBranchMenuItem.setText(Messages.GitProjectView_MergeBranch);
-		Menu mergeBranchSubmenu = new Menu(mergeBranchMenuItem);
-
-		MergeBranchAction action = new MergeBranchAction();
-		action.selectionChanged(new Action()
-		{
-		}, new StructuredSelection(selectedProject));
-		action.fillMenu(mergeBranchSubmenu);
-		mergeBranchMenuItem.setEnabled(repository.allBranches().size() > 1);
-		mergeBranchMenuItem.setMenu(mergeBranchSubmenu);
-	}
-
-	protected void addDeleteBranchSubMenu(final GitRepository repository, Menu menu)
-	{
-		// Delete branch
-		MenuItem deleteBranchMenuItem = new MenuItem(menu, SWT.CASCADE);
-		deleteBranchMenuItem.setText(Messages.GitProjectView_DeleteBranch);
-		Menu deleteBranchSubmenu = new Menu(deleteBranchMenuItem);
-		DeleteBranchAction action = new DeleteBranchAction();
-		action.selectionChanged(new Action()
-		{
-		}, new StructuredSelection(selectedProject));
-		action.fillMenu(deleteBranchSubmenu);
-		deleteBranchMenuItem.setEnabled(repository.localBranches().size() > 1);
-		deleteBranchMenuItem.setMenu(deleteBranchSubmenu);
-	}
-
 	@Override
 	protected void mangleContextMenu(Menu menu)
 	{
@@ -1451,7 +704,7 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 		if (repo != null || selectedProject == null || !selectedProject.isAccessible())
 		{
 			Set<String> toRemove = new HashSet<String>();
-			toRemove.add("team.main"); //$NON-NLS-1$
+			toRemove.add(TEAM_MAIN);
 			removeMenuItems(menu, toRemove);
 		}
 		else
@@ -1469,52 +722,77 @@ class GitProjectView extends SingleProjectView implements IGitRepositoryListener
 					{
 						IContributionItem contrib = (IContributionItem) data;
 						// Just replace team with initialize git repo
-						if ("team.main".equals(contrib.getId())) //$NON-NLS-1$
+						if (TEAM_MAIN.equals(contrib.getId()))
 						{
-							createAttachRepoMenuItem(menu, i + 1);
+							addAttachItem(menu, i + 1);
 							break;
 						}
 					}
 				}
 				Set<String> toRemove = new HashSet<String>();
-				toRemove.add("team.main"); //$NON-NLS-1$
+				toRemove.add(TEAM_MAIN);
 				removeMenuItems(menu, toRemove);
 			}
 		}
 		// Remove all the other stuff we normally do...
 		super.mangleContextMenu(menu);
-		if (repo == null)
-			return;
-
-		// Add the git actions Diff..., Stage/Unstage, Revert
-		MenuItem additions = getAdditionsMenuItem(menu);
-		int index = menu.indexOf(additions);
-		if (index > 0)
-			index++;
-		createDiffMenuItem(menu, index++);
-		createStageMenuItem(menu, index++);
-		createUnstageMenuItem(menu, index++);
-		createRevertMenuItem(menu, index);
 	}
 
-	private MenuItem getAdditionsMenuItem(Menu menu)
+	private void addAttachItem(Menu menu, int index)
 	{
-		MenuItem[] items = menu.getItems();
-		for (MenuItem item : items)
+		// FIXME Move this constant into an interface on Git UI plugin!
+		final String commandId = "com.aptana.git.ui.command.attach"; //$NON-NLS-1$
+		final MenuItem customizeMenuItem = new MenuItem(menu, SWT.PUSH, index);
+		ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+		Command c = commandService.getCommand(commandId);
+		try
 		{
-			Object data = item.getData();
-			if (data instanceof Separator)
-			{
-				Separator sep = (Separator) data;
-				if (sep.getId().equals(ICommonMenuConstants.GROUP_ADDITIONS))
-					return item;
-			}
+			customizeMenuItem.setText(c.getName());
 		}
-		return null;
+		catch (NotDefinedException e2)
+		{
+			// ignore
+		}
+		customizeMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
+						IHandlerService.class);
+				try
+				{
+					handlerService.executeCommand(commandId, null);
+				}
+				catch (ExecutionException e1)
+				{
+				}
+				catch (NotDefinedException e1)
+				{
+				}
+				catch (NotEnabledException e1)
+				{
+				}
+				catch (NotHandledException e1)
+				{
+				}
+			}
+		});
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
+	}
+
+	public void toggleChangedFilesFilter()
+	{
+		if (fChangedFilesFilter == null)
+		{
+			addGitChangedFilesFilter();
+		}
+		else
+		{
+			removeFilter();
+		}
 	}
 }

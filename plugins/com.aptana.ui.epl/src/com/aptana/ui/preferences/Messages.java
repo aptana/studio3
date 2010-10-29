@@ -19,6 +19,12 @@ public class Messages extends NLS
 	public static String GenericRootPage_noAvailablePages;
 	public static String GenericRootPage_preferences;
 
+	public static String PropertyAndPreferencePage_configureProjectSettings;
+
+	public static String PropertyAndPreferencePage_configureWorkspaceSettings;
+
+	public static String PropertyAndPreferencePage_enableProjectSpecific;
+
 	static
 	{
 		// initialize resource bundle

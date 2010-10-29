@@ -37,7 +37,7 @@ package com.aptana.editor.ruby.parsing;
 import com.aptana.editor.ruby.parsing.ast.RubyScript;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
-import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseRootNode;
 
 public class RubyParser implements IParser
 {
@@ -49,7 +49,7 @@ public class RubyParser implements IParser
 		fParser = new RubySourceParser();
 	}
 
-	public IParseNode parse(IParseState parseState) throws Exception
+	public IParseRootNode parse(IParseState parseState) throws Exception
 	{
 		String source = new String(parseState.getSource());
 		RubyScript root = new RubyScript(parseState.getStartingOffset(), parseState.getStartingOffset()

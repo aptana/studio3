@@ -38,16 +38,13 @@ package com.aptana.editor.css;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -55,6 +52,8 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.text.rules.EmptyCommentRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -73,64 +72,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, STRING };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
-
-	/**
-	 * Detector for empty comments.
-	 */
-	static class EmptyCommentDetector implements IWordDetector
-	{
-		/**
-		 * isWordStart
-		 */
-		public boolean isWordStart(char c)
-		{
-			return (c == '/');
-		}
-
-		/**
-		 * isWordPart
-		 */
-		public boolean isWordPart(char c)
-		{
-			return (c == '*' || c == '/');
-		}
-	}
-
-	/**
-	 * WordPredicateRule
-	 */
-	static class WordPredicateRule extends WordRule implements IPredicateRule
-	{
-		private IToken fSuccessToken;
-
-		/**
-		 * WordPredicateRule
-		 * 
-		 * @param successToken
-		 */
-		public WordPredicateRule(IToken successToken)
-		{
-			super(new EmptyCommentDetector());
-			fSuccessToken = successToken;
-			addWord("/**/", fSuccessToken); //$NON-NLS-1$
-		}
-
-		/**
-		 * evaluate
-		 */
-		public IToken evaluate(ICharacterScanner scanner, boolean resume)
-		{
-			return super.evaluate(scanner);
-		}
-
-		/**
-		 * getSuccessToken
-		 */
-		public IToken getSuccessToken()
-		{
-			return fSuccessToken;
-		}
-	}
 
 	private IToken stringToken = new Token(STRING);
 
@@ -167,7 +108,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new WordPredicateRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
+				new EmptyCommentRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 		};
 	}
 
@@ -231,7 +172,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new ThemeingDamagerRepairer(getWordScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
@@ -240,12 +181,11 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, STRING);
 	}
 
-	protected ITokenScanner getWordScanner()
+	protected ITokenScanner getCommentScanner()
 	{
 		if (multilineCommentScanner == null)
 		{
-			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+			multilineCommentScanner = new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 		}
 		return multilineCommentScanner;
 	}

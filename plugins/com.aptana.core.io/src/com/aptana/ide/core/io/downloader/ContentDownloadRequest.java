@@ -129,7 +129,7 @@ public class ContentDownloadRequest
 		}
 		catch (URISyntaxException e)
 		{
-			CoreIOPlugin.log(e);
+			CoreIOPlugin.log(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 
 		try

@@ -75,7 +75,7 @@ class GitChangedFilesFilter extends ViewerFilter
 		return repo.resourceOrChildHasChanges(resource);
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

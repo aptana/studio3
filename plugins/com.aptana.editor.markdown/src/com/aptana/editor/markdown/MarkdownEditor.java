@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -38,7 +38,10 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class MarkdownEditor extends AbstractThemeableEditor
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{

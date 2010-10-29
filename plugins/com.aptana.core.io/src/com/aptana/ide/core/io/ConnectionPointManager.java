@@ -68,13 +68,14 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	protected static final String STATE_FILENAME = "connections"; //$NON-NLS-1$
 
 	private static final String EXTENSION_POINT_ID = CoreIOPlugin.PLUGIN_ID + ".connectionPoint"; //$NON-NLS-1$
-	protected static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
-	protected static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
+	private static final String TAG_CONNECTION_POINT_TYPE = "connectionPointType"; //$NON-NLS-1$
+	private static final String TAG_CONNECTION_POINT_CATEGORY = "connectionPointCategory"; //$NON-NLS-1$
 	protected static final String ATT_ID = "id"; //$NON-NLS-1$
-	protected static final String ATT_NAME = "name"; //$NON-NLS-1$
-	protected static final String ATT_ORDER = "order"; //$NON-NLS-1$
-	protected static final String ATT_CLASS = "class"; //$NON-NLS-1$
-	protected static final String ATT_CATEGORY = "category"; //$NON-NLS-1$
+	private static final String ATT_NAME = "name"; //$NON-NLS-1$
+	private static final String ATT_ORDER = "order"; //$NON-NLS-1$
+	private static final String ATT_REMOTE = "remote"; //$NON-NLS-1$
+	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ATT_CATEGORY = "category"; //$NON-NLS-1$
 
 	private static final String ELEMENT_ROOT = "connections"; //$NON-NLS-1$
 	private static final String ELEMENT_CONNECTION = "connection"; //$NON-NLS-1$
@@ -444,7 +445,8 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 				order = Integer.parseInt(element.getAttribute(ATT_ORDER));
 			} catch (NumberFormatException e) {
 			}
-			categories.put(id, new ConnectionPointCategory(id, name, order));
+			boolean remote = Boolean.parseBoolean(element.getAttribute(ATT_REMOTE));
+			categories.put(id, new ConnectionPointCategory(id, name, order, remote));
 		} else if (TAG_CONNECTION_POINT_TYPE.equals(element.getName())) {
 			String typeId = element.getAttribute(ATT_ID);
 			if (typeId == null || typeId.length() == 0) {
