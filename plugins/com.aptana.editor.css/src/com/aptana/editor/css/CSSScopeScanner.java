@@ -45,7 +45,7 @@ import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.text.rules.CharacterMapRule;
-import com.aptana.editor.css.CSSSourceConfiguration.WordPredicateRule;
+import com.aptana.editor.common.text.rules.EmptyCommentRule;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class CSSScopeScanner extends CSSCodeScanner
@@ -67,7 +67,7 @@ public class CSSScopeScanner extends CSSCodeScanner
 		// Add the rules for block comments, single and double quoted strings
 		rules.add(new SingleLineRule("\"", "\"", createToken(CSSTokenType.DOUBLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$ 
 		rules.add(new SingleLineRule("\'", "\'", createToken(CSSTokenType.SINGLE_QUOTED_STRING), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new WordPredicateRule(createToken(CSSTokenType.COMMENT)));
+		rules.add(new EmptyCommentRule(createToken(CSSTokenType.COMMENT)));
 		rules.add(new MultiLineRule("/*", "*/", createToken(CSSTokenType.COMMENT), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		// Add rules for the start characters of classes and ids

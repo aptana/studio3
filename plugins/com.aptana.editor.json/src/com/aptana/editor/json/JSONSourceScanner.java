@@ -43,7 +43,6 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
-import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
@@ -52,6 +51,7 @@ import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 import com.aptana.editor.json.parsing.lexer.JSONTokenType;
 import com.aptana.editor.json.text.rules.JSONNumberRule;
+import com.aptana.editor.json.text.rules.JSONPropertyRule;
 
 @SuppressWarnings("nls")
 public class JSONSourceScanner extends RuleBasedScanner
@@ -81,8 +81,13 @@ public class JSONSourceScanner extends RuleBasedScanner
 		rules.add(new EndOfLineRule("//", createToken(JSONTokenType.COMMENT)));
 		rules.add(new MultiLineRule("/*", "*/", createToken(JSONTokenType.COMMENT)));
 
-		rules.add(new SingleLineRule("\"", "\"", createToken(JSONTokenType.STRING_DOUBLE)));
-		rules.add(new SingleLineRule("'", "'", createToken(JSONTokenType.STRING_SINGLE)));
+		rules.add( //
+			new JSONPropertyRule( //
+				createToken(JSONTokenType.STRING_SINGLE), //
+				createToken(JSONTokenType.STRING_DOUBLE), //
+				createToken(JSONTokenType.PROPERTY) //
+			) //
+		);
 
 		WordRule keywordRule = new WordRule(new KeywordDetector(), Token.UNDEFINED);
 		keywordRule.addWord("true", createToken(JSONTokenType.TRUE));

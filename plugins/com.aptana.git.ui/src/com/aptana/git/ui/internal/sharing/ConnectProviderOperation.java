@@ -44,7 +44,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 	 * @param projects
 	 *            the projects to connect to the Git team provider.
 	 */
-	public ConnectProviderOperation(final IProject[] projects)
+	protected ConnectProviderOperation(final IProject[] projects)
 	{
 		this.projects = projects;
 	}
@@ -72,7 +72,7 @@ public class ConnectProviderOperation implements IWorkspaceRunnable
 		}
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

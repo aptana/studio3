@@ -69,7 +69,7 @@ public class GitColors
 	 */
 	private static final String UNSTAGED_TOKEN = "markup.deleted"; //$NON-NLS-1$
 
-	public static Color greenFG()
+	protected static Color greenFG()
 	{
 		if (getActiveTheme().hasEntry(STAGED_TOKEN))
 		{
@@ -96,7 +96,7 @@ public class GitColors
 		return ThemePlugin.getDefault().getColorManager().getColor(DEFAULT_GREEN_BG);
 	}
 
-	public static Color redFG()
+	protected static Color redFG()
 	{
 		if (getActiveTheme().hasEntry(UNSTAGED_TOKEN))
 		{
@@ -133,12 +133,12 @@ public class GitColors
 		return getActiveTheme().hasLightFG();
 	}
 
-	protected static Theme getActiveTheme()
+	private static Theme getActiveTheme()
 	{
 		return getThemeManager().getCurrentTheme();
 	}
 
-	protected static IThemeManager getThemeManager()
+	private static IThemeManager getThemeManager()
 	{
 		return ThemePlugin.getDefault().getThemeManager();
 	}

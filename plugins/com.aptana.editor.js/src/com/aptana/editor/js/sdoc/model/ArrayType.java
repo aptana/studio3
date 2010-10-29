@@ -56,7 +56,7 @@ public class ArrayType extends Type
 	 */
 	public ArrayType(Type memberType)
 	{
-		super(JSTypeConstants.ARRAY_TYPE); //$NON-NLS-1$
+		super(JSTypeConstants.ARRAY_TYPE);
 
 		this._memberType = (memberType != null) ? memberType : Type.OBJECT_TYPE;
 	}
@@ -78,7 +78,7 @@ public class ArrayType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(JSTypeConstants.ARRAY_TYPE); //$NON-NLS-1$
+		writer.print(JSTypeConstants.ARRAY_TYPE);
 
 		if (this._memberType != Type.OBJECT_TYPE)
 		{

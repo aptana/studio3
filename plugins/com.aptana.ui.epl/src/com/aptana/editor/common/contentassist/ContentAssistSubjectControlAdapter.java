@@ -388,7 +388,7 @@ final class ContentAssistSubjectControlAdapter implements IContentAssistSubjectC
 	 * @param offset
 	 *            a document offset
 	 * @return the auto activation characters
-	 * @see IContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 * @see import org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
 	 */
 	char[] getContextInformationAutoActivationCharacters(ContentAssistant contentAssistant, int offset)
 	{

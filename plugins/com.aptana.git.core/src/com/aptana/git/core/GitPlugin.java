@@ -153,7 +153,7 @@ public class GitPlugin extends Plugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
 	}
 
-	public static void logError(CoreException e)
+	protected static void logError(CoreException e)
 	{
 		getDefault().getLog().log(e.getStatus());
 	}
@@ -174,12 +174,6 @@ public class GitPlugin extends Plugin
 	{
 		if (getDefault() != null && getDefault().isDebugging())
 			getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
-	}
-
-	public static void trace(String string)
-	{
-		if (getDefault() != null && getDefault().isDebugging())
-			getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
 	}
 
 	/**

@@ -35,8 +35,11 @@
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +53,16 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -85,6 +94,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
+import com.aptana.explorer.ui.filter.PathFilter;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
@@ -95,6 +106,15 @@ import com.aptana.theme.ThemePlugin;
  */
 public class FilteringProjectView extends GitProjectView
 {
+	/**
+	 * Attribute/element names for filter extensions.
+	 */
+	private static final String ELEMENT_PRIORITY = "priority"; //$NON-NLS-1$
+	private static final String ELEMENT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ELEMENT_NATURE = "nature"; //$NON-NLS-1$
+	private static final String FILTERS_EXT_PT_ID = "filters"; //$NON-NLS-1$
+	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
+
 	/**
 	 * Memento names for saving state of view and restoring it across launches.
 	 */
@@ -114,7 +134,7 @@ public class FilteringProjectView extends GitProjectView
 
 	private IResource currentFilter = null;
 
-	private PathFilter patternFilter;
+	private AbstractResourceBasedViewerFilter patternFilter;
 	private WorkbenchJob refreshJob;
 
 	/**
@@ -134,6 +154,7 @@ public class FilteringProjectView extends GitProjectView
 	private Map<IProject, List<String>> projectExpansions;
 	private Map<IProject, List<String>> projectSelections;
 	private Map<IProject, String> projectFilters;
+	private ArrayList<IConfigurationElement> fgElements;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -155,7 +176,6 @@ public class FilteringProjectView extends GitProjectView
 		customComposite.setLayout(gridLayout);
 
 		super.createPartControl(customComposite);
-		patternFilter = new PathFilter();
 		createRefreshJob();
 
 		// Add eyeball hover
@@ -270,6 +290,10 @@ public class FilteringProjectView extends GitProjectView
 		if (filter != null)
 		{
 			projectFilters.put(project, filter.getLocation().toPortableString());
+		}
+		else
+		{
+			projectFilters.remove(project);
 		}
 	}
 
@@ -734,24 +758,27 @@ public class FilteringProjectView extends GitProjectView
 					redrawFalseControl.setRedraw(false);
 					// collapse all
 					getCommonViewer().collapseAll();
-					// Now apply/remove teh filter. This will trigger a refresh!
+					// Now apply/remove the filter. This will trigger a refresh!
 					IResource filterResource = getFilterResource();
 					try
 					{
 						if (filterResource == null)
 						{
-							patternFilter.setResourceToFilterOn(null);
-
-							getCommonViewer().removeFilter(patternFilter);
+							if (patternFilter != null)
+							{
+								getCommonViewer().removeFilter(patternFilter);
+								patternFilter = null;
+							}
 						}
 						else
 						{
-							getCommonViewer().removeFilter(patternFilter);
-							patternFilter.setResourceToFilterOn(filterResource);
-							showFilterLabel(
-									eyeball,
-									NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
-											new Object[] { patternFilter.getPattern() }));
+							if (patternFilter != null)
+							{
+								getCommonViewer().removeFilter(patternFilter);
+							}
+							patternFilter = createPatternFilter(filterResource);
+							showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
+									new Object[] { patternFilter.getPattern() }));
 							getCommonViewer().addFilter(patternFilter);
 						}
 					}
@@ -759,7 +786,7 @@ public class FilteringProjectView extends GitProjectView
 					{
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
-					
+
 					// Now set up expansion of elements
 					if (filterResource != null)
 					{
@@ -851,6 +878,112 @@ public class FilteringProjectView extends GitProjectView
 			}
 
 		};
+	}
+
+	/**
+	 * Based on the registered filters, we grab the one that has the highest priority and matches one of the project
+	 * natures. Defaults to {@link PathFilter} in case no match is made.
+	 * 
+	 * @param filterResource
+	 * @return
+	 */
+	protected AbstractResourceBasedViewerFilter createPatternFilter(IResource filterResource)
+	{
+		IProject project = filterResource.getProject();
+		Set<String> natures = new HashSet<String>();
+		try
+		{
+			for (String natureId : project.getDescription().getNatureIds())
+			{
+				natures.add(natureId);
+			}
+		}
+		catch (CoreException e1)
+		{
+			// ignore
+		}
+
+		final List<AbstractResourceBasedViewerFilter> filters = new ArrayList<AbstractResourceBasedViewerFilter>();
+		final List<Integer> priorities = new ArrayList<Integer>();
+		for (IConfigurationElement element : getResourceBasedFilters())
+		{
+			if (natures.contains(element.getAttribute(ELEMENT_NATURE)))
+			{
+				try
+				{
+					AbstractResourceBasedViewerFilter participant = (AbstractResourceBasedViewerFilter) element
+							.createExecutableExtension(ELEMENT_CLASS);
+					String rawPriority = element.getAttribute(ELEMENT_PRIORITY);
+					Integer priority;
+					try
+					{
+						priority = Integer.parseInt(rawPriority);
+					}
+					catch (NumberFormatException e)
+					{
+						priority = 50;
+					}
+					filters.add(participant);
+					priorities.add(priority);
+				}
+				catch (CoreException e)
+				{
+					ExplorerPlugin.logError(e);
+				}
+			}
+		}
+
+		AbstractResourceBasedViewerFilter patternFilter;
+		if (filters.isEmpty())
+		{
+			patternFilter = new PathFilter();
+		}
+		else if (filters.size() > 1)
+		{
+			List<AbstractResourceBasedViewerFilter> copy = new ArrayList<AbstractResourceBasedViewerFilter>(filters);
+			Collections.sort(copy, new Comparator<AbstractResourceBasedViewerFilter>()
+			{
+				public int compare(AbstractResourceBasedViewerFilter arg0, AbstractResourceBasedViewerFilter arg1)
+				{
+					return priorities.get(filters.indexOf(arg0)).compareTo(priorities.get(filters.indexOf(arg1)));
+				}
+			});
+			patternFilter = copy.get(0);
+		}
+		else
+		{
+			patternFilter = filters.get(0);
+		}
+		patternFilter.setResourceToFilterOn(filterResource);
+		return patternFilter;
+	}
+
+	private synchronized Collection<IConfigurationElement> getResourceBasedFilters()
+	{
+		if (fgElements == null)
+		{
+			fgElements = new ArrayList<IConfigurationElement>();
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			if (registry != null)
+			{
+				IExtensionPoint extensionPoint = registry
+						.getExtensionPoint(ExplorerPlugin.PLUGIN_ID, FILTERS_EXT_PT_ID);
+				if (extensionPoint != null)
+				{
+					for (IExtension extension : extensionPoint.getExtensions())
+					{
+						for (IConfigurationElement element : extension.getConfigurationElements())
+						{
+							if (ELEMENT_FILTER.equals(element.getName()))
+							{
+								fgElements.add(element);
+							}
+						}
+					}
+				}
+			}
+		}
+		return fgElements;
 	}
 
 	protected IResource getFilterResource()

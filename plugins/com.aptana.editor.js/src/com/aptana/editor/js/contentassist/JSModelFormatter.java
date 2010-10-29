@@ -101,9 +101,9 @@ public class JSModelFormatter
 				}
 			}
 
-			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
-			buffer.append("<b>").append(Messages.JSModelFormatter_Defined_Section_Header).append("</b>");
-			buffer.append(NEW_LINE); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE);
+			buffer.append("<b>").append(Messages.JSModelFormatter_Defined_Section_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
+			buffer.append(NEW_LINE);
 
 			boolean first = true;
 
@@ -125,7 +125,7 @@ public class JSModelFormatter
 					buffer.append(NEW_LINE);
 				}
 
-				buffer.append("- ").append(document);
+				buffer.append("- ").append(document); //$NON-NLS-1$
 			}
 		}
 	}
@@ -142,7 +142,7 @@ public class JSModelFormatter
 
 		if (description != null && description.length() > 0)
 		{
-			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE);
 			buffer.append(description);
 		}
 	}
@@ -157,12 +157,12 @@ public class JSModelFormatter
 	{
 		if (examples != null && examples.size() > 0)
 		{
-			buffer.append(DOUBLE_NEW_LINE); //$NON-NLS-1$
+			buffer.append(DOUBLE_NEW_LINE);
 			buffer.append("<b>").append(Messages.JSModelFormatter_Exampes_Section_Header).append("</b>");//$NON-NLS-1$ //$NON-NLS-2$
-			buffer.append(NEW_LINE); //$NON-NLS-1$
+			buffer.append(NEW_LINE);
 
 			// emit list
-			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples)); //$NON-NLS-1$
+			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples));
 		}
 	}
 
@@ -179,7 +179,7 @@ public class JSModelFormatter
 		if (sinceList != null && sinceList.isEmpty() == false)
 		{
 			buffer.append(DOUBLE_NEW_LINE);
-			buffer.append("<b>").append(Messages.JSModelFormatter_Specification_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append("<b>").append(Messages.JSModelFormatter_Specification_Header).append("</b>"); //$NON-NLS-1$ //$NON-NLS-2$
 			buffer.append(NEW_LINE);
 
 			for (SinceElement since : property.getSinceList())

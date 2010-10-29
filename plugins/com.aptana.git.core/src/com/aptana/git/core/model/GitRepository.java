@@ -867,17 +867,6 @@ public class GitRepository
 	}
 
 	/**
-	 * Determine if the passed in branch has a remote tracking branch.
-	 * 
-	 * @param branchName
-	 * @return
-	 */
-	public boolean trackingRemote(String branchName)
-	{
-		return remoteTrackingBranch(branchName) != null;
-	}
-
-	/**
 	 * Returns the remote tracking branch name for the branch passed in. Returns null if there is none.
 	 * 
 	 * @param branchName

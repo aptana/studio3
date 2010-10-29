@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.editor.json;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.json.JSONPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.ui,
@@ -12,6 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  com.aptana.editor.common,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0"
+ beaver
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

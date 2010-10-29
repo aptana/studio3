@@ -49,6 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -95,13 +96,21 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
@@ -118,15 +127,18 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
  * @author Michael Xia (mxia@aptana.com)
  */
+@SuppressWarnings("deprecation")
 public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener,
 		DirectionToolBar.Client, OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {
@@ -302,7 +314,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			this.filesToBeSynced = filesToBeSynced;
 			if (filesToBeSynced.length == 1)
 			{
-				String path = EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[0]);
+				String path = EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[0], null);
 				if (path == null || path.trim().length() == 0)
 				{
 					// the selection is from the project level, so we are doing
@@ -1087,8 +1099,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 		GridData gridData = new GridData(SWT.FILL, SWT.END, false, false);
 		GC gc = new GC(startSync);
 		// calculates the ideal width
-		gridData.widthHint = Math.max(gc.stringExtent(Messages.SmartSyncDialog_StartSync).x, gc
-				.stringExtent(Messages.SmartSyncDialog_RunInBackground).x) + 50;
+		gridData.widthHint = Math.max(gc.stringExtent(Messages.SmartSyncDialog_StartSync).x,
+				gc.stringExtent(Messages.SmartSyncDialog_RunInBackground).x) + 50;
 		gc.dispose();
 		startSync.setLayoutData(gridData);
 		startSync.addSelectionListener(this);
@@ -1198,7 +1210,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					if (forceUp)
 					{
 						IFileStore[] clientFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(
-								source, true, false, null) : EFSUtils.getAllFiles(filesToBeSynced, true, false, monitor));
+								source, true, false, null) : EFSUtils
+								.getAllFiles(filesToBeSynced, true, false, monitor));
 						items = syncer.createSyncItems(clientFiles, new IFileStore[0], monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
@@ -1209,7 +1222,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						VirtualFileSyncPair pair;
 						for (IFileStore file : serverFiles)
 						{
-							pair = pairs.get(EFSUtils.getRelativePath(destConnectionPoint.getRoot(), file));
+							pair = pairs.get(EFSUtils.getRelativePath(destConnectionPoint.getRoot(), file, null));
 							if (pair != null)
 							{
 								pair.setDestinationFile(file);
@@ -1244,7 +1257,8 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					{
 						if (filesToBeSynced == null)
 						{
-							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest, monitor);
+							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest,
+									monitor);
 						}
 						else
 						{
@@ -1404,7 +1418,6 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	@Override
 	protected Control createDialogArea(Composite parent)
 	{
-
 		dialogArea = (Composite) super.createDialogArea(parent);
 
 		titleImage = SyncingUIPlugin.getImageDescriptor("/icons/full/wizban/sync.png").createImage(); //$NON-NLS-1$
@@ -1806,9 +1819,54 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 					// disconnect directly
 					syncer.disconnect();
 				}
+				refresh(monitor);
+
 				return Status.OK_STATUS;
 			}
 
+			/**
+			 * Performs post-sync refresh.
+			 */
+			private void refresh(IProgressMonitor monitor)
+			{
+				IConnectionPoint clientConnection = syncer.getClientFileManager();
+				if (clientConnection instanceof WorkspaceConnectionPoint)
+				{
+					IResource resource = ((WorkspaceConnectionPoint) clientConnection).getResource();
+					try
+					{
+						IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
+						if (viewPart instanceof CommonNavigator)
+						{
+							CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+							viewer.refresh(resource);
+						}
+					}
+					catch (PartInitException e)
+					{
+						// Unable to refresh the project explorer view
+					}
+				}
+
+				IConnectionPoint serverConnection = syncer.getServerFileManager();
+				ConnectionPointType type = CoreIOPlugin.getConnectionPointManager().getType(serverConnection);
+				if (type != null && type.getCategory().isRemote())
+				{
+					try
+					{
+						IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
+						if (viewPart instanceof RemoteNavigatorView)
+						{
+							RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
+							view.refresh(serverConnection);
+						}
+					}
+					catch (PartInitException e)
+					{
+						// Unable to refresh the remote view
+					}
+				}
+			}
 		};
 		updateEndJob.setSystem(true);
 		updateEndJob.schedule();
@@ -2016,7 +2074,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			StringBuilder buf = new StringBuilder();
 			for (int i = 0; i < filesToBeSynced.length; ++i)
 			{
-				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i]));
+				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i], null));
 				buf.append("\n"); //$NON-NLS-1$
 			}
 			Text text;

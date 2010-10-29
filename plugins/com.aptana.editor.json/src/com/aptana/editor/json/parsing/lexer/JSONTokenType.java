@@ -41,18 +41,19 @@ public enum JSONTokenType
 {
 	UNDEFINED(""),	// -1
 	EOF(""),	// 0
-	STRING_DOUBLE("string.quoted.double.json"),	// 1
-	STRING_SINGLE("string.quoted.single.json"),	// 2
-	LCURLY("keyword.operator.json"),	// 3
-	LBRACKET("keyword.operator.json"),	// 4
-	NUMBER("keyword.operator.json"),	// 5
-	TRUE("keyword.operator.json"),	// 6
-	FALSE("keyword.operator.json"),	// 7
-	NULL("keyword.operator.json"),	// 8
+	LCURLY("keyword.operator.json"),	// 1
+	LBRACKET("keyword.operator.json"),	// 2
+	NUMBER("keyword.operator.json"),	// 3
+	TRUE("keyword.operator.json"),	// 4
+	FALSE("keyword.operator.json"),	// 5
+	NULL("keyword.operator.json"),	// 6
+	STRING_DOUBLE("string.quoted.double.json"),	// 7
+	STRING_SINGLE("string.quoted.single.json"),	// 8
 	RCURLY("keyword.operator.json"),	// 9
-	RBRACKET("keyword.operator.json"),	// 10
-	COMMA("keyword.operator.json"),	// 11
-	COLON("keyword.operator.json"),	// 12
+	PROPERTY("property.json"),	// 10
+	RBRACKET("keyword.operator.json"),	// 11
+	COMMA("keyword.operator.json"),	// 12
+	COLON("keyword.operator.json"),	// 13
 	
 	COMMENT("comment.json");
 

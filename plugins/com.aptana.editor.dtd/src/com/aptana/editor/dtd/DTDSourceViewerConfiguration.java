@@ -35,16 +35,12 @@
 package com.aptana.editor.dtd;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-public class DTDSourceViewerConfiguration extends CommonSourceViewerConfiguration
+public class DTDSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
 	/**
 	 * DTDSourceViewerConfiguration
@@ -59,36 +55,11 @@ public class DTDSourceViewerConfiguration extends CommonSourceViewerConfiguratio
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
 	 */
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	@Override
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
 	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, DTDSourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
-	 */
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-
-		DTDSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-
-		return reconciler;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return DTDSourceConfiguration.getDefault().getTopContentTypes();
+		return DTDSourceConfiguration.getDefault();
 	}
 }

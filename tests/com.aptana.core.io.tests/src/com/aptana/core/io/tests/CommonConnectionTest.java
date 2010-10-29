@@ -101,13 +101,11 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			cachedProperties = new Properties();
 			String propertiesFile = System.getProperty("junit.properties"); //$NON-NLS-1$
-			System.out.println("Received pointer to connection test properties file: " + propertiesFile);
 			if (propertiesFile != null && new File(propertiesFile).length() > 0)
 			{
 				try
 				{
 					cachedProperties.load(new FileInputStream(propertiesFile));
-					System.out.println("loaded test properties: ");
 					cachedProperties.list(System.out);
 				}
 				catch (IOException ignore)
@@ -143,7 +141,10 @@ public abstract class CommonConnectionTest extends TestCase
 			if (fs.fetchInfo().exists())
 			{
 				fs.delete(EFS.NONE, null);
-				assertFalse(fs.fetchInfo().exists());
+				if (verifyTeardownDeletion())
+				{
+					assertFalse(fs.fetchInfo().exists());
+				}
 			}
 		}
 		finally
@@ -678,6 +679,11 @@ public abstract class CommonConnectionTest extends TestCase
 		return false;
 	}
 
+	protected boolean verifyTeardownDeletion()
+	{
+		return true;
+	}
+
 	public final void testPutInfoFileBase() throws CoreException, IOException
 	{
 		IFileStore fs = cp.getRoot().getFileStore(testPath.append("/file.txt")); //$NON-NLS-1$
@@ -714,21 +720,22 @@ public abstract class CommonConnectionTest extends TestCase
 		assertTrue(fi.exists());
 		assertTrue(fi.isDirectory());
 
-		long lastModified = fi.getLastModified();
 		if (supportsSetModificationTime())
 		{
+			long lastModified = fi.getLastModified();
 			lastModified -= new Random().nextInt(7 * 24) * 60000;
 			lastModified -= lastModified % 60000; // remove seconds/milliseconds
-		}
-		IFileInfo pfi = new FileInfo();
-		pfi.setLastModified(lastModified);
-		fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
 
-		fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
-		assertNotNull(fi);
-		assertTrue(fi.exists());
-		assertTrue(fi.isDirectory());
-		assertEquals(lastModified, fi.getLastModified());
+			IFileInfo pfi = new FileInfo();
+			pfi.setLastModified(lastModified);
+			fs.putInfo(pfi, EFS.SET_LAST_MODIFIED, null);
+
+			fi = fs.fetchInfo(IExtendedFileStore.DETAILED, null);
+			assertNotNull(fi);
+			assertTrue(fi.exists());
+			assertTrue(fi.isDirectory());
+			assertEquals(lastModified, fi.getLastModified());
+		}
 	}
 
 	protected boolean supportsChangePermissions()

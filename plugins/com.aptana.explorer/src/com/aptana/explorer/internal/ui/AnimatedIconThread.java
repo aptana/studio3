@@ -39,7 +39,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 import com.aptana.explorer.ExplorerPlugin;
 
-public class AnimatedIconThread extends Thread
+class AnimatedIconThread extends Thread
 {
 
 	private int i = 0;
@@ -49,7 +49,7 @@ public class AnimatedIconThread extends Thread
 	private String[] imagePaths;
 	private Boolean running = true;
 
-	public AnimatedIconThread(String defaultImagePath, String[] animatedImagePaths, Display display, ToolItem item)
+	protected AnimatedIconThread(String defaultImagePath, String[] animatedImagePaths, Display display, ToolItem item)
 	{
 		imagePaths = animatedImagePaths;
 		currentDisplay = display;
@@ -90,7 +90,7 @@ public class AnimatedIconThread extends Thread
 
 	}
 
-	public void terminate()
+	protected void terminate()
 	{
 		running = false;
 	}

@@ -138,7 +138,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	{
 	}
 
-	protected IViewReference findView(IWorkbenchPage page, String viewId)
+	private IViewReference findView(IWorkbenchPage page, String viewId)
 	{
 		IViewReference refs[] = page.getViewReferences();
 		for (int i = 0; i < refs.length; i++)

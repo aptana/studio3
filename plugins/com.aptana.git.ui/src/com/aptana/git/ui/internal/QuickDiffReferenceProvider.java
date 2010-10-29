@@ -127,7 +127,7 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider
 		}
 	}
 
-	protected IEditorInput getEditorInput()
+	private IEditorInput getEditorInput()
 	{
 		if (this.editor == null)
 		{
@@ -136,7 +136,7 @@ public class QuickDiffReferenceProvider implements IQuickDiffReferenceProvider
 		return this.editor.getEditorInput();
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

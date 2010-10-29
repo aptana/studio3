@@ -35,7 +35,9 @@
 package com.aptana.editor.json.outline;
 
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.json.parsing.ast.JSONObjectNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * JSONOutlineContentProvider
@@ -56,7 +58,10 @@ public class JSONOutlineContentProvider extends CommonOutlineContentProvider
 
 			for (int i = 0; i < children.length; i++)
 			{
-				children[i] = entry.getChild(i).getLastChild();
+				IParseNode child = entry.getChild(i);
+				CommonOutlineItem item = new CommonOutlineItem(child.getFirstChild(), child.getLastChild());
+				
+				children[i] = item;
 			}
 
 			return children;
