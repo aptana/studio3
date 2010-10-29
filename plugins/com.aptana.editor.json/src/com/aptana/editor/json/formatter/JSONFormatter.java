@@ -39,6 +39,7 @@ import java.util.Map;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.json.preferences.IPreferenceConstants;
@@ -166,7 +167,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 				{
 					if (!input.equals(output))
 					{
-						logError(input, output);
+						return new ReplaceEdit(offset, length, output);
 					}
 					else
 					{
