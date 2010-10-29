@@ -36,12 +36,13 @@ package com.aptana.editor.json.formatter;
 
 import beaver.Symbol;
 
-import com.aptana.editor.json.formatter.nodes.JSONObjectFormatNode;
+import com.aptana.editor.json.formatter.nodes.JSONArrayFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONEntryFormatNode;
+import com.aptana.editor.json.formatter.nodes.JSONObjectFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONRootFormatNode;
+import com.aptana.editor.json.parsing.ast.JSONArrayNode;
 import com.aptana.editor.json.parsing.ast.JSONEntryNode;
 import com.aptana.editor.json.parsing.ast.JSONNode;
-import com.aptana.editor.json.parsing.ast.JSONNodeType;
 import com.aptana.editor.json.parsing.ast.JSONObjectNode;
 import com.aptana.editor.json.parsing.ast.JSONParseRootNode;
 import com.aptana.editor.json.parsing.ast.JSONTreeWalker;
@@ -101,9 +102,32 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONObjectNode)
 		 */
 		@Override
+		public void visit(JSONArrayNode node)
+		{
+			JSONArrayFormatNode object = new JSONArrayFormatNode(_document);
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset();
+			IFormatterTextNode textNode = createTextNode(_document, startingOffset, startingOffset + 1);
+			
+			object.setBegin(textNode);
+			push(object);
+			this.visitChildren(node);
+			checkedPop(object, endingOffset);
+			
+			textNode = createTextNode(_document, endingOffset, endingOffset + 1);
+			object.setEnd(textNode);
+		}
+		
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONObjectNode)
+		 */
+		@Override
 		public void visit(JSONObjectNode node)
 		{
-			JSONObjectFormatNode object = new JSONObjectFormatNode(_document, node.getParent().getNodeType() == JSONNodeType.ENTRY.getIndex());
+			IParseNode parent = node.getParent();
+			boolean isFirstElement = (parent instanceof JSONArrayNode && parent.getFirstChild() == node);
+			
+			JSONObjectFormatNode object = new JSONObjectFormatNode(_document, isFirstElement);
 			int startingOffset = node.getStartingOffset();
 			int endingOffset = node.getEndingOffset();
 			IFormatterTextNode textNode = createTextNode(_document, startingOffset, startingOffset + 1);
@@ -130,8 +154,11 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			IFormatterTextNode nameText = createTextNode(_document, name.getStartingOffset(), name.getEndingOffset() + 1);
 			IFormatterTextNode colonText = createTextNode(_document, colon.getStart(), colon.getEnd() + 1);
 			
+			// add children
 			entry.addChild(nameText);
 			entry.addChild(colonText);
+			
+			// push node, visit children, then remove from stack
 			push(entry);
 			this.visit(value);
 			checkedPop(entry, node.getEndingOffset() + 1);
