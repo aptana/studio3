@@ -291,6 +291,10 @@ public class FilteringProjectView extends GitProjectView
 		{
 			projectFilters.put(project, filter.getLocation().toPortableString());
 		}
+		else
+		{
+			projectFilters.remove(project);
+		}
 	}
 
 	private void addFocusHover()
