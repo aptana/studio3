@@ -59,7 +59,12 @@ public class Activator extends Plugin
 	/**
 	 * Context id set by workbench part to indicate they are scripting aware.
 	 */
-	public static final String CONTEXT_ID = "com.aptana.scripting.context"; //$NON-NLS-1$
+	public static final String SCRIPTING_CONTEXT_ID = "com.aptana.scripting.context"; //$NON-NLS-1$
+
+	/**
+	 * Context id set by workbench part to indicate it's an Aptana Editor and make it aware to any generic command.
+	 */
+	public static final String EDITOR_CONTEXT_ID = "com.aptana.editor.context"; //$NON-NLS-1$
 
 	/**
 	 * Returns the shared instance

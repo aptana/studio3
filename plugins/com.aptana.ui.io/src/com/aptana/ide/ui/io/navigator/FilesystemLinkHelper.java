@@ -32,39 +32,50 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.formatter.preferences;
+package com.aptana.ide.ui.io.navigator;
 
-import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.navigator.ILinkHelper;
 
-/**
- * CSS formatter settings dialog.
- */
-public class CSSFormatterModifyDialog extends FormatterModifyDialog
+import com.aptana.ide.ui.io.navigator.actions.EditorUtils.RemoteFileStoreEditorInput;
+
+public class FilesystemLinkHelper implements ILinkHelper
 {
-	/**
-	 * Constructs a new HTMLFormatterModifyDialog
-	 * 
-	 * @param dialogOwner
-	 * @param formatterFactory
-	 */
-	public CSSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
+
+	public IStructuredSelection findSelection(IEditorInput anInput)
 	{
-		super(dialogOwner, formatterFactory);
+		IFileStore fileStore = (IFileStore) anInput.getAdapter(IFileStore.class);
+		IFileInfo fileInfo = (IFileInfo) anInput.getAdapter(IFileInfo.class);
+		if (fileStore == null || fileInfo == null)
+		{
+			return StructuredSelection.EMPTY;
+		}
+		return new StructuredSelection(new FileSystemObject(fileStore, fileInfo));
 	}
 
-	protected void addPages()
+	public void activateEditor(IWorkbenchPage aPage, IStructuredSelection aSelection)
 	{
-		addTabPage(Messages.CSSFormatterModifyDialog_indentation_page_tab_name, new CSSFormatterControlStatementsPage(
-				this));
-		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
-		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
-
-		// TODO: Fix issue with comments not wrapping correctly with newlines
-		// Something like: /*
-		// border: 1px solid red;
-		// */
-		// addTabPage("Comments", new CSSFormatterCommentsPage(this));
+		if (aSelection == null || aSelection.isEmpty())
+		{
+			return;
+		}
+		Object element = aSelection.getFirstElement();
+		if (element instanceof FileSystemObject)
+		{
+			FileSystemObject file = (FileSystemObject) element;
+			IFileStore fileStore = file.getFileStore();
+			IFileInfo fileInfo = file.getFileInfo();
+			IEditorPart editorPart = aPage.findEditor(new RemoteFileStoreEditorInput(fileStore, fileStore, fileInfo));
+			if (editorPart != null)
+			{
+				aPage.bringToTop(editorPart);
+			}
+		}
 	}
 }

@@ -34,37 +34,43 @@
  */
 package com.aptana.editor.css.formatter.preferences;
 
-import com.aptana.formatter.IScriptFormatterFactory;
-import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
-import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
+import java.net.URL;
 
-/**
- * CSS formatter settings dialog.
- */
-public class CSSFormatterModifyDialog extends FormatterModifyDialog
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+
+import com.aptana.editor.css.formatter.CSSFormatterConstants;
+import com.aptana.formatter.ui.IFormatterControlManager;
+import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
+
+public class CSSFormatterBlankLinesPage extends FormatterModifyTabPage
 {
-	/**
-	 * Constructs a new HTMLFormatterModifyDialog
-	 * 
-	 * @param dialogOwner
-	 * @param formatterFactory
-	 */
-	public CSSFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
+	private static final String BLANK_LINES_PREVIEW_NAME = "blank-lines-preview.css"; //$NON-NLS-1$
+
+	public CSSFormatterBlankLinesPage(IFormatterModifyDialog dialog)
 	{
-		super(dialogOwner, formatterFactory);
+		super(dialog);
 	}
 
-	protected void addPages()
+	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		addTabPage(Messages.CSSFormatterModifyDialog_indentation_page_tab_name, new CSSFormatterControlStatementsPage(
-				this));
-		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
-		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
+		Group blankLinesGroup = SWTFactory.createGroup(parent,
+				Messages.CSSFormatterBlankLinesPage_blankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createNumber(blankLinesGroup, CSSFormatterConstants.LINES_AFTER_ELEMENTS,
+				Messages.CSSFormatterBlankLinesPage_afterCSSRule);
 
-		// TODO: Fix issue with comments not wrapping correctly with newlines
-		// Something like: /*
-		// border: 1px solid red;
-		// */
-		// addTabPage("Comments", new CSSFormatterCommentsPage(this));
+		Group preserveLinesGroup = SWTFactory.createGroup(parent,
+				Messages.CSSFormatterBlankLinesPage_existingBlankLinesLabel, 2, 1, GridData.FILL_HORIZONTAL);
+		manager.createNumber(preserveLinesGroup, CSSFormatterConstants.PRESERVED_LINES,
+				Messages.CSSFormatterBlankLinesPage_existingBlankLinesToPreserve);
 	}
+
+	protected URL getPreviewContent()
+	{
+		return getClass().getResource(BLANK_LINES_PREVIEW_NAME);
+	}
+
 }

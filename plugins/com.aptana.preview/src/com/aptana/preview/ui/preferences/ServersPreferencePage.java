@@ -65,6 +65,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.ListDialog;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.StringUtil;
 import com.aptana.preview.Activator;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
 import com.aptana.preview.server.ServerConfigurationManager;
@@ -128,13 +129,13 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 		buttonContainer.setLayout(GridLayoutFactory.swtDefaults().create());
 
 		Button newButton = new Button(buttonContainer, SWT.PUSH);
-		newButton.setText(CoreStrings.NEW);
+		newButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
 		newButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).hint(
 				Math.max(newButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
 						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 
 		final Button editButton = new Button(buttonContainer, SWT.PUSH);
-		editButton.setText(CoreStrings.EDIT);
+		editButton.setText(StringUtil.ellipsify(CoreStrings.EDIT));
 		editButton.setLayoutData(GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).create());
 
 		final Button deleteButton = new Button(buttonContainer, SWT.PUSH);
