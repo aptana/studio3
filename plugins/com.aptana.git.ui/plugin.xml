@@ -215,140 +215,302 @@
       <key
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.add_remote"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.github.network"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.pull"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.status"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.revert"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstage"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.stage"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.create_branch"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.switch_branch"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_branch"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.delete_branch"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_conflicts"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_HEAD"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_revision"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.blame"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.disconnect"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.diff"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.attach"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.showInResourceHistory"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.stash"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstash"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.add_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.github.network"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.pull"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.status"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.commit"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.revert"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stage"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.create_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.switch_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.delete_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.merge_conflicts"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_HEAD"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_revision"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.blame"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.disconnect"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.diff"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.attach"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.showInResourceHistory"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stash"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstash"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
       </key>
    </extension>
    <extension
