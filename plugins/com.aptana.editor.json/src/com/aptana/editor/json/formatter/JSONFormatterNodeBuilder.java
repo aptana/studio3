@@ -37,17 +37,24 @@ package com.aptana.editor.json.formatter;
 import beaver.Symbol;
 
 import com.aptana.editor.json.formatter.nodes.JSONArrayFormatNode;
+import com.aptana.editor.json.formatter.nodes.JSONEmptyFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONEntryFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONObjectFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONRootFormatNode;
 import com.aptana.editor.json.parsing.ast.JSONArrayNode;
 import com.aptana.editor.json.parsing.ast.JSONEntryNode;
+import com.aptana.editor.json.parsing.ast.JSONFalseNode;
 import com.aptana.editor.json.parsing.ast.JSONNode;
+import com.aptana.editor.json.parsing.ast.JSONNullNode;
+import com.aptana.editor.json.parsing.ast.JSONNumberNode;
 import com.aptana.editor.json.parsing.ast.JSONObjectNode;
 import com.aptana.editor.json.parsing.ast.JSONParseRootNode;
+import com.aptana.editor.json.parsing.ast.JSONStringNode;
 import com.aptana.editor.json.parsing.ast.JSONTreeWalker;
+import com.aptana.editor.json.parsing.ast.JSONTrueNode;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterTextNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -104,18 +111,9 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSONArrayNode node)
 		{
-			JSONArrayFormatNode object = new JSONArrayFormatNode(_document);
-			int startingOffset = node.getStartingOffset();
-			int endingOffset = node.getEndingOffset();
-			IFormatterTextNode textNode = createTextNode(_document, startingOffset, startingOffset + 1);
+			JSONArrayFormatNode formatNode = new JSONArrayFormatNode(_document, node);
 			
-			object.setBegin(textNode);
-			push(object);
-			this.visitChildren(node);
-			checkedPop(object, endingOffset);
-			
-			textNode = createTextNode(_document, endingOffset, endingOffset + 1);
-			object.setEnd(textNode);
+			this.addComposite(formatNode, node);
 		}
 		
 		/* (non-Javadoc)
@@ -124,21 +122,9 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSONObjectNode node)
 		{
-			IParseNode parent = node.getParent();
-			boolean isFirstElement = (parent instanceof JSONArrayNode && parent.getFirstChild() == node);
+			JSONObjectFormatNode formatNode = new JSONObjectFormatNode(_document, node);
 			
-			JSONObjectFormatNode object = new JSONObjectFormatNode(_document, isFirstElement);
-			int startingOffset = node.getStartingOffset();
-			int endingOffset = node.getEndingOffset();
-			IFormatterTextNode textNode = createTextNode(_document, startingOffset, startingOffset + 1);
-			
-			object.setBegin(textNode);
-			push(object);
-			this.visitChildren(node);
-			checkedPop(object, endingOffset);
-			
-			textNode = createTextNode(_document, endingOffset, endingOffset + 1);
-			object.setEnd(textNode);
+			this.addComposite(formatNode, node);
 		}
 
 		/* (non-Javadoc)
@@ -162,6 +148,104 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(entry);
 			this.visit(value);
 			checkedPop(entry, node.getEndingOffset() + 1);
+		}
+
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONFalseNode)
+		 */
+		@Override
+		public void visit(JSONFalseNode node)
+		{
+			this.addPrimitive(node);
+		}
+
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONNullNode)
+		 */
+		@Override
+		public void visit(JSONNullNode node)
+		{
+			this.addPrimitive(node);
+		}
+
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONNumberNode)
+		 */
+		@Override
+		public void visit(JSONNumberNode node)
+		{
+			this.addPrimitive(node);
+		}
+
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONStringNode)
+		 */
+		@Override
+		public void visit(JSONStringNode node)
+		{
+			this.addPrimitive(node);
+		}
+
+		/* (non-Javadoc)
+		 * @see com.aptana.editor.json.parsing.ast.JSONTreeWalker#visit(com.aptana.editor.json.parsing.ast.JSONTrueNode)
+		 */
+		@Override
+		public void visit(JSONTrueNode node)
+		{
+			this.addPrimitive(node);
+		}
+		
+		/**
+		 * addComposite
+		 * 
+		 * @param node
+		 */
+		public void addComposite(FormatterBlockWithBeginEndNode formatNode, JSONNode node)
+		{
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset();
+			IFormatterTextNode textNode = createTextNode(_document, startingOffset, startingOffset + 1);
+			
+			formatNode.setBegin(textNode);
+			push(formatNode);
+			
+			// process children
+			if (node.hasChildren())
+			{
+				this.visitChildren(node);
+			}
+			else
+			{
+				JSONEmptyFormatNode emptyNode = new JSONEmptyFormatNode(_document);
+				
+				emptyNode.addChild(createTextNode(_document, startingOffset + 1, endingOffset));
+				
+				formatNode.addChild(emptyNode);
+			}
+			
+			// all done
+			checkedPop(formatNode, endingOffset);
+			
+			textNode = createTextNode(_document, endingOffset, endingOffset + 1);
+			formatNode.setEnd(textNode);
+		}
+		
+		/**
+		 * pushPrimitiveText
+		 * 
+		 * @param node
+		 */
+		public void addPrimitive(JSONNode node)
+		{
+			//IParseNode parent = node.getParent();
+			JSONPrimitiveFormatNode primitive = new JSONPrimitiveFormatNode(_document);
+			int startingOffset = node.getStartingOffset();
+			int endingOffset = node.getEndingOffset();
+			IFormatterTextNode textNode = createTextNode(_document, startingOffset, endingOffset + 1);
+			
+			primitive.addChild(textNode);
+			push(primitive);
+			checkedPop(primitive, primitive.getEndOffset());
 		}
 	}
 }
