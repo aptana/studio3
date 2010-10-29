@@ -50,7 +50,7 @@ public class JSONParser extends Parser implements IParser {
         {
         }
     }
-    
+
     /*
      * (non-Javadoc)
      * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
@@ -162,18 +162,19 @@ public class JSONParser extends Parser implements IParser {
 			{
 					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
-			case 15: // Entry = PROPERTY.p COLON Value.v
+			case 15: // Entry = PROPERTY.p COLON.c Value.v
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final String p = (String) _symbol_p.value;
+					final Symbol c = _symbols[offset + 2];
 					final Symbol _symbol_v = _symbols[offset + 3];
 					final JSONNode v = (JSONNode) _symbol_v.value;
 					
-            JSONEntryNode entry = new JSONEntryNode();
+            JSONEntryNode entry = new JSONEntryNode(c);
             JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
 
             property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());
-            
+
             entry.addChild(property);
             entry.addChild(v);
 
