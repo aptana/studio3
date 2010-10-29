@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.json.formatter;
 
-import com.aptana.editor.json.formatter.nodes.JSONCommentNode;
+import com.aptana.editor.json.formatter.nodes.JSONCommentFormatNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
@@ -65,7 +65,7 @@ public class JSONFormatterNodeRewriter extends FormatterNodeRewriter
 	@Override
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset, Object object)
 	{
-		return new JSONCommentNode(document, startOffset, endOffset);
+		return new JSONCommentFormatNode(document, startOffset, endOffset);
 	}
 
 	/*
