@@ -35,6 +35,7 @@
 package com.aptana.ui.internal.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -138,14 +139,17 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openInWindowsExplorer(File file)
 	{
+		// This works for Windows XP Pro! Can't run under ProcessBuilder or it does some quoting/mangling of args that breaks this!
 		String explorer = PlatformUtil.expandEnvironmentStrings("%SystemRoot%\\explorer.exe"); //$NON-NLS-1$
-		Map<Integer, String> result = ProcessUtil.runInBackground(explorer, null, "/select,\"" //$NON-NLS-1$
-				+ file.getAbsolutePath() + "\""); //$NON-NLS-1$
-		if (result == null || result.isEmpty())
+		try
+		{
+			Process p = Runtime.getRuntime().exec("\"" + explorer + "\" /select,\"" + file.getAbsolutePath() + "\"");
+			return p.exitValue() == 0;
+		} 
+		catch (IOException e)
 		{
 			return false;
 		}
-		return result.keySet().iterator().next() == 0;
 	}
 
 	private boolean openInFinder(File file)
