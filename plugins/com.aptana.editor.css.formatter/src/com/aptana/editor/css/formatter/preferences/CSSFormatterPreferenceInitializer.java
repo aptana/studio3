@@ -57,8 +57,8 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		IEclipsePreferences pref = new DefaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
 
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		pref.putBoolean(CSSFormatterConstants.WRAP_COMMENTS, false);
 		pref.putInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		pref.put(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);

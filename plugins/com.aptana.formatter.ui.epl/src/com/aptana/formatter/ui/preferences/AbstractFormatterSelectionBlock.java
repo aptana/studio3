@@ -15,6 +15,8 @@ package com.aptana.formatter.ui.preferences;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +94,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private Button fLoadButton;
 	private Button fSaveButton;
 
-	private int selectedFormatter;
+	// Have this one static to keep the selection when re-opening the preferences in the same Studio session.
+	private static int selectedFormatter;
 	private IScriptFormatterFactory[] factories;
 	protected SourceViewer fSelectedPreviewViewer;
 	private ArrayList<SourceViewer> sourcePreviewViewers;
@@ -122,6 +125,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			IWorkbenchPreferenceContainer container)
 	{
 		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST), container);
+		Collections.sort(TEMP_LIST, new Comparator<IScriptFormatterFactory>()
+		{
+			public int compare(IScriptFormatterFactory s1, IScriptFormatterFactory s2)
+			{
+				return s1.getName().compareToIgnoreCase(s2.getName());
+			}
+		});
 		factories = TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 		sourcePreviewViewers = new ArrayList<SourceViewer>();
@@ -189,6 +199,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		for (IScriptFormatterFactory factory : factories)
 		{
 			factory.savePreferences(settings, delegate);
+		}
+		if (selectedFormatter < 0)
+		{
+			selectedFormatter = 0;
 		}
 		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 		previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
@@ -436,7 +450,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		layout.marginWidth = 0;
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
+
 		// Buttons panel
 		Composite buttons = new Composite(rightPanel, SWT.NONE);
 		layout = new GridLayout(2, true);
@@ -464,7 +478,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		IProfileManager profileManager = getProfileManager();
 		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
-		
+
 		// Previews area
 		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
 		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -483,17 +497,24 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 		listViewer.setInput(this.factories);
-		listViewer.setSelection(new StructuredSelection(this.factories[0]));
+		if (selectedFormatter < 0)
+		{
+			selectedFormatter = 0;
+		}
+		listViewer.setSelection(new StructuredSelection(this.factories[selectedFormatter]));
 		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
-				fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
-				previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
-				previewPane.layout();
-				updatePreview();
+				if (selectedFormatter > -1)
+				{
+					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
+					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+					previewPane.layout();
+					updatePreview();
+				}
 			}
 		});
 
@@ -502,7 +523,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			SourceViewer sourcePreview = createSourcePreview(previewPane, factory);
 			sourcePreviewViewers.add(sourcePreview);
 		}
-		if (selectedFormatter != -1 && sourcePreviewViewers.size() > selectedFormatter)
+		if (selectedFormatter > -1 && sourcePreviewViewers.size() > selectedFormatter)
 		{
 			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 			previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
@@ -545,6 +566,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			public void widgetSelected(SelectionEvent e)
 			{
 				IScriptFormatterFactory formatter = getSelectedFormatter();
+				if (formatter == null)
+				{
+					return;
+				}
 				PreferenceKey[] preferenceKeys = formatter.getPreferenceKeys();
 				IProfileManager manager = getProfileManager();
 				if (!MessageDialog.openQuestion(defaultsBt.getShell(),
@@ -612,6 +637,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected IScriptFormatterFactory getSelectedFormatter()
 	{
+		if (selectedFormatter < 0 || selectedFormatter >= factories.length)
+		{
+			return null;
+		}
 		return factories[selectedFormatter];
 	}
 
@@ -637,7 +666,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			if (dialog != null)
 			{
 				IProfile profile = manager.getSelected();
-				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile.getName());
+				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile
+						.getName());
 				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
