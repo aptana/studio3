@@ -39,13 +39,15 @@ import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 
 /**
- * An CSS formatter context.
+ * JSONFormatterContext
  */
 public class JSONFormatterContext extends FormatterContext
 {
 	private static final String WRAPPING_COMMENT_PREFIX = " * "; //$NON-NLS-1$
 
 	/**
+	 * JSONFormatterContext
+	 * 
 	 * @param indent
 	 */
 	public JSONFormatterContext(int indent)
