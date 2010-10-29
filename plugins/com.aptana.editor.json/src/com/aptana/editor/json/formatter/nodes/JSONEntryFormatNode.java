@@ -35,12 +35,12 @@
 package com.aptana.editor.json.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 
 /**
  * JSONPropertyNode
  */
-public class JSONEntryFormatNode extends FormatterBlockNode
+public class JSONEntryFormatNode extends FormatterBlockWithBeginEndNode
 {
 	/**
 	 * @param document
@@ -67,7 +67,7 @@ public class JSONEntryFormatNode extends FormatterBlockNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		return false;
+		return true;
 	}
 
 	/*
