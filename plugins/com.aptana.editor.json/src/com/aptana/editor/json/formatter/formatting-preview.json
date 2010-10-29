@@ -1,0 +1,21 @@
+{
+    "empty-object": {},
+    "empty-array": [],
+    "simple-object": {
+        "number": 10,
+        "boolean": true,
+        "null": null
+    },
+    "simple-array": [10, true, null],
+    "nested-object": {
+        "inner-object": {
+            "number": 10,
+            "boolean": true,
+            "null": null
+        }
+    },
+    "nested-array": [
+        [1, 2, 3],
+        [4, 5, 6]
+    ]
+}
