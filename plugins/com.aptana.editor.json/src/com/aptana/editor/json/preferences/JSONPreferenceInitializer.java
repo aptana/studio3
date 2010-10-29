@@ -56,7 +56,7 @@ public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences pref = new DefaultScope().getNode(JSONPlugin.PLUGIN_ID);
 
 		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 	}
 }
