@@ -199,14 +199,27 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 */
 	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
 	{
-		JSONFormatterNodeBuilder builder = new JSONFormatterNodeBuilder();
+		// create document as a means for retrieving source
 		FormatterDocument document = createFormatterDocument(input, offset);
+		
+		// create format node builder and generate root node
+		JSONFormatterNodeBuilder builder = new JSONFormatterNodeBuilder();
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new JSONFormatterNodeRewriter(parseResult).rewrite(root);
+		
+		// include comments
+		JSONFormatterNodeRewriter rewriter = new JSONFormatterNodeRewriter(parseResult);
+		rewriter.rewrite(root);
+		
+		// create a formatting context
 		IFormatterContext context = new JSONFormatterContext(indentationLevel);
+		
+		// create writer to walk the formatter tree and to emit source
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
-
+		
+		// walk the formatter tree
 		root.accept(context, writer);
+		
+		// make sure to emit any remaining text at the end of the file
 		writer.flush(context);
 
 		return writer.getOutput();
