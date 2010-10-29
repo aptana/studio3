@@ -62,8 +62,8 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	{
 		IEclipsePreferences store = new DefaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
-		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "2"); //$NON-NLS-1$
-		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "2"); //$NON-NLS-1$
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);
 		store.putInt(HTMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		// We add all the 'Void' html tags here as well. They should not trigger an indent increase.
