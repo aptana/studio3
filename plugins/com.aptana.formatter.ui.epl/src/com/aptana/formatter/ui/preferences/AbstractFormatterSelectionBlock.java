@@ -15,6 +15,8 @@ package com.aptana.formatter.ui.preferences;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +124,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			IWorkbenchPreferenceContainer container)
 	{
 		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST), container);
+		Collections.sort(TEMP_LIST, new Comparator<IScriptFormatterFactory>()
+		{
+			public int compare(IScriptFormatterFactory s1, IScriptFormatterFactory s2)
+			{
+				return s1.getName().compareToIgnoreCase(s2.getName());
+			}
+		});
 		factories = TEMP_LIST.toArray(new IScriptFormatterFactory[TEMP_LIST.size()]);
 		TEMP_LIST = new ArrayList<IScriptFormatterFactory>();
 		sourcePreviewViewers = new ArrayList<SourceViewer>();
@@ -436,7 +445,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		layout.marginWidth = 0;
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
-		
+
 		// Buttons panel
 		Composite buttons = new Composite(rightPanel, SWT.NONE);
 		layout = new GridLayout(2, true);
@@ -464,7 +473,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		}
 		IProfileManager profileManager = getProfileManager();
 		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
-		
+
 		// Previews area
 		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
 		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -637,7 +646,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			if (dialog != null)
 			{
 				IProfile profile = manager.getSelected();
-				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile.getName());
+				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile
+						.getName());
 				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
