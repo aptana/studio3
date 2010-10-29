@@ -94,7 +94,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private Button fLoadButton;
 	private Button fSaveButton;
 
-	private int selectedFormatter;
+	// Have this one static to keep the selection when re-opening the preferences in the same Studio session.
+	private static int selectedFormatter;
 	private IScriptFormatterFactory[] factories;
 	protected SourceViewer fSelectedPreviewViewer;
 	private ArrayList<SourceViewer> sourcePreviewViewers;
@@ -198,6 +199,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		for (IScriptFormatterFactory factory : factories)
 		{
 			factory.savePreferences(settings, delegate);
+		}
+		if (selectedFormatter < 0)
+		{
+			selectedFormatter = 0;
 		}
 		fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 		previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
@@ -492,17 +497,24 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 		listViewer.setInput(this.factories);
-		listViewer.setSelection(new StructuredSelection(this.factories[0]));
+		if (selectedFormatter < 0)
+		{
+			selectedFormatter = 0;
+		}
+		listViewer.setSelection(new StructuredSelection(this.factories[selectedFormatter]));
 		listViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				// Update the preview
 				selectedFormatter = listViewer.getList().getSelectionIndex();
-				fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
-				previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
-				previewPane.layout();
-				updatePreview();
+				if (selectedFormatter > -1)
+				{
+					fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
+					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
+					previewPane.layout();
+					updatePreview();
+				}
 			}
 		});
 
@@ -511,7 +523,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			SourceViewer sourcePreview = createSourcePreview(previewPane, factory);
 			sourcePreviewViewers.add(sourcePreview);
 		}
-		if (selectedFormatter != -1 && sourcePreviewViewers.size() > selectedFormatter)
+		if (selectedFormatter > -1 && sourcePreviewViewers.size() > selectedFormatter)
 		{
 			fSelectedPreviewViewer = sourcePreviewViewers.get(selectedFormatter);
 			previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
@@ -554,6 +566,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			public void widgetSelected(SelectionEvent e)
 			{
 				IScriptFormatterFactory formatter = getSelectedFormatter();
+				if (formatter == null)
+				{
+					return;
+				}
 				PreferenceKey[] preferenceKeys = formatter.getPreferenceKeys();
 				IProfileManager manager = getProfileManager();
 				if (!MessageDialog.openQuestion(defaultsBt.getShell(),
@@ -621,6 +637,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected IScriptFormatterFactory getSelectedFormatter()
 	{
+		if (selectedFormatter < 0 || selectedFormatter >= factories.length)
+		{
+			return null;
+		}
 		return factories[selectedFormatter];
 	}
 
