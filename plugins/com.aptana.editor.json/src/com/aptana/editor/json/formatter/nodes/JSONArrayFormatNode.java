@@ -35,8 +35,10 @@
 package com.aptana.editor.json.formatter.nodes;
 
 import com.aptana.editor.json.parsing.ast.JSONArrayNode;
+import com.aptana.editor.json.parsing.ast.JSONObjectNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * JSONObjectNode
@@ -74,7 +76,18 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		return this._referenceNode.hasChildren();
+		boolean result = false;
+		
+		for (IParseNode child : this._referenceNode)
+		{
+			if (child instanceof JSONArrayNode || child instanceof JSONObjectNode)
+			{
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
 	}
 
 	/*
