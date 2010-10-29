@@ -60,7 +60,6 @@ public class JSONFormatterModifyDialog extends FormatterModifyDialog
 	 */
 	protected void addPages()
 	{
-		addTabPage(Messages.JSONFormatterModifyDialog_indentation_page_tab_name, new JSONFormatterControlStatementsPage(this));
-		addTabPage(Messages.JSONFormatterModifyDialog_braces_, new JSONFormatterBracesPage(this));
+		addTabPage(Messages.JSONFormatterModifyDialog_indentation_page_tab_name, new JSONFormatWhitespacePage(this));
 	}
 }
