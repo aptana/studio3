@@ -34,22 +34,30 @@
  */
 package com.aptana.editor.json.formatter;
 
+import com.aptana.editor.json.parsing.ast.JSONArrayNode;
+import com.aptana.editor.json.parsing.ast.JSONNode;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * JSONPrimitiveFormatNode
  */
 public class JSONPrimitiveFormatNode extends FormatterBlockWithBeginNode
 {
+	private boolean _firstElement;
+	
 	/**
 	 * JSONPrimitiveFormatNode
 	 * 
 	 * @param document
 	 */
-	public JSONPrimitiveFormatNode(IFormatterDocument document)
+	public JSONPrimitiveFormatNode(IFormatterDocument document, JSONNode referenceNode)
 	{
 		super(document);
+		
+		IParseNode parent = referenceNode.getParent();
+		this._firstElement = (parent instanceof JSONArrayNode && parent.getFirstChild() == referenceNode);
 	}
 
 	/* (non-Javadoc)
@@ -67,6 +75,6 @@ public class JSONPrimitiveFormatNode extends FormatterBlockWithBeginNode
 	@Override
 	public int getSpacesCountBefore()
 	{
-		return 1;
+		return this._firstElement ? 0 : 1;
 	}
 }
