@@ -129,6 +129,7 @@ import com.aptana.theme.Theme;
 import com.aptana.theme.ThemeExporter;
 import com.aptana.theme.ThemePlugin;
 
+@SuppressWarnings("restriction")
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener,
 		IInputValidator, IPropertyChangeListener
 {
