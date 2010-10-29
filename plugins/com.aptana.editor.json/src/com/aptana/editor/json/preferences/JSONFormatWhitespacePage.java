@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.editor.json.formatter.JSONFormatter;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.IFormatterControlManager;
@@ -54,9 +55,9 @@ import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
 import com.aptana.formatter.ui.util.SWTFactory;
 
 /**
- * JSONFormatterControlStatementsPage
+ * JSONFormatWhitespacePage
  */
-public class JSONFormatterControlStatementsPage extends FormatterModifyTabPage
+public class JSONFormatWhitespacePage extends FormatterModifyTabPage
 {
 	/**
 	 * Listens to changes in the type of tab selected.
@@ -101,7 +102,7 @@ public class JSONFormatterControlStatementsPage extends FormatterModifyTabPage
 		}
 	}
 
-	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "control-statements-preview.json"; //$NON-NLS-1$
+	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "formatting-preview.json"; //$NON-NLS-1$
 	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB };
 	private static final String[] TAB_OPTION_NAMES = new String[] { FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
 		FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB };
@@ -111,7 +112,7 @@ public class JSONFormatterControlStatementsPage extends FormatterModifyTabPage
 	 * 
 	 * @param dialog
 	 */
-	public JSONFormatterControlStatementsPage(IFormatterModifyDialog dialog)
+	public JSONFormatWhitespacePage(IFormatterModifyDialog dialog)
 	{
 		super(dialog);
 	}
@@ -158,6 +159,6 @@ public class JSONFormatterControlStatementsPage extends FormatterModifyTabPage
 	 */
 	protected URL getPreviewContent()
 	{
-		return getClass().getResource(CONTROL_STATEMENTS_PREVIEW_NAME);
+		return JSONFormatter.class.getResource(CONTROL_STATEMENTS_PREVIEW_NAME);
 	}
 }
