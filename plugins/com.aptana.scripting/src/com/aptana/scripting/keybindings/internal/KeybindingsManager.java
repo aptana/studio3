@@ -213,7 +213,7 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
-			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.CONTEXT_ID));
+			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
 		}
 	};
 
@@ -350,7 +350,7 @@ public class KeybindingsManager implements LoadCycleListener
 				// Set the initial enabled state of KeybindingsManager
 				IContextService contextService = (IContextService) workbench.getService(IContextService.class);
 				contextService.addContextManagerListener(contextManagerListener);
-				setEnabled(contextService.getActiveContextIds().contains(Activator.CONTEXT_ID));
+				setEnabled(contextService.getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
 
 				return Status.OK_STATUS;
 			}
