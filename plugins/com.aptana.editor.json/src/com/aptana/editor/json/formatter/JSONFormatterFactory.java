@@ -56,7 +56,7 @@ import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 {
 	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_ID);
-	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.json"; //$NON-NLS-1$
+	private static final String FORMATTER_PREVIEW_FILE = "formatting-preview.json"; //$NON-NLS-1$
 	private static final PreferenceKey[] KEYS = { //
 		new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_INDENTATION_SIZE), //
 		new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_TAB_CHAR), //
