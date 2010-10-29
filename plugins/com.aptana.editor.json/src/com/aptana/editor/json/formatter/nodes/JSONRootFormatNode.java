@@ -34,33 +34,50 @@
  */
 package com.aptana.editor.json.formatter.nodes;
 
-import com.aptana.editor.json.preferences.IPreferenceConstants;
+import java.util.List;
+
+import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterCommentNode;
+import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
+import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
 /**
- * JSONCommentNode
+ * JSONRootNode
  */
-public class JSONCommentNode extends FormatterCommentNode
+public class JSONRootFormatNode extends FormatterBlockNode
 {
 	/**
-	 * JSONCommentNode
+	 * JSONRootNode
 	 * 
 	 * @param document
-	 * @param startOffset
-	 * @param endOffset
 	 */
-	public JSONCommentNode(IFormatterDocument document, int startOffset, int endOffset)
+	public JSONRootFormatNode(IFormatterDocument document)
 	{
-		super(document, startOffset, endOffset);
+		super(document);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterCommentNode#getWrappingKey()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptNodes(java.util.List,
+	 * com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
 	 */
-	public String getWrappingKey()
+	protected void acceptNodes(List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		return IPreferenceConstants.WRAP_COMMENTS;
+		int indent = context.getIndent();
+
+		if (!visitor.endsWithNewLine() && getDocument().getInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET) > 0)
+		{
+			visitor.ensureLineStarted(context);
+			visitor.writeLineBreak(context);
+		}
+
+		super.acceptNodes(nodes, context, visitor);
+
+		if (indent > 0)
+		{
+			context.decIndent();
+		}
 	}
 }
