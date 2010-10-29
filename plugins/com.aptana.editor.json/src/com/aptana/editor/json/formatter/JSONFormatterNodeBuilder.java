@@ -210,18 +210,13 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			push(formatNode);
 			
 			// process children
-			if (node.hasChildren())
-			{
-				this.visitChildren(node);
-			}
-			else
-			{
-				JSONEmptyFormatNode emptyNode = new JSONEmptyFormatNode(_document);
-				
-				emptyNode.addChild(createTextNode(_document, startingOffset + 1, endingOffset));
-				
-				formatNode.addChild(emptyNode);
-			}
+			this.visitChildren(node);
+			
+			// remove any trailing whitespace
+			int lastOffset = (node.hasChildren()) ? node.getLastChild().getEndingOffset(): startingOffset;
+			JSONEmptyFormatNode emptyNode = new JSONEmptyFormatNode(_document);
+			emptyNode.addChild(createTextNode(_document, lastOffset + 1, endingOffset));
+			formatNode.addChild(emptyNode);
 			
 			// all done
 			checkedPop(formatNode, endingOffset);
@@ -237,8 +232,7 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		public void addPrimitive(JSONNode node)
 		{
-			//IParseNode parent = node.getParent();
-			JSONPrimitiveFormatNode primitive = new JSONPrimitiveFormatNode(_document);
+			JSONPrimitiveFormatNode primitive = new JSONPrimitiveFormatNode(_document, node);
 			int startingOffset = node.getStartingOffset();
 			int endingOffset = node.getEndingOffset();
 			IFormatterTextNode textNode = createTextNode(_document, startingOffset, endingOffset + 1);
