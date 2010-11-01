@@ -46,7 +46,8 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 {
 	private JSONArrayNode _referenceNode;
-	
+	private boolean _arrayElement;
+
 	/**
 	 * JSONObjectFormatNode
 	 * 
@@ -55,8 +56,11 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	public JSONArrayFormatNode(IFormatterDocument document, JSONArrayNode referenceNode)
 	{
 		super(document);
-		
+
 		this._referenceNode = referenceNode;
+		
+		IParseNode parent = referenceNode.getParent();
+		this._arrayElement = (parent instanceof JSONArrayNode);
 	}
 
 	/*
@@ -66,7 +70,17 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	public int getSpacesCountBefore()
 	{
-		return 1;
+		return (this._arrayElement) ? 0 : 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 */
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return false;
 	}
 
 	/*
@@ -77,7 +91,7 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingEndNewLine()
 	{
 		boolean result = false;
-		
+
 		for (IParseNode child : this._referenceNode)
 		{
 			if (child instanceof JSONArrayNode || child instanceof JSONObjectNode)
@@ -86,7 +100,7 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 				break;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -107,6 +121,6 @@ public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 	@Override
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		return true;
+		return (this._arrayElement == false);
 	}
 }
