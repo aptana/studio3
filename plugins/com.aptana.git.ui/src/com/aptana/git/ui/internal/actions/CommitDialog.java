@@ -569,6 +569,7 @@ class CommitDialog extends StatusDialog
 						ChangedFile file = getChangedFile(item);
 						if (file != null)
 						{
+							changedFiles.add(file);
 							IFile iFile = gitRepository.getFileForChangedFile(file);
 							if (iFile != null)
 							{

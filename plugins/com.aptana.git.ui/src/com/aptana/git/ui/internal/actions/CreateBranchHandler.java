@@ -3,7 +3,6 @@ package com.aptana.git.ui.internal.actions;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.Window;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.dialogs.CreateBranchDialog;
@@ -25,8 +24,7 @@ public class CreateBranchHandler extends AbstractGitHandler
 			openError(Messages.CommitAction_MultipleRepos_Title, Messages.CommitAction_MultipleRepos_Message);
 			return null;
 		}
-		CreateBranchDialog dialog = new CreateBranchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-				theRepo);
+		CreateBranchDialog dialog = new CreateBranchDialog(getShell(), theRepo);
 		if (dialog.open() == Window.OK)
 		{
 			String branchName = dialog.getValue().trim();

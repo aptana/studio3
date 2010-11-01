@@ -84,7 +84,7 @@ public final class UIUtils
 		Shell shell = getDisplay().getActiveShell();
 		if (shell == null)
 		{
-			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			IWorkbenchWindow window = getActiveWorkbenchWindow();
 			if (window != null)
 			{
 				shell = window.getShell();
@@ -100,12 +100,7 @@ public final class UIUtils
 	 */
 	public static IEditorPart getActiveEditor()
 	{
-		IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (workbench == null)
-		{
-			return null;
-		}
-		IWorkbenchPage workbenchPage = workbench.getActivePage();
+		IWorkbenchPage workbenchPage = getActivePage();
 		if (workbenchPage == null)
 		{
 			return null;
@@ -120,17 +115,27 @@ public final class UIUtils
 	 */
 	public static IWorkbenchPart getActivePart()
 	{
-		IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (workbench == null)
-		{
-			return null;
-		}
-		IWorkbenchPage workbenchPage = workbench.getActivePage();
+		IWorkbenchPage workbenchPage = getActivePage();
 		if (workbenchPage == null)
 		{
 			return null;
 		}
 		return workbenchPage.getActivePart();
+	}
+
+	public static IWorkbenchPage getActivePage()
+	{
+		IWorkbenchWindow workbench = getActiveWorkbenchWindow();
+		if (workbench == null)
+		{
+			return null;
+		}
+		return workbench.getActivePage();
+	}
+
+	public static IWorkbenchWindow getActiveWorkbenchWindow()
+	{
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	/**
@@ -143,14 +148,10 @@ public final class UIUtils
 	 */
 	public static IViewPart findView(String viewID) throws PartInitException
 	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window != null)
+		IWorkbenchPage page = getActivePage();
+		if (page != null)
 		{
-			IWorkbenchPage page = window.getActivePage();
-			if (page != null)
-			{
-				return page.findView(viewID);
-			}
+			return page.findView(viewID);
 		}
 		return null;
 	}
@@ -194,15 +195,20 @@ public final class UIUtils
 
 	private static void showErrorDialog(String title, String message)
 	{
-		MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
+		MessageDialog.openError(getActiveWorkbenchWindow().getShell(), title, message);
 	}
-	
-	public static boolean showPromptDialog(final String title, final String message) {
-		if (Display.getCurrent() == null) {
-			UIJob job = new UIJob(title) {
+
+	public static boolean showPromptDialog(final String title, final String message)
+	{
+		if (Display.getCurrent() == null)
+		{
+			UIJob job = new UIJob(title)
+			{
 				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) {
-					if (showPromptDialogUI(title, message)) {
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					if (showPromptDialogUI(title, message))
+					{
 						return Status.OK_STATUS;
 					}
 					return Status.CANCEL_STATUS;
@@ -211,18 +217,23 @@ public final class UIUtils
 			job.setPriority(Job.INTERACTIVE);
 			job.setUser(true);
 			job.schedule();
-			try {
+			try
+			{
 				job.join();
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e)
+			{
 			}
 			return job.getResult() == Status.OK_STATUS;
-		} else {
+		}
+		else
+		{
 			return showPromptDialogUI(title, message);
 		}
 	}
-	
-	private static boolean showPromptDialogUI(String title, String message) {
-		return MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, message);
-	}
 
+	private static boolean showPromptDialogUI(String title, String message)
+	{
+		return MessageDialog.openQuestion(getActiveWorkbenchWindow().getShell(), title, message);
+	}
 }
