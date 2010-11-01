@@ -34,27 +34,56 @@
  */
 package com.aptana.preview.ui.properties;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 
-public class Messages extends NLS
+import com.aptana.preview.Activator;
+import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.ServerConfigurationManager;
+
+public class ProjectPreviewUtil
 {
+	private static final String SERVER = "previewServer"; //$NON-NLS-1$
+	private static final QualifiedName KEY = new QualifiedName(Activator.PLUGIN_ID, SERVER);
 
-	private static final String BUNDLE_NAME = "com.aptana.preview.ui.properties.messages"; //$NON-NLS-1$
-
-	public static String ProjectPreviewPropertyPage_ChooseServerType;
-	public static String ProjectPreviewPropertyPage_ERR_FailToCreateServer;
-	public static String ProjectPreviewPropertyPage_ERR_FailToOpenServerDialog;
-	public static String ProjectPreviewPropertyPage_LBL_NoSettings;
-	public static String ProjectPreviewPropertyPage_NoPreviewServer;
-	public static String ProjectPreviewPropertyPage_Server_Label;
-
-	static
+	public static AbstractWebServerConfiguration getServerConfiguration(IProject project)
 	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		if (project != null)
+		{
+			try
+			{
+				String name = project.getPersistentProperty(KEY);
+				if (name != null)
+				{
+					return ServerConfigurationManager.getInstance().findServerConfiguration(name);
+				}
+			}
+			catch (CoreException e)
+			{
+			}
+		}
+		return null;
 	}
 
-	private Messages()
+	public static void setServerConfiguration(IProject project, AbstractWebServerConfiguration serverConfig)
 	{
+		if (project != null)
+		{
+			try
+			{
+				if (serverConfig == null)
+				{
+					project.setPersistentProperty(KEY, null);
+				}
+				else
+				{
+					project.setPersistentProperty(KEY, serverConfig.getName());
+				}
+			}
+			catch (CoreException e)
+			{
+			}
+		}
 	}
 }

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="previewHandlers" name="Preview Handlers" schema="schema/previewHandlers.exsd"/>
-   <extension-point id="webServerTypes" name="WebServer Types" schema="schema/webServerTypes.exsd"/>
+   <extension-point id="previewHandlers" name="%extension-point.preview.name" schema="schema/previewHandlers.exsd"/>
+   <extension-point id="webServerTypes" name="%extension-point.webserver.name" schema="schema/webServerTypes.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.aptana.ui.category"
             defaultHandler="com.aptana.preview.ui.handlers.ShowPreviewHandler"
-            description="Show Preview Editor"
+            description="%command.preview.description"
             id="com.aptana.preview.commands.showPreview"
-            name="Show Preview">
+            name="%command.preview.name">
       </command>
    </extension>
    <extension
@@ -40,7 +40,7 @@
             icon="icons/etool16/preview.png"
             id="com.aptana.preview.editor"
             matchingStrategy="com.aptana.preview.internal.PreviewEditorMatchingStrategy"
-            name="Preview Editor">
+            name="%editor.preview.name">
       </editor>
    </extension>
    <extension
@@ -49,16 +49,15 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.preview.ui.preferences.ServersPreferencePage"
             id="com.aptana.preview.preferences.previewServers"
-            name="Preview Servers">
+            name="%page.servers.name">
       </page>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
             class="com.aptana.preview.ui.properties.ProjectPreviewPropertyPage"
-            icon="icons/obj16/preview.png"
             id="com.aptana.preview.propertyPages.Preview"
-            name="Preview Settings">
+            name="%page.preview.name">
          <enabledWhen>
             <adapt
                   type="org.eclipse.core.resources.IProject">
@@ -72,7 +71,7 @@
          point="org.eclipse.ui.keywords">
       <keyword
             id="com.aptana.preview.keyword"
-            label="preview">
+            label="%keyword.preview.label">
       </keyword>
    </extension>
    <extension
@@ -87,7 +86,7 @@
       <type
             class="com.aptana.preview.server.SimpleWebServerConfiguration"
             id="com.aptana.preview.server.simple"
-            name="Simple Web Server">
+            name="%type.webserver.name">
       </type>
    </extension>
    <extension
