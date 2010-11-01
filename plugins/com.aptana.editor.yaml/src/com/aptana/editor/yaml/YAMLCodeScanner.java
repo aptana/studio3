@@ -109,7 +109,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	{
 		private YAMLDocumentSeparatorRule(IToken defaultToken)
 		{
-			super(new YAMLDocumentSeparatorDetector(), defaultToken, false);
+			super(new SingleCharacterDetector('.'), defaultToken, false);
 			setColumnConstraint(0);
 		}
 
@@ -120,16 +120,23 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
-	private final class YAMLDocumentSeparatorDetector implements IWordDetector
+	private final class SingleCharacterDetector implements IWordDetector
 	{
+		private char fChar;
+
+		SingleCharacterDetector(char c)
+		{
+			this.fChar = c;
+		}
+
 		public boolean isWordStart(char c)
 		{
-			return c == '.';
+			return c == fChar;
 		}
 
 		public boolean isWordPart(char c)
 		{
-			return c == '.';
+			return c == fChar;
 		}
 	}
 
@@ -142,7 +149,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	{
 		private YAMLDirectiveSeparatorRule(IToken defaultToken)
 		{
-			super(new YAMLDirectiveSeparatorDetector(), defaultToken, false);
+			super(new SingleCharacterDetector('-'), defaultToken, false);
 			setColumnConstraint(0);
 		}
 
@@ -150,19 +157,6 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		protected boolean wordOK(String word, ICharacterScanner scanner)
 		{
 			return word.length() == 3;
-		}
-	}
-
-	private final class YAMLDirectiveSeparatorDetector implements IWordDetector
-	{
-		public boolean isWordStart(char c)
-		{
-			return c == '-';
-		}
-
-		public boolean isWordPart(char c)
-		{
-			return c == '-';
 		}
 	}
 
