@@ -20,7 +20,7 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
-import com.aptana.ui.MenuDialog;
+import com.aptana.ui.QuickMenuDialog;
 import com.aptana.ui.MenuDialogItem;
 
 public class MergeBranchHandler extends AbstractGitHandler
@@ -47,7 +47,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			MenuDialog dialog = new MenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
 			dialog.setInput(listOfMaps);
 			if (dialog.open() == Window.OK)
 			{

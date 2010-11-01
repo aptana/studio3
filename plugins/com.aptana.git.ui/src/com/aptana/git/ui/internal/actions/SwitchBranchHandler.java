@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.ui.MenuDialog;
+import com.aptana.ui.QuickMenuDialog;
 import com.aptana.ui.MenuDialogItem;
 
 public class SwitchBranchHandler extends AbstractGitHandler
@@ -45,7 +45,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			MenuDialog dialog = new MenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
 			dialog.setInput(listOfMaps);
 			if (dialog.open() == Window.OK)
 			{

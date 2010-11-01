@@ -65,7 +65,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.progress.UIJob;
 
-public class MenuDialog extends PopupDialog
+/**
+ * Pop up a quick menu. useful for commands when we want users to be able to select a value without having to take their
+ * hands off the keyboard. Much better UI than a dialog with a combo!
+ * 
+ * @author cwilliams
+ */
+public class QuickMenuDialog extends PopupDialog
 {
 
 	/**
@@ -74,20 +80,13 @@ public class MenuDialog extends PopupDialog
 	private static final String MNEMONIC = "mnemonic"; //$NON-NLS-1$
 	private static final String INDEX = "index"; //$NON-NLS-1$
 	private static final String IS_SEPARATOR = "isSeparator"; //$NON-NLS-1$
-	
+
 	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
 
 	private Table completionsTable;
 	private List<MenuDialogItem> menuItems = new ArrayList<MenuDialogItem>();
 
-	/**
-	 * Second argument is expected to be a List<Map<String,Object>>. The map is either "title" =>
-	 * "some_value_to_display", or {"display" => "display_name", "image" => "filename_of_image.png".
-	 * 
-	 * @param parent
-	 * @param menuItems
-	 */
-	public MenuDialog(Shell parent)
+	public QuickMenuDialog(Shell parent)
 	{
 		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
 	}
