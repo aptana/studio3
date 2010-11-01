@@ -1,6 +1,8 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -14,7 +16,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.dialogs.BranchDialog;
+import com.aptana.ui.MenuDialog;
+import com.aptana.ui.MenuDialogItem;
 
 public class SwitchBranchHandler extends AbstractGitHandler
 {
@@ -29,11 +32,26 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		BranchDialog dialog = new BranchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), repo, true,
-				false);
-		if (dialog.open() == Window.OK)
+
+		String currentBranch = repo.currentBranch();
+		List<MenuDialogItem> listOfMaps = new ArrayList<MenuDialogItem>();
+		for (String branch : repo.localBranches())
 		{
-			switchBranch(repo, dialog.getBranch());
+			if (branch.equals(currentBranch))
+			{
+				continue;
+			}
+			listOfMaps.add(new MenuDialogItem(branch));
+		}
+		if (!listOfMaps.isEmpty())
+		{
+			MenuDialog dialog = new MenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			dialog.setInput(listOfMaps);
+			if (dialog.open() == Window.OK)
+			{
+				MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
+				switchBranch(repo, item.getText());
+			}
 		}
 		return null;
 	}

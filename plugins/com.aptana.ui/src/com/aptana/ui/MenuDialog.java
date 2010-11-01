@@ -32,12 +32,10 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.ui;
+package com.aptana.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -65,24 +63,38 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 public class MenuDialog extends PopupDialog
 {
+
+	/**
+	 * Keys used to set internal values in TableItems data map.
+	 */
+	private static final String MNEMONIC = "mnemonic"; //$NON-NLS-1$
+	private static final String INDEX = "index"; //$NON-NLS-1$
+	private static final String IS_SEPARATOR = "isSeparator"; //$NON-NLS-1$
+	
 	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
 
-	private static final String TITLE = "title"; //$NON-NLS-1$
-	private static final String SEPARATOR = "separator"; //$NON-NLS-1$
-	private static final String IMAGE = "image"; //$NON-NLS-1$
-
-	private List<Map<String, Object>> menuItems;
 	private Table completionsTable;
+	private List<MenuDialogItem> menuItems = new ArrayList<MenuDialogItem>();
 
-	public MenuDialog(Shell parent, Map<String, Object>... menuItems)
+	/**
+	 * Second argument is expected to be a List<Map<String,Object>>. The map is either "title" =>
+	 * "some_value_to_display", or {"display" => "display_name", "image" => "filename_of_image.png".
+	 * 
+	 * @param parent
+	 * @param menuItems
+	 */
+	public MenuDialog(Shell parent)
 	{
 		super(parent, PopupDialog.INFOPOPUP_SHELLSTYLE, true, false, false, false, false, null, null);
-		this.menuItems = Arrays.asList(menuItems);
+	}
+
+	public void setInput(List<MenuDialogItem> items)
+	{
+		this.menuItems = items;
 	}
 
 	/**
@@ -117,7 +129,7 @@ public class MenuDialog extends PopupDialog
 	@Override
 	protected Point getInitialLocation(Point initialSize)
 	{
-		Display display = PlatformUI.getWorkbench().getDisplay();
+		Display display = getShell().getDisplay();
 		if (display != null && !display.isDisposed())
 		{
 			return display.getCursorLocation();
@@ -141,7 +153,7 @@ public class MenuDialog extends PopupDialog
 	private final void createEmptyDialogArea(final Composite parent)
 	{
 		final Label noMatchesLabel = new Label(parent, SWT.NULL);
-		noMatchesLabel.setText(Messages.MenuDialog_NoMatchesFound);
+		noMatchesLabel.setText("Messages.MenuDialog_NoMatchesFound"); // FIXME This message should be externalized!
 		noMatchesLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		noMatchesLabel.setBackground(parent.getBackground());
 	}
@@ -156,7 +168,7 @@ public class MenuDialog extends PopupDialog
 	 *            The lexicographically sorted map of partial matches for the current state; must not be
 	 *            <code>null</code> or empty.
 	 */
-	private final void createTableDialogArea(final Composite parent, final List<Map<String, Object>> partialMatches)
+	private final void createTableDialogArea(final Composite parent, final List<MenuDialogItem> partialMatches)
 	{
 		// Layout the table.
 		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
@@ -168,76 +180,34 @@ public class MenuDialog extends PopupDialog
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
 		// Initialize the columns and rows.
-		Map<String, Object> rep = partialMatches.iterator().next();
 		int mnemonic = 0;
 		int index = -1;
-		if (rep.containsKey(TITLE))
+
+		// image, display, insert, tool_tip
+		columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
+		columns.add(new TableColumn(completionsTable, SWT.LEFT, 1));
+		columns.add(new TableColumn(completionsTable, SWT.CENTER, 2));
+
+		for (MenuDialogItem map : partialMatches)
 		{
-			// just a list
-			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
-			columns.add(new TableColumn(completionsTable, SWT.CENTER, 1));
-
-			for (Map<String, Object> map : partialMatches)
+			index++;
+			if (map.isSeparator())
 			{
-				index++;
-				if (map.containsKey(SEPARATOR))
-				{
-					insertSeparator(2);
-					continue;
-				}
-				String title = (String) map.get(TITLE);
-				if (title.trim().equals("---")) //$NON-NLS-1$
-				{
-					insertSeparator(2);
-					continue;
-				}
-				final TableItem item = new TableItem(completionsTable, SWT.NULL);
-				item.setText(0, title);
-				item.setData("mnemonic", mnemonic); //$NON-NLS-1$
-				item.setText(1, mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : ""); //$NON-NLS-1$
-				item.setData("index", index); //$NON-NLS-1$
+				insertSeparator(3);
+				continue;
 			}
-		}
-		else
-		{
-			// image, display, insert, tool_tip
-			columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
-			columns.add(new TableColumn(completionsTable, SWT.LEFT, 1));
-			columns.add(new TableColumn(completionsTable, SWT.CENTER, 2));
-			for (Map<String, Object> map : partialMatches)
+			final TableItem item = new TableItem(completionsTable, SWT.NULL);
+			Image image = map.getImage();
+			if (image != null)
 			{
-				index++;
-				if (map.containsKey(SEPARATOR))
-				{
-					insertSeparator(3);
-					continue;
-				}
-				final TableItem item = new TableItem(completionsTable, SWT.NULL);
-				String filename = (String) map.get(IMAGE);
-				Image image = null;
-				if (filename != null && filename.trim().length() > 0)
-				{
-					try
-					{
-						image = new Image(Display.getCurrent(), filename);
-
-					}
-					catch (Exception e)
-					{
-						// TODO Log?
-					}
-				}
-				if (image != null)
-				{
-					// TODO Listen for disposal and dispose of these images
-					item.setImage(0, image);
-				}
-
-				item.setText(1, (String) map.get("display")); //$NON-NLS-1$
-				item.setData("mnemonic", mnemonic); //$NON-NLS-1$ // FIXME This is really off by one, but we expect it to be later. Funky code from Sandip. Juts use real value maybe?
-				item.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
-				item.setData("index", index); //$NON-NLS-1$
+				item.setImage(0, image);
 			}
+
+			item.setText(1, map.getText());
+			item.setData(MNEMONIC, mnemonic); // FIXME This is really off by one, but we expect it to be later. Funky
+												// code from Sandip. Just use real value maybe?
+			item.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
+			item.setData(INDEX, index);
 		}
 
 		Dialog.applyDialogFont(parent);
@@ -281,7 +251,7 @@ public class MenuDialog extends PopupDialog
 						int returnCode = index;
 						for (TableItem item : completionsTable.getItems())
 						{
-							Object data = item.getData("mnemonic"); //$NON-NLS-1$
+							Object data = item.getData(MNEMONIC);
 							if (data instanceof Integer)
 							{
 								Integer value = (Integer) data;
@@ -289,7 +259,7 @@ public class MenuDialog extends PopupDialog
 								{
 									// OK We found the table item that was assigned this mnemonic, now we need to find
 									// it's index in partialMatches!
-									returnCode = (Integer) item.getData("index"); //$NON-NLS-1$
+									returnCode = (Integer) item.getData(INDEX);
 									break;
 								}
 							}
@@ -379,8 +349,12 @@ public class MenuDialog extends PopupDialog
 
 	protected boolean isSeparator(TableItem item)
 	{
-		// FIXME This isn't the best way to determine if a row is actually a separator
-		return item.getText().equals(""); //$NON-NLS-1$
+		Object obj = item.getData(IS_SEPARATOR);
+		if (obj instanceof Boolean)
+		{
+			return (Boolean) obj;
+		}
+		return false;
 	}
 
 	protected void insertSeparator(int columns)
@@ -393,13 +367,14 @@ public class MenuDialog extends PopupDialog
 			editor.grabHorizontal = true;
 			editor.setEditor(label, item, i);
 		}
+		item.setData(IS_SEPARATOR, true);
 	}
 
 	protected void select()
 	{
 		int index = completionsTable.getSelectionIndex();
 		TableItem item = completionsTable.getItem(index);
-		int returnCode = (Integer) item.getData("index"); //$NON-NLS-1$
+		int returnCode = (Integer) item.getData(INDEX);
 		setReturnCode(returnCode);
 		close();
 	}
