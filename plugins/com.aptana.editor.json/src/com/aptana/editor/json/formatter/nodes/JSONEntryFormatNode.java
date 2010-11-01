@@ -35,12 +35,12 @@
 package com.aptana.editor.json.formatter.nodes;
 
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
  * JSONPropertyNode
  */
-public class JSONEntryFormatNode extends FormatterBlockWithBeginEndNode
+public class JSONEntryFormatNode extends FormatterBlockWithBeginNode
 {
 	/**
 	 * @param document
