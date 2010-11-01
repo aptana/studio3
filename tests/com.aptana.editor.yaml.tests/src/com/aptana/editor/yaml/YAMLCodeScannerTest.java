@@ -201,4 +201,83 @@ public class YAMLCodeScannerTest extends AbstractTokenScannerTestCase
 
 		assertToken(new Token("variable.other.yaml"), 0, 3);
 	}
+
+	public void testMergeKey()
+	{
+		String src = "  <<: 2002-12-14";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("entity.name.tag.yaml"), 0, 5);
+		assertToken(new Token("string.unquoted.yaml"), 5, 1); // FIXME Should be whitespace!
+		assertToken(new Token("constant.other.date.yaml"), 6, 10);
+	}
+
+	public void testValueWithLessThanLessThan()
+	{
+		String src = "key: <<value";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("entity.name.tag.yaml"), 0, 4);
+		assertToken(new Token("string.unquoted.yaml"), 4, 1); // FIXME Should be whitespace!
+		assertToken(new Token("string.unquoted.yaml"), 5, 1);
+		assertToken(new Token("string.unquoted.yaml"), 6, 1);
+		assertToken(new Token("string.unquoted.yaml"), 7, 5);
+	}
+
+	// TODO Add test for "---" not on beginning of line
+
+	public void testDirectiveSeparator()
+	{
+		String src = "---";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("meta.separator.yaml"), 0, 3);
+	}
+
+	public void testDocumentSeparator()
+	{
+		String src = "...";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("meta.separator.yaml"), 0, 3);
+	}
+
+	public void testDocumentSeparatorNotAtBeginningOfLine()
+	{
+		String src = " ...";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("string.unquoted.yaml"), 0, 1); // FIXME Should be whitespace!
+		assertToken(new Token("string.unquoted.yaml"), 1, 1);
+		assertToken(new Token("string.unquoted.yaml"), 2, 1);
+		assertToken(new Token("string.unquoted.yaml"), 3, 1);
+	}
+
+	public void testSimpleDocument()
+	{
+		String src = "---\nadapter: sqlite3\n...\ndate: 2004-10-01\nnumber: 123";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(new Token("meta.separator.yaml"), 0, 3); // ---
+		assertToken(new Token("string.unquoted.yaml"), 3, 1); // FIXME Should be whitespace!
+		assertToken(new Token("entity.name.tag.yaml"), 4, 8); // adapter:
+		assertToken(new Token("string.unquoted.yaml"), 12, 1); // FIXME Should be whitespace!
+		assertToken(new Token("string.unquoted.yaml"), 13, 7); // sqlite3
+		assertToken(new Token("string.unquoted.yaml"), 20, 1); // FIXME Should be whitespace!
+		assertToken(new Token("meta.separator.yaml"), 21, 3); // ...
+		assertToken(new Token("string.unquoted.yaml"), 24, 1); // FIXME Should be whitespace!
+		assertToken(new Token("entity.name.tag.yaml"), 25, 5); // date:
+		assertToken(new Token("string.unquoted.yaml"), 30, 1); // FIXME Should be whitespace!
+		assertToken(new Token("constant.other.date.yaml"), 31, 10); // 2004-10-01
+		assertToken(new Token("string.unquoted.yaml"), 41, 1); // FIXME Should be whitespace!
+		assertToken(new Token("entity.name.tag.yaml"), 42, 7); // number:
+		assertToken(new Token("string.unquoted.yaml"), 49, 1); // FIXME Should be whitespace!
+		assertToken(new Token("constant.numeric.yaml"), 50, 3); // 123
+	}
 }

@@ -87,9 +87,83 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		rule = new WordRule(new YAMLUnquotedWordDetector(), new Token("string.unquoted.yaml")); //$NON-NLS-1$
 		rules.add(rule);
 
+		// Directive Separators
+		rule = new YAMLDirectiveSeparatorRule(new Token("meta.separator.yaml")); //$NON-NLS-1$
+		rules.add(rule);
+
+		// Document Separators
+		rule = new YAMLDocumentSeparatorRule(new Token("meta.separator.yaml")); //$NON-NLS-1$
+		rules.add(rule);
+
 		rules.add(new SingleCharacterRule('-', new Token("keyword.operator.symbol"))); //$NON-NLS-1$
 
 		return rules;
+	}
+
+	/**
+	 * Detects "...".
+	 * 
+	 * @author cwilliams
+	 */
+	private final class YAMLDocumentSeparatorRule extends ExtendedWordRule
+	{
+		private YAMLDocumentSeparatorRule(IToken defaultToken)
+		{
+			super(new YAMLDocumentSeparatorDetector(), defaultToken, false);
+			setColumnConstraint(0);
+		}
+
+		@Override
+		protected boolean wordOK(String word, ICharacterScanner scanner)
+		{
+			return word.length() == 3;
+		}
+	}
+
+	private final class YAMLDocumentSeparatorDetector implements IWordDetector
+	{
+		public boolean isWordStart(char c)
+		{
+			return c == '.';
+		}
+
+		public boolean isWordPart(char c)
+		{
+			return c == '.';
+		}
+	}
+
+	/**
+	 * Detects "---".
+	 * 
+	 * @author cwilliams
+	 */
+	private final class YAMLDirectiveSeparatorRule extends ExtendedWordRule
+	{
+		private YAMLDirectiveSeparatorRule(IToken defaultToken)
+		{
+			super(new YAMLDirectiveSeparatorDetector(), defaultToken, false);
+			setColumnConstraint(0);
+		}
+
+		@Override
+		protected boolean wordOK(String word, ICharacterScanner scanner)
+		{
+			return word.length() == 3;
+		}
+	}
+
+	private final class YAMLDirectiveSeparatorDetector implements IWordDetector
+	{
+		public boolean isWordStart(char c)
+		{
+			return c == '-';
+		}
+
+		public boolean isWordPart(char c)
+		{
+			return c == '-';
+		}
 	}
 
 	private final class YAMLKeyRule extends ExtendedWordRule
@@ -256,8 +330,8 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 				return true;
 			}
 			c = Character.toLowerCase(c);
-			return c == 'x' || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e'
-					|| c == 'f' || c == 'l' || c == 'u' || c == 'o';
+			return c == 'x' || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e' || c == 'f' || c == 'l'
+					|| c == 'u' || c == 'o';
 		}
 	}
 
