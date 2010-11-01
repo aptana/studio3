@@ -60,9 +60,7 @@ import com.aptana.formatter.nodes.FormatterEmptyNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
- * CSS formatter node builder.<br>
- * This builder generates the formatter nodes that will then be processed by the {@link JSONFormatterNodeRewriter} to
- * produce the output for the code formatting process.
+ * JSONFormatterNodeBuilder
  */
 public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
