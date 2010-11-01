@@ -58,7 +58,7 @@ public class JSONObjectFormatNode extends FormatterBlockWithBeginEndNode
 		super(document);
 
 		this._referenceNode = referenceNode;
-		
+
 		IParseNode parent = referenceNode.getParent();
 		this._firstElement = (parent instanceof JSONArrayNode && parent.getFirstChild() == referenceNode);
 	}
