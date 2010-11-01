@@ -32,75 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.preferences;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 
 /**
- * JSONNode
+ * JSONFormatterModifyDialog
  */
-public class JSONNode extends ParseNode
+public class JSONFormatterModifyDialog extends FormatterModifyDialog
 {
-	private JSONNodeType _type;
-
 	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
+	 * Constructs a new HTMLFormatterModifyDialog
 	 * 
-	 * @param type
+	 * @param dialogOwner
+	 * @param formatterFactory
 	 */
-	public JSONNode(JSONNodeType type)
+	public JSONFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
+		super(dialogOwner, formatterFactory);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see com.aptana.formatter.ui.preferences.FormatterModifyDialog#addPages()
 	 */
-	@Override
-	public String toString()
+	protected void addPages()
 	{
-		return this._type.toString();
+		addTabPage(Messages.JSONFormatterModifyDialog_indentation_page_tab_name, new JSONFormatWhitespacePage(this));
 	}
 }

@@ -34,16 +34,42 @@
  */
 package com.aptana.editor.json.parsing.ast;
 
+import beaver.Symbol;
+
 /**
  * JSONEntryNode
  */
 public class JSONEntryNode extends JSONNode
 {
+	private Symbol _colon;
+
 	/**
 	 * JSONEntryNode
 	 */
-	public JSONEntryNode()
+	public JSONEntryNode(Symbol colon)
 	{
 		super(JSONNodeType.ENTRY);
+
+		this._colon = colon;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.json.parsing.ast.JSONNode#accept(com.aptana.editor.json.parsing.ast.JSONTreeWalker)
+	 */
+	@Override
+	public void accept(JSONTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/**
+	 * getColon
+	 * 
+	 * @return
+	 */
+	public Symbol getColon()
+	{
+		return this._colon;
 	}
 }

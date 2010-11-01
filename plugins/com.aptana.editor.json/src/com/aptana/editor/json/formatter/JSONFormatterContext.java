@@ -32,75 +32,51 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.FormatterContext;
+import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.nodes.IFormatterNode;
 
 /**
- * JSONNode
+ * JSONFormatterContext
  */
-public class JSONNode extends ParseNode
+public class JSONFormatterContext extends FormatterContext
 {
-	private JSONNodeType _type;
-
 	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
+	 * JSONFormatterContext
 	 * 
-	 * @param type
+	 * @param indent
 	 */
-	public JSONNode(JSONNodeType type)
+	public JSONFormatterContext(int indent)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
+		super(indent);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
 	 */
-	@Override
-	public String toString()
+	protected boolean isCountable(IFormatterNode node)
 	{
-		return this._type.toString();
+		return node instanceof IFormatterContainerNode;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(java.lang.CharSequence, int)
+	 */
+	public int getCommentStartLength(CharSequence chars, int offset)
+	{
+		return 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 */
+	public String getWrappingCommentPrefix()
+	{
+		return "";
 	}
 }

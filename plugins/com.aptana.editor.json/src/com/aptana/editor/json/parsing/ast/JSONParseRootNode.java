@@ -67,4 +67,14 @@ public class JSONParseRootNode extends ParseRootNode
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);
 	}
+
+	/**
+	 * accept
+	 * 
+	 * @param walker
+	 */
+	public void accept(JSONTreeWalker walker)
+	{
+		walker.visit(this);
+	}
 }

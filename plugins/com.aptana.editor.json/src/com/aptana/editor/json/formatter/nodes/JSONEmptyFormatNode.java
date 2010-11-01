@@ -32,75 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter.nodes;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.IFormatterWriter;
+import com.aptana.formatter.nodes.FormatterBlockNode;
 
 /**
- * JSONNode
+ * JSONEmptyFormatNode
  */
-public class JSONNode extends ParseNode
+public class JSONEmptyFormatNode extends FormatterBlockNode
 {
-	private JSONNodeType _type;
-
 	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
+	 * JSONEmptyFormatNode
 	 * 
-	 * @param type
+	 * @param document
 	 */
-	public JSONNode(JSONNodeType type)
+	public JSONEmptyFormatNode(IFormatterDocument document)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
+		super(document);
 	}
 
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#accept(com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
 	 */
 	@Override
-	public String toString()
+	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		return this._type.toString();
+		// do nothing
 	}
 }

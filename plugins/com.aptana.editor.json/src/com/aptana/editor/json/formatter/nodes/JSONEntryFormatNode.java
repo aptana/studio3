@@ -32,75 +32,51 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter.nodes;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * JSONNode
+ * JSONPropertyNode
  */
-public class JSONNode extends ParseNode
+public class JSONEntryFormatNode extends FormatterBlockWithBeginNode
 {
-	private JSONNodeType _type;
-
 	/**
-	 * JSONNode
+	 * @param document
 	 */
-	public JSONNode()
+	public JSONEntryFormatNode(IFormatterDocument document)
 	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
-	 * 
-	 * @param type
-	 */
-	public JSONNode(JSONNodeType type)
-	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
+		super(document);
 	}
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	public short getNodeType()
+	@Override
+	protected boolean isAddingBeginNewLine()
 	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
+		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
 	 */
 	@Override
-	public String toString()
+	protected boolean isAddingEndNewLine()
 	{
-		return this._type.toString();
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		return false;
 	}
 }
