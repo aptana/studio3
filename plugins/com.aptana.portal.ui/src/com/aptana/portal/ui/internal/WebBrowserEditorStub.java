@@ -41,8 +41,8 @@ package com.aptana.portal.ui.internal;
  */
 @SuppressWarnings("restriction")
 public class WebBrowserEditorStub extends
-  com.aptana.browser.parts.WebBrowserEditor/**/				// use Aptana WebKit browser
-  /*org.eclipse.ui.internal.browser.WebBrowserEditor/**/	// use default SWT browser
+  /*com.aptana.browser.parts.WebBrowserEditor/**/				// use Aptana WebKit browser
+  org.eclipse.ui.internal.browser.WebBrowserEditor/**/	// use default SWT browser
 {
 
 }
