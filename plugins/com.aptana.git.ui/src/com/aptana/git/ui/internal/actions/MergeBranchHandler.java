@@ -14,14 +14,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
-import com.aptana.ui.QuickMenuDialog;
 import com.aptana.ui.MenuDialogItem;
+import com.aptana.ui.QuickMenuDialog;
 
 public class MergeBranchHandler extends AbstractGitHandler
 {
@@ -47,7 +46,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
 			dialog.setInput(listOfMaps);
 			if (dialog.open() == Window.OK)
 			{

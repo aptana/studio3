@@ -19,12 +19,12 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.ui.QuickMenuDialog;
 import com.aptana.ui.MenuDialogItem;
+import com.aptana.ui.QuickMenuDialog;
+import com.aptana.ui.UIUtils;
 
 public class DeleteBranchHandler extends AbstractGitHandler
 {
@@ -50,7 +50,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 			}
 			listOfMaps.add(new MenuDialogItem(branch));
 		}
-		QuickMenuDialog dialog = new QuickMenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+		QuickMenuDialog dialog = new QuickMenuDialog(getShell());
 		dialog.setInput(listOfMaps);
 		if (dialog.open() == Window.OK)
 		{
@@ -78,7 +78,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 
 						public void run()
 						{
-							result[0] = MessageDialog.openConfirm(Display.getCurrent().getActiveShell(),
+							result[0] = MessageDialog.openConfirm(UIUtils.getActiveShell(),
 									Messages.DeleteBranchAction_BranchDeletionFailed_Title, MessageFormat.format(
 											Messages.DeleteBranchAction_BranchDeletionFailed_Msg, branchName,
 											theStatus.getMessage()));
@@ -115,17 +115,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
-				Display display = PlatformUI.getWorkbench().getDisplay();
-				if (display == null)
-				{
-					display = Display.getDefault();
-				}
-				Shell aShell = display.getActiveShell();
-				if (aShell == null)
-				{
-					aShell = new Shell(display);
-				}
-				final Shell shell = aShell;
+				final Shell shell = UIUtils.getActiveShell();
 				String text = MessageFormat.format(Messages.DeleteBranchAction_BranchDelete_Msg, branchName);
 				DefaultToolTip toolTip = new DefaultToolTip(shell)
 				{

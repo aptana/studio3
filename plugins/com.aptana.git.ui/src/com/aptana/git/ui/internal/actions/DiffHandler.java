@@ -112,8 +112,7 @@ public class DiffHandler extends AbstractGitHandler
 
 			public void run()
 			{
-				MessageDialog dialog = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-						.getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
+				MessageDialog dialog = new MessageDialog(getShell(), Messages.GitProjectView_GitDiffDialogTitle, null,
 						"", 0, new String[] { IDialogConstants.OK_LABEL }, 0) //$NON-NLS-1$
 				{
 					@Override

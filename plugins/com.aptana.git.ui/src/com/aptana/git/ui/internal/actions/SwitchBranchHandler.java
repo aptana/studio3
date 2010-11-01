@@ -10,14 +10,13 @@ import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.ui.QuickMenuDialog;
 import com.aptana.ui.MenuDialogItem;
+import com.aptana.ui.QuickMenuDialog;
+import com.aptana.ui.UIUtils;
 
 public class SwitchBranchHandler extends AbstractGitHandler
 {
@@ -45,7 +44,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		}
 		if (!listOfMaps.isEmpty())
 		{
-			QuickMenuDialog dialog = new QuickMenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			QuickMenuDialog dialog = new QuickMenuDialog(UIUtils.getActiveShell());
 			dialog.setInput(listOfMaps);
 			if (dialog.open() == Window.OK)
 			{
@@ -61,7 +60,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		if (!repo.switchBranch(branchName))
 			return;
 		// Now show a tooltip "toast" for 3 seconds to announce success
-		final Shell shell = Display.getDefault().getActiveShell();
+		final Shell shell = UIUtils.getActiveShell();
 		String text = MessageFormat.format(Messages.SwitchBranchAction_BranchSwitch_Msg, branchName);
 		DefaultToolTip toolTip = new DefaultToolTip(shell)
 		{
