@@ -979,7 +979,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		return super.performOk();
 	}
 
-	@SuppressWarnings("restriction")
 	protected void performOkFonts()
 	{
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,

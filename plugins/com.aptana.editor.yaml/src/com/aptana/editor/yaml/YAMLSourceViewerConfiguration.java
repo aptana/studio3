@@ -32,59 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.editor.yaml;
 
-package com.aptana.terminal.internal.emulator;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-import java.util.Map;
+import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
-import org.eclipse.tm.terminal.model.StyleColor;
-
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
-
-/**
- * @author Max Stepanov
- *
- */
-/* package */ class ThemedStyleMap extends StyleMap {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
+public class YAMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
+{
+	/**
+	 * YAMLSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
 	 */
-	@SuppressWarnings("rawtypes")
+	public YAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
+	{
+		super(preferences, editor);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 */
 	@Override
-	protected Color getColor(Map map, StyleColor color) {
-		// Just grab colors straight from theme!
-		String colorName = color.getName().toLowerCase();
-		String ansiName = "ansi." + colorName; //$NON-NLS-1$
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		if (theme.hasEntry(ansiName)) {
-			return theme.getForeground(ansiName);
-		}
-		if (StyleMap.WHITE_FOREGROUND.equals(colorName)) {
-			ansiName = "ansi.white"; //$NON-NLS-1$
-			if (theme.hasEntry(ansiName)) {
-				return theme.getForeground(ansiName);
-			}
-		}
-		boolean isForeground = map == fColorMapForeground;
-		if (StyleMap.BLACK.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-		if (StyleMap.WHITE.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-
-		// fall back to defaults...
-		return super.getColor(map, color);
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
+	{
+		return YAMLSourceConfiguration.getDefault();
 	}
-
-	protected Color getBackgroundColor() {
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
-	}
-
-
 }

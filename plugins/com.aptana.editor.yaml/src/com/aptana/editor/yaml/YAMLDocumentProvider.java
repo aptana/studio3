@@ -32,59 +32,41 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.editor.yaml;
 
-package com.aptana.terminal.internal.emulator;
+import org.eclipse.jface.text.rules.IPartitionTokenScanner;
 
-import java.util.Map;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.SimpleDocumentProvider;
 
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
-import org.eclipse.tm.terminal.model.StyleColor;
-
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
-
-/**
- * @author Max Stepanov
- *
- */
-/* package */ class ThemedStyleMap extends StyleMap {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
+public class YAMLDocumentProvider extends SimpleDocumentProvider
+{
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitionScanner()
 	 */
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Color getColor(Map map, StyleColor color) {
-		// Just grab colors straight from theme!
-		String colorName = color.getName().toLowerCase();
-		String ansiName = "ansi." + colorName; //$NON-NLS-1$
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		if (theme.hasEntry(ansiName)) {
-			return theme.getForeground(ansiName);
-		}
-		if (StyleMap.WHITE_FOREGROUND.equals(colorName)) {
-			ansiName = "ansi.white"; //$NON-NLS-1$
-			if (theme.hasEntry(ansiName)) {
-				return theme.getForeground(ansiName);
-			}
-		}
-		boolean isForeground = map == fColorMapForeground;
-		if (StyleMap.BLACK.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-		if (StyleMap.WHITE.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-
-		// fall back to defaults...
-		return super.getColor(map, color);
+	public IPartitionTokenScanner createPartitionScanner()
+	{
+		return new YAMLSourcePartitionScanner();
 	}
 
-	protected Color getBackgroundColor() {
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonDocumentProvider#getDefaultContentType(java.lang.String)
+	 */
+	protected String getDefaultContentType(String filename)
+	{
+		return IYAMLConstants.CONTENT_TYPE_YAML;
 	}
 
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.SimpleDocumentProvider#getPartitioningConfiguration()
+	 */
+	@Override
+	public IPartitioningConfiguration getPartitioningConfiguration()
+	{
+		return YAMLSourceConfiguration.getDefault();
+	}
 }

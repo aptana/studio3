@@ -33,58 +33,20 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.terminal.internal.emulator;
-
-import java.util.Map;
-
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
-import org.eclipse.tm.terminal.model.StyleColor;
-
-import com.aptana.theme.Theme;
-import com.aptana.theme.ThemePlugin;
+package com.aptana.editor.yaml;
 
 /**
  * @author Max Stepanov
  *
  */
-/* package */ class ThemedStyleMap extends StyleMap {
+public interface IYAMLConstants {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	protected Color getColor(Map map, StyleColor color) {
-		// Just grab colors straight from theme!
-		String colorName = color.getName().toLowerCase();
-		String ansiName = "ansi." + colorName; //$NON-NLS-1$
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		if (theme.hasEntry(ansiName)) {
-			return theme.getForeground(ansiName);
-		}
-		if (StyleMap.WHITE_FOREGROUND.equals(colorName)) {
-			ansiName = "ansi.white"; //$NON-NLS-1$
-			if (theme.hasEntry(ansiName)) {
-				return theme.getForeground(ansiName);
-			}
-		}
-		boolean isForeground = map == fColorMapForeground;
-		if (StyleMap.BLACK.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-		if (StyleMap.WHITE.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
-		}
-
-		// fall back to defaults...
-		return super.getColor(map, color);
-	}
-
-	protected Color getBackgroundColor() {
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
-	}
-
-
+	public String CONTENT_TYPE_YAML = "com.aptana.contenttype.yaml"; //$NON-NLS-1$
+	
+	public String YAML_SCOPE = "source.yaml"; //$NON-NLS-1$
+	public String YAML_COMMENT_SCOPE = "comment.line.number-sign.yaml"; //$NON-NLS-1$
+	public String YAML_STRING_SINGLE_SCOPE = "string.quoted.single.yaml"; //$NON-NLS-1$
+	public String YAML_STRING_DOUBLE_SCOPE = "string.quoted.double.yaml"; //$NON-NLS-1$
+	public String YAML_INTERPOLATED_STRING_SCOPE = "string.interpolated.yaml"; //$NON-NLS-1$
+	public String YAML_DIRECTIVE_SCOPE = "meta.tage.directive.yaml"; //$NON-NLS-1$
 }

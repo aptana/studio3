@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.yaml.YAMLEditor"
+            contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
+            default="false"
+            extensions="yaml,yml"
+            icon="icons/yaml.png"
+            id="com.aptana.editor.yaml"
+            name="%editor.yaml.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.yml">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="yaml,yml"
+            id="com.aptana.contenttype.yml"
+            name="%content-type.yml.name"
+            priority="normal">
+      </content-type>
+   </extension>
+
+</plugin>
