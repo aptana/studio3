@@ -32,24 +32,23 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.formatter.nodes;
+package com.aptana.formatter.nodes;
 
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.IFormatterWriter;
-import com.aptana.formatter.nodes.FormatterBlockNode;
 
 /**
  * JSONEmptyFormatNode
  */
-public class JSONEmptyFormatNode extends FormatterBlockNode
+public class FormatterEmptyNode extends FormatterBlockNode
 {
 	/**
 	 * JSONEmptyFormatNode
 	 * 
 	 * @param document
 	 */
-	public JSONEmptyFormatNode(IFormatterDocument document)
+	public FormatterEmptyNode(IFormatterDocument document)
 	{
 		super(document);
 	}

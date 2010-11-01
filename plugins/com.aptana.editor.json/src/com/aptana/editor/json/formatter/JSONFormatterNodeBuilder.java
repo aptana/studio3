@@ -37,7 +37,6 @@ package com.aptana.editor.json.formatter;
 import beaver.Symbol;
 
 import com.aptana.editor.json.formatter.nodes.JSONArrayFormatNode;
-import com.aptana.editor.json.formatter.nodes.JSONEmptyFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONEntryFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONObjectFormatNode;
 import com.aptana.editor.json.formatter.nodes.JSONRootFormatNode;
@@ -57,6 +56,7 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterTextNode;
+import com.aptana.formatter.nodes.FormatterEmptyNode;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
@@ -214,7 +214,7 @@ public class JSONFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			
 			// remove any trailing whitespace
 			int lastOffset = (node.hasChildren()) ? node.getLastChild().getEndingOffset(): startingOffset;
-			JSONEmptyFormatNode emptyNode = new JSONEmptyFormatNode(_document);
+			FormatterEmptyNode emptyNode = new FormatterEmptyNode(_document);
 			emptyNode.addChild(createTextNode(_document, lastOffset + 1, endingOffset));
 			formatNode.addChild(emptyNode);
 			
