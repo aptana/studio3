@@ -124,7 +124,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 				FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
 
-				new JSONFormatterNodeRewriter(parseResult).rewrite(root);
+				new JSONFormatterNodeRewriter().rewrite(root);
 				IFormatterContext context = new JSONFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 
@@ -207,7 +207,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		
 		// include comments
-		JSONFormatterNodeRewriter rewriter = new JSONFormatterNodeRewriter(parseResult);
+		JSONFormatterNodeRewriter rewriter = new JSONFormatterNodeRewriter();
 		rewriter.rewrite(root);
 		
 		// create a formatting context

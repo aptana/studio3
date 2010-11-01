@@ -43,8 +43,6 @@ import com.aptana.formatter.nodes.IFormatterNode;
  */
 public class JSONFormatterContext extends FormatterContext
 {
-	private static final String WRAPPING_COMMENT_PREFIX = " * "; //$NON-NLS-1$
-
 	/**
 	 * JSONFormatterContext
 	 * 
@@ -55,12 +53,8 @@ public class JSONFormatterContext extends FormatterContext
 		super(indent);
 	}
 
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
 	 */
 	protected boolean isCountable(IFormatterNode node)
@@ -68,19 +62,12 @@ public class JSONFormatterContext extends FormatterContext
 		return node instanceof IFormatterContainerNode;
 	}
 
-	/**
-	 * Check if the char sequence starts with a '/*' sequence. If so, return the length of the sequence; Otherwise,
-	 * return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(java.lang.CharSequence, int)
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{
-		if (chars.length() > offset + 1 && chars.charAt(offset) == '/' && chars.charAt(offset + 1) == '*')
-		{
-			return 2;
-		}
-		
 		return 0;
 	}
 
@@ -90,6 +77,6 @@ public class JSONFormatterContext extends FormatterContext
 	 */
 	public String getWrappingCommentPrefix()
 	{
-		return WRAPPING_COMMENT_PREFIX;
+		return "";
 	}
 }
