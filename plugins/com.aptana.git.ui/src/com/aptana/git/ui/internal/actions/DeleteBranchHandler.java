@@ -1,6 +1,8 @@
 package com.aptana.git.ui.internal.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -21,7 +23,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.ui.internal.dialogs.BranchDialog;
+import com.aptana.ui.MenuDialog;
+import com.aptana.ui.MenuDialogItem;
 
 public class DeleteBranchHandler extends AbstractGitHandler
 {
@@ -36,13 +39,24 @@ public class DeleteBranchHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		BranchDialog dialog = new BranchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), repo, true,
-				false);
+
+		String currentBranch = repo.currentBranch();
+		List<MenuDialogItem> listOfMaps = new ArrayList<MenuDialogItem>();
+		for (String branch : repo.localBranches())
+		{
+			if (branch.equals(currentBranch))
+			{
+				continue;
+			}
+			listOfMaps.add(new MenuDialogItem(branch));
+		}
+		MenuDialog dialog = new MenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+		dialog.setInput(listOfMaps);
 		if (dialog.open() == Window.OK)
 		{
-			deleteBranch(repo, dialog.getBranch());
+			MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
+			deleteBranch(repo, item.getText());
 		}
-
 		return null;
 	}
 

@@ -1,5 +1,8 @@
 package com.aptana.git.ui.internal.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
@@ -17,7 +20,8 @@ import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
-import com.aptana.git.ui.internal.dialogs.BranchDialog;
+import com.aptana.ui.MenuDialog;
+import com.aptana.ui.MenuDialogItem;
 
 public class MergeBranchHandler extends AbstractGitHandler
 {
@@ -30,11 +34,26 @@ public class MergeBranchHandler extends AbstractGitHandler
 		{
 			return null;
 		}
-		BranchDialog dialog = new BranchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), repo, true,
-				true);
-		if (dialog.open() == Window.OK)
+
+		String currentBranch = repo.currentBranch();
+		List<MenuDialogItem> listOfMaps = new ArrayList<MenuDialogItem>();
+		for (String branch : repo.allBranches())
 		{
-			mergeBranch(repo, dialog.getBranch());
+			if (branch.equals(currentBranch))
+			{
+				continue;
+			}
+			listOfMaps.add(new MenuDialogItem(branch));
+		}
+		if (!listOfMaps.isEmpty())
+		{
+			MenuDialog dialog = new MenuDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell());
+			dialog.setInput(listOfMaps);
+			if (dialog.open() == Window.OK)
+			{
+				MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
+				mergeBranch(repo, item.getText());
+			}
 		}
 		return null;
 	}
