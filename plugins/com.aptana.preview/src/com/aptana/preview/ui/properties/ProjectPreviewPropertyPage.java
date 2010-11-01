@@ -61,6 +61,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.preview.Activator;
+import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
 import com.aptana.preview.server.ServerConfigurationManager;
 import com.aptana.preview.server.ServerConfigurationManager.ConfigurationType;

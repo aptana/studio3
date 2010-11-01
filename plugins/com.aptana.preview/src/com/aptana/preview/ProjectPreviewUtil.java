@@ -32,20 +32,16 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.preview.ui.properties;
+package com.aptana.preview;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 
-import com.aptana.preview.Activator;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
 import com.aptana.preview.server.ServerConfigurationManager;
 
 public class ProjectPreviewUtil
 {
-	private static final String SERVER = "previewServer"; //$NON-NLS-1$
-	private static final QualifiedName KEY = new QualifiedName(Activator.PLUGIN_ID, SERVER);
 
 	public static AbstractWebServerConfiguration getServerConfiguration(IProject project)
 	{
@@ -53,7 +49,7 @@ public class ProjectPreviewUtil
 		{
 			try
 			{
-				String name = project.getPersistentProperty(KEY);
+				String name = project.getPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER);
 				if (name != null)
 				{
 					return ServerConfigurationManager.getInstance().findServerConfiguration(name);
@@ -74,11 +70,11 @@ public class ProjectPreviewUtil
 			{
 				if (serverConfig == null)
 				{
-					project.setPersistentProperty(KEY, null);
+					project.setPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER, null);
 				}
 				else
 				{
-					project.setPersistentProperty(KEY, serverConfig.getName());
+					project.setPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER, serverConfig.getName());
 				}
 			}
 			catch (CoreException e)
