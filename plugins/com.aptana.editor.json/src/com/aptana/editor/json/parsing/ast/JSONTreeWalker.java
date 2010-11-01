@@ -34,73 +34,77 @@
  */
 package com.aptana.editor.json.parsing.ast;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
- * JSONNode
+ * JSONTreeWalker
  */
-public class JSONNode extends ParseNode
+public class JSONTreeWalker
 {
-	private JSONNodeType _type;
-
-	/**
-	 * JSONNode
-	 */
-	public JSONNode()
+	public void visit(JSONArrayNode node)
 	{
-		this(JSONNodeType.EMPTY);
+		this.visitChildren(node);
+	}
+
+	public void visit(JSONEntryNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSONFalseNode node)
+	{
+		// leaf
+	}
+
+	public void visit(JSONNullNode node)
+	{
+		// leaf
+	}
+
+	public void visit(JSONNumberNode node)
+	{
+		// leaf
+	}
+
+	public void visit(JSONObjectNode node)
+	{
+		this.visitChildren(node);
+	}
+
+	public void visit(JSONParseRootNode node)
+	{
+		for (IParseNode child : node)
+		{
+			if (child instanceof JSONNode)
+			{
+				((JSONNode) child).accept(this);
+			}
+		}
+	}
+
+	public void visit(JSONStringNode node)
+	{
+		// leaf
+	}
+
+	public void visit(JSONTrueNode node)
+	{
+		// leaf
 	}
 
 	/**
-	 * JSONNode
+	 * visitChildren
 	 * 
-	 * @param type
+	 * @param node
 	 */
-	public JSONNode(JSONNodeType type)
+	protected void visitChildren(JSONNode node)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return this._type.toString();
+		for (IParseNode child : node)
+		{
+			if (child instanceof JSONNode)
+			{
+				((JSONNode) child).accept(this);
+			}
+		}
 	}
 }

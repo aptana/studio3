@@ -32,75 +32,95 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter.nodes;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.editor.json.parsing.ast.JSONArrayNode;
+import com.aptana.editor.json.parsing.ast.JSONObjectNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
- * JSONNode
+ * JSONObjectNode
  */
-public class JSONNode extends ParseNode
+public class JSONArrayFormatNode extends FormatterBlockWithBeginEndNode
 {
-	private JSONNodeType _type;
+	private JSONArrayNode _referenceNode;
+	private boolean _arrayElement;
 
 	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
+	 * JSONObjectFormatNode
 	 * 
-	 * @param type
+	 * @param document
 	 */
-	public JSONNode(JSONNodeType type)
+	public JSONArrayFormatNode(IFormatterDocument document, JSONArrayNode referenceNode)
 	{
-		super(IJSONParserConstants.LANGUAGE);
+		super(document);
 
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
+		this._referenceNode = referenceNode;
+		
+		IParseNode parent = referenceNode.getParent();
+		this._arrayElement = (parent instanceof JSONArrayNode);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
 	 */
 	@Override
-	public String toString()
+	public int getSpacesCountBefore()
 	{
-		return this._type.toString();
+		return (this._arrayElement) ? 0 : 1;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 */
+	@Override
+	protected boolean isAddingBeginNewLine()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	@Override
+	protected boolean isAddingEndNewLine()
+	{
+		boolean result = false;
+
+		for (IParseNode child : this._referenceNode)
+		{
+			if (child instanceof JSONArrayNode || child instanceof JSONObjectNode)
+			{
+				result = true;
+				break;
+			}
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 */
+	@Override
+	protected boolean isIndenting()
+	{
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	@Override
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return (this._arrayElement == false);
 	}
 }

@@ -32,75 +32,23 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter.nodes;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockNode;
 
 /**
- * JSONNode
+ * JSONRootNode
  */
-public class JSONNode extends ParseNode
+public class JSONRootFormatNode extends FormatterBlockNode
 {
-	private JSONNodeType _type;
-
 	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
+	 * JSONRootNode
 	 * 
-	 * @param type
+	 * @param document
 	 */
-	public JSONNode(JSONNodeType type)
+	public JSONRootFormatNode(IFormatterDocument document)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return this._type.toString();
+		super(document);
 	}
 }

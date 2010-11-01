@@ -32,75 +32,31 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.preferences;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+
+import com.aptana.editor.json.JSONPlugin;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
- * JSONNode
+ * JSONPreferenceInitializer
  */
-public class JSONNode extends ParseNode
+public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 {
-	private JSONNodeType _type;
-
-	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
-	 * 
-	 * @param type
-	 */
-	public JSONNode(JSONNodeType type)
-	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	@Override
-	public String toString()
+	public void initializeDefaultPreferences()
 	{
-		return this._type.toString();
+		IEclipsePreferences pref = new DefaultScope().getNode(JSONPlugin.PLUGIN_ID);
+
+		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
+		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 	}
 }

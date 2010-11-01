@@ -32,75 +32,58 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.preview.ui.properties;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 
-/**
- * JSONNode
- */
-public class JSONNode extends ParseNode
+import com.aptana.preview.Activator;
+import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.ServerConfigurationManager;
+
+public class ProjectPreviewUtil
 {
-	private JSONNodeType _type;
+	private static final String SERVER = "previewServer"; //$NON-NLS-1$
+	private static final QualifiedName KEY = new QualifiedName(Activator.PLUGIN_ID, SERVER);
 
-	/**
-	 * JSONNode
-	 */
-	public JSONNode()
+	public static AbstractWebServerConfiguration getServerConfiguration(IProject project)
 	{
-		this(JSONNodeType.EMPTY);
+		if (project != null)
+		{
+			try
+			{
+				String name = project.getPersistentProperty(KEY);
+				if (name != null)
+				{
+					return ServerConfigurationManager.getInstance().findServerConfiguration(name);
+				}
+			}
+			catch (CoreException e)
+			{
+			}
+		}
+		return null;
 	}
 
-	/**
-	 * JSONNode
-	 * 
-	 * @param type
-	 */
-	public JSONNode(JSONNodeType type)
+	public static void setServerConfiguration(IProject project, AbstractWebServerConfiguration serverConfig)
 	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
-	 */
-	@Override
-	public String toString()
-	{
-		return this._type.toString();
+		if (project != null)
+		{
+			try
+			{
+				if (serverConfig == null)
+				{
+					project.setPersistentProperty(KEY, null);
+				}
+				else
+				{
+					project.setPersistentProperty(KEY, serverConfig.getName());
+				}
+			}
+			catch (CoreException e)
+			{
+			}
+		}
 	}
 }

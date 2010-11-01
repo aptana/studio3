@@ -32,75 +32,22 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterNodeRewriter;
+import com.aptana.formatter.nodes.IFormatterNode;
 
-/**
- * JSONNode
- */
-public class JSONNode extends ParseNode
+public class JSONFormatterNodeRewriter extends FormatterNodeRewriter
 {
-	private JSONNodeType _type;
-
-	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
-	 * 
-	 * @param type
-	 */
-	public JSONNode(JSONNodeType type)
-	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
-	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public JSONNodeType getType()
-	{
-		return this._type;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#createCommentNode(com.aptana.formatter.IFormatterDocument,
+	 * int, int, java.lang.Object)
 	 */
 	@Override
-	public String toString()
+	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset, Object object)
 	{
-		return this._type.toString();
+		return null;
 	}
 }

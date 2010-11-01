@@ -37,11 +37,9 @@ package com.aptana.editor.json;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -50,8 +48,6 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
-import com.aptana.editor.common.text.rules.CommentScanner;
-import com.aptana.editor.common.text.rules.EmptyCommentRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
@@ -60,18 +56,12 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 {
 	public static final String PREFIX = "__json__"; //$NON-NLS-1$
 	public static final String DEFAULT = "__json" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
-	public final static String SINGLELINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
-	public static final String MULTILINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 
 	// TODO: add other content types
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, MULTILINE_COMMENT, SINGLELINE_COMMENT };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSONConstants.CONTENT_TYPE_JSON } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
-		new EndOfLineRule("//", new Token(SINGLELINE_COMMENT)), //$NON-NLS-1$
-		new EmptyCommentRule(new Token(MULTILINE_COMMENT)),
-		new MultiLineRule("/*", "*/", new Token(MULTILINE_COMMENT), '\0', true) //$NON-NLS-1$ //$NON-NLS-2$
-	};
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] { };
 	private JSONSourceScanner beaverScanner;
 
 	private static JSONSourceConfiguration instance;
@@ -88,8 +78,6 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IJSONConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(SINGLELINE_COMMENT), new QualifiedContentType("comment.line.double-slash.json")); //$NON-NLS-1$
-			c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType("comment.block.json")); //$NON-NLS-1$
 
 			instance = new JSONSourceConfiguration();
 		}
@@ -187,13 +175,5 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
-
-		DefaultDamagerRepairer multilineDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.block.json"))); //$NON-NLS-1$
-		reconciler.setDamager(multilineDR, MULTILINE_COMMENT);
-		reconciler.setRepairer(multilineDR, MULTILINE_COMMENT);
-
-		DefaultDamagerRepairer singlelineDR = new ThemeingDamagerRepairer(new CommentScanner(this.getToken("comment.line.double-slash.json"))); //$NON-NLS-1$
-		reconciler.setDamager(singlelineDR, SINGLELINE_COMMENT);
-		reconciler.setRepairer(singlelineDR, SINGLELINE_COMMENT);
 	}
 }

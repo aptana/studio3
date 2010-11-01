@@ -32,75 +32,49 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.json.parsing.ast;
+package com.aptana.editor.json.formatter;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
-import com.aptana.parsing.ast.ParseNode;
+import com.aptana.editor.json.parsing.ast.JSONArrayNode;
+import com.aptana.editor.json.parsing.ast.JSONNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
- * JSONNode
+ * JSONPrimitiveFormatNode
  */
-public class JSONNode extends ParseNode
+public class JSONPrimitiveFormatNode extends FormatterBlockWithBeginNode
 {
-	private JSONNodeType _type;
-
-	/**
-	 * JSONNode
-	 */
-	public JSONNode()
-	{
-		this(JSONNodeType.EMPTY);
-	}
-
-	/**
-	 * JSONNode
-	 * 
-	 * @param type
-	 */
-	public JSONNode(JSONNodeType type)
-	{
-		super(IJSONParserConstants.LANGUAGE);
-
-		this._type = type;
-	}
-
-	/**
-	 * accept
-	 * 
-	 * @param walker
-	 */
-	public void accept(JSONTreeWalker walker)
-	{
-		// sub-classes must override this method so their types will be
-		// recognized properly
-	}
+	private boolean _firstElement;
 	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
-	 */
-	public short getNodeType()
-	{
-		return this._type.getIndex();
-	}
-
 	/**
-	 * getType
+	 * JSONPrimitiveFormatNode
 	 * 
-	 * @return
+	 * @param document
 	 */
-	public JSONNodeType getType()
+	public JSONPrimitiveFormatNode(IFormatterDocument document, JSONNode referenceNode)
 	{
-		return this._type;
+		super(document);
+		
+		IParseNode parent = referenceNode.getParent();
+		this._firstElement = (parent instanceof JSONArrayNode && parent.getFirstChild() == referenceNode);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#shouldConsumePreviousWhiteSpaces()
 	 */
 	@Override
-	public String toString()
+	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		return this._type.toString();
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.AbstractFormatterNode#getSpacesCountBefore()
+	 */
+	@Override
+	public int getSpacesCountBefore()
+	{
+		return this._firstElement ? 0 : 1;
 	}
 }
