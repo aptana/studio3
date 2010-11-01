@@ -48,4 +48,5 @@ public interface IYAMLConstants {
 	public String YAML_STRING_SINGLE_SCOPE = "string.quoted.single.yaml"; //$NON-NLS-1$
 	public String YAML_STRING_DOUBLE_SCOPE = "string.quoted.double.yaml"; //$NON-NLS-1$
 	public String YAML_INTERPOLATED_STRING_SCOPE = "string.interpolated.yaml"; //$NON-NLS-1$
+	public String YAML_DIRECTIVE_SCOPE = "meta.tage.directive.yaml"; //$NON-NLS-1$
 }

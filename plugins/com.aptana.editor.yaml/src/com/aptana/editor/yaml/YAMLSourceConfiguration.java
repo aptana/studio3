@@ -65,12 +65,13 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	public final static String PREFIX = "__yaml_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
+	public final static String DIRECTIVE = PREFIX + "directive"; //$NON-NLS-1$
 	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
 	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 	public final static String INTERPOLATED = PREFIX + "interpolated"; //$NON-NLS-1$
 	public final static String COMMENT = PREFIX + "comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, COMMENT, STRING_SINGLE, STRING_DOUBLE,
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, DIRECTIVE, COMMENT, STRING_SINGLE, STRING_DOUBLE,
 			INTERPOLATED };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IYAMLConstants.CONTENT_TYPE_YAML } };
@@ -91,6 +92,8 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				IYAMLConstants.YAML_STRING_DOUBLE_SCOPE));
 		c.addTranslation(new QualifiedContentType(INTERPOLATED), new QualifiedContentType(
 				IYAMLConstants.YAML_INTERPOLATED_STRING_SCOPE));
+		c.addTranslation(new QualifiedContentType(DIRECTIVE), new QualifiedContentType(
+				IYAMLConstants.YAML_DIRECTIVE_SCOPE));
 	}
 
 	public static YAMLSourceConfiguration getDefault()
@@ -104,11 +107,15 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private YAMLSourceConfiguration()
 	{
+		EndOfLineRule directiveRule = new EndOfLineRule("%", new Token(DIRECTIVE)); //$NON-NLS-1$
+		directiveRule.setColumnConstraint(0);
+		
 		partitioningRules = new IPredicateRule[] { 
 				new SingleLineRule("`", "`", new Token(INTERPOLATED), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("'", "'", new Token(STRING_SINGLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new EndOfLineRule("#", new Token(COMMENT)) //$NON-NLS-1$
+				new EndOfLineRule("#", new Token(COMMENT)), //$NON-NLS-1$
+				directiveRule
 		};
 	}
 

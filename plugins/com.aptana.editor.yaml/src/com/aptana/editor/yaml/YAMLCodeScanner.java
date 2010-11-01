@@ -139,7 +139,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 			if (pattern == null)
 			{
 				pattern = Pattern
-						.compile("((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?"); //$NON-NLS-1$
+						.compile("(\\+|-)?((0(x|X|o|O)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?"); //$NON-NLS-1$
 			}
 			return pattern;
 		}
@@ -182,7 +182,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 
 		public boolean isWordPart(char c)
 		{
-			return isWordStart(c) || c == '-' || c == '_';
+			return isWordStart(c) || c == '-' || c == '_' || c == '/' || c == '.';
 		}
 	}
 
@@ -246,7 +246,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	{
 		public boolean isWordStart(char c)
 		{
-			return Character.isDigit(c) || c == '.';
+			return Character.isDigit(c) || c == '.' || c == '-' || c == '+';
 		}
 
 		public boolean isWordPart(char c)
@@ -256,8 +256,8 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 				return true;
 			}
 			c = Character.toLowerCase(c);
-			return c == '+' || c == '-' || c == 'x' || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e'
-					|| c == 'f' || c == 'l' || c == 'u';
+			return c == 'x' || c == 'a' || c == 'b' || c == 'c' || c == 'd' || c == 'e'
+					|| c == 'f' || c == 'l' || c == 'u' || c == 'o';
 		}
 	}
 
