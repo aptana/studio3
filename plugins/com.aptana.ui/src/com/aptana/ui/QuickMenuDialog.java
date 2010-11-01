@@ -83,7 +83,7 @@ public class QuickMenuDialog extends PopupDialog
 
 	private static final String MNEMONICS = "123456789"; //$NON-NLS-1$
 
-	private Table completionsTable;
+	private Table fTable;
 	private List<MenuDialogItem> menuItems = new ArrayList<MenuDialogItem>();
 
 	public QuickMenuDialog(Shell parent)
@@ -138,6 +138,7 @@ public class QuickMenuDialog extends PopupDialog
 
 	protected Color getBackground()
 	{
+		// TODO Use themes for colors?
 		return getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 	}
 
@@ -152,7 +153,7 @@ public class QuickMenuDialog extends PopupDialog
 	private final void createEmptyDialogArea(final Composite parent)
 	{
 		final Label noMatchesLabel = new Label(parent, SWT.NULL);
-		noMatchesLabel.setText("Messages.MenuDialog_NoMatchesFound"); // FIXME This message should be externalized!
+		noMatchesLabel.setText(Messages.QuickMenuDialog_NoMatchesFound);
 		noMatchesLabel.setLayoutData(new GridData(GridData.FILL_BOTH));
 		noMatchesLabel.setBackground(parent.getBackground());
 	}
@@ -170,11 +171,11 @@ public class QuickMenuDialog extends PopupDialog
 	private final void createTableDialogArea(final Composite parent, final List<MenuDialogItem> partialMatches)
 	{
 		// Layout the table.
-		completionsTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
+		fTable = new Table(parent, SWT.FULL_SELECTION | SWT.SINGLE);
 		final GridData gridData = new GridData(GridData.FILL_BOTH);
-		completionsTable.setLayoutData(gridData);
-		completionsTable.setBackground(parent.getBackground());
-		completionsTable.setLinesVisible(false);
+		fTable.setLayoutData(gridData);
+		fTable.setBackground(parent.getBackground());
+		fTable.setLinesVisible(false);
 
 		List<TableColumn> columns = new ArrayList<TableColumn>();
 
@@ -183,30 +184,30 @@ public class QuickMenuDialog extends PopupDialog
 		int index = -1;
 
 		// image, display, insert, tool_tip
-		columns.add(new TableColumn(completionsTable, SWT.LEFT, 0));
-		columns.add(new TableColumn(completionsTable, SWT.LEFT, 1));
-		columns.add(new TableColumn(completionsTable, SWT.CENTER, 2));
+		columns.add(new TableColumn(fTable, SWT.LEFT, 0));
+		columns.add(new TableColumn(fTable, SWT.LEFT, 1));
+		columns.add(new TableColumn(fTable, SWT.CENTER, 2));
 
-		for (MenuDialogItem map : partialMatches)
+		for (MenuDialogItem item : partialMatches)
 		{
 			index++;
-			if (map.isSeparator())
+			if (item.isSeparator())
 			{
 				insertSeparator(3);
 				continue;
 			}
-			final TableItem item = new TableItem(completionsTable, SWT.NULL);
-			Image image = map.getImage();
+			final TableItem tableItem = new TableItem(fTable, SWT.NULL);
+			Image image = item.getImage();
 			if (image != null)
 			{
-				item.setImage(0, image);
+				tableItem.setImage(0, image);
 			}
 
-			item.setText(1, map.getText());
-			item.setData(MNEMONIC, mnemonic); // FIXME This is really off by one, but we expect it to be later. Funky
+			tableItem.setText(1, item.getText());
+			tableItem.setData(MNEMONIC, mnemonic); // FIXME This is really off by one, but we expect it to be later. Funky
 												// code from Sandip. Just use real value maybe?
-			item.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
-			item.setData(INDEX, index);
+			tableItem.setText(2, (mnemonic < MNEMONICS.length() ? String.valueOf(MNEMONICS.charAt(mnemonic++)) : "")); //$NON-NLS-1$
+			tableItem.setData(INDEX, index);
 		}
 
 		Dialog.applyDialogFont(parent);
@@ -220,7 +221,7 @@ public class QuickMenuDialog extends PopupDialog
 		/*
 		 * If you double-click on the table, it should execute the selected command.
 		 */
-		completionsTable.addListener(SWT.DefaultSelection, new Listener()
+		fTable.addListener(SWT.DefaultSelection, new Listener()
 		{
 			public final void handleEvent(final Event event)
 			{
@@ -228,7 +229,7 @@ public class QuickMenuDialog extends PopupDialog
 			}
 		});
 
-		completionsTable.addKeyListener(new KeyListener()
+		fTable.addKeyListener(new KeyListener()
 		{
 			public void keyReleased(KeyEvent e)
 			{
@@ -243,12 +244,12 @@ public class QuickMenuDialog extends PopupDialog
 				int index = MNEMONICS.indexOf(e.character);
 				if (index != -1)
 				{
-					if (index < completionsTable.getItemCount())
+					if (index < fTable.getItemCount())
 					{
 						e.doit = false;
 						// I need to return the index of the item as it was in partialMatches!
 						int returnCode = index;
-						for (TableItem item : completionsTable.getItems())
+						for (TableItem item : fTable.getItems())
 						{
 							Object data = item.getData(MNEMONIC);
 							if (data instanceof Integer)
@@ -271,7 +272,7 @@ public class QuickMenuDialog extends PopupDialog
 		});
 
 		// Don't ever draw separators as selected!
-		completionsTable.addListener(SWT.EraseItem, new Listener()
+		fTable.addListener(SWT.EraseItem, new Listener()
 		{
 
 			public void handleEvent(Event event)
@@ -288,20 +289,20 @@ public class QuickMenuDialog extends PopupDialog
 			}
 		});
 
-		completionsTable.addTraverseListener(new TraverseListener()
+		fTable.addTraverseListener(new TraverseListener()
 		{
 
 			public void keyTraversed(TraverseEvent e)
 			{
-				int selectionIndex = completionsTable.getSelectionIndex();
+				int selectionIndex = fTable.getSelectionIndex();
 				final int initialIndex = selectionIndex;
 				if (e.detail == SWT.TRAVERSE_ARROW_NEXT)
 				{
 					selectionIndex++;
-					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					while (isSeparator(fTable.getItem(selectionIndex)))
 					{
 						selectionIndex++;
-						if (selectionIndex >= completionsTable.getItemCount())
+						if (selectionIndex >= fTable.getItemCount())
 							return;
 					}
 					selectionIndex--;
@@ -309,7 +310,7 @@ public class QuickMenuDialog extends PopupDialog
 				else if (e.detail == SWT.TRAVERSE_ARROW_PREVIOUS)
 				{
 					selectionIndex--;
-					while (isSeparator(completionsTable.getItem(selectionIndex)))
+					while (isSeparator(fTable.getItem(selectionIndex)))
 					{
 						selectionIndex--;
 						if (selectionIndex < 0)
@@ -322,7 +323,7 @@ public class QuickMenuDialog extends PopupDialog
 								@Override
 								public IStatus runInUIThread(IProgressMonitor monitor)
 								{
-									completionsTable.setSelection(initialIndex);
+									fTable.setSelection(initialIndex);
 									return Status.OK_STATUS;
 								}
 							}.schedule();
@@ -337,9 +338,9 @@ public class QuickMenuDialog extends PopupDialog
 					return;
 				}
 
-				if (selectionIndex < completionsTable.getItemCount() && selectionIndex >= 0)
+				if (selectionIndex < fTable.getItemCount() && selectionIndex >= 0)
 				{
-					completionsTable.setSelection(selectionIndex);
+					fTable.setSelection(selectionIndex);
 					e.doit = false;
 				}
 			}
@@ -358,11 +359,11 @@ public class QuickMenuDialog extends PopupDialog
 
 	protected void insertSeparator(int columns)
 	{
-		TableItem item = new TableItem(completionsTable, SWT.NULL);
+		TableItem item = new TableItem(fTable, SWT.NULL);
 		for (int i = 0; i < columns; i++)
 		{
-			TableEditor editor = new TableEditor(completionsTable);
-			Label label = new Label(completionsTable, SWT.SEPARATOR | SWT.HORIZONTAL);
+			TableEditor editor = new TableEditor(fTable);
+			Label label = new Label(fTable, SWT.SEPARATOR | SWT.HORIZONTAL);
 			editor.grabHorizontal = true;
 			editor.setEditor(label, item, i);
 		}
@@ -371,8 +372,8 @@ public class QuickMenuDialog extends PopupDialog
 
 	protected void select()
 	{
-		int index = completionsTable.getSelectionIndex();
-		TableItem item = completionsTable.getItem(index);
+		int index = fTable.getSelectionIndex();
+		TableItem item = fTable.getItem(index);
 		int returnCode = (Integer) item.getData(INDEX);
 		setReturnCode(returnCode);
 		close();

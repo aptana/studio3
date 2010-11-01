@@ -49,6 +49,8 @@ public class Messages extends NLS
     public static String IDialogConstants_LBL_Apply;
     public static String IDialogConstants_LBL_Browse;
 
+	public static String QuickMenuDialog_NoMatchesFound;
+
 	static
 	{
 		// initialize resource bundle
