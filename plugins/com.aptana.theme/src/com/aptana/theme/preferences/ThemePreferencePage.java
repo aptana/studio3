@@ -59,6 +59,8 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.ColorSelector;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextAttribute;
@@ -87,6 +89,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -102,6 +105,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.FontDialog;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -110,6 +115,10 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.themes.ThemeElementHelper;
+import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.scripting.model.BundleManager;
@@ -120,6 +129,7 @@ import com.aptana.theme.Theme;
 import com.aptana.theme.ThemeExporter;
 import com.aptana.theme.ThemePlugin;
 
+@SuppressWarnings("restriction")
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener,
 		IInputValidator, IPropertyChangeListener
 {
@@ -215,6 +225,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private Button fExportButton;
 
+	private Font fFont;
+	private Text fFontText;
+
 	@Override
 	protected Control createContents(Composite parent)
 	{
@@ -222,13 +235,61 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		composite.setLayout(new GridLayout(1, false));
 		composite.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true));
 
-		createThemeListControls(composite);
-		createGlobalColorControls(composite);
-		createTokenEditTable(composite);
+		Group group = new Group(composite, SWT.SHADOW_IN);
+		group.setLayout(new GridLayout(1, false));
+		group.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true));
+
+		createThemeListControls(group);
+		createGlobalColorControls(group);
+		createTokenEditTable(group);
+		createFontArea(composite);
 		createInvasivePrefArea(composite);
 
 		setTheme(getThemeManager().getCurrentTheme().getName());
 		return composite;
+	}
+
+	private void createFontArea(Composite composite)
+	{
+		Composite themesComp = new Composite(composite, SWT.NONE);
+		themesComp.setLayout(new GridLayout(3, false));
+		themesComp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		Label label = new Label(themesComp, SWT.NONE);
+		label.setText(Messages.ThemePreferencePage_FontNameLabel);
+
+		fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+		fFontText = new Text(themesComp, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
+		fFontText.setText(toString(fFont));
+		fFontText.setFont(fFont);
+		fFontText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		Button selectFontButton = new Button(themesComp, SWT.PUSH);
+		selectFontButton.setText(Messages.ThemePreferencePage_SelectFontButtonLabel);
+		selectFontButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				final FontDialog fontDialog = new FontDialog(getShell());
+				fontDialog.setFontList(fFont.getFontData());
+				final FontData data = fontDialog.open();
+				if (data != null)
+				{
+					setFont(new Font(fFont.getDevice(), fontDialog.getFontList()));
+				}
+			}
+		});
+	}
+
+	private static String toString(Font font)
+	{
+		if (font == null || font.getFontData() == null || font.getFontData().length <= 0)
+		{
+			return ""; //$NON-NLS-1$
+		}
+		FontData data = font.getFontData()[0];
+		return MessageFormat.format(Messages.ThemePreferencePage_FontName, data.getName(), data.getHeight());
 	}
 
 	private void createInvasivePrefArea(Composite composite)
@@ -553,12 +614,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public Font getFont(Object element)
 			{
 				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				Font font = token.getValue().getFont();
-				if (font == null)
-					font = JFaceResources.getTextFont();
 				if (token.getValue().getStyle() == 0) // TODO Limit to only checking for bold or italic
-					return font;
-				return lazyFont(font, token.getValue().getStyle());
+					return fFont;
+				return lazyFont(fFont, token.getValue().getStyle());
 			}
 		});
 
@@ -690,7 +748,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Label addTokenLabel = new Label(textField, SWT.RIGHT);
 		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
 
-		fScopeText = new Text(textField, SWT.SINGLE);
+		fScopeText = new Text(textField, SWT.SINGLE | SWT.BORDER);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		fScopeText.setLayoutData(data);
 		fScopeText.setEditable(false);
@@ -916,13 +974,43 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	@Override
 	public boolean performOk()
 	{
+		performOkFonts();
 		getThemeManager().setCurrentTheme(getTheme());
 		return super.performOk();
+	}
+
+	protected void performOkFonts()
+	{
+		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
+				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
+		ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+		String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+		for (String fontId : fontIds)
+		{
+			// Only set new values if they're different from existing!
+			Font existing = JFaceResources.getFont(fontId);
+			String existingString = ""; //$NON-NLS-1$
+			if (!existing.isDisposed())
+			{
+				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+			}
+			if (!existingString.equals(fdString))
+			{
+				// put in registry...
+				JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
+				// Save to prefs...
+				String key = ThemeElementHelper.createPreferenceKey(currentTheme, IThemeManager.VIEW_FONT_NAME);
+				store.setValue(key, fdString);
+			}
+		}
 	}
 
 	@Override
 	protected void performDefaults()
 	{
+		// Reset the font to what it was originally! TODO Grab the original default for TEXT_FONT?
+		setFont(JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME));
 		try
 		{
 			Theme theme = getTheme();
@@ -953,6 +1041,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			fFonts.clear();
 			fFonts = null;
 		}
+		fFont = null;
 		super.dispose();
 	}
 
@@ -1171,5 +1260,22 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			theme.updateCaret(newColor);
 		}
 		setTheme(fSelectedTheme);
+	}
+
+	protected void setFont(Font font)
+	{
+		if (fFont.equals(font)) // TODO Also same if FontData arrays are equal!
+		{
+			return;
+		}
+		fFont = font;
+		fFontText.setFont(fFont);
+		fFontText.setText(ThemePreferencePage.toString(fFont));
+		// Set the fFont on the table!
+		if (fFonts != null)
+		{
+			fFonts.clear();
+		}
+		tableViewer.refresh();
 	}
 }

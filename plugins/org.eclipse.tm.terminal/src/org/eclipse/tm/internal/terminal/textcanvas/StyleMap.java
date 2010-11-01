@@ -45,8 +45,8 @@ public class StyleMap {
 	// TODO propagate the name of the font in the FontRegistry
 	private static final String fDefaultFontName="terminal.views.view.font.definition"; //$NON-NLS-1$
 	String fFontName=fDefaultFontName;
-	Map fColorMapForeground=new HashMap();
-	Map fColorMapBackground=new HashMap();
+	protected Map fColorMapForeground=new HashMap();
+	protected Map fColorMapBackground=new HashMap();
 	Map fFontMap=new HashMap();
 	private Point fCharSize;
 	private final Style fDefaultStyle;
