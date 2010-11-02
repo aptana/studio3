@@ -21,12 +21,6 @@
    <extension
          point="com.aptana.configurations.configurationProcessors">
       <processor
-            category="gems"
-            class="com.aptana.portal.ui.dispatch.configurationProcessors.GemsConfigurationProcessor"
-            id="com.aptana.portal.gems.processor"
-            name="Gems">
-      </processor>
-      <processor
             category="configurations"
             class="com.aptana.portal.ui.dispatch.configurationProcessors.RubyInstallProcessor"
             id="com.aptana.portal.ruby.installer.processor"
@@ -77,23 +71,6 @@
    </extension>
    <extension
          point="com.aptana.portal.ui.browserInteractions">
-      <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.RecentFilesActionController"
-            id="portal.recentFiles"
-            name="Recent Files Action Controller">
-      </actionController>
-      <browserNotification
-            class="com.aptana.portal.ui.dispatch.browserNotifications.RecentFilesBrowserNotification"
-            id="com.aptana.portal.recentFilesNotification"
-            name="Recent Files Notifier"
-            notificationTarget="com.aptana.portal.ui.browser.portal">
-      </browserNotification>
-      <actionController
-            class="com.aptana.portal.ui.dispatch.actionControllers.GemsActionController"
-            configurationProcessor="com.aptana.portal.gems.processor"
-            id="portal.gems"
-            name="Ruby Gems Actions">
-      </actionController>
       <actionController
             class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
             configurationProcessor="com.aptana.portal.versions.processor"

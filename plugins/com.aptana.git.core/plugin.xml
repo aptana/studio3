@@ -23,13 +23,4 @@
             class="com.aptana.git.internal.core.PreferenceInitializer">
       </initializer>
    </extension>
-   <extension
-         point="com.aptana.configurations.configurationProcessors">
-      <delegate
-            class="com.aptana.git.internal.core.delegate.GitVersionDelegate"
-            id="com.aptana.git.version.delegate"
-            name="GitVersion Processor Delegate"
-            targetID="com.aptana.portal.versions.processor">
-      </delegate>
-   </extension>
 </plugin>
