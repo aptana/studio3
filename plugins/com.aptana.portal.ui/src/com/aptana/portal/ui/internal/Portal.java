@@ -89,6 +89,9 @@ public class Portal
 	public static final String ACTIVE_PROJECT_KEY = "activeProject"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpnature"; //$NON-NLS-1$
+	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
+	private static final String PYDEV_NATURE = "org.python.pydev.pythonNature"; //$NON-NLS-1$
+
 	private static Portal instance;
 	private PortalBrowserEditor portalBrowser;
 
@@ -156,8 +159,6 @@ public class Portal
 			return;
 		}
 		final URL finalURL = url;
-		// TODO: Shalom - Put a condition on this startup to not load the portal
-		// when it was already loaded once and the user set up everything needed.
 		Job job = new UIJob("Launching Aptana Portal...") //$NON-NLS-1$
 		{
 			public IStatus runInUIThread(IProgressMonitor monitor)
@@ -333,21 +334,31 @@ public class Portal
 	{
 		if (selectedProject != null)
 		{
-			// R for Rails, P for pydev, W for web, O for other. How do we determine? Check natures?
+			// R for Rails, D for pydev, W for web, P for PHP and O for other.
 			try
 			{
-				// FIXME This id is a constant in the rails plugins...
-				if (selectedProject.hasNature(RAILS_NATURE))
+				if (selectedProject.hasNature(WEB_NATURE))
+				{
+					return 'W';
+				}
+				else if (selectedProject.hasNature(RAILS_NATURE))
+				{
 					return 'R';
+				}
 				else if (selectedProject.hasNature(PHP_NATURE))
+				{
 					return 'P';
+				}
+				else if (selectedProject.hasNature(PYDEV_NATURE))
+				{
+					return 'D';
+				}
 			}
 			catch (CoreException e)
 			{
 				PortalUIPlugin.logError(e);
 			}
 		}
-		// TODO How do we determine if project is "web"? check for HTML/JS/CSS files?
 		return 'O';
 	}
 
