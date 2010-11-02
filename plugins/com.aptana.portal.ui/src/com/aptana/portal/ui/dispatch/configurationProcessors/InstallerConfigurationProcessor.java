@@ -35,7 +35,6 @@
 package com.aptana.portal.ui.dispatch.configurationProcessors;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,11 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -74,7 +70,6 @@ import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
 public abstract class InstallerConfigurationProcessor extends AbstractConfigurationProcessor
 {
 	protected static final String APTANA_PROPERTIES_FILE_NAME = ".aptana"; //$NON-NLS-1$
-	protected static final String WINDOWS_7ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
 	protected static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
 	protected static final String INSTALL_DIR_ATTRIBUTE = "install_dir"; //$NON-NLS-1$
 
@@ -190,11 +185,12 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 	/**
 	 * Extract the given zip file into the target folder on a Windows machine.
 	 * 
-	 * @param zipFile
+	 * @param sfxZip
+	 *            Self extracting 7zip file.
 	 * @param targetFolder
 	 * @return The status of that extraction result.
 	 */
-	public static IStatus extractWin(String zipFile, String targetFolder)
+	public static IStatus extractWin(String sfxZip, String targetFolder)
 	{
 		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
 				Messages.InstallerConfigurationProcessor_unableToExtractZip);
@@ -205,22 +201,20 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 							"Unable to extract the Zip file. A Windows OS extractor was called for a non-Windows platform.", new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
-		if (zipFile == null || targetFolder == null)
+		if (sfxZip == null || targetFolder == null)
 		{
 			PortalUIPlugin.logError("Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
-		IPath zipExecutable = getBundlePath(WINDOWS_7ZIP_EXECUTABLE);
 		File destinationFolder = new File(targetFolder);
 		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
 		{
 			PortalUIPlugin.logError("Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
 			return errorStatus;
 		}
-		ProcessBuilder processBuilder = new ProcessBuilder(zipExecutable.toOSString(), "x", //$NON-NLS-1$
-				"-o" + targetFolder, //$NON-NLS-1$
+		ProcessBuilder processBuilder = new ProcessBuilder(sfxZip, "-o" + targetFolder, //$NON-NLS-1$
 				"-y", //$NON-NLS-1$
-				zipFile);
+				sfxZip);
 		processBuilder.directory(destinationFolder);
 		processBuilder.redirectErrorStream(true);
 		String output = null;
@@ -309,30 +303,5 @@ public abstract class InstallerConfigurationProcessor extends AbstractConfigurat
 		{
 			cacheVersion(installDir, urls[0], getApplicationName());
 		}
-	}
-
-	/*
-	 * Returns an IPath from the given portable string.
-	 */
-	private static IPath getBundlePath(String path)
-	{
-		URL url = FileLocator.find(PortalUIPlugin.getDefault().getBundle(), Path.fromPortableString(path), null);
-		if (url != null)
-		{
-			try
-			{
-				url = FileLocator.toFileURL(url);
-				File file = new File(url.getPath());
-				if (file.exists())
-				{
-					return Path.fromOSString(file.getAbsolutePath());
-				}
-			}
-			catch (IOException e)
-			{
-				PortalUIPlugin.logError(e);
-			}
-		}
-		return null;
 	}
 }

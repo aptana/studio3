@@ -128,10 +128,11 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			}
 
 			// Check that we got the expected two install URLs
-			if (urls.length != 2)
+			// TODO - Once we place DevKit back again, this should hold a value of 2 URLs.
+			if (urls.length != 1)
 			{
 				// structure error
-				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { RUBY, 2,
+				String err = NLS.bind(Messages.InstallProcessor_wrongNumberOfInstallLinks, new Object[] { RUBY, 1,
 						urls.length });
 				applyErrorAttributes(err);
 				PortalUIPlugin.logError(new Exception(err));
@@ -198,7 +199,7 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 	 */
 	protected IStatus install(IProgressMonitor progressMonitor)
 	{
-		if (downloadedPaths == null || downloadedPaths[0] == null || downloadedPaths[1] == null)
+		if (downloadedPaths == null || downloadedPaths[0] == null)
 		{
 			String failureMessge = Messages.InstallProcessor_couldNotLocateInstaller;
 			if (downloadedPaths != null && downloadedPaths[0] != null)
@@ -253,20 +254,22 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 			{
 				return status;
 			}
-			PortalUIPlugin.logInfo(
-					"Successfully installed Ruby into " + installDir[0] + ". Starting to install DevKit...", null); //$NON-NLS-1$ //$NON-NLS-2$
+			PortalUIPlugin.logInfo("Successfully installed Ruby into " + installDir[0], null); //$NON-NLS-1$
 			// Ruby was installed successfully. Now we need to extract DevKit into the Ruby dir and change its
 			// configurations to match the installation location.
-			status = installDevKit(installDir[0]);
-			if (!status.isOK())
-			{
-				displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, status
-						.getMessage());
-				return status;
-			}
+
+			// TODO - We need to fix the DevKit installation. The DevKit team changed their installation way recently...
+
+			// status = installDevKit(installDir[0]);
+			// if (!status.isOK())
+			// {
+			// displayMessageInUIThread(MessageDialog.ERROR, Messages.InstallProcessor_installationErrorTitle, status
+			// .getMessage());
+			// return status;
+			// }
 			finalizeInstallation(installDir[0]);
-			PortalUIPlugin.logInfo(
-					"Successfully installed DevKit into " + installDir[0] + ". Ruby installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
+			// PortalUIPlugin.logInfo(
+			//					"Successfully installed DevKit into " + installDir[0] + ". Ruby installation completed.", null); //$NON-NLS-1$ //$NON-NLS-2$
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -369,12 +372,13 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 	 * Extract the downloaded DevKit into the install dir and configure it to work.<br>
 	 * At this stage, we assume that the install dir and the DevKit package have been verified and valid!
 	 * 
-	 * @param installDir
+	 * @param dir
 	 * @return The result status of the installation
 	 * @throws Exception
 	 */
-	protected IStatus installDevKit(final String installDir)
+	protected IStatus installDevKit(String dir)
 	{
+		final String installDir = dir + File.separatorChar + "DevKit"; //$NON-NLS-1$
 		Job job = new Job(NLS.bind(Messages.InstallProcessor_installingTaskName, DEVKIT))
 		{
 			@Override
@@ -464,12 +468,14 @@ public class RubyInstallProcessor extends InstallerConfigurationProcessor
 		File propertiesFile = new File(installDir, APTANA_PROPERTIES_FILE_NAME);
 		Properties properties = new Properties();
 		properties.put("ruby_install", urls[0]); //$NON-NLS-1$
-		properties.put("devkit_install", urls[1]); //$NON-NLS-1$
+		// TODO - Uncomment this once we have DevKit back
+		// properties.put("devkit_install", urls[1]); //$NON-NLS-1$
 		FileOutputStream fileOutputStream = null;
 		try
 		{
 			fileOutputStream = new FileOutputStream(propertiesFile);
-			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment, "Ruby & DevKit")); //$NON-NLS-1$
+			properties.store(fileOutputStream, NLS.bind(Messages.InstallProcessor_aptanaInstallationComment,
+					"Ruby & DevKit")); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{

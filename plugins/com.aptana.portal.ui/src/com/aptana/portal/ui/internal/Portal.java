@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -78,11 +77,12 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	//	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
-	//	private static final String BASE_REMOTE_URL = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
-	// for debugging, do NOT check in with these uncommented:
-	public static final String BASE_URL_PREFIX = Platform.inDevelopmentMode() ? System.getProperty(
-			"toolboxURL", "http://localhost:3000/toolbox") : "http://localhost:3000/toolbox"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	public static final String BASE_URL_PREFIX = "http://173.45.232.197/toolbox"; //$NON-NLS-1$
+
+	// Note: 173.45.232.197 is the staging site
+	// For debugging, do NOT check in with these uncommented:
+	// public static final String BASE_URL_PREFIX = Platform.inDevelopmentMode() ? System.getProperty(
+	//			"toolboxURL", "http://localhost:3000/toolbox") : "http://173.45.232.197/toolbox"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	private static final String BASE_REMOTE_URL = BASE_URL_PREFIX;
 	private static final String BASE_LOCAL_URL = "/content/index.html"; //$NON-NLS-1$
 
