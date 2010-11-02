@@ -43,6 +43,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.progress.UIJob;
@@ -66,7 +67,7 @@ public class BrowserNotifier
 	private static final String NOTIFICATION_PATTERN = "eventsDispatcher.notify(''{0}'');"; //$NON-NLS-1$
 	private static final String DATA_PATTERN_PREFIX = '\"' + IBrowserNotificationConstants.EVENT_DATA + "\":"; //$NON-NLS-1$
 	private static BrowserNotifier instance = null;
-	private HashMap<String, BrowserWrapper> browsers;
+	private Map<String, BrowserWrapper> browsers;
 
 	// Private constructor
 	private BrowserNotifier()
@@ -167,7 +168,6 @@ public class BrowserNotifier
 		return json;
 	}
 
-
 	/**
 	 * Returns a JSON error notification.<br>
 	 * The returned JSON string will be in this form:
@@ -199,7 +199,7 @@ public class BrowserNotifier
 		}
 		return json;
 	}
-	
+
 	/**
 	 * Create a notification string that can be executed in a Browser.execute command later on.<br>
 	 * This notification will be in a form of:
