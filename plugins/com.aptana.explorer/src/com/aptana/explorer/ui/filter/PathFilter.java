@@ -48,6 +48,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.index.core.Index;
@@ -75,7 +76,6 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 	private IResource filterResource;
 	protected Pattern regexp;
 
-	private String fFilterLocationMinusExtension;
 	private String fFilterResourceURI;
 
 	protected String patternString;
@@ -242,15 +242,15 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		{
 			// Memoize the location/location URI because it's expensive to grab
 			String resourceURI = null;
-			String resourceLocationMinusExtension = null;
+			String filterResourceLocation = filterResource.getLocation().toPortableString();
+			String resourceLocation = resource.getLocation().toPortableString();
 			for (QueryResult result : queryResults)
 			{
 				String includedFile = result.getWord();
 				// check if the 'resource' includes 'filteredResource'
-				if (getFilterResourceLocationMinusExtension().endsWith(includedFile))
+				if (includedFile.endsWith(URLEncoder.encode(filterResourceLocation, null, null)))
 				{
 					// OK, we've established that filteredResource is included by the result.documents
-
 					// check if the documents contains 'resource'
 					for (String document : result.getDocuments())
 					{
@@ -267,13 +267,8 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 				else
 				{
 					// Check if the current 'resource' is included by 'filteredResource'
-					if (resourceLocationMinusExtension == null)
-					{
-						resourceLocationMinusExtension = resource.getLocation().removeFileExtension()
-								.toPortableString();
-					}
 					// Something includes our current 'resource'
-					if (resourceLocationMinusExtension.endsWith(includedFile))
+					if (includedFile.endsWith(URLEncoder.encode(resourceLocation, null, null)))
 					{
 						// See if one of the documents is the one we're filtering on, if so include this resource
 						for (String document : result.getDocuments())
@@ -297,15 +292,6 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 			fFilterResourceURI = filterResource.getLocationURI().toString();
 		}
 		return fFilterResourceURI;
-	}
-
-	private String getFilterResourceLocationMinusExtension()
-	{
-		if (fFilterLocationMinusExtension == null)
-		{
-			fFilterLocationMinusExtension = filterResource.getLocation().removeFileExtension().toPortableString();
-		}
-		return fFilterLocationMinusExtension;
 	}
 
 	/**
@@ -366,7 +352,6 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		{
 			queryResults = null;
 		}
-		fFilterLocationMinusExtension = null;
 		fFilterResourceURI = null;
 		if (resource == null)
 		{
