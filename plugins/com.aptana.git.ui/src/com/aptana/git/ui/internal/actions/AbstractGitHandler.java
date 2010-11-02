@@ -15,18 +15,18 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
+import com.aptana.ui.UIUtils;
 
 abstract class AbstractGitHandler extends AbstractHandler
 {
@@ -40,10 +40,15 @@ abstract class AbstractGitHandler extends AbstractHandler
 
 			public void run()
 			{
-				MessageDialog.openError(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
-						Messages.CommitAction_MultipleRepos_Title, Messages.CommitAction_MultipleRepos_Message);
+				MessageDialog.openError(getShell(), Messages.CommitAction_MultipleRepos_Title,
+						Messages.CommitAction_MultipleRepos_Message);
 			}
 		});
+	}
+
+	protected Shell getShell()
+	{
+		return UIUtils.getActiveShell();
 	}
 
 	@Override
@@ -78,17 +83,7 @@ abstract class AbstractGitHandler extends AbstractHandler
 
 	protected IWorkbenchPage getActivePage()
 	{
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench == null)
-		{
-			return null;
-		}
-		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-		if (window == null)
-		{
-			return null;
-		}
-		return window.getActivePage();
+		return UIUtils.getActivePage();
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException

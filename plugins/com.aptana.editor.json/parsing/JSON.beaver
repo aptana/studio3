@@ -151,9 +151,9 @@ Entries
     ;
 
 Entry
-    =   PROPERTY.p COLON Value.v
+    =   PROPERTY.p COLON.c Value.v
         {:
-            JSONEntryNode entry = new JSONEntryNode();
+            JSONEntryNode entry = new JSONEntryNode(c);
             JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
 
             property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());

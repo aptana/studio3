@@ -32,22 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.git.ui.internal.dialogs;
+package com.aptana.editor.json.preferences;
 
-import org.eclipse.osgi.util.NLS;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 
-public class Messages extends NLS
+/**
+ * JSONFormatterModifyDialog
+ */
+public class JSONFormatterModifyDialog extends FormatterModifyDialog
 {
-	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.dialogs.messages"; //$NON-NLS-1$
-	public static String BranchDialog_msg;
-	public static String BranchDialog_title;
-	static
+	/**
+	 * Constructs a new HTMLFormatterModifyDialog
+	 * 
+	 * @param dialogOwner
+	 * @param formatterFactory
+	 */
+	public JSONFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		super(dialogOwner, formatterFactory);
 	}
 
-	private Messages()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.ui.preferences.FormatterModifyDialog#addPages()
+	 */
+	protected void addPages()
 	{
+		addTabPage(Messages.JSONFormatterModifyDialog_indentation_page_tab_name, new JSONFormatWhitespacePage(this));
 	}
 }

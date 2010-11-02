@@ -171,10 +171,6 @@ public class CoreIOPlugin extends Plugin
 
 	public static void clearConnectionContext(Object key)
 	{
-		ConnectionContext context = getDefault().connectionContexts.get(key);
-		if (context != null) {
-			context.clear();
-		}
 		getDefault().connectionContexts.remove(key);
 	}
 

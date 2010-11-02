@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: YAML Editor Tests
+Bundle-SymbolicName: com.aptana.editor.yaml.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: Aptana, Inc.
+Fragment-Host: com.aptana.editor.yaml;bundle-version="3.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit,
+ org.eclipse.test.performance,
+ com.aptana.core;bundle-version="3.0.0"
+Export-Package: com.aptana.editor.yaml.tests

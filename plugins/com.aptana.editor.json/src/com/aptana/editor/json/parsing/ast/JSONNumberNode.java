@@ -53,6 +53,16 @@ public class JSONNumberNode extends JSONNode
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.json.parsing.ast.JSONNode#accept(com.aptana.editor.json.parsing.ast.JSONTreeWalker)
+	 */
+	@Override
+	public void accept(JSONTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getText()
 	 */
 	public String getText()
