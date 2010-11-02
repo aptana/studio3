@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.configurations.ConfigurationsPlugin;
+import com.aptana.core.util.StringUtil;
 
 /**
  * A registry class for the configuration processors that were loaded to the configurationProcessors extension point.
@@ -163,17 +164,17 @@ public class ConfigurationProcessorsRegistry
 		if (isProcessor || isDelegate)
 		{
 			String id = element.getAttribute(ATT_ID);
-			if (id == null || id.length() == 0)
+			if (StringUtil.isEmpty(id))
 			{
 				return;
 			}
 			String name = element.getAttribute(ATT_NAME);
-			if (name == null || name.length() == 0)
+			if (StringUtil.isEmpty(name))
 			{
 				return;
 			}
 			String clazz = element.getAttribute(ATT_CLASS);
-			if (clazz == null || clazz.length() == 0)
+			if (StringUtil.isEmpty(clazz))
 			{
 				return;
 			}
