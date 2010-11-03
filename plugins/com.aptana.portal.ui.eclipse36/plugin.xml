@@ -7,7 +7,7 @@
             category="plugins"
             class="com.aptana.portal.ui.eclipse36.dispatch.configurationProcessors.PluginsConfigurationProcessor"
             id="com.aptana.portal.plugins36.processor"
-            name="Plugins">
+            name="%plugins_processor_name">
       </processor>
    </extension>
    <extension
@@ -16,7 +16,7 @@
             class="com.aptana.portal.ui.dispatch.actionControllers.PluginsActionController"
             configurationProcessor="com.aptana.portal.plugins36.processor"
             id="portal.plugins"
-            name="Plugins Actions">
+            name="%plugin_actions_name">
       </actionController>
    </extension>
 </plugin>
