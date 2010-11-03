@@ -80,6 +80,7 @@ public class Activator extends AbstractUIPlugin {
 				ServerConfigurationManager.getInstance().loadState(getStateLocation().append(location));
 			}
 		}
+		PreviewManager.getInstance().init();
 	}
 
 	/*

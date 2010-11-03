@@ -178,8 +178,6 @@ public final class PreviewManager {
 				}
 			}
 		};
-
-		addPartListener();
 	}
 
 	public static PreviewManager getInstance() {
@@ -187,6 +185,10 @@ public final class PreviewManager {
 			instance = new PreviewManager();
 		}
 		return instance;
+	}
+
+	public void init() {
+		addPartListener();
 	}
 
 	public void dispose() {
