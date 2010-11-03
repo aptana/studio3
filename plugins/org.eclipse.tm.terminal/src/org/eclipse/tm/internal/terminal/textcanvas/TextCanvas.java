@@ -27,11 +27,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
@@ -220,11 +223,25 @@ public class TextCanvas extends GridCanvas {
 				fCellCanvasModel.setSelection(p.y, fDraggingStart.y, p.x, fDraggingStart.x);
 			} else {
 				fCellCanvasModel.setSelection(fDraggingStart.y, p.y, fDraggingStart.x, p.x);
-
 			}
+			setClipboardContent(DND.SELECTION_CLIPBOARD);
 		}
 	}
-
+	
+	private void setClipboardContent(int clipboardType) throws SWTError {
+		if (!(Platform.WS_GTK.equals(Platform.getWS()) || Platform.WS_MOTIF.equals(Platform.getWS()))) {
+			return;
+		}
+		String text = fCellCanvasModel.getSelectedText();
+		if (text != null) {
+			Object[] data = new Object[]{ text };
+			Transfer[] types = new Transfer[]{ TextTransfer.getInstance() };
+			Clipboard clipboard = new Clipboard(getDisplay());
+			clipboard.setContents(data, types, clipboardType);
+			clipboard.dispose();
+		}
+	}
+	
 	int compare(Point p1, Point p2) {
 		if (p1.equals(p2))
 			return 0;

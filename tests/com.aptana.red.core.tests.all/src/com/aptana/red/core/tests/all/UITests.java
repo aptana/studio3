@@ -59,6 +59,7 @@ public class UITests
 		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
 		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.yaml.tests.AllTests.suite());
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui

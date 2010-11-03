@@ -64,6 +64,17 @@ public class JSONNode extends ParseNode
 		this._type = type;
 	}
 
+	/**
+	 * accept
+	 * 
+	 * @param walker
+	 */
+	public void accept(JSONTreeWalker walker)
+	{
+		// sub-classes must override this method so their types will be
+		// recognized properly
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()

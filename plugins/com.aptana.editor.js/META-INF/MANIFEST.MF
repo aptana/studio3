@@ -25,5 +25,6 @@ Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist.index,
  com.aptana.editor.js.outline,
  com.aptana.editor.js.parsing,
- com.aptana.editor.js.parsing.ast
+ com.aptana.editor.js.parsing.ast,
+ com.aptana.editor.js.sdoc.parsing
 Eclipse-ExtensibleAPI: true

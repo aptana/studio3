@@ -426,7 +426,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					}
 					if (context != null) {
 						Calendar cal = Calendar.getInstance();
-						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET)+cal.get(Calendar.DST_OFFSET) - serverTimeZoneShift);
+						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET)/*+cal.get(Calendar.DST_OFFSET)*/ - serverTimeZoneShift);
 						context.put(ConnectionContext.SERVER_TIMEZONE, TimeZone.getAvailableIDs(rawOffset));
 					}
 				} 

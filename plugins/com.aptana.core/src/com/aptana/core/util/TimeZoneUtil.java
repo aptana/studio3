@@ -35,12 +35,24 @@
 
 package com.aptana.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Max Stepanov
  *
  */
 public final class TimeZoneUtil {
 
+	private static final List<String> commonTimeZones = new ArrayList<String>();
+	
+	static {
+		commonTimeZones.add("EST"); //$NON-NLS-1$
+		commonTimeZones.add("CST"); //$NON-NLS-1$
+		commonTimeZones.add("MST"); //$NON-NLS-1$
+		commonTimeZones.add("PST"); //$NON-NLS-1$
+	}
+	
 	/**
 	 * 
 	 */
@@ -48,6 +60,11 @@ public final class TimeZoneUtil {
 	}
 	
 	public static String getCommonTimeZone(String[] timezones) {
+		for (String i : timezones) {
+			if (commonTimeZones.contains(i)) {
+				return i;
+			}
+		}
 		for (String i : timezones) {
 			if (i.startsWith("GMT")) { //$NON-NLS-1$
 				return i;

@@ -46,8 +46,10 @@ public class Messages extends NLS
 	public static String UIPlugin_UpdateWarning_Title;
 	public static String UIUtils_Error;
 
-    public static String IDialogConstants_LBL_Apply;
-    public static String IDialogConstants_LBL_Browse;
+	public static String IDialogConstants_LBL_Apply;
+	public static String IDialogConstants_LBL_Browse;
+
+	public static String QuickMenuDialog_NoMatchesFound;
 
 	static
 	{

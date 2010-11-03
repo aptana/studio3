@@ -37,6 +37,7 @@ package com.aptana.scripting.ui;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
@@ -54,51 +55,7 @@ import com.aptana.theme.extensions.ConsoleThemePageParticipant;
 public class ScriptingConsole
 {
 	private static final String CONSOLE_ICON_PATH = "icons/console.png"; //$NON-NLS-1$
-
 	private static ScriptingConsole INSTANCE;
-	private MessageConsole console;
-	private MessageConsoleStream outputConsoleStream;
-	private MessageConsoleStream errorConsoleStream;
-	private MessageConsoleStream infoConsoleStream;
-	private MessageConsoleStream warningConsoleStream;
-	private MessageConsoleStream traceConsoleStream;
-
-	/**
-	 * Singleton: private constructor
-	 */
-	private ScriptingConsole()
-	{
-		if (console == null)
-		{
-			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin
-					.getImageDescriptor(CONSOLE_ICON_PATH));
-
-			// create message streams
-			outputConsoleStream = console.newMessageStream();
-			errorConsoleStream = console.newMessageStream();
-			infoConsoleStream = console.newMessageStream();
-			warningConsoleStream = console.newMessageStream();
-			traceConsoleStream = console.newMessageStream();
-
-			// bring console into view when errors occur
-			errorConsoleStream.setActivateOnWrite(true);
-
-			HashMap<MessageConsoleStream, String> themeConsoleStreamToColor = new HashMap<MessageConsoleStream, String>();
-			themeConsoleStreamToColor.put(outputConsoleStream, ConsoleThemer.CONSOLE_OUTPUT);
-			themeConsoleStreamToColor.put(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
-			themeConsoleStreamToColor.put(infoConsoleStream, ConsoleThemer.CONSOLE_INFO);
-			themeConsoleStreamToColor.put(warningConsoleStream, ConsoleThemer.CONSOLE_WARNING);
-			themeConsoleStreamToColor.put(traceConsoleStream, ConsoleThemer.CONSOLE_TRACE);
-
-			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
-			// following the theme.
-			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE,
-					themeConsoleStreamToColor);
-
-			// register our console with Eclipse
-			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
-		}
-	}
 
 	/**
 	 * Return the singleton instance of ScriptConsole. Should be called on UI thread.
@@ -117,6 +74,52 @@ public class ScriptingConsole
 		return INSTANCE;
 	}
 
+	private MessageConsole console;
+	private MessageConsoleStream outputConsoleStream;
+	private MessageConsoleStream errorConsoleStream;
+	private MessageConsoleStream infoConsoleStream;
+	private MessageConsoleStream warningConsoleStream;
+	private MessageConsoleStream traceConsoleStream;
+	private Map<MessageConsoleStream, String> streamColorMap;
+
+	/**
+	 * Singleton: private constructor
+	 */
+	private ScriptingConsole()
+	{
+		if (console == null)
+		{
+			// NOTE: We use this odd logic with the getters to cover a case that
+			// occurs when a console stream gets wrapped in a RubyIO object for
+			// scripting purposes. When the RubyIO object gets GC'ed, the stream
+			// is closed. When we get a stream, we detect if it is closed and
+			// create a new one, transfer the old color and font settings, and
+			// update the stream color map for later themeing
+			
+			// create our scripting console so the getters can create streams
+			// from it
+			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+
+			// create the message stream color map so the getters can populate
+			// it
+			streamColorMap = new HashMap<MessageConsoleStream, String>();
+			
+			// make sure message streams exist so we can apply themes to them.
+			getOutputConsoleStream();
+			getErrorConsoleStream();
+			getInfoConsoleStream();
+			getWarningConsoleStream();
+			getTraceConsoleStream();
+
+			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
+			// following the theme.
+			console.setAttribute(ConsoleThemePageParticipant.THEME_CONSOLE_STREAM_TO_COLOR_ATTRIBUTE, streamColorMap);
+
+			// register our console with Eclipse
+			ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { console });
+		}
+	}
+
 	/**
 	 * addListeners
 	 */
@@ -126,12 +129,54 @@ public class ScriptingConsole
 	}
 
 	/**
+	 * getConsoleStream
+	 * 
+	 * @param currentStream
+	 * @param colorKey
+	 * @return
+	 */
+	MessageConsoleStream getConsoleStream(MessageConsoleStream currentStream, String colorKey)
+	{
+		if (currentStream == null || currentStream.isClosed())
+		{
+			// remove obsolete reference
+			if (currentStream != null)
+			{
+				streamColorMap.remove(currentStream);
+			}
+
+			// create a new stream to take the place of the old one
+			MessageConsoleStream newStream = console.newMessageStream();
+
+			// add in new reference
+			streamColorMap.put(newStream, colorKey);
+
+			// transfer current font and color settings, if possible
+			if (currentStream != null)
+			{
+				newStream.setColor(currentStream.getColor());
+				newStream.setFontStyle(currentStream.getFontStyle());
+			}
+
+			// return the new console
+			currentStream = newStream;
+		}
+
+		return currentStream;
+	}
+
+	/**
 	 * getErrorConsoleStream
 	 * 
 	 * @return
 	 */
 	MessageConsoleStream getErrorConsoleStream()
 	{
+		errorConsoleStream = getConsoleStream(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
+		
+		// bring console into view when errors occur
+		errorConsoleStream.setActivateOnWrite(true);
+		
 		return errorConsoleStream;
 	}
 
@@ -142,7 +187,7 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getInfoConsoleStream()
 	{
-		return infoConsoleStream;
+		return infoConsoleStream = getConsoleStream(infoConsoleStream, ConsoleThemer.CONSOLE_INFO);
 	}
 
 	/**
@@ -152,7 +197,7 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getOutputConsoleStream()
 	{
-		return outputConsoleStream;
+		return outputConsoleStream = getConsoleStream(outputConsoleStream, ConsoleThemer.CONSOLE_OUTPUT);
 	}
 
 	/**
@@ -162,7 +207,7 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getTraceConsoleStream()
 	{
-		return traceConsoleStream;
+		return traceConsoleStream = getConsoleStream(traceConsoleStream, ConsoleThemer.CONSOLE_TRACE);
 	}
 
 	/**
@@ -172,7 +217,7 @@ public class ScriptingConsole
 	 */
 	MessageConsoleStream getWarningConsoleStream()
 	{
-		return warningConsoleStream;
+		return warningConsoleStream = getConsoleStream(warningConsoleStream, ConsoleThemer.CONSOLE_WARNING);
 	}
 
 	/**
@@ -226,5 +271,4 @@ public class ScriptingConsole
 			}
 		});
 	}
-
 }
