@@ -230,7 +230,7 @@ public class PortalUIPlugin extends AbstractUIPlugin
 
 	public static void logInfo(String string, Throwable t)
 	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string, t));
+		log(new Status(IStatus.INFO, PLUGIN_ID, string, t));
 	}
 
 	public static void logError(Throwable t)
@@ -240,11 +240,16 @@ public class PortalUIPlugin extends AbstractUIPlugin
 
 	public static void logError(String string, Throwable t)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
+		log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
 	}
 
 	public static void logWarning(String message)
 	{
-		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+		log(new Status(IStatus.WARNING, PLUGIN_ID, message));
+	}
+	
+	public static void log(IStatus status)
+	{
+		getDefault().getLog().log(status);
 	}
 }

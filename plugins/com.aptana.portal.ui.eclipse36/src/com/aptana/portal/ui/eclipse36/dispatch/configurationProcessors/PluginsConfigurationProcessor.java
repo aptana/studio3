@@ -246,18 +246,7 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		{
 			return;
 		}
-		/*
-		 * QueryableMetadataRepositoryManager queryableManager = new QueryableMetadataRepositoryManager(provisioningUI,
-		 * false) {
-		 * @Override protected Collection<URI> getRepoLocations(IRepositoryManager manager) { List<URI> result = new
-		 * ArrayList<URI>(1); try { result.add(new URI(updateSite)); } catch (URISyntaxException e) {
-		 * PortalUIPlugin.logError(e); } return result; } };
-		 */
-
-		// InstallWizard wizard = new InstallWizard(generateNonManipulatingRepoPolicy(), profileId, toInstall, null,
-		// queryableManager);
 		InstallOperation op = new InstallOperation(provisioningUI.getSession(), toInstall);
-		// op.setProfileId(provisioningUI.getProfileId());
 		provisioningUI.openInstallWizard(toInstall, op, null);
 	}
 
@@ -275,8 +264,6 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 				try
 				{
 					URI siteURL = new URI(updateSite);
-					// IMetadataRepositoryManager manager = (IMetadataRepositoryManager) ServiceHelper.getService(
-					// PortalUIPlugin.getContext(), IMetadataRepositoryManager.class.getName());
 					IMetadataRepository repo = provisioningUI.loadMetadataRepository(siteURL, true,
 							new NullProgressMonitor());
 					if (repo == null)
@@ -284,10 +271,6 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 						throw new ProvisionException(Messages.PluginsConfigurationProcessor_metadataRepoNotFound
 								+ siteURL);
 					}
-					// if (!manager.isEnabled(siteURL))
-					// {
-					// manager.setEnabled(siteURL, true);
-					// }
 					sub.worked(1);
 					IArtifactRepositoryManager artifactManager = (IArtifactRepositoryManager) provisioningUI
 							.getSession().getProvisioningAgent().getService(IArtifactRepositoryManager.SERVICE_NAME);
@@ -351,21 +334,4 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		}
 		return units;
 	}
-
-	/**
-	 * Generates a copy of the default policy but removes the ability to manipulate repos, so that that portion of
-	 * Install Wizard UI doesn't show and mess up our installation process!
-	 * 
-	 * @return
-	 */
-	/*
-	 * TODO : Check if this is needed in the 3.6 environment private Policy generateNonManipulatingRepoPolicy() { Policy
-	 * newPolicy = new Policy(); newPolicy.setLicenseManager(Policy.getDefault().getLicenseManager());
-	 * newPolicy.setPlanValidator(Policy.getDefault().getPlanValidator());
-	 * newPolicy.setProfileChooser(Policy.getDefault().getProfileChooser());
-	 * newPolicy.setQueryContext(Policy.getDefault().getQueryContext());
-	 * newPolicy.setQueryProvider(Policy.getDefault().getQueryProvider()); newPolicy.setRepositoryManipulator(null);
-	 * return newPolicy; }
-	 */
-
 }

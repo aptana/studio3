@@ -118,7 +118,7 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		if (!loadingStatus.isOK())
 		{
 			applyErrorAttributes(loadingStatus.getMessage());
-			PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
+			PortalUIPlugin.log(loadingStatus);
 			return configurationStatus;
 		}
 
