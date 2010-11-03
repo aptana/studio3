@@ -170,7 +170,7 @@ public final class PreviewManager {
 					}
 					if (editorPart != null) {
 						try {
-							openPreview(editorPart, editorPart.getEditorInput(), null);
+							openPreview(editorPart, editorPart.getEditorInput(), null, false);
 						} catch (CoreException e) {
 							Activator.log(e);
 						}
@@ -238,6 +238,10 @@ public final class PreviewManager {
 	}
 
 	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
+		openPreview(editorPart, editorInput, content, true);
+	}
+
+	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
 		String fileName = null;
 		IProject project = null;
 		IPath path = null;
@@ -274,13 +278,13 @@ public final class PreviewManager {
 			previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
 		}
 		if (previewConfig != null) {
-			showEditor(editorPart, sourceConfig, previewConfig);
+			showEditor(editorPart, sourceConfig, previewConfig, forceOpen);
 		} else {
 			// TODO: add some user notification
 		}
 	}
 
-	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig) throws CoreException {
+	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig, boolean forceOpen) throws CoreException {
 		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage workbenchPage = null;
 		if (workbenchWindow != null) {
@@ -308,7 +312,7 @@ public final class PreviewManager {
 				for (IEditorPart previewEditorPart : openedPreviewEditors) {
 					previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
 				}				
-			} else {
+			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
 			}
 		}
