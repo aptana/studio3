@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.xml,
  com.aptana.parsing,
  beaver,
- com.aptana.theme
+ com.aptana.theme,
+ com.aptana.preview;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

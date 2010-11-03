@@ -51,6 +51,7 @@ import com.aptana.preview.server.ServerConfigurationManager;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("deprecation")
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
@@ -67,10 +68,7 @@ public class Activator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -86,13 +84,11 @@ public class Activator extends AbstractUIPlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-	 * )
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
 	 */
 	public void stop(BundleContext context) throws Exception {
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
+		PreviewManager.getInstance().dispose();
 		plugin = null;
 		super.stop(context);
 	}

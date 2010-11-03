@@ -35,6 +35,8 @@
 
 package com.aptana.preview;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -47,12 +49,16 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -74,25 +80,106 @@ public final class PreviewManager {
 
 	private static PreviewManager instance;
 	private IPropertyListener editorPropertyListener;
-	private WeakHashMap<IEditorPart, PreviewEditorInput> trackedEditors = new WeakHashMap<IEditorPart, PreviewEditorInput>();
+	private Map<IEditorPart, PreviewEditorInput> trackedEditors = new WeakHashMap<IEditorPart, PreviewEditorInput>();
+
+	private IPartListener editorPartListener = new IPartListener()
+	{
+
+		public void partActivated(IWorkbenchPart part)
+		{
+		}
+
+		public void partBroughtToTop(IWorkbenchPart part)
+		{
+		}
+
+		public void partClosed(IWorkbenchPart part)
+		{
+			if (part instanceof IEditorPart)
+			{
+				part.removePropertyListener(editorPropertyListener);
+			}
+		}
+
+		public void partDeactivated(IWorkbenchPart part)
+		{
+		}
+
+		public void partOpened(IWorkbenchPart part)
+		{
+			if (part instanceof IEditorPart)
+			{
+				part.addPropertyListener(editorPropertyListener);
+			}
+		}
+	};
+
+	private final IWindowListener windowListener = new IWindowListener()
+	{
+
+		public void windowActivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowClosed(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(editorPartListener);
+			}
+		}
+
+		public void windowDeactivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowOpened(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.addPartListener(editorPartListener);
+			}
+		}
+	};
 
 	/**
 	 * 
 	 */
 	private PreviewManager() {
 		editorPropertyListener = new IPropertyListener() {
+
 			public void propertyChanged(Object source, int propId) {
 				if (source instanceof IEditorPart && EditorPart.PROP_DIRTY == propId
-						&& !((EditorPart) source).isDirty() && trackedEditors.containsKey(source)) {
-					IEditorPart editorPart = (IEditorPart) source;
-					try {
-						openPreview(editorPart, editorPart.getEditorInput(), null);
-					} catch (CoreException e) {
-						Activator.log(e);
+						&& !((EditorPart) source).isDirty()) {
+					IEditorPart editorPart = null;
+					if (trackedEditors.containsKey(source)) {
+						editorPart = (IEditorPart) source;
+					} else {
+						Set<IEditorPart> editors = trackedEditors.keySet();
+						for (IEditorPart editor : editors) {
+							if (editor instanceof IPreviewableEditor
+									&& ((IPreviewableEditor) editor).updatePreviewWhenChanged((IEditorPart) source)) {
+								editorPart = editor;
+								// TODO: what if multiple editors in the tracked list need to update?
+								// Need a way to know which editor the Preview editor is currently previewing against
+								break;
+							}
+						}
+					}
+					if (editorPart != null) {
+						try {
+							openPreview(editorPart, editorPart.getEditorInput(), null);
+						} catch (CoreException e) {
+							Activator.log(e);
+						}
 					}
 				}
 			}
 		};
+
+		addPartListener();
 	}
 
 	public static PreviewManager getInstance() {
@@ -100,6 +187,10 @@ public final class PreviewManager {
 			instance = new PreviewManager();
 		}
 		return instance;
+	}
+
+	public void dispose() {
+		removePartListener();
 	}
 
 	public void openPreviewForEditor(IEditorPart editorPart) {
@@ -227,4 +318,31 @@ public final class PreviewManager {
 		}
 	}
 
+	private void addPartListener() {
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows) {
+			partService = window.getPartService();
+			if (partService != null) {
+				partService.addPartListener(editorPartListener);
+			}
+		}
+		// Listen on any future windows
+		PlatformUI.getWorkbench().addWindowListener(windowListener);
+	}
+
+	private void removePartListener()
+	{
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
+		{
+			partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(editorPartListener);
+			}
+		}
+		PlatformUI.getWorkbench().removeWindowListener(windowListener);
+	}
 }
