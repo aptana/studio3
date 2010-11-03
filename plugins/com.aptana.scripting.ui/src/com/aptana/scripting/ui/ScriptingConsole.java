@@ -89,24 +89,27 @@ public class ScriptingConsole
 	{
 		if (console == null)
 		{
+			// NOTE: We use this odd logic with the getters to cover a case that
+			// occurs when a console stream gets wrapped in a RubyIO object for
+			// scripting purposes. When the RubyIO object gets GC'ed, the stream
+			// is closed. When we get a stream, we detect if it is closed and
+			// create a new one, transfer the old color and font settings, and
+			// update the stream color map for later themeing
+			
+			// create our scripting console so the getters can create streams
+			// from it
 			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
-			// create message streams
-			outputConsoleStream = console.newMessageStream();
-			errorConsoleStream = console.newMessageStream();
-			infoConsoleStream = console.newMessageStream();
-			warningConsoleStream = console.newMessageStream();
-			traceConsoleStream = console.newMessageStream();
-
-			// bring console into view when errors occur
-			errorConsoleStream.setActivateOnWrite(true);
-
+			// create the message stream color map so the getters can populate
+			// it
 			streamColorMap = new HashMap<MessageConsoleStream, String>();
-			streamColorMap.put(outputConsoleStream, ConsoleThemer.CONSOLE_OUTPUT);
-			streamColorMap.put(errorConsoleStream, ConsoleThemer.CONSOLE_ERROR);
-			streamColorMap.put(infoConsoleStream, ConsoleThemer.CONSOLE_INFO);
-			streamColorMap.put(warningConsoleStream, ConsoleThemer.CONSOLE_WARNING);
-			streamColorMap.put(traceConsoleStream, ConsoleThemer.CONSOLE_TRACE);
+			
+			// make sure message streams exist so we can apply themes to them.
+			getOutputConsoleStream();
+			getErrorConsoleStream();
+			getInfoConsoleStream();
+			getWarningConsoleStream();
+			getTraceConsoleStream();
 
 			// Will be used later on by the ConsoleThemePageParticipant to properly set the colors
 			// following the theme.
