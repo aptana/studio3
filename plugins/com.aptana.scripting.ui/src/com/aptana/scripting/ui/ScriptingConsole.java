@@ -137,13 +137,16 @@ public class ScriptingConsole
 		if (currentStream == null || currentStream.isClosed())
 		{
 			// remove obsolete reference
-			streamColorMap.remove(currentStream);
+			if (currentStream != null)
+			{
+				streamColorMap.remove(currentStream);
+			}
 
 			// create a new stream to take the place of the old one
 			MessageConsoleStream newStream = console.newMessageStream();
 
 			// add in new reference
-			streamColorMap.put(currentStream, colorKey);
+			streamColorMap.put(newStream, colorKey);
 
 			// transfer current font and color settings, if possible
 			if (currentStream != null)
