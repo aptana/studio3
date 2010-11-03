@@ -77,7 +77,8 @@ BOOL InitConsoleHandler(void)
 	hMonitorThreadExitEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	hMonitorThread = ::CreateThread(NULL, 0, MonitorThreadProc, 0, 0, NULL);
 	if ( hMonitorThread != NULL ) {
-		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_HIGHEST);
+		::SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_TIME_CRITICAL);
 		::SwitchToThread();
 	}
 
@@ -566,7 +567,7 @@ static void ReadConsoleBuffer()
 		}
 	} else
 	{
-		if( csbiConsole.srWindow.Top < csbiNextConsole.srWindow.Top )
+		while( csbiConsole.srWindow.Top < csbiNextConsole.srWindow.Top )
 		{
 			SMALL_RECT srPrevBuffer;
 			srPrevBuffer.Top = csbiConsole.srWindow.Top;
@@ -577,6 +578,9 @@ static void ReadConsoleBuffer()
 			ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize);
 			MoveCursor(coordConsoleSize.X-1, coordConsoleSize.Y-1);
 			SHORT nRows = csbiNextConsole.srWindow.Top - csbiConsole.srWindow.Top;
+			if( nRows > coordConsoleSize.Y ) {
+				nRows = coordConsoleSize.Y;
+			}
 			for( SHORT i = 0; i < nRows; ++i) {
 				OutputString("\r\n");
 			}
@@ -591,7 +595,8 @@ static void ReadConsoleBuffer()
 					lpCharInfo->Attributes = DEFAULT_ATTRIBUTES;
 				}
 			}
-			csbiConsole.srWindow = csbiNextConsole.srWindow;
+			csbiConsole.srWindow.Top += nRows;
+			csbiConsole.srWindow.Bottom += nRows;
 		}
 
 		SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srBuffer, lpNextScreenBuffer);
