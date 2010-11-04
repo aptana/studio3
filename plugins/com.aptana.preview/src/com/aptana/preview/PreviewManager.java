@@ -82,63 +82,48 @@ public final class PreviewManager {
 	private IPropertyListener editorPropertyListener;
 	private Map<IEditorPart, PreviewEditorInput> trackedEditors = new WeakHashMap<IEditorPart, PreviewEditorInput>();
 
-	private IPartListener editorPartListener = new IPartListener()
-	{
+	private IPartListener editorPartListener = new IPartListener() {
 
-		public void partActivated(IWorkbenchPart part)
-		{
+		public void partActivated(IWorkbenchPart part) {
 		}
 
-		public void partBroughtToTop(IWorkbenchPart part)
-		{
+		public void partBroughtToTop(IWorkbenchPart part) {
 		}
 
-		public void partClosed(IWorkbenchPart part)
-		{
-			if (part instanceof IEditorPart)
-			{
+		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
 				part.removePropertyListener(editorPropertyListener);
 			}
 		}
 
-		public void partDeactivated(IWorkbenchPart part)
-		{
+		public void partDeactivated(IWorkbenchPart part) {
 		}
 
-		public void partOpened(IWorkbenchPart part)
-		{
-			if (part instanceof IEditorPart)
-			{
+		public void partOpened(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
 				part.addPropertyListener(editorPropertyListener);
 			}
 		}
 	};
 
-	private final IWindowListener windowListener = new IWindowListener()
-	{
+	private final IWindowListener windowListener = new IWindowListener() {
 
-		public void windowActivated(IWorkbenchWindow window)
-		{
+		public void windowActivated(IWorkbenchWindow window) {
 		}
 
-		public void windowClosed(IWorkbenchWindow window)
-		{
+		public void windowClosed(IWorkbenchWindow window) {
 			IPartService partService = window.getPartService();
-			if (partService != null)
-			{
+			if (partService != null) {
 				partService.removePartListener(editorPartListener);
 			}
 		}
 
-		public void windowDeactivated(IWorkbenchWindow window)
-		{
+		public void windowDeactivated(IWorkbenchWindow window) {
 		}
 
-		public void windowOpened(IWorkbenchWindow window)
-		{
+		public void windowOpened(IWorkbenchWindow window) {
 			IPartService partService = window.getPartService();
-			if (partService != null)
-			{
+			if (partService != null) {
 				partService.addPartListener(editorPartListener);
 			}
 		}
@@ -238,12 +223,33 @@ public final class PreviewManager {
 			Activator.log(e);
 		}
 	}
+	
+	public boolean testEditorInputForPreview(IEditorInput editorInput) {
+		try {
+			SourceConfig sourceConfig = getSourceConfig(editorInput, null);
+			if (sourceConfig != null) {
+				IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
+				if (handler == null) {
+					if (DefaultPreviewHandler.getInstance().handle(sourceConfig) != null) {
+						return true;
+					}
+				} else {
+					// TODO: use IPreviewHandler.canHandle() ?
+					return true;
+				}
+				
+			}
+		} catch (CoreException e) {
+			Activator.log(e);
+		}
+		return false;
+	}
 
 	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
 		openPreview(editorPart, editorInput, content, true);
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
+	private SourceConfig getSourceConfig(IEditorInput editorInput, String content) throws CoreException {
 		String fileName = null;
 		IProject project = null;
 		IPath path = null;
@@ -263,21 +269,28 @@ public final class PreviewManager {
 		} else if (editorInput instanceof IURIEditorInput) {
 
 		} else if (editorInput instanceof PreviewEditorInput) {
-			return;
+			return null;
 		}
 		if (fileName == null) {
-			return;
+			return null;
 		}
 		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-		IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(contentType);
-		if (handler == null) {
-			handler = DefaultPreviewHandler.getInstance();
-		}
-		SourceConfig sourceConfig = new SourceConfig(editorInput, project, project != null ? workspacePath : path,
-				content);
-		PreviewConfig previewConfig = handler.handle(sourceConfig);
-		if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
-			previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+		return new SourceConfig(editorInput, project,
+				project != null ? workspacePath : path, content, contentType);
+	}
+
+	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
+		SourceConfig sourceConfig = getSourceConfig(editorInput, content);
+		PreviewConfig previewConfig = null;
+		if (sourceConfig != null) {
+			IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
+			if (handler == null) {
+				handler = DefaultPreviewHandler.getInstance();
+			}
+			previewConfig = handler.handle(sourceConfig);
+			if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
+				previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+			}
 		}
 		if (previewConfig != null) {
 			showEditor(editorPart, sourceConfig, previewConfig, forceOpen);
