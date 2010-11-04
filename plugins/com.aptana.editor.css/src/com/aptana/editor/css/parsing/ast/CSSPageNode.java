@@ -42,14 +42,14 @@ import com.aptana.parsing.ast.IParseNode;
 public class CSSPageNode extends CSSNode
 {
 
-	private String fPageSelector;
+	private CSSPageSelectorNode fPageSelector;
 
 	public CSSPageNode(int start, int end)
 	{
 		this(null, null, start, end);
 	}
 
-	public CSSPageNode(String pageSelector, int start, int end)
+	public CSSPageNode(CSSPageSelectorNode pageSelector, int start, int end)
 	{
 		this(pageSelector, null, start, end);
 	}
@@ -60,7 +60,7 @@ public class CSSPageNode extends CSSNode
 	}
 
 	@SuppressWarnings("unchecked")
-	public CSSPageNode(String pageSelector, Object declarations, int start, int end)
+	public CSSPageNode(CSSPageSelectorNode pageSelector, Object declarations, int start, int end)
 	{
 		super(CSSNodeTypes.PAGE, start, end);
 		fPageSelector = pageSelector;
@@ -75,7 +75,7 @@ public class CSSPageNode extends CSSNode
 		}
 	}
 
-	public String getSelector()
+	public CSSPageSelectorNode getSelector()
 	{
 		return fPageSelector;
 	}
