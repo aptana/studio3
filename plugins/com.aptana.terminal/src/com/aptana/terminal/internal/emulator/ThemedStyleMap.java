@@ -71,7 +71,7 @@ import com.aptana.theme.ThemePlugin;
 		}
 		boolean isForeground = map == fColorMapForeground;
 		if (StyleMap.BLACK.equals(colorName)) {
-			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
+			return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
 		}
 		if (StyleMap.WHITE.equals(colorName)) {
 			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
