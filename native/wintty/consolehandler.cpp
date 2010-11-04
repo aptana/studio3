@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 #include "stdafx.h"
 #include "consolehandler.h"
@@ -244,7 +278,7 @@ static void EraseWindow()
 static void ScrollWindow(BOOL bUp)
 {
 	if( bUp ) {
-		OutputString("\x1B[D");
+		OutputString("\x1B[L");
 	} else {
 		OutputString("\x1B[M");
 	}
@@ -489,6 +523,13 @@ static void ReadConsoleBuffer()
 	{
 		// refresh screen
 		if( lpPrevScreenBuffer != NULL ) {
+			SHORT nRowsDiff = (csbiConsole.srWindow.Bottom - csbiConsole.srWindow.Top + 1) - coordConsoleSize.Y;
+			if( (nRowsDiff > 0) && (csbiNextConsole.srWindow.Top != 0) && (csbiConsole.srWindow.Top == 0) ) {
+				MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+				for( SHORT i = 0; i < nRowsDiff; ++i) {
+					OutputString("\r\n");
+				}
+			}
 			EraseWindow();
 			MoveCursorAbs(0, 0);
 		}
@@ -576,7 +617,7 @@ static void ReadConsoleBuffer()
 			srPrevBuffer.Right = csbiConsole.srWindow.Right;
 			SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srPrevBuffer, lpNextScreenBuffer);
 			ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize);
-			MoveCursor(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+			MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
 			SHORT nRows = csbiNextConsole.srWindow.Top - csbiConsole.srWindow.Top;
 			if( nRows > coordConsoleSize.Y ) {
 				nRows = coordConsoleSize.Y;
@@ -745,12 +786,24 @@ static void SetConsoleSize(SHORT width, SHORT height)
 
 	SMALL_RECT srConsoleRect = csbi.srWindow;
 	srConsoleRect.Right = srConsoleRect.Left + width - 1;
-	if( (srConsoleRect.Bottom - srConsoleRect.Top + 1 < height)
-		|| (srConsoleRect.Top == 0)
-		|| (srConsoleRect.Bottom + 1 < height) ) {
-		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // increase bottom
-	} else {
+	BOOL bAdjustTop = TRUE;
+	if( srConsoleRect.Bottom - srConsoleRect.Top + 1 < height ) { // height increase
+		if( srConsoleRect.Bottom + 1 <= height ) { // if close to top, adjust top then adjust bottom
+			srConsoleRect.Top = 0;
+			bAdjustTop = FALSE;
+		}
+	} else { // height decrease
+		if( csbi.dwCursorPosition.Y <= srConsoleRect.Top + height - 1 ) { // cursor is inside adjusted area, adjust bottom
+			bAdjustTop = FALSE;
+		} else { // cursor is outside, adjust bottom to cursor then adjust top
+			srConsoleRect.Bottom = csbi.dwCursorPosition.Y;
+		}
+	}
+
+	if( bAdjustTop ) {
 		srConsoleRect.Top = srConsoleRect.Bottom - height + 1; // move top
+	} else {
+		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // move bottom
 	}
 
 	COORD finalCoordBufferSize = csbi.dwSize;

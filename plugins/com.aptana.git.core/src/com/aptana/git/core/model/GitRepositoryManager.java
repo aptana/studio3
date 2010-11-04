@@ -35,7 +35,6 @@
 package com.aptana.git.core.model;
 
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +62,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	private static final String GIT_DIR = GitRepository.GIT_DIR;
 
 	private Set<IGitRepositoriesListener> listeners = new HashSet<IGitRepositoriesListener>();
-	private Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
+	private Map<String, GitRepository> cachedRepos = new HashMap<String, GitRepository>(3);
 
 	public void addListener(IGitRepositoriesListener listener)
 	{
@@ -83,14 +82,18 @@ public class GitRepositoryManager implements IGitRepositoryManager
 
 	public void cleanup()
 	{
+		synchronized (listeners)
+		{
+			listeners.clear();
+		}
+
 		synchronized (cachedRepos)
 		{
-			for (SoftReference<GitRepository> reference : cachedRepos.values())
+			for (GitRepository reference : cachedRepos.values())
 			{
-				if (reference == null || reference.get() == null)
+				if (reference == null)
 					continue;
-				GitRepository cachedRepo = reference.get();
-				cachedRepo.dispose();
+				reference.dispose();
 			}
 			cachedRepos.clear();
 		}
@@ -129,12 +132,11 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			cachedRepos.remove(p.getLocationURI().getPath());
 
 			// Only dispose if there's no other projects attached to same repo!
-			for (SoftReference<GitRepository> ref : cachedRepos.values())
+			for (GitRepository ref : cachedRepos.values())
 			{
-				if (ref == null || ref.get() == null)
+				if (ref == null)
 					continue;
-				GitRepository other = ref.get();
-				if (other.equals(repo))
+				if (ref.equals(repo))
 				{
 					dispose = false;
 					break;
@@ -171,41 +173,36 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
 			return null;
 
-		SoftReference<GitRepository> ref;
 		synchronized (cachedRepos)
 		{
-			ref = cachedRepos.get(path.getPath());
-		}
-		if (ref == null || ref.get() == null)
-		{
+			GitRepository ref = cachedRepos.get(path.getPath());
+			if (ref != null)
+			{
+				return ref;
+			}
+
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
+
 			// Check to see if any cached repo has the same git dir
-			synchronized (cachedRepos)
+			for (GitRepository reference : cachedRepos.values())
 			{
-				for (SoftReference<GitRepository> reference : cachedRepos.values())
+				if (reference == null)
+					continue;
+				if (reference.getFileURL().getPath().equals(gitDirURL.getPath()))
 				{
-					if (reference == null || reference.get() == null)
-						continue;
-					GitRepository cachedRepo = reference.get();
-					if (cachedRepo.getFileURL().getPath().equals(gitDirURL.getPath()))
-					{
-						// Same git dir, so cache under our new path as well
-						cachedRepos.put(path.getPath(), reference);
-						return cachedRepo;
-					}
+					// Same git dir, so cache under our new path as well
+					cachedRepos.put(path.getPath(), reference);
+					return reference;
 				}
 			}
+
 			// no cache for this repo or any repo sharing same git dir
-			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
-			synchronized (cachedRepos)
-			{
-				cachedRepos.put(path.getPath(), ref);
-			}
+			ref = new GitRepository(gitDirURL);
+			cachedRepos.put(path.getPath(), ref);
+			return ref;
 		}
-		// TODO What if the underlying .git dir was wiped while we still had the object cached?
-		return ref.get();
 	}
 
 	public GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
@@ -251,8 +248,12 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (!repositoryPath.toFile().exists())
 			return null;
 
-		if (isBareRepository(repositoryPath))
-			return repositoryURL;
+		// handle the most common case of .git under the url first, since the processes are slow
+		File gitDir = repositoryPath.append(GIT_DIR).toFile();
+		if (gitDir.isDirectory())
+		{
+			return gitDir.toURI();
+		}
 
 		// Use rev-parse to find the .git dir for the repository being opened
 		Map<Integer, String> result = GitExecutable.instance()
@@ -271,12 +272,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			return new File(newPath).toURI();
 
 		return null;
-	}
-
-	private boolean isBareRepository(IPath path)
-	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
-		return "true".equals(output); //$NON-NLS-1$
 	}
 
 	public void addListenerToEachRepository(IGitRepositoryListener listener)

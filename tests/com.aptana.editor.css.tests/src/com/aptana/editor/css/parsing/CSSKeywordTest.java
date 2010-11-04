@@ -63,6 +63,18 @@ public class CSSKeywordTest extends CSSTokensTest
 		assertToken("@charsets", CSSTokenType.AT_RULE, 0, 9); //$NON-NLS-1$
 	}
 
+	public void testFontFaceKeyword()
+	{
+		assertToken("@font-face", CSSTokenType.FONTFACE, 0, 10); //$NON-NLS-1$
+		assertToken("@font-faces", CSSTokenType.AT_RULE, 0, 11); //$NON-NLS-1$
+	}
+
+	public void testNamespaceKeyword()
+	{
+		assertToken("@namespace", CSSTokenType.NAMESPACE, 0, 10); //$NON-NLS-1$
+		assertToken("@namespaces", CSSTokenType.AT_RULE, 0, 11); //$NON-NLS-1$
+	}
+
 	public void testUrlKeyword()
 	{
 		assertToken("url(test.css)", CSSTokenType.URL, 0, 13); //$NON-NLS-1$

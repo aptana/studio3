@@ -12,7 +12,7 @@
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.lexer.IRange";
 
-%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, LPAREN;
+%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, FONTFACE, NAMESPACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
@@ -112,6 +112,8 @@ Statement
 	|	Import
 	|	Media
 	|	Page
+	|	FontFace
+	|	Namespace
 	|	AtRule
 	|	Rule
 	;
@@ -156,11 +158,33 @@ Page
 		:}
 	|	PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r
 		{:
-			return new CSSPageNode(s, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), p.getStart(), r.getEnd());
 		:}
 	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
 		{:
-			return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), d.value, p.getStart(), r.getEnd());
+		:}
+	;
+
+FontFace
+	=	FONTFACE.f LCURLY RCURLY.r
+		{:
+			return new CSSFontFaceNode(f.getStart(), r.getEnd());
+		:}
+	|	FONTFACE.f LCURLY Declarations.d RCURLY.r
+		{:
+			return new CSSFontFaceNode(f.getStart(), d.value, r.getEnd());
+		:}
+	;
+
+Namespace
+	=	NAMESPACE.n ImportWord.w SEMICOLON.e
+		{:
+			return new CSSNamespaceNode(n.getStart(), w, e.getEnd());
+		:}
+	|	NAMESPACE.n IDENTIFIER.i ImportWord.w SEMICOLON.e
+		{:
+			return new CSSNamespaceNode(n.getStart(), i, w, e.getEnd());
 		:}
 	;
 

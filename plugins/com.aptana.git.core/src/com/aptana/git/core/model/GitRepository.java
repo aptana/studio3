@@ -36,6 +36,8 @@ package com.aptana.git.core.model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -70,6 +72,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
@@ -79,6 +82,10 @@ import com.aptana.git.core.model.GitRef.TYPE;
 public class GitRepository
 {
 
+	/**
+	 * File used to associate SHAs and refs when git pack-refs has been used.
+	 */
+	private static final String PACKED_REFS = "packed-refs"; //$NON-NLS-1$
 	/**
 	 * The file used
 	 */
@@ -96,7 +103,7 @@ public class GitRepository
 	 * A file created when we hit merge conflicts that need to be manually resolved.
 	 */
 	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
-	private static final String HEAD = "HEAD"; //$NON-NLS-1$
+	static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -571,16 +578,6 @@ public class GitRepository
 		this.currentBranch = addBranch(headRef());
 	}
 
-	protected String parseReference(String parent)
-	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse", //$NON-NLS-1$
-				"--verify", parent); //$NON-NLS-1$
-		int exitValue = result.keySet().iterator().next();
-		if (exitValue != 0)
-			return null;
-		return result.values().iterator().next();
-	}
-
 	private boolean reloadRefs()
 	{
 		_headRef = null;
@@ -874,17 +871,56 @@ public class GitRepository
 	 */
 	private GitRef remoteTrackingBranch(String branchName)
 	{
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
-				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (output == null || output.trim().length() == 0)
+		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
+		// TODO Store the config contents and only read it again when last mod changes?
+		File configFile = gitFile("config");
+		String contents = "";
+		try
 		{
-			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there...
-			// See http://kernel.org/pub/software/scm/git/docs/git-pull.html#REMOTES
-			// Git will look in a few places and assume use of remote defined
+			contents = IOUtil.read(new FileInputStream(configFile));
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName);
+		if (index == -1)
+		{
 			return null;
 		}
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
+		int precedingBracket = contents.lastIndexOf('[', index);
+		if (precedingBracket == -1)
+		{
+			precedingBracket = 0;
+		}
+		int trailingBracket = contents.indexOf('[', index);
+		if (trailingBracket == -1)
+		{
+			trailingBracket = contents.length();
+		}
+		String branchDetails = contents.substring(precedingBracket, trailingBracket);
+		String remoteBranchName = null;
+		String remoteName = "origin";
+		String[] lines = branchDetails.split("\\r?\\n|\\r");
+		for (String line : lines)
+		{
+			line = line.trim();
+			if (line.startsWith("remote = "))
+			{
+				remoteName = line.substring(9);
+			}
+			else if (line.startsWith("[branch \""))
+			{
+				remoteBranchName = line.substring(9, line.length() - 2);
+			}
+		}
+		if (remoteBranchName == null)
+		{
+			return null;
+		}
+		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteName + "/" + remoteBranchName); //$NON-NLS-1$
 	}
 
 	/**
@@ -1221,5 +1257,43 @@ public class GitRepository
 	public IFile getFileForChangedFile(ChangedFile file)
 	{
 		return index().getResourceForChangedFile(file);
+	}
+
+	/**
+	 * Attempts to resolve the ref to it's SHA. takes in something like refs/heads/master or refs/remotes/origin/master
+	 * and returns it's SHA. Checks for the refs/* file and failing that looks in packed-refs. If this fails, it will
+	 * return the ref's original string (i.e. refs/heads/master)
+	 * 
+	 * @param ref
+	 * @return
+	 */
+	public String toSHA(GitRef ref)
+	{
+		File sha1File = gitFile(ref.ref());
+		// If the file doesn't exist, it's inside packed-refs!
+		try
+		{
+			if (!sha1File.isFile())
+			{
+				File packedRefs = gitFile(PACKED_REFS);
+				String packedRefContents = IOUtil.read(new FileInputStream(packedRefs));
+				// each line is 40 char sha, space, ref name
+				int index = packedRefContents.indexOf(ref.ref());
+				if (index != -1)
+				{
+					return new String(packedRefContents.substring(index - 41, index - 1));
+				}
+			}
+			else
+			{
+				return IOUtil.read(new FileInputStream(sha1File));
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			// ignore
+			e.printStackTrace();
+		}
+		return ref.ref();
 	}
 }

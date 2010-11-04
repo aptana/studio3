@@ -217,7 +217,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
 					currentTheme.getForeground());
 			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
-			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable")));
+			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND",
+					StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable")));
 		}
 		if (monitor.isCanceled())
 		{
@@ -574,6 +575,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
 		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
+		setGitAndMercurialValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+
 		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
 		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
 
@@ -665,6 +668,95 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		catch (BackingStoreException e)
 		{
 			ThemePlugin.logError(e);
+		}
+	}
+
+	private void setGitAndMercurialValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
+	{
+		if (prefs == null)
+			return;
+		if (revertToDefaults)
+		{
+			// EGit colors
+			prefs.remove("org.eclipse.egit.ui.UncommittedChangeBackgroundColor");
+			prefs.remove("org.eclipse.egit.ui.UncommittedChangeForegroundColor");
+
+			// Mercurial colors
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor");
+
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor");
+
+		}
+		else
+		{
+			TextAttribute changedFile = theme.getTextAttribute("markup.changed"); //$NON-NLS-1$
+			TextAttribute addedFile = theme.getTextAttribute("markup.inserted"); //$NON-NLS-1$
+			TextAttribute deletedFile = theme.getTextAttribute("markup.deleted"); //$NON-NLS-1$
+			TextAttribute conflictFile = theme.getTextAttribute("invalid"); //$NON-NLS-1$
+
+			// FIXME Grab colors from GitColors class, which should be moved to theme plugin and called something like
+			// SCMColors or added to Theme class
+
+			// EGit colors
+			// TODO do we walso need to override font?
+			prefs.put("org.eclipse.egit.ui.UncommittedChangeForegroundColor",
+					StringConverter.asString(addedFile.getForeground().getRGB()));
+			prefs.put("org.eclipse.egit.ui.UncommittedChangeBackgroundColor",
+					StringConverter.asString(addedFile.getBackground().getRGB()));
+
+			// Mercurial colors
+			// TODO Do we also need to override fonts?
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor",
+					StringConverter.asString(addedFile.getForeground().getRGB()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor",
+					StringConverter.asString(addedFile.getBackground().getRGB()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor",
+					StringConverter.asString(changedFile.getForeground().getRGB()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor",
+					StringConverter.asString(changedFile.getBackground().getRGB()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor",
+					StringConverter.asString(deletedFile.getForeground().getRGB()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor",
+					StringConverter.asString(deletedFile.getBackground().getRGB()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor",
+					StringConverter.asString(deletedFile.getForeground().getRGB()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor",
+					StringConverter.asString(deletedFile.getBackground().getRGB()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor",
+					StringConverter.asString(theme.getForeground()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor",
+					StringConverter.asString(theme.getBackground()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor",
+					StringConverter.asString(conflictFile.getForeground().getRGB()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor",
+					StringConverter.asString(conflictFile.getBackground().getRGB()));
+
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor",
+					StringConverter.asString(theme.getForeground()));
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor",
+					StringConverter.asString(theme.getBackground()));
 		}
 	}
 

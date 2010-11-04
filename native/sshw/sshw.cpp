@@ -31,8 +31,6 @@
  * plugin containing this source file.
  * 
  * Any modifications to this file must keep this entire header intact.
- *
- * sshw.cpp : Defines the entry point for the console application.
  */
 
 #include "stdafx.h"
