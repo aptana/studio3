@@ -136,4 +136,47 @@ public class AbstractFormatterNodeBuilder
 	{
 		return new FormatterTextNode(document, startIndex, endIndex);
 	}
+
+	/**
+	 * Try to locate the given char by traversing backwards on the given document from the start offset.<br>
+	 * In case no match is located, the original start offset is returned.
+	 * 
+	 * @param document
+	 * @param c
+	 * @param start
+	 * @return The char offset, and if not found - the original start offset.
+	 */
+	public int locateCharBackward(FormatterDocument document, char c, int start)
+	{
+		for (int offset = start; offset >= 0; offset--)
+		{
+			if (document.charAt(offset) == c)
+			{
+				return offset;
+			}
+		}
+		return start;
+	}
+
+	/**
+	 * Try to locate the given char by traversing forward on the given document from the start offset.<br>
+	 * In case no match is located, the original start offset is returned.
+	 * 
+	 * @param document
+	 * @param c
+	 * @param start
+	 * @return The char offset, and if not found - the original start offset.
+	 */
+	public int locateCharForward(FormatterDocument document, char c, int start)
+	{
+		int length = document.getLength();
+		for (int offset = start; offset < length; offset++)
+		{
+			if (document.charAt(offset) == c)
+			{
+				return offset;
+			}
+		}
+		return start;
+	}
 }

@@ -43,6 +43,8 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.parsing.HTMLParser;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -127,10 +129,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		return indent;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
-	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
 	{
 		if (!ScriptFormatterManager.hasFormatterFor(getMainContentType()))
@@ -139,12 +137,22 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		}
 		String input = source.substring(offset, offset + length);
 		IParser parser = checkoutParser();
-		IParseState parseState = new HTMLParseState();
-		parseState.setEditState(input, null, 0, 0);
+		String mainContentType = getMainContentType();
+		if (!(parser instanceof HTMLParser))
+		{
+			// Check it back in and request a specific HTML parser.
+			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
+			// HTNLParser (like PHPParser).
+			checkinParser(parser, mainContentType);
+			mainContentType = IHTMLParserConstants.LANGUAGE;
+			parser = checkoutParser(mainContentType);
+		}
 		try
 		{
+			IParseState parseState = new HTMLParseState();
+			parseState.setEditState(input, null, 0, 0);
 			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
+			checkinParser(parser, mainContentType);
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel);
