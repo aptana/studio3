@@ -44,6 +44,12 @@ public class Messages extends NLS // NO_UCD
 	public static String ConnectionPointManager_CategoryUnknown; // NO_UCD
 	public static String ConnectionPointManager_FailedStoreConnectionProperties; // NO_UCD
 
+	public static String LockUtils_failedToLock;
+
+	public static String LockUtils_failedToWrite;
+
+	public static String LockUtils_seeErrorLog;
+
 	static
 	{
 		// initialize resource bundle

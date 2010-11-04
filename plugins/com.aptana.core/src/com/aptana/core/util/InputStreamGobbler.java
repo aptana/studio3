@@ -1,3 +1,5 @@
+package com.aptana.core.util;
+
 /**
  * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
@@ -32,7 +34,6 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.internal;
 
 import java.io.BufferedReader;
 import java.io.IOException;

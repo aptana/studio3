@@ -1,0 +1,134 @@
+body {
+    font-family:"Lucida Sans","Lucida Grande",Helvetica, Arial, Verdana, sans-serif;
+    font-size:12px;
+    letter-spacing:-0.5px;
+}
+
+/**
+ *-----------------------------------------------------------------------
+ * TYPOGRAPHY
+ *-----------------------------------------------------------------------
+ */
+ 
+a {
+    color:#888888;
+    text-decoration:none;
+}
+
+a:hover {
+    color:#f56d21;
+}
+
+a:visited {
+    color:#65436f;
+}
+
+h1 {
+    font-size:24px;
+}
+
+h2 {
+    font-size:18px;
+    font-weight:bold;
+}
+
+h3 {
+    color:#000;
+    font-size:16px;
+}
+
+h4 {
+    color:#878b95;
+    font-size:12px;
+}
+
+h5 {
+    color:#878b95;
+    font-size:11px;
+}
+
+p {
+    font-size:12px;
+    line-height:19px;
+}
+
+h1 + h4,
+h2 + h4,
+h3 + h5 {
+    margin-top:2px;
+}
+
+h4 + p {
+    margin-top:12px;
+}
+
+h5 + p {
+    margin-top:6px;
+}
+
+p strong {
+    font-weight:bold;
+    display:block;
+    line-height:16px;
+    margin-bottom:4px;
+}
+
+/**
+ *-----------------------------------------------------------------------
+ * HEADER
+ *-----------------------------------------------------------------------
+ */
+
+#header{
+    background:url('../images/page-header-bg.png') repeat-x top left #2d323e;
+    height:58px;
+    text-align:center;
+    overflow:hidden;
+    width:100%;
+}
+
+#header .logo {
+    float:left;   
+}
+
+#header .page-title {
+    margin-left:-108px;
+}
+
+
+/**
+ *-----------------------------------------------------------------------
+ * BODY
+ *-----------------------------------------------------------------------
+ */
+
+#body,
+#detail {
+    margin:100px auto;
+    padding:20px 0;
+    width:573px;
+    border:1px solid #e3e4e5;
+}
+
+#body ul.cols,
+#detail ul.cols {
+    overflow:hidden;
+    width:100%;
+}
+
+#body ul.cols li.left,
+#body ul.cols li.right,
+#detail ul.cols li.left,
+#detail ul.cols li.right{
+    float:left;
+    overflow:hidden;
+}
+
+#reload {
+    padding-right:10px;
+    padding-left:16px;
+    padding-top:2px;
+    float:right;
+    background:url('../images/arrow-rotate-clockwise.png');
+    background-repeat:no-repeat;
+}

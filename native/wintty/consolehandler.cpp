@@ -63,7 +63,6 @@ static CHAR_INFO* lpPrevScreenBuffer = NULL;
 static CHAR_INFO* lpNextScreenBuffer = NULL;
 static DWORD dwBufferMemorySize = 0;
 static DWORD dwScreenBufferSize = 0;
-static BOOL bSizeChangeInProgress = FALSE;
 
 #define COLOR_MASK (COMMON_LVB_REVERSE_VIDEO|COMMON_LVB_UNDERSCORE|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED|BACKGROUND_INTENSITY)
 #define DEFAULT_ATTRIBUTES (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)
@@ -502,9 +501,6 @@ static void ReadConsoleBuffer()
 	COORD coordBufferSize;
 	SMALL_RECT srBuffer;
 	
-	if( bSizeChangeInProgress ) {
-		return;
-	}
 	::ResetEvent(hConsoleOut);
 	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	coordConsoleSize.X = csbiNextConsole.dwSize.X; //csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
@@ -779,7 +775,6 @@ static void SendConsoleKey(WORD key)
 
 static void SetConsoleSize(SHORT width, SHORT height)
 {
-	bSizeChangeInProgress = TRUE;
 	HANDLE hConsole = ::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -792,12 +787,19 @@ static void SetConsoleSize(SHORT width, SHORT height)
 	SMALL_RECT srConsoleRect = csbi.srWindow;
 	srConsoleRect.Right = srConsoleRect.Left + width - 1;
 	BOOL bAdjustTop = TRUE;
-	if( ( ((srConsoleRect.Bottom - srConsoleRect.Top + 1 < height) && (srConsoleRect.Top == 0) )
-		|| (srConsoleRect.Top == 0)
-		|| (srConsoleRect.Bottom + 1 < height) )
-		&& (csbi.dwCursorPosition.Y <= srConsoleRect.Top + height - 1)) {
-		bAdjustTop = FALSE;
+	if( srConsoleRect.Bottom - srConsoleRect.Top + 1 < height ) { // height increase
+		if( srConsoleRect.Bottom + 1 <= height ) { // if close to top, adjust top then adjust bottom
+			srConsoleRect.Top = 0;
+			bAdjustTop = FALSE;
+		}
+	} else { // height decrease
+		if( csbi.dwCursorPosition.Y <= srConsoleRect.Top + height - 1 ) { // cursor is inside adjusted area, adjust bottom
+			bAdjustTop = FALSE;
+		} else { // cursor is outside, adjust bottom to cursor then adjust top
+			srConsoleRect.Bottom = csbi.dwCursorPosition.Y;
+		}
 	}
+
 	if( bAdjustTop ) {
 		srConsoleRect.Top = srConsoleRect.Bottom - height + 1; // move top
 	} else {
@@ -831,7 +833,6 @@ static void SetConsoleSize(SHORT width, SHORT height)
 		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
 	}
 	::CloseHandle(hConsole);
-	bSizeChangeInProgress = FALSE;
 }
 
 static void SendProcessList();
