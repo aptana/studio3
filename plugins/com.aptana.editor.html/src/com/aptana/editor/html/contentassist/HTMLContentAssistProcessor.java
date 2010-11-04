@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +46,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -54,6 +62,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -76,6 +86,9 @@ import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
+import com.aptana.preview.ProjectPreviewUtil;
+import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.SimpleWebServerConfiguration;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -298,6 +311,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				proposals.addAll(this.addClassProposals(offset));
 			}
+			else if (attributeName.equals("src") || attributeName.equals("href")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				proposals.addAll(this.addURIPathProposals(offset));
+			}
 			else
 			{
 				String elementName = this.getElementName(lexemeProvider, offset);
@@ -330,6 +347,130 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						offset);
 			}
 		}
+		return proposals;
+	}
+
+	/**
+	 * addURIPathProposals - Does incremental proposals for filepaths in the 'src'/'href' values.
+	 * 
+	 * @param offset
+	 */
+	protected List<ICompletionProposal> addURIPathProposals(int offset)
+	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		this._replaceRange = null;
+		try
+		{
+			String valuePrefix = this._currentLexeme.getText();
+			int length = offset - this._currentLexeme.getStartingOffset();
+			valuePrefix = valuePrefix.substring(0, length);
+
+			URI editorStoreURI = getURI();
+			IFileStore editorStore = EFS.getStore(editorStoreURI);
+
+			// Strip the quotes off the value prefix!
+			if (valuePrefix.length() > 0 && (valuePrefix.charAt(0) == '"' || valuePrefix.charAt(0) == '\''))
+			{
+				valuePrefix = valuePrefix.substring(1);
+				offset = this._currentLexeme.getStartingOffset() + 1;
+			}
+
+			// Based on prefix we need to choose project root (webroot), some other place, or current file as URI
+			// base.
+			IFileStore baseStore = null;
+			if (valuePrefix.length() > 0 && valuePrefix.charAt(0) == '/')
+			{
+				baseStore = EFS.getStore(getProjectURI());
+
+				// Get the project webroot
+				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+						.getServerConfiguration(getProject());
+				SimpleWebServerConfiguration swsc = (SimpleWebServerConfiguration) serverConfiguration;
+				if (swsc != null)
+				{
+					IPath path = swsc.getDocumentRoot();
+					if (path.isAbsolute())
+					{
+						baseStore = EFS.getStore(path.toFile().toURI());
+					}
+					else
+					{
+						baseStore = baseStore.getFileStore(path);
+					}
+				}
+				else
+				{
+					// HACK This is for Rails projects, when user hasn't specified special server preview
+					IFileStore publicDir = baseStore.getChild("public"); //$NON-NLS-1$
+					if (publicDir.fetchInfo().exists())
+					{
+						baseStore = publicDir;
+					}
+				}
+				baseStore = baseStore.getChild(valuePrefix);
+			}
+			else
+			{
+				baseStore = editorStore.getParent();
+				baseStore = baseStore.getChild(valuePrefix);
+			}
+
+			// replace from last slash on...
+			int lastSlash = valuePrefix.lastIndexOf('/');
+			if (lastSlash != -1)
+			{
+				offset += lastSlash + 1;
+			}
+			this._replaceRange = new Range(offset, this._currentLexeme.getEndingOffset() - 1);
+
+			// TODO Handle when it's just an absolute URI!
+			// else if ()
+			// {
+			//
+			// }
+
+			// Then we grab the filestore pointing to the parent and ask for the children!
+			Image[] userAgentIcons = this.getAllUserAgentIcons();
+			for (IFileStore f : baseStore.childStores(EFS.NONE, new NullProgressMonitor()))
+			{
+				String name = f.getName();
+				// Don't include the current file in the list
+				if (name.startsWith(".") || f.toURI().equals(editorStoreURI)) //$NON-NLS-1$
+				{
+					continue;
+				}
+
+				// Grab images based on whether it's a dir or not. For files can we determine if it matches some
+				// content type and grab the icon for that?
+				Image image = null;
+				IFileInfo info = f.fetchInfo();
+				if (info.isDirectory())
+				{
+					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+				}
+				else
+				{
+					ImageDescriptor imageDesc = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(name);
+					if (imageDesc != null)
+					{
+						image = imageDesc.createImage();
+					}
+					if (image == null)
+					{
+						image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+					}
+				}
+				CommonCompletionProposal cp = createProposal(name, name, image, null, userAgentIcons, null, offset,
+						name.length());
+				proposals.add(cp);
+
+			}
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+
 		return proposals;
 	}
 
