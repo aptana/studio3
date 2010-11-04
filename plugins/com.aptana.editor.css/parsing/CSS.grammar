@@ -12,7 +12,7 @@
 %import "com.aptana.parsing.ast.ParseRootNode";
 %import "com.aptana.parsing.lexer.IRange";
 
-%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, LPAREN;
+%terminals AT_RULE, CHARSET, IMPORT, MEDIA, PAGE, FONTFACE, LPAREN;
 %terminals SEMICOLON, COLON, COMMA, LCURLY, RCURLY, LBRACKET, RBRACKET, RPAREN, SLASH;
 %terminals MINUS, PLUS, EQUAL, STAR, GREATER;
 %terminals IDENTIFIER, STRING, URL, NUMBER, CLASS, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, PERCENTAGE;
@@ -112,6 +112,7 @@ Statement
 	|	Import
 	|	Media
 	|	Page
+	|	FontFace
 	|	AtRule
 	|	Rule
 	;
@@ -161,6 +162,17 @@ Page
 	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
 		{:
 			return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
+		:}
+	;
+
+FontFace
+	=	FONTFACE.f LCURLY RCURLY.r
+		{:
+			return new CSSFontFaceNode(f.getStart(), r.getEnd());
+		:}
+	|	FONTFACE.f LCURLY Declarations.d RCURLY.r
+		{:
+			return new CSSFontFaceNode(f.getStart(), d.value, r.getEnd());
 		:}
 	;
 

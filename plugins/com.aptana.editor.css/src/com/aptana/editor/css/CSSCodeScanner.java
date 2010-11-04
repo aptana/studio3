@@ -70,6 +70,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	private static final String KEYWORD_PAGE = "@page"; //$NON-NLS-1$
 	private static final String KEYWORD_MEDIA = "@media"; //$NON-NLS-1$
 	private static final String KEYWORD_CHARSET = "@charset"; //$NON-NLS-1$
+	private static final String KEYWORD_FONTFACE = "@font-face"; //$NON-NLS-1$
 	private static final String WORD_INCLUDES = "~="; //$NON-NLS-1$
 	private static final String WORD_DASHMATCH = "|="; //$NON-NLS-1$
 
@@ -206,6 +207,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 		wordRule.addWord(KEYWORD_IMPORT, createToken(CSSTokenType.IMPORT));
 		wordRule.addWord(KEYWORD_MEDIA, createToken(CSSTokenType.MEDIA_KEYWORD));
 		wordRule.addWord(KEYWORD_PAGE, createToken(CSSTokenType.PAGE));
+		wordRule.addWord(KEYWORD_FONTFACE, createToken(CSSTokenType.FONTFACE));
 		rules.add(wordRule);
 
 		// !important

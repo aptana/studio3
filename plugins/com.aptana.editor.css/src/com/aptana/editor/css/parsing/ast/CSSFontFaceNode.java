@@ -34,22 +34,74 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSNodeTypes
+import java.util.Arrays;
+import java.util.List;
+
+import com.aptana.parsing.ast.IParseNode;
+
+public class CSSFontFaceNode extends CSSNode
 {
-	public static final short UNKNOWN = 0;
-	public static final short ATTRIBUTE_SELECTOR = 1;
-	public static final short FUNCTION = 2;
-	public static final short CHAR_SET = 3;
-	public static final short DECLARATION = 4;
-	public static final short IMPORT = 5;
-	public static final short RULE = 6;
-	public static final short MEDIA = 7;
-	public static final short PAGE = 8;
-	public static final short SELECTOR = 9;
-	public static final short SIMPLE_SELECTOR = 10;
-	public static final short EXPRESSION = 11;
-	public static final short TERM = 12;
-	public static final short TERM_LIST = 13;
-	public static final short COMMENT = 14;
-	public static final short FONTFACE = 15;
+
+	public CSSFontFaceNode(int start, int end)
+	{
+		this(start, null, end);
+	}
+
+	@SuppressWarnings("unchecked")
+	public CSSFontFaceNode(int start, Object declarations, int end)
+	{
+		super(CSSNodeTypes.FONTFACE, start, end);
+		if (declarations instanceof CSSDeclarationNode)
+		{
+			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
+		}
+		else if (declarations instanceof List<?>)
+		{
+			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
+			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
+		}
+	}
+
+	public CSSDeclarationNode[] getDeclarations()
+	{
+		List<IParseNode> list = Arrays.asList(getChildren());
+		return list.toArray(new CSSDeclarationNode[list.size()]);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSFontFaceNode))
+		{
+			return false;
+		}
+		CSSFontFaceNode other = (CSSFontFaceNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append("@font-face "); //$NON-NLS-1$
+		text.append("{"); //$NON-NLS-1$
+		CSSDeclarationNode[] declarations = getDeclarations();
+		int size = declarations.length;
+		for (int i = 0; i < size; ++i)
+		{
+			text.append(declarations[i]);
+			if (i < size - 1)
+			{
+				text.append(" "); //$NON-NLS-1$
+			}
+		}
+		text.append("}"); //$NON-NLS-1$
+		return text.toString();
+	}
 }
