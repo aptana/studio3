@@ -31,10 +31,6 @@
  * plugin containing this source file.
  * 
  * Any modifications to this file must keep this entire header intact.
- *
- * stdafx.h : include file for standard system include files,
- * or project specific include files that are used frequently, but
- * are changed infrequently
  */
 
 #pragma once
