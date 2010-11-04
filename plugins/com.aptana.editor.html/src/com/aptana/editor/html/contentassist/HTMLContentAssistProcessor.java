@@ -35,6 +35,7 @@
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,6 +89,7 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.ServerConfigurationManager;
 import com.aptana.preview.server.SimpleWebServerConfiguration;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -385,9 +387,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				// Get the project webroot
 				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
-				SimpleWebServerConfiguration swsc = (SimpleWebServerConfiguration) serverConfiguration;
-				if (swsc != null)
+				if (serverConfiguration == null)
 				{
+					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance()
+							.getServerConfigurations())
+					{
+						URL url = server.resolve(editorStore);
+						if (url != null)
+						{
+							serverConfiguration = server;
+							break;
+						}
+					}
+				}
+				if (serverConfiguration != null && serverConfiguration instanceof SimpleWebServerConfiguration)
+				{
+					SimpleWebServerConfiguration swsc = (SimpleWebServerConfiguration) serverConfiguration;
 					IPath path = swsc.getDocumentRoot();
 					if (path.isAbsolute())
 					{
