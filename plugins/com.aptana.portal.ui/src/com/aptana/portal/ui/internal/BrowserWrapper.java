@@ -112,7 +112,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#addTitleListener(org.eclipse.swt.browser.TitleListener)
 	 */
 	public void addTitleListener(TitleListener listener) {
-		callMethod("addTitleListener", TitleListener.class, listener);
+		callMethod("addTitleListener", TitleListener.class, listener); //$NON-NLS-1$
 	}
 
 	/**
@@ -120,7 +120,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#addProgressListener(org.eclipse.swt.browser.ProgressListener)
 	 */
 	public void addProgressListener(ProgressListener listener) {
-		callMethod("addProgressListener", ProgressListener.class, listener);
+		callMethod("addProgressListener", ProgressListener.class, listener); //$NON-NLS-1$
 	}
 
 	/**
@@ -128,7 +128,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#addLocationListener(org.eclipse.swt.browser.LocationListener)
 	 */
 	public void addLocationListener(LocationListener listener) {
-		callMethod("addLocationListener", LocationListener.class, listener);
+		callMethod("addLocationListener", LocationListener.class, listener); //$NON-NLS-1$
 	}
 
 	/**
@@ -136,7 +136,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.widgets.Widget#addDisposeListener(org.eclipse.swt.events.DisposeListener)
 	 */
 	public void addDisposeListener(DisposeListener listener) {
-		callMethod("addDisposeListener", DisposeListener.class, listener);
+		callMethod("addDisposeListener", DisposeListener.class, listener); //$NON-NLS-1$
 	}
 
 	/**
@@ -144,7 +144,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.widgets.Widget#isDisposed()
 	 */
 	public boolean isDisposed() {
-		return (Boolean) callMethod("isDisposed");
+		return (Boolean) callMethod("isDisposed"); //$NON-NLS-1$
 	}
 
 	/**
@@ -153,7 +153,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#execute(java.lang.String)
 	 */
 	public boolean execute(String script) {
-		return (Boolean)callMethod("execute", String.class, script);
+		return (Boolean)callMethod("execute", String.class, script); //$NON-NLS-1$
 	}
 
 	/**
@@ -161,7 +161,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#setJavascriptEnabled(boolean)
 	 */
 	public void setJavascriptEnabled(boolean enabled) {
-		callMethod("setJavascriptEnabled", boolean.class, enabled);
+		callMethod("setJavascriptEnabled", boolean.class, enabled); //$NON-NLS-1$
 	}
 
 	/**
@@ -169,7 +169,7 @@ public final class BrowserWrapper {
 	 * @see org.eclipse.swt.browser.Browser#getUrl()
 	 */
 	public String getUrl() {
-		return (String) callMethod("getUrl");
+		return (String) callMethod("getUrl"); //$NON-NLS-1$
 	}
 
 }
