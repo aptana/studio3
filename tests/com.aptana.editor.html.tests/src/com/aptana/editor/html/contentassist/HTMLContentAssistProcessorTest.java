@@ -91,6 +91,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE >", fDocument.get());
 		Point p = viewer.getSelectedRange();
@@ -108,6 +109,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE >", fDocument.get());
 		Point p = viewer.getSelectedRange();
@@ -125,6 +127,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE html>", fDocument.get());
 		Point p = viewer.getSelectedRange();
@@ -142,6 +145,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE >", fDocument.get());
 		Point p = viewer.getSelectedRange();
@@ -159,6 +163,43 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<!DOCTYPE >", fDocument.get());
+		Point p = viewer.getSelectedRange();
+		assertEquals(10, p.x);
+		assertEquals(0, p.y);
+	}
+	
+	public void testDOCTYPEProposal6()
+	{
+		int offset = 3;
+		IDocument fDocument = createDocument("<!DOCTYP >");
+		char trigger = '\t';
+		ITextViewer viewer = createTextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
+		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
+
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<!DOCTYPE >", fDocument.get());
+		Point p = viewer.getSelectedRange();
+		assertEquals(10, p.x);
+		assertEquals(0, p.y);
+	}
+	
+	public void testDOCTYPEProposal7()
+	{
+		int offset = 3;
+		IDocument fDocument = createDocument("<!DOCTYPE >");
+		char trigger = '\t';
+		ITextViewer viewer = createTextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
+		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
+
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE >", fDocument.get());
 		Point p = viewer.getSelectedRange();
@@ -176,6 +217,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE HTML>", fDocument.get());
 	}
@@ -190,6 +232,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE HTML>", fDocument.get());
 	}
@@ -204,6 +247,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<abbr></abbr>", fDocument.get());
 	}
@@ -218,6 +262,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("a", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<a></a>", fDocument.get());
 	}
@@ -232,6 +277,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<abbr></abbr></a>", fDocument.get());
 	}
@@ -246,6 +292,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("abbr", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<abbr></abbr></a>", fDocument.get());
 	}
@@ -260,6 +307,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("img", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<img />", fDocument.get());
 	}
@@ -274,6 +322,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!doctype HTML>", fDocument.get());
 	}
@@ -288,6 +337,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal linkProposal = findProposal("HTML 4.01 Strict", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"",
 				fDocument.get());
@@ -303,6 +353,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(1, proposals.length);
 		ICompletionProposal closeProposal = findProposal("ul", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("<ul>\n</ul>", fDocument.get());
 	}
@@ -317,6 +368,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(CLOSE_TAG_PROPOSALS_COUNT, proposals.length);
 		ICompletionProposal closeProposal = findProposal("ul", proposals);
 
+		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
 		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
 		assertEquals("</ul>", fDocument.get());
 	}
