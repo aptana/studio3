@@ -346,6 +346,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 			return false;
 
 		int overlapIndex = getDisplayString().length() - _replacementString.length();
+		overlapIndex = Math.max(0, overlapIndex);
 		String endPortion = getDisplayString().substring(overlapIndex);
 		boolean validated = isValidPrefix(getPrefix(document, offset), endPortion);
 

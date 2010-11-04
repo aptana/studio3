@@ -516,7 +516,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
 				{
 					replaceOffset = previousLexeme.getStartingOffset();
-					replaceLength = this._currentLexeme.getEndingOffset() - replaceOffset;
+					replaceLength = this._currentLexeme.getEndingOffset() - replaceOffset + 1;
 				}
 			}
 			else if (this._currentLexeme.getType() == HTMLTokenType.TEXT
@@ -680,6 +680,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		this._replaceRange = null;
 		// Replace all the way until we hit the end of the doctype tag!
 		Lexeme<HTMLTokenType> ptr = _currentLexeme;
+		Image[] userAgentIcons = this.getAllUserAgentIcons();
+
+		if (ptr != null && ptr.getType() == HTMLTokenType.META && ptr.contains(offset))
+		{
+			proposals.addAll(addElementProposals(lexemeProvider, offset));
+			return;
+		}
+
 		while (ptr != null && ptr.getType() != HTMLTokenType.TAG_END)
 		{
 			int index = lexemeProvider.getLexemeIndex(ptr.getStartingOffset());
@@ -690,7 +698,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			this._replaceRange = new Range(_currentLexeme.getStartingOffset(), ptr.getStartingOffset() - 1);
 		}
 
-		Image[] userAgentIcons = this.getAllUserAgentIcons();
 		for (Map.Entry<String, String> entry : DOCTYPES.entrySet())
 		{
 			String src = entry.getValue();
