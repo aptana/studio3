@@ -34,23 +34,52 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-public class CSSNodeTypes
+public class CSSNamespaceNode extends CSSNode
 {
-	public static final short UNKNOWN = 0;
-	public static final short ATTRIBUTE_SELECTOR = 1;
-	public static final short FUNCTION = 2;
-	public static final short CHAR_SET = 3;
-	public static final short DECLARATION = 4;
-	public static final short IMPORT = 5;
-	public static final short RULE = 6;
-	public static final short MEDIA = 7;
-	public static final short PAGE = 8;
-	public static final short SELECTOR = 9;
-	public static final short SIMPLE_SELECTOR = 10;
-	public static final short EXPRESSION = 11;
-	public static final short TERM = 12;
-	public static final short TERM_LIST = 13;
-	public static final short COMMENT = 14;
-	public static final short FONTFACE = 15;
-	public static final short NAMESPACE = 16;
+
+	private String fPrefix;
+	private String fUriStr;
+
+	public CSSNamespaceNode(int start, String uri, int end)
+	{
+		this(start, null, uri, end);
+	}
+
+	public CSSNamespaceNode(int start, String prefix, String uri, int end)
+	{
+		super(CSSNodeTypes.NAMESPACE, start, end);
+		fPrefix = prefix;
+		fUriStr = uri;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSNamespaceNode))
+		{
+			return false;
+		}
+		CSSNamespaceNode other = (CSSNamespaceNode) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + toString().hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		StringBuilder text = new StringBuilder();
+		text.append("@namespace "); //$NON-NLS-1$
+		if (fPrefix != null)
+		{
+			text.append(fPrefix).append(" "); //$NON-NLS-1$
+		}
+		text.append(fUriStr);
+		text.append(";"); //$NON-NLS-1$
+		return text.toString();
+	}
 }
