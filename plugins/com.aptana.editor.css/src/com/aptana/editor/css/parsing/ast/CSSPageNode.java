@@ -75,6 +75,11 @@ public class CSSPageNode extends CSSNode
 		}
 	}
 
+	public String getSelector()
+	{
+		return fPageSelector;
+	}
+
 	public CSSDeclarationNode[] getDeclarations()
 	{
 		List<IParseNode> list = Arrays.asList(getChildren());
