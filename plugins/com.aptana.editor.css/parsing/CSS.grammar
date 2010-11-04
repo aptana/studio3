@@ -158,11 +158,11 @@ Page
 		:}
 	|	PAGE.p COLON IDENTIFIER.s LCURLY RCURLY.r
 		{:
-			return new CSSPageNode(s, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), p.getStart(), r.getEnd());
 		:}
 	|	PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
 		{:
-			return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), d.value, p.getStart(), r.getEnd());
 		:}
 	;
 

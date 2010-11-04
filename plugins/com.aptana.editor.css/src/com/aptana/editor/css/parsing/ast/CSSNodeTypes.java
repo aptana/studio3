@@ -53,4 +53,5 @@ public class CSSNodeTypes
 	public static final short COMMENT = 14;
 	public static final short FONTFACE = 15;
 	public static final short NAMESPACE = 16;
+	public static final short PAGE_SELECTOR = 17;
 }

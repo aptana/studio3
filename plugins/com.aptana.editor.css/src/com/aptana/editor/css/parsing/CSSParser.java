@@ -205,7 +205,7 @@ public class CSSParser extends Parser implements IParser {
 					final String s = (String) _symbol_s.value;
 					final Symbol r = _symbols[offset + 5];
 					
-			return new CSSPageNode(s, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), p.getStart(), r.getEnd());
 			}
 			case 20: // Page = PAGE.p COLON IDENTIFIER.s LCURLY Declarations.d RCURLY.r
 			{
@@ -215,7 +215,7 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol d = _symbols[offset + 5];
 					final Symbol r = _symbols[offset + 6];
 					
-			return new CSSPageNode(s, d.value, p.getStart(), r.getEnd());
+			return new CSSPageNode(new CSSPageSelectorNode(s, _symbol_s.getStart(), _symbol_s.getEnd()), d.value, p.getStart(), r.getEnd());
 			}
 			case 21: // FontFace = FONTFACE.f LCURLY RCURLY.r
 			{

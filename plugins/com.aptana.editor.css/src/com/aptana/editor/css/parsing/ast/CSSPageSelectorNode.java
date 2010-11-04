@@ -34,96 +34,41 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-import java.util.Arrays;
-import java.util.List;
-
-import com.aptana.parsing.ast.IParseNode;
-
-public class CSSPageNode extends CSSNode
+public class CSSPageSelectorNode extends CSSNode
 {
 
-	private CSSPageSelectorNode fPageSelector;
+	private String fText;
 
-	public CSSPageNode(int start, int end)
+	public CSSPageSelectorNode(String text, int start, int end)
 	{
-		this(null, null, start, end);
+		super(CSSNodeTypes.PAGE_SELECTOR, start, end);
+		fText = text;
 	}
 
-	public CSSPageNode(CSSPageSelectorNode pageSelector, int start, int end)
+	public String getText()
 	{
-		this(pageSelector, null, start, end);
-	}
-
-	public CSSPageNode(Object declarations, int start, int end)
-	{
-		this(null, declarations, start, end);
-	}
-
-	@SuppressWarnings("unchecked")
-	public CSSPageNode(CSSPageSelectorNode pageSelector, Object declarations, int start, int end)
-	{
-		super(CSSNodeTypes.PAGE, start, end);
-		fPageSelector = pageSelector;
-		if (declarations instanceof CSSDeclarationNode)
-		{
-			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
-		}
-		else if (declarations instanceof List<?>)
-		{
-			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
-			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
-		}
-	}
-
-	public CSSPageSelectorNode getSelector()
-	{
-		return fPageSelector;
-	}
-
-	public CSSDeclarationNode[] getDeclarations()
-	{
-		List<IParseNode> list = Arrays.asList(getChildren());
-		return list.toArray(new CSSDeclarationNode[list.size()]);
+		return fText;
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj) || !(obj instanceof CSSPageNode))
+		if (!super.equals(obj) || !(obj instanceof CSSPageSelectorNode))
 		{
 			return false;
 		}
-		CSSPageNode other = (CSSPageNode) obj;
-		return toString().equals(other.toString());
+		return fText.equals(((CSSPageSelectorNode) obj).fText);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return super.hashCode() * 31 + toString().hashCode();
+		return super.hashCode() * 31 + fText.hashCode();
 	}
 
 	@Override
 	public String toString()
 	{
-		StringBuilder text = new StringBuilder();
-		text.append("@page "); //$NON-NLS-1$
-		if (fPageSelector != null)
-		{
-			text.append(":").append(fPageSelector).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		text.append("{"); //$NON-NLS-1$
-		CSSDeclarationNode[] declarations = getDeclarations();
-		int size = declarations.length;
-		for (int i = 0; i < size; ++i)
-		{
-			text.append(declarations[i]);
-			if (i < size - 1)
-			{
-				text.append(" "); //$NON-NLS-1$
-			}
-		}
-		text.append("}"); //$NON-NLS-1$
-		return text.toString();
+		return getText();
 	}
 }
