@@ -29,6 +29,7 @@ static CHAR_INFO* lpPrevScreenBuffer = NULL;
 static CHAR_INFO* lpNextScreenBuffer = NULL;
 static DWORD dwBufferMemorySize = 0;
 static DWORD dwScreenBufferSize = 0;
+static BOOL bSizeChangeInProgress = FALSE;
 
 #define COLOR_MASK (COMMON_LVB_REVERSE_VIDEO|COMMON_LVB_UNDERSCORE|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED|FOREGROUND_INTENSITY|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_RED|BACKGROUND_INTENSITY)
 #define DEFAULT_ATTRIBUTES (FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED)
@@ -244,7 +245,7 @@ static void EraseWindow()
 static void ScrollWindow(BOOL bUp)
 {
 	if( bUp ) {
-		OutputString("\x1B[D");
+		OutputString("\x1B[L");
 	} else {
 		OutputString("\x1B[M");
 	}
@@ -467,6 +468,9 @@ static void ReadConsoleBuffer()
 	COORD coordBufferSize;
 	SMALL_RECT srBuffer;
 	
+	if( bSizeChangeInProgress ) {
+		return;
+	}
 	::ResetEvent(hConsoleOut);
 	::GetConsoleScreenBufferInfo(hConsoleOut, &csbiNextConsole);
 	coordConsoleSize.X = csbiNextConsole.dwSize.X; //csbiNextConsole.srWindow.Right - csbiNextConsole.srWindow.Left + 1;
@@ -489,6 +493,13 @@ static void ReadConsoleBuffer()
 	{
 		// refresh screen
 		if( lpPrevScreenBuffer != NULL ) {
+			SHORT nRowsDiff = (csbiConsole.srWindow.Bottom - csbiConsole.srWindow.Top + 1) - coordConsoleSize.Y;
+			if( (nRowsDiff > 0) && (csbiNextConsole.srWindow.Top != 0) && (csbiConsole.srWindow.Top == 0) ) {
+				MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+				for( SHORT i = 0; i < nRowsDiff; ++i) {
+					OutputString("\r\n");
+				}
+			}
 			EraseWindow();
 			MoveCursorAbs(0, 0);
 		}
@@ -576,7 +587,7 @@ static void ReadConsoleBuffer()
 			srPrevBuffer.Right = csbiConsole.srWindow.Right;
 			SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srPrevBuffer, lpNextScreenBuffer);
 			ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize);
-			MoveCursor(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+			MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
 			SHORT nRows = csbiNextConsole.srWindow.Top - csbiConsole.srWindow.Top;
 			if( nRows > coordConsoleSize.Y ) {
 				nRows = coordConsoleSize.Y;
@@ -734,6 +745,7 @@ static void SendConsoleKey(WORD key)
 
 static void SetConsoleSize(SHORT width, SHORT height)
 {
+	bSizeChangeInProgress = TRUE;
 	HANDLE hConsole = ::CreateFile(_T("CONOUT$"), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -745,12 +757,17 @@ static void SetConsoleSize(SHORT width, SHORT height)
 
 	SMALL_RECT srConsoleRect = csbi.srWindow;
 	srConsoleRect.Right = srConsoleRect.Left + width - 1;
-	if( (srConsoleRect.Bottom - srConsoleRect.Top + 1 < height)
+	BOOL bAdjustTop = TRUE;
+	if( ( ((srConsoleRect.Bottom - srConsoleRect.Top + 1 < height) && (srConsoleRect.Top == 0) )
 		|| (srConsoleRect.Top == 0)
-		|| (srConsoleRect.Bottom + 1 < height) ) {
-		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // increase bottom
-	} else {
+		|| (srConsoleRect.Bottom + 1 < height) )
+		&& (csbi.dwCursorPosition.Y <= srConsoleRect.Top + height - 1)) {
+		bAdjustTop = FALSE;
+	}
+	if( bAdjustTop ) {
 		srConsoleRect.Top = srConsoleRect.Bottom - height + 1; // move top
+	} else {
+		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // move bottom
 	}
 
 	COORD finalCoordBufferSize = csbi.dwSize;
@@ -780,6 +797,7 @@ static void SetConsoleSize(SHORT width, SHORT height)
 		::SetConsoleScreenBufferSize(hConsole, finalCoordBufferSize);
 	}
 	::CloseHandle(hConsole);
+	bSizeChangeInProgress = FALSE;
 }
 
 static void SendProcessList();
