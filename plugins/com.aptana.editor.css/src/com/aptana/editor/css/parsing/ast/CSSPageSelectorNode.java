@@ -32,8 +32,43 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.editor.css.parsing.ast;
 
-#pragma once
+public class CSSPageSelectorNode extends CSSNode
+{
 
-extern HANDLE GetParentProcess(void);
-extern void TerminateProcessTree(DWORD dwProcessId);
+	private String fText;
+
+	public CSSPageSelectorNode(String text, int start, int end)
+	{
+		super(CSSNodeTypes.PAGE_SELECTOR, start, end);
+		fText = text;
+	}
+
+	public String getText()
+	{
+		return fText;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof CSSPageSelectorNode))
+		{
+			return false;
+		}
+		return fText.equals(((CSSPageSelectorNode) obj).fText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fText.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return getText();
+	}
+}

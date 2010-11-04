@@ -515,6 +515,46 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test empty font-face
+	 * 
+	 * @throws Exception
+	 */
+	public void testFontFaceEmpty() throws Exception
+	{
+		parseTest("@font-face {}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test font-face with declaration
+	 * 
+	 * @throws Exception
+	 */
+	public void testFontFaceDeclaration() throws Exception
+	{
+		parseTest("@font-face {font-family: name;}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test namespace with a string
+	 * 
+	 * @throws Exception
+	 */
+	public void testNamespaceString() throws Exception
+	{
+		parseTest("@namespace \"test\";" + EOL); //$NON-NLS-1$
+	}
+
+	/**
+	 * Test namespace with a prefix and a string
+	 * 
+	 * @throws Exception
+	 */
+	public void testNamespacePrefixString() throws Exception
+	{
+		parseTest("@namespace foo \"test\";" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test the star, '*', selector
 	 * 
 	 * @throws Exception

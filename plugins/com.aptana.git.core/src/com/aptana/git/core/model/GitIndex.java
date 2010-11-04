@@ -60,7 +60,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 
@@ -210,7 +210,7 @@ public class GitIndex
 			{
 				Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
 						"diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-						"-z", getParentTree()); //$NON-NLS-1$
+						"-z", GitRepository.HEAD); //$NON-NLS-1$
 				if (result != null && result.keySet().iterator().next() == 0)
 				{
 					readStagedFiles(result.values().iterator().next());
@@ -284,17 +284,6 @@ public class GitIndex
 		postIndexChange(preRefreshFiles, toRefresh);
 
 		return Status.OK_STATUS;
-	}
-
-	private String getParentTree()
-	{
-		String parent = amend ? "HEAD^" : "HEAD"; //$NON-NLS-1$ //$NON-NLS-2$
-
-		if (repository.parseReference(parent) == null)
-			// We don't have a head ref. Return the empty tree.
-			return "4b825dc642cb6eb9a060e54bf8d69288fbee4904"; //$NON-NLS-1$
-
-		return parent;
 	}
 
 	private void readOtherFiles(String string)
@@ -511,7 +500,7 @@ public class GitIndex
 		args.add("--add"); //$NON-NLS-1$
 		args.add("--remove"); //$NON-NLS-1$
 		args.add("--stdin"); //$NON-NLS-1$
-		StringBuffer input = new StringBuffer(stageFiles.size()*stageFiles.iterator().next().getPath().length());
+		StringBuffer input = new StringBuffer(stageFiles.size() * stageFiles.iterator().next().getPath().length());
 		for (ChangedFile file : stageFiles)
 		{
 			input.append(file.getPath()).append('\n');
@@ -554,8 +543,8 @@ public class GitIndex
 			input.append(file.indexInfo());
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
-				workingDirectory, new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
+				new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 			return false;
 
@@ -592,8 +581,8 @@ public class GitIndex
 		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 		int ret = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(),
-				workingDirectory, arguments);
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
+				arguments);
 		ret = result.keySet().iterator().next();
 
 		if (ret != 0)
@@ -631,7 +620,8 @@ public class GitIndex
 	{
 		int exitCode = 1;
 		commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+				"commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && !result.isEmpty())
 		{
 			exitCode = result.keySet().iterator().next();
@@ -650,6 +640,20 @@ public class GitIndex
 	 */
 	String[] commitsBetween(String sha1, String sha2)
 	{
+		// Speed up the most common case of when the two SHAs are the same for refs!
+		if (sha1.startsWith(GitRef.REFS))
+		{
+			sha1 = repository.toSHA(GitRef.refFromString(sha1));
+		}
+		if (sha2.startsWith(GitRef.REFS))
+		{
+			sha2 = repository.toSHA(GitRef.refFromString(sha2));
+		}
+		if (sha1.equals(sha2))
+		{
+			return new String[0];
+		}
+
 		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log", "--pretty=format:\"%s\"", //$NON-NLS-1$ //$NON-NLS-2$
 				sha1 + ".." + sha2); //$NON-NLS-1$
 		if (result == null || result.trim().length() == 0)
@@ -679,8 +683,14 @@ public class GitIndex
 			if (file.status == ChangedFile.Status.NEW)
 				return GitExecutable.instance().outputForCommand(workingDirectory, "show", indexPath); //$NON-NLS-1$
 
-			return GitExecutable.instance().outputForCommand(workingDirectory, "diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
-					getParentTree(), "--", file.path); //$NON-NLS-1$
+			Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory,
+					"diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+					GitRepository.HEAD, "--", file.path); //$NON-NLS-1$
+			if (result == null || result.keySet().iterator().next() != 0)
+			{
+				return null;
+			}
+			return result.values().iterator().next();
 		}
 
 		// unstaged
@@ -688,7 +698,7 @@ public class GitIndex
 		{
 			try
 			{
-				return ProcessUtil.read(new FileInputStream(workingDirectory.append(file.path).toFile()));
+				return IOUtil.read(new FileInputStream(workingDirectory.append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$
 			}
 			catch (FileNotFoundException e)
 			{
@@ -787,7 +797,7 @@ public class GitIndex
 	IFile getResourceForChangedFile(ChangedFile changedFile)
 	{
 		return ResourcesPlugin.getWorkspace().getRoot()
-		.getFileForLocation(workingDirectory.append(changedFile.getPath()));
+				.getFileForLocation(workingDirectory.append(changedFile.getPath()));
 	}
 
 	protected ChangedFile getChangedFileForResource(IResource resource)

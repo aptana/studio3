@@ -69,6 +69,11 @@ public abstract class ProcessUtil
 		return result.values().iterator().next();
 	}
 
+	/**
+	 * @deprecated Please use {@link IOUtil#read(InputStream, String)} instead with a value of "UTF-8".
+	 * @param stream
+	 * @return
+	 */
 	public static String read(InputStream stream)
 	{
 		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
@@ -148,7 +153,7 @@ public abstract class ProcessUtil
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}
-		return null;		
+		return null;
 	}
 
 	/**
@@ -182,6 +187,7 @@ public abstract class ProcessUtil
 
 	/**
 	 * Launches the process and returns a handle to the active Process.
+	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param environment
@@ -190,14 +196,15 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException, CoreException {
+	public static Process run(String command, IPath workingDirectory, Map<String, String> environment,
+			String... arguments) throws IOException, CoreException
+	{
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
 		return run(commands, workingDirectory, environment);
 	}
 
 	/**
-	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param arguments
@@ -205,12 +212,15 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(String command, IPath workingDirectory, String... arguments) throws IOException, CoreException {
+	public static Process run(String command, IPath workingDirectory, String... arguments) throws IOException,
+			CoreException
+	{
 		return run(command, workingDirectory, null, arguments);
 	}
 
 	/**
 	 * Launches the process and returns a handle to the active Process.
+	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param environment
@@ -218,12 +228,16 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException, CoreException {
+	public static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
+			throws IOException, CoreException
+	{
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		if (workingDirectory != null) {
+		if (workingDirectory != null)
+		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
-		if (environment != null && !environment.isEmpty()) {
+		if (environment != null && !environment.isEmpty())
+		{
 			processBuilder.environment().putAll(environment);
 		}
 		return processBuilder.start();

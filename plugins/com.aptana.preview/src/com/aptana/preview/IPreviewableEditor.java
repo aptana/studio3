@@ -32,8 +32,18 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.preview;
 
-#pragma once
+import org.eclipse.ui.IEditorPart;
 
-extern HANDLE GetParentProcess(void);
-extern void TerminateProcessTree(DWORD dwProcessId);
+public interface IPreviewableEditor
+{
+	/**
+	 * Checks if a change in another editor should trigger this editor to update its preview content.
+	 * 
+	 * @param editorPart
+	 *            the particular editor part that is changed
+	 * @return true if this editor should update its preview, false otherwise
+	 */
+	public boolean updatePreviewWhenChanged(IEditorPart editorPart);
+}

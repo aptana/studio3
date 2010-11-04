@@ -31,10 +31,6 @@
  * plugin containing this source file.
  * 
  * Any modifications to this file must keep this entire header intact.
- *
- * stdafx.cpp : source file that includes just the standard includes
- * sshw.pch will be the pre-compiled header
- * stdafx.obj will contain the pre-compiled type information
  */
 
 #include "stdafx.h"

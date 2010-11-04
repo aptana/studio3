@@ -91,6 +91,48 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	}
 
 	/**
+	 * Returns an {@link IParser} for a given content-type (or language).<br>
+	 * Note that in case you use this method to checkout a parser, you'll have to check it back in using the
+	 * {@link #checkinParser(IParser, String)} function and provide it with the same content-type or language
+	 * identifier.
+	 * 
+	 * @param contentTypeOrLanguage
+	 * @return IParser (can be null in case there is no assigned parser for the given content-type or language)
+	 * @see #checkinParser(IParser, String)
+	 */
+	protected IParser checkoutParser(String contentTypeOrLanguage)
+	{
+		IParser parser = null;
+		IParserPool pool = ParserPoolFactory.getInstance().getParserPool(contentTypeOrLanguage);
+		if (pool != null)
+		{
+			parser = pool.checkOut();
+		}
+		return parser;
+	}
+
+	/**
+	 * Check in the parser back into the parser pool.
+	 * 
+	 * @param IParser
+	 *            - The parser to check-in
+	 * @param contentTypeOrLanguage
+	 *            - The content-type or language that can identify the parser pool this parser will be pushed back into.
+	 * @see #checkoutParser(String)
+	 */
+	protected void checkinParser(IParser parser, String contentTypeOrLanguage)
+	{
+		if (parser != null)
+		{
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(contentTypeOrLanguage);
+			if (pool != null)
+			{
+				pool.checkIn(parser);
+			}
+		}
+	}
+
+	/**
 	 * Returns the main Content-Type that this formatter is formatting now. The value of this main Content-Type is
 	 * mainly used when retrieving the parser .
 	 * 
