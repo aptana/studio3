@@ -51,6 +51,10 @@ public class DiffHandler extends AbstractGitHandler
 	private List<ChangedFile> getChangedFilesForResource(GitRepository repo, IResource resource)
 	{
 		List<ChangedFile> files = new ArrayList<ChangedFile>();
+		if (repo == null)
+		{
+			return files;
+		}
 		if (resource instanceof IContainer)
 		{
 			files.addAll(repo.getChangedFilesForContainer((IContainer) resource));
@@ -77,6 +81,10 @@ public class DiffHandler extends AbstractGitHandler
 		}
 
 		GitRepository repo = getSelectedRepository();
+		if (repo == null)
+		{
+			return null;
+		}
 		for (ChangedFile file : changedFiles)
 		{
 			if (file == null)
