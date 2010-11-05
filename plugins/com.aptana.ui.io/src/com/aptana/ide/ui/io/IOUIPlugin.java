@@ -35,14 +35,6 @@
 
 package com.aptana.ide.ui.io;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -86,37 +78,6 @@ public class IOUIPlugin extends AbstractUIPlugin {
 
     // The shared instance
     private static IOUIPlugin plugin;
-
-    private IResourceChangeListener resourceListener = new IResourceChangeListener() {
-
-        public void resourceChanged(IResourceChangeEvent event) {
-            if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-                // only refreshes the direct parent of the files that are added
-                // or removed
-                IResourceDelta delta = event.getDelta();
-                if (delta != null) {
-                    List<IResource> list = new ArrayList<IResource>();
-                    getResourcesNeededToRefresh(list, delta);
-                    for (IResource resource : list) {
-                        refreshNavigatorView(resource);
-                    }
-                }
-            }
-        }
-
-        private void getResourcesNeededToRefresh(List<IResource> list, IResourceDelta delta) {
-            IResourceDelta[] children = delta.getAffectedChildren();
-            int kind;
-            for (IResourceDelta child : children) {
-                kind = child.getKind();
-                if (kind == IResourceDelta.ADDED || kind == IResourceDelta.REMOVED) {
-                    list.add(child.getResource().getParent());
-                } else if (kind == IResourceDelta.CHANGED) {
-                    getResourcesNeededToRefresh(list, child);
-                }
-            }
-        }
-    };
 
     private IConnectionPointListener connectionListener = new IConnectionPointListener() {
 
@@ -166,7 +127,6 @@ public class IOUIPlugin extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
         CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
     }
@@ -175,7 +135,6 @@ public class IOUIPlugin extends AbstractUIPlugin {
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
         CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
         new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
         plugin = null;
