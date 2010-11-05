@@ -303,7 +303,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 				throw e;
 			}
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@SuppressWarnings({ "rawtypes" })
 			private Throwable unwind(Throwable t)
 			{
 				for (;;)

@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.aptana.portal.ui.dispatch.BrowserNotifier;
-import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 
 /**
  * A base class for all browser notification classed. The BrowserNotification register itself as a listener to some

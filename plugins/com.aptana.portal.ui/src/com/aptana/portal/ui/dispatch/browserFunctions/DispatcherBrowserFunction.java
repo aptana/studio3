@@ -76,7 +76,7 @@ public class DispatcherBrowserFunction implements IBrowserFunctionHandler
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_CONTROLLER
 	 * @see IBrowserNotificationConstants#JSON_ERROR_UNKNOWN_ACTION
 	 */
-	@SuppressWarnings( { "unchecked", "rawtypes" })
+	@SuppressWarnings( { "rawtypes" })
 	public Object function(Object[] arguments)
 	{
 		if (arguments == null || arguments.length != 1 || arguments[0] == null)

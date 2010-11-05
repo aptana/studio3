@@ -34,9 +34,6 @@
  */
 package com.aptana.portal.ui.dispatch;
 
-import com.aptana.configurations.processor.ConfigurationProcessorsRegistry;
-import com.aptana.configurations.processor.IConfigurationProcessor;
-
 /**
  * An action controller interface for contributed controllers that will be invoked when a JavaScript request is coming
  * from the internal browser (Portal). Note that there is no consideration here for the arguments that method can

@@ -154,7 +154,7 @@ public abstract class RepositoryStatusHelper
 		return fromExceptionMessage(cause, nlsMessage, new Object[] {});
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static Throwable unwind(Throwable t)
 	{
 		for (;;)
