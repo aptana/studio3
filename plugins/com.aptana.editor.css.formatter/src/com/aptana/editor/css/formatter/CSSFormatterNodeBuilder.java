@@ -98,40 +98,132 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		if (cssNode.getNodeType() == CSSNodeTypes.RULE)
 		{
-			pushFormatterNode(cssNode);
+			pushFormatterRuleNode((CSSRuleNode) cssNode);
 		}
-		//account for nodes like @import, @font-face and @media nodes
+		else if (cssNode.getNodeType() == CSSNodeTypes.PAGE)
+		{
+			pushFormatterPageNode((CSSPageNode) cssNode);
+		}
+		else if (cssNode.getNodeType() == CSSNodeTypes.FONTFACE)
+		{
+			pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
+		}
+		// TODO account for @media nodes
+
+	}
+
+	/**
+	 * Accepts a CSSFontFaceNode and breaks down the node into different formatter nodes which should represent it while
+	 * rewriting the doc.<br>
+	 * The CSSFontFaceNode will be broken down into several nodes of type FormatterCSSSelectorNode,
+	 * FormatterCSSBlockNode, and FormatterCSSDeclarationNode (if declarations are present).
+	 * 
+	 * @param pageNode
+	 */
+	private void pushFormatterFontFaceNode(CSSFontFaceNode faceFontNode)
+	{
+
+		CSSDeclarationNode[] declarations = faceFontNode.getDeclarations();
+		int blockStartOffset = getBlockStartOffset(faceFontNode.getStartingOffset() + 9, document);
+
+		//create a FormatterCSSSelectorNode for @font-face
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
+		formatterSelectorNode.setBegin(createTextNode(document,
+				getSelectorNodeBegin(faceFontNode.getStartingOffset(), document),
+				getSelectorNodeEnd(faceFontNode.getStartingOffset() + 9, document) + 1));
+		push(formatterSelectorNode);
+		checkedPop(formatterSelectorNode, -1);
+
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
+		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
+		formatterBlockNode.setEnd(createTextNode(document, faceFontNode.getEndingOffset(),
+				faceFontNode.getEndingOffset() + 1));
+		push(formatterBlockNode);
+
+		if (declarations != null && declarations.length != 0)
+		{
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
+					declarations[0].getStartingOffset()));
+		}
+		else
+		{
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, faceFontNode.getEndingOffset()));
+		}
+
+		pushFormatterDeclarationNodes(faceFontNode.getEndingOffset(), declarations, formatterBlockNode);
+
+		checkedPop(formatterBlockNode, -1);
+
+	}
+
+	/**
+	 * Accepts a CSSPageNode and breaks down the node into different formatter nodes which should represent it while
+	 * rewriting the doc.<br>
+	 * The CSSPageNode will be broken down into several nodes of type FormatterCSSSelectorNode, FormatterCSSBlockNode,
+	 * and FormatterCSSDeclarationNode (if declarations are present).
+	 * 
+	 * @param pageNode
+	 */
+	private void pushFormatterPageNode(CSSPageNode pageNode)
+	{
+
+		CSSPageSelectorNode selector = pageNode.getSelector();
+		CSSDeclarationNode[] declarations = pageNode.getDeclarations();
+		int blockStartOffset = getBlockStartOffset(selector.getEndingOffset() + 1, document);
+
+		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
+		formatterSelectorNode.setBegin(createTextNode(document,
+				getSelectorNodeBegin(pageNode.getStartingOffset(), document),
+				getSelectorNodeEnd(pageNode.getStartingOffset() + 5, document) + 1));
+		push(formatterSelectorNode);
+		checkedPop(formatterSelectorNode, -1);
+
+		formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+		// we do startingOffset - 1 to account for the ':'
+		formatterSelectorNode.setBegin(createTextNode(document,
+				getSelectorNodeBegin(selector.getStartingOffset() - 1, document),
+				getSelectorNodeEnd(selector.getEndingOffset() + 1, document) + 1));
+
+		push(formatterSelectorNode);
+		checkedPop(formatterSelectorNode, -1);
+
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
+		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
+		formatterBlockNode.setEnd(createTextNode(document, pageNode.getEndingOffset(), pageNode.getEndingOffset() + 1));
+		push(formatterBlockNode);
+
+		if (declarations != null && declarations.length != 0)
+		{
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
+					declarations[0].getStartingOffset()));
+		}
+		else
+		{
+			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, pageNode.getEndingOffset()));
+		}
+
+		pushFormatterDeclarationNodes(pageNode.getEndingOffset(), declarations, formatterBlockNode);
+
+		checkedPop(formatterBlockNode, -1);
 
 	}
 
 	/**
 	 * Accepts a CSSRuleNode and breaks down the node into different formatter nodes which should represent it while
 	 * rewriting the doc.<br>
-	 * The CSSRuleNode will be broken down into several nodes of type FormatterCSSRuleNode, FormatterCSSBlockNode, and
-	 * FormatterCSSDeclarationNode (if declarations are present).
+	 * The CSSRuleNode will be broken down into several nodes of type FormatterCSSSelectorNode, FormatterCSSBlockNode,
+	 * and FormatterCSSDeclarationNode (if declarations are present).
 	 * 
-	 * @param node
-	 * @return FormatterBlockWithBeginEndNode sub-classing instance
+	 * @param ruleNode
 	 */
-	private void pushFormatterNode(CSSNode node)
+	private void pushFormatterRuleNode(CSSRuleNode ruleNode)
 	{
-		CSSRuleNode ruleNode = (CSSRuleNode) node;
 
 		CSSSelectorNode[] selectors = ruleNode.getSelectors();
 		CSSDeclarationNode[] declarations = ruleNode.getDeclarations();
 		int blockStartOffset = getBlockStartOffset(selectors[selectors.length - 1].getEndingOffset() + 1, document);
 
-		for (int i = 0; i < selectors.length; i++)
-		{
-			CSSSelectorNode selectorNode = selectors[i];
-			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
-			formatterSelectorNode.setBegin(createTextNode(document,
-					getSelectorNodeBegin(selectorNode.getStartingOffset(), document),
-					getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1));
-			push(formatterSelectorNode);
-
-			checkedPop(formatterSelectorNode, -1);
-		}
+		pushFormatterSelectorNodes(selectors);
 
 		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
@@ -148,6 +240,15 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, ruleNode.getEndingOffset()));
 		}
 
+		pushFormatterDeclarationNodes(ruleNode.getEndingOffset(), declarations, formatterBlockNode);
+
+		checkedPop(formatterBlockNode, -1);
+
+	}
+
+	private void pushFormatterDeclarationNodes(int parentEndOffset, CSSDeclarationNode[] declarations,
+			FormatterBlockWithBeginEndNode formatterBlockNode)
+	{
 		for (int i = 0; i < declarations.length; ++i)
 		{
 
@@ -168,12 +269,24 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			else
 			{
 				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
-						ruleNode.getEndingOffset()));
+						parentEndOffset));
 			}
 		}
+	}
 
-		checkedPop(formatterBlockNode, -1);
+	private void pushFormatterSelectorNodes(CSSSelectorNode[] selectors)
+	{
+		for (int i = 0; i < selectors.length; i++)
+		{
+			CSSSelectorNode selectorNode = selectors[i];
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
+			formatterSelectorNode.setBegin(createTextNode(document,
+					getSelectorNodeBegin(selectorNode.getStartingOffset(), document),
+					getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1));
+			push(formatterSelectorNode);
 
+			checkedPop(formatterSelectorNode, -1);
+		}
 	}
 
 	private int getBlockStartOffset(int offset, FormatterDocument document)
