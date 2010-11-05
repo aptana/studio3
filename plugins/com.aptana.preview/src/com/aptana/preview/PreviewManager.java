@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPathEditorInput;
@@ -180,6 +181,23 @@ public final class PreviewManager {
 
 	public void init() {
 		addPartListener();
+		// attaches property listener to all opened editors
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IWorkbenchPage[] pages;
+		IEditorReference[] editors;
+		IEditorPart editorPart;
+		for (IWorkbenchWindow window : windows) {
+			pages = window.getPages();
+			for (IWorkbenchPage page : pages) {
+				editors = page.getEditorReferences();
+				for (IEditorReference editor : editors) {
+					editorPart = editor.getEditor(false);
+					if (editorPart != null) {
+						editorPart.addPropertyListener(editorPropertyListener);
+					}
+				}
+			}
+		}
 	}
 
 	public void dispose() {
