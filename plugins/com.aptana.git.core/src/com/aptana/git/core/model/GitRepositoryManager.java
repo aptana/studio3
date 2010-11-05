@@ -51,7 +51,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.team.core.IIgnoreInfo;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.Team;
 import org.eclipse.team.core.TeamException;
 
 import com.aptana.git.core.GitPlugin;
@@ -117,7 +119,24 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		{
 			file.mkdirs();
 		}
-		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
+		if (result != null && !result.isEmpty() && result.keySet().iterator().next() == 0)
+		{
+			GitRepository repo = getUnattachedExisting(path.toFile().toURI());
+			if (repo != null)
+			{
+				// Create a .gitignore that contains the contents of the Prefs > Team > Ignored Resources!
+				IIgnoreInfo[] infos = Team.getAllIgnores();
+				for (IIgnoreInfo info : infos)
+				{
+					if (info == null || !info.getEnabled() || info.getPattern().equals(".git")) //$NON-NLS-1$
+					{
+						continue;
+					}
+					repo.ignore(info.getPattern());
+				}
+			}
+		}
 	}
 
 	public void removeRepository(IProject p)

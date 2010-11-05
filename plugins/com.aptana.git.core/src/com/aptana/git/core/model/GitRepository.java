@@ -1311,13 +1311,25 @@ public class GitRepository
 	 */
 	public boolean ignoreResource(IResource resource)
 	{
-		File gitIgnore = new File(workingDirectory().toFile(), GITIGNORE);
 		IPath relativePath = relativePath(resource);
+		return ignore(relativePath.toPortableString());
+	}
+
+	/**
+	 * Adds a pattern to the repo's .gitignore file.
+	 * 
+	 * @param pattern
+	 * @return
+	 */
+	public boolean ignore(String pattern)
+	{
+		File gitIgnore = new File(workingDirectory().toFile(), GITIGNORE);
 		PrintWriter writer = null;
 		try
 		{
+			// FIXME Don't write duplicate entries!
 			writer = new PrintWriter(new FileWriter(gitIgnore, true));
-			writer.println(relativePath.toPortableString());
+			writer.println(pattern);
 			return true;
 		}
 		catch (IOException e)
