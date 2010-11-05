@@ -209,6 +209,12 @@
             id="com.aptana.git.ui.command.unstash"
             name="%command.unstash.name">
       </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.IgnoreHandler"
+            id="com.aptana.git.ui.command.ignore"
+            name="%IgnoreAction_label">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -374,6 +380,13 @@
             sequence="M1+M4+G">
       </key>
       <key
+            commandId="com.aptana.git.ui.command.ignore"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -508,6 +521,12 @@
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstash"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.ignore"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+G">
@@ -1255,6 +1274,58 @@
                id="com.aptana.git.ui.actions.MergeConflictsAction"
                label="%MergeConflictsAction_label"
                tooltip="%MergeConflictsAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.ignore"
+               id="com.aptana.git.ui.actions.MergeConflictsAction"
+               label="%IgnoreAction_label">
             <visibleWhen
                   checkEnabled="false">
                <or>

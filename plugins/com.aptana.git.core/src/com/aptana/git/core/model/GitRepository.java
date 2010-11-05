@@ -39,7 +39,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -82,6 +84,10 @@ import com.aptana.git.core.model.GitRef.TYPE;
 public class GitRepository
 {
 
+	/**
+	 * Filename to store ignores of files.
+	 */
+	private static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
 	/**
 	 * File used to associate SHAs and refs when git pack-refs has been used.
 	 */
@@ -1295,5 +1301,36 @@ public class GitRepository
 			e.printStackTrace();
 		}
 		return ref.ref();
+	}
+
+	/**
+	 * Add the filename to .gitignore
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	public boolean ignoreResource(IResource resource)
+	{
+		File gitIgnore = new File(workingDirectory().toFile(), GITIGNORE);
+		IPath relativePath = relativePath(resource);
+		PrintWriter writer = null;
+		try
+		{
+			writer = new PrintWriter(new FileWriter(gitIgnore, true));
+			writer.println(relativePath.toPortableString());
+			return true;
+		}
+		catch (IOException e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+			return false;
+		}
+		finally
+		{
+			if (writer != null)
+			{
+				writer.close();
+			}
+		}
 	}
 }
