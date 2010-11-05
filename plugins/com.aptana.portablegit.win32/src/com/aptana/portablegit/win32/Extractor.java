@@ -51,7 +51,7 @@ import org.eclipse.core.runtime.Path;
 /* package */ class Extractor {
 
 	private static final String ZIP_EXECUTABLE = "$os$/7za.exe"; //$NON-NLS-1$
-	private static final String ARCHIVE_PATH = "$os$/PortableGit-1.7.0.2-preview20100309.7z"; //$NON-NLS-1$
+	private static final String ARCHIVE_PATH = "$os$/PortableGit-1.7.3.1-preview20101002.7z"; //$NON-NLS-1$
 
 	/**
 	 * 
