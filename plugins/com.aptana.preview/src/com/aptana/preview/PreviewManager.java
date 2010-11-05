@@ -36,7 +36,6 @@
 package com.aptana.preview;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -68,6 +67,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.preview.internal.DefaultPreviewHandler;
 import com.aptana.preview.internal.EditorUtils;
+import com.aptana.preview.internal.Editors;
 import com.aptana.preview.internal.PreviewEditorInput;
 import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
@@ -142,14 +142,20 @@ public final class PreviewManager {
 					if (trackedEditors.containsKey(source)) {
 						editorPart = (IEditorPart) source;
 					} else {
-						Set<IEditorPart> editors = trackedEditors.keySet();
-						for (IEditorPart editor : editors) {
-							if (editor instanceof IPreviewableEditor
-									&& ((IPreviewableEditor) editor).updatePreviewWhenChanged((IEditorPart) source)) {
-								editorPart = editor;
-								// TODO: what if multiple editors in the tracked list need to update?
-								// Need a way to know which editor the Preview editor is currently previewing against
-								break;
+						for (IEditorPart editor : trackedEditors.keySet()) {
+							IEditorPreviewDelegate editorPreviewDelegate = Editors.getInstance().getEditorPreviewDelegate(editor);
+							if (editorPreviewDelegate != null) {
+								try {
+									editorPreviewDelegate.init(editor);
+									if (editorPreviewDelegate.isEditorInputLinked( ((IEditorPart) source).getEditorInput())) {
+										editorPart = editor;
+										// TODO: what if multiple editors in the tracked list need to update?
+										// Need a way to know which editor the Preview editor is currently previewing against
+										break;
+									}
+								} finally {
+									editorPreviewDelegate.dispose();
+								}
 							}
 						}
 					}

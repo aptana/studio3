@@ -34,16 +34,28 @@
  */
 package com.aptana.preview;
 
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
-public interface IPreviewableEditor
+public interface IEditorPreviewDelegate
 {
 	/**
-	 * Checks if a change in another editor should trigger this editor to update its preview content.
+	 * Initialize delegate for the specified editor part.
+	 * @param targetEditorPart
+	 */
+	public void init(IEditorPart targetEditorPart);
+	
+	/**
+	 * Release any references.
+	 */
+	public void dispose();
+	
+	/**
+	 * Checks if a change in another editor input should trigger the target editor to update its preview content.
 	 * 
-	 * @param editorPart
-	 *            the particular editor part that is changed
+	 * @param editorInput
+	 *            the particular editor input that has changed
 	 * @return true if this editor should update its preview, false otherwise
 	 */
-	public boolean updatePreviewWhenChanged(IEditorPart editorPart);
+	public boolean isEditorInputLinked(IEditorInput editorInput);
 }

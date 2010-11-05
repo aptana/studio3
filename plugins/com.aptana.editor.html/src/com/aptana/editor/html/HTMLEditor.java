@@ -34,33 +34,19 @@
  */
 package com.aptana.editor.html;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.js.Activator;
-import com.aptana.index.core.Index;
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.QueryResult;
-import com.aptana.preview.IPreviewableEditor;
 
-public class HTMLEditor extends AbstractThemeableEditor implements IPreviewableEditor
+public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
@@ -124,48 +110,4 @@ public class HTMLEditor extends AbstractThemeableEditor implements IPreviewableE
 		return Activator.getDefault().getPreferenceStore();
 	}
 
-	public boolean updatePreviewWhenChanged(IEditorPart editorPart)
-	{
-		// checks if this HTML file includes the source the changed editor is referencing (JS or CSS file)
-		IEditorInput htmlEditorInput = getEditorInput();
-		IEditorInput includedFileEditorInput = editorPart.getEditorInput();
-		if (htmlEditorInput instanceof IFileEditorInput && includedFileEditorInput instanceof IURIEditorInput)
-		{
-			IFile htmlFile = ((IFileEditorInput) htmlEditorInput).getFile();
-			Index index = IndexManager.getInstance().getIndex(htmlFile.getProject().getLocationURI());
-			List<QueryResult> queryResults = null;
-			try
-			{
-				queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
-						HTMLIndexConstants.RESOURCE_JS }, null, 0);
-			}
-			catch (IOException e)
-			{
-				return false;
-			}
-			if (queryResults != null)
-			{
-				String includedFileToCheck = (((IURIEditorInput) includedFileEditorInput).getURI()).toString();
-				String includedFile;
-				String htmlFileToCheck = htmlFile.getLocation().toPortableString();
-				for (QueryResult result : queryResults)
-				{
-					includedFile = result.getWord();
-					if (includedFileToCheck.equals(includedFile))
-					{
-						Set<String> documents = result.getDocuments();
-						for (String document : documents)
-						{
-							if (document.endsWith(htmlFileToCheck))
-							{
-								return true;
-							}
-						}
-						return false;
-					}
-				}
-			}
-		}
-		return false;
-	}
 }

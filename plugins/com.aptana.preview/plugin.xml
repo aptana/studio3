@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="previewHandlers" name="%extension-point.preview.name" schema="schema/previewHandlers.exsd"/>
-   <extension-point id="webServerTypes" name="%extension-point.webserver.name" schema="schema/webServerTypes.exsd"/>
+   <extension-point id="previewHandlers" name="%extension-point.previewHandlers.name" schema="schema/previewHandlers.exsd"/>
+   <extension-point id="webServerTypes" name="%extension-point.webServerTypes.name" schema="schema/webServerTypes.exsd"/>
+   <extension-point id="editors" name="%extension-point.previewableEditors.name" schema="schema/editors.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
       <command
