@@ -34,10 +34,15 @@
  */
 package com.aptana.editor.html;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -97,7 +102,7 @@ public class OpenTagCloser implements VerifyKeyListener
 				return;
 			}
 
-			String openTag = getOpenTag(document, offset, event);
+			String openTag = getOpenTag(document, offset);
 			if (openTag == null || skipOpenTag(openTag))
 				return;
 
@@ -175,8 +180,137 @@ public class OpenTagCloser implements VerifyKeyListener
 		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
 	}
 
+	/**
+	 * Returns null when no match found! Assumes the document has been partitioned via HTML partition scanner
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	protected static IRegion findMatchingTag(IDocument document, int offset)
+	{
+		try
+		{
+			ITypedRegion region = document.getPartition(offset);
+			// if region isn't HTML_TAG, HTML_SCRIPT, HTML_SVG, HTML_STYLE return null here
+			if (isntTagPartition(region))
+			{
+				return null;
+			}
+			String src = document.get(region.getOffset(), region.getLength());
+			if (src.startsWith("</"))
+			{
+				return findMatchingOpen(document, region);
+			}
+			// Handle self-closing tags!
+			if (src.endsWith("/>"))
+			{
+				return null;
+			}
+			return findMatchingClose(document, region);
+		}
+		catch (BadLocationException e)
+		{
+			Activator.logError(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	private static boolean isntTagPartition(ITypedRegion region)
+	{
+		return !region.getType().equals(HTMLSourceConfiguration.HTML_TAG)
+				&& !region.getType().equals(HTMLSourceConfiguration.HTML_SCRIPT)
+				&& !region.getType().equals(HTMLSourceConfiguration.HTML_STYLE)
+				&& !region.getType().equals(HTMLSourceConfiguration.HTML_SVG);
+	}
+
+	private static IRegion findMatchingClose(IDocument document, ITypedRegion region) throws BadLocationException
+	{
+		return findMatch(document, region, true);
+	}
+
+	private static IRegion findMatchingOpen(IDocument document, ITypedRegion region) throws BadLocationException
+	{
+		return findMatch(document, region, false);
+	}
+
+	private static IRegion findMatch(IDocument document, ITypedRegion region, boolean findClose)
+			throws BadLocationException
+	{
+		String tagSrc = document.get(region.getOffset(), region.getLength());
+		if (tagSrc == null)
+		{
+			return null;
+		}
+
+		String tagName = getTagName(tagSrc);
+		int start;
+		int length;
+		if (findClose)
+		{
+			// search forwards
+			start = region.getOffset() + region.getLength();
+			length = document.getLength() - start;
+		}
+		else
+		{
+			// search backwards
+			start = 0;
+			length = region.getOffset() - 1;
+		}
+		List<ITypedRegion> previousPartitions = Arrays.asList(document.computePartitioning(start, length));
+		if (!findClose)
+		{
+			// search backwards
+			Collections.reverse(previousPartitions);
+		}
+
+		// Actually make a "stack" of open and close tags for this tag name and see if it's
+		// unbalanced
+		int stack = 1;
+		for (ITypedRegion pp : previousPartitions)
+		{
+			if (isntTagPartition(pp))
+			{
+				continue;
+			}
+			String src = document.get(pp.getOffset(), pp.getLength());
+			if (src.startsWith("</" + tagName + " ") || src.startsWith("</" + tagName + ">"))
+			{
+				// close!
+				if (findClose)
+				{
+					stack--;
+				}
+				else
+				{
+					stack++;
+				}
+			}
+			else if (src.startsWith("<" + tagName + " ") || src.startsWith("<" + tagName + ">"))
+			{
+				// open!
+				if (findClose)
+				{
+					stack++;
+				}
+				else
+				{
+					stack--;
+				}
+			}
+			if (stack == 0)
+			{
+				return pp;
+			}
+		}
+
+		return null;
+	}
+
 	public static boolean tagClosed(IDocument document, String openTag)
 	{
+		// TODO use findMatchingClose(document, region)?
 		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
 		String tagName = getTagName(openTag);
 
@@ -231,9 +365,13 @@ public class OpenTagCloser implements VerifyKeyListener
 	 * @param openTag
 	 * @return
 	 */
-	protected static String getTagName(String openTag)
+	private static String getTagName(String openTag)
 	{
 		if (openTag.startsWith("<"))
+		{
+			openTag = openTag.substring(1);
+		}
+		if (openTag.startsWith("/"))
 		{
 			openTag = openTag.substring(1);
 		}
@@ -251,7 +389,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return openTag;
 	}
 
-	private String getMatchingCloseTag(String openTag)
+	private static String getMatchingCloseTag(String openTag)
 	{
 
 		int index = openTag.indexOf(' ');
@@ -265,7 +403,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return closeTag;
 	}
 
-	private String getOpenTag(IDocument document, int offset, VerifyEvent event) throws BadLocationException
+	private static String getOpenTag(IDocument document, int offset) throws BadLocationException
 	{
 		// Read current tag, see if it's self-closing or has been closed later...
 		int start = offset - 1;

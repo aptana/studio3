@@ -76,4 +76,39 @@
          </previewDelegate>
       </editor>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="com.aptana.html.tagPair.occurrences"
+            colorPreferenceKey="htmlTagPairOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="htmlTagPairOccurrenceIndicationHighlighting"
+            highlightPreferenceValue="true"
+            isGoToNextNavigationTarget="true"
+            isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
+            isGoToPreviousNavigationTarget="true"
+            isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
+            label="HTML Tag Pair Occurrences"
+            overviewRulerPreferenceKey="htmlTagPairOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="showOccurrenceInNextPrevDropdownToolbarAction"
+            textPreferenceKey="htmlTagPairOccurrenceIndication"
+            textPreferenceValue="false"
+            textStylePreferenceKey="htmlTagPairOccurrenceIndicationTextStyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="htmlTagPairOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.html.tagPair.occurrences"
+            super="com.aptana.editor.common.occurrence">
+      </type>
+   </extension>
 </plugin>

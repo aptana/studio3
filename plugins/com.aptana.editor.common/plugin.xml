@@ -521,4 +521,11 @@
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.editor.common.occurrence">
+      </type>
+   </extension>
 </plugin>

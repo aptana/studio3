@@ -34,8 +34,21 @@
  */
 package com.aptana.editor.html;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -50,7 +63,10 @@ public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
-																				// quotes
+	
+	private Map<Annotation, Position> fTagPairOccurrences;
+
+	// quotes
 
 	@Override
 	protected void initializeEditor()
@@ -110,4 +126,81 @@ public class HTMLEditor extends AbstractThemeableEditor
 		return Activator.getDefault().getPreferenceStore();
 	}
 
+	@Override
+	protected void selectionChanged()
+	{
+		super.selectionChanged();
+
+		ISelection selection = getSelectionProvider().getSelection();
+		if (selection.isEmpty())
+		{
+			return;
+		}
+		ITextSelection textSelection = (ITextSelection) selection;
+
+		int offset = textSelection.getOffset();
+		markOccurences(offset);
+	}
+
+	/**
+	 * Overridden parent method to handle highlighting of both start and end tag when either is selected If/when we have
+	 * common based class for tag based languages (html, xml etc.), this method should be moved there.
+	 * 
+	 * @see com.aptana.ide.editors.unified.UnifiedEditor#markOccurences(com.aptana.ide.lexer.LexemeList,
+	 *      com.aptana.ide.lexer.Lexeme)
+	 */
+	protected void markOccurences(int offset)
+	{
+		IDocumentProvider documentProvider = getDocumentProvider();
+		if (documentProvider == null)
+		{
+			return;
+		}
+		IAnnotationModel annotationModel = documentProvider.getAnnotationModel(getEditorInput());
+		if (annotationModel == null)
+		{
+			return;
+		}
+
+		if (fTagPairOccurrences != null)
+		{
+			for (Annotation a : fTagPairOccurrences.keySet())
+			{
+				annotationModel.removeAnnotation(a);
+			}
+			fTagPairOccurrences = null;
+		}
+
+		Map<Annotation, Position> occurrences = new HashMap<Annotation, Position>();
+
+		IDocument document = getSourceViewer().getDocument();
+		IRegion match = OpenTagCloser.findMatchingTag(document, offset);
+		if (match != null)
+		{
+			// Compare versus last positions, if they're the same don't wipe out the old ones and add new ones!
+			occurrences.put(new Annotation("com.aptana.html.tagPair.occurrences", false, "tag pair match"), new Position(
+					match.getOffset(), match.getLength()));
+
+			try
+			{
+				ITypedRegion partition = document.getPartition(offset);
+				occurrences.put(new Annotation("com.aptana.html.tagPair.occurrences", false, "tag pair match"), new Position(
+						partition.getOffset(), partition.getLength()));
+			}
+			catch (BadLocationException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
+			{
+				annotationModel.addAnnotation(entry.getKey(), entry.getValue());
+			}
+			fTagPairOccurrences = occurrences;
+		}
+		else
+		{
+			fTagPairOccurrences = null;
+		}
+	}
 }
