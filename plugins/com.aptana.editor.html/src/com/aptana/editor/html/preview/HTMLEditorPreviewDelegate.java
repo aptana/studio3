@@ -45,6 +45,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 
+import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -94,7 +95,7 @@ public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate {
 			if (queryResults != null) {
 				String includedFileToCheck = (((IURIEditorInput) editorInput).getURI()).toString();
 				String includedFile;
-				String htmlFileToCheck = htmlFile.getLocation().toPortableString();
+				String htmlFileToCheck = URLEncoder.encode(htmlFile.getLocation().toPortableString(), null, null);
 				for (QueryResult result : queryResults) {
 					includedFile = result.getWord();
 					if (includedFileToCheck.equals(includedFile)) {
