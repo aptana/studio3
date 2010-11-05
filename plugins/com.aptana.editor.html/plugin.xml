@@ -67,4 +67,13 @@
             targetId="com.aptana.editor.html">
       </hyperlinkDetector>
    </extension>
+   <extension
+         point="com.aptana.preview.editors">
+      <editor
+            targetId="com.aptana.editor.html">
+         <previewDelegate
+               class="com.aptana.editor.html.preview.HTMLEditorPreviewDelegate">
+         </previewDelegate>
+      </editor>
+   </extension>
 </plugin>
