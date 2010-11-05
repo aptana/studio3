@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.aptana.feature.portal35"
+      label="%featureName"
+      version="3.0.0.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      %description
+   </description>
+
+   <copyright url="%copyrightURL">
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.equinox.p2.core" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.metadata" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.engine" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.repository" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.metadata.repository" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.artifact.repository" version="1.0.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.p2.ui" version="1.0.0" match="compatible"/>
+      <import plugin="org.mortbay.jetty.util"/>
+      <import plugin="com.aptana.portal.ui"/>
+      <import plugin="com.aptana.configurations"/>
+   </requires>
+
+   <plugin
+         id="com.aptana.portal.ui.eclipse35"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
