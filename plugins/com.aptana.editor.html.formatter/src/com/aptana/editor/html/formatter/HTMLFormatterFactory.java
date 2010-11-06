@@ -43,6 +43,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.HTMLSourceViewerConfiguration;
 import com.aptana.editor.html.formatter.preferences.HTMLFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
@@ -113,5 +114,14 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	public IPreferenceStore getPreferenceStore()
 	{
 		return HTMLFormatterPlugin.getDefault().getPreferenceStore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return HTMLSourceConfiguration.getDefault();
 	}
 }

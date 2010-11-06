@@ -43,6 +43,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.CSSSourceViewerConfiguration;
 import com.aptana.editor.css.formatter.preferences.CSSFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
@@ -106,6 +107,15 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 	public IPreferenceStore getPreferenceStore()
 	{
 		return CSSFormatterPlugin.getDefault().getPreferenceStore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return CSSSourceConfiguration.getDefault();
 	}
 
 }

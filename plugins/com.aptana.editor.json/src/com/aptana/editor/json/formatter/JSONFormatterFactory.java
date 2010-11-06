@@ -44,6 +44,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.json.JSONPlugin;
+import com.aptana.editor.json.JSONSourceConfiguration;
 import com.aptana.editor.json.JSONSourceViewerConfiguration;
 import com.aptana.editor.json.preferences.IPreferenceConstants;
 import com.aptana.editor.json.preferences.JSONFormatterModifyDialog;
@@ -55,17 +56,19 @@ import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 
 public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 {
-	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_ID);
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(JSONPlugin.PLUGIN_ID,
+			IPreferenceConstants.FORMATTER_ID);
 	private static final String FORMATTER_PREVIEW_FILE = "formatting-preview.json"; //$NON-NLS-1$
 	private static final PreferenceKey[] KEYS = { //
-		new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_INDENTATION_SIZE), //
-		new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_TAB_CHAR), //
-		new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_TAB_SIZE) //
+	new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_INDENTATION_SIZE), //
+			new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_TAB_CHAR), //
+			new PreferenceKey(JSONPlugin.PLUGIN_ID, IPreferenceConstants.FORMATTER_TAB_SIZE) //
 	};
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IScriptFormatterFactory#createDialog(com.aptana.formatter.ui.IFormatterModifyDialogOwner)
+	 * @see
+	 * com.aptana.formatter.IScriptFormatterFactory#createDialog(com.aptana.formatter.ui.IFormatterModifyDialogOwner)
 	 */
 	public IFormatterModifyDialog createDialog(IFormatterModifyDialogOwner dialogOwner)
 	{
@@ -83,10 +86,13 @@ public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IScriptFormatterFactory#createSimpleSourceViewerConfiguration(org.eclipse.jface.text.source.ISharedTextColors, org.eclipse.jface.preference.IPreferenceStore, org.eclipse.ui.texteditor.ITextEditor, boolean)
+	 * @see
+	 * com.aptana.formatter.IScriptFormatterFactory#createSimpleSourceViewerConfiguration(org.eclipse.jface.text.source
+	 * .ISharedTextColors, org.eclipse.jface.preference.IPreferenceStore, org.eclipse.ui.texteditor.ITextEditor,
+	 * boolean)
 	 */
-	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager, IPreferenceStore preferenceStore,
-		ITextEditor editor, boolean configureFormatter)
+	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
+			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{
 		return new JSONSourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
 	}
@@ -125,5 +131,14 @@ public class JSONFormatterFactory extends AbstractScriptFormatterFactory
 	public URL getPreviewContent()
 	{
 		return getClass().getResource(FORMATTER_PREVIEW_FILE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return JSONSourceConfiguration.getDefault();
 	}
 }
