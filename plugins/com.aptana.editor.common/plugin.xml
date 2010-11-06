@@ -220,6 +220,52 @@
             </visibleWhen>
          </dynamic>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+         <menu
+               id="com.aptana.source.menu"
+               label="Source"
+               mnemonic="&amp;Source">
+            <command
+                  commandId="com.aptana.editor.commands.Format"
+                  label="Format"
+                  mnemonic="&amp;Format"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <instanceof
+                           value="com.aptana.editor.common.AbstractThemeableEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.edit">
+         <menu
+               id="com.aptana.source.popup.menu"
+               label="Source"
+               mnemonic="&amp;Source">
+            <command
+                  commandId="com.aptana.editor.commands.Format"
+                  label="Format"
+                  mnemonic="&amp;Format"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <instanceof
+                           value="com.aptana.editor.common.AbstractThemeableEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
    <extension
