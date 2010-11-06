@@ -190,9 +190,15 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 static void FlushBuffer();
 static void TestAndFlushBuffer();
 static void OutputChar(CHAR ch);
+static void OutputUnicodeChar(WCHAR ch);
 static void OutputNumber(SHORT value);
 static void OutputNumber64(DWORD value);
 static void OutputString(CHAR* szStr);
+
+static void OutputCRLF()
+{
+	OutputString("\r\n");
+}
 
 static void MoveCursorAbs(SHORT x, SHORT y)
 {
@@ -469,19 +475,19 @@ static bool ProcessSnapshotDiff(CHAR_INFO* lpPrevBuffer, CHAR_INFO* lpNextBuffer
 					} else {
 						MoveCursor(x, y);
 					}
-					if( lpNextCharInfo->Char.AsciiChar == '\0' ) {
+					if( lpNextCharInfo->Char.UnicodeChar == L'\0' ) {
 						break;
 					} else if( wCharAttributes != lpNextCharInfo->Attributes ) {
 						ChangeAttributes(lpNextCharInfo->Attributes);
 					}
-					OutputChar(lpNextCharInfo->Char.AsciiChar);
+					OutputUnicodeChar(lpNextCharInfo->Char.UnicodeChar);
 					++csbiConsole.dwCursorPosition.X;
 				}
 			}
 			if( bReplaceLine)
 			{
 				if( y !=  coordConsoleSize.Y -1 ) {
-					OutputString("\r\n");
+					OutputCRLF();
 					csbiConsole.dwCursorPosition.X = 0;
 					++csbiConsole.dwCursorPosition.Y;
 				}
@@ -527,7 +533,7 @@ static void ReadConsoleBuffer()
 			if( (nRowsDiff > 0) && (csbiNextConsole.srWindow.Top != 0) && (csbiConsole.srWindow.Top == 0) ) {
 				MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
 				for( SHORT i = 0; i < nRowsDiff; ++i) {
-					OutputString("\r\n");
+					OutputCRLF();
 				}
 			}
 			EraseWindow();
@@ -558,7 +564,7 @@ static void ReadConsoleBuffer()
 			{
 				if( bHasNonEmptyChar ) {
 					if ( y != coordConsoleSize.Y-1) {
-						OutputString("\r\n");
+						OutputCRLF();
 						csbiConsole.dwCursorPosition.X = 0;
 						++csbiConsole.dwCursorPosition.Y;
 					}
@@ -568,12 +574,12 @@ static void ReadConsoleBuffer()
 			}
 			for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpCharInfo)
 			{
-				if( (lpCharInfo->Char.AsciiChar == ' ') && (lpCharInfo->Attributes == wCharAttributes) && !bHasNonEmptyChar ) {
+				if( (lpCharInfo->Char.UnicodeChar == L' ') && (lpCharInfo->Attributes == wCharAttributes) && !bHasNonEmptyChar ) {
 					continue;
 				}
 				if( !bHasNonEmptyChar ) {
 					for( SHORT i = 0; i < y; ++i) {
-						OutputString("\r\n");
+						OutputCRLF();
 						csbiConsole.dwCursorPosition.X = 0;
 						++csbiConsole.dwCursorPosition.Y;
 					}
@@ -583,15 +589,15 @@ static void ReadConsoleBuffer()
 					}
 					bHasNonEmptyChar = TRUE;
 				}
-				if( lpCharInfo->Char.AsciiChar == '\0' ) {
+				if( lpCharInfo->Char.UnicodeChar == L'\0' ) {
 					break;
 				} else if( wCharAttributes != lpCharInfo->Attributes ) {
 					ChangeAttributes(lpCharInfo->Attributes);
-				} else if( (lpCharInfo->Char.AsciiChar == ' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
+				} else if( (lpCharInfo->Char.UnicodeChar == L' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
 					lpCharInfo += coordConsoleSize.X - x;
 					break;
 				}
-				OutputChar(lpCharInfo->Char.AsciiChar);
+				OutputUnicodeChar(lpCharInfo->Char.UnicodeChar);
 				++csbiConsole.dwCursorPosition.X;
 			}
 			if( bHasNonEmptyChar ) {
@@ -599,7 +605,7 @@ static void ReadConsoleBuffer()
 					break;
 				}
 				if ( y != coordConsoleSize.Y-1) {
-					OutputString("\r\n");
+					OutputCRLF();
 					csbiConsole.dwCursorPosition.X = 0;
 					++csbiConsole.dwCursorPosition.Y; 
 				}
@@ -623,7 +629,7 @@ static void ReadConsoleBuffer()
 				nRows = coordConsoleSize.Y;
 			}
 			for( SHORT i = 0; i < nRows; ++i) {
-				OutputString("\r\n");
+				OutputCRLF();
 			}
 			csbiConsole.dwCursorPosition.X = 0;
 			DWORD dwShift = nRows*coordConsoleSize.X;
@@ -632,7 +638,7 @@ static void ReadConsoleBuffer()
 				::MoveMemory(lpPrevScreenBuffer, lpNextScreenBuffer + dwShift, (dwScreenBufferSize-dwShift)*sizeof(CHAR_INFO));
 				CHAR_INFO* lpCharInfo = lpPrevScreenBuffer + (dwScreenBufferSize-dwShift);
 				for( DWORD i = 0; i < dwShift; ++i, ++lpCharInfo) {
-					lpCharInfo->Char.AsciiChar = ' ';
+					lpCharInfo->Char.UnicodeChar = L' ';
 					lpCharInfo->Attributes = DEFAULT_ATTRIBUTES;
 				}
 			}
@@ -878,10 +884,10 @@ static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength)
 {
 	for( SHORT x = 0; x < sLength; ++x, ++lpCharInfo) {
-		if( (lpCharInfo->Char.AsciiChar == '\0') || (lpCharInfo->Attributes == 0) ) {
+		if( (lpCharInfo->Char.UnicodeChar == L'\0') || (lpCharInfo->Attributes == 0) ) {
 			continue;
 		}
-		if( (lpCharInfo->Char.AsciiChar != ' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
+		if( (lpCharInfo->Char.UnicodeChar != L' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
 			return FALSE;
 		}
 	}
@@ -948,6 +954,19 @@ static void OutputString(CHAR* szStr)
 	}
 	while( *szStr != 0 ) {
 		chOutputBuffer[dwBufferFilled++] = *szStr++;
+	}
+}
+
+static void OutputUnicodeChar(WCHAR ch)
+{
+	if( dwBufferFilled + 1 > sizeof(chOutputBuffer) ){
+		FlushBuffer();
+	}
+	WCHAR wcString[2] = { ch, L'\0' };
+	CHAR cString[16];
+	int size = ::WideCharToMultiByte(CP_UTF8, 0, wcString, -1, cString, sizeof(cString), NULL, NULL);
+	if( size > 0 ) {
+		OutputString(cString);
 	}
 }
 
