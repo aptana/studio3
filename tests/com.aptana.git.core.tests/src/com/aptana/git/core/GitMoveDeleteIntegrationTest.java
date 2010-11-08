@@ -68,6 +68,8 @@ public class GitMoveDeleteIntegrationTest extends TestCase
 		// create a git repo
 		getGitRepositoryManager().create(project.getLocation());
 		repo = getGitRepositoryManager().attachExisting(project, new NullProgressMonitor());
+		// delete auto-generated .gitignore file
+		repo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()
