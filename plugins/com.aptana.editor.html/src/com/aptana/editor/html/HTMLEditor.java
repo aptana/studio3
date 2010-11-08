@@ -63,7 +63,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
-	
+
 	private Map<Annotation, Position> fTagPairOccurrences;
 
 	// quotes
@@ -137,19 +137,17 @@ public class HTMLEditor extends AbstractThemeableEditor
 			return;
 		}
 		ITextSelection textSelection = (ITextSelection) selection;
-
 		int offset = textSelection.getOffset();
-		markOccurences(offset);
+		highlightTagPair(offset);
 	}
 
 	/**
-	 * Overridden parent method to handle highlighting of both start and end tag when either is selected If/when we have
-	 * common based class for tag based languages (html, xml etc.), this method should be moved there.
+	 * Given the offset, tries to determine if we're on an HTML close/start tag, and if so it will find the matching
+	 * open/close and highlight the pair.
 	 * 
-	 * @see com.aptana.ide.editors.unified.UnifiedEditor#markOccurences(com.aptana.ide.lexer.LexemeList,
-	 *      com.aptana.ide.lexer.Lexeme)
+	 * @param offset
 	 */
-	protected void markOccurences(int offset)
+	private void highlightTagPair(int offset)
 	{
 		IDocumentProvider documentProvider = getDocumentProvider();
 		if (documentProvider == null)
@@ -164,6 +162,15 @@ public class HTMLEditor extends AbstractThemeableEditor
 
 		if (fTagPairOccurrences != null)
 		{
+			// if the offset is included by one of these two positions, we don't need to wipe and re-calculate!
+			for (Position pos : fTagPairOccurrences.values())
+			{
+				if (pos.includes(offset))
+				{
+					return;
+				}
+			}
+			// New position, wipe the existing annotations in preparation for re-calculating...
 			for (Annotation a : fTagPairOccurrences.keySet())
 			{
 				annotationModel.removeAnnotation(a);
@@ -171,26 +178,26 @@ public class HTMLEditor extends AbstractThemeableEditor
 			fTagPairOccurrences = null;
 		}
 
+		// Calculate current pair
 		Map<Annotation, Position> occurrences = new HashMap<Annotation, Position>();
-
 		IDocument document = getSourceViewer().getDocument();
 		IRegion match = OpenTagCloser.findMatchingTag(document, offset);
 		if (match != null)
 		{
-			// Compare versus last positions, if they're the same don't wipe out the old ones and add new ones!
-			occurrences.put(new Annotation("com.aptana.html.tagPair.occurrences", false, "tag pair match"), new Position(
-					match.getOffset(), match.getLength()));
+			// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new ones!
+			occurrences.put(new Annotation(IHTMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
+					new Position(match.getOffset(), match.getLength()));
 
 			try
 			{
+				// The current tag we're in!
 				ITypedRegion partition = document.getPartition(offset);
-				occurrences.put(new Annotation("com.aptana.html.tagPair.occurrences", false, "tag pair match"), new Position(
+				occurrences.put(new Annotation(IHTMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null), new Position(
 						partition.getOffset(), partition.getLength()));
 			}
 			catch (BadLocationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Activator.logError(e.getMessage(), e);
 			}
 			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
 			{
@@ -200,6 +207,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		}
 		else
 		{
+			// no new pair, so don't highlgiht anything
 			fTagPairOccurrences = null;
 		}
 	}
