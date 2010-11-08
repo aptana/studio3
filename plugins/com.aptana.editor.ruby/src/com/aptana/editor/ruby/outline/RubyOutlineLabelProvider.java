@@ -47,17 +47,18 @@ import com.aptana.editor.ruby.core.IRubyType;
 public class RubyOutlineLabelProvider extends LabelProvider
 {
 
-	private static final Image CLASS = RubyEditorPlugin.getImage("icons/class_obj.png"); //$NON-NLS-1$
+	static final Image CLASS = RubyEditorPlugin.getImage("icons/class_obj.png"); //$NON-NLS-1$
 	private static final Image MODULE = RubyEditorPlugin.getImage("icons/module_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PUBLIC = RubyEditorPlugin.getImage("icons/method_public_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PROTECTED = RubyEditorPlugin.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PRIVATE = RubyEditorPlugin.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_SINGLETON = RubyEditorPlugin.getImage("icons/class_method.png"); //$NON-NLS-1$
+	static final Image METHOD_CONSTRUCTOR = RubyEditorPlugin.getImage("icons/constructor.png"); //$NON-NLS-1$
 	private static final Image CLASS_VAR = RubyEditorPlugin.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
 	private static final Image CONSTANT = RubyEditorPlugin.getImage("icons/constant_obj.png"); //$NON-NLS-1$
 	private static final Image GLOBAL = RubyEditorPlugin.getImage("icons/global_obj.png"); //$NON-NLS-1$
-	private static final Image INSTANCE_VAR = RubyEditorPlugin.getImage("icons/instance_var_obj.png"); //$NON-NLS-1$
-	private static final Image LOCAL_VAR = RubyEditorPlugin.getImage("icons/local_var_obj.png"); //$NON-NLS-1$
+	static final Image INSTANCE_VAR = RubyEditorPlugin.getImage("icons/instance_var_obj.png"); //$NON-NLS-1$
+	static final Image LOCAL_VAR = RubyEditorPlugin.getImage("icons/local_var_obj.png"); //$NON-NLS-1$
 	private static final Image IMPORT_DECLARATION = RubyEditorPlugin.getImage("icons/import_obj.png"); //$NON-NLS-1$
 	private static final Image IMPORT_CONTAINER = RubyEditorPlugin.getImage("icons/import_container_obj.png"); //$NON-NLS-1$
 
@@ -78,6 +79,10 @@ public class RubyOutlineLabelProvider extends LabelProvider
 			if (method.isSingleton())
 			{
 				return METHOD_SINGLETON;
+			}
+			if (method.isConstructor())
+			{
+				return METHOD_CONSTRUCTOR;
 			}
 			Visibility visibility = method.getVisibility();
 			switch (visibility)

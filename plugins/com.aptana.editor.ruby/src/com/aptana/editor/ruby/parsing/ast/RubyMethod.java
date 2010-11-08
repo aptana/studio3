@@ -114,4 +114,9 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 		text.append(")"); //$NON-NLS-1$
 		return text.toString();
 	}
+
+	public boolean isConstructor()
+	{
+		return !isSingleton() && getName().equals("initialize"); //$NON-NLS-1$
+	}
 }

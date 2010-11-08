@@ -74,6 +74,7 @@ public class RubyOutlineTest extends TestCase
 
 	public void testBasic() throws Exception
 	{
+		// TODO Add more types and ensure we have the right order: imports, class vars, globals, etc.
 		String source = "class Test\n\tdef initialize(files)\n\t\t@files = files\n\tend\nend";
 		ParseState parseState = new ParseState();
 		parseState.setEditState(source, source, 0, 0);
@@ -82,21 +83,21 @@ public class RubyOutlineTest extends TestCase
 		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
 		assertEquals(1, elements.length); // class Test
 		assertEquals("Test", fLabelProvider.getText(elements[0]));
-		assertEquals(RubyEditorPlugin.getImage("icons/class_obj.png"), fLabelProvider.getImage(elements[0]));
+		assertEquals(RubyOutlineLabelProvider.CLASS, fLabelProvider.getImage(elements[0]));
 
 		Object[] level1 = fContentProvider.getChildren(elements[0]); // initialize(files) and @files
-		assertEquals(2, level1.length);
-		assertEquals("initialize(files)", fLabelProvider.getText(level1[0]));
-		assertEquals(RubyEditorPlugin.getImage("icons/method_protected_obj.png"), fLabelProvider.getImage(level1[0]));
-		assertEquals("@files", fLabelProvider.getText(level1[1]));
-		assertEquals(RubyEditorPlugin.getImage("icons/instance_var_obj.png"), fLabelProvider.getImage(level1[1]));
-
-		Object[] level2 = fContentProvider.getChildren(level1[0]); // files
+		assertEquals(2, level1.length);		
+		assertEquals("@files", fLabelProvider.getText(level1[0]));
+		assertEquals(RubyOutlineLabelProvider.INSTANCE_VAR, fLabelProvider.getImage(level1[0]));
+		assertEquals("initialize(files)", fLabelProvider.getText(level1[1]));
+		assertEquals(RubyOutlineLabelProvider.METHOD_CONSTRUCTOR, fLabelProvider.getImage(level1[1]));
+		
+		Object[] level2 = fContentProvider.getChildren(level1[1]); // files
 		assertEquals(1, level2.length);
 		assertEquals("files", fLabelProvider.getText(level2[0]));
-		assertEquals(RubyEditorPlugin.getImage("icons/local_var_obj.png"), fLabelProvider.getImage(level2[0]));
+		assertEquals(RubyOutlineLabelProvider.LOCAL_VAR, fLabelProvider.getImage(level2[0]));
 
-		level2 = fContentProvider.getChildren(level1[1]);
+		level2 = fContentProvider.getChildren(level1[0]);
 		assertEquals(0, level2.length);
 	}
 }
