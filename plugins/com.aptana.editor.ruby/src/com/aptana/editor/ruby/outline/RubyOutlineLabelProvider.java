@@ -53,6 +53,7 @@ public class RubyOutlineLabelProvider extends LabelProvider
 	private static final Image METHOD_PROTECTED = RubyEditorPlugin.getImage("icons/method_protected_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_PRIVATE = RubyEditorPlugin.getImage("icons/method_private_obj.png"); //$NON-NLS-1$
 	private static final Image METHOD_SINGLETON = RubyEditorPlugin.getImage("icons/class_method.png"); //$NON-NLS-1$
+	private static final Image METHOD_CONSTRUCTOR = RubyEditorPlugin.getImage("icons/constructor.png"); //$NON-NLS-1$
 	private static final Image CLASS_VAR = RubyEditorPlugin.getImage("icons/class_var_obj.png"); //$NON-NLS-1$
 	private static final Image CONSTANT = RubyEditorPlugin.getImage("icons/constant_obj.png"); //$NON-NLS-1$
 	private static final Image GLOBAL = RubyEditorPlugin.getImage("icons/global_obj.png"); //$NON-NLS-1$
@@ -78,6 +79,10 @@ public class RubyOutlineLabelProvider extends LabelProvider
 			if (method.isSingleton())
 			{
 				return METHOD_SINGLETON;
+			}
+			if (method.isConstructor())
+			{
+				return METHOD_CONSTRUCTOR;
 			}
 			Visibility visibility = method.getVisibility();
 			switch (visibility)
