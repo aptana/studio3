@@ -133,6 +133,12 @@
             name="%openDevToolbox.name">
       </command>
    </extension>
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+			class="com.aptana.portal.ui.propertyTesters.DevelopmentModePropertyTester"
+			id="com.aptana.portal.ui.developmentModePropertyTester" namespace="com.aptana.portal.ui"
+			properties="inDevelopmentMode" type="java.lang.Object" />
+	</extension>
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
@@ -141,6 +147,14 @@
                commandId="com.aptana.portal.command.openToolbox"
                icon="icons/obj16/dev_toolbox.png"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <test
+                     forcePluginActivation="true"
+                     property="com.aptana.portal.ui.inDevelopmentMode"
+                     value="true">
+               </test>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -152,9 +166,17 @@
                   icon="icons/obj16/dev_toolbox.png"
                   style="push">
                <visibleWhen>
-                  <reference
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.aptana.portal.ui.inDevelopmentMode"
+                           value="true">
+                     </test>
+                     <reference
                         definitionId="com.aptana.ui.contributions.inGlobalActionSet">
-                  </reference>
+                     </reference>
+                  </and>
+                  
                </visibleWhen>
             </command>
          </toolbar>
