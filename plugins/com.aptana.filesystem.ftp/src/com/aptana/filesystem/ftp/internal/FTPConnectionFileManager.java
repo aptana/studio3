@@ -409,6 +409,9 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 						if (lastModifiedLocalTZ != null) {
 							// align to minutes
 							serverTimeZoneShift = (lastModifiedLocalTZ.getTime() - lastModifiedLocalTZ.getTime() % 60000) - (lastModifiedServerInLocalTZ.getTime() - lastModifiedServerInLocalTZ.getTime() % 60000);
+							Calendar calendar = (Calendar) Calendar.getInstance().clone();
+							calendar.setTime(lastModifiedLocalTZ);
+							serverTimeZoneShift -= calendar.get(Calendar.DST_OFFSET);
 						}
 					}
 					if (serverTimeZoneShift == Integer.MIN_VALUE) {
@@ -425,8 +428,9 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 						ftpClient.delete(file.getName());
 					}
 					if (context != null) {
-						Calendar cal = Calendar.getInstance();
-						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET)/*+cal.get(Calendar.DST_OFFSET)*/ - serverTimeZoneShift);
+						Calendar cal = (Calendar) Calendar.getInstance().clone();
+						cal.setTime(new Date());
+						int rawOffset = (int) (cal.get(Calendar.ZONE_OFFSET) - serverTimeZoneShift);
 						context.put(ConnectionContext.SERVER_TIMEZONE, TimeZone.getAvailableIDs(rawOffset));
 					}
 				} 
