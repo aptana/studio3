@@ -35,6 +35,8 @@
 package com.aptana.editor.ruby;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
@@ -44,6 +46,9 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.ruby.core.IImportContainer;
+import com.aptana.editor.ruby.core.IRubyField;
+import com.aptana.editor.ruby.core.IRubyMethod;
+import com.aptana.editor.ruby.core.IRubyType;
 import com.aptana.editor.ruby.outline.RubyOutlineContentProvider;
 import com.aptana.editor.ruby.outline.RubyOutlineLabelProvider;
 import com.aptana.editor.ruby.parsing.IRubyParserConstants;
@@ -103,5 +108,37 @@ public class RubySourceEditor extends AbstractThemeableEditor
 			}
 		}
 		super.setSelectedElement(element);
+	}
+	
+	@Override
+	protected void selectionChanged()
+	{
+		super.selectionChanged();
+		
+		ISelection selection = getSelectionProvider().getSelection();
+		if (selection.isEmpty())
+		{
+			return;
+		}
+		ITextSelection textSelection = (ITextSelection) selection;
+		updateOccurrences(textSelection);
+	}
+
+	private void updateOccurrences(ITextSelection textSelection)
+	{
+		IParseNode currentNode = getASTNodeAt(textSelection.getOffset());
+		if (currentNode instanceof IRubyType)
+		{
+			// TODO Match "end" to "class/module ..."
+		}
+		else if (currentNode instanceof IRubyMethod)
+		{
+			// TODO Match "end" to "def ..."
+		}
+		else if (currentNode instanceof IRubyField)
+		{
+			// TODO Find occurrences of variables!
+		}
+		
 	}
 }
