@@ -79,6 +79,8 @@ public class RubyOutlineContentProvider extends CommonOutlineContentProvider
 				switch (element.getNodeType())
 				{
 					case IRubyElement.SCRIPT:
+						return -2;
+					case IRubyElement.GLOBAL:
 						return -1;
 					case IRubyElement.IMPORT_CONTAINER:
 						return 0;
