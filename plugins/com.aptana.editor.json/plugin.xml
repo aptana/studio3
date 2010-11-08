@@ -48,7 +48,7 @@
                class="com.aptana.editor.json.formatter.JSONFormatterFactory"
                description="%editor.json.formatter.description"
                id="com.aptana.editor.json.formatterFactory"
-               name="editor.json.formatter.name"
+               name="%editor.json.formatter.name"
                priority="10">
          </formatterFactory>
       </engineContribution>
