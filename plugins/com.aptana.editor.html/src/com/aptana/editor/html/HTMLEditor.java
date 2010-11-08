@@ -207,7 +207,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		}
 		else
 		{
-			// no new pair, so don't highlgiht anything
+			// no new pair, so don't highlight anything
 			fTagPairOccurrences = null;
 		}
 	}
