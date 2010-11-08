@@ -482,6 +482,8 @@ public class GitRepositoryTest extends TestCase
 		GitRepository repo = getGitRepositoryManager().getUnattachedExisting(path.toFile().toURI());
 		assertNotNull(repo);
 		fRepo = repo;
+		// Remove the auto-generated .gitignore file!
+		fRepo.workingDirectory().append(GitRepository.GITIGNORE).toFile().delete();
 		return repo;
 	}
 
