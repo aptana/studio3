@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.browser,
  org.eclipse.ui.ide,
  com.aptana.usage,
- com.aptana.editor.common,
  com.aptana.core,
  com.aptana.configurations,
  org.eclipse.core.resources,
@@ -33,7 +32,5 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.processorDelegates,
  com.aptana.portal.ui.internal,
  com.aptana.portal.ui.internal.startup
-Import-Package: com.aptana.configurations,
- com.aptana.editor.common,
- com.aptana.usage
+Import-Package: com.aptana.usage
 Eclipse-ExtensibleAPI: true
