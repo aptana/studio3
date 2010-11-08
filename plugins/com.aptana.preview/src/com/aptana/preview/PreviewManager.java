@@ -35,6 +35,7 @@
 
 package com.aptana.preview;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -47,12 +48,17 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -62,6 +68,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.preview.internal.DefaultPreviewHandler;
 import com.aptana.preview.internal.EditorUtils;
+import com.aptana.preview.internal.Editors;
 import com.aptana.preview.internal.PreviewEditorInput;
 import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
@@ -74,21 +81,91 @@ public final class PreviewManager {
 
 	private static PreviewManager instance;
 	private IPropertyListener editorPropertyListener;
-	private WeakHashMap<IEditorPart, PreviewEditorInput> trackedEditors = new WeakHashMap<IEditorPart, PreviewEditorInput>();
+	private Map<IEditorPart, PreviewEditorInput> trackedEditors = new WeakHashMap<IEditorPart, PreviewEditorInput>();
+
+	private IPartListener editorPartListener = new IPartListener() {
+
+		public void partActivated(IWorkbenchPart part) {
+		}
+
+		public void partBroughtToTop(IWorkbenchPart part) {
+		}
+
+		public void partClosed(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				part.removePropertyListener(editorPropertyListener);
+			}
+		}
+
+		public void partDeactivated(IWorkbenchPart part) {
+		}
+
+		public void partOpened(IWorkbenchPart part) {
+			if (part instanceof IEditorPart) {
+				part.addPropertyListener(editorPropertyListener);
+			}
+		}
+	};
+
+	private final IWindowListener windowListener = new IWindowListener() {
+
+		public void windowActivated(IWorkbenchWindow window) {
+		}
+
+		public void windowClosed(IWorkbenchWindow window) {
+			IPartService partService = window.getPartService();
+			if (partService != null) {
+				partService.removePartListener(editorPartListener);
+			}
+		}
+
+		public void windowDeactivated(IWorkbenchWindow window) {
+		}
+
+		public void windowOpened(IWorkbenchWindow window) {
+			IPartService partService = window.getPartService();
+			if (partService != null) {
+				partService.addPartListener(editorPartListener);
+			}
+		}
+	};
 
 	/**
 	 * 
 	 */
 	private PreviewManager() {
 		editorPropertyListener = new IPropertyListener() {
+
 			public void propertyChanged(Object source, int propId) {
 				if (source instanceof IEditorPart && EditorPart.PROP_DIRTY == propId
-						&& !((EditorPart) source).isDirty() && trackedEditors.containsKey(source)) {
-					IEditorPart editorPart = (IEditorPart) source;
-					try {
-						openPreview(editorPart, editorPart.getEditorInput(), null);
-					} catch (CoreException e) {
-						Activator.log(e);
+						&& !((EditorPart) source).isDirty()) {
+					IEditorPart editorPart = null;
+					if (trackedEditors.containsKey(source)) {
+						editorPart = (IEditorPart) source;
+					} else {
+						for (IEditorPart editor : trackedEditors.keySet()) {
+							IEditorPreviewDelegate editorPreviewDelegate = Editors.getInstance().getEditorPreviewDelegate(editor);
+							if (editorPreviewDelegate != null) {
+								try {
+									editorPreviewDelegate.init(editor);
+									if (editorPreviewDelegate.isEditorInputLinked( ((IEditorPart) source).getEditorInput())) {
+										editorPart = editor;
+										// TODO: what if multiple editors in the tracked list need to update?
+										// Need a way to know which editor the Preview editor is currently previewing against
+										break;
+									}
+								} finally {
+									editorPreviewDelegate.dispose();
+								}
+							}
+						}
+					}
+					if (editorPart != null) {
+						try {
+							openPreview(editorPart, editorPart.getEditorInput(), null, false);
+						} catch (CoreException e) {
+							Activator.log(e);
+						}
 					}
 				}
 			}
@@ -100,6 +177,31 @@ public final class PreviewManager {
 			instance = new PreviewManager();
 		}
 		return instance;
+	}
+
+	public void init() {
+		addPartListener();
+		// attaches property listener to all opened editors
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IWorkbenchPage[] pages;
+		IEditorReference[] editors;
+		IEditorPart editorPart;
+		for (IWorkbenchWindow window : windows) {
+			pages = window.getPages();
+			for (IWorkbenchPage page : pages) {
+				editors = page.getEditorReferences();
+				for (IEditorReference editor : editors) {
+					editorPart = editor.getEditor(false);
+					if (editorPart != null) {
+						editorPart.addPropertyListener(editorPropertyListener);
+					}
+				}
+			}
+		}
+	}
+
+	public void dispose() {
+		removePartListener();
 	}
 
 	public void openPreviewForEditor(IEditorPart editorPart) {
@@ -145,8 +247,33 @@ public final class PreviewManager {
 			Activator.log(e);
 		}
 	}
+	
+	public boolean testEditorInputForPreview(IEditorInput editorInput) {
+		try {
+			SourceConfig sourceConfig = getSourceConfig(editorInput, null);
+			if (sourceConfig != null) {
+				IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
+				if (handler == null) {
+					if (DefaultPreviewHandler.getInstance().handle(sourceConfig) != null) {
+						return true;
+					}
+				} else {
+					// TODO: use IPreviewHandler.canHandle() ?
+					return true;
+				}
+				
+			}
+		} catch (CoreException e) {
+			Activator.log(e);
+		}
+		return false;
+	}
 
 	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content) throws CoreException {
+		openPreview(editorPart, editorInput, content, true);
+	}
+
+	private SourceConfig getSourceConfig(IEditorInput editorInput, String content) throws CoreException {
 		String fileName = null;
 		IProject project = null;
 		IPath path = null;
@@ -166,30 +293,37 @@ public final class PreviewManager {
 		} else if (editorInput instanceof IURIEditorInput) {
 
 		} else if (editorInput instanceof PreviewEditorInput) {
-			return;
+			return null;
 		}
 		if (fileName == null) {
-			return;
+			return null;
 		}
 		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-		IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(contentType);
-		if (handler == null) {
-			handler = DefaultPreviewHandler.getInstance();
-		}
-		SourceConfig sourceConfig = new SourceConfig(editorInput, project, project != null ? workspacePath : path,
-				content);
-		PreviewConfig previewConfig = handler.handle(sourceConfig);
-		if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
-			previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+		return new SourceConfig(editorInput, project,
+				project != null ? workspacePath : path, content, contentType);
+	}
+
+	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
+		SourceConfig sourceConfig = getSourceConfig(editorInput, content);
+		PreviewConfig previewConfig = null;
+		if (sourceConfig != null) {
+			IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
+			if (handler == null) {
+				handler = DefaultPreviewHandler.getInstance();
+			}
+			previewConfig = handler.handle(sourceConfig);
+			if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
+				previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+			}
 		}
 		if (previewConfig != null) {
-			showEditor(editorPart, sourceConfig, previewConfig);
+			showEditor(editorPart, sourceConfig, previewConfig, forceOpen);
 		} else {
 			// TODO: add some user notification
 		}
 	}
 
-	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig) throws CoreException {
+	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig, boolean forceOpen) throws CoreException {
 		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage workbenchPage = null;
 		if (workbenchWindow != null) {
@@ -217,7 +351,7 @@ public final class PreviewManager {
 				for (IEditorPart previewEditorPart : openedPreviewEditors) {
 					previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
 				}				
-			} else {
+			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
 			}
 		}
@@ -227,4 +361,31 @@ public final class PreviewManager {
 		}
 	}
 
+	private void addPartListener() {
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows) {
+			partService = window.getPartService();
+			if (partService != null) {
+				partService.addPartListener(editorPartListener);
+			}
+		}
+		// Listen on any future windows
+		PlatformUI.getWorkbench().addWindowListener(windowListener);
+	}
+
+	private void removePartListener()
+	{
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		IPartService partService;
+		for (IWorkbenchWindow window : windows)
+		{
+			partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(editorPartListener);
+			}
+		}
+		PlatformUI.getWorkbench().removeWindowListener(windowListener);
+	}
 }

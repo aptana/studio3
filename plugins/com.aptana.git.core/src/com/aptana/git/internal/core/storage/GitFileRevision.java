@@ -26,7 +26,7 @@ public abstract class GitFileRevision extends FileRevision
 {
 
 	private static final String DEV_NULL = "/dev/null"; //$NON-NLS-1$
-	protected final String path;
+	private final String path;
 
 	GitFileRevision(final String fileName)
 	{

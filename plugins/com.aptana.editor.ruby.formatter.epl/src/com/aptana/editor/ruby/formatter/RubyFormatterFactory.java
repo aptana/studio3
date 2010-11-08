@@ -21,6 +21,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.ruby.RubySourceConfiguration;
 import com.aptana.editor.ruby.RubySourceViewerConfiguration;
 import com.aptana.editor.ruby.formatter.preferences.RubyFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
@@ -93,5 +94,14 @@ public class RubyFormatterFactory extends AbstractScriptFormatterFactory
 	public IPreferenceStore getPreferenceStore()
 	{
 		return RubyFormatterPlugin.getDefault().getPreferenceStore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return RubySourceConfiguration.getDefault();
 	}
 }

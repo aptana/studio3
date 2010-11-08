@@ -48,4 +48,6 @@ public interface IRubyMethod extends IRubyMember
 	public String[] getBlockVars();
 
 	public boolean isSingleton();
+
+	public boolean isConstructor();
 }

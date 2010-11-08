@@ -39,7 +39,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.actions.messages"; //$NON-NLS-1$
-	public static String AbstractOperationAction_GenericFailed_Message;
+
 	public static String CommitAction_MultipleRepos_Message;
 	public static String CommitAction_MultipleRepos_Title;
 	public static String CommitAction_NoRepo_Message;
@@ -59,6 +59,8 @@ public class Messages extends NLS
 	public static String CommitDialog_EnterMessage_Error;
 	public static String CommitDialog_MessageLabel;
 	public static String CommitDialog_PathColumnLabel;
+
+	public static String CommitDialog_RevertLabel;
 	public static String CommitDialog_StageFilesFirst_Error;
 	public static String CommitDialog_StageSelected;
 	public static String CommitDialog_StageSelectedMarker;
@@ -70,6 +72,10 @@ public class Messages extends NLS
 	public static String DeleteBranchAction_BranchDelete_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Title;
+
+	public static String DeleteBranchHandler_JobName;
+
+	public static String GithubNetworkHandler_ViewName;
 	static
 	{
 		// initialize resource bundle

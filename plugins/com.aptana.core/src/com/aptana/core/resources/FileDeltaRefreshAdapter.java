@@ -46,6 +46,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -94,13 +95,16 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 						{
 							// Check to see if this project exists in the new branch! If not, auto-close the project, or
 							// just not refresh it?
-							File dir = resource.getLocation().toFile();
-							if (!dir.exists())
+							IPath path = resource.getLocation();
+							if (path == null || !path.toFile().exists())
 							{
 								// Close the project, this actually causes the .project file to get generated, though!
 								try
 								{
-									resource.getProject().close(sub.newChild(100));
+									if (resource.getProject().exists())
+									{
+										resource.getProject().close(sub.newChild(100));
+									}
 								}
 								catch (CoreException e)
 								{
@@ -109,10 +113,18 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 										throw e;
 									}
 								}
-								File dotProject = new File(dir, IProjectDescription.DESCRIPTION_FILE_NAME);
-								if (dotProject.delete())
+								if (path != null)
 								{
-									dir.delete();
+									File projectFile = path.toFile();
+									if (projectFile != null)
+									{
+										File dotProject = new File(projectFile,
+												IProjectDescription.DESCRIPTION_FILE_NAME);
+										if (dotProject.delete())
+										{
+											projectFile.delete();
+										}
+									}
 								}
 								continue;
 							}

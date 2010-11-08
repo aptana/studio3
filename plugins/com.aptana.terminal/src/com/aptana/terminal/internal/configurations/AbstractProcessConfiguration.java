@@ -72,7 +72,7 @@ import com.aptana.terminal.IProcessConfiguration;
 
 	private String getVersion() {
 		// Grab RED RCP plugin version
-		String version = EclipseUtil.getPluginVersion("com.aptana.radrails.rcp"); //$NON-NLS-1$
+		String version = EclipseUtil.getPluginVersion(EclipseUtil.STANDALONE_PLUGIN_ID);
 		if (version == null) {
 			// Grab Product version
 			version = EclipseUtil.getProductVersion();

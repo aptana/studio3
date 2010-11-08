@@ -96,6 +96,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
@@ -177,7 +178,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
-	protected ISiteConnection[] siteConnections;
+	private ISiteConnection[] siteConnections;
 	protected IProject selectedProject;
 
 	/**
@@ -203,15 +204,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	// private static final String[] animationImage = {
 	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
 	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
-	
-	protected static final String GROUP_RUN = "group.run"; //$NON-NLS-1$
-	protected static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
-	protected static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
-	protected static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
-	protected static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
-	protected static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
-	protected static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
-	protected static final String GROUP_EY_COMMANDS = "group.ey"; //$NON-NLS-1$
+
+	private static final String GROUP_DEPLOY = "group.deploy"; //$NON-NLS-1$
+	private static final String GROUP_HEROKU_COMMANDS = "group.herokucommands"; //$NON-NLS-1$
+	private static final String GROUP_CAP = "group.cap"; //$NON-NLS-1$
+	private static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
+	private static final String GROUP_FTP = "group.ftp"; //$NON-NLS-1$
+	private static final String GROUP_WIZARD = "group.wizard"; //$NON-NLS-1$
+	private static final String GROUP_EY_COMMANDS = "group.ey"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(final Composite parent)
@@ -280,9 +280,10 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
 				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
-				fillCommandsMenu(commandsMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(commandsMenuManager, "toolbar:" + commandsMenuManager.getId()); //$NON-NLS-1$
+				menuService.populateContributionManager(commandsMenuManager,
+						MenuUtil.menuUri(commandsMenuManager.getId()));
+				fillCommandsMenu(commandsMenuManager);
 				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
@@ -370,7 +371,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
 
-	protected void fillCommandsMenu(MenuManager menuManager)
+	private void fillCommandsMenu(MenuManager menuManager)
 	{
 		// Filtering
 		// Run
@@ -379,59 +380,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		// Git branching
 		// Git misc
 		// Misc project/properties
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_FILTERING));
-		menuManager.add(new Separator(GROUP_RUN));
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_ADDITIONS));
-		menuManager.add(new Separator(IContextMenuConstants.GROUP_PROPERTIES));
-
-		// Add run related items
-		menuManager.appendToGroup(GROUP_RUN, new ContributionItem()
-		{
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				if (projects.length > 0)
-				{
-					new MenuItem(menu, SWT.SEPARATOR);
-
-					MenuItem projectsMenuItem = new MenuItem(menu, SWT.CASCADE);
-					projectsMenuItem.setText(Messages.SingleProjectView_SwitchToApplication);
-
-					Menu projectsMenu = new Menu(menu);
-					for (IProject iProject : projects)
-					{
-						// hide closed projects
-						if (!iProject.isAccessible())
-						{
-							continue;
-						}
-						// Construct the menu to attach to the above button.
-						final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
-						projectNameMenuItem.setText(iProject.getName());
-						projectNameMenuItem.setSelection(selectedProject != null
-								&& iProject.getName().equals(selectedProject.getName()));
-						projectNameMenuItem.addSelectionListener(new SelectionAdapter()
-						{
-							public void widgetSelected(SelectionEvent e)
-							{
-								String projectName = projectNameMenuItem.getText();
-								projectToolItem.setText(projectName);
-								setActiveProject(projectName);
-							}
-						});
-					}
-					projectsMenuItem.setMenu(projectsMenu);
-				}
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
+		
 		// Stick Delete in Properties area
 		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
 		{
@@ -484,10 +433,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				Point toolbarLocation = deployToolBar.getLocation();
 				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = deployToolBar.getSize();
+				// FIXME Move declaration/filling of menu to ext pt, that means removing fillDeployMenu!
 				final MenuManager deployMenuManager = new MenuManager(null, DEPLOY_MENU_ID);
 				fillDeployMenu(deployMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(deployMenuManager, "toolbar:" + deployMenuManager.getId()); //$NON-NLS-1$
+				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
 				final Menu commandsMenu = deployMenuManager.createContextMenu(deployToolBar);
 				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
 				commandsMenu.setVisible(true);
@@ -495,7 +445,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		});
 	}
 
-	protected void fillDeployMenu(MenuManager menuManager)
+	private void fillDeployMenu(MenuManager menuManager)
 	{
 		if (selectedProject != null && selectedProject.isAccessible())
 		{
@@ -970,7 +920,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return search;
 	}
 
-	protected void createNavigator(Composite myComposite)
+	private void createNavigator(Composite myComposite)
 	{
 		Composite viewer = new Composite(myComposite, SWT.BORDER);
 		viewer.setLayout(new FillLayout());
@@ -1012,7 +962,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		};
 	}
 
-	protected void fixNavigatorManager()
+	private void fixNavigatorManager()
 	{
 		// HACK! This is to fix behavior that Eclipse bakes into
 		// CommonNavigatorManager.UpdateActionBarsJob where it
@@ -1088,7 +1038,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return filter;
 	}
 
-	protected void hideFilterLabel()
+	private void hideFilterLabel()
 	{
 		filterLayoutData.exclude = true;
 		filterComp.setVisible(false);
@@ -1161,7 +1111,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return project;
 	}
 
-	protected void setActiveProject(String projectName)
+	private void setActiveProject(String projectName)
 	{
 		IProject newSelectedProject = null;
 		if (projectName != null && projectName.trim().length() > 0)
@@ -1254,25 +1204,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getCommonViewer().refresh(selectedProject, true);
 	}
 
-	protected void updateViewer(Object... elements)
-	{
-		if (getCommonViewer() == null)
-		{
-			return;
-		}
-		// FIXME Need to update the element plus all it's children recursively
-		// if we want to call "update"
-		// List<Object> nonNulls = new ArrayList<Object>();
-		for (Object element : elements)
-		{
-			if (element == null)
-				continue;
-			// nonNulls.add(element);
-			getCommonViewer().refresh(element);
-		}
-		// getCommonViewer().update(nonNulls.toArray(), null);
-	}
-
 	@Override
 	public void dispose()
 	{
@@ -1282,7 +1213,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		super.dispose();
 	}
 
-	protected IControlThemerFactory getControlThemerFactory()
+	private IControlThemerFactory getControlThemerFactory()
 	{
 		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
@@ -1498,7 +1429,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 	}
 
-	protected void forceOurNewFileWizard(Menu menu)
+	private void forceOurNewFileWizard(Menu menu)
 	{
 		// Hack the New > File entry
 		for (MenuItem menuItem : menu.getItems())

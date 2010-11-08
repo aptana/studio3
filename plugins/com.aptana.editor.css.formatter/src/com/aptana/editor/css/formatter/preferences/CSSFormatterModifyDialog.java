@@ -56,9 +56,10 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 
 	protected void addPages()
 	{
-		addTabPage(Messages.CSSFormatterModifyDialog_indentation_page_tab_name,
-				new CSSFormatterControlStatementsPage(this));
-		addTabPage(Messages.CSSFormatterModifyDialog_braces_, new CSSFormatterBracesPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_indentation_page_tab_name, new CSSFormatterControlStatementsPage(
+				this));
+		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
 
 		// TODO: Fix issue with comments not wrapping correctly with newlines
 		// Something like: /*

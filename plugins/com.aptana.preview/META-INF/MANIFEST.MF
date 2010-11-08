@@ -6,6 +6,7 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.preview.Activator
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem,
  org.eclipse.jface.text,
@@ -19,3 +20,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.browser
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.preview,
+ com.aptana.preview.server

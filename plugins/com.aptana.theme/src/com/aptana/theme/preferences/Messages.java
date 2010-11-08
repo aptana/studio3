@@ -47,6 +47,8 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_CaretLabel;
 	public static String ThemePreferencePage_DeleteThemeMsg;
 	public static String ThemePreferencePage_DeleteThemeTitle;
+	public static String ThemePreferencePage_FontName;
+	public static String ThemePreferencePage_FontNameLabel;
 	public static String ThemePreferencePage_FontStyleColumnLabel;
 	public static String ThemePreferencePage_ForegroundColumnLabel;
 	public static String ThemePreferencePage_ForegroundLabel;
@@ -63,6 +65,7 @@ public class Messages extends NLS
 	public static String ThemePreferencePage_RenameThemeMsg;
 	public static String ThemePreferencePage_RenameThemeTitle;
 	public static String ThemePreferencePage_ScopeSelectoreLabel;
+	public static String ThemePreferencePage_SelectFontButtonLabel;
 	public static String ThemePreferencePage_SelectionLabel;
 	public static String ThemePreferencePage_UnderlineButtonLabel;
 

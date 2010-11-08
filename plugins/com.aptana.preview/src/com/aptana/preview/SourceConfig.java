@@ -40,6 +40,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.ui.IEditorInput;
 
 /**
@@ -53,15 +54,17 @@ public final class SourceConfig {
 	private IPath location;
 	private String content;
 	private IFileStore fileStore;
+	private IContentType contentType;
 
 	/**
 	 * 
 	 */
-	public SourceConfig(IEditorInput editorInput, IProject project, IPath location, String content) {
+	public SourceConfig(IEditorInput editorInput, IProject project, IPath location, String content, IContentType contentType) {
 		this.editorInput = editorInput;
 		this.project = project;
 		this.location = location;
 		this.content = content;
+		this.contentType = contentType;
 		IPath path = location;
 		if (project != null) {
 			path = ResourcesPlugin.getWorkspace().getRoot().getFile(location).getLocation();
@@ -102,6 +105,13 @@ public final class SourceConfig {
 	 */
 	public String getContent() {
 		return content;
+	}
+
+	/**
+	 * @return the contentType
+	 */
+	public IContentType getContentType() {
+		return contentType;
 	}
 
 }

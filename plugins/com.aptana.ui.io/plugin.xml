@@ -29,6 +29,9 @@
             <contentExtension
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
        <viewerActionBinding
@@ -45,7 +48,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="com.aptana.ide.ui.io.navigator.ProjectExplorerContentProvider"
-            icon="icons/full/obj16/projects.png"
+            icon="icons/full/obj16/drive.png"
             id="com.aptana.ide.ui.io.navigatorContent"
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.default.name"
@@ -509,6 +512,9 @@
             <contentExtension
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
+            <contentExtension
+                  pattern="com.aptana.ui.io.navigator.linkHelper">
+            </contentExtension>
          </includes>
       </viewerContentBinding>
       <viewerActionBinding
@@ -535,7 +541,7 @@
       <navigatorContent
             activeByDefault="true"
             contentProvider="com.aptana.ide.ui.io.navigator.RemoteTreeContentProvider"
-            icon="icons/full/obj16/projects.png"
+            icon="icons/full/eview16/remote.png"
             id="com.aptana.ide.ui.io.remoteNavigatorContent"
             labelProvider="com.aptana.ide.ui.io.navigator.FileTreeLabelProvider"
             name="%navigatorContent.remote.name"
@@ -649,6 +655,28 @@
             id="com.aptana.ui.io.preferences.PermissionPreferencePage"
             name="%PreferencePage.permissions.label">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.linkHelper">
+      <linkHelper
+            class="com.aptana.ide.ui.io.navigator.FilesystemLinkHelper"
+            id="com.aptana.ui.io.navigator.linkHelper">
+         <editorInputEnablement>
+            <instanceof
+                  value="org.eclipse.ui.ide.FileStoreEditorInput">
+            </instanceof></editorInputEnablement>
+         <selectionEnablement>
+            <and>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <test
+                     property="com.aptana.ide.ui.io.navigator.file.isDirectory"
+                     value="false">
+               </test>
+            </and>
+         </selectionEnablement>
+      </linkHelper>
    </extension>
 
 </plugin>

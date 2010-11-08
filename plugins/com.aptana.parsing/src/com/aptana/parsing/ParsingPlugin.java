@@ -42,25 +42,55 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class ParsingPlugin extends Plugin {
-
-	// The plug-in ID
+public class ParsingPlugin extends Plugin
+{
 	public static final String PLUGIN_ID = "com.aptana.parsing"; //$NON-NLS-1$
-
-	// The shared instance
 	private static ParsingPlugin plugin;
-	
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static ParsingPlugin getDefault()
+	{
+		return plugin;
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param e
+	 */
+	public static void logError(Exception e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+	}
+
+	/**
+	 * logError
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void logError(String msg, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	}
+
 	/**
 	 * The constructor
 	 */
-	public ParsingPlugin() {
+	public ParsingPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 	}
@@ -69,7 +99,8 @@ public class ParsingPlugin extends Plugin {
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		try
 		{
 			ParserPoolFactory.getInstance().dispose();
@@ -78,20 +109,6 @@ public class ParsingPlugin extends Plugin {
 		{
 			plugin = null;
 			super.stop(context);
-		}		
-	}
-
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static ParsingPlugin getDefault() {
-		return plugin;
-	}
-
-	public static void logError(Exception e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+		}
 	}
 }

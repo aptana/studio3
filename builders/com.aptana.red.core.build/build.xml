@@ -110,7 +110,12 @@
 				<include name="plugins/*" />
 			</fileset>
 		</copy>
-		
+		<copy todir="${baseLocation}/dropins">
+			<fileset dir="${portal35.dir}">
+				<include name="plugins/com.aptana.portal.ui.*.jar" />
+			</fileset>
+		</copy>
+
 		<!-- Unjar the features -->
 		<for param="file">
 			<path>

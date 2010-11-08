@@ -44,7 +44,6 @@ public class Messages extends NLS
 	public static String HTMLOutlineContentProvider_PlaceholderItemLabel;
 	public static String HTMLOutlineContentProvider_FetchingExternalFilesJobName;
 	public static String HTMLOutlineContentProvider_UnableToResolveFile_Error;
-	public static String HTMLOutlineContentProvider_UnableToFindParser_Error;
 	public static String HTMLOutlineContentProvider_FileNotFound_Error;
 	
 	static

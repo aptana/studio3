@@ -239,7 +239,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext(Activator.CONTEXT_ID);
+		contextService.activateContext(Activator.SCRIPTING_CONTEXT_ID);
+		contextService.activateContext(Activator.EDITOR_CONTEXT_ID);
 	}
 
 	/*

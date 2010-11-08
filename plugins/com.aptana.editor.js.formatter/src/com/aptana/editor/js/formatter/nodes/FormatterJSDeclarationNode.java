@@ -110,7 +110,7 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	 * @param node
 	 * @return
 	 */
-	private boolean isPartOfExpression(IParseNode node)
+	public static boolean isPartOfExpression(IParseNode node)
 	{
 		if (node == null)
 		{
@@ -139,7 +139,11 @@ public class FormatterJSDeclarationNode extends FormatterBlockWithBeginNode
 	@Override
 	public int getSpacesCountBefore()
 	{
-		// TODO preferences?
+		// TODO add preferences
+		if (node.getParent().getNodeType() == JSNodeTypes.GROUP)
+		{
+			return 0;
+		}
 		return 1;
 	}
 

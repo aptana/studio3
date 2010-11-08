@@ -575,6 +575,8 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		// builds the context menu
 		tree.setMenu(createMenu(tree));
 
+		updateMenuStates();
+
 		return fTreeViewer;
 	}
 
@@ -838,12 +840,13 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 	private void updateMenuStates()
 	{
 		ISelection selection = fTreeViewer.getSelection();
-		boolean hasSelection = !selection.isEmpty();
+		boolean hasSelection = !selection.isEmpty() && (selection instanceof IStructuredSelection);
+		boolean singleSelection = hasSelection && ((IStructuredSelection) selection).size() == 1;
 		fOpenItem.setEnabled(hasSelection);
 		fTransferItem.setEnabled(hasSelection);
 		fDeleteItem.setEnabled(hasSelection);
-		fRenameItem.setEnabled(hasSelection);
-		fPropertiesItem.setEnabled(hasSelection);
+		fRenameItem.setEnabled(hasSelection && singleSelection);
+		fPropertiesItem.setEnabled(hasSelection && singleSelection);
 	}
 
 	private static IFileStore getFolderStore(IAdaptable destination)

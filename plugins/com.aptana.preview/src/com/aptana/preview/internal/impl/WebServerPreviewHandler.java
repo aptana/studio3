@@ -39,9 +39,9 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.preview.IPreviewConstants;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
+import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.SourceConfig;
 import com.aptana.preview.server.AbstractWebServerConfiguration;
 import com.aptana.preview.server.ServerConfigurationManager;
@@ -54,27 +54,19 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig
-	 * )
+	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		String serverConfigurationName = config.getProject().getPersistentProperty(
-				IPreviewConstants.PROJECT_PREVIEW_SERVER);
-		if (serverConfigurationName != null && serverConfigurationName.length() > 0) {
-			AbstractWebServerConfiguration serverConfiguration = ServerConfigurationManager.getInstance()
-					.findServerConfiguration(serverConfigurationName);
-			if (serverConfiguration != null) {
-				URL url = serverConfiguration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
-				}
+		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
+		if (serverConfiguration != null) {
+			URL url = serverConfiguration.resolve(config.getFileStore());
+			if (url != null) {
+				return new PreviewConfig(url);
 			}
 		} else {
-			for (AbstractWebServerConfiguration serverConfiguration : ServerConfigurationManager.getInstance()
+			for (AbstractWebServerConfiguration configuration : ServerConfigurationManager.getInstance()
 					.getServerConfigurations()) {
-				URL url = serverConfiguration.resolve(config.getFileStore());
+				URL url = configuration.resolve(config.getFileStore());
 				if (url != null) {
 					return new PreviewConfig(url);
 				}
@@ -82,5 +74,4 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 		}
 		return null;
 	}
-
 }

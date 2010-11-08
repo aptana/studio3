@@ -67,9 +67,6 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.parsing.IParser;
-import com.aptana.parsing.IParserPool;
-import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -153,48 +150,30 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 	private void indexFileStore(Index index, IFileStore file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		
 		try
 		{
-			if (file == null)
+			if (file != null)
 			{
-				return;
-			}
-
-			sub.subTask(file.getName());
-
-			removeTasks(file, sub.newChild(10));
-
-			// grab the source of the file we're going to parse
-			String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
-
-			// minor optimization when creating a new empty file
-			if (source != null && source.length() > 0)
-			{
-				// create parser and associated parse state
-				IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IJSParserConstants.LANGUAGE);
-
-				if (pool != null)
+				sub.subTask(file.getName());
+	
+				removeTasks(file, sub.newChild(10));
+	
+				// grab the source of the file we're going to parse
+				String source = IOUtil.read(file.openInputStream(EFS.NONE, sub.newChild(20)));
+	
+				// minor optimization when creating a new empty file
+				if (source != null && source.trim().length() > 0)
 				{
-					IParser parser = pool.checkOut();
-
-					// apply the source to the parse state and parse
-					ParseState parseState = new ParseState();
-					parseState.setEditState(source, source, 0, 0);
-					parser.parse(parseState);
-
-					pool.checkIn(parser);
+					IParseNode ast = ParserPoolFactory.parse(IJSParserConstants.LANGUAGE, source);
 					sub.worked(50);
-
-					// process results
-					IParseNode ast = parseState.getParseResult();
-					this.processParseResults(file, source, index, ast, sub.newChild(20));
+					
+					if (ast != null)
+					{
+						this.processParseResults(file, source, index, ast, sub.newChild(20));
+					}
 				}
 			}
-		}
-		catch (beaver.Parser.Exception e)
-		{
-			// just like in FileServer ... "not logging the parsing error here since
-			// the source could be in an intermediate state of being edited by the user"
 		}
 		catch (Throwable e)
 		{

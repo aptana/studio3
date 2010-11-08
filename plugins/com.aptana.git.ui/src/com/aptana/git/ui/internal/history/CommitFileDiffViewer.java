@@ -89,7 +89,7 @@ class CommitFileDiffViewer extends TableViewer
 		getControl().setMenu(menu);
 	}
 
-	void showTwoWayFileDiff(final Diff d)
+	private void showTwoWayFileDiff(final Diff d)
 	{
 		if (d == null || d.isBinary())
 			return;

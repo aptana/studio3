@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="browserInteractions" name="Browser Interactions" schema="schema/browserInteractions.exsd"/>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.portal.ui.browser.PortalBrowserEditor"
+            default="false"
+            icon="icons/obj16/radrails16.png"
+            id="com.aptana.portal.ui.browser.portal"
+            name="%portalBrowser.name">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.aptana.portal.ui.internal.startup.PortalStartup">
+      </startup>
+   </extension>
+   <extension
+         point="com.aptana.configurations.configurationProcessors">
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.RubyInstallProcessor"
+            id="com.aptana.portal.ruby.installer.processor"
+            name="Ruby Installer">
+      </processor>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.XAMPPInstallProcessor"
+            id="com.aptana.portal.xampp.installer.processor"
+            name="XAMPP Installer">
+      </processor>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.VersionsConfigurationProcessor"
+            id="com.aptana.portal.versions.processor"
+            name="Program Version Configurations">
+      </processor>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.RailsVersionProcessor"
+            id="com.aptana.portal.versions.processor.rails"
+            name="Rails Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.SQLiteVersionProcessor"
+            id="com.aptana.portal.versions.processor.sqlite"
+            name="SQLite Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
+      <delegate
+            class="com.aptana.portal.ui.dispatch.processorDelegates.RubyVersionProcessor"
+            id="com.aptana.portal.versions.processor.ruby"
+            name="Ruby Version Processor Delegate"
+            targetID="com.aptana.portal.versions.processor">
+      </delegate>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.JavaScriptLibraryInstallProcessor"
+            id="com.aptana.portal.jsLibrary.installer.processor"
+            name="JS Library Installer">
+      </processor>
+      <processor
+            category="configurations"
+            class="com.aptana.portal.ui.dispatch.configurationProcessors.PythonInstallProcessor"
+            id="com.aptana.portal.python.installer.processor"
+            name="Python Installer">
+      </processor>
+   </extension>
+   <extension
+         point="com.aptana.portal.ui.browserInteractions">
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.SystemActionController"
+            configurationProcessor="com.aptana.portal.versions.processor"
+            id="portal.system.versions"
+            name="Apps Versions Action Controller">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.ConsoleController"
+            id="console"
+            name="Console Controller">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.ruby.installer.processor"
+            id="portal.ruby.installer"
+            name="Ruby Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.xampp.installer.processor"
+            id="portal.xampp.installer"
+            name="XAMPP Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.jsLibrary.installer.processor"
+            id="portal.js_library.installer"
+            name="JS Libraries Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.InstallActionController"
+            configurationProcessor="com.aptana.portal.python.installer.processor"
+            id="portal.python.installer"
+            name="Python Installer Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.PreferenceActionController"
+            id="portal.preferences"
+            name="Preference Actions">
+      </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.BrowserActionController"
+            id="portal.browser"
+            name="Browser Actions">
+      </actionController>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.portal.ui.PortalPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.portal.ui.internal.command.ShowToolboxCommandHandler"
+            description="%openDevToolbox.description"
+            id="com.aptana.portal.command.openToolbox"
+            name="%openDevToolbox.name">
+      </command>
+   </extension>
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+			class="com.aptana.portal.ui.propertyTesters.DevelopmentModePropertyTester"
+			id="com.aptana.portal.ui.developmentModePropertyTester" namespace="com.aptana.portal.ui"
+			properties="inDevelopmentMode" type="java.lang.Object" />
+	</extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:aptanahelp?after=additions">
+         <command
+               commandId="com.aptana.portal.command.openToolbox"
+               icon="icons/obj16/dev_toolbox.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <test
+                     forcePluginActivation="true"
+                     property="com.aptana.portal.ui.inDevelopmentMode"
+                     value="true">
+               </test>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="com.aptana.ui.globalActionSet">
+            <command
+                  commandId="com.aptana.portal.command.openToolbox"
+                  icon="icons/obj16/dev_toolbox.png"
+                  style="push">
+               <visibleWhen>
+                  <and>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.aptana.portal.ui.inDevelopmentMode"
+                           value="true">
+                     </test>
+                     <reference
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
+                     </reference>
+                  </and>
+                  
+               </visibleWhen>
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+</plugin>

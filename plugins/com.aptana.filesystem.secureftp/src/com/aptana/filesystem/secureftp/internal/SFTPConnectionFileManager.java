@@ -89,7 +89,7 @@ import com.enterprisedt.net.j2ssh.transport.publickey.SshPrivateKeyFile;
  */
 public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager implements ISFTPConnectionFileManager {
 
-	protected static final int SLEEP_INTERVAL = 10; /* 10 secs */
+	private static final int KEEPALIVE_INTERVAL = 45*1000; /* 45 secs */
 
 	private SSHFTPClient ftpClient;
 	private IPath keyFilePath;
@@ -98,6 +98,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 
 	private int connectionRetryCount;
+	private Thread keepaliveThread;
 
 	/* (non-Javadoc)
 	 * @see com.aptana.filesystem.secureftp.ISFTPConnectionFileManager#init(java.lang.String, int, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, java.lang.String, char[], java.lang.String, java.lang.String, java.lang.String)
@@ -130,8 +131,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		ftpClient.setTimeout(TIMEOUT);
 		ftpClient.setControlEncoding(encoding);
 		ftpClient.setMonitorInterval(1024);
-		ftpClient.setSleepEnabled(true);
-		ftpClient.setSleepTime(SLEEP_INTERVAL);
+		ftpClient.setSleepEnabled(false);
 		if (ISFTPConstants.COMPRESSION_NONE.equals(compression)) {
 			ftpClient.disableAllAlgorithms(SSHFTPAlgorithm.COMPRESSION);
 			ftpClient.setAlgorithmEnabled(SSHFTPAlgorithm.COMPRESSION_NONE, true);
@@ -228,6 +228,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 			ftpClient.setType(ISFTPConstants.TRANSFER_TYPE_ASCII.equals(transferType)
 					? FTPTransferType.ASCII : FTPTransferType.BINARY);
+			initKeepAlive();
 		} catch (OperationCanceledException e) {
 			safeQuit();
 			throw e;
@@ -259,6 +260,37 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			} catch (Exception ignore) {
 			}
 		}		
+	}
+	
+	private void initKeepAlive() {
+		Thread thread = keepaliveThread;
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+			}
+		}
+		keepaliveThread = new Thread() {
+			@Override
+			public void run() {
+				while (ftpClient != null && ftpClient.connected()) {
+					try {
+						ftpClient.keepAlive();
+					} catch (Exception e) {
+						SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, "Sending Keep-Alive failed", e));
+					}
+					try {
+						Thread.sleep(KEEPALIVE_INTERVAL);
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				keepaliveThread = null;
+			}
+			
+		};
+		keepaliveThread.start();
 	}
 
 	/* (non-Javadoc)

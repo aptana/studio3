@@ -105,7 +105,11 @@ public class ConnectionPointLabelDecorator implements ILabelDecorator
 						// finds the first segment in the path that does not match
 						if (!currentPath.segment(i).equals(path.segment(i)))
 						{
-							decoratedText = ".../" + currentPath.removeFirstSegments(i).toPortableString(); //$NON-NLS-1$
+							decoratedText = currentPath.removeFirstSegments(i).toPortableString();
+							if (i > 0)
+							{
+								decoratedText = ".../" + decoratedText; //$NON-NLS-1$
+							}
 							break;
 						}
 					}

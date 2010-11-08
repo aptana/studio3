@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.configurations;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: com.aptana.configurations.ConfigurationsPlugin
+Bundle-Vendor: %providerName
+Require-Bundle: org.eclipse.core.runtime,
+ org.mortbay.jetty.util,
+ com.aptana.core;bundle-version="3.0.0",
+ com.aptana.scripting
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Export-Package: com.aptana.configurations,
+ com.aptana.configurations.processor
+Eclipse-ExtensibleAPI: true

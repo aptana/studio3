@@ -56,22 +56,27 @@ import com.aptana.theme.ThemePlugin;
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Color getColor(Map map, StyleColor color) {
-		if (color.getName().equalsIgnoreCase(StyleMap.BLACK)) {
-			return getForegroundColor();
-		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE)) {
-			return getBackgroundColor();
-		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE_FOREGROUND)) {
-			// FIXME turn to "ansi.white"
-		}
-
 		// Just grab colors straight from theme!
-		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
+		String colorName = color.getName().toLowerCase();
+		String ansiName = "ansi." + colorName; //$NON-NLS-1$
 		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);
 		}
+		if (StyleMap.WHITE_FOREGROUND.equals(colorName)) {
+			ansiName = "ansi.white"; //$NON-NLS-1$
+			if (theme.hasEntry(ansiName)) {
+				return theme.getForeground(ansiName);
+			}
+		}
+		boolean isForeground = map == fColorMapForeground;
+		if (StyleMap.BLACK.equals(colorName)) {
+			return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		}
+		if (StyleMap.WHITE.equals(colorName)) {
+			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
+		}
+
 		// fall back to defaults...
 		return super.getColor(map, color);
 	}
@@ -81,8 +86,5 @@ import com.aptana.theme.ThemePlugin;
 		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
 	}
 
-	protected Color getForegroundColor() {
-		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
-	}
+
 }

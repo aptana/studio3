@@ -133,7 +133,8 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 	{
 		FormatterClassNode classNode = new FormatterClassNode(document);
 		SourcePosition position = visited.getPosition();
-		classNode.setBegin(createTextNode(document, visited));
+		classNode.setBegin(builder.createTextNode(document, position.getStartOffset(), visited.getReceiverNode()
+				.getPosition().getStartOffset()));
 		builder.push(classNode);
 		visitChildren(visited);
 		Node bodyNode = visited.getBodyNode();
@@ -347,7 +348,7 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 	public Object visitIfNode(IfNode visited)
 	{
 		SourcePosition position = visited.getPosition();
-		if (position.getStartLine() == position.getEndLine())
+		if (isInSameLineExcludingWhitespaces(position))
 		{
 			// Inline if
 			List<Node> children = new ArrayList<Node>(3);
@@ -729,7 +730,8 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 		{
 			// it's a block iteration node
 			int iterStart = visited.getIterNode().getPosition().getStartOffset();
-			FormatterStringNode strNode = new FormatterStringNode(document, visited.getPosition().getStartOffset(), iterStart);
+			FormatterStringNode strNode = new FormatterStringNode(document, visited.getPosition().getStartOffset(),
+					iterStart);
 			builder.addChild(strNode);
 			visitChildren(visited);
 		}
@@ -905,6 +907,30 @@ public class RubyFormatterNodeBuilderVisitor extends AbstractVisitor
 	private IFormatterTextNode createTextNode(IFormatterDocument document, SourcePosition position)
 	{
 		return builder.createTextNode(document, position.getStartOffset(), position.getEndOffset());
+	}
+
+	/**
+	 * Returns true if the given position start and end lines are equal, or if the end-line was pushed only because
+	 * new-lines and white spaces appear in the code.
+	 * 
+	 * @param position
+	 * @return
+	 */
+	private boolean isInSameLineExcludingWhitespaces(SourcePosition position)
+	{
+		if (position.getStartLine() == position.getEndLine())
+		{
+			return true;
+		}
+		// We split on new-lines, and in case the split result is giving us a String array of one element, we know that
+		// all the rest of the lines in that text were new-lines terminators.
+		String text = document.get(position.getStartOffset(), position.getEndOffset());
+		String[] linesSplit = text.split("\r?\n|\r"); //$NON-NLS-1$
+		if (linesSplit.length == 1)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	protected static final Comparator<Node> POSITION_COMPARATOR = new Comparator<Node>()

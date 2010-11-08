@@ -77,6 +77,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
 import com.aptana.editor.js.formatter.preferences.JSFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
@@ -110,6 +111,7 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 			JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_IF_IN_ELSEIF_STATEMENT,
 			JSFormatterConstants.NEW_LINES_BEFORE_FINALLY_STATEMENT,
+			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION,
 			JSFormatterConstants.LINES_AFTER_FUNCTION_DECLARATION, JSFormatterConstants.PRESERVED_LINES,
 			JSFormatterConstants.BRACE_POSITION_BLOCK, JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE,
 			JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH,
@@ -155,5 +157,14 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 	public IPreferenceStore getPreferenceStore()
 	{
 		return JSFormatterPlugin.getDefault().getPreferenceStore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return JSSourceConfiguration.getDefault();
 	}
 }

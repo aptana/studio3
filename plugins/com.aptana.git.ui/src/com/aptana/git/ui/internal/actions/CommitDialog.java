@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -90,6 +91,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -103,9 +105,8 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.git.ui.actions.RevertAction;
 
-public class CommitDialog extends StatusDialog
+class CommitDialog extends StatusDialog
 {
 	private static final String CHANGED_FILE_DATA_KEY = "changedFile"; //$NON-NLS-1$
 
@@ -122,7 +123,10 @@ public class CommitDialog extends StatusDialog
 	private Browser diffArea;
 	private ChangedFile fLastDiffFile;
 
-	public CommitDialog(Shell parentShell, GitRepository gitRepository)
+	private StagingButtons unstageButtons;
+	private StagingButtons stageButtons;
+
+	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
 		Assert.isNotNull(gitRepository, "Must have a non-null git repository!"); //$NON-NLS-1$
@@ -176,6 +180,21 @@ public class CommitDialog extends StatusDialog
 			{
 				packTable(stagedTable);
 				packTable(unstagedTable);
+				// Select the first item in staged if there is one
+				if (unstagedTable.getItemCount() > 0)
+				{
+					unstagedTable.select(0);
+					ChangedFile file = getChangedFile(unstagedTable.getItem(0));
+					updateDiff(false, file);
+					stageButtons.updateSelectionButton();
+				}
+				else if (stagedTable.getItemCount() > 0)
+				{
+					stagedTable.select(0);
+					ChangedFile file = getChangedFile(stagedTable.getItem(0));
+					updateDiff(true, file);
+					unstageButtons.updateSelectionButton();
+				}
 			}
 		});
 		return container;
@@ -248,6 +267,7 @@ public class CommitDialog extends StatusDialog
 					Messages.CommitDialog_UnstageSelected);
 			createTableComposite(composite, staged);
 			buttons.setTable(stagedTable, staged);
+			unstageButtons = buttons;
 		}
 		else
 		{
@@ -256,6 +276,7 @@ public class CommitDialog extends StatusDialog
 					Messages.CommitDialog_StageAll, Messages.CommitDialog_StageSelectedMarker,
 					Messages.CommitDialog_StageSelected);
 			buttons.setTable(unstagedTable, staged);
+			stageButtons = buttons;
 		}
 	}
 
@@ -542,11 +563,13 @@ public class CommitDialog extends StatusDialog
 				{
 					TableItem[] selected = myTable.getSelection();
 					List<IResource> files = new ArrayList<IResource>();
+					final List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
 					for (TableItem item : selected)
 					{
 						ChangedFile file = getChangedFile(item);
 						if (file != null)
 						{
+							changedFiles.add(file);
 							IFile iFile = gitRepository.getFileForChangedFile(file);
 							if (iFile != null)
 							{
@@ -554,42 +577,50 @@ public class CommitDialog extends StatusDialog
 							}
 						}
 					}
-					RevertAction revertAction = new RevertAction()
-					{
-						// need to remove the file(s) from staged table once action runs
-						@Override
-						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
-						{
-							// need to make a copy because operation will actually change input files.
-							final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
-							for (ChangedFile cf : changedFiles)
+					
+					ContributionItem ci = new ContributionItem() {
+						public void fill(Menu menu, int index) {
+							MenuItem item = new MenuItem(menu, SWT.NONE);
+							item.setText(Messages.CommitDialog_RevertLabel);
+							// need to remove the file(s) from staged table once action runs
+							item.addSelectionListener(new SelectionAdapter()
 							{
-								copy.add(new ChangedFile(cf));
-							}
-							super.doOperation(repo, changedFiles);
-							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-							{
-
-								public void run()
+								@Override
+								public void widgetSelected(SelectionEvent e)
 								{
-									// If this file was shown in diff area, we need to blank the diff area!
-									if (fLastDiffFile != null)
+									// need to make a copy because operation will actually change input files.
+									final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
+									for (ChangedFile cf : changedFiles)
 									{
-										for (ChangedFile file : copy)
-										{
-											if (file != null && file.equals(fLastDiffFile))
-											{
-												updateDiff(null, Messages.CommitDialog_NoFileSelected);
-											}
-										}
+										copy.add(new ChangedFile(cf));
 									}
-									removeDraggedFilesFromSource(unstagedTable, copy);
+									
+									gitRepository.index().discardChangesForFiles(changedFiles);
+									
+									PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+									{
+
+										public void run()
+										{
+											// If this file was shown in diff area, we need to blank the diff area!
+											if (fLastDiffFile != null)
+											{
+												for (ChangedFile file : copy)
+												{
+													if (file != null && file.equals(fLastDiffFile))
+													{
+														updateDiff(null, Messages.CommitDialog_NoFileSelected);
+													}
+												}
+											}
+											removeDraggedFilesFromSource(unstagedTable, copy);
+										}
+									});
 								}
 							});
 						}
-					};
-					revertAction.selectionChanged(null, new StructuredSelection(files));
-					manager.add(revertAction);
+			    	};
+					manager.add(ci);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 				}

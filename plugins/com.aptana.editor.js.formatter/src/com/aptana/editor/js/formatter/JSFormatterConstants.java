@@ -74,6 +74,8 @@ public interface JSFormatterConstants
 
 	// Empty lines
 	public static final String LINES_AFTER_FUNCTION_DECLARATION = FORMATTER_ID + ".line.after.function.declaration"; //$NON-NLS-1$
+	public static final String LINES_AFTER_FUNCTION_DECLARATION_IN_EXPRESSION = FORMATTER_ID
+			+ ".line.after.function.declaration.expression"; //$NON-NLS-1$
 	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
 
 	// Braces position

@@ -57,6 +57,7 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.IRemoteFileStoreEditorInput;
 import com.aptana.ui.UIUtils;
 
 /**
@@ -64,7 +65,7 @@ import com.aptana.ui.UIUtils;
  */
 public class EditorUtils {
 
-    public static class RemoteFileStoreEditorInput extends FileStoreEditorInput {
+    public static class RemoteFileStoreEditorInput extends FileStoreEditorInput implements IRemoteFileStoreEditorInput {
 
     	protected IFileStore fLocalFileStore;
         protected IFileStore fRemoteFileStore;
@@ -94,6 +95,11 @@ public class EditorUtils {
             return null;
         }
 
+		public IFileStore getRemoteFileStore()
+		{
+			return fRemoteFileStore;
+		}
+
         @Override
         public int hashCode() {
             return fRemoteFileStore.hashCode();
@@ -106,6 +112,19 @@ public class EditorUtils {
             }
             return false;
         }
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public Object getAdapter(Class adapter)
+		{
+			if (IFileStore.class == adapter) {
+				return fRemoteFileStore;
+			}
+			if (IFileInfo.class == adapter) {
+				return fRemoteFileInfo;
+			}
+			return super.getAdapter(adapter);
+		}
     }
 
     /**

@@ -492,6 +492,19 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		URI result = null;
 
+		IProject project = getProject();
+		if (project != null)
+		{
+			result = project.getLocationURI();
+		}
+
+		return result;
+	}
+
+	protected IProject getProject()
+	{
+		IProject result = null;
+
 		if (editor != null)
 		{
 			IEditorInput editorInput = editor.getEditorInput();
@@ -500,9 +513,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			{
 				IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 				IFile file = fileEditorInput.getFile();
-				IProject project = file.getProject();
-
-				result = project.getLocationURI();
+				result = file.getProject();
 			}
 		}
 

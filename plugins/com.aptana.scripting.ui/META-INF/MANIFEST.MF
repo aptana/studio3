@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.aptana.scripting,
  com.aptana.theme,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
