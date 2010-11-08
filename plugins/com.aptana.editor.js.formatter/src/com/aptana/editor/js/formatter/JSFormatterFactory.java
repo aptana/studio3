@@ -77,6 +77,7 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.js.JSSourceViewerConfiguration;
 import com.aptana.editor.js.formatter.preferences.JSFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
@@ -156,5 +157,14 @@ public class JSFormatterFactory extends AbstractScriptFormatterFactory
 	public IPreferenceStore getPreferenceStore()
 	{
 		return JSFormatterPlugin.getDefault().getPreferenceStore();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatterFactory#getPartitioningConfiguration()
+	 */
+	public Object getPartitioningConfiguration()
+	{
+		return JSSourceConfiguration.getDefault();
 	}
 }

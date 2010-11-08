@@ -18,6 +18,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.ISharedTextColors;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -35,6 +36,12 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.editor.common.ExtendedFastPartitioner;
+import com.aptana.editor.common.IExtendedPartitioner;
+import com.aptana.editor.common.IPartitioningConfiguration;
+import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
 import com.aptana.formatter.ContributionExtensionManager;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
@@ -132,6 +139,15 @@ public abstract class AbstractFormatterPreferencePage extends AbstractConfigurat
 			fPreviewViewer.setEditable(false);
 			IDocument document = new Document();
 			fPreviewViewer.setDocument(document);
+			IPartitioningConfiguration partitioningConfiguration = (IPartitioningConfiguration) factory
+					.getPartitioningConfiguration();
+			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(partitioningConfiguration
+					.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
+			IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, partitioningConfiguration
+					.getContentTypes());
+			partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
+			partitioner.connect(document);
+			document.setDocumentPartitioner(partitioner);
 			return fPreviewViewer;
 		}
 

@@ -107,4 +107,13 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @see #getMainContentType()
 	 */
 	void setMainContentType(String mainContentType);
+
+	/**
+	 * Returns an IPartitioningConfiguration instance. The definition of this method returned an Object for dependency
+	 * reasons. Implementors are expected to return an IPartitioningConfiguration. For example:
+	 * HTMLSourceConfiguration.getDefault()
+	 * 
+	 * @return An IPartitioningConfiguration instance
+	 */
+	Object getPartitioningConfiguration();
 }

@@ -41,9 +41,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
@@ -83,6 +83,10 @@ import com.aptana.portal.ui.PortalUIPlugin;
 @SuppressWarnings("restriction")
 public class PluginsConfigurationProcessor extends AbstractConfigurationProcessor
 {
+	protected static final String PLUGIN_VERSION_ATTR = "plugin_version"; //$NON-NLS-1$
+	protected static final String PLUGIN_ID_ATTR = "plugin_id"; //$NON-NLS-1$
+	protected static final String FEATURE_ID_ATTR = "feature_id"; //$NON-NLS-1$
+	protected static final String PLUGIN_POST_CHECK_ATTR = "plugin_post_check"; //$NON-NLS-1$
 	private static final String FEATURE_IU_SUFFIX = ".feature.group"; //$NON-NLS-1$
 	private static final String P2_INSTALL = "org.eclipse.equinox.p2.ui.sdk.install"; //$NON-NLS-1$
 	private static final String PLUGINS_ATTR = "plugins"; //$NON-NLS-1$
@@ -99,58 +103,52 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 		// Clear the previous attributes that we are no longer interested at.
 		configurationStatus.removeAttribute(PLUGINS_ATTR);
 		clearErrorAttributes();
-		if (attributes == null || !(attributes instanceof Object[]))
+		// Load the plugin's attributes
+		IStatus loadingStatus = loadAttributes(attributes);
+		if (!loadingStatus.isOK())
 		{
-			applyErrorAttributes(Messages.PluginsConfigurationProcessor_missingPluginNames);
-			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_missingPluginNames));
+			applyErrorAttributes(loadingStatus.getMessage());
+			PortalUIPlugin.log(loadingStatus);
 			return configurationStatus;
 		}
-		// Place the array values into a hash.
-		Object[] attrArray = (Object[]) attributes;
-		Map<String, String> attrPlugins = new HashMap<String, String>();
-		for (Object pluginDef : attrArray)
+
+		// Check that we got the plugin-id and version in the attributes.
+		if (!attributesMap.containsKey(PLUGIN_ID_ATTR) || !attributesMap.containsKey(PLUGIN_VERSION_ATTR))
 		{
-			Object[] def = null;
-			if (!(pluginDef instanceof Object[]) || (def = (Object[]) pluginDef).length != 4)
-			{
-				applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest);
-				PortalUIPlugin.logError(new Exception(
-						Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest));
-				return configurationStatus;
-			}
-			// We only use the first two arguments. The third is the update site URL.
-			attrPlugins.put((String) def[0], (String) def[1]);
+			applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest);
+			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest));
+			return configurationStatus;
 		}
+		// Start the check
 		configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
 		// TODO - Save the status in case of an error or completion.
+		String pluginId = attributesMap.get(PLUGIN_ID_ATTR);
+		Version pluginVersion = Version.parseVersion(attributesMap.get(PLUGIN_VERSION_ATTR));
 		Map<String, Map<String, String>> bundleData = new HashMap<String, Map<String, String>>();
 		Bundle[] bundles = WorkbenchPlugin.getDefault().getBundles();
+		boolean found = false;
 		for (Bundle b : bundles)
 		{
 			String bundleSymbolicName = b.getSymbolicName();
-			if (attrPlugins.containsKey(bundleSymbolicName))
+			if (pluginId.equals(bundleSymbolicName))
 			{
 				if (b.getState() != Bundle.UNINSTALLED)
 				{
 					Version bundleVersion = b.getVersion();
-					Version requestedVersion = Version.parseVersion(attrPlugins.get(bundleSymbolicName));
-					String compatibility = (bundleVersion.compareTo(requestedVersion) >= 0) ? COMPATIBILITY_OK
+					String compatibility = (bundleVersion.compareTo(pluginVersion) >= 0) ? COMPATIBILITY_OK
 							: COMPATIBILITY_UPDATE;
 					Map<String, String> bundleInfo = new HashMap<String, String>(4);
 					bundleInfo.put(ITEM_EXISTS, YES);
 					bundleInfo.put(ITEM_VERSION, bundleVersion.toString());
 					bundleInfo.put(ITEM_COMPATIBILITY, compatibility);
 					bundleData.put(bundleSymbolicName, bundleInfo);
-					// Remove the name from the original map. Eventually, we will be left with the plugins we could not
-					// locate in the system
-					attrPlugins.remove(bundleSymbolicName);
+					found = true;
+					break;
 				}
 			}
 		}
-		// Traverse what we have left in the original map that was created from the attributes and mark all plug-ins as
-		// 'missing'
-		Set<String> missingPlugins = attrPlugins.keySet();
-		for (String pluginId : missingPlugins)
+		// if we did not find it, mark the plugin as missing
+		if (!found)
 		{
 			Map<String, String> bundleInfo = new HashMap<String, String>(4);
 			bundleInfo.put(ITEM_EXISTS, NO);
@@ -181,17 +179,29 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 			return configurationStatus;
 		}
 		clearErrorAttributes();
-		Object[] attrArray = null;
-		if (attributes == null || !(attributes instanceof Object[]) || (attrArray = (Object[]) attributes).length != 3)
+
+		// Load the plugin's attributes
+		IStatus loadingStatus = loadAttributes(attributes);
+		if (!loadingStatus.isOK())
 		{
-			applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongAttributesForConfigure);
-			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_wrongAttributesForConfigure));
+			applyErrorAttributes(loadingStatus.getMessage());
+			PortalUIPlugin.logError(new Exception(loadingStatus.getMessage()));
 			return configurationStatus;
 		}
+
+		// Check that we got the plugin-id and version in the attributes.
+		if (!attributesMap.containsKey(FEATURE_ID_ATTR))
+		{
+			applyErrorAttributes(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest);
+			PortalUIPlugin.logError(new Exception(Messages.PluginsConfigurationProcessor_wrongPluginDefinitionRequest));
+			return configurationStatus;
+		}
+
+		// Start the plugin installation
 		configurationStatus.setStatus(ConfigurationStatus.PROCESSING);
-		String updateURL = (String) attrArray[0];
-		String featureID = (String) attrArray[1];
-		Object pluginPostCheckAttributes = attrArray[2];
+		String updateURL = urls[0];
+		String featureID = attributesMap.get(FEATURE_ID_ATTR);
+		String pluginPostCheckAttributes = attributesMap.get(PLUGIN_POST_CHECK_ATTR);
 		IHandlerService handlerService = (IHandlerService) workbench.getService(IHandlerService.class);
 		try
 		{
@@ -203,10 +213,9 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 			{
 				openInstallDialog(updateURL, featureID, progressMonitor);
 			}
-			// At this point, check if we have a valid pluginPostCheckAttributes data. If so, call for computeStatus and
-			// return its result.
-			if (pluginPostCheckAttributes != null && pluginPostCheckAttributes instanceof Object[]
-					&& ((Object[]) pluginPostCheckAttributes).length > 0)
+			// At this point, check if the plugin_post_check attribute is set to 'true' . If so, call for computeStatus
+			// and return its result.
+			if (pluginPostCheckAttributes != null && Boolean.valueOf(pluginPostCheckAttributes).booleanValue())
 			{
 				return computeStatus(progressMonitor, pluginPostCheckAttributes);
 			}

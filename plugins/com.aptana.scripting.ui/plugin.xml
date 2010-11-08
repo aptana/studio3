@@ -58,13 +58,13 @@
          point="com.aptana.scripting.contextContributors">
       <contributor
             class="com.aptana.scripting.ui.StreamContextContributor"
-            name="RadRails Stream Contributor">
+            name="Aptana Stream Contributor">
       </contributor>
    </extension>
    <extension
          point="com.aptana.scripting.loadPaths">
       <loadPath
-            name="RadRails Framework Directory"
+            name="Aptana Framework Directory"
             path="framework/">
       </loadPath>
    </extension>
