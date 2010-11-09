@@ -32,23 +32,51 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.portal.ui;
+package com.aptana.browser.internal;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 
-/**
- * Initialize the portal (dev-toolbox) preferences.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class PortalPreferenceInitializer extends AbstractPreferenceInitializer
+public class BrowserBackgroundImage
 {
-	@Override
-	public void initializeDefaultPreferences()
+
+	private final String id;
+	private final ImageDescriptor imageDescriptor;
+	private final int horizontalIndent;
+	private final int verticalIndent;
+	private final boolean blackBackground;
+
+	public BrowserBackgroundImage(String id, ImageDescriptor imageDescriptor, int horizontalIndent, int verticalIndent,
+			boolean blackBackground)
 	{
-		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
-		// TODO - Change this to true once the Toolbox server-side is ready!
-		preferenceStore.setDefault(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, false);
+		this.id = id;
+		this.imageDescriptor = imageDescriptor;
+		this.horizontalIndent = horizontalIndent;
+		this.verticalIndent = verticalIndent;
+		this.blackBackground = blackBackground;
+	}
+
+	public String getId()
+	{
+		return id;
+	}
+
+	public ImageDescriptor getImageDescriptor()
+	{
+		return imageDescriptor;
+	}
+
+	public int getHorizontalIndent()
+	{
+		return horizontalIndent;
+	}
+
+	public int getVerticalIndent()
+	{
+		return verticalIndent;
+	}
+
+	public boolean isBlackBackground()
+	{
+		return blackBackground;
 	}
 }

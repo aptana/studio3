@@ -32,23 +32,54 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.portal.ui;
+package com.aptana.browser.internal;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-
-/**
- * Initialize the portal (dev-toolbox) preferences.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class PortalPreferenceInitializer extends AbstractPreferenceInitializer
+public class BrowserSize
 {
-	@Override
-	public void initializeDefaultPreferences()
+
+	private final String name;
+	private final int width;
+	private final int height;
+	private final BrowserSizeCategory category;
+	private final BrowserBackgroundImage image;
+
+	public BrowserSize(String name, int width, int height, BrowserSizeCategory category, BrowserBackgroundImage image)
 	{
-		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
-		// TODO - Change this to true once the Toolbox server-side is ready!
-		preferenceStore.setDefault(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, false);
+		this.name = name;
+		this.width = width;
+		this.height = height;
+		this.category = category;
+		this.image = image;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public int getHeight()
+	{
+		return height;
+	}
+
+	public BrowserSizeCategory getCategory()
+	{
+		return category;
+	}
+
+	public BrowserBackgroundImage getImage()
+	{
+		return image;
+	}
+
+	@Override
+	public String toString()
+	{
+		return getName();
 	}
 }
