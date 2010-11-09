@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -52,8 +55,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,6 +65,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.tasks.TaskTag;
@@ -83,11 +85,8 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 	private TableViewer fTasksTableViewer;
 	private Button fCaseSensitiveButton;
-
 	private Button fAddButton;
-
 	private Button fEditButton;
-
 	private Button fRemoveButton;
 
 	/**
@@ -97,23 +96,19 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setFont(parent.getFont());
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
+		composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
+
 		Label label = new Label(composite, SWT.WRAP);
 		label.setText(Messages.TasksPreferencePage_Description);
 		label.setFont(parent.getFont());
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.widthHint = 400;
-		data.horizontalSpan = 2;
-		label.setLayoutData(data);
+		label.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
 		label = new Label(composite, SWT.NONE); // spacer
-		data = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-		data.horizontalSpan = 2;
-		label.setLayoutData(data);
+		label.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
+
 		createTaskTableArea(composite);
 		createCaseSensitiveArea(composite);
+
+		updateButtonStates();
 
 		return composite;
 	}
@@ -121,18 +116,12 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 	private void createCaseSensitiveArea(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = 2;
-		composite.setLayoutData(data);
+		composite.setLayout(GridLayoutFactory.fillDefaults().create());
+		composite.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).create());
 
 		fCaseSensitiveButton = new Button(composite, SWT.CHECK);
 		fCaseSensitiveButton.setFont(parent.getFont());
 		fCaseSensitiveButton.setText(Messages.TasksPreferencePage_CaseSensitiveLabel);
-
 		fCaseSensitiveButton.setSelection(getPreferenceStore()
 				.getBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE));
 		setButtonLayoutData(fCaseSensitiveButton);
@@ -143,65 +132,51 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 	 */
 	private void createTaskTableArea(Composite parent)
 	{
-		Composite composite = new Composite(parent, SWT.NONE);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.widthHint = 200;
-		composite.setLayoutData(data);
-
-		GridLayout layout = new GridLayout(2, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-
-		Table table = new Table(composite, SWT.BORDER | SWT.SINGLE);
+		fTasksTableViewer = new TableViewer(parent, SWT.BORDER | SWT.SINGLE);
+		Table table = fTasksTableViewer.getTable();
+		table.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
+		table.setFont(parent.getFont());
+
 		TableColumn tagNameColumn = new TableColumn(table, SWT.NONE);
 		tagNameColumn.setText(Messages.TasksPreferencePage_TagNameColumnHeader);
 		tagNameColumn.setWidth(100);
 		TableColumn tagPriorityColumn = new TableColumn(table, SWT.NONE);
 		tagPriorityColumn.setText(Messages.TasksPreferencePage_PriorityColumnHeader);
 		tagPriorityColumn.setWidth(100);
-		table.setFont(parent.getFont());
 
-		fTasksTableViewer = new TableViewer(table);
-		table.setFont(parent.getFont());
-		table.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fTasksTableViewer.setContentProvider(ArrayContentProvider.getInstance());
-		TaskLabelProvider categoryLabelProvider = new TaskLabelProvider();
-		fTasksTableViewer.setLabelProvider(categoryLabelProvider);
+		fTasksTableViewer.setLabelProvider(new TaskLabelProvider());
 		fTasksTableViewer.setSorter(new ViewerSorter());
+		fTasksTableViewer.setInput(getTaskTags());
 
 		fTasksTableViewer.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 			public void selectionChanged(SelectionChangedEvent event)
 			{
 				// Enable/disable buttons
-				boolean enable = !event.getSelection().isEmpty();
-				fEditButton.setEnabled(enable);
-				fRemoveButton.setEnabled(enable);
+				updateButtonStates();
 			}
 		});
-		fTasksTableViewer.setInput(getTaskTags());
 
-		createTaskButtons(composite);
+		createTaskButtons(parent);
 	}
 
 	private void createTaskButtons(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.widthHint = 100;
-		composite.setLayoutData(data);
-
-		GridLayout layout = new GridLayout(1, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
+		composite.setLayoutData(GridDataFactory.fillDefaults().create());
+		composite.setLayout(GridLayoutFactory.fillDefaults().create());
 
 		// Now create the buttons
 		fAddButton = new Button(composite, SWT.PUSH);
-		fAddButton.setText(Messages.TasksPreferencePage_AddButtonLabel);
+		fAddButton.setText(StringUtil.ellipsify(CoreStrings.NEW));
+		fAddButton.setLayoutData(GridDataFactory
+				.swtDefaults()
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(Math.max(fAddButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
+						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 		fAddButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -213,8 +188,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				TableItem[] items = fTasksTableViewer.getTable().getItems();
 				for (TableItem anItem : items)
 				{
-					TaskTag aTag = (TaskTag) anItem.getData();
-					tags.add(aTag);
+					tags.add((TaskTag) anItem.getData());
 				}
 
 				// Open a dialog for user to enter the tag name and select priority!
@@ -222,17 +196,20 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				dialog.setTitle(Messages.TasksPreferencePage_NewTagTitle);
 				if (dialog.open() == Window.OK)
 				{
-					TaskTag result = dialog.getTaskTag();
 					// Insert task in our model and set the new input on the table!
-					tags.add(result);
-
+					tags.add(dialog.getTaskTag());
 					fTasksTableViewer.setInput(tags);
 				}
 			}
 		});
 
 		fEditButton = new Button(composite, SWT.PUSH);
-		fEditButton.setText(Messages.TasksPreferencePage_EditButtonLabel);
+		fEditButton.setText(StringUtil.ellipsify(CoreStrings.EDIT));
+		fEditButton.setLayoutData(GridDataFactory
+				.swtDefaults()
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(Math.max(fEditButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
+						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 		fEditButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -242,8 +219,7 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				TableItem[] items = fTasksTableViewer.getTable().getItems();
 				for (TableItem anItem : items)
 				{
-					TaskTag aTag = (TaskTag) anItem.getData();
-					tags.add(aTag);
+					tags.add((TaskTag) anItem.getData());
 				}
 
 				int index = fTasksTableViewer.getTable().getSelectionIndex();
@@ -256,15 +232,19 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 				dialog.setTitle(Messages.TasksPreferencePage_EditTagTitle);
 				if (dialog.open() == Window.OK)
 				{
-					TaskTag result = dialog.getTaskTag();
-					tags.set(index, result);
+					tags.set(index, dialog.getTaskTag());
 					fTasksTableViewer.setInput(tags);
 				}
 			}
 		});
 
 		fRemoveButton = new Button(composite, SWT.PUSH);
-		fRemoveButton.setText(Messages.TasksPreferencePage_RemoveButtonLabel);
+		fRemoveButton.setText(CoreStrings.REMOVE);
+		fRemoveButton.setLayoutData(GridDataFactory
+				.swtDefaults()
+				.align(SWT.FILL, SWT.CENTER)
+				.hint(Math.max(fRemoveButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x,
+						convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH)), SWT.DEFAULT).create());
 		fRemoveButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
@@ -282,6 +262,13 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 		String rawTagNames = getPreferenceStore().getString(IPreferenceConstants.TASK_TAG_NAMES);
 		String rawTagPriorities = getPreferenceStore().getString(IPreferenceConstants.TASK_TAG_PRIORITIES);
 		return createTaskTags(rawTagNames, rawTagPriorities);
+	}
+
+	private void updateButtonStates()
+	{
+		boolean enable = !fTasksTableViewer.getSelection().isEmpty();
+		fEditButton.setEnabled(enable);
+		fRemoveButton.setEnabled(enable);
 	}
 
 	/**
@@ -310,10 +297,8 @@ public final class TasksPreferencePage extends PreferencePage implements IWorkbe
 
 		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAG_NAMES,
 				StringUtil.join(DELIMITER, tagNames.toArray(new String[tagNames.size()])));
-
 		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAG_PRIORITIES,
 				StringUtil.join(DELIMITER, tagPriorities.toArray(new String[tagPriorities.size()])));
-
 		getPreferenceStore().setValue(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE,
 				fCaseSensitiveButton.getSelection());
 
