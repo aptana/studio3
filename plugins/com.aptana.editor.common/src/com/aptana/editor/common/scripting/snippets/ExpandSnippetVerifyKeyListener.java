@@ -50,6 +50,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.HasTriggerFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -139,7 +140,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 	{
 		for (CommandElement commandElement : commandsFromScope)
 		{
-			String[] triggers = commandElement.getTriggers();
+			String[] triggers = commandElement.getTriggerTypeValues(TriggerType.PREFIX);
 			if (triggers != null)
 			{
 				for (String trigger : triggers)

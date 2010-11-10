@@ -75,6 +75,7 @@ import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.NotFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -313,7 +314,7 @@ public class EditorCommandsMenuContributor extends ContributionItem
 					}
 					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0)
 					{
-						String[] triggers = command.getTriggers();
+						String[] triggers = command.getTriggerTypeValues(TriggerType.PREFIX);
 						if (triggers != null && triggers.length > 0)
 						{
 							// Use first trigger
