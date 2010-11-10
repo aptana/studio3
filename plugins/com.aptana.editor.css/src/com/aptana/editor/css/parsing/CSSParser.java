@@ -116,7 +116,7 @@ public class CSSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
-					final beaver.Symbol[] p = _list_p == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_p.toArray(new beaver.Symbol[_list_p.size()]);
+					final CSSNode[] p = _list_p == null ? new CSSNode[0] : (CSSNode[]) _list_p.toArray(new CSSNode[_list_p.size()]);
 					
 			return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 			}
@@ -127,11 +127,11 @@ public class CSSParser extends Parser implements IParser {
 			}
 			case 2: // Statements = Statements Statement
 			{
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
 			case 3: // Statements = Statement
 			{
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
 			case 12: // CharSet = CHARSET.c STRING.s SEMICOLON.e
 			{
@@ -173,15 +173,18 @@ public class CSSParser extends Parser implements IParser {
 					
 			return new CSSMediaNode(l, m.getStart(), r.getEnd());
 			}
-			case 16: // Media = MEDIA.m List.l LCURLY Statements RCURLY.r
+			case 16: // Media = MEDIA.m List.l LCURLY Statements.s RCURLY.r
 			{
 					final Symbol m = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
 					final String[] l = _list_l == null ? new String[0] : (String[]) _list_l.toArray(new String[_list_l.size()]);
+					final Symbol _symbol_s = _symbols[offset + 4];
+					final ArrayList _list_s = (ArrayList) _symbol_s.value;
+					final CSSNode[] s = _list_s == null ? new CSSNode[0] : (CSSNode[]) _list_s.toArray(new CSSNode[_list_s.size()]);
 					final Symbol r = _symbols[offset + 5];
 					
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			return new CSSMediaNode(l, s, m.getStart(), r.getEnd());
 			}
 			case 17: // Page = PAGE.p LCURLY RCURLY.r
 			{

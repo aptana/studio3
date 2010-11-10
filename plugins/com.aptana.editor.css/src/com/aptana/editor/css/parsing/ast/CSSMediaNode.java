@@ -40,12 +40,29 @@ public class CSSMediaNode extends CSSNode
 {
 
 	private String[] fMedias;
+	private CSSNode[] fStatements;
 	private String fText;
 
 	public CSSMediaNode(String[] medias, int start, int end)
 	{
+		this(medias, new CSSNode[0], start, end);
+	}
+
+	public CSSMediaNode(String[] medias, CSSNode[] statements, int start, int end)
+	{
 		super(CSSNodeTypes.MEDIA, start, end);
 		fMedias = medias;
+		fStatements = statements;
+	}
+
+	public String[] getMedias()
+	{
+		return fMedias;
+	}
+
+	public CSSNode[] getStatements()
+	{
+		return fStatements;
 	}
 
 	@Override
@@ -56,13 +73,16 @@ public class CSSMediaNode extends CSSNode
 			return false;
 		}
 		CSSMediaNode other = (CSSMediaNode) obj;
-		return Arrays.equals(fMedias, other.fMedias);
+		return Arrays.equals(fMedias, other.fMedias) && Arrays.equals(fStatements, other.fStatements);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return super.hashCode() * 31 + Arrays.hashCode(fMedias);
+		int hash = super.hashCode();
+		hash = hash * 31 + Arrays.hashCode(fMedias);
+		hash = hash * 31 + Arrays.hashCode(fStatements);
+		return hash;
 	}
 
 	@Override
@@ -76,7 +96,12 @@ public class CSSMediaNode extends CSSNode
 			{
 				text.append(" ").append(media); //$NON-NLS-1$
 			}
-			text.append("{").append("}"); //$NON-NLS-1$ //$NON-NLS-2$
+			text.append("{"); //$NON-NLS-1$
+			for (CSSNode statement : fStatements)
+			{
+				text.append(statement);
+			}
+			text.append("}"); //$NON-NLS-1$
 			fText = text.toString();
 		}
 		return fText;

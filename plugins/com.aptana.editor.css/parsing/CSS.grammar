@@ -19,6 +19,7 @@
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, IMPORTANT, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, HASH, CLASS = "String";
+%typeof Statement = "CSSNode";
 %typeof Declaration, Declaration2 = "CSSDeclarationNode";
 %typeof Expression, Function, Term = "CSSExpressionNode";
 %typeof ImportWord, Identifier, IdentiferOrString, Separator, Primitive, TypeOrUniversalSelector, AttributeValueOperator = "String";
@@ -141,9 +142,9 @@ Media
 		{:
 			return new CSSMediaNode(l, m.getStart(), r.getEnd());
 		:}
-	|	MEDIA.m List.l LCURLY Statements RCURLY.r
+	|	MEDIA.m List.l LCURLY Statements.s RCURLY.r
 		{:
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			return new CSSMediaNode(l, s, m.getStart(), r.getEnd());
 		:}
 	;
 
