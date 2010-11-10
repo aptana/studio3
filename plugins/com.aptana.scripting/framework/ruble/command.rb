@@ -151,8 +151,16 @@ module Ruble
       @jobj.trigger
     end
 
-    def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
+    def trigger=(type, *values)
+      if type.kind_of? Symbol
+        @jobj.setTrigger(type.to_s, values.to_java(:String))
+      elsif type.kind_of? Array
+          @jobj.setTrigger("prefix", type.to_java(:String))
+      else
+        values.unshift type
+        @jobj.setTrigger("prefix", values.to_java(:String))
+        #@jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
+      end
     end
 
     class << self
