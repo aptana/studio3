@@ -91,7 +91,7 @@ public class TemplateElement extends CommandElement
 	}
 
 	@Override
-	public String[] getTriggers()
+	public String[] getTriggerTypeValues(TriggerType type)
 	{
 		return new String[0];
 	}
