@@ -35,6 +35,7 @@
 package com.aptana.scripting;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,6 +51,7 @@ import com.aptana.scripting.model.BundleChangeListener;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.ElementChangeListener;
 import com.aptana.scripting.model.TriggerType;
@@ -94,6 +96,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	private Map<File, Set<CommandElement>> _fileToCommandMap = new HashMap<File, Set<CommandElement>>();
 	private Map<CommandElement, Set<File>> _commandToFilesMap = new HashMap<CommandElement, Set<File>>();
 	private Map<File, Integer> _fileWatcherId = new HashMap<File, Integer>();
+	private Map<Integer, File> _watcherIdFile = new HashMap<Integer, File>();
 
 	/**
 	 * FileWatcherRegistrant
@@ -188,6 +191,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 					int id = FileWatcher.addWatch(file.getAbsolutePath(), IJNotify.FILE_ANY, true, this);
 
 					this._fileWatcherId.put(file, id);
+					this._watcherIdFile.put(id, file);
 				}
 				catch (JNotifyException e)
 				{
@@ -245,12 +249,50 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 		}
 	}
 
+	private void execute(int wd, String type, String... properties)
+	{
+		// create property map
+		Map<String, String> propertyMap = new HashMap<String, String>();
+		
+		// add type
+		propertyMap.put("type", type);
+		
+		// add optional key/values
+		int length = properties.length & ~0x01;
+
+		for (int i = 0; i < length; i += 2)
+		{
+			String name = properties[i];
+			String value = properties[i + 1];
+
+			propertyMap.put(name, value);
+		}
+
+		// get commands for this watch id
+		Set<CommandElement> commands = this.getCommandsByWatchId(wd);
+
+		// and execute each
+		for (CommandElement command : commands)
+		{
+			CommandContext context = command.createCommandContext();
+
+			context.put(TriggerType.FILE_WATCHER.getName(), propertyMap);
+			command.execute(context);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see net.contentobjects.jnotify.JNotifyListener#fileCreated(int, java.lang.String, java.lang.String)
 	 */
 	public void fileCreated(int wd, String rootPath, String name)
 	{
+		this.execute( //
+			wd, //
+			"created", //
+			"rootPath", rootPath, //
+			"name", name //
+		);
 	}
 
 	/*
@@ -259,6 +301,12 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 */
 	public void fileDeleted(int wd, String rootPath, String name)
 	{
+		this.execute( //
+			wd, //
+			"deleted", //
+			"rootPath", rootPath, //
+			"name", name //
+		);
 	}
 
 	/*
@@ -267,6 +315,12 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 */
 	public void fileModified(int wd, String rootPath, String name)
 	{
+		this.execute( //
+			wd, //
+			"modified", //
+			"rootPath", rootPath, //
+			"name", name //
+		);
 	}
 
 	/*
@@ -276,6 +330,36 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 */
 	public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 	{
+		this.execute( //
+			wd, //
+			"deleted", //
+			"rootPath", rootPath, //
+			"oldName", oldName, //
+			"newName", newName //
+		);
+	}
+
+	/**
+	 * getCommandsByWatchId
+	 * 
+	 * @param wd
+	 * @return
+	 */
+	private Set<CommandElement> getCommandsByWatchId(int wd)
+	{
+		File file = this._watcherIdFile.get(wd);
+		Set<CommandElement> result;
+
+		if (file != null)
+		{
+			result = this._fileToCommandMap.get(file);
+		}
+		else
+		{
+			result = Collections.emptySet();
+		}
+
+		return result;
 	}
 
 	/**
@@ -300,9 +384,12 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 						// no more commands watching this file, so remove the watch
 						if (this._fileWatcherId.containsKey(file))
 						{
+							int id = this._fileWatcherId.remove(file);
+							this._watcherIdFile.remove(id);
+
 							try
 							{
-								FileWatcher.removeWatch(this._fileWatcherId.remove(file));
+								FileWatcher.removeWatch(id);
 							}
 							catch (JNotifyException e)
 							{
@@ -338,5 +425,24 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 
 		manager.removeBundleChangeListener(this);
 		manager.removeElementChangeListener(this);
+
+		// remove all watches
+		for (int id : this._watcherIdFile.keySet())
+		{
+			try
+			{
+				FileWatcher.removeWatch(id);
+			}
+			catch (JNotifyException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+		}
+
+		// drop all references
+		this._commandToFilesMap.clear();
+		this._fileToCommandMap.clear();
+		this._fileWatcherId.clear();
+		this._watcherIdFile.clear();
 	}
 }
