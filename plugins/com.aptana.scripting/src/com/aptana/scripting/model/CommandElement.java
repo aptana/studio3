@@ -1000,6 +1000,16 @@ public class CommandElement extends AbstractBundleElement
 	/**
 	 * setTrigger
 	 * 
+	 * @param type
+	 */
+	public void setTrigger(String type)
+	{
+		this.setTrigger(type, NO_TRIGGER_VALUES);
+	}
+	
+	/**
+	 * setTrigger
+	 * 
 	 * @param trigger
 	 */
 	public void setTrigger(String type, String[] values)
