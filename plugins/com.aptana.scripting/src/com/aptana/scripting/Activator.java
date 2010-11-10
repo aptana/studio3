@@ -143,20 +143,27 @@ public class Activator extends Plugin
 	public void start(BundleContext context) throws Exception
 	{
 		super.start(context);
-		plugin = this;
-		Job startupJob = new Job("Start bundle manager") //$NON-NLS-1$
-		{
 
+		plugin = this;
+
+		Job startupJob = new Job("Start Ruble bundle manager") //$NON-NLS-1$
+		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				BundleManager manager = BundleManager.getInstance();
+
+				// register file association listener
 				fileTypeListener = new FileTypeAssociationListener();
-				BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
+				manager.addBundleChangeListener(fileTypeListener);
 
-				// go ahead and process the workspace now to process bundles that exist already
-				BundleManager.getInstance().loadBundles();
+				// grabbing instance registers itself the bundle manager
+				FileWatcherRegistrant.getInstance();
 
-				// install Keybinding Manager
+				// load all existing bundles
+				manager.loadBundles();
+
+				// install key binding Manager
 				KeybindingsManager.install();
 
 				// turn on project and file monitoring
@@ -168,9 +175,11 @@ public class Activator extends Plugin
 				{
 					Activator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 				}
+
 				return Status.OK_STATUS;
 			}
 		};
+
 		startupJob.schedule();
 	}
 
@@ -183,13 +192,18 @@ public class Activator extends Plugin
 		try
 		{
 			BundleMonitor.getInstance().endMonitoring();
+
 			KeybindingsManager.uninstall();
+
 			if (fileTypeListener != null)
 			{
 				fileTypeListener.cleanup();
 				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
+				fileTypeListener = null;
 			}
-			fileTypeListener = null;
+
+			FileWatcherRegistrant.shutdown();
+
 			// FIXME Clean up the bundle manager singleton!
 		}
 		catch (Exception e)
