@@ -62,6 +62,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.Policy;
+import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
@@ -95,6 +96,8 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	protected String authId;
 	
 	private long lastOperationTime;
+	protected String defaultOwner;
+	protected String defaultGroup;
 
 	private Map<IPath, ExtendedFileInfo> fileInfoCache;
 	private Map<IPath, ExtendedFileInfo[]> fileInfosCache;
@@ -127,6 +130,43 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 			fileInfoCache = null;
 			fileInfosCache = null;
 		}
+	}
+	
+	protected boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor) {
+		ConnectionContext context = CoreIOPlugin.getConnectionContext(this);
+		if (context != null && context.containsKey(ConnectionContext.USE_TEMPORARY_ON_UPLOAD)) {
+			return context.getBoolean(ConnectionContext.USE_TEMPORARY_ON_UPLOAD);
+		}
+		if (fileInfo.exists()) {
+			// test if using temporary file for existing file may cause any differences on remote side
+			if (defaultOwner == null || defaultGroup == null) {
+				IPath tempFile = basePath.append(path).removeLastSegments(1).append(System.currentTimeMillis()+TMP_UPLOAD_SUFFIX);
+				ExtendedFileInfo tempFileInfo = null;
+				monitor.beginTask(Messages.BaseFTPConnectionFileManager_GetheringServerDetails, 3);
+				try {
+					try {
+						createFile(tempFile, Policy.subMonitorFor(monitor, 1));
+						tempFileInfo = fetchFile(tempFile, EFS.NONE, Policy.subMonitorFor(monitor, 1));
+					} finally {
+						deleteFile(tempFile, Policy.subMonitorFor(monitor, 1));
+					}
+				} catch (Exception e) {
+					FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.BaseFTPConnectionFileManager_ErrorDetectOwnerGroup, e));
+				}
+
+				if (tempFileInfo != null) {
+					defaultOwner = tempFileInfo.getOwner();
+					defaultGroup = tempFileInfo.getGroup();
+				} else {
+					return false;
+				}
+			}
+			if (!defaultOwner.equals(fileInfo.getOwner())
+				|| !defaultGroup.equals(fileInfo.getGroup())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/* (non-Javadoc)
@@ -251,15 +291,18 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 				throw new CoreException(new Status(IStatus.ERROR, FTPPlugin.PLUGIN_ID,
 						Messages.BaseFTPConnectionFileManager_file_is_directory, new FileNotFoundException(path.toPortableString())));				
 			}
-			clearCache(path);
-			long permissions;
+			long permissions = -1;
+			boolean useTemporary = canUseTemporaryFile(path, fileInfo, Policy.subMonitorFor(monitor, 1));
 			if (fileInfo.exists()) {
-			    permissions = fileInfo.getPermissions();
+				if (useTemporary) {
+					permissions = fileInfo.getPermissions();
+				}
 			} else {
 			    // new file; uses the user-defined default permissions
 			    permissions = PreferenceUtils.getFilePermissions();
 			}
-			return writeFile(basePath.append(path), permissions, Policy.subMonitorFor(monitor, 1));
+			clearCache(path);
+			return writeFile(basePath.append(path), useTemporary, permissions, Policy.subMonitorFor(monitor, 1));
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, FTPPlugin.PLUGIN_ID,
 					Messages.BaseFTPConnectionFileManager_parent_doesnt_exist, new FileNotFoundException(path.toPortableString())));
@@ -457,10 +500,11 @@ public abstract class BaseFTPConnectionFileManager implements IConnectionFileMan
 	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
-	protected abstract OutputStream writeFile(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
+	protected abstract OutputStream writeFile(IPath path, boolean useTemporary, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void deleteFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void deleteDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void createDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
+	protected abstract void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 
 	protected abstract void setModificationTime(IPath path, long modificationTime, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
