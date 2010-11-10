@@ -39,7 +39,7 @@
 		</properties>
         <methods>
             
-			<method name = "getComputedStyle" scope = "static" visibility = "basic">
+			<method name = "getComputedStyle" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "elt" type = "Element" usage = "required">
                         <description>Document element to get the style information for.</description>
@@ -434,7 +434,7 @@
 				</example>
             </method>
             
-			<method name = "substringData" scope = "static" visibility = "basic">
+			<method name = "substringData" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "offset" type = "Number" usage = "required">
                         <description>The character offset inside the content to return.</description>
@@ -987,7 +987,7 @@
         </properties>
         <methods>
             
-			<method name = "getCounterValue" scope = "static" visibility = "basic">
+			<method name = "getCounterValue" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Counter"/>
                 </return-types>
@@ -1022,7 +1022,7 @@
                 <return-description>Returns the value of a number.</return-description>
             </method>
             
-			<method name = "getRectValue" scope = "static" visibility = "basic">
+			<method name = "getRectValue" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Rect"/>
                 </return-types>
@@ -1037,7 +1037,7 @@
                 <return-description>Returns a Rect object representing the value of a CSS_RECT.</return-description>
             </method>
             
-			<method name = "getRGBColorValue" scope = "static" visibility = "basic">
+			<method name = "getRGBColorValue" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "RGBColor"/>
                 </return-types>
@@ -1052,7 +1052,7 @@
                 <return-description>Returns a RGBColor object representing the value of a CSS_RGBCOLOR.</return-description>
             </method>
             
-			<method name = "getStringValue" scope = "static" visibility = "basic">
+			<method name = "getStringValue" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "String"/>
                 </return-types>
@@ -1252,7 +1252,7 @@
         </properties>
         <methods>
             
-			<method name = "item" scope = "static" visibility = "basic">
+			<method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index of the CSS rule to return.</description>
@@ -1361,7 +1361,7 @@
         </properties>
         <methods>
             
-			<method name = "getPropertyCSSValue" scope = "static" visibility = "basic">
+			<method name = "getPropertyCSSValue" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "propertyName" type = "String" usage = "required">
                         <description>Name of the CSS attribute to return the CSS value for.</description>
@@ -1381,7 +1381,7 @@
                 <return-description>Returns a CSS attribute value.</return-description>
             </method>
             
-			<method name = "getPropertyPriority" scope = "static" visibility = "basic">
+			<method name = "getPropertyPriority" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "propertyName" type = "String" usage = "required">
                         <description>Name of the CSS attribute to return the priority value for.</description>
@@ -1407,7 +1407,7 @@
                 <return-description>Returns the string "important" if the CSS attribute has the "important" modifier. Returns an empty string for any other values.</return-description>
             </method>
             
-			<method name = "getPropertyValue" scope = "static" visibility = "basic">
+			<method name = "getPropertyValue" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "propertyName" type = "String" usage = "required">
                         <description>Name of the CSS attribute to return the value for.</description>
@@ -1433,7 +1433,7 @@
                 <return-description>Returns a CSS attribute value as a string.</return-description>
             </method>
             
-			<method name = "item" scope = "static" visibility = "basic">
+			<method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Position of the CSS attribute to retrieve.</description>
@@ -1459,7 +1459,7 @@
                 <return-description>Returns the name of the CSS attribute at the specified position.</return-description>
             </method>
             
-			<method name = "removeProperty" scope = "static" visibility = "basic">
+			<method name = "removeProperty" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "propertyName" type = "String" usage = "required">
                         <description>Name of the CSS attribute to delete.</description>
@@ -1818,7 +1818,7 @@
         </properties>
         <methods>
             
-			<method name = "item" scope = "static" visibility = "basic">
+			<method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Position in the CSSValueList array to return the CSSValue from.</description>
@@ -2869,7 +2869,7 @@
                 <return-description>Returns an object with the concept set.</return-description>
             </method>
             
-			<method name = "createAttribute" scope = "static" visibility = "basic">
+			<method name = "createAttribute" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Name of the attribute to create.</description>
@@ -2920,7 +2920,7 @@
                 <return-description>Returns a new Attr node object.</return-description>
             </method>
             
-			<method name = "createAttributeNS" scope = "static" visibility = "basic">
+			<method name = "createAttributeNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>The namespace of the new attribute.</description>
@@ -3058,7 +3058,7 @@
                 <return-description>Returns a new empty DocumentFragment object.</return-description>
             </method>
             
-			<method name = "createElement" scope = "static" visibility = "basic">
+			<method name = "createElement" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "tagName" type = "String" usage = "required">
                         <description>The tag name of the element to be created.</description>
@@ -3212,7 +3212,7 @@
                 <return-description>Returns a new Element object as specified by tagName.</return-description>
             </method>
             
-			<method name = "createElementNS" scope = "static" visibility = "basic">
+			<method name = "createElementNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace of the new element.</description>
@@ -3265,7 +3265,7 @@
                 <return-description>Returns a new Element object as specified by tagName and created with a namespace.</return-description>
             </method>
             
-			<method name = "createEntityReference" scope = "static" visibility = "basic">
+			<method name = "createEntityReference" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Name of the new entity reference.</description>
@@ -3295,7 +3295,7 @@
                 <return-description>Returns a new XML EntityReference object.</return-description>
             </method>
             
-			<method name = "createEventObject" scope = "static" visibility = "basic">
+			<method name = "createEventObject" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "eventObj" type = "String" usage = "zero-or-more">
                         <description>Event to clone properties for, if copying from an existing Event.</description>
@@ -3443,7 +3443,7 @@
                 <return-description>Returns a new ProcessingInstruction node.</return-description>
             </method>
             
-			<method name = "createStyleSheet" scope = "static" visibility = "basic">
+			<method name = "createStyleSheet" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "url" type = "String" usage = "optional">
                         <description>URL to create the styleSheet object from. Default is to create an empty styleSheet.</description>
@@ -3470,7 +3470,7 @@
 				</example>
             </method>
             
-			<method name = "createTextNode" scope = "static" visibility = "basic">
+			<method name = "createTextNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "data" type = "String" usage = "required">
                         <description>Text to include in the Text node.</description>
@@ -3526,7 +3526,7 @@
                 <return-description>Returns the element found at the specified x, y location in the document.</return-description>
             </method>
             
-			<method name = "execCommand" scope = "static" visibility = "basic">
+			<method name = "execCommand" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "command" type = "String" usage = "required">
                         <description>Command to execute.</description>
@@ -3550,7 +3550,7 @@
                 <return-description>Returns true if the command is successful.</return-description>
             </method>
             
-			<method name = "focus" scope = "static" visibility = "basic">
+			<method name = "focus" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Object"/>
                 </return-types>
@@ -3562,7 +3562,7 @@
                 <return-description>The current document with focus on it.</return-description>
             </method>
             
-			<method name = "getElementById" scope = "static" visibility = "basic">
+			<method name = "getElementById" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "id" type = "String" usage = "required">
                         <description>Id of the element to get.</description>
@@ -3605,7 +3605,7 @@
                 <return-description>Returns the &lt;code&gt;Element&lt;/code&gt; object node that matches the given &lt;code&gt;ID&lt;/code&gt;.</return-description>
             </method>
             
-			<method name = "getElementsByTagName" scope = "static" visibility = "basic">
+			<method name = "getElementsByTagName" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "tagname" type = "String" usage = "one-or-more">
                         <description>Tag name of the elements to return. Specify "*" to return all tags.</description>
@@ -3757,7 +3757,7 @@
                 <return-description>Returns an array of &lt;code&gt;Element&lt;/code&gt; nodes with the specified tag name.</return-description>
             </method>
             
-			<method name = "getElementsByTagNameNS" scope = "static" visibility = "basic">
+			<method name = "getElementsByTagNameNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace of the elements to return. Specify "&lt;code&gt;*&lt;/code&gt;" to return all tags.</description>
@@ -3912,7 +3912,7 @@
                 <return-description>Returns the text currently selected by the user.</return-description>
             </method>
             
-			<method name = "importNode" scope = "static" visibility = "basic">
+			<method name = "importNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "importedNode" type = "Object" usage = "required">
                         <description>Node to import.</description>
@@ -5115,7 +5115,7 @@
         </constructors>
         <methods>
             
-			<method name = "createCSSStyleSheet" scope = "static" visibility = "basic">
+			<method name = "createCSSStyleSheet" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "title" type = "String" usage = "required">
                         <description>Title of the CSS stylesheet.</description>
@@ -5141,7 +5141,7 @@
                 <return-description>Returns a new CSSStyleSheet.</return-description>
             </method>
             
-			<method name = "createDocument" scope = "static" visibility = "basic">
+			<method name = "createDocument" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace URI to use for the root element for the document.</description>
@@ -5200,7 +5200,7 @@
                 <return-description>Returns a new XML document object.</return-description>
             </method>
             
-			<method name = "createDocumentType" scope = "static" visibility = "basic">
+			<method name = "createDocumentType" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "qualifiedName" type = "String" usage = "required">
                         <description>Qualified name for the document.</description>
@@ -5415,7 +5415,7 @@
 			
         </properties>
         <methods>
-            <method name = "getAttribute" scope = "static" visibility = "basic">
+            <method name = "getAttribute" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>The name of the attribute to get the value for.</description>
@@ -5469,7 +5469,7 @@
                 <return-description>Returns the value of the specified attribute.</return-description>
             </method>
             
-			<method name = "getAttributeNode" scope = "static" visibility = "basic">
+			<method name = "getAttributeNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>The name of the attribute to get the Attr node object for.</description>
@@ -5514,7 +5514,7 @@
                 <return-description>Returns the Attr object.</return-description>
             </method>
             
-			<method name = "getAttributeNodeNS" scope = "static" visibility = "basic">
+			<method name = "getAttributeNodeNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>The namespace URI of the attribute node to get.</description>
@@ -5559,7 +5559,7 @@
                 <return-description>Returns the Attr node object.</return-description>
             </method>
             
-			<method name = "getAttributeNS" scope = "static" visibility = "basic">
+			<method name = "getAttributeNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>The namespace URI of the attribute to get.</description>
@@ -5606,7 +5606,7 @@
                 <return-description>Returns the value of the attribute.</return-description>
             </method>
             
-			<method name = "getElementsByTagName" scope = "static" visibility = "basic">
+			<method name = "getElementsByTagName" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Tag name of the element(s) to retrieve. (Use "*" as a wild card to return all tags.)</description>
@@ -5764,7 +5764,7 @@
                 <return-description>Returns a NodeList array of all Element nodes descending from the specified Element.</return-description>
             </method>
             
-			<method name = "getElementsByTagNameNS" scope = "static" visibility = "basic">
+			<method name = "getElementsByTagNameNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace URI of the elements to get. (Use "*" as a wild card.)</description>
@@ -6043,7 +6043,7 @@
                 <description>Removes an attribute by name</description>
             </method>
             
-			<method name = "removeAttributeNode" scope = "static" visibility = "basic">
+			<method name = "removeAttributeNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "oldAttr" type = "Attr" usage = "required">
                         <description>Node to remove from the attribute.</description>
@@ -6167,7 +6167,7 @@
                 <description>Adds a new attribute.</description>
             </method>
             
-			<method name = "setAttributeNode" scope = "static" visibility = "basic">
+			<method name = "setAttributeNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newAttr" type = "Attr" usage = "required">
                         <description>Attr node of the attribute to set.</description>
@@ -6221,7 +6221,7 @@
                 <return-description>Returns the Attr node that the newAttr node replaced.</return-description>
             </method>
             
-			<method name = "setAttributeNodeNS" scope = "static" visibility = "basic">
+			<method name = "setAttributeNodeNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newAttr" type = "Attr" usage = "required">
                         <description>Attr node of the attribute to set, including the namespace information.</description>
@@ -8366,7 +8366,7 @@
         </properties>
         <methods>
             
-			<method name = "item" scope = "static" visibility = "basic">
+			<method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index position of the element.</description>
@@ -8395,7 +8395,7 @@
                 <return-description>Returns the element found at the specified position in the collection.</return-description>
             </method>
             
-			<method name = "namedItem" scope = "static" visibility = "basic">
+			<method name = "namedItem" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Name of the element.</description>
@@ -8641,7 +8641,7 @@
                 <description>Closes the output stream to the document.</description>
             </method>
             
-			<method name = "getElementsByName" scope = "static" visibility = "basic">
+			<method name = "getElementsByName" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "elementName" type = "String" usage = "required">
                         <description>Name of the element.</description>
@@ -10683,7 +10683,7 @@
                 </browsers>
             </method>
             
-			<method name = "getElementsByTagName" scope = "static" visibility = "basic">
+			<method name = "getElementsByTagName" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "tagname" type = "String" usage = "one-or-more">
                         <description>Tag name of the elements to return. Specify "*" to return all tags.</description>
@@ -11181,7 +11181,7 @@
                 <description>Removes an attribute by name</description>
             </method>
             
-			<method name = "removeAttributeNode" scope = "static" visibility = "basic">
+			<method name = "removeAttributeNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "oldAttr" type = "Attr" usage = "required">
                         <description>Node to remove from the attribute.</description>
@@ -11220,7 +11220,7 @@
                 <return-description>Returns the Attr node that has been removed.</return-description>
             </method>
             
-			<method name = "removeBehavior" scope = "static" visibility = "basic">
+			<method name = "removeBehavior" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "id" type = "String" usage = "required">
                         <description>id of the behavior to remove.</description>
@@ -11240,7 +11240,7 @@
                 <return-description>Returns returns true if the behavior is successfully removed.</return-description>
             </method>
             
-			<method name = "removeChild" scope = "static" visibility = "basic">
+			<method name = "removeChild" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "oldChild" type = "Node" usage = "required">
                         <description>Child node to remove.</description>
@@ -11355,7 +11355,7 @@
                 <description>Replaces the current text adjacent to the element with the specified text.</description>
             </method>
             
-			<method name = "replaceChild" scope = "static" visibility = "basic">
+			<method name = "replaceChild" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newChild" type = "Node" usage = "required">
                         <description>Node to replace the oldChild node with.</description>
@@ -11517,7 +11517,7 @@
                 <description>Adds a new attribute.</description>
             </method>
             
-			<method name = "setAttributeNode" scope = "static" visibility = "basic">
+			<method name = "setAttributeNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newAttr" type = "Attr" usage = "required">
                         <description>Attr node of the attribute to set.</description>
@@ -13321,7 +13321,7 @@
         </properties>
         <methods>
             
-			<method name = "createCaption" scope = "static" visibility = "basic">
+			<method name = "createCaption" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "HTMLElement"/>
                 </return-types>
@@ -13347,7 +13347,7 @@
                 <return-description>Returns a new caption element.</return-description>
             </method>
             
-			<method name = "createTFoot" scope = "static" visibility = "basic">
+			<method name = "createTFoot" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "HTMLElement"/>
                 </return-types>
@@ -13373,7 +13373,7 @@
                 <return-description>Returns a new tfoot element.</return-description>
             </method>
             
-			<method name = "createTHead" scope = "static" visibility = "basic">
+			<method name = "createTHead" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "HTMLElement"/>
                 </return-types>
@@ -13499,7 +13499,7 @@
                 <description>Deletes the thead element from the table.</description>
             </method>
             
-			<method name = "insertRow" scope = "static" visibility = "basic">
+			<method name = "insertRow" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index for the row before where the new row will be inserted.</description>
@@ -13658,7 +13658,7 @@
                 <description>Deletes the cell at the specified position from the row.</description>
             </method>
             
-			<method name = "insertCell" scope = "static" visibility = "basic">
+			<method name = "insertCell" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index position of the cell before where the new cell will be inserted.</description>
@@ -13769,7 +13769,7 @@
                 <description>Deletes the row at the specified position in the table section.</description>
             </method>
 			
-            <method name = "insertRow" scope = "static" visibility = "basic">
+            <method name = "insertRow" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index of the row before where the row will be inserted.</description>
@@ -14227,7 +14227,7 @@
                 <description>Deletes the specified media type from the list.</description>
             </method>
 			
-            <method name = "item" scope = "static" visibility = "basic">
+            <method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index position of the item to get.</description>
@@ -14648,7 +14648,7 @@
         </properties>
         <methods>
             
-			<method name = "getNamedItem" scope = "static" visibility = "basic">
+			<method name = "getNamedItem" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Name of the node.</description>
@@ -14686,7 +14686,7 @@
                 <return-description>Returns the specified node.</return-description>
             </method>
 			
-            <method name = "getNamedItemNS" scope = "static" visibility = "basic">
+            <method name = "getNamedItemNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace URI of the node to retrieve.</description>
@@ -14729,7 +14729,7 @@
                 <return-description>Returns the node identified by the given name and XML namespace URI.</return-description>
             </method>
             
-			<method name = "item" scope = "static" visibility = "basic">
+			<method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index number to retrieve.</description>
@@ -14775,7 +14775,7 @@
                 <return-description>Returns the node at the specified index number.</return-description>
             </method>
             
-			<method name = "removeNamedItem" scope = "static" visibility = "basic">
+			<method name = "removeNamedItem" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "name" type = "String" usage = "required">
                         <description>Name of the node to remove from the map</description>
@@ -14823,7 +14823,7 @@
                 <return-description>Returns the removed node.</return-description>
             </method>
             
-			<method name = "removeNamedItemNS" scope = "static" visibility = "basic">
+			<method name = "removeNamedItemNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "namespaceURI" type = "String" usage = "required">
                         <description>Namespace URI of the node to remove.</description>
@@ -14861,7 +14861,7 @@
                 <return-description>Returns the removed node.</return-description>
             </method>
             
-			<method name = "setNamedItem" scope = "static" visibility = "basic">
+			<method name = "setNamedItem" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "arg" type = "Node" usage = "required">
                         <description>Node to add to the map.</description>
@@ -14921,7 +14921,7 @@
                 <return-description>Returns the replaced node.</return-description>
             </method>
             
-			<method name = "setNamedItemNS" scope = "static" visibility = "basic">
+			<method name = "setNamedItemNS" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "arg" type = "Node" usage = "required">
                         <description>Node to add to the map.</description>
@@ -15396,7 +15396,7 @@
         </properties>
         <methods>
             
-			<method name = "appendChild" scope = "static" visibility = "basic">
+			<method name = "appendChild" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newChild" type = "Node" usage = "required">
                         <description>Node to add to the current element as a child.</description>
@@ -15462,7 +15462,7 @@
                 <return-description>Returns the removed node, if applicable.</return-description>
             </method>
             
-			<method name = "cloneNode" scope = "static" visibility = "basic">
+			<method name = "cloneNode" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "deep" type = "Boolean" usage = "required">
                         <description>If true, clone the child nodes, also.</description>
@@ -15589,7 +15589,7 @@
                 <return-description>Returns true if the node has child nodes.</return-description>
             </method>
             
-			<method name = "insertBefore" scope = "static" visibility = "basic">
+			<method name = "insertBefore" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newChild" type = "Node" usage = "required">
                         <description>Child node to insert.</description>
@@ -15728,7 +15728,7 @@
                 <description>Merges text nodes adjacent to the element to create a normalized DOM.</description>
             </method>
             
-			<method name = "removeChild" scope = "static" visibility = "basic">
+			<method name = "removeChild" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "oldChild" type = "Node" usage = "required">
                         <description>Child node to remove.</description>
@@ -15779,7 +15779,7 @@
                 <return-description>Removes the specified child node from the element and returns the node.</return-description>
             </method>
             
-			<method name = "replaceChild" scope = "static" visibility = "basic">
+			<method name = "replaceChild" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "newChild" type = "Node" usage = "required">
                         <description>Node to replace the oldChild node with.</description>
@@ -16003,7 +16003,7 @@
                 <description>Detaches the NodeIterator from the document.</description>
             </method>
             
-			<method name = "nextNode" scope = "static" visibility = "basic">
+			<method name = "nextNode" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -16019,7 +16019,7 @@
                 <return-description>Returns the next node in the filtered set of nodes.</return-description>
             </method>
             
-			<method name = "previousNode" scope = "static" visibility = "basic">
+			<method name = "previousNode" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -16081,7 +16081,7 @@
 			
         </properties>
         <methods>
-            <method name = "item" scope = "static" visibility = "basic">
+            <method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index number to retrieve.</description>
@@ -16369,7 +16369,7 @@
         </properties>
         <methods>
             
-			<method name = "cloneContents" scope = "static" visibility = "basic">
+			<method name = "cloneContents" scope = "instance" visibility = "basic">
                 <references>
                     <reference name = "DocumentFragment"/>
                     <reference name = "Range.deleteContents"/>
@@ -16394,7 +16394,7 @@
                 <return-description>Returns a new DocumentFragment.</return-description>
             </method>
             
-			<method name = "cloneRange" scope = "static" visibility = "basic">
+			<method name = "cloneRange" scope = "instance" visibility = "basic">
                 <references>
                     <reference name = "Document.createRange"/>
                 </references>
@@ -16511,7 +16511,7 @@
                 <description>Stops the implementation of the range.</description>
             </method>
             
-			<method name = "extractContents" scope = "static" visibility = "basic">
+			<method name = "extractContents" scope = "instance" visibility = "basic">
                 <references>
                     <reference name = "DocumentFragment"/>
                     <reference name = "Range.cloneContents"/>
@@ -16781,7 +16781,7 @@
                 <description>Inserts the specified node and makes it a parent to the nodes in the Range.</description>
             </method>
             
-			<method name = "toString" scope = "static" visibility = "basic">
+			<method name = "toString" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "String"/>
                 </return-types>
@@ -17220,7 +17220,7 @@
 			
         </properties>
         <methods>
-            <method name = "item" scope = "static" visibility = "basic">
+            <method name = "item" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "index" type = "Number" usage = "required">
                         <description>Index position of the StyleSheet.</description>
@@ -17277,7 +17277,7 @@
         </constructors>
         <methods>
             
-			<method name = "splitText" scope = "static" visibility = "basic">
+			<method name = "splitText" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "offset" type = "Number" usage = "required">
                         <description>Number of characters from the beginning of the text string to split the node.</description>
@@ -17455,7 +17455,7 @@
         </properties>
         <methods>
             
-			<method name = "firstChild" scope = "static" visibility = "basic">
+			<method name = "firstChild" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17476,7 +17476,7 @@
                 <return-description>Returns the first child node of the current node.</return-description>
             </method>
             
-			<method name = "lastChild" scope = "static" visibility = "basic">
+			<method name = "lastChild" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17497,7 +17497,7 @@
                 <return-description>Returns the last child node of the current node.</return-description>
             </method>
             
-			<method name = "nextNode" scope = "static" visibility = "basic">
+			<method name = "nextNode" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17514,7 +17514,7 @@
                 <return-description>Returns the next node in the document subtree.</return-description>
             </method>
             
-			<method name = "nextSibling" scope = "static" visibility = "basic">
+			<method name = "nextSibling" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17535,7 +17535,7 @@
                 <return-description>Returns the next sibling node of the current node.</return-description>
             </method>
             
-			<method name = "parentNode" scope = "static" visibility = "basic">
+			<method name = "parentNode" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17556,7 +17556,7 @@
                 <return-description>Returns the parent node of the current node.</return-description>
             </method>
             
-			<method name = "previousNode" scope = "static" visibility = "basic">
+			<method name = "previousNode" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>
@@ -17573,7 +17573,7 @@
                 <return-description>Returns the previous node in the document subtree.</return-description>
             </method>
             
-			<method name = "previousSibling" scope = "static" visibility = "basic">
+			<method name = "previousSibling" scope = "instance" visibility = "basic">
                 <return-types>
                     <return-type type = "Node"/>
                 </return-types>

@@ -37,6 +37,7 @@ package com.aptana.filesystem.ftp.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import com.enterprisedt.net.ftp.FTPClient;
@@ -49,50 +50,47 @@ import com.enterprisedt.net.ftp.FileTransferOutputStream;
  *
  */
 public class FTPFileUploadOutputStream extends OutputStream {
-
+	
 	private FTPClientInterface ftpClient;
 	private FileTransferOutputStream ftpOutputStream;
 	private String filename;
 	private Date modificationTime;
 	private long permissions;
 	private FTPClientPool pool;
+	private Runnable completeRunnable;
 	
 	/**
 	 * @param pool 
 	 * 
 	 */
-	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public FTPFileUploadOutputStream(FTPClientPool pool, FTPClientInterface ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions, Runnable completeRunnable) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
 		this.pool = pool;
+		this.completeRunnable = completeRunnable;
 	}
 
 	private void safeQuit(boolean failed) {		
 		try {
 			if (ftpClient.connected()) {
-				if (failed) {
+				if (failed && filename != null) {
 					ftpClient.delete(ftpOutputStream.getRemoteFile());
 				}
 			}
-		}
-		catch (Exception e)
-		{
-			// ignore
-		}
-		finally 
-		{
-			try
-			{
+		} catch (Exception ignore) {
+		} finally {
+			try {
 				ftpOutputStream.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
+			} catch (IOException ignore) {
 			}
 			pool.checkIn(ftpClient);
+			if (completeRunnable != null) {
+				completeRunnable.run();
+				completeRunnable = null;
+			}
 		}
 	}
 
@@ -117,19 +115,21 @@ public class FTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.close();
 			try {
-				if (modificationTime != null) {
-					ftpClient.setModTime(ftpOutputStream.getRemoteFile(), modificationTime);
-				}
+				String actualFilename = filename != null ? filename : ftpOutputStream.getRemoteFile();
 				if (filename != null) {
 					if (ftpClient.exists(filename)) {
 						ftpClient.delete(filename);
 					}
-					ftpClient.rename(ftpOutputStream.getRemoteFile(), filename);
-                    if (ftpClient instanceof FTPClient) {
-                        ((FTPClient) ftpClient).site("CHMOD " + Long.toOctalString(permissions) //$NON-NLS-1$
-                                + " " + filename); //$NON-NLS-1$
-                    }
+					ftpClient.rename(ftpOutputStream.getRemoteFile(), actualFilename);
+					filename = null;
 				}
+				if (modificationTime != null) {
+					ftpClient.setModTime(actualFilename, modificationTime);
+				}
+                if (ftpClient instanceof FTPClient && permissions > 0) {
+                    ((FTPClient) ftpClient).site(
+                    		MessageFormat.format("CHMOD {0} {1}", Long.toOctalString(permissions), actualFilename)); //$NON-NLS-1$
+                }
 			} catch (FTPException e) {
 				safeQuit(true);
 				throw new IOException(e.getMessage()); 

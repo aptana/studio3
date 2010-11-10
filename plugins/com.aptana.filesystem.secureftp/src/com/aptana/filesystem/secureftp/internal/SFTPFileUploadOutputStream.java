@@ -56,32 +56,38 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 	private String filename;
 	private Date modificationTime;
 	private long permissions;
+	private Runnable completeRunnable;
 	
 	/**
 	 * 
 	 */
-	public SFTPFileUploadOutputStream(SSHFTPClient ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions) {
+	public SFTPFileUploadOutputStream(SSHFTPClient ftpClient, FileTransferOutputStream ftpOutputStream, String filename, Date modificationTime, long permissions, Runnable completeRunnable) {
 		this.ftpClient = ftpClient;
 		this.ftpOutputStream = ftpOutputStream;
 		this.filename = filename;
 		this.modificationTime = modificationTime;
 		this.permissions = permissions;
+		this.completeRunnable = completeRunnable;
 	}
 
 	private void safeClose(boolean failed) {
 		try {
 			if (ftpClient.connected()) {
-				if (failed) {
+				if (failed && filename != null) {
 					ftpClient.delete(ftpOutputStream.getRemoteFile());
 				}
 			}
 		} catch (Exception e) {
-			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP upload error.", e));
+			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPFileUploadOutputStream_ErrorUpload, e));
 		} finally {
 			try {
 				ftpOutputStream.close();
 			} catch (IOException e) {
-				SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP close stream error.", e));
+				SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPFileUploadOutputStream_ErrorCloseStream, e));
+			}
+			if (completeRunnable != null) {
+				completeRunnable.run();
+				completeRunnable = null;
 			}
 		}
 	}
@@ -107,15 +113,19 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 		try {
 			ftpOutputStream.close();
 			try {
-				if (modificationTime != null) {
-					ftpClient.setModTime(ftpOutputStream.getRemoteFile(), modificationTime);
-				}
+				String actualFilename = filename != null ? filename : ftpOutputStream.getRemoteFile();
 				if (filename != null) {
 					if (ftpClient.exists(filename)) {
 						ftpClient.delete(filename);
 					}
-					ftpClient.rename(ftpOutputStream.getRemoteFile(), filename);
-                    ((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), filename);
+					ftpClient.rename(ftpOutputStream.getRemoteFile(), actualFilename);
+					filename = null;
+				}
+				if (modificationTime != null) {
+					ftpClient.setModTime(actualFilename, modificationTime);
+				}
+				if (permissions > 0) {
+					((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
 				}
 			} catch (FTPException e) {
 				safeClose(true);
