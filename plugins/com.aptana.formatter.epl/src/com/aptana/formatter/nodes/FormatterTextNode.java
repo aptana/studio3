@@ -49,6 +49,11 @@ public class FormatterTextNode extends AbstractFormatterNode implements IFormatt
 			writeSpaces(visitor, context, getSpacesCountBefore());
 		}
 		visitor.write(context, getStartOffset(), getEndOffset());
+		// Write any spaces after writing the text
+		if (getSpacesCountAfter() > 0)
+		{
+			writeSpaces(visitor, context, getSpacesCountAfter());
+		}
 	}
 
 	public boolean isEmpty()
