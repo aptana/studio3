@@ -142,7 +142,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		try {
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
-			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
+			Activator.log("Send terminal size failed.", e); //$NON-NLS-1$
 		}
 	}
 	
@@ -152,7 +152,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			try {
 				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
 			} catch (IOException e) {
-				Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
+				Activator.log("Get terminal process list failed.", e); //$NON-NLS-1$
 				return null;
 			}
 			synchronized (processList) {
@@ -243,7 +243,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
 			return true;
 		} catch (Exception e) {
-			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
+			Activator.log("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
 		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
 		return false;
@@ -315,7 +315,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				}
 			}
 		} else {
-			Activator.logWarning("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+			Activator.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
 		}
 	}
 
