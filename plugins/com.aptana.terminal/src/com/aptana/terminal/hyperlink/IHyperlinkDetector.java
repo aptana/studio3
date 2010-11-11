@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package org.eclipse.tm.terminal.model;
+package com.aptana.terminal.hyperlink;
 
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 

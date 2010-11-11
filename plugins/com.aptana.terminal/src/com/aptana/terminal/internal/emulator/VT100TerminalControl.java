@@ -39,6 +39,7 @@ import java.io.UnsupportedEncodingException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.MouseAdapter;
@@ -102,6 +103,14 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	public void disposeTerminal() {
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
 		super.disposeTerminal();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#createTextCanvas(org.eclipse.swt.widgets.Composite, org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel, org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer)
+	 */
+	@Override
+	protected org.eclipse.tm.internal.terminal.textcanvas.TextCanvas createTextCanvas(Composite parent, ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
+		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
 	}
 
 	/* (non-Javadoc)

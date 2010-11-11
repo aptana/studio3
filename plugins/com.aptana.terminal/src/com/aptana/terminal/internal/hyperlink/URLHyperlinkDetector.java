@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.terminal.internal;
+package com.aptana.terminal.internal.hyperlink;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
-import org.eclipse.tm.terminal.model.IHyperlinkDetector;
+
+import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 
 /**
  * Detects URLs or bare hostnames like www.cnn.com and generates hyperlinks for them.

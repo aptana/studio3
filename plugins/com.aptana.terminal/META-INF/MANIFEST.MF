@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.terminal,
+ com.aptana.terminal.editor,
+ com.aptana.terminal.hyperlink,
  com.aptana.terminal.views,
- com.aptana.terminal.widget,
- com.aptana.terminal.editor
+ com.aptana.terminal.widget
 Eclipse-ExtensibleAPI: true
