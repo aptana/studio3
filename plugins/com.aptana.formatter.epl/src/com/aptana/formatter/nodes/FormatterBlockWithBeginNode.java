@@ -53,11 +53,22 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			context.incIndent();
 		}
-		// if (addingNewLine)
-		// {
-		// visitor.writeLineBreak(context);
-		// }
+		boolean endWithNewLine = isAddingEndNewLine();
+		if (endWithNewLine && !visitor.endsWithNewLine())
+		{
+			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+			// a new-line.
+			visitor.writeLineBreak(context);
+		}
 		super.accept(context, visitor);
+
+		// Write any spaces after visiting the body
+		if (getSpacesCountAfter() > 0)
+		{
+			writeSpaces(visitor, context, getSpacesCountAfter());
+		}
+
+		// de-dent if needed
 		if (indenting)
 		{
 			context.decIndent();

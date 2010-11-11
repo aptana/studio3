@@ -11,6 +11,7 @@
  *******************************************************************************/
 package com.aptana.formatter.nodes;
 
+import java.util.List;
 import java.util.Stack;
 
 import com.aptana.formatter.FormatterDocument;
@@ -54,10 +55,18 @@ public class AbstractFormatterNodeBuilder
 		{
 			// Check if the node should consume any gaps that we have to previous node end offset.
 			// This way, we can consume all white-spaces in between.
+			// The check take into consideration the value of the previous node's getSpacesCountAfter(), so that we do
+			// not trim more then what that node was adding.
 			if (node.shouldConsumePreviousWhiteSpaces())
 			{
+				List<IFormatterNode> children = parentNode.getChildren();
+				int preservedSpaces = 0;
+				if (!children.isEmpty())
+				{
+					preservedSpaces = children.get(children.size() - 1).getSpacesCountAfter();
+				}
 				String text = parentNode.getDocument().get(parentNode.getEndOffset(), pos);
-				if (text.trim().length() == 0)
+				if (text.trim().length() == 0 && preservedSpaces == 0)
 				{
 					return;
 				}
@@ -69,7 +78,7 @@ public class AbstractFormatterNodeBuilder
 						break;
 					}
 				}
-				pos = pos - (text.length() - rightPos) + 1;
+				pos = pos - (text.length() - rightPos + preservedSpaces) + 1;
 			}
 			parentNode.addChild(createTextNode(parentNode.getDocument(), parentNode.getEndOffset(), pos));
 
