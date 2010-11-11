@@ -32,16 +32,16 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.ruby.internal.hyperlink;
+package com.aptana.workbench.hyperlink;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.tm.terminal.model.IHyperlinkDetector;
 
-import com.aptana.editor.common.text.hyperlink.EditorLineHyperlink;
+import com.aptana.terminal.hyperlink.IHyperlinkDetector;
+
 
 public class StacktraceHyperlinkDetector implements IHyperlinkDetector
 {

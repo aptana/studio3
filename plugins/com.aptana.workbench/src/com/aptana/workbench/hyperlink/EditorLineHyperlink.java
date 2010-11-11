@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.text.hyperlink;
+package com.aptana.workbench.hyperlink;
 
 import java.io.File;
 
@@ -56,15 +56,14 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.workbench.Activator;
 
 public class EditorLineHyperlink implements IHyperlink
 {
@@ -104,13 +103,9 @@ public class EditorLineHyperlink implements IHyperlink
 			IEditorPart editor = IDE.openEditorOnFileStore(page, store);
 			setEditorToLine(editor);
 		}
-		catch (PartInitException e)
-		{
-			CommonEditorPlugin.logError(e);
-		}
 		catch (CoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			Activator.log(e);
 		}
 	}
 
@@ -218,7 +213,7 @@ public class EditorLineHyperlink implements IHyperlink
 		}
 		catch (BadLocationException e)
 		{
-			CommonEditorPlugin.logError(e);
+			Activator.log(e);
 		}
 		provider.disconnect(pInput);
 	}
