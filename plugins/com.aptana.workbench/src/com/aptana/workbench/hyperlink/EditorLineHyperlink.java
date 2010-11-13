@@ -63,7 +63,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.views.TerminalView;
-import com.aptana.workbench.Activator;
+import com.aptana.workbench.WorkbenchPlugin;
 
 public class EditorLineHyperlink implements IHyperlink
 {
@@ -105,7 +105,7 @@ public class EditorLineHyperlink implements IHyperlink
 		}
 		catch (CoreException e)
 		{
-			Activator.log(e);
+			WorkbenchPlugin.log(e);
 		}
 	}
 
@@ -213,7 +213,7 @@ public class EditorLineHyperlink implements IHyperlink
 		}
 		catch (BadLocationException e)
 		{
-			Activator.log(e);
+			WorkbenchPlugin.log(e);
 		}
 		provider.disconnect(pInput);
 	}

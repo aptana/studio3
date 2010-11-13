@@ -3,16 +3,21 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: com.aptana.workbench;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.workbench.Activator
+Bundle-Activator: com.aptana.workbench.WorkbenchPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
  org.eclipse.core.resources,
  org.eclipse.core.filesystem,
  org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
- com.aptana.terminal
+ com.aptana.core,
+ com.aptana.editor.common,
+ com.aptana.git.core,
+ com.aptana.terminal,
+ com.aptana.scripting
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.workbench.hyperlink

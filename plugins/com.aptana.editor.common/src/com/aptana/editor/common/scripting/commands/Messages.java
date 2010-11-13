@@ -43,15 +43,6 @@ public class Messages extends NLS {
 	public static String CommandExecutionUtils_Input_File_Does_Not_Exist;
 	public static String CommandExecutionUtils_ClickToFocusTypeEscapeToDismissWhenFocused;
 	public static String CommandExecutionUtils_Unable_To_Write_To_Output_File;
-	public static String EditBundleJob_BundleHasNoRepository_Error;
-	public static String EditBundleJob_CantCreateUserBundlesDir_Error;
-	public static String EditBundleJob_GitCloneFailed_Error;
-	public static String EditBundleJob_Name;
-	public static String EditBundleJob_RequiresGitError;
-	public static String EditorCommandsMenuContributor_CommandsForOtherScopes;
-	public static String EditorCommandsMenuContributor_LBL_EditBundle;
-	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
-	public static String EditorCommandsMenuContributor_TITLE_CommandNotDefined;
 	public static String FilterThroughCommandDialog_LBL_Command;
 	public static String FilterThroughCommandDialog_LBL_ConsoleName;
 	public static String FilterThroughCommandDialog_LBL_CreateNewDocument;
