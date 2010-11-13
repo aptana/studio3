@@ -36,6 +36,7 @@ package com.aptana.ide.ui.io.navigator.actions;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
@@ -56,8 +57,8 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.IRemoteFileStoreEditorInput;
 import com.aptana.ui.UIUtils;
 
 /**
@@ -65,7 +66,7 @@ import com.aptana.ui.UIUtils;
  */
 public class EditorUtils {
 
-    public static class RemoteFileStoreEditorInput extends FileStoreEditorInput implements IRemoteFileStoreEditorInput {
+    public static class RemoteFileStoreEditorInput extends FileStoreEditorInput {
 
     	protected IFileStore fLocalFileStore;
         protected IFileStore fRemoteFileStore;
@@ -119,9 +120,12 @@ public class EditorUtils {
 		{
 			if (IFileStore.class == adapter) {
 				return fRemoteFileStore;
-			}
-			if (IFileInfo.class == adapter) {
+			} else if (IFileInfo.class == adapter) {
 				return fRemoteFileInfo;
+			} else if (URI.class == adapter) {
+				if (fRemoteFileStore instanceof IExtendedFileStore) {
+					return ((IExtendedFileStore) fRemoteFileStore).toCanonicalURI();
+				}
 			}
 			return super.getAdapter(adapter);
 		}
