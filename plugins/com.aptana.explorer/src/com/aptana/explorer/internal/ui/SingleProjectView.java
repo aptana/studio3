@@ -66,6 +66,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -152,7 +153,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 * Pref key to track whether we turned off ".*" filename filter that is on by default.
 	 */
 	private static final String TURNED_OFF_DOT_STAR_FILE_FILTER = "turnedOffDotStarFileFilter"; //$NON-NLS-1$
-	
+
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
@@ -941,8 +942,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	private void turnOffDotStarFileFilterOnFirstStartup()
 	{
-		if (!Platform.getPreferencesService().getBoolean(ExplorerPlugin.PLUGIN_ID, TURNED_OFF_DOT_STAR_FILE_FILTER, false,
-				null))
+		if (!Platform.getPreferencesService().getBoolean(ExplorerPlugin.PLUGIN_ID, TURNED_OFF_DOT_STAR_FILE_FILTER,
+				false, null))
 		{
 			INavigatorFilterService filterService = getCommonViewer().getNavigatorContentService().getFilterService();
 			ICommonFilterDescriptor[] descs = filterService.getVisibleFilterDescriptors();
@@ -955,7 +956,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					ids.add(desc.getId());
 				}
 			}
-			filterService.activateFilterIdsAndUpdateViewer(ids.toArray(new String[0]));
+
+			filterService.setActiveFilterIds(ids.toArray(new String[0]));
+			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
+			getCommonViewer().setFilters(visibleFilters);
+
 			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.putBoolean(TURNED_OFF_DOT_STAR_FILE_FILTER, true);
 			try
