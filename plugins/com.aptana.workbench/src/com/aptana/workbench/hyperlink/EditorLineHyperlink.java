@@ -35,14 +35,22 @@
 package com.aptana.workbench.hyperlink;
 
 import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
@@ -50,19 +58,29 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.part.ISetSelectionTarget;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.views.TerminalView;
+import com.aptana.ui.IUIConstants;
 import com.aptana.workbench.WorkbenchPlugin;
 
 public class EditorLineHyperlink implements IHyperlink
@@ -100,12 +118,78 @@ public class EditorLineHyperlink implements IHyperlink
 		{
 			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 			IFileStore store = EFS.getStore(getFile().toURI());
+			if (store == null)
+			{
+				return;
+			}
+			if (store.fetchInfo().isDirectory())
+			{
+				openDirectory(page, store);
+				return;
+			}
 			IEditorPart editor = IDE.openEditorOnFileStore(page, store);
 			setEditorToLine(editor);
 		}
 		catch (CoreException e)
 		{
 			WorkbenchPlugin.log(e);
+		}
+	}
+
+	protected void openDirectory(IWorkbenchPage page, IFileStore store) throws CoreException
+	{
+		URI uri = store.toURI();
+		if (!"file".equals(uri.getScheme())) //$NON-NLS-1$
+		{
+			return;
+		}
+		File file = store.toLocalFile(EFS.NONE, new NullProgressMonitor());
+		IContainer container = ResourcesPlugin.getWorkspace().getRoot()
+				.getContainerForLocation(Path.fromOSString(file.getAbsolutePath()));
+		if (container == null)
+		{
+			// If this is an external directory, open it in the "finder" - OpenInFinderHandler.open(uri)
+			IHandlerService service = (IHandlerService) page.getActivePart().getSite()
+					.getService(IHandlerService.class);
+			ICommandService commandService = (ICommandService) page.getActivePart().getSite()
+					.getService(ICommandService.class);
+			Command command = commandService.getCommand(IUIConstants.OPEN_IN_OS_FILE_MANAGER_ID);
+			ParameterizedCommand pc = ParameterizedCommand.generateCommand(command, null);
+			List<Object> list = new ArrayList<Object>();
+			list.add(store);
+			EvaluationContext context = new EvaluationContext(service.getCurrentState(), list);
+			context.addVariable(ISources.SHOW_IN_SELECTION, new StructuredSelection(list));
+			try
+			{
+				service.executeCommandInContext(pc, null, context);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+			return;
+		}
+		// Select in the App Explorer
+		IViewReference[] viewRefs = page.getViewReferences();
+		for (IViewReference ref : viewRefs)
+		{
+			if (IExplorerUIConstants.VIEW_ID.equals(ref.getId()))
+			{
+				IViewPart part = (IViewPart) ref.getPart(false);
+				if (part != null && part instanceof ISetSelectionTarget)
+				{
+					// Select the directory!
+					ISetSelectionTarget target = (ISetSelectionTarget) part;
+					target.selectReveal(new StructuredSelection(container));
+				}
+				// Also expand it, if possible
+				if (part != null && part instanceof CommonNavigator)
+				{
+					CommonNavigator navigator = (CommonNavigator) part;
+					AbstractTreeViewer treeViewer = navigator.getCommonViewer();
+					treeViewer.expandToLevel(container, 1);
+				}
+			}
 		}
 	}
 

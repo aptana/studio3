@@ -153,11 +153,9 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 */
 	private static final String TURNED_OFF_DOT_STAR_FILE_FILTER = "turnedOffDotStarFileFilter"; //$NON-NLS-1$
 	
-	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
-	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
 
@@ -288,7 +286,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
+				final MenuManager commandsMenuManager = new MenuManager(null, IExplorerUIConstants.GEAR_MENU_ID);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(commandsMenuManager,
 						MenuUtil.menuUri(commandsMenuManager.getId()));
@@ -443,7 +441,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = deployToolBar.getSize();
 				// FIXME Move declaration/filling of menu to ext pt, that means removing fillDeployMenu!
-				final MenuManager deployMenuManager = new MenuManager(null, DEPLOY_MENU_ID);
+				final MenuManager deployMenuManager = new MenuManager(null, IExplorerUIConstants.DEPLOY_MENU_ID);
 				fillDeployMenu(deployMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
