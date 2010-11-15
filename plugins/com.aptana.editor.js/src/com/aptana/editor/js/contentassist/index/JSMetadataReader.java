@@ -162,14 +162,46 @@ public class JSMetadataReader extends MetadataReader
 	{
 		String typeName = attributes.getValue("type"); //$NON-NLS-1$
 
-		if (this.isValidIdentifier(typeName))
+		if (this.isValidTypeIdentifier(typeName))
 		{
-			String className = "Class<" + typeName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-
-			// create a new class documentation object
-			TypeElement type = this.getType(typeName);
-			TypeElement clas = this.getType(className);
-
+			String[] parts = typeName.split("\\.");
+			String accumulatedTypeName = parts[0];
+			TypeElement type = this.getType(accumulatedTypeName);
+			TypeElement clas = this.getType("Class<" + accumulatedTypeName + ">");
+			
+			for (int i = 1; i < parts.length; i++)
+			{
+				// grab name part
+				String propertyName = parts[i];
+				
+				// update accumulated type name
+				accumulatedTypeName += "." + propertyName;
+				
+				// try to grab the property off of the current type
+				PropertyElement property = type.getProperty(propertyName);
+				
+				// create property, if we didn't have one
+				if (property == null)
+				{
+					property = new PropertyElement();
+					
+					property.setName(propertyName);
+					property.setIsClassProperty(true);
+					property.addType(accumulatedTypeName);
+					
+					type.addProperty(property);
+//					clas.addProperty(property);
+				}
+				
+				// make sure to save last type we visited
+				this._typesByName.put(type.getName(), type);
+				this._typesByName.put(clas.getName(), clas);
+				
+				// create new types
+				type = this.getType(accumulatedTypeName);
+				clas = this.getType("Class<" + accumulatedTypeName + ">");
+			}
+			
 			// set optional superclass
 			String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
 
@@ -408,11 +440,7 @@ public class JSMetadataReader extends MetadataReader
 			{
 				if (this.isValidTypeIdentifier(propertyType))
 				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
-
-					returnType.setType(propertyType);
-
-					property.addType(returnType);
+					property.addType(propertyType);
 				}
 				else
 				{
