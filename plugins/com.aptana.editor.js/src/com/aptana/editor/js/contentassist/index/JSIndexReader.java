@@ -381,8 +381,11 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType, propertyName),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+			List<QueryResult> functions = index.query( //
+				new String[] { JSIndexConstants.FUNCTION }, //
+				this.getMemberPattern(owningType, propertyName), //
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			);
 
 			if (functions != null && functions.size() > 0)
 			{
@@ -614,8 +617,11 @@ public class JSIndexReader
 
 		if (index != null)
 		{
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType, propertyName),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+			List<QueryResult> properties = index.query( //
+				new String[] { JSIndexConstants.PROPERTY }, //
+				this.getMemberPattern(owningType, propertyName), //
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			);
 
 			if (properties != null && properties.size() > 0)
 			{
