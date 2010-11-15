@@ -36,6 +36,7 @@
 package com.aptana.editor.html.preview;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -76,12 +77,12 @@ public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.preview.IEditorPreviewDelegate#updatePreviewWhenChanged(org.eclipse.ui.IEditorPart)
+	 * @see com.aptana.preview.IEditorPreviewDelegate#isLinked(java.net.URI)
 	 */
-	public boolean isEditorInputLinked(IEditorInput editorInput) {
+	public boolean isLinked(URI uri) {
 		// checks if this HTML file includes the source the changed editor is referencing (JS or CSS file)
 		IEditorInput targetEditorInput = targetEditorPart.getEditorInput();
-		if (targetEditorInput instanceof IFileEditorInput && editorInput instanceof IURIEditorInput) {
+		if (targetEditorInput instanceof IFileEditorInput) {
 			IFile htmlFile = ((IFileEditorInput) targetEditorInput).getFile();
 			Index index = IndexManager.getInstance().getIndex(htmlFile.getProject().getLocationURI());
 			List<QueryResult> queryResults = null;
@@ -93,7 +94,7 @@ public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate {
 				return false;
 			}
 			if (queryResults != null) {
-				String includedFileToCheck = (((IURIEditorInput) editorInput).getURI()).toString();
+				String includedFileToCheck = uri.toString();
 				String includedFile;
 				String htmlFileToCheck = URLEncoder.encode(htmlFile.getLocation().toPortableString(), null, null);
 				for (QueryResult result : queryResults) {
@@ -112,5 +113,4 @@ public class HTMLEditorPreviewDelegate implements IEditorPreviewDelegate {
 		}
 		return false;
 	}
-
 }

@@ -32,32 +32,26 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.parsing.io;
+package com.aptana.workbench.commands;
 
 import org.eclipse.osgi.util.NLS;
 
-/**
- * @author Kevin Lindsey
- */
-public final class Messages extends NLS
-{
-	private static final String BUNDLE_NAME = "com.aptana.parsing.io.messages"; //$NON-NLS-1$
-
-	private Messages()
-	{
-	}
-
-	static
-	{
+public class Messages extends NLS {
+	private static final String BUNDLE_NAME = "com.aptana.workbench.commands.messages"; //$NON-NLS-1$
+	public static String EditBundleJob_BundleHasNoRepository_Error;
+	public static String EditBundleJob_CantCreateUserBundlesDir_Error;
+	public static String EditBundleJob_GitCloneFailed_Error;
+	public static String EditBundleJob_Name;
+	public static String EditBundleJob_RequiresGitError;
+	public static String EditorCommandsMenuContributor_CommandsForOtherScopes;
+	public static String EditorCommandsMenuContributor_LBL_EditBundle;
+	public static String EditorCommandsMenuContributor_MSG_CommandNotDefined;
+	public static String EditorCommandsMenuContributor_TITLE_CommandNotDefined;
+	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	public static String FileUtilities_Text_Undefined;
-	public static String SourceWriter_Offset_Below_Zero;
-	public static String SourceWriter_Remove_Length_Below_Zero;
-	public static String SourceWriter_Remove_Beyond_Length;
-	public static String TabledInputStream_Input_Undefined;
-	public static String TabledInputStream_Incompatible_Format;
-	public static String TabledOutputStream_Output_Undefined;
+	private Messages() {
+	}
 }

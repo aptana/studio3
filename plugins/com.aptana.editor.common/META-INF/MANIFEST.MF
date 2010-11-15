@@ -6,10 +6,9 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.common.CommonEditorPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.4.0",
+ org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.jface.text,
- org.eclipse.core.expressions,
  org.eclipse.ui.editors,
  org.eclipse.ui.console,
  org.eclipse.ui.ide,
@@ -18,20 +17,14 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.scripting,
  com.aptana.core,
  com.aptana.ui.epl,
- beaver,
  com.aptana.parsing,
  com.aptana.editor.findbar,
  org.jruby,
- com.aptana.git.core,
  com.aptana.usage,
  com.aptana.index.core,
  com.aptana.ui,
  com.aptana.theme,
- com.aptana.terminal,
- com.aptana.org.eclipse.tm.terminal,
- com.aptana.formatter.epl;bundle-version="3.0.0",
- com.aptana.ui.io,
- com.aptana.core.io
+ com.aptana.formatter.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

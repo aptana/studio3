@@ -592,7 +592,7 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		// TODO how to get the initial size correctly!
 		snapshot.updateSnapshot(false);
 		ITextCanvasModel canvasModel=new PollingTextCanvasModel(snapshot);
-		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,createLineRenderer(canvasModel));
+		fCtlText=createTextCanvas(fWndParent,canvasModel,createLineRenderer(canvasModel));
 
 		fCtlText.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fCtlText.addResizeHandler(new TextCanvas.ResizeListener() {
@@ -606,6 +606,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		fClipboard = new Clipboard(fDisplay);
 //		fViewer.setDocument(new TerminalDocument());
 		setFont(JFaceResources.getTextFont());
+	}
+	
+	protected TextCanvas createTextCanvas(Composite parent, ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
+		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
 	}
 	
 	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {

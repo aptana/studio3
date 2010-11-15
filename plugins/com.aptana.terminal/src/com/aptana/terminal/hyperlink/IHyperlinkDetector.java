@@ -32,12 +32,16 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.ui.io;
+package com.aptana.terminal.hyperlink;
 
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
 
-public interface IRemoteFileStoreEditorInput
+/**
+ * An interface for clients to detect and contribute hyperlinks to Terminals.
+ * 
+ * @author cwilliams
+ */
+public interface IHyperlinkDetector
 {
-
-	public IFileStore getRemoteFileStore();
+	IHyperlink[] detectHyperlinks(String contents);
 }

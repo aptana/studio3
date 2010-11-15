@@ -14,7 +14,6 @@
 -->
 <plugin>
    <extension-point id="terminalConnectors" name="Terminal Connectors" schema="schema/terminalConnectors.exsd"/>
-   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
    <extension point="org.eclipse.ui.contexts">           
       <context
             name="%terminal.context.name"

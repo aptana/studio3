@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.js.sdoc.model;
 
-import com.aptana.parsing.io.SourcePrinter;
+import com.aptana.core.util.SourcePrinter;
 
 import beaver.Symbol;
 

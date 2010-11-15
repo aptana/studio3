@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.tm.terminal.model.IHyperlinkDetector"/>
+                  <meta.attribute kind="java" basedOn=":com.aptana.terminal.hyperlink.IHyperlinkDetector"/>
                </appInfo>
             </annotation>
          </attribute>

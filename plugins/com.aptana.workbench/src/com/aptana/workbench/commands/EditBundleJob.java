@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.scripting.commands;
+package com.aptana.workbench.commands;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -58,12 +58,12 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.scripting.Activator;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundlePrecedence;
+import com.aptana.workbench.WorkbenchPlugin;
 
 /**
  * This job tries to grab down a local copy of a pre-installed application bundle. It will also generate a project for
@@ -106,13 +106,13 @@ class EditBundleJob extends Job
 		}
 		catch (CoreException e)
 		{
-			CommonEditorPlugin.logError(e);
+			WorkbenchPlugin.log(e);
 			return e.getStatus();
 		}
 		catch (Exception e)
 		{
-			CommonEditorPlugin.logError(e);
-			return new Status(IStatus.ERROR, CommonEditorPlugin.PLUGIN_ID, e.getMessage(), e);
+			WorkbenchPlugin.log(e);
+			return new Status(IStatus.ERROR, WorkbenchPlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		return Status.OK_STATUS;
 	}
@@ -131,8 +131,8 @@ class EditBundleJob extends Job
 		IPath destRuble = destinationDir.append(bundle.getBundleDirectory().getName());
 		if (destRuble.toFile().isDirectory())
 		{
-			CommonEditorPlugin
-					.logInfo("Trying to grab bundle, destination directory already exists: " + destRuble.toOSString()); //$NON-NLS-1$
+			WorkbenchPlugin
+					.log("Trying to grab bundle, destination directory already exists: " + destRuble.toOSString()); //$NON-NLS-1$
 			return destRuble; // Already exists, just return it.
 		}
 

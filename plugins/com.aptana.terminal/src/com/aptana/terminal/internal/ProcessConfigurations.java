@@ -108,7 +108,7 @@ public final class ProcessConfigurations {
 				try {
 					configurations.add((IProcessConfiguration) element.createExecutableExtension(ATT_CLASS));
 				} catch (CoreException e) {
-					Activator.logError("Process configuration instantiation failed.", e); //$NON-NLS-1$
+					Activator.log("Process configuration instantiation failed.", e); //$NON-NLS-1$
 				}
 			}
 		}

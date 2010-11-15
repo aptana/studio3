@@ -41,8 +41,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {

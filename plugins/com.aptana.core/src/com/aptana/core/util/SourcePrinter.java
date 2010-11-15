@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.parsing.io;
+package com.aptana.core.util;
 
 /**
  * @author Kevin Lindsey

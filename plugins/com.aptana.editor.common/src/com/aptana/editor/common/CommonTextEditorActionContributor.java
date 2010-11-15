@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.common;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -57,8 +58,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
-
-import com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor;
 
 /**
  * This provides the action contributions for Aptana Editors.
@@ -147,7 +146,10 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 						menuItem.dispose();
 					}
 					
-					EditorCommandsMenuContributor.fill(menu, textEditor);
+					IEditorCommandsMenuContributor contributor = getEditorCommandsMenuContributor();
+					if (contributor != null) {
+						contributor.fill(menu, textEditor);
+					}
 					menu.setVisible(true);
 				}
 
@@ -188,5 +190,13 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 				menuToolItem.setEnabled(textEditor instanceof AbstractThemeableEditor);
 			}
 		}
+	}
+	
+	private IEditorCommandsMenuContributor getEditorCommandsMenuContributor() {
+		IEditorCommandsMenuContributor adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager().getAdapter(this, IEditorCommandsMenuContributor.class);
+		if (adapter == null && Platform.getAdapterManager().hasAdapter(this, IEditorCommandsMenuContributor.class.getName())) {
+			adapter = (IEditorCommandsMenuContributor) Platform.getAdapterManager().loadAdapter(this, IEditorCommandsMenuContributor.class.getName());
+		}
+		return adapter;
 	}
 }

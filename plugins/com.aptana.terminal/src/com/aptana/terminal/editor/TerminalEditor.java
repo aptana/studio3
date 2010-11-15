@@ -82,7 +82,7 @@ import com.aptana.terminal.preferences.IPreferenceConstants;
 import com.aptana.terminal.widget.TerminalComposite;
 
 @SuppressWarnings("restriction")
-public class TerminalEditor extends EditorPart implements ISaveablePart2, ITerminalListener, IProcessListener {
+public class TerminalEditor extends EditorPart implements ISaveablePart2, IProcessListener {
 	public static final String ID = "com.aptana.terminal.TerminalEditor"; //$NON-NLS-1$
 
 	private TerminalComposite terminalComposite;
@@ -102,7 +102,18 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	@Override
 	public void createPartControl(Composite parent) {		
 		terminalComposite = new TerminalComposite(parent, SWT.NONE);
-		terminalComposite.setTerminalListener(this);
+		terminalComposite.setTerminalListener(new ITerminalListener() {
+			public void setTerminalTitle(final String title) {
+				Utils.runInDisplayThread(new Runnable() {
+					public void run() {
+						setPartName(title);
+					}
+				});
+			}
+			
+			public void setState(TerminalState state) {
+			}
+		});
 		terminalComposite.setProcessListener(this);
 		IEditorInput input = getEditorInput();
 		if (input instanceof TerminalEditorInput) {
@@ -267,23 +278,6 @@ public class TerminalEditor extends EditorPart implements ISaveablePart2, ITermi
 	protected void setContentDescription(String description) {
 		super.setContentDescription(description);
 		checkCanClose = false; // reset state set by testEditor
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setState(org.eclipse.tm.internal.terminal.provisional.api.TerminalState)
-	 */
-	public void setState(TerminalState state) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.tm.internal.terminal.control.ITerminalListener#setTerminalTitle(java.lang.String)
-	 */
-	public void setTerminalTitle(final String title) {
-		Utils.runInDisplayThread(new Runnable() {
-			public void run() {
-				setPartName(title);
-			}
-		});
 	}
 
 	/*
