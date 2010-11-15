@@ -67,6 +67,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.util.ExpiringMap;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.IFTPConnectionFileManager;
 import com.aptana.filesystem.ftp.IFTPConstants;
