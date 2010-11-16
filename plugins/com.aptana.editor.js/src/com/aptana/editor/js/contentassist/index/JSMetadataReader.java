@@ -67,7 +67,7 @@ public class JSMetadataReader extends MetadataReader
 {
 	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
-	static final Pattern PARAMETER_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); // $NON-NLS-1$
+	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); // $NON-NLS-1$
 	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); // $NON-NLS-1$
 
 	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
@@ -381,7 +381,7 @@ public class JSMetadataReader extends MetadataReader
 			
 			String types = attributes.getValue("type"); //$NON-NLS-1$
 
-			for (String type : PARAMETER_DELIMITER_PATTERN.split(types))
+			for (String type : PARAMETER_TYPE_DELIMITER_PATTERN.split(types))
 			{
 				if (this.isValidTypeIdentifier(type))
 				{
