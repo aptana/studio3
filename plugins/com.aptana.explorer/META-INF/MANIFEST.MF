@@ -30,7 +30,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.deploy,
  com.aptana.theme,
  com.aptana.ui.ftp,
- com.aptana.ui.secureftp
+ com.aptana.ui.secureftp,
+ org.eclipse.ui.navigator.resources;bundle-version="3.3.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
