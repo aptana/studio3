@@ -32,43 +32,42 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+
 package com.aptana.ide.core.io.vfs;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
-public class Messages extends NLS // NO_UCD
-{
+/**
+ * @author Max Stepanov
+ *
+ */
+/* package */ final class Policy {
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.vfs.messages"; //$NON-NLS-1$
-
-	public static String VirtualConnectionManager_NoMatchingConnectionForURI; // NO_UCD
-
-	public static String BaseConnectionFileManager_symlink_resolve_failed;
-
-	public static String BaseConnectionFileManager_cant_move;
-	public static String BaseConnectionFileManager_creating_folder;
-	public static String BaseConnectionFileManager_creating_folders;
-	public static String BaseConnectionFileManager_deleting;
-
-	public static String BaseConnectionFileManager_file_already_exists;
-	public static String BaseConnectionFileManager_file_is_directory;
-	public static String BaseConnectionFileManager_gethering_details;
-
-	public static String BaseConnectionFileManager_listing_directory;
-	public static String BaseConnectionFileManager_moving;
-	public static String BaseConnectionFileManager_no_such_file;
-	public static String BaseConnectionFileManager_opening_file;
-	public static String BaseConnectionFileManager_parent_doesnt_exist;
-	public static String BaseConnectionFileManager_parent_is_not_directory;
-	public static String BaseConnectionFileManager_putting_changes;
-
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	/**
+	 * 
+	 */
+	private Policy() {
+	}
+		
+	public static IProgressMonitor monitorFor(IProgressMonitor monitor) {
+		return monitor == null ? new NullProgressMonitor() : monitor;
 	}
 
-	private Messages()
-	{
+	public static IProgressMonitor subMonitorFor(IProgressMonitor monitor, int ticks) {
+		if (monitor == null)
+			return new NullProgressMonitor();
+		if (monitor instanceof NullProgressMonitor)
+			return monitor;
+		return new SubProgressMonitor(monitor, ticks);
 	}
+
+	public static void checkCanceled(IProgressMonitor monitor) {
+		if (monitor.isCanceled())
+			throw new OperationCanceledException();
+	}
+
+
 }

@@ -37,6 +37,7 @@ package com.aptana.editor.js.formatter.nodes;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
  * A JS 'case' formatter node.<br>
@@ -65,8 +66,9 @@ public class FormatterJSCaseNode extends FormatterBlockWithBeginNode
 	 */
 	protected boolean isAddingBeginNewLine()
 	{
-		// always add a new line in front of a 'case'
-		return true;
+		return !hasBlockedChild
+				|| CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+						JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE));
 	}
 
 	/*

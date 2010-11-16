@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.filesystem.ftp.internal;
+package com.aptana.core.util;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
