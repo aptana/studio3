@@ -67,8 +67,8 @@ public class JSMetadataReader extends MetadataReader
 {
 	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
-	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); // $NON-NLS-1$
-	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); // $NON-NLS-1$
+	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
+	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
 
 	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
@@ -181,7 +181,7 @@ public class JSMetadataReader extends MetadataReader
 				String propertyName = parts[i];
 
 				// update accumulated type name
-				accumulatedTypeName += "." + propertyName;
+				accumulatedTypeName += "." + propertyName; //$NON-NLS-1$
 
 				// try to grab the property off of the current type
 				PropertyElement property = type.getProperty(propertyName);

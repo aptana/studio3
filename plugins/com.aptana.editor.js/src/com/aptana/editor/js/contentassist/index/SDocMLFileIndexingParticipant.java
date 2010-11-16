@@ -142,7 +142,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 
 					String typeName = type.getName();
 
-					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false)
+					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false) //$NON-NLS-1$
 					{
 						PropertyElement property = window.getProperty(typeName);
 
