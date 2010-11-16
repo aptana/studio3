@@ -37,10 +37,13 @@ package com.aptana.editor.common.internal.peer;
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPartitioningException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextViewer;
+import org.eclipse.jface.text.TypedRegion;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Event;
@@ -207,7 +210,19 @@ public class PeerCharacterCloserTest extends TestCase
 
 	public void testDontCountCharsInPrecedingCommentsForDeterminingPairBalance()
 	{
-		setDocument("// '\n ");
+		document = new Document("// '\n ")
+		{
+			@Override
+			public ITypedRegion getPartition(String partitioning, int offset, boolean preferOpenPartitions)
+					throws BadLocationException, BadPartitioningException
+			{
+				if (offset >= 0 && offset <= 4)
+					return new TypedRegion(0, 4, "comment");
+				return new TypedRegion(4, 2, DEFAULT_PARTITIONING);
+			}
+		};
+		viewer.setDocument(document);
+		
 		viewer.setSelectedRange(5, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -257,6 +272,40 @@ public class PeerCharacterCloserTest extends TestCase
 		assertFalse(event.doit);
 		assertEquals("function x()\n" + "{\n" + "    if (false)\n" + "    {}\n" + "\n" + "    if (false)\n" + "    {\n"
 				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
+	}
+	
+	public void testStudio3_1213()
+	{
+		setDocument("bundle do |bundle|\n" +
+"  bundle.author = 'Ed Spencer'\n" +
+"  bundle.contact_email_rot_13 = 'null'\n" +
+"  bundle.description =  \"A bundle for ExtJS\"\n" +
+"\n" +
+"  bundle.menu \"ExtJS do |main_menu|\n" +
+"  end\n" +
+"end");
+		viewer.setSelectedRange(154, 0);
+		closer = new PeerCharacterCloser(viewer)
+		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if (offset >= 148) // Add the first double string too
+					return "source.ruby.rails string.quoted.double.ruby";
+				if ((offset >= 37 && offset <= 48) || (offset >= 82 && offset <= 87))
+					return "source.ruby.rails string.quoted.single.ruby";
+				return "source.ruby.rails";
+			}
+		};
+		VerifyEvent event = sendEvent('"');
+
+		assertTrue(event.doit); // Don't pair, insert single character!
 	}
 
 	protected IDocument setDocument(String src)

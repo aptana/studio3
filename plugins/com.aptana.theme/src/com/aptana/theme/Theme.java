@@ -705,6 +705,7 @@ public class Theme
 			return;
 		}
 		selection = new RGBa(newColor);
+		searchResultBG = null;
 		save();
 	}
 
