@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -118,7 +119,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
-	private IContextInformationValidator _validator;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
@@ -377,6 +377,24 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer, int)
+	 */
+	@Override
+	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
+	{
+		// TODO Auto-generated method stub
+		String text1 = "name";
+		String text2 = "name, event";
+		String text3 = "name, event, handler";
+		
+		return new IContextInformation[] {
+			new ContextInformation(text1 + " context", text1 + " info"),
+			new ContextInformation(text2 + " context", text2 + " info"),
+			new ContextInformation(text3 + " context", text3 + " info"),
+		};
+	}
+
 	/**
 	 * createLexemeProvider
 	 * 
@@ -507,6 +525,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return new char[] { '.' };
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
+	@Override
+	public char[] getContextInformationAutoActivationCharacters()
+	{
+		return new char[] { '(', ',' };
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -515,12 +542,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
-		if (this._validator == null)
-		{
-			this._validator = new JSContextInformationValidator();
-		}
-
-		return this._validator;
+		return new JSContextInformationValidator();
 	}
 
 	/**
