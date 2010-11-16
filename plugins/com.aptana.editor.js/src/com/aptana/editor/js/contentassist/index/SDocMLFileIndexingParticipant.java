@@ -36,6 +36,7 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -47,8 +48,8 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
-import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.IFileStoreIndexingParticipant;
@@ -112,8 +113,15 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 				JSIndexWriter indexer = new JSIndexWriter();
 				
 				// create new Window type for this file
-				TypeElement window = new TypeElement();
-				window.setName(JSTypeConstants.WINDOW_TYPE);
+				JSIndexReader jsir = new JSIndexReader();
+				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, EnumSet.allOf(ContentSelector.class));
+				
+				if (window == null)
+				{
+					window = new TypeElement();
+					window.setName(JSTypeConstants.WINDOW_TYPE);
+				}
+				
 				URI location = file.toURI();
 
 				// write types and add properties to Window
@@ -132,20 +140,22 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 					indexer.writeType(index, type, location);
 					
 					String typeName = type.getName();
-					
-					if (typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false)
+						
+					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false)
 					{
-						PropertyElement property = new PropertyElement();
-						property.setName(typeName);
+						PropertyElement property = window.getProperty(typeName);
 						
-						ReturnTypeElement returnType = new ReturnTypeElement();
-						returnType.setType(typeName);
-						
-						property.addType(returnType);
-						
-						JSTypeUtil.addAllUserAgents(property);
-						
-						window.addProperty(property);
+						if (property == null)
+						{
+							property = new PropertyElement();
+							
+							property.setName(typeName);
+							property.addType(typeName);
+							
+							JSTypeUtil.addAllUserAgents(property);
+							
+							window.addProperty(property);
+						}
 					}
 				}
 
