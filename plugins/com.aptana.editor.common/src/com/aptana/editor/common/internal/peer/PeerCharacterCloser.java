@@ -380,7 +380,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		char c = event.character;
 		int beginning = 0;
 		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
-		// partition if we can
+		// partition if we can. 
+		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to single string/comment partition?
 		if (document instanceof IDocumentExtension3)
 		{
 			try
@@ -400,8 +401,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
-			if (ignoreScope(document, beginning + index))
-				continue;
+//			if (ignoreScope(document, beginning + index))
+//				continue;
 			open = !open;
 			if (open)
 			{
