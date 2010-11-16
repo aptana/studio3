@@ -36,7 +36,6 @@ package com.aptana.scripting.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
@@ -84,32 +83,6 @@ public class MenuElement extends AbstractBundleElement
 				this._children.add(menu);
 			}
 		}
-	}
-
-	/**
-	 * cloneByScope
-	 * 
-	 * @param scope
-	 * @return
-	 */
-	public MenuElement cloneByScope(String scope)
-	{
-		MenuElement result = null;
-
-		// find all menus in the specified scope
-		List<MenuElement> matches = new ArrayList<MenuElement>();
-
-		for (MenuElement menu : this.getLeafMenus())
-		{
-			if (menu.matches(scope))
-			{
-				matches.add(menu);
-			}
-		}
-
-		// TODO: collect into one tree
-
-		return result;
 	}
 
 	/**
@@ -166,41 +139,6 @@ public class MenuElement extends AbstractBundleElement
 	protected String getElementName()
 	{
 		return "menu"; //$NON-NLS-1$
-	}
-
-	/**
-	 * getLeafMenus
-	 * 
-	 * @return
-	 */
-	protected MenuElement[] getLeafMenus()
-	{
-		Stack<MenuElement> stack = new Stack<MenuElement>();
-		List<MenuElement> result = new ArrayList<MenuElement>();
-
-		// prime stack
-		stack.push(this);
-
-		while (stack.size() > 0)
-		{
-			MenuElement menu = stack.pop();
-
-			if (menu.isHierarchicalMenu())
-			{
-				synchronized (childrenLock)
-				{
-					stack.addAll(menu._children);
-				}
-			}
-			else if (menu.isLeafMenu())
-			{
-				result.add(menu);
-			}
-
-			// NOTE: we ignore separators
-		}
-
-		return result.toArray(new MenuElement[result.size()]);
 	}
 
 	/*
