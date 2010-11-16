@@ -113,6 +113,11 @@ public class JSOutlineItem extends CommonOutlineItem
 		return fVirtualChildren != null && fVirtualChildren.size() > 0;
 	}
 
+	public void setLabel(String text)
+	{
+		fLabel = text;
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{

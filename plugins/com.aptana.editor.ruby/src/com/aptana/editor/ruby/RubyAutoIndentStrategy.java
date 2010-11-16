@@ -182,7 +182,7 @@ class RubyAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	@SuppressWarnings("nls")
 	private boolean atStartOfBlock(String line)
 	{
-		return line.startsWith("class ") || line.startsWith("if ") || line.startsWith("module ")
+		return line.startsWith("class ") || line.startsWith("if ") || line.startsWith("while ") || line.startsWith("module ")
 				|| line.startsWith("unless ") || line.startsWith("def ") || line.equals("begin")
 				|| line.startsWith("case ") || line.startsWith("for ") || openBlockPattern.matcher(line).matches();
 	}
