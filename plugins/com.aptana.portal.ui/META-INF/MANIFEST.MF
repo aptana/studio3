@@ -32,5 +32,4 @@ Export-Package: com.aptana.portal.ui,
  com.aptana.portal.ui.dispatch.processorDelegates,
  com.aptana.portal.ui.internal,
  com.aptana.portal.ui.internal.startup
-Import-Package: com.aptana.usage
 Eclipse-ExtensibleAPI: true
