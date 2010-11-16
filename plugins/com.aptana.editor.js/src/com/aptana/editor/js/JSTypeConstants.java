@@ -50,6 +50,7 @@ public class JSTypeConstants
 	public static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 	public static final String USER_TYPE = "UserType"; //$NON-NLS-1$
 
+	public static final String NO_TYPE = "none"; //$NON-NLS-1$
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
 	public static final String VOID_TYPE = "void"; //$NON-NLS-1$
 	public static final String NULL_TYPE = "null"; //$NON-NLS-1$
