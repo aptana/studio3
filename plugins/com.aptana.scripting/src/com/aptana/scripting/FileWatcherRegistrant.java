@@ -129,7 +129,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.BundleChangeListener#added(com.aptana.scripting.model.BundleElement)
 	 */
-	public void added(BundleElement bundle)
+	public void bundleAdded(BundleElement bundle)
 	{
 	}
 
@@ -205,7 +205,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.BundleChangeListener#becameHidden(com.aptana.scripting.model.BundleEntry)
 	 */
-	public void becameHidden(BundleEntry entry)
+	public void bundlesBecameHidden(BundleEntry entry)
 	{
 	}
 
@@ -213,7 +213,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.BundleChangeListener#becameVisible(com.aptana.scripting.model.BundleEntry)
 	 */
-	public void becameVisible(BundleEntry entry)
+	public void bundlesBecameVisible(BundleEntry entry)
 	{
 	}
 
@@ -221,7 +221,7 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.BundleChangeListener#deleted(com.aptana.scripting.model.BundleElement)
 	 */
-	public void deleted(BundleElement bundle)
+	public void bundleDeleted(BundleElement bundle)
 	{
 	}
 

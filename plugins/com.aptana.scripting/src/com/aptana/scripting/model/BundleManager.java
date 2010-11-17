@@ -399,7 +399,7 @@ public class BundleManager
 				{
 					for (BundleChangeListener listener : this._bundleListeners)
 					{
-						listener.added(bundle);
+						listener.bundleAdded(bundle);
 					}
 				}
 			}
@@ -421,7 +421,7 @@ public class BundleManager
 				{
 					for (BundleChangeListener listener : this._bundleListeners)
 					{
-						listener.becameHidden(entry);
+						listener.bundlesBecameHidden(entry);
 					}
 				}
 			}
@@ -443,7 +443,7 @@ public class BundleManager
 				{
 					for (BundleChangeListener listener : this._bundleListeners)
 					{
-						listener.becameVisible(entry);
+						listener.bundlesBecameVisible(entry);
 					}
 				}
 			}
@@ -465,7 +465,7 @@ public class BundleManager
 				{
 					for (BundleChangeListener listener : this._bundleListeners)
 					{
-						listener.deleted(bundle);
+						listener.bundleDeleted(bundle);
 					}
 				}
 			}

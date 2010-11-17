@@ -46,22 +46,22 @@ public class BundleVisibilityTests extends BundleTestBase
 		List<BundleEntry> _hiddenEntries = new ArrayList<BundleEntry>();
 		List<BundleEntry> _visibleEntries = new ArrayList<BundleEntry>();
 		
-		public void added(BundleElement bundle)
+		public void bundleAdded(BundleElement bundle)
 		{
 			this._addedBundles.add(bundle);
 		}
 
-		public void becameHidden(BundleEntry entry)
+		public void bundlesBecameHidden(BundleEntry entry)
 		{
 			this._hiddenEntries.add(entry);
 		}
 
-		public void becameVisible(BundleEntry entry)
+		public void bundlesBecameVisible(BundleEntry entry)
 		{
 			this._visibleEntries.add(entry);
 		}
 
-		public void deleted(BundleElement bundle)
+		public void bundleDeleted(BundleElement bundle)
 		{
 			this._deletedBundles.add(bundle);
 		}

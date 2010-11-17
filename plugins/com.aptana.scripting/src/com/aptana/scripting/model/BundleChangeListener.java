@@ -38,31 +38,35 @@ public interface BundleChangeListener
 {
 	/**
 	 * This event fires whenever a new bundle is added to its bundle entry. The event fires after the becameHidden
-	 * becameVisible events fire. When this event fires, the bundle elements visibility flag has been set.
+	 * becameVisible events. When this event fires, the bundle element's visibility flag will have been set.
 	 * 
 	 * @param bundle
 	 */
-	void added(BundleElement bundle);
+	void bundleAdded(BundleElement bundle);
 
 	/**
 	 * This event fires whenever one or more bundles that were previously visible have become hidden by another bundle.
 	 * All bundles that have changed state are members of the specified bundle entry. The bundle entry can then be used
 	 * to calculate bundle properties following the bundle precedence rules. This can be done either via the helper
-	 * methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}
+	 * methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}. Note that a bundle will be
+	 * included in the BundleEntry if it has been deleted or if it has been added but is not visible due to bundle
+	 * precedence.
 	 * 
 	 * @param entry
 	 */
-	void becameHidden(BundleEntry entry);
+	void bundlesBecameHidden(BundleEntry entry);
 
 	/**
 	 * This event fires whenever one or more bundles that were previously hidden have become visible by the deletion of
 	 * another bundle. All bundles that have changed state are members of the specified bundle entry. The bundle entry
 	 * can then be used to calculate bundle properties following the bundle precedence rules. This can be done either
-	 * via the helper methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}
+	 * via the helper methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}. Note that a
+	 * bundle will be included in the BundleEntry if it has been added and is visible or if another bundle has been
+	 * deleted thus exposing it due to bundle precedence. 
 	 * 
 	 * @param entry
 	 */
-	void becameVisible(BundleEntry entry);
+	void bundlesBecameVisible(BundleEntry entry);
 
 	/**
 	 * This event fires whenever a bundle is removed from its bundle entry. The event fires before the becameHidden
@@ -71,5 +75,5 @@ public interface BundleChangeListener
 	 * 
 	 * @param bundle
 	 */
-	void deleted(BundleElement bundle);
+	void bundleDeleted(BundleElement bundle);
 }
