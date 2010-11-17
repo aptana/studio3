@@ -1,7 +1,5 @@
 /*******************************************************************************
-
  * Copyright (c) 2007 Gunnar Wagenknecht and others.
-
  * All rights reserved. This program and the accompanying materials
 
  * are made available under the terms of the Eclipse Public License v1.0
@@ -27,6 +25,7 @@ package com.aptana.ui.properties;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,6 +104,10 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	// a map between nature id and its text description
 	private Map<String, String> fNatureDescriptions;
 
+	private Object[] fInitialCheckedItems;
+	private String fInitialPrimaryNature;
+	private boolean fNaturesModified;
+
 	public ProjectNaturesPage()
 	{
 		fNatureDescriptions = new HashMap<String, String>();
@@ -121,14 +124,15 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		try
 		{
 			fCurrentProjectNatures = fProject.getDescription().getNatureIds();
-			// assumes the first one in the array is the primary nature
-			fPrimaryNature = fCurrentProjectNatures.length == 0 ? null : fCurrentProjectNatures[0];
 		}
 		catch (CoreException e)
 		{
 			UIEplPlugin.logError(Messages.ProjectNaturesPage_ERR_RetrieveNatures, e);
 			fCurrentProjectNatures = new String[0];
 		}
+		// assumes the first one in the array is the primary nature
+		fInitialPrimaryNature = fCurrentProjectNatures.length == 0 ? null : fCurrentProjectNatures[0];
+		fPrimaryNature = fInitialPrimaryNature;
 
 		setDescription(MessageFormat.format(Messages.ProjectNaturesPage_Description, fProject.getName()));
 		Label description = createDescriptionLabel(composite);
@@ -162,6 +166,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				updateButtons();
 			}
 		});
+		fInitialCheckedItems = fTableViewer.getCheckedElements();
 		table.setMenu(createMenu(table));
 
 		// Add the buttons
@@ -179,6 +184,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	@Override
 	public boolean performOk()
 	{
+		if (!fNaturesModified && !isPrimaryNatureModified())
+		{
+			return true;
+		}
+
 		Object[] checkedNatures = fTableViewer.getCheckedElements();
 		final List<String> natureIds = new ArrayList<String>();
 		for (Object nature : checkedNatures)
@@ -233,6 +243,8 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	public void checkStateChanged(CheckStateChangedEvent event)
 	{
 		// Check if the current checked items are the same as the initial ones.
+		Object[] checkedElements = fTableViewer.getCheckedElements();
+		fNaturesModified = !Arrays.equals(fInitialCheckedItems, checkedElements);
 		if (fPrimaryNature == null)
 		{
 			// in case that the item was checked, set it as the primary
@@ -247,7 +259,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			if (!event.getChecked() && isPrimary(event.getElement()))
 			{
 				// find the next available item which is checked and set it to the primary
-				Object[] checkedElements = fTableViewer.getCheckedElements();
 				if (checkedElements.length == 0)
 				{
 					fPrimaryNature = null;
@@ -483,6 +494,12 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	{
 		StructuredSelection selection = (StructuredSelection) fTableViewer.getSelection();
 		fMakePrimaryButton.setEnabled(!selection.isEmpty() && !isPrimary(selection.getFirstElement()));
+	}
+
+	private boolean isPrimaryNatureModified()
+	{
+		return (fInitialPrimaryNature == null && fPrimaryNature != null)
+				|| !fInitialPrimaryNature.equals(fPrimaryNature);
 	}
 
 	private static boolean isAptanaNature(String natureId)

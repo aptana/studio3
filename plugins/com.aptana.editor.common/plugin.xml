@@ -10,6 +10,12 @@
             id="com.aptana.editor.common.scripting.commands.FilterThroughCommand"
             name="%command.filter.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            description="%command.format.description"
+            id="com.aptana.editor.commands.Format"
+            name="%command.format.name">
+      </command>
        <command
              categoryId="org.eclipse.ui.category.views"
              defaultHandler="com.aptana.editor.common.internal.commands.ExpandAllHandler"
@@ -159,6 +165,19 @@
                value="9">
          </parameter>
       </key>
+      <key
+            commandId="com.aptana.editor.commands.Format"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+F">
+      </key>
+      <key
+            commandId="com.aptana.editor.commands.Format"
+            contextId="com.aptana.editor.context"
+            platform="gtk"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="ESC CTRL+F">
+      </key>
 
    </extension>
    <extension
@@ -179,27 +198,50 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:com.aptana.scripting.menu?after=additions">
-         <dynamic
-               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
-               id="com.aptana.editor.common.dynamic">
-         </dynamic>
+            locationURI="menu:org.eclipse.ui.main.menu?after=edit">
+         <menu
+               id="com.aptana.source.menu"
+               label="Source"
+               mnemonic="&amp;Source">
+            <command
+                  commandId="com.aptana.editor.commands.Format"
+                  label="Format"
+                  mnemonic="&amp;Format"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <instanceof
+                           value="com.aptana.editor.common.AbstractThemeableEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
       </menuContribution>
       <menuContribution
-            locationURI="popup:com.aptana.scripting.popup.menu?after=commands">
-         <dynamic
-               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
-               id="com.aptana.editor.common.dynamic">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <instanceof
-                        value="org.eclipse.ui.texteditor.ITextEditor">
-                  </instanceof>
-               </with>
-            </visibleWhen>
-         </dynamic>
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.edit">
+         <menu
+               id="com.aptana.source.popup.menu"
+               label="Source"
+               mnemonic="&amp;Source">
+            <command
+                  commandId="com.aptana.editor.commands.Format"
+                  label="Format"
+                  mnemonic="&amp;Format"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <instanceof
+                           value="com.aptana.editor.common.AbstractThemeableEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
       </menuContribution>
    </extension>
 
@@ -298,6 +340,11 @@
       <context
             id="com.aptana.editor.common.outline"
             name="%context.outline.name">
+      </context>
+      <context
+            id="com.aptana.editor.context"
+            name="%context.editor.name"
+            parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
    <extension
@@ -479,7 +526,13 @@
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
             id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="%page.name.0"/>            
+            name="%page.name.0"/>
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.common.preferences.TasksPreferencePage"
+            id="com.aptana.editor.common.preferences.TasksPreferencePage"
+            name="%page.tasks.name">
+      </page>            
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
@@ -490,5 +543,12 @@
             name="%hyperlinkDetector.name"
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.editor.common.occurrence">
+      </type>
    </extension>
 </plugin>

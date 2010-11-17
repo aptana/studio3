@@ -41,10 +41,12 @@ import java.util.Map;
 import net.contentobjects.jnotify.JNotifyAdapter;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -86,10 +88,55 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 					{
 						return Status.CANCEL_STATUS;
 					}
-					entry.getKey().refreshLocal(entry.getValue(), sub.newChild(1));
-					synchronized (toRefresh)
+					IResource resource = entry.getKey();
+					try
 					{
-						toRefresh.remove(entry.getKey());
+						if (resource.getType() == IResource.PROJECT)
+						{
+							// Check to see if this project exists in the new branch! If not, auto-close the project, or
+							// just not refresh it?
+							IPath path = resource.getLocation();
+							if (path == null || !path.toFile().exists())
+							{
+								// Close the project, this actually causes the .project file to get generated, though!
+								try
+								{
+									if (resource.getProject().exists())
+									{
+										resource.getProject().close(sub.newChild(100));
+									}
+								}
+								catch (CoreException e)
+								{
+									if (e.getStatus().getSeverity() > IStatus.WARNING)
+									{
+										throw e;
+									}
+								}
+								if (path != null)
+								{
+									File projectFile = path.toFile();
+									if (projectFile != null)
+									{
+										File dotProject = new File(projectFile,
+												IProjectDescription.DESCRIPTION_FILE_NAME);
+										if (dotProject.delete())
+										{
+											projectFile.delete();
+										}
+									}
+								}
+								continue;
+							}
+						}
+						resource.refreshLocal(entry.getValue(), sub.newChild(1));
+					}
+					finally
+					{
+						synchronized (toRefresh)
+						{
+							toRefresh.remove(resource);
+						}
 					}
 				}
 				return Status.OK_STATUS;

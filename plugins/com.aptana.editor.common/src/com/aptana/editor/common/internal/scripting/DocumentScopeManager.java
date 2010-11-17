@@ -108,7 +108,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 	}
 
-	private QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
+	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
 	{
 		if (document == null)
 			return UNKNOWN;

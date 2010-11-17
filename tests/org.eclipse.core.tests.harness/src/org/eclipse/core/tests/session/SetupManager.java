@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Platform;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SetupManager {
 	public class SetupException extends Exception {
 		/**

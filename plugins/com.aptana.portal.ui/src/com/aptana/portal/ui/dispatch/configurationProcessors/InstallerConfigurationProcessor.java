@@ -1,0 +1,307 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
+package com.aptana.portal.ui.dispatch.configurationProcessors;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.mortbay.util.ajax.JSON;
+import org.osgi.framework.Version;
+
+import com.aptana.configurations.processor.AbstractConfigurationProcessor;
+import com.aptana.configurations.processor.ConfigurationStatus;
+import com.aptana.core.util.InputStreamGobbler;
+import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.downloader.DownloadManager;
+import com.aptana.portal.ui.IPortalPreferences;
+import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;
+
+/**
+ * Basic, abstract implementation, of a processor that deals with installing software.
+ * 
+ * @author Shalom Gibly <sgibly@aptana.com>
+ */
+public abstract class InstallerConfigurationProcessor extends AbstractConfigurationProcessor
+{
+	protected static final String APTANA_PROPERTIES_FILE_NAME = ".aptana"; //$NON-NLS-1$
+	protected static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
+	protected static final String INSTALL_DIR_ATTRIBUTE = "install_dir"; //$NON-NLS-1$
+
+	protected String[] downloadedPaths;
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.configurations.processor.AbstractConfigurationProcessor#computeStatus(org.eclipse.core.runtime.
+	 * IProgressMonitor, java.lang.Object)
+	 */
+	@Override
+	public ConfigurationStatus computeStatus(IProgressMonitor progressMonitor, Object attributes)
+	{
+		// This one does nothing. We should compute the status in the generic VersionsConfigurationProcessor
+		return configurationStatus;
+	}
+
+	/**
+	 * Returns the application's name.
+	 * 
+	 * @return The application's name (e.g. XAMPP, Ruby)
+	 */
+	protected abstract String getApplicationName();
+
+	/**
+	 * Download the remote content and store it the temp directory.
+	 * 
+	 * @param URLs
+	 * @param progressMonitor
+	 */
+	public IStatus download(String[] URLs, IProgressMonitor progressMonitor)
+	{
+		if (URLs.length == 0)
+		{
+			String err = Messages.InstallerConfigurationProcessor_missingDownloadTargets;
+			applyErrorAttributes(err);
+			PortalUIPlugin.logError("We expected an array of URLs, but got an empty array.", new Exception(err)); //$NON-NLS-1$
+			return new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID, err);
+		}
+		downloadedPaths = null;
+		DownloadManager downloadManager = new DownloadManager();
+		List<URL> urlsList = new ArrayList<URL>(URLs.length);
+		for (int i = 0; i < URLs.length; i++)
+		{
+			try
+			{
+				urlsList.add(new URL(urls[i]));
+			}
+			catch (MalformedURLException mue)
+			{
+				PortalUIPlugin.logError(mue);
+			}
+		}
+		try
+		{
+			downloadManager.addURLs(urlsList);
+			IStatus status = downloadManager.start(progressMonitor);
+			if (status.isOK())
+			{
+				downloadedPaths = downloadManager.getContentsLocations();
+			}
+			return status;
+		}
+		catch (Exception e)
+		{
+			PortalUIPlugin.logError(e);
+		}
+		return Status.CANCEL_STATUS;
+	}
+
+	/**
+	 * Cache the installed application location and version in the preferences.
+	 * 
+	 * @param installDir
+	 *            - The directory the application was installed to.
+	 * @param versionedFileLocation
+	 *            - Can be the URL that we grabbed the installer from, or any other string that contains a version
+	 *            information in a form of x.y.z.
+	 * @param appName
+	 *            - The application name (e.g. xampp)
+	 */
+	@SuppressWarnings("unchecked")
+	public void cacheVersion(String installDir, String versionedFileLocation, String appName)
+
+	{
+		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
+		String versions = preferenceStore.getString(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME);
+		Map<String, Map<String, String>> versionsMap = null;
+		if (versions == null || versions.equals(StringUtil.EMPTY))
+		{
+			versionsMap = new HashMap<String, Map<String, String>>();
+		}
+		else
+		{
+			versionsMap = (Map<String, Map<String, String>>) JSON.parse(versions);
+		}
+		Map<String, String> appVersionMap = new HashMap<String, String>();
+		Version version = BaseVersionProcessor.parseVersion(versionedFileLocation);
+		if (version != null)
+		{
+			appVersionMap.put(IPortalPreferences.CACHED_VERSION_PROPERTY, version.toString());
+			appVersionMap.put(IPortalPreferences.CACHED_LOCATION_PROPERTY, installDir);
+			versionsMap.put(appName.toLowerCase(), appVersionMap);
+			preferenceStore.setValue(IPortalPreferences.CACHED_VERSIONS_PROPERTY_NAME, JSON.toString(versionsMap));
+		}
+		else
+		{
+			PortalUIPlugin.logError("Could not cache the location and version for " + appName + ". Install dir: " //$NON-NLS-1$ //$NON-NLS-2$
+					+ installDir + ", versionedFileLocation: " + versionedFileLocation, new Exception()); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Extract the given zip file into the target folder on a Windows machine.
+	 * 
+	 * @param sfxZip
+	 *            Self extracting 7zip file.
+	 * @param targetFolder
+	 * @return The status of that extraction result.
+	 */
+	public static IStatus extractWin(String sfxZip, String targetFolder)
+	{
+		IStatus errorStatus = new Status(IStatus.ERROR, PortalUIPlugin.PLUGIN_ID,
+				Messages.InstallerConfigurationProcessor_unableToExtractZip);
+		if (!Platform.OS_WIN32.equals(Platform.getOS()))
+		{
+			PortalUIPlugin
+					.logError(
+							"Unable to extract the Zip file. A Windows OS extractor was called for a non-Windows platform.", new Exception()); //$NON-NLS-1$
+			return errorStatus;
+		}
+		if (sfxZip == null || targetFolder == null)
+		{
+			PortalUIPlugin.logError("Undefined zip file or target folder", new Exception()); //$NON-NLS-1$
+			return errorStatus;
+		}
+		File destinationFolder = new File(targetFolder);
+		if (!destinationFolder.exists() && !destinationFolder.mkdirs())
+		{
+			PortalUIPlugin.logError("Failed to create destination directory " + destinationFolder, new Exception()); //$NON-NLS-1$
+			return errorStatus;
+		}
+		ProcessBuilder processBuilder = new ProcessBuilder(sfxZip, "-o" + targetFolder, //$NON-NLS-1$
+				"-y", //$NON-NLS-1$
+				sfxZip);
+		processBuilder.directory(destinationFolder);
+		processBuilder.redirectErrorStream(true);
+		String output = null;
+		try
+		{
+			Process process = processBuilder.start();
+			InputStreamGobbler errorGobbler = new InputStreamGobbler(process.getErrorStream(), "\n", null); //$NON-NLS-1$
+			InputStreamGobbler outputGobbler = new InputStreamGobbler(process.getInputStream(), "\n", null); //$NON-NLS-1$
+			outputGobbler.start();
+			errorGobbler.start();
+			process.waitFor();
+			outputGobbler.interrupt();
+			errorGobbler.interrupt();
+			outputGobbler.join();
+			errorGobbler.join();
+			output = outputGobbler.getResult();
+			String errors = errorGobbler.getResult();
+			int exitVal = process.exitValue();
+			if (exitVal == 0)
+			{
+				return Status.OK_STATUS;
+			}
+			else
+			{
+				PortalUIPlugin
+						.logError(
+								"Zip extraction failed. The process returned " + exitVal, new Exception("Process output:\n" + errors)); //$NON-NLS-1$ //$NON-NLS-2$
+				return errorStatus;
+			}
+		}
+		catch (Exception e)
+		{
+			PortalUIPlugin.logError(e);
+			return errorStatus;
+		}
+		finally
+		{
+			if (output != null)
+			{
+				PortalUIPlugin.logInfo(output, null);
+			}
+		}
+	}
+
+	/**
+	 * Display a message dialog in a UI thread.
+	 * 
+	 * @param kind
+	 *            See {@link MessageDialog} for the types allowed.
+	 * @param title
+	 * @param message
+	 */
+	public void displayMessageInUIThread(final int kind, final String title, final String message)
+	{
+		Display.getDefault().syncExec(new Runnable()
+		{
+			public void run()
+			{
+				MessageDialog.open(kind, null, title, message, SWT.NONE);
+			}
+		});
+	}
+
+	/**
+	 * Finalize the installation. <br>
+	 * This implementation just marks to delete on exit any downaloaded file.
+	 * 
+	 * @param installDir
+	 */
+	protected void finalizeInstallation(String installDir)
+	{
+		if (downloadedPaths != null)
+		{
+			for (String f : downloadedPaths)
+			{
+				File toDelete = new File(f);
+				if (toDelete.exists())
+				{
+					toDelete.deleteOnExit();
+				}
+			}
+		}
+		// Cache the version and the location of the installed app.
+		// We assume here that the version of app is specified in the install URL!
+		if (installDir != null)
+		{
+			cacheVersion(installDir, urls[0], getApplicationName());
+		}
+	}
+}

@@ -36,7 +36,7 @@ package com.aptana.scripting.model;
 
 import org.jruby.RubyProc;
 
-import com.aptana.parsing.io.SourcePrinter;
+import com.aptana.core.util.SourcePrinter;
 
 public class EnvironmentElement extends AbstractBundleElement
 {

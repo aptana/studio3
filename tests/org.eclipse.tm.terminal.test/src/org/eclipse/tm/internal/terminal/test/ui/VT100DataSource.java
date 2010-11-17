@@ -86,9 +86,9 @@ final class VT100DataSource implements IDataSource {
 		}
 		fEmulator=new VT100Emulator(terminal,new ITerminalControlForText() {
 
+			@SuppressWarnings("unused")
 			public void disconnectTerminal() {
 				// TODO Auto-generated method stub
-
 			}
 
 			public OutputStream getOutputStream() {

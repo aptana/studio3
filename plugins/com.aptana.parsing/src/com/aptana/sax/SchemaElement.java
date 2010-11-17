@@ -45,7 +45,7 @@ import java.util.Map;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import com.aptana.parsing.io.SourcePrinter;
+import com.aptana.core.util.SourcePrinter;
 
 /**
  * @author Kevin Lindsey

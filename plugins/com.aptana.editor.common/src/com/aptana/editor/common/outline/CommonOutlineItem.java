@@ -112,4 +112,9 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 	{
 		return fSourceRange.isEmpty();
 	}
+
+	public void setRange(IRange range)
+	{
+		fSourceRange = range;
+	}
 }

@@ -38,8 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class FunctionType extends Type
 {
@@ -51,7 +51,7 @@ public class FunctionType extends Type
 	 */
 	public FunctionType()
 	{
-		super(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
+		super(JSTypeConstants.FUNCTION_TYPE);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class FunctionType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(JSTypeConstants.FUNCTION_TYPE); //$NON-NLS-1$
+		writer.print(JSTypeConstants.FUNCTION_TYPE);
 
 		boolean first;
 

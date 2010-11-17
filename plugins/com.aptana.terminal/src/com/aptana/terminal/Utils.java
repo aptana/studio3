@@ -101,7 +101,7 @@ public class Utils
 					new Object[] { editorId }
 				);
 				
-				Activator.logError(message, e);
+				Activator.log(message, e);
 			}
 		}
 		

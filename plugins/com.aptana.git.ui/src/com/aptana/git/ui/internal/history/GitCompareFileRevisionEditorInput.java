@@ -74,7 +74,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		setTitle(left.getName());
 	}
 
-	FileRevisionTypedElement getRightRevision()
+	private FileRevisionTypedElement getRightRevision()
 	{
 		if (right instanceof FileRevisionTypedElement)
 		{
@@ -83,7 +83,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		return null;
 	}
 
-	FileRevisionTypedElement getLeftRevision()
+	private FileRevisionTypedElement getLeftRevision()
 	{
 		if (left instanceof FileRevisionTypedElement)
 		{
@@ -537,7 +537,7 @@ public class GitCompareFileRevisionEditorInput extends SaveableCompareEditorInpu
 		super.handleDispose();
 	}
 
-	protected IControlThemerFactory getControlThemerFactory()
+	private IControlThemerFactory getControlThemerFactory()
 	{
 		return ThemePlugin.getDefault().getControlThemerFactory();
 	}

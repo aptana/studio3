@@ -156,11 +156,17 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 
 			String line = d.get(info.getOffset(), info.getLength());
 			String trimmedLine = line.trim();
-			if (c1 == '*' && !trimmedLine.endsWith("*/")) //$NON-NLS-1$
+			String upToOffset = line.substring(0, c.offset - info.getOffset());
+			// What we want is to add a star if user hit return inside a comment block
+			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				buf.append("* "); //$NON-NLS-1$
+				buf.append("*"); //$NON-NLS-1$
+				if (d.getChar(c.offset) != '/')
+				{
+					buf.append(" "); //$NON-NLS-1$
+				}
 			}
-			// FIXME Don't do this is the newline comes before the /*!
+			// FIXME Don't do this if the newline comes before the /*!
 			else if (trimmedLine.startsWith("/*") && !trimmedLine.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			{
 				buf.append(" * "); //$NON-NLS-1$

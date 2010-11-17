@@ -1,0 +1,346 @@
+// java -jar beaver.jar -T -w IDL.grammar
+%package "com.aptana.editor.idl.parsing";
+
+%class "IDLParser";
+
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseRootNode";
+
+%implements "IParser";
+
+%embed {:
+    // suppress parser error reporting and let the custom error recovery mechanism handle it
+    private static class IDLEvents extends Events
+    {
+        public void scannerError(Scanner.Exception e)
+        {
+        }
+
+        public void syntaxError(Symbol token)
+        {
+        }
+
+        public void unexpectedTokenRemoved(Symbol token)
+        {
+        }
+
+        public void missingTokenInserted(Symbol token)
+        {
+        }
+
+        public void misspelledTokenReplaced(Symbol token)
+        {
+        }
+
+        public void errorPhraseRemoved(Symbol error)
+        {
+        }
+    }
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
+	 */
+	public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+	{
+		IDLScanner scanner = new IDLScanner();
+
+		// grab source
+		char[] characters = parseState.getSource();
+
+		// make sure we have some source
+		String source = (characters != null) ? new String(characters) : "";
+
+		// send source to the scanner
+		scanner.setSource(source);
+
+		// parse
+		IParseRootNode result = (IParseRootNode) parse(scanner);
+
+		// save reference to result
+		parseState.setParseResult(result);
+
+		return result;
+	}
+:};
+
+%init {:
+        report = new IDLEvents();
+:};
+
+%terminals ANY, ATTRIBUTE, BOOLEAN, CONST, DOMSTRING, EXCEPTION, FLOAT, GETRAISES, IN, INTERFACE, LONG;
+%terminals MODULE, OBJECT, OCTET, RAISES, READONLY, SEQUENCE, SETRAISES, SHORT, TYPEDEF, UNSIGNED, TRUE;
+%terminals FALSE, VOID, NUMBER, LBRACKET, RBRACKET, LPAREN, RPAREN, LCURLY, RCURLY, SEMICOLON, COMMA;
+%terminals COLON, DOUBLE_COLON, LESS_THAN, GREATER_THAN, EQUAL, IDENTIFIER;
+%terminals OMITTABLE, DOUBLE, QUESTION, ELLIPSIS, OPTIONAL, GETTER, SETTER, CREATOR, DELETER, CALLER;
+%terminals STRINGIFIER, IMPLEMENTS;
+
+%goal Definitions;
+
+// Level 0
+
+Definitions
+	=	Definitions ExtendedAttributeList Definition
+	|	Definitions Definition
+	|	ExtendedAttributeList Definition
+	|	Definition
+	;
+
+ExtendedAttributeList
+	=	LBRACKET ExtendedAttributes RBRACKET
+	|	LBRACKET RBRACKET
+	;
+
+ExtendedAttributes
+	=	ExtendedAttributes COMMA ExtendedAttribute
+	|	ExtendedAttribute
+	;
+
+ExtendedAttribute
+	=	ExtendedAttributeNoArg
+	|	ExtendedAttributeArgList
+	|	ExtendedAttributeNamedArgList
+	|	ExtendedAttributeIdent
+	|	ExtendedAttributeScopedName
+	;
+
+ExtendedAttributeNoArg
+	=	IDENTIFIER
+	;
+
+ExtendedAttributeArgList
+	=	IDENTIFIER LPAREN RPAREN
+	|	IDENTIFIER LPAREN ArgumentList RPAREN
+	;
+
+ExtendedAttributeNamedArgList
+	=	IDENTIFIER EQUAL IDENTIFIER LPAREN RPAREN
+	|	IDENTIFIER EQUAL IDENTIFIER LPAREN ArgumentList RPAREN
+	;
+
+ExtendedAttributeIdent
+	=	IDENTIFIER EQUAL IDENTIFIER
+	;
+
+ExtendedAttributeScopedName
+	=	IDENTIFIER EQUAL ScopedName
+	;
+
+ArgumentList
+	=	ArgumentList COMMA Argument
+	|	Argument
+	;
+
+Argument
+	=	ExtendedAttributeList? IN? OPTIONAL? Type ELLIPSIS? IDENTIFIER
+	;
+
+Type
+	=	NullableType
+	|	ScopedName
+	|	ANY
+	|	OBJECT
+	;
+
+NullableType
+	=	UnsignedIntegerType
+	|	UnsignedIntegerType QUESTION
+	|	BOOLEAN
+	|	BOOLEAN QUESTION
+	|	OCTET
+	|	OCTET QUESTION
+	|	FLOAT
+	|	FLOAT QUESTION
+	|	DOUBLE
+	|	DOUBLE QUESTION
+	|	DOMSTRING
+	|	DOMSTRING QUESTION
+	|	SEQUENCE LESS_THAN Type GREATER_THAN
+	|	SEQUENCE LESS_THAN Type GREATER_THAN QUESTION
+	;
+
+UnsignedIntegerType
+	=	UNSIGNED SHORT
+	|	UNSIGNED LONG
+	|	UNSIGNED LONG LONG
+	|	IntegerType
+	;
+
+IntegerType
+	=	SHORT
+	|	LONG
+	|	LONG LONG
+	;
+
+ScopedName
+	=	AbsoluteScopedName
+	|	RelativeScopedName
+	;
+
+AbsoluteScopedName
+	=	AbsoluteScopedName DOUBLE_COLON IDENTIFIER
+	|	DOUBLE_COLON IDENTIFIER
+	;
+
+RelativeScopedName
+	=	IDENTIFIER AbsoluteScopedName
+	;
+
+// ***
+
+Definition
+	=	Module
+	|	Interface
+	|	Exception
+	|	Typedef
+	|	ImplementsStatement
+	;
+
+Module
+	=	MODULE IDENTIFIER LCURLY Definitions RCURLY SEMICOLON
+	;
+
+Interface
+	=	INTERFACE IDENTIFIER InterfaceInheritance LCURLY InterfaceMembers RCURLY SEMICOLON
+	;
+
+InterfaceInheritance
+	=	COLON ScopedNameList
+	|	// empty
+	;
+
+InterfaceMembers
+	=	ExtendedAttributeList InterfaceMember InterfaceMembers
+	|	// empty
+	;
+
+InterfaceMember
+	=	Const
+	|	AttributeOrOperation
+	;
+
+Exception
+	=	EXCEPTION IDENTIFIER LCURLY ExceptionMembers RCURLY SEMICOLON
+	;
+
+ExceptionMembers
+	=	ExtendedAttributeList ExceptionMember ExceptionMembers
+	|	// empty
+	;
+
+Typedef
+	=	TYPEDEF Type IDENTIFIER SEMICOLON
+	;
+
+ImplementsStatement
+	=	ScopedName IMPLEMENTS ScopedName SEMICOLON
+	;
+
+Const
+	=	CONST Type IDENTIFIER EQUAL ConstExpr SEMICOLON
+	;
+
+ConstExpr
+	=	BooleanLiteral
+	|	NUMBER
+	;
+
+BooleanLiteral
+	=	TRUE
+	|	FALSE
+	;
+
+AttributeOrOperation
+	=	STRINGIFIER StringifierAttributeOrOperation
+	|	Attribute
+	|	Operation
+	;
+
+StringifierAttributeOrOperation
+	=	Attribute
+	|	OperationRest
+	|	SEMICOLON
+	;
+
+Attribute
+	=	ReadOnly ATTRIBUTE Type IDENTIFIER GetRaises SetRaises SEMICOLON
+	;
+
+ReadOnly
+	=	READONLY
+	|	// empty
+	;
+
+GetRaises
+	=	GETRAISES ExceptionList
+	|	// empty
+	;
+
+SetRaises
+	=	SETRAISES ExceptionList
+	|	// empty
+	;
+
+Operation
+	=	OmittableSpecials OperationRest
+	;
+
+OmittableSpecials
+	=	OMITTABLE Specials
+	|	Specials
+	;
+
+Specials
+	=	Special Specials
+	|	// empty
+	;
+
+Special
+	=	GETTER
+	|	SETTER
+	|	CREATOR
+	|	DELETER
+	|	CALLER
+	;
+
+OperationRest
+	=	ReturnType OptionalIdentifier LPAREN ArgumentList RPAREN Raises SEMICOLON
+	;
+
+OptionalIdentifier
+	=	IDENTIFIER
+	|	// empty
+	;
+
+Raises
+	=	RAISES ExceptionList
+	|	// empty
+	;
+
+ExceptionList
+	=	LPAREN ScopedNameList RPAREN
+	;
+
+ExceptionMember
+	=	Const
+	|	ExceptionField
+	;
+
+ExceptionField
+	=	Type IDENTIFIER SEMICOLON
+	;
+
+ReturnType
+	=	Type
+	|	VOID
+	;
+
+ScopedNameList
+	=	ScopedName ScopedNames
+	;
+
+ScopedNames
+	=	COMMA ScopedName ScopedNames
+	|	// empty
+	;

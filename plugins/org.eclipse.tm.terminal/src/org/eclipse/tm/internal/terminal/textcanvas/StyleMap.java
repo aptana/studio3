@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.tm.terminal.model.Style;
 import org.eclipse.tm.terminal.model.StyleColor;
 
+@SuppressWarnings({"unchecked","rawtypes"})
 public class StyleMap {
 	protected static final String BLACK = "black"; //$NON-NLS-1$
 	protected static final String WHITE = "white"; //$NON-NLS-1$
@@ -44,8 +45,8 @@ public class StyleMap {
 	// TODO propagate the name of the font in the FontRegistry
 	private static final String fDefaultFontName="terminal.views.view.font.definition"; //$NON-NLS-1$
 	String fFontName=fDefaultFontName;
-	Map fColorMapForeground=new HashMap();
-	Map fColorMapBackground=new HashMap();
+	protected Map fColorMapForeground=new HashMap();
+	protected Map fColorMapBackground=new HashMap();
 	Map fFontMap=new HashMap();
 	private Point fCharSize;
 	private final Style fDefaultStyle;

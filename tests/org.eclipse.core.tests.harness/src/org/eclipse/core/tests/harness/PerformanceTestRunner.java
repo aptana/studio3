@@ -88,13 +88,17 @@ public abstract class PerformanceTestRunner {
 		}
 	}
 
-	protected void setUp() throws CoreException {
-		// subclasses to override
-	}
+	/**
+	 * Subclasses to override
+	 * @throws CoreException
+	 */
+	protected abstract void setUp() throws CoreException;
 
-	protected void tearDown() throws CoreException {
-		// subclasses to override
-	}
+	/**
+	 * Subclasses to override
+	 * @throws CoreException
+	 */
+	protected abstract void tearDown() throws CoreException;
 
 	/**
 	 * Sets the finger print name. Setting this value will make the test part

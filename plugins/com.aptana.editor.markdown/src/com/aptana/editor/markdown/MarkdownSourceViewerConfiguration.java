@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -35,18 +35,19 @@
 package com.aptana.editor.markdown;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.CommonSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.ISourceViewerConfiguration;
+import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 
-class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfiguration
+class MarkdownSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
-
+	/**
+	 * MarkdownSourceViewerConfiguration
+	 * 
+	 * @param preferences
+	 * @param editor
+	 */
 	public MarkdownSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
 	{
 		super(preferences, editor);
@@ -54,37 +55,11 @@ class MarkdownSourceViewerConfiguration extends CommonSourceViewerConfiguration
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
 	 */
 	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
+	public ISourceViewerConfiguration getSourceViewerConfiguration()
 	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				MarkdownSourceConfiguration.CONTENT_TYPES });
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
-	 */
-	public String[][] getTopContentTypes()
-	{
-		return MarkdownSourceConfiguration.getDefault().getTopContentTypes();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getPresentationReconciler(org.eclipse.jface.text.source
-	 * .ISourceViewer)
-	 */
-	@Override
-	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
-	{
-		PresentationReconciler reconciler = (PresentationReconciler) super.getPresentationReconciler(sourceViewer);
-		MarkdownSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
-		return reconciler;
+		return MarkdownSourceConfiguration.getDefault();
 	}
 }

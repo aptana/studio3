@@ -296,17 +296,17 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		IDocument document = viewer.getDocument();
 		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString());
 		int shift = (validPrefix) ? offset - this._replacementOffset : 0;
-		
+
 		if (shift < this._replacementString.length())
 		{
 			int length = Math.max(0, this._replacementLength - shift);
 			String toReplace = this._replacementString.substring(shift);
-			
+
 			if (!validPrefix)
 			{
 				offset = this._replacementOffset;
 			}
-			
+
 			try
 			{
 				document.replace(offset, length, toReplace);
@@ -345,7 +345,10 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		if (offset < this._replacementOffset)
 			return false;
 
-		boolean validated = isValidPrefix(getPrefix(document, offset), getDisplayString());
+		int overlapIndex = getDisplayString().length() - _replacementString.length();
+		overlapIndex = Math.max(0, overlapIndex);
+		String endPortion = getDisplayString().substring(overlapIndex);
+		boolean validated = isValidPrefix(getPrefix(document, offset), endPortion);
 
 		if (validated && event != null)
 		{

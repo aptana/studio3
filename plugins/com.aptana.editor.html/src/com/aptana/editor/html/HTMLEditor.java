@@ -34,8 +34,21 @@
  */
 package com.aptana.editor.html;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -48,9 +61,12 @@ import com.aptana.editor.js.Activator;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
-
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
+
+	private Map<Annotation, Position> fTagPairOccurrences;
+
+	// quotes
 
 	@Override
 	protected void initializeEditor()
@@ -108,5 +124,91 @@ public class HTMLEditor extends AbstractThemeableEditor
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
 		return Activator.getDefault().getPreferenceStore();
+	}
+
+	@Override
+	protected void selectionChanged()
+	{
+		super.selectionChanged();
+
+		ISelection selection = getSelectionProvider().getSelection();
+		if (selection.isEmpty())
+		{
+			return;
+		}
+		ITextSelection textSelection = (ITextSelection) selection;
+		int offset = textSelection.getOffset();
+		highlightTagPair(offset);
+	}
+
+	/**
+	 * Given the offset, tries to determine if we're on an HTML close/start tag, and if so it will find the matching
+	 * open/close and highlight the pair.
+	 * 
+	 * @param offset
+	 */
+	private void highlightTagPair(int offset)
+	{
+		IDocumentProvider documentProvider = getDocumentProvider();
+		if (documentProvider == null)
+		{
+			return;
+		}
+		IAnnotationModel annotationModel = documentProvider.getAnnotationModel(getEditorInput());
+		if (annotationModel == null)
+		{
+			return;
+		}
+
+		if (fTagPairOccurrences != null)
+		{
+			// if the offset is included by one of these two positions, we don't need to wipe and re-calculate!
+			for (Position pos : fTagPairOccurrences.values())
+			{
+				if (pos.includes(offset))
+				{
+					return;
+				}
+			}
+			// New position, wipe the existing annotations in preparation for re-calculating...
+			for (Annotation a : fTagPairOccurrences.keySet())
+			{
+				annotationModel.removeAnnotation(a);
+			}
+			fTagPairOccurrences = null;
+		}
+
+		// Calculate current pair
+		Map<Annotation, Position> occurrences = new HashMap<Annotation, Position>();
+		IDocument document = getSourceViewer().getDocument();
+		IRegion match = OpenTagCloser.findMatchingTag(document, offset);
+		if (match != null)
+		{
+			// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new ones!
+			occurrences.put(new Annotation(IHTMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null),
+					new Position(match.getOffset(), match.getLength()));
+
+			try
+			{
+				// The current tag we're in!
+				ITypedRegion partition = document.getPartition(offset);
+				occurrences.put(new Annotation(IHTMLConstants.TAG_PAIR_OCCURRENCE_ID, false, null), new Position(
+						partition.getOffset(), partition.getLength()));
+			}
+			catch (BadLocationException e)
+			{
+				Activator.logError(e.getMessage(), e);
+			}
+			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
+			{
+				annotationModel.addAnnotation(entry.getKey(), entry.getValue());
+			}
+			fTagPairOccurrences = occurrences;
+		}
+		else
+		{
+			// no new pair, so don't highlight anything
+			fTagPairOccurrences = null;
+		}
 	}
 }

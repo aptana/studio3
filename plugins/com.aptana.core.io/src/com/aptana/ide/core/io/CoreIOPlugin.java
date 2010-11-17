@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.ide.core.io.auth.AuthenticationManager;
@@ -140,24 +139,9 @@ public class CoreIOPlugin extends Plugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static CoreIOPlugin getDefault()
+	private static CoreIOPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void log(Throwable e)
-	{
-		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
-	}
-
-	public static void log(String msg)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
-	}
-
-	public static void log(String msg, Throwable e)
-	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
 	}
 
 	public static void log(IStatus status)
@@ -187,10 +171,6 @@ public class CoreIOPlugin extends Plugin
 
 	public static void clearConnectionContext(Object key)
 	{
-		ConnectionContext context = getDefault().connectionContexts.get(key);
-		if (context != null) {
-			context.clear();
-		}
 		getDefault().connectionContexts.remove(key);
 	}
 

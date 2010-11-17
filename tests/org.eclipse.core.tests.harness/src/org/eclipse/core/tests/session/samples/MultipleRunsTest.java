@@ -16,6 +16,7 @@ import org.eclipse.core.tests.session.*;
 import org.eclipse.test.performance.*;
 
 public class MultipleRunsTest extends TestCase {
+	@SuppressWarnings("cast")
 	public void testMultipleRuns() throws SetupManager.SetupException {
 		// the test case to run multiple times
 		TestDescriptor test = new TestDescriptor(SampleSessionTest.class.getName(), "testApplicationStartup");
@@ -31,7 +32,7 @@ public class MultipleRunsTest extends TestCase {
 		for (int i = 0; i < 5; i++) {
 			test.run(result);
 			if (result.failureCount() > 0) {
-				((TestFailure) result.failures().nextElement()).thrownException().printStackTrace();
+				((TestFailure) result.errors().nextElement()).thrownException().printStackTrace();
 				return;
 			}
 			if (result.errorCount() > 0) {

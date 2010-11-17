@@ -37,9 +37,14 @@ package com.aptana.editor.html;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IHTMLConstants {
+public interface IHTMLConstants
+{
 
 	public String CONTENT_TYPE_HTML = "com.aptana.contenttype.html"; //$NON-NLS-1$
+
+	/**
+	 * The annotation type/id used to mark tag pair occurrences.
+	 */
+	public String TAG_PAIR_OCCURRENCE_ID = "com.aptana.html.tagPair.occurrences"; //$NON-NLS-1$
 }

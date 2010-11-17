@@ -122,6 +122,12 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 		initializeDialogUnits(parent);
 		Dialog.applyDialogFont(ftpConnectionComposite);
 
+		boolean autoSync = SyncPreferenceUtil.isAutoSync(project);
+		ftpConnectionComposite.setAutoSyncSelected(autoSync);
+		if (autoSync)
+		{
+			ftpConnectionComposite.setSyncDirection(SyncPreferenceUtil.getAutoSyncDirection(project));
+		}
 		ftpConnectionComposite.validate();
 	}
 

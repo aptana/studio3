@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="com.aptana.browser.configuration" name="%extension-point.browserconfiguration.name" schema="schema/com.aptana.browser.configuration.exsd"/>
    <extension
          point="org.eclipse.ui.views">
       <view
@@ -9,7 +10,7 @@
             class="com.aptana.browser.parts.WebBrowserView"
             icon="icons/obj16/browser.png"
             id="com.aptana.browser.views.webbrowser"
-            name="Web Browser"
+            name="%view.browser.name"
             restorable="true">
       </view>
    </extension>
@@ -20,7 +21,7 @@
             default="false"
             icon="icons/obj16/browser.png"
             id="com.aptana.browser.editors.webbrowser"
-            name="Web Browser">
+            name="%editor.browser.name">
       </editor>
    </extension>
    <extension
@@ -36,55 +37,79 @@
          point="org.eclipse.ui.actionSets">
       <actionSet
             id="com.aptana.browser.actionSet"
-            label="Show WebBrowser ActionSet"
+            label="%actionSet.show.browser.label"
             visible="true">
          <action
                class="com.aptana.browser.actions.ShowBrowserEditorAction"
                icon="icons/obj16/browser.png"
                id="com.aptana.browser.ShowBrowserEditorAction"
-               label="WebBrowser Editor"
+               label="%action.browser.editor.label"
                menubarPath="window/showView/additions"
                style="push">
          </action>
       </actionSet>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.views"
-            defaultHandler="com.aptana.browser.handlers.ShowPreviewHandler"
-            description="Show Preview Editor"
-            id="com.aptana.browser.commands.showPreview"
-            name="Show Preview">
-      </command>
-   </extension>
-   <!-- not adding the icon for now since the functionality hasn't been implemented
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="com.aptana.ui.globalActionSet">
-            <command
-                  commandId="com.aptana.browser.commands.showPreview"
-                  icon="icons/obj16/browser.png"
-                  style="push">
-               <visibleWhen>
-                  <reference
-                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
-                  </reference>
-               </visibleWhen>
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
-   -->
-   <extension
          point="org.eclipse.ui.browserSupport">
       <support
             class="com.aptana.browser.support.WorkbenchBrowserSupport"
             default="false">
       </support>
+   </extension>
+   <extension
+         point="com.aptana.browser.configuration">
+      <sizeCategory
+            id="com.aptana.browser.sizeCategory.computer"
+            name="%sizeCategory.computer.name">
+      </sizeCategory>
+      <size
+            category="com.aptana.browser.sizeCategory.computer"
+            height="1024"
+            name="%size.sxga.name"
+            width="1280">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.computer"
+            height="768"
+            name="%size.xga.name"
+            width="1024">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.computer"
+            height="600"
+            name="%size.svga.name"
+            width="800">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.computer"
+            height="480"
+            name="%size.vga.name"
+            width="640">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.computer"
+            height="240"
+            name="%size.qvga.name"
+            width="320">
+      </size>
+      <sizeCategory
+            id="com.aptana.browser.sizeCategory.mobile"
+            name="%sizeCategory.mobile.name">
+      </sizeCategory>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="460"
+            image="com.aptana.browser.backgroundImage.iphone"
+            name="%size.iphone.name"
+            width="320">
+      </size>
+      <backgroundImage
+            bgcolor="true"
+            horizontalIndent="35"
+            id="com.aptana.browser.backgroundImage.iphone"
+            path="images/iphone_ver.png"
+            verticalIndent="150">
+      </backgroundImage>
    </extension>
 
 </plugin>

@@ -35,18 +35,15 @@
 
 package com.aptana.ide.ui.io;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IViewPart;
@@ -65,7 +62,10 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
-import com.aptana.ide.ui.io.navigator.internal.NavigatorDecoratorLoader;
+import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
+import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.UIUtils;
 
 /**
@@ -78,37 +78,6 @@ public class IOUIPlugin extends AbstractUIPlugin {
 
     // The shared instance
     private static IOUIPlugin plugin;
-
-    private IResourceChangeListener resourceListener = new IResourceChangeListener() {
-
-        public void resourceChanged(IResourceChangeEvent event) {
-            if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-                // only refreshes the direct parent of the files that are added
-                // or removed
-                IResourceDelta delta = event.getDelta();
-                if (delta != null) {
-                    List<IResource> list = new ArrayList<IResource>();
-                    getResourcesNeededToRefresh(list, delta);
-                    for (IResource resource : list) {
-                        refreshNavigatorView(resource);
-                    }
-                }
-            }
-        }
-
-        private void getResourcesNeededToRefresh(List<IResource> list, IResourceDelta delta) {
-            IResourceDelta[] children = delta.getAffectedChildren();
-            int kind;
-            for (IResourceDelta child : children) {
-                kind = child.getKind();
-                if (kind == IResourceDelta.ADDED || kind == IResourceDelta.REMOVED) {
-                    list.add(child.getResource().getParent());
-                } else if (kind == IResourceDelta.CHANGED) {
-                    getResourcesNeededToRefresh(list, child);
-                }
-            }
-        }
-    };
 
     private IConnectionPointListener connectionListener = new IConnectionPointListener() {
 
@@ -135,6 +104,17 @@ public class IOUIPlugin extends AbstractUIPlugin {
 
     };
 
+	private IPreferenceChangeListener themeChangeListener = new IPreferenceChangeListener()
+	{
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (event.getKey().equals(IThemeManager.THEME_CHANGED))
+			{
+				ImageUtils.themeChanged();
+			}
+		}
+	};
+
     /**
      * The constructor
      */
@@ -147,17 +127,16 @@ public class IOUIPlugin extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
         CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
-        NavigatorDecoratorLoader.init();
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
     }
 
     /**
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
         CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
+        new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
         plugin = null;
         super.stop(context);
     }
@@ -182,6 +161,30 @@ public class IOUIPlugin extends AbstractUIPlugin {
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
+
+	/**
+	 * Returns an image for the image file at the given plug-in relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image object
+	 */
+	public static Image getImage(String path)
+	{
+		ImageRegistry registry = plugin.getImageRegistry();
+		Image image = registry.get(path);
+		if (image == null)
+		{
+			ImageDescriptor id = getImageDescriptor(path);
+			if (id == null)
+			{
+				return null;
+			}
+			registry.put(path, id);
+			image = registry.get(path);
+		}
+		return image;
+	}
 
     /**
      * Returns the active workbench window
@@ -228,26 +231,48 @@ public class IOUIPlugin extends AbstractUIPlugin {
             public void run() {
                 try {
                     IViewPart view = findView(IPageLayout.ID_PROJECT_EXPLORER);
-                    if (view != null && view instanceof CommonNavigator) {
-                        CommonViewer viewer = ((CommonNavigator) view).getCommonViewer();
-                        if (element == null) {
-                            // full refresh
-                            viewer.refresh();
-                        } else {
-                            viewer.refresh(element);
-                        }
+                    refreshNavigatorInternal(view, element, selection);
 
-                        if (selection != null) {
-                            // ensures the category's new content are loaded
-                            viewer.expandToLevel(element, 1);
-                            viewer.setSelection(new StructuredSelection(selection));
-                        }
-                    }
+                    view = findView(RemoteNavigatorView.ID);
+                    refreshNavigatorInternal(view, element, selection);
                 } catch (PartInitException e) {
                 }
             }
         });
     }
+
+	private static void refreshNavigatorInternal(IViewPart viewPart, Object element, Object selection)
+	{
+		if (viewPart == null)
+		{
+			return;
+		}
+		if (viewPart instanceof IRefreshableNavigator)
+		{
+			((IRefreshableNavigator) viewPart).refresh(element);
+		}
+		else if (viewPart instanceof CommonNavigator)
+		{
+			CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+			if (element == null)
+			{
+				// full refresh
+				viewer.refresh();
+			}
+			else
+			{
+				viewer.refresh(element);
+			}
+		}
+
+		if (selection != null && viewPart instanceof CommonNavigator)
+		{
+			// ensures the category's new content are loaded
+			CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+			viewer.expandToLevel(element, 1);
+			viewer.setSelection(new StructuredSelection(selection));
+		}
+	}
 
     public static void logError(String msg, Exception e) {
         log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));

@@ -2,16 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.scripting.ui;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.scripting.ui.ScriptingUIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.views,
  org.eclipse.core.runtime,
- com.aptana.scripting;bundle-version="1.0.0",
+ com.aptana.scripting,
  com.aptana.theme,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

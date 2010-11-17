@@ -213,7 +213,7 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
-			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.CONTEXT_ID));
+			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
 		}
 	};
 
@@ -246,11 +246,22 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		if (installed.compareAndSet(false, true))
 		{
-			IWorkbench workbench = PlatformUI.getWorkbench();
-			INSTANCE = new KeybindingsManager(workbench);
+			IWorkbench workbench = null;
+			try
+			{
+				workbench = PlatformUI.getWorkbench();
+			}
+			catch (Exception e)
+			{
+				// ignore, may be running headless, like in tests
+			}
+			if (workbench != null)
+			{
+				INSTANCE = new KeybindingsManager(workbench);
 
-			// Load initial bindings
-			INSTANCE.initBindings();
+				// Load initial bindings
+				INSTANCE.initBindings();
+			}
 		}
 	}
 
@@ -339,7 +350,7 @@ public class KeybindingsManager implements LoadCycleListener
 				// Set the initial enabled state of KeybindingsManager
 				IContextService contextService = (IContextService) workbench.getService(IContextService.class);
 				contextService.addContextManagerListener(contextManagerListener);
-				setEnabled(contextService.getActiveContextIds().contains(Activator.CONTEXT_ID));
+				setEnabled(contextService.getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
 
 				return Status.OK_STATUS;
 			}

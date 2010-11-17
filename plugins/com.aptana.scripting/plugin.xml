@@ -69,7 +69,7 @@
          point="org.eclipse.ui.contexts">
       <context
             id="com.aptana.scripting.context"
-            name="Aptana Scriptable Context"
+            name="%context.scripting.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>

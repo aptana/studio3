@@ -36,13 +36,19 @@ package com.aptana.ide.core.io;
 
 import org.eclipse.osgi.util.NLS;
 
-public class Messages extends NLS
+public class Messages extends NLS // NO_UCD
 {
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.messages"; //$NON-NLS-1$
 
-	public static String ConnectionPointManager_CategoryUnknown;
-	public static String ConnectionPointManager_FailedStoreConnectionProperties;
+	public static String ConnectionPointManager_CategoryUnknown; // NO_UCD
+	public static String ConnectionPointManager_FailedStoreConnectionProperties; // NO_UCD
+
+	public static String LockUtils_failedToLock;
+
+	public static String LockUtils_failedToWrite;
+
+	public static String LockUtils_seeErrorLog;
 
 	static
 	{

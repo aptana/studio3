@@ -37,6 +37,7 @@ package com.aptana.terminal.connector;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +72,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 
 	public static final String ID = "com.aptana.terminal.connector.local"; //$NON-NLS-1$
 	
-	private static final String ENCODING = "ISO-8859-1"; //$NON-NLS-1$
+	protected  static final String ENCODING = "UTF-8"; //$NON-NLS-1$
 	private static final char DLE = '\u0010';
 	private static final int PROCESS_LIST_TIMEOUT = 1500;
 
@@ -141,7 +142,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 		try {
 			streamsProxy.write("\u001b[8;"+Integer.toString(currentHeight)+";"+Integer.toString(currentWidth)+"t"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} catch (IOException e) {
-			Activator.logError("Send terminal size failed.", e); //$NON-NLS-1$
+			Activator.log("Send terminal size failed.", e); //$NON-NLS-1$
 		}
 	}
 	
@@ -151,7 +152,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			try {
 				streamsProxy.write(DLE+"$p"); //$NON-NLS-1$
 			} catch (IOException e) {
-				Activator.logError("Get terminal process list failed.", e); //$NON-NLS-1$
+				Activator.log("Get terminal process list failed.", e); //$NON-NLS-1$
 				return null;
 			}
 			synchronized (processList) {
@@ -225,7 +226,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			
 			// Hook up standard input:
 			//
-			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, ENCODING), 1024);
+			processInputStream = new BufferedOutputStream(new StreamsProxyOutputStream(streamsProxy, Charset.defaultCharset().name()), 1024);
 			
 			// Hook up standard output:
 			//
@@ -242,7 +243,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
 			return true;
 		} catch (Exception e) {
-			Activator.logError("Starting terminal process failed.", e); //$NON-NLS-1$
+			Activator.log("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
 		control.displayTextInTerminal(Messages.LocalTerminalConnector_NoShellErrorMessage);
 		return false;
@@ -314,7 +315,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 				}
 			}
 		} else {
-			Activator.logWarning("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
+			Activator.log("LocalTerminalConnector:UNKNOWN COMMAND RESPONSE: "+response); //$NON-NLS-1$
 		}
 	}
 

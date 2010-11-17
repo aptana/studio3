@@ -61,7 +61,7 @@ public class SFTPFileDownloadInputStream extends InputStream {
 		try {
 			ftpInputStream.close();
 		} catch (IOException e) {
-			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, "SFTP download error.", e));
+			SecureFTPPlugin.log(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPFileDownloadInputStream_ErrorDownload, e));
 		}
 	}
 

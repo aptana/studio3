@@ -8,7 +8,7 @@
             class="com.aptana.editor.xml.XMLEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
-            extensions="xml,tld,pt,cpt,dtml,rss,opml"
+            extensions="tld,pt,cpt,dtml,rss,opml"
             id="com.aptana.editor.xml"
             name="%editor.xml.name">
          <contentTypeBinding

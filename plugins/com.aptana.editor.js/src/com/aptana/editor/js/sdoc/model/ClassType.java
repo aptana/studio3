@@ -34,8 +34,8 @@
  */
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class ClassType extends Type
 {
@@ -56,7 +56,7 @@ public class ClassType extends Type
 	 */
 	public ClassType(Type type)
 	{
-		super(JSTypeConstants.CLASS_TYPE); //$NON-NLS-1$
+		super(JSTypeConstants.CLASS_TYPE);
 
 		this._type = (type != null) ? type : Type.OBJECT_TYPE;
 	}
@@ -78,7 +78,7 @@ public class ClassType extends Type
 	 */
 	public void toSource(SourcePrinter writer)
 	{
-		writer.print(JSTypeConstants.CLASS_TYPE); //$NON-NLS-1$
+		writer.print(JSTypeConstants.CLASS_TYPE);
 		writer.print("<"); //$NON-NLS-1$
 		this._type.toSource(writer);
 		writer.print(">"); //$NON-NLS-1$

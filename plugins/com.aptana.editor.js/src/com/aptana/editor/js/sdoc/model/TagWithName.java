@@ -34,8 +34,8 @@
  */
 package com.aptana.editor.js.sdoc.model;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 
 public abstract class TagWithName extends Tag
 {

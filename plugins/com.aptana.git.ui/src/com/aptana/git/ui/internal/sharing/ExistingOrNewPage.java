@@ -175,7 +175,7 @@ class ExistingOrNewPage extends WizardPage
 		setControl(g);
 	}
 
-	protected IGitRepositoryManager getGitRepositoryManager()
+	private IGitRepositoryManager getGitRepositoryManager()
 	{
 		return GitPlugin.getDefault().getGitRepositoryManager();
 	}

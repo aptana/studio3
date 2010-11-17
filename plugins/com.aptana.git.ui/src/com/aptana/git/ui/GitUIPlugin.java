@@ -294,18 +294,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void logInfo(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
-	}
-
-	public static void trace(String string)
-	{
-		if (!getDefault().isDebugging())
-			return;
-		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
-	}
-
 	public static String getPluginId()
 	{
 		return PLUGIN_ID;
@@ -321,7 +309,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(e.getStatus());
 	}
 
-	public static void logError(Exception e)
+	private static void logError(Exception e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), "", e)); //$NON-NLS-1$
 	}

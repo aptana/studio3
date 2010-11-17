@@ -65,7 +65,7 @@ public class WorkbenchBrowserSupport extends DefaultBrowserSupport {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IWebBrowser createBrowser(int style, String browserId, String name, String tooltip) throws PartInitException {
 		if (browserId == null) {
 			browserId = getDefaultId();

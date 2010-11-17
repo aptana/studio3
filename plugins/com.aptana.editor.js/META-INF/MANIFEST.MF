@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.js;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.js.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.index.core,
  com.aptana.editor.common,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0",
+ beaver,
  com.aptana.theme
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
@@ -24,5 +24,7 @@ Export-Package: com.aptana.editor.js,
  com.aptana.editor.js.contentassist,
  com.aptana.editor.js.contentassist.index,
  com.aptana.editor.js.outline,
- com.aptana.editor.js.parsing
+ com.aptana.editor.js.parsing,
+ com.aptana.editor.js.parsing.ast,
+ com.aptana.editor.js.sdoc.parsing
 Eclipse-ExtensibleAPI: true

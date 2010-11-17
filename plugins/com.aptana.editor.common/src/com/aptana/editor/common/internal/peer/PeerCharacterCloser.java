@@ -65,6 +65,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.SmartTypingPairsElement;
@@ -90,8 +91,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs = NO_PAIRS;
 
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
-	private static final ScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
+	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
 	PeerCharacterCloser(ITextViewer textViewer)
 	{
@@ -113,7 +114,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		// early pruning to slow down normal typing as little as possible
 		if (!event.doit || !isAutoInsertEnabled() || isModifierKey(event.keyCode))
 		{
-			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase performance!
+			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase
+			// performance!
 			return;
 		}
 
@@ -228,6 +230,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	private boolean isModifierKey(int keyCode)
 	{
+		// TODO Ignore if it's not in the superset of character pairs!
 		switch (keyCode)
 		{
 			case SWT.SHIFT:
@@ -253,14 +256,19 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 			return NO_PAIRS;
 		}
-		Map<ScopeSelector, SmartTypingPairsElement> map = new HashMap<ScopeSelector, SmartTypingPairsElement>();
+		Map<IScopeSelector, SmartTypingPairsElement> map = new HashMap<IScopeSelector, SmartTypingPairsElement>();
 		for (SmartTypingPairsElement pe : pairs)
 		{
-			map.put(pe.getScopeSelector(), pe);
+			IScopeSelector ss = pe.getScopeSelector();
+			if (ss == null)
+			{
+				continue;
+			}
+			map.put(ss, pe);
 		}
-		ScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
-		return yay.getPairs();
+		return yay == null ? NO_PAIRS: yay.getPairs();
 	}
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
@@ -372,7 +380,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		char c = event.character;
 		int beginning = 0;
 		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
-		// partition if we can
+		// partition if we can. 
+		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to single string/comment partition?
 		if (document instanceof IDocumentExtension3)
 		{
 			try
@@ -392,8 +401,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
-			if (ignoreScope(document, beginning + index))
-				continue;
+//			if (ignoreScope(document, beginning + index))
+//				continue;
 			open = !open;
 			if (open)
 			{

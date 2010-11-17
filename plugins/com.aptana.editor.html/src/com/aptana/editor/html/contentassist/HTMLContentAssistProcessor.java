@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import java.net.URI;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +47,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -54,6 +63,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
@@ -76,9 +87,15 @@ import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
+import com.aptana.preview.ProjectPreviewUtil;
+import com.aptana.preview.server.AbstractWebServerConfiguration;
+import com.aptana.preview.server.ServerConfigurationManager;
+import com.aptana.preview.server.SimpleWebServerConfiguration;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
+	private static final String DOCTYPE_PRECEDING_TEXT = "!"; //$NON-NLS-1$
+
 	/**
 	 * LocationType
 	 */
@@ -98,7 +115,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
+	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
 	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
@@ -296,6 +313,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				proposals.addAll(this.addClassProposals(offset));
 			}
+			else if (attributeName.equals("src") || attributeName.equals("href")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				proposals.addAll(this.addURIPathProposals(offset));
+			}
 			else
 			{
 				String elementName = this.getElementName(lexemeProvider, offset);
@@ -332,6 +353,143 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addURIPathProposals - Does incremental proposals for filepaths in the 'src'/'href' values.
+	 * 
+	 * @param offset
+	 */
+	protected List<ICompletionProposal> addURIPathProposals(int offset)
+	{
+		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+		this._replaceRange = null;
+		try
+		{
+			String valuePrefix = this._currentLexeme.getText();
+			int length = offset - this._currentLexeme.getStartingOffset();
+			valuePrefix = valuePrefix.substring(0, length);
+
+			URI editorStoreURI = getURI();
+			IFileStore editorStore = EFS.getStore(editorStoreURI);
+
+			// Strip the quotes off the value prefix!
+			if (valuePrefix.length() > 0 && (valuePrefix.charAt(0) == '"' || valuePrefix.charAt(0) == '\''))
+			{
+				valuePrefix = valuePrefix.substring(1);
+				offset = this._currentLexeme.getStartingOffset() + 1;
+			}
+
+			// Based on prefix we need to choose project root (webroot), some other place, or current file as URI
+			// base.
+			IFileStore baseStore = null;
+			if (valuePrefix.length() > 0 && valuePrefix.charAt(0) == '/')
+			{
+				baseStore = EFS.getStore(getProjectURI());
+
+				// Get the project webroot
+				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+						.getServerConfiguration(getProject());
+				if (serverConfiguration == null)
+				{
+					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance()
+							.getServerConfigurations())
+					{
+						URL url = server.resolve(editorStore);
+						if (url != null)
+						{
+							serverConfiguration = server;
+							break;
+						}
+					}
+				}
+				if (serverConfiguration != null && serverConfiguration instanceof SimpleWebServerConfiguration)
+				{
+					SimpleWebServerConfiguration swsc = (SimpleWebServerConfiguration) serverConfiguration;
+					IPath path = swsc.getDocumentRoot();
+					if (path.isAbsolute())
+					{
+						baseStore = EFS.getStore(path.toFile().toURI());
+					}
+					else
+					{
+						baseStore = baseStore.getFileStore(path);
+					}
+				}
+				else
+				{
+					// HACK This is for Rails projects, when user hasn't specified special server preview
+					IFileStore publicDir = baseStore.getChild("public"); //$NON-NLS-1$
+					if (publicDir.fetchInfo().exists())
+					{
+						baseStore = publicDir;
+					}
+				}
+				baseStore = baseStore.getChild(valuePrefix);
+			}
+			else
+			{
+				baseStore = editorStore.getParent();
+				baseStore = baseStore.getChild(valuePrefix);
+			}
+
+			// replace from last slash on...
+			int lastSlash = valuePrefix.lastIndexOf('/');
+			if (lastSlash != -1)
+			{
+				offset += lastSlash + 1;
+			}
+			this._replaceRange = new Range(offset, this._currentLexeme.getEndingOffset() - 1);
+
+			// TODO Handle when it's just an absolute URI!
+			// else if ()
+			// {
+			//
+			// }
+
+			// Then we grab the filestore pointing to the parent and ask for the children!
+			Image[] userAgentIcons = this.getAllUserAgentIcons();
+			for (IFileStore f : baseStore.childStores(EFS.NONE, new NullProgressMonitor()))
+			{
+				String name = f.getName();
+				// Don't include the current file in the list
+				if (name.startsWith(".") || f.toURI().equals(editorStoreURI)) //$NON-NLS-1$
+				{
+					continue;
+				}
+
+				// Grab images based on whether it's a dir or not. For files can we determine if it matches some
+				// content type and grab the icon for that?
+				Image image = null;
+				IFileInfo info = f.fetchInfo();
+				if (info.isDirectory())
+				{
+					image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+				}
+				else
+				{
+					ImageDescriptor imageDesc = PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(name);
+					if (imageDesc != null)
+					{
+						image = imageDesc.createImage();
+					}
+					if (image == null)
+					{
+						image = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+					}
+				}
+				CommonCompletionProposal cp = createProposal(name, name, image, null, userAgentIcons, null, offset,
+						name.length());
+				proposals.add(cp);
+
+			}
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+
+		return proposals;
+	}
+
+	/**
 	 * addElementProposals
 	 * 
 	 * @param lexemeProvider
@@ -346,10 +504,45 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			boolean close = true;
 			int replaceLength = 0;
+			int replaceOffset = offset;
+			if (this._currentLexeme.getType() == HTMLTokenType.META) // DOCTYPE?
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength();
 
-			if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength = this._currentLexeme.getEndingOffset() - replaceOffset + 1;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TEXT
+					&& this._currentLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT)) // !
+			{
+				replaceOffset = this._currentLexeme.getStartingOffset();
+				replaceLength = this._currentLexeme.getLength(); // replace the '!'
+
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+				if (nextLexeme != null && nextLexeme.getType() == HTMLTokenType.TAG_END)
+				{
+					replaceLength = nextLexeme.getEndingOffset() - replaceOffset;
+				}
+			}
+			else if (this._currentLexeme.getType() == HTMLTokenType.TAG_END) // '|>
 			{
 				replaceLength = 1; // replace the '>'
+				// What if previous lexeme is "!", We need to replace that!
+				int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+				Lexeme<HTMLTokenType> previousLexeme = lexemeProvider.getLexeme(index - 1);
+				if (previousLexeme.getText().equals(DOCTYPE_PRECEDING_TEXT))
+				{
+					replaceOffset = previousLexeme.getStartingOffset();
+					replaceLength += previousLexeme.getLength();
+				}
 			}
 			else if (this._currentLexeme.getType() != HTMLTokenType.TAG_START) // as long as it's not: "<|<"
 			{
@@ -365,7 +558,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 				if (nextLexeme != null) // && !nextLexeme.equals(_currentLexeme))
 				{
-					offset = _currentLexeme.getStartingOffset();
+					replaceOffset = _currentLexeme.getStartingOffset();
 					replaceLength = _currentLexeme.getLength();
 
 					if (nextLexeme.equals(this._currentLexeme) == false)
@@ -385,13 +578,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			}
 
 			HTMLParseState state = null;
-
 			for (ElementElement element : elements)
 			{
-				String[] userAgents = element.getUserAgentNames();
-				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 				String replaceString = element.getName();
-
+				List<Integer> positions = new ArrayList<Integer>();
 				int cursorPosition = replaceString.length();
 				if (close)
 				{
@@ -403,14 +593,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 					if (element.getName().charAt(0) == '!') // don't close DOCTYPE with a slash
 					{
-						replaceString += " >"; //$NON-NLS-1$
 						cursorPosition += 1;
+						// Don't add ">" unless we know we need it! Look at next Lexeme!
+						int index = lexemeProvider.getLexemeIndex(_currentLexeme.getStartingOffset());
+						Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(index + 1);
+						if (nextLexeme == null || nextLexeme.getType() == HTMLTokenType.TAG_START)
+						{
+							replaceString += " >"; //$NON-NLS-1$
+						}
 					}
 					else if (state.isEmptyTagType(element.getName()))
 					{
 						replaceString += " />"; //$NON-NLS-1$
-						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag
-						cursorPosition += 3;
+						// TODO Depending on tag, we should stick cursor inside the tag or after the end of tag. Right
+						// now it's stuck at end of tag
+						positions.add(cursorPosition + 3);
 					}
 					else
 					{
@@ -419,7 +616,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						IDocument doc = new Document(_document.get());
 						try
 						{
-							doc.replace(offset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
+							doc.replace(replaceOffset, replaceLength, element.getName() + ">"); //$NON-NLS-1$
 						}
 						catch (BadLocationException e)
 						{
@@ -428,22 +625,19 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						if (!OpenTagCloser.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
-							// TODO Depending on the tag, we should add a "tabstop" inside the open part of the tag
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
+							positions.add(cursorPosition + 4 + element.getName().length());
 						}
 						else
 						{
 							replaceString += ">"; //$NON-NLS-1$
-							cursorPosition += 1;
+							positions.add(cursorPosition + 1);
 						}
 					}
 				}
-
-				CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-						cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
-
-				proposal.setFileLocation(HTMLIndexConstants.CORE);
-				proposal.setUserAgentImages(userAgentIcons);
+				positions.add(0, cursorPosition);
+				HTMLTagProposal proposal = new HTMLTagProposal(replaceString, replaceOffset, replaceLength, element,
+						positions.toArray(new Integer[positions.size()]));
 				proposals.add(proposal);
 			}
 		}
@@ -484,7 +678,26 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			int offset)
 	{
 		this._replaceRange = null;
+		// Replace all the way until we hit the end of the doctype tag!
+		Lexeme<HTMLTokenType> ptr = _currentLexeme;
 		Image[] userAgentIcons = this.getAllUserAgentIcons();
+
+		if (ptr != null && ptr.getType() == HTMLTokenType.META && ptr.contains(offset))
+		{
+			proposals.addAll(addElementProposals(lexemeProvider, offset));
+			return;
+		}
+
+		while (ptr != null && ptr.getType() != HTMLTokenType.TAG_END)
+		{
+			int index = lexemeProvider.getLexemeIndex(ptr.getStartingOffset());
+			ptr = lexemeProvider.getLexeme(index + 1);
+		}
+		if (ptr != null)
+		{
+			this._replaceRange = new Range(_currentLexeme.getStartingOffset(), ptr.getStartingOffset() - 1);
+		}
+
 		for (Map.Entry<String, String> entry : DOCTYPES.entrySet())
 		{
 			String src = entry.getValue();

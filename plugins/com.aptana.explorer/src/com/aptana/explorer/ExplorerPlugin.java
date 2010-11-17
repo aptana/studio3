@@ -46,6 +46,7 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -137,7 +138,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 	{
 	}
 
-	protected IViewReference findView(IWorkbenchPage page, String viewId)
+	private IViewReference findView(IWorkbenchPage page, String viewId)
 	{
 		IViewReference refs[] = page.getViewReferences();
 		for (int i = 0; i < refs.length; i++)
@@ -225,22 +226,46 @@ public class ExplorerPlugin extends AbstractUIPlugin
 
 	private void addPartListener()
 	{
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows)
+		IWorkbench workbench = null;
+		try
 		{
-			window.addPerspectiveListener(fPerspectiveListener);
+			workbench = PlatformUI.getWorkbench();
 		}
-		// Listen on any future windows
-		PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			for (IWorkbenchWindow window : windows)
+			{
+				window.addPerspectiveListener(fPerspectiveListener);
+			}
+			// Listen on any future windows
+			workbench.addWindowListener(fWindowListener);
+		}
 	}
 
 	private void removePartListener()
 	{
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows)
+		IWorkbench workbench = null;
+		try
 		{
-			window.removePerspectiveListener(fPerspectiveListener);
+			workbench = PlatformUI.getWorkbench();
 		}
-		PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			for (IWorkbenchWindow window : windows)
+			{
+				window.removePerspectiveListener(fPerspectiveListener);
+			}
+			workbench.removeWindowListener(fWindowListener);
+		}
 	}
 }

@@ -5,8 +5,12 @@ Bundle-SymbolicName: com.aptana.core.epl;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Require-Bundle: org.eclipse.core.runtime
-Export-Package: com.aptana.core.epl
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ecf,
+ org.eclipse.ecf.filetransfer
+Export-Package: com.aptana.core.epl,
+ com.aptana.filewatcher.poller,
+ com.aptana.core.epl.downloader
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: com.aptana.core.epl.CoreEPLPlugin
 Eclipse-ExtensibleAPI: true

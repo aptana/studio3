@@ -40,8 +40,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.editor.js.parsing.ast.JSNode;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class JSPropertyCollection
 {

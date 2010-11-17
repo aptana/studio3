@@ -2,20 +2,29 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.xml;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
+ com.aptana.core,
  com.aptana.editor.common,
+ com.aptana.editor.dtd,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0",
- com.aptana.theme
+ beaver,
+ com.aptana.theme,
+ com.aptana.index.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Localization: plugin
-Export-Package: com.aptana.editor.xml
+Export-Package: com.aptana.editor.xml,
+ com.aptana.editor.xml.contentassist;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.contentassist.index;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.contentassist.model;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.parsing;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.parsing.ast;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.parsing.lexer;x-friends:="com.aptana.editor.svg"
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy
 Eclipse-ExtensibleAPI: true

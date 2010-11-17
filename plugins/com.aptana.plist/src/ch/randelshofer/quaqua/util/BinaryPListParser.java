@@ -1,6 +1,4 @@
 /*
- * @(#)BinaryPListParser.java
- *
  * Copyright (c) 2005-2010 Werner Randelshofer
  * Hausmatt 10, Immensee, CH-6405, Switzerland.
  * All rights reserved.

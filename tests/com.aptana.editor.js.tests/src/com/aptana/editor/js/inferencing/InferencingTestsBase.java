@@ -1,21 +1,58 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.inferencing;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
@@ -38,9 +75,9 @@ public abstract class InferencingTestsBase extends TestCase
 {
 	public class Indexer extends JSFileIndexingParticipant
 	{
-		public void indexTree(Index index, JSParseRootNode root, URI location)
+		public void indexTree(IFileStore file, String source, Index index, JSParseRootNode root)
 		{
-			this.processParseResults(index, root, location);
+			this.processParseResults(file, source, index, root, new NullProgressMonitor());
 		}
 	}
 
@@ -53,17 +90,40 @@ public abstract class InferencingTestsBase extends TestCase
 	 * @param file
 	 * @return
 	 */
-	protected String getContent(File file)
+//	protected String getContent(File file)
+//	{
+//		String result = "";
+//
+//		try
+//		{
+//			FileInputStream input = new FileInputStream(file);
+//
+//			result = IOUtil.read(input);
+//		}
+//		catch (IOException e)
+//		{
+//			fail(e.getMessage());
+//		}
+//
+//		return result;
+//	}
+	
+	/**
+	 * getContent
+	 * 
+	 * @param file
+	 * @return
+	 */
+	protected String getContent(IFileStore file)
 	{
 		String result = "";
 
 		try
 		{
-			FileInputStream input = new FileInputStream(file);
-
+			InputStream input = file.openInputStream(EFS.NONE, new NullProgressMonitor());
 			result = IOUtil.read(input);
 		}
-		catch (IOException e)
+		catch (CoreException e)
 		{
 			fail(e.getMessage());
 		}
@@ -77,12 +137,12 @@ public abstract class InferencingTestsBase extends TestCase
 	 * @param path
 	 * @return
 	 */
-	protected String getContent(String path)
-	{
-		File file = this.getFile(new Path(path));
-
-		return this.getContent(file);
-	}
+//	protected String getContent(String path)
+//	{
+//		File file = this.getFile(new Path(path));
+//
+//		return this.getContent(file);
+//	}
 
 	/**
 	 * getFile
@@ -90,32 +150,32 @@ public abstract class InferencingTestsBase extends TestCase
 	 * @param path
 	 * @return
 	 */
-	protected File getFile(IPath path)
-	{
-		File result = null;
-
-		try
-		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
-			URL fileURL = FileLocator.toFileURL(url);
-			URI fileURI = ResourceUtil.toURI(fileURL);
-
-			result = new File(fileURI);
-		}
-		catch (IOException e)
-		{
-			fail(e.getMessage());
-		}
-		catch (URISyntaxException e)
-		{
-			fail(e.getMessage());
-		}
-
-		assertNotNull(result);
-		assertTrue(result.exists());
-
-		return result;
-	}
+//	protected File getFile(IPath path)
+//	{
+//		File result = null;
+//
+//		try
+//		{
+//			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
+//			URL fileURL = FileLocator.toFileURL(url);
+//			URI fileURI = ResourceUtil.toURI(fileURL);
+//
+//			result = new File(fileURI);
+//		}
+//		catch (IOException e)
+//		{
+//			fail(e.getMessage());
+//		}
+//		catch (URISyntaxException e)
+//		{
+//			fail(e.getMessage());
+//		}
+//
+//		assertNotNull(result);
+//		assertTrue(result.exists());
+//
+//		return result;
+//	}
 
 	/**
 	 * JSScope
@@ -169,15 +229,55 @@ public abstract class InferencingTestsBase extends TestCase
 	{
 		return URI.create("inference.testing");
 	}
-
+	
 	/**
 	 * getLastStatementTypes
 	 * 
-	 * @param source
+	 * @param path
 	 * @return
+	 * @throws CoreException 
 	 */
-	public List<String> getLastStatementTypes(String source)
+	protected List<String> getLastStatementTypes(String rawSource)
 	{
+		// Create a temp file with the contents and then grab filestore pointing at it?
+		try
+		{
+			File file = File.createTempFile("infer", ".js");
+			file.deleteOnExit();
+			IFileStore store = EFS.getLocalFileSystem().fromLocalFile(file);
+			IOUtil.write(store.openOutputStream(EFS.NONE, new NullProgressMonitor()), rawSource);
+			return getLastStatementTypes(store);
+		}
+		catch (Exception e)
+		{
+			fail(e.getMessage());
+		}
+		return Collections.emptyList();
+	}
+	
+	/**
+	 * getLastStatementTypes
+	 * 
+	 * @param path
+	 * @return
+	 * @throws CoreException 
+	 */
+	protected List<String> getLastStatementTypes(IPath path)
+	{
+		return getLastStatementTypes(getFileStore(path));
+	}
+	
+	/**
+	 * getLastStatementTypes
+	 * 
+	 * @param store
+	 * @return
+	 * @throws CoreException 
+	 */
+	protected List<String> getLastStatementTypes(IFileStore store)
+	{
+		String source = getContent(store);
+		
 		IParseNode root = this.getParseRootNode(source);
 		assertNotNull(root);
 		assertTrue(root instanceof JSParseRootNode);
@@ -189,10 +289,32 @@ public abstract class InferencingTestsBase extends TestCase
 		JSScope globals = this.getGlobals((JSParseRootNode) root);
 		assertNotNull(globals);
 
-		Indexer indexer = new Indexer();
-		indexer.indexTree(this.getIndex(), (JSParseRootNode) root, this.getLocation());
+		Indexer indexer = new Indexer();		
+		
+		indexer.indexTree(store, source, this.getIndex(), (JSParseRootNode) root);
 
 		return this.getTypes(globals, (JSNode) statement);
+	}
+
+	protected IFileStore getFileStore(IPath path)
+	{
+		IFileStore store = null;
+		try
+		{
+			URL url = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), path, null);
+			url = FileLocator.toFileURL(url);
+			URI fileURI = ResourceUtil.toURI(url);
+			store = EFS.getStore(fileURI);
+		}
+		catch (Exception e)
+		{
+			fail(e.getMessage());
+		}
+
+		assertNotNull(store);
+//		assertTrue(store.exists());
+		
+		return store;
 	}
 
 	/**
@@ -286,9 +408,20 @@ public abstract class InferencingTestsBase extends TestCase
 	 * @param source
 	 * @param types
 	 */
-	public void lastStatementTypeTests(String source, String... types)
+	public void lastStatementTypeTests(String rawSource, String... types)
 	{
-		List<String> statementTypes = this.getLastStatementTypes(source);
+		List<String> statementTypes = this.getLastStatementTypes(rawSource);
+		assertStatementTypes(statementTypes, types);
+	}
+	
+	public void lastStatementTypeTests(IPath path, String... types)
+	{
+		List<String> statementTypes = this.getLastStatementTypes(path);
+		assertStatementTypes(statementTypes, types);
+	}
+	
+	protected void assertStatementTypes(List<String> statementTypes, String... types)
+	{
 		assertNotNull(statementTypes);
 
 		assertEquals(types.length, statementTypes.size());

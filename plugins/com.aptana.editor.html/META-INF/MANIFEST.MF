@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.html;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.editor.html.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
@@ -11,16 +11,19 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.views,
- org.eclipse.ui.ide;bundle-version="3.4.0",
+ org.eclipse.ui.ide,
+ org.eclipse.ui.workbench.texteditor,
  com.aptana.core,
  com.aptana.index.core,
  com.aptana.editor.common,
  com.aptana.editor.js,
  com.aptana.editor.css,
+ com.aptana.editor.svg,
+ com.aptana.editor.xml,
  com.aptana.parsing,
- beaver;bundle-version="1.0.0",
+ beaver,
  com.aptana.theme,
- org.eclipse.ui.workbench.texteditor
+ com.aptana.preview;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -28,5 +31,6 @@ Export-Package: com.aptana.editor.html,
  com.aptana.editor.html.contentassist.index,
  com.aptana.editor.html.outline,
  com.aptana.editor.html.parsing,
+ com.aptana.editor.html.parsing.ast,
  com.aptana.editor.html.parsing.lexer
 Eclipse-ExtensibleAPI: true

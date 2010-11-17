@@ -153,7 +153,7 @@ public class GitPlugin extends Plugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), msg, e));
 	}
 
-	public static void logError(CoreException e)
+	protected static void logError(CoreException e)
 	{
 		getDefault().getLog().log(e.getStatus());
 	}
@@ -176,22 +176,16 @@ public class GitPlugin extends Plugin
 			getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
 	}
 
-	public static void trace(String string)
-	{
-		if (getDefault() != null && getDefault().isDebugging())
-			getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
-	}
-
 	/**
 	 * FIXME This doesn't seem like the best place to stick this.
 	 * 
 	 * @param commit
-	 * @param fileName
+	 * @param repoRelativePath
 	 * @return
 	 */
-	public static IFileRevision revisionForCommit(GitCommit commit, String fileName)
+	public static IFileRevision revisionForCommit(GitCommit commit, IPath repoRelativePath)
 	{
-		return new CommitFileRevision(commit, fileName);
+		return new CommitFileRevision(commit, repoRelativePath);
 	}
 
 	public IPath getGIT_SSH()

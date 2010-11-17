@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.formatter.ui.preferences.CommonFomatterPreferencePage"
+            id="com.aptana.formatter.common"
+            name="%codeFormatter.page.name">
+         <keywordReference
+               id="com.aptana.formatter.keyword.beautifier">
+         </keywordReference>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="com.aptana.formatter.keyword.beautifier"
+            label="%keyword.label.beautifier">
+      </keyword>
+   </extension>
+</plugin>

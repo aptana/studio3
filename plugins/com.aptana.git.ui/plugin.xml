@@ -1,184 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="com.aptana.git.ui.resourceContributions"
-            objectClass="org.eclipse.core.resources.IResource">
-         <filter
-               name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
-         </filter>
-         <action
-               class="com.aptana.git.ui.actions.RevertAction"
-               definitionId="com.aptana.git.ui.command.revert"
-               id="com.aptana.git.ui.actions.RevertAction"
-               label="%RevertAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%RevertAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.UnstageAction"
-               definitionId="com.aptana.git.ui.command.unstage"
-               id="com.aptana.git.ui.actions.UnstageAction"
-               label="%UnstageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%UnstageAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.StageAction"
-               definitionId="com.aptana.git.ui.command.stage"
-               id="com.aptana.git.ui.actions.StageAction"
-               label="%StageAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%StageAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.GithubNetworkAction"
-               definitionId="com.aptana.git.ui.command.github.network"
-               icon="icons/obj16/github.gif"
-               id="com.aptana.git.ui.actions.GithubNetworkAction"
-               label="%GithubNetworkAction_label"
-               menubarPath="team.main/group1"
-               tooltip="%GithubNetworkAction_tooltip">
-         </action>
-         <action
-               label="%DisconnectAction_label"
-               tooltip="%DisconnectAction_tooltip"
-               class="com.aptana.git.ui.actions.DisconnectAction"
-               id="com.aptana.git.ui.actions.DisconnectAction"
-               menubarPath="team.main/projectGroup">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.AddRemoteAction"
-               definitionId="com.aptana.git.ui.command.add_remote"
-               id="com.aptana.git.ui.actions.AddRemoteAction"
-               label="%AddRemoteAction_label"
-               menubarPath="team.main/projectGroup"
-               tooltip="%AddRemoteAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.PushAction"
-               definitionId="com.aptana.git.ui.command.push"
-               id="com.aptana.git.ui.actions.PushAction"
-               label="%PushAction_label"
-               menubarPath="team.main/projectGroup"
-               tooltip="%PushAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.PullAction"
-               definitionId="com.aptana.git.ui.command.pull"
-               id="com.aptana.git.ui.actions.PullAction"
-               label="%PullAction_label"
-               menubarPath="team.main/projectGroup"
-               tooltip="%PullAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.StatusAction"
-               definitionId="com.aptana.git.ui.command.status"
-               id="com.aptana.git.ui.actions.StatusAction"
-               label="%StatusAction_label"
-               menubarPath="team.main/projectGroup"
-               tooltip="%StatusAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
-               id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
-               label="%ShowResourceInHistoryAction_label"
-               menubarPath="team.main/group1"
-               tooltip="%ShowResourceInHistoryAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.CommitAction"
-               definitionId="com.aptana.git.ui.command.commit"
-               id="com.aptana.git.ui.actions.CommitAction"
-               label="%CommitAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%CommitAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.DeleteBranchAction"
-               id="com.aptana.git.ui.actions.DeleteBranchAction"
-               definitionId="com.aptana.git.ui.command.delete_branch"
-               label="%DeleteBranchAction_label"
-               menubarPath="team.main/group2"
-               tooltip="%DeleteBranchAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.actions.MergeBranchAction"
-               id="com.aptana.git.ui.actions.MergeBranchAction"
-               definitionId="com.aptana.git.ui.command.merge_branch"
-               label="%MergeBranchAction_label"
-               menubarPath="team.main/group2"
-               tooltip="%MergeBranchAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.SwitchBranchAction"
-               enablesFor="+"
-               id="com.aptana.git.ui.actions.SwitchBranchAction"
-               definitionId="com.aptana.git.ui.command.switch_branch"
-               label="%SwitchBranchAction_label"
-               menubarPath="team.main/group2"
-               style="pulldown"
-               tooltip="%SwitchBranchAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.CreateBranchAction"
-               id="com.aptana.git.ui.actions.CreateBranchAction"
-               definitionId="com.aptana.git.ui.command.create_branch"
-               label="%CreateBranchAction_label"
-               menubarPath="team.main/group2"
-               tooltip="%CreateBranchAction_tooltip">
-         </action>         
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="com.aptana.git.ui.fileContributions"
-            objectClass="org.eclipse.core.resources.IFile">
-         <filter
-               name="projectPersistentProperty"
-               value="org.eclipse.team.core.repository=com.aptana.git.core.GitRepositoryProvider">
-         </filter>
-          <action
-               class="com.aptana.git.ui.internal.actions.MergeConflictsAction"
-               definitionId="com.aptana.git.ui.command.merge_conflicts"
-               enablesFor="+"
-               id="com.aptana.git.ui.actions.MergeConflictsAction"
-               label="%MergeConflictsAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%MergeConflictsAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.CompareWithHEADAction"
-               definitionId="com.aptana.git.ui.command.compare_with_HEAD"
-               enablesFor="+"
-               id="com.aptana.git.ui.actions.CompareWithHEADAction"
-               label="%CompareWithHEADAction_label"
-               menubarPath="compareWithMenu/compareWithGroup"
-               tooltip="%CompareWithHEADAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.CompareWithRevisionAction"
-               definitionId="com.aptana.git.ui.command.compare_with_revision"
-               enablesFor="+"
-               id="com.aptana.git.ui.actions.CompareWithRevisionAction"
-               label="%CompareWithRevisionAction_label"
-               menubarPath="compareWithMenu/compareWithGroup"
-               tooltip="%CompareWithRevisionAction_tooltip">
-         </action>
-         <action
-               class="com.aptana.git.ui.internal.actions.BlameAction"
-               definitionId="com.aptana.git.ui.command.blame"
-               enablesFor="+"
-               id="com.aptana.git.ui.actions.BlameAction"
-               label="%BlameAction_label"
-               menubarPath="team.main/targetGroup"
-               tooltip="%BlameAction_tooltip">
-         </action>
-      </objectContribution>
-   </extension>
    
    <extension point="org.eclipse.ui.importWizards">
       <category name="%Git_clone_category"
@@ -251,93 +73,147 @@
       </category>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.AddRemoteHandler"
             id="com.aptana.git.ui.command.add_remote"
             name="%AddRemoteAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.PushHandler"
             id="com.aptana.git.ui.command.push"
             name="%PushAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.GithubNetworkHandler"
             id="com.aptana.git.ui.command.github.network"
             name="%GithubNetworkAction_label">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.PullHandler"
             id="com.aptana.git.ui.command.pull"
             name="%PullAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CommitHandler"
             id="com.aptana.git.ui.command.commit"
             name="%CommitAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.StatusHandler"
             id="com.aptana.git.ui.command.status"
             name="%StatusAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.RevertHandler"
             id="com.aptana.git.ui.command.revert"
             name="%RevertAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.StageHandler"
             id="com.aptana.git.ui.command.stage"
             name="%StageAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.UnstageHandler"
             id="com.aptana.git.ui.command.unstage"
             name="%UnstageAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CreateBranchHandler"
             id="com.aptana.git.ui.command.create_branch"
             name="%CreateBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.SwitchBranchHandler"
             id="com.aptana.git.ui.command.switch_branch"
             name="%SwitchBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.MergeBranchHandler"
             id="com.aptana.git.ui.command.merge_branch"
             name="%MergeBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DeleteBranchHandler"
             id="com.aptana.git.ui.command.delete_branch"
             name="%DeleteBranchAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.MergeConflictsHandler"
             id="com.aptana.git.ui.command.merge_conflicts"
             name="%MergeConflictsAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CompareWithHEADHandler"
             id="com.aptana.git.ui.command.compare_with_HEAD"
             name="%CompareWithHEADAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.CompareWithRevisionHandler"
             id="com.aptana.git.ui.command.compare_with_revision"
             name="%CompareWithRevisionAction_tooltip">
       </command>
       <command
             categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.BlameHandler"
             id="com.aptana.git.ui.command.blame"
             name="%BlameAction_label">
       </command>
       <command
+            categoryId="com.aptana.git.ui.category"
             defaultHandler="com.aptana.git.ui.internal.actions.ShowInHistoryHandler"
             id="com.aptana.git.ui.command.showInResourceHistory"
-            name="Show in Resource History">
+            name="%command.showin.resource.name">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DisconnectHandler"
+            id="com.aptana.git.ui.command.disconnect"
+            name="%DisconnectAction_label">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.DiffHandler"
+            id="com.aptana.git.ui.command.diff"
+            name="%command.diff.name">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.AttachGitRepoHandler"
+            id="com.aptana.git.ui.command.attach"
+            name="%command.attach.name">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.StashHandler"
+            id="com.aptana.git.ui.command.stash"
+            name="%command.stash.name">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.UnstashHandler"
+            id="com.aptana.git.ui.command.unstash"
+            name="%command.unstash.name">
+      </command>
+      <command
+            categoryId="com.aptana.git.ui.category"
+            defaultHandler="com.aptana.git.ui.internal.actions.IgnoreHandler"
+            id="com.aptana.git.ui.command.ignore"
+            name="%IgnoreAction_label">
       </command>
    </extension>
    <extension
@@ -345,98 +221,315 @@
       <key
             commandId="com.aptana.git.ui.command.push"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M1+M4+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.add_remote"
             contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.github.network"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.pull"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.status"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.commit"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.revert"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstage"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stage"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.create_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.switch_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.merge_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.delete_branch"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.merge_conflicts"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_HEAD"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.compare_with_revision"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.blame"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.disconnect"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.diff"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.attach"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.showInResourceHistory"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stash"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstash"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.ignore"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M4+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.push"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.add_remote"
+            contextId="org.eclipse.ui.contexts.window"
+            platform="carbon"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.github.network"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.pull"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.status"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.commit"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.revert"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.unstage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.stage"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.create_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.switch_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.delete_branch"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.merge_conflicts"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_HEAD"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
       </key>
       <key
             commandId="com.aptana.git.ui.command.compare_with_revision"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="CTRL+M2+G">
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.blame"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.disconnect"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.diff"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.attach"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.showInResourceHistory"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.stash"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.unstash"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
+      </key>
+      <key
+            commandId="com.aptana.git.ui.command.ignore"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+M3+G">
       </key>
    </extension>
    <extension
@@ -445,7 +538,7 @@
             category="org.eclipse.team.ui.TeamPreferences"
             class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
             id="com.aptana.git.ui.GitExecutableLocationPage"
-            name="Git">
+            name="%page.git.name">
       </page>
    </extension>
    <extension
@@ -453,7 +546,7 @@
       <referenceprovider
             class="com.aptana.git.ui.internal.QuickDiffReferenceProvider"
             id="com.aptana.git.ui.quickdiff"
-            label="Git Quick Diff">
+            label="%referenceprovider.quickdiff.label">
       </referenceprovider>
    </extension>
    <extension
@@ -468,5 +561,1236 @@
                tooltip="%ShowResourceInHistoryAction_label">
          </command>
       </menuContribution>
+      <!-- Have to add the Team menu since eclipse hasn't transitioned to this ext pt and old menus get added _after_ we process this new ext pt, so our contributions would fail -->
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?endof=additions">
+         <menu
+               id="team.main"
+               label="%TeamMenu.label">
+            <separator
+                  name="group1">
+            </separator>
+            <separator
+                  name="applyPatchGroup">
+            </separator>
+            <separator
+                  name="group2"
+                  visible="true">
+            </separator>
+            <separator
+                  name="group3">
+            </separator>
+            <separator
+                  name="group4">
+            </separator>
+            <separator
+                  name="group5">
+            </separator>
+            <separator
+                  name="group6">
+            </separator>
+            <separator
+                  name="group7">
+            </separator>
+            <separator
+                  name="group8">
+            </separator>
+            <separator
+                  name="group9">
+            </separator>
+            <separator
+                  name="group10">
+            </separator>
+            <separator
+                  name="targetGroup"
+                  visible="true">
+            </separator>
+            <separator
+                  name="projectGroup"
+                  visible="true">
+            </separator>
+         </menu>
+         <menu
+               id="compareWithMenu"
+               label="%CompareWithMenu.label">
+            <separator
+                  name="compareWithGroup">
+            </separator>
+         </menu>
+         <menu
+               id="replaceWithMenu"
+               label="%ReplaceWithMenu.label">
+            <separator
+                  name="replaceWithGroup">
+            </separator>
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <or>
+                           <adapt
+                                 type="org.eclipse.core.resources.IContainer">
+                           </adapt>
+                           <adapt
+                                 type="org.eclipse.core.resources.IFile">
+                           </adapt>
+                        </or>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:team.main?endof=group1">
+         <command
+               commandId="com.aptana.git.ui.command.github.network"
+               id="com.aptana.git.ui.actions.GithubNetworkAction"
+               label="%GithubNetworkAction_label"
+               tooltip="%GithubNetworkAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+         	   commandId="com.aptana.git.ui.command.showInResourceHistory"
+               id="com.aptana.git.ui.actions.ShowResourceInHistoryAction"
+               label="%ShowResourceInHistoryAction_label"
+               tooltip="%ShowResourceInHistoryAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+       </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:team.main?endof=group2">
+         <command
+               commandId="com.aptana.git.ui.command.create_branch"
+               id="com.aptana.git.ui.actions.CreateBranchAction"
+               label="%CreateBranchAction_label"
+               tooltip="%CreateBranchAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <menu
+               commandId="com.aptana.git.ui.command.switch_branch"
+               id="com.aptana.git.ui.actions.SwitchBranchAction"
+               label="%SwitchBranchAction_label"
+               tooltip="%SwitchBranchAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.SwitchBranchItem"
+                  id="com.aptana.git.ui.command.switch_branch.items">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </menu>
+         <menu
+               commandId="com.aptana.git.ui.command.merge_branch"
+               id="com.aptana.git.ui.actions.MergeBranchAction"
+               label="%MergeBranchAction_label"
+               tooltip="%MergeBranchAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.MergeBranchItem"
+                  id="com.aptana.git.ui.command.merge_branch.items">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </menu>
+         <menu
+               commandId="com.aptana.git.ui.command.delete_branch"
+               id="com.aptana.git.ui.actions.DeleteBranchAction"
+               label="%DeleteBranchAction_label"
+               tooltip="%DeleteBranchAction_tooltip">
+            <dynamic
+                  class="com.aptana.git.ui.actions.DeleteBranchItem"
+                  id="com.aptana.git.ui.command.delete_branch.items">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:team.main?endof=targetGroup">
+         <command
+               commandId="com.aptana.git.ui.command.commit"
+               id="com.aptana.git.ui.actions.CommitAction"
+               label="%CommitAction_label"
+               tooltip="%CommitAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.stage"
+               id="com.aptana.git.ui.actions.StageAction"
+               label="%StageAction_label"
+               tooltip="%StageAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.unstage"
+               id="com.aptana.git.ui.actions.UnstageAction"
+               label="%UnstageAction_label"
+               tooltip="%UnstageAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.revert"
+               id="com.aptana.git.ui.actions.RevertAction"
+               label="%RevertAction_label"
+               tooltip="%RevertAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.blame"
+               id="com.aptana.git.ui.actions.BlameAction"
+               label="%BlameAction_label"
+               tooltip="%BlameAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.merge_conflicts"
+               id="com.aptana.git.ui.actions.MergeConflictsAction"
+               label="%MergeConflictsAction_label"
+               tooltip="%MergeConflictsAction_tooltip">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.git.ui.command.ignore"
+               id="com.aptana.git.ui.actions.MergeConflictsAction"
+               label="%IgnoreAction_label">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IFile">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+       <menuContribution
+            allPopups="true"
+            locationURI="popup:team.main?endof=projectGroup">
+          <command
+                commandId="com.aptana.git.ui.command.status"
+                id="com.aptana.git.ui.actions.StatusAction"
+                label="%StatusAction_label"
+                tooltip="%StatusAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <with
+                         variable="activeMenuSelection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="activeMenuEditorInput">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="selection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                </or>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="com.aptana.git.ui.command.pull"
+                id="com.aptana.git.ui.actions.PullAction"
+                label="%PullAction_label"
+                tooltip="%PullAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <with
+                         variable="activeMenuSelection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="activeMenuEditorInput">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="selection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                </or>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="com.aptana.git.ui.command.push"
+                id="com.aptana.git.ui.actions.PushAction"
+                label="%PushAction_label"
+                style="push"
+                tooltip="%PushAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <with
+                         variable="activeMenuSelection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="activeMenuEditorInput">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="selection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                </or>
+             </visibleWhen>
+             
+          </command>
+          <command
+                commandId="com.aptana.git.ui.command.add_remote"
+                id="com.aptana.git.ui.actions.AddRemoteAction"
+                label="%AddRemoteAction_label"
+                tooltip="%AddRemoteAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <with
+                         variable="activeMenuSelection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="activeMenuEditorInput">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="selection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IResource">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                </or>
+             </visibleWhen>
+          </command>
+         <command
+               label="%DisconnectAction_label"
+               commandId="com.aptana.git.ui.command.disconnect"
+               tooltip="%DisconnectAction_tooltip"
+               id="com.aptana.git.ui.actions.DisconnectAction">
+            <visibleWhen
+                  checkEnabled="false">
+               <or>
+                  <with
+                        variable="activeMenuSelection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activeMenuEditorInput">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+               </or>
+            </visibleWhen>
+         </command>
+       </menuContribution>
+       <menuContribution
+             allPopups="true"
+             locationURI="popup:compareWithMenu?endof=compareWithGroup">
+          <command
+                commandId="com.aptana.git.ui.command.compare_with_HEAD"
+                id="com.aptana.git.ui.actions.CompareWithHEADAction"
+                label="%CompareWithHEADAction_label"
+                style="push"
+                tooltip="%CompareWithHEADAction_tooltip">
+             <visibleWhen
+                   checkEnabled="false">
+                <or>
+                   <with
+                         variable="activeMenuSelection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IFile">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="activeMenuEditorInput">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IFile">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                   <with
+                         variable="selection">
+                      <iterate
+                            ifEmpty="false">
+                         <adapt
+                               type="org.eclipse.core.resources.IFile">
+                            <test
+                                  args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                  property="org.eclipse.core.resources.projectPersistentProperty"
+                                  value="true">
+                            </test>
+                         </adapt>
+                      </iterate>
+                   </with>
+                </or>
+             </visibleWhen>
+          </command>
+           <command
+               commandId="com.aptana.git.ui.command.compare_with_revision"
+               id="com.aptana.git.ui.actions.CompareWithRevisionAction"
+               label="%CompareWithRevisionAction_label"
+               tooltip="%CompareWithRevisionAction_tooltip">
+              <visibleWhen
+                    checkEnabled="false">
+                 <or>
+                    <with
+                          variable="activeMenuSelection">
+                       <iterate
+                             ifEmpty="false">
+                          <adapt
+                                type="org.eclipse.core.resources.IFile">
+                             <test
+                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                   property="org.eclipse.core.resources.projectPersistentProperty"
+                                   value="true">
+                             </test>
+                          </adapt>
+                       </iterate>
+                    </with>
+                    <with
+                          variable="activeMenuEditorInput">
+                       <iterate
+                             ifEmpty="false">
+                          <adapt
+                                type="org.eclipse.core.resources.IFile">
+                             <test
+                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                   property="org.eclipse.core.resources.projectPersistentProperty"
+                                   value="true">
+                             </test>
+                          </adapt>
+                       </iterate>
+                    </with>
+                    <with
+                          variable="selection">
+                       <iterate
+                             ifEmpty="false">
+                          <adapt
+                                type="org.eclipse.core.resources.IFile">
+                             <test
+                                   args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                   property="org.eclipse.core.resources.projectPersistentProperty"
+                                   value="true">
+                             </test>
+                          </adapt>
+                       </iterate>
+                    </with>
+                 </or>
+              </visibleWhen>
+         </command>
+       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.git.ui.command.stage"
+            icon="icons/elcl16/add.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.unstage"
+            icon="icons/elcl16/subtract.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.commit"
+            icon="icons/elcl16/disk.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.github.network"
+            icon="icons/obj16/github.gif">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.pull"
+            icon="icons/elcl16/arrow_down.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.push"
+            icon="icons/elcl16/arrow_up.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.stash"
+            icon="icons/elcl16/arrow_left.png">
+      </image>
+      <image
+            commandId="com.aptana.git.ui.command.unstash"
+            icon="icons/elcl16/arrow_right.png">
+      </image>
    </extension>
 </plugin>

@@ -45,7 +45,7 @@ import org.osgi.framework.Bundle;
 public class EclipseUtil
 {
 
-	private static final String STANDALONE_PLUGIN_ID = "com.aptana.radrails.rcp"; //$NON-NLS-1$
+	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
 
 	/**
 	 * Retrieves the bundle version of a plugin based on its id.

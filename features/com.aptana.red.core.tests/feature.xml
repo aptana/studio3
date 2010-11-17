@@ -85,6 +85,9 @@
       <import plugin="com.aptana.browser"/>
       <import plugin="com.aptana.plist"/>
       <import plugin="com.aptana.editor.markdown"/>
+      <import plugin="com.aptana.editor.dtd"/>
+      <import plugin="com.aptana.filesystem.s3"/>
+      <import plugin="com.aptana.editor.yaml"/>
    </requires>
 
    <plugin
@@ -313,5 +316,29 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.filesystem.s3.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.dtd.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.yaml.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
 
 </feature>

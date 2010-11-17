@@ -43,7 +43,7 @@ import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
 public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IJSTokenScanner
 {
-	private static final Pattern DIVISION_START = Pattern.compile("^.*[-+$_a-zA-Z0-9/'\"')\\]]\\s*$");
+	private static final Pattern DIVISION_START = Pattern.compile("^.*[-+$_a-zA-Z0-9/'\"')\\]]\\s*$"); //$NON-NLS-1$
 	private static final int PREVIEW_LENGTH = 80;
 
 	/**

@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 #include "stdafx.h"
 #include "consolehandler.h"
@@ -77,7 +111,8 @@ BOOL InitConsoleHandler(void)
 	hMonitorThreadExitEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 	hMonitorThread = ::CreateThread(NULL, 0, MonitorThreadProc, 0, 0, NULL);
 	if ( hMonitorThread != NULL ) {
-		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_HIGHEST);
+		::SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		::SetThreadPriority(hMonitorThread, THREAD_PRIORITY_TIME_CRITICAL);
 		::SwitchToThread();
 	}
 
@@ -155,9 +190,15 @@ static DWORD WINAPI MonitorThreadProc(LPVOID lpParameter)
 static void FlushBuffer();
 static void TestAndFlushBuffer();
 static void OutputChar(CHAR ch);
+static void OutputUnicodeChar(WCHAR ch);
 static void OutputNumber(SHORT value);
 static void OutputNumber64(DWORD value);
 static void OutputString(CHAR* szStr);
+
+static void OutputCRLF()
+{
+	OutputString("\r\n");
+}
 
 static void MoveCursorAbs(SHORT x, SHORT y)
 {
@@ -243,7 +284,7 @@ static void EraseWindow()
 static void ScrollWindow(BOOL bUp)
 {
 	if( bUp ) {
-		OutputString("\x1B[D");
+		OutputString("\x1B[L");
 	} else {
 		OutputString("\x1B[M");
 	}
@@ -434,19 +475,19 @@ static bool ProcessSnapshotDiff(CHAR_INFO* lpPrevBuffer, CHAR_INFO* lpNextBuffer
 					} else {
 						MoveCursor(x, y);
 					}
-					if( lpNextCharInfo->Char.AsciiChar == '\0' ) {
+					if( lpNextCharInfo->Char.UnicodeChar == L'\0' ) {
 						break;
 					} else if( wCharAttributes != lpNextCharInfo->Attributes ) {
 						ChangeAttributes(lpNextCharInfo->Attributes);
 					}
-					OutputChar(lpNextCharInfo->Char.AsciiChar);
+					OutputUnicodeChar(lpNextCharInfo->Char.UnicodeChar);
 					++csbiConsole.dwCursorPosition.X;
 				}
 			}
 			if( bReplaceLine)
 			{
 				if( y !=  coordConsoleSize.Y -1 ) {
-					OutputString("\r\n");
+					OutputCRLF();
 					csbiConsole.dwCursorPosition.X = 0;
 					++csbiConsole.dwCursorPosition.Y;
 				}
@@ -488,6 +529,13 @@ static void ReadConsoleBuffer()
 	{
 		// refresh screen
 		if( lpPrevScreenBuffer != NULL ) {
+			SHORT nRowsDiff = (csbiConsole.srWindow.Bottom - csbiConsole.srWindow.Top + 1) - coordConsoleSize.Y;
+			if( (nRowsDiff > 0) && (csbiNextConsole.srWindow.Top != 0) && (csbiConsole.srWindow.Top == 0) ) {
+				MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+				for( SHORT i = 0; i < nRowsDiff; ++i) {
+					OutputCRLF();
+				}
+			}
 			EraseWindow();
 			MoveCursorAbs(0, 0);
 		}
@@ -516,7 +564,7 @@ static void ReadConsoleBuffer()
 			{
 				if( bHasNonEmptyChar ) {
 					if ( y != coordConsoleSize.Y-1) {
-						OutputString("\r\n");
+						OutputCRLF();
 						csbiConsole.dwCursorPosition.X = 0;
 						++csbiConsole.dwCursorPosition.Y;
 					}
@@ -526,12 +574,12 @@ static void ReadConsoleBuffer()
 			}
 			for( SHORT x = 0; x < coordConsoleSize.X; ++x, ++lpCharInfo)
 			{
-				if( (lpCharInfo->Char.AsciiChar == ' ') && (lpCharInfo->Attributes == wCharAttributes) && !bHasNonEmptyChar ) {
+				if( (lpCharInfo->Char.UnicodeChar == L' ') && (lpCharInfo->Attributes == wCharAttributes) && !bHasNonEmptyChar ) {
 					continue;
 				}
 				if( !bHasNonEmptyChar ) {
 					for( SHORT i = 0; i < y; ++i) {
-						OutputString("\r\n");
+						OutputCRLF();
 						csbiConsole.dwCursorPosition.X = 0;
 						++csbiConsole.dwCursorPosition.Y;
 					}
@@ -541,15 +589,15 @@ static void ReadConsoleBuffer()
 					}
 					bHasNonEmptyChar = TRUE;
 				}
-				if( lpCharInfo->Char.AsciiChar == '\0' ) {
+				if( lpCharInfo->Char.UnicodeChar == L'\0' ) {
 					break;
 				} else if( wCharAttributes != lpCharInfo->Attributes ) {
 					ChangeAttributes(lpCharInfo->Attributes);
-				} else if( (lpCharInfo->Char.AsciiChar == ' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
+				} else if( (lpCharInfo->Char.UnicodeChar == L' ') && IsLineEmpty(lpCharInfo, coordConsoleSize.X - x) ) {
 					lpCharInfo += coordConsoleSize.X - x;
 					break;
 				}
-				OutputChar(lpCharInfo->Char.AsciiChar);
+				OutputUnicodeChar(lpCharInfo->Char.UnicodeChar);
 				++csbiConsole.dwCursorPosition.X;
 			}
 			if( bHasNonEmptyChar ) {
@@ -557,7 +605,7 @@ static void ReadConsoleBuffer()
 					break;
 				}
 				if ( y != coordConsoleSize.Y-1) {
-					OutputString("\r\n");
+					OutputCRLF();
 					csbiConsole.dwCursorPosition.X = 0;
 					++csbiConsole.dwCursorPosition.Y; 
 				}
@@ -566,7 +614,7 @@ static void ReadConsoleBuffer()
 		}
 	} else
 	{
-		if( csbiConsole.srWindow.Top < csbiNextConsole.srWindow.Top )
+		while( csbiConsole.srWindow.Top < csbiNextConsole.srWindow.Top )
 		{
 			SMALL_RECT srPrevBuffer;
 			srPrevBuffer.Top = csbiConsole.srWindow.Top;
@@ -575,10 +623,13 @@ static void ReadConsoleBuffer()
 			srPrevBuffer.Right = csbiConsole.srWindow.Right;
 			SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srPrevBuffer, lpNextScreenBuffer);
 			ProcessSnapshotDiff(lpPrevScreenBuffer, lpNextScreenBuffer, coordConsoleSize);
-			MoveCursor(coordConsoleSize.X-1, coordConsoleSize.Y-1);
+			MoveCursorAbs(coordConsoleSize.X-1, coordConsoleSize.Y-1);
 			SHORT nRows = csbiNextConsole.srWindow.Top - csbiConsole.srWindow.Top;
+			if( nRows > coordConsoleSize.Y ) {
+				nRows = coordConsoleSize.Y;
+			}
 			for( SHORT i = 0; i < nRows; ++i) {
-				OutputString("\r\n");
+				OutputCRLF();
 			}
 			csbiConsole.dwCursorPosition.X = 0;
 			DWORD dwShift = nRows*coordConsoleSize.X;
@@ -587,11 +638,12 @@ static void ReadConsoleBuffer()
 				::MoveMemory(lpPrevScreenBuffer, lpNextScreenBuffer + dwShift, (dwScreenBufferSize-dwShift)*sizeof(CHAR_INFO));
 				CHAR_INFO* lpCharInfo = lpPrevScreenBuffer + (dwScreenBufferSize-dwShift);
 				for( DWORD i = 0; i < dwShift; ++i, ++lpCharInfo) {
-					lpCharInfo->Char.AsciiChar = ' ';
+					lpCharInfo->Char.UnicodeChar = L' ';
 					lpCharInfo->Attributes = DEFAULT_ATTRIBUTES;
 				}
 			}
-			csbiConsole.srWindow = csbiNextConsole.srWindow;
+			csbiConsole.srWindow.Top += nRows;
+			csbiConsole.srWindow.Bottom += nRows;
 		}
 
 		SnapshotBuffer(coordConsoleSize, coordBufferSize, csbiConsole.srWindow, srBuffer, lpNextScreenBuffer);
@@ -740,12 +792,24 @@ static void SetConsoleSize(SHORT width, SHORT height)
 
 	SMALL_RECT srConsoleRect = csbi.srWindow;
 	srConsoleRect.Right = srConsoleRect.Left + width - 1;
-	if( (srConsoleRect.Bottom - srConsoleRect.Top + 1 < height)
-		|| (srConsoleRect.Top == 0)
-		|| (srConsoleRect.Bottom + 1 < height) ) {
-		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // increase bottom
-	} else {
+	BOOL bAdjustTop = TRUE;
+	if( srConsoleRect.Bottom - srConsoleRect.Top + 1 < height ) { // height increase
+		if( srConsoleRect.Bottom + 1 <= height ) { // if close to top, adjust top then adjust bottom
+			srConsoleRect.Top = 0;
+			bAdjustTop = FALSE;
+		}
+	} else { // height decrease
+		if( csbi.dwCursorPosition.Y <= srConsoleRect.Top + height - 1 ) { // cursor is inside adjusted area, adjust bottom
+			bAdjustTop = FALSE;
+		} else { // cursor is outside, adjust bottom to cursor then adjust top
+			srConsoleRect.Bottom = csbi.dwCursorPosition.Y;
+		}
+	}
+
+	if( bAdjustTop ) {
 		srConsoleRect.Top = srConsoleRect.Bottom - height + 1; // move top
+	} else {
+		srConsoleRect.Bottom = srConsoleRect.Top + height - 1; // move bottom
 	}
 
 	COORD finalCoordBufferSize = csbi.dwSize;
@@ -820,10 +884,10 @@ static BOOL ProcessEscSequence(CHAR *chSequence, DWORD dwLength)
 static BOOL IsLineEmpty(CHAR_INFO *lpCharInfo, SHORT sLength)
 {
 	for( SHORT x = 0; x < sLength; ++x, ++lpCharInfo) {
-		if( (lpCharInfo->Char.AsciiChar == '\0') || (lpCharInfo->Attributes == 0) ) {
+		if( (lpCharInfo->Char.UnicodeChar == L'\0') || (lpCharInfo->Attributes == 0) ) {
 			continue;
 		}
-		if( (lpCharInfo->Char.AsciiChar != ' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
+		if( (lpCharInfo->Char.UnicodeChar != L' ') || (lpCharInfo->Attributes != DEFAULT_ATTRIBUTES) ) {
 			return FALSE;
 		}
 	}
@@ -890,6 +954,19 @@ static void OutputString(CHAR* szStr)
 	}
 	while( *szStr != 0 ) {
 		chOutputBuffer[dwBufferFilled++] = *szStr++;
+	}
+}
+
+static void OutputUnicodeChar(WCHAR ch)
+{
+	if( dwBufferFilled + 1 > sizeof(chOutputBuffer) ){
+		FlushBuffer();
+	}
+	WCHAR wcString[2] = { ch, L'\0' };
+	CHAR cString[16];
+	int size = ::WideCharToMultiByte(CP_UTF8, 0, wcString, -1, cString, sizeof(cString), NULL, NULL);
+	if( size > 0 ) {
+		OutputString(cString);
 	}
 }
 

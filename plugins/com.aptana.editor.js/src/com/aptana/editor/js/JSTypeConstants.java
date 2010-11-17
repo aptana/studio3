@@ -50,6 +50,7 @@ public class JSTypeConstants
 	public static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 	public static final String USER_TYPE = "UserType"; //$NON-NLS-1$
 
+	public static final String NO_TYPE = "none"; //$NON-NLS-1$
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
 	public static final String VOID_TYPE = "void"; //$NON-NLS-1$
 	public static final String NULL_TYPE = "null"; //$NON-NLS-1$
@@ -60,9 +61,9 @@ public class JSTypeConstants
 	public static final String DYNAMIC_CLASS_PREFIX = "-dynamic-type-"; //$NON-NLS-1$
 	public static final String GENERIC_OPEN = "<"; //$NON-NLS-1$
 	public static final String GENERIC_CLOSE = ">"; //$NON-NLS-1$
-	public static final String GENERIC_ARRAY_OPEN = ARRAY_TYPE + GENERIC_OPEN; //$NON-NLS-1$
-	public static final String GENERIC_CLASS_OPEN = CLASS_TYPE + GENERIC_OPEN; //$NON-NLS-1$
-	public static final String GENERIC_FUNCTION_OPEN = FUNCTION_TYPE + GENERIC_OPEN; //$NON-NLS-1$
+	public static final String GENERIC_ARRAY_OPEN = ARRAY_TYPE + GENERIC_OPEN;
+	public static final String GENERIC_CLASS_OPEN = CLASS_TYPE + GENERIC_OPEN;
+	public static final String GENERIC_FUNCTION_OPEN = FUNCTION_TYPE + GENERIC_OPEN;
 
 	public static final String FUNCTION_SIGNATURE_DELIMITER = ":"; //$NON-NLS-1$
 	public static final String PARAMETER_TYPE_DELIMITER = "|"; //$NON-NLS-1$
@@ -70,7 +71,7 @@ public class JSTypeConstants
 
 	public static final Pattern FUNCTION_PREFIX = Pattern.compile( //
 		MessageFormat.format( //
-			"^({0}$|{0}{1}|{0}{2})", //
+			"^({0}$|{0}{1}|{0}{2})", // //$NON-NLS-1$
 			FUNCTION_TYPE, //
 			FUNCTION_SIGNATURE_DELIMITER, //
 			GENERIC_OPEN //

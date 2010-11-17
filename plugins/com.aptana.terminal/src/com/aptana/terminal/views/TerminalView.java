@@ -94,7 +94,7 @@ import com.aptana.terminal.widget.TerminalComposite;
  *
  */
 @SuppressWarnings("restriction")
-public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalListener, IProcessListener {
+public class TerminalView extends ViewPart implements ISaveablePart2, IProcessListener {
 
 	public static final String ID = "com.aptana.terminal.views.terminal"; //$NON-NLS-1$
 
@@ -131,7 +131,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 			view = (TerminalView) page.showView(TerminalView.ID, secondaryId, IWorkbenchPage.VIEW_ACTIVATE);
 			view.initialize(title, workingDirectory);
 		} catch (PartInitException e) {
-			Activator.logError("Terminal view creation failed.", e); //$NON-NLS-1$
+			Activator.log("Terminal view creation failed.", e); //$NON-NLS-1$
 		}
 		return view;
 	}
@@ -151,7 +151,18 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	@Override
 	public void createPartControl(Composite parent) {
 		terminalComposite = new TerminalComposite(parent, SWT.NONE);
-		terminalComposite.setTerminalListener(this);
+		terminalComposite.setTerminalListener(new ITerminalListener() {
+			public void setTerminalTitle(final String title) {
+				Utils.runInDisplayThread(new Runnable() {
+					public void run() {
+						setPartName(title);
+					}
+				});
+			}
+			
+			public void setState(TerminalState state) {
+			}
+		});
 		terminalComposite.setProcessListener(this);
 		if (getViewSite().getSecondaryId() == null || savedState != null) {
 			if (savedState != null) {
@@ -324,18 +335,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 	public void setFocus() {
 		terminalComposite.setFocus();
 	}
-	
-	public void setState(TerminalState state) {
-	}
-
-	public void setTerminalTitle(final String title) {
-		Utils.runInDisplayThread(new Runnable() {
-			public void run() {
-				setPartName(title);
-			}
-		});
-	}
-	
+		
 	protected void initialize(String title, IPath workingDirectory) {
 		if (terminalComposite.isConnected()) {
 			return;
@@ -428,7 +428,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		fActionEditSelectAll = new TerminalActionSelectAll(terminalComposite.getTerminalViewControl());
 
 		// open view action
-		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+		fOpenViewAction = new Action(Messages.TerminalView_Open_Terminal_View, Activator.getImageDescriptor("/icons/terminal_small_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				openView(null, getPartName(), getWorkingDirectory());
@@ -437,7 +437,7 @@ public class TerminalView extends ViewPart implements ISaveablePart2, ITerminalL
 		fOpenViewAction.setToolTipText(Messages.TerminalView_Create_Terminal_View_Tooltip);
 
 		// open editor action
-		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal.png")) { //$NON-NLS-1$
+		fOpenEditorAction = new Action(Messages.TerminalView_Open_Terminal_Editor, Activator.getImageDescriptor("/icons/terminal_add.png")) { //$NON-NLS-1$
 			@Override
 			public void run() {
 				Utils.openTerminalEditor(TerminalEditor.ID, true);

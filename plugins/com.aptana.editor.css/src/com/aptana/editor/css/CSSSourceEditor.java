@@ -45,7 +45,10 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createOutlinePage()
+	 */
 	@Override
 	protected CommonOutlinePage createOutlinePage()
 	{
@@ -56,6 +59,10 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		return outline;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
+	 */
 	@Override
 	protected void initializeEditor()
 	{
@@ -64,19 +71,31 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new CSSDocumentProvider());
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
+	 */
 	@Override
 	protected FileService createFileService()
 	{
 		return new FileService(ICSSParserConstants.LANGUAGE);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlineElementAt(int)
+	 */
 	@Override
 	protected Object getOutlineElementAt(int caret)
 	{
 		return CSSOutlineContentProvider.getElementAt(getFileService().getParseResult(), caret);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.AbstractThemeableEditor#getOutlinePreferenceStore()
+	 */
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{

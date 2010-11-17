@@ -6,7 +6,8 @@
       <connectionPointCategory
             id="com.aptana.ide.filesystem.ftp.ftpCategory"
             name="%connectionPointCategory.name.ftp"
-            order="100">
+            order="100"
+            remote="true">
       </connectionPointCategory>
       <connectionPointType
             category="com.aptana.ide.filesystem.ftp.ftpCategory"

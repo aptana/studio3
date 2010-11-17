@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.aptana.editor.idl.IDLEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="true"
+            extensions="idl"
+            id="com.aptana.editor.idl"
+            name="%editor.name">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.idl">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="idl"
+            id="com.aptana.contenttype.idl"
+            name="%content-type.name"
+            priority="normal">
+      </content-type>
+   </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.idl.parsing.IDLParser"
+            content-type="com.aptana.contenttype.idl"
+            language="text/idl">
+      </parser>
+   </extension>
+
+</plugin>

@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
+import java.util.Arrays;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -504,6 +505,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					Logger.log("sending ESC + '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					getOutputStream().write('\u001b');
 					getOutputStream().write(byteToSend);
+				} else if (byteToSend > 127) {
+					byte[] bytesToSend = String.valueOf(chKey).getBytes(fEncoding);
+					Logger.log("sending '" + Arrays.asList(bytesToSend) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+					getOutputStream().write(bytesToSend);
 				} else {
 					Logger.log("sending '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 					getOutputStream().write(byteToSend);
@@ -587,7 +592,7 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		// TODO how to get the initial size correctly!
 		snapshot.updateSnapshot(false);
 		ITextCanvasModel canvasModel=new PollingTextCanvasModel(snapshot);
-		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,createLineRenderer(canvasModel));
+		fCtlText=createTextCanvas(fWndParent,canvasModel,createLineRenderer(canvasModel));
 
 		fCtlText.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fCtlText.addResizeHandler(new TextCanvas.ResizeListener() {
@@ -601,6 +606,10 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 		fClipboard = new Clipboard(fDisplay);
 //		fViewer.setDocument(new TerminalDocument());
 		setFont(JFaceResources.getTextFont());
+	}
+	
+	protected TextCanvas createTextCanvas(Composite parent, ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
+		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
 	}
 	
 	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {
@@ -815,11 +824,11 @@ public class VT100TerminalControl implements ITerminalControlForText, ITerminalC
 					break;
 
 				case 0x1000005: // PgUp key.
-					sendString("\u001b[I"); //$NON-NLS-1$
+					sendString("\u001b[5~"); //$NON-NLS-1$
 					break;
 
 				case 0x1000006: // PgDn key.
-					sendString("\u001b[G"); //$NON-NLS-1$
+					sendString("\u001b[6~"); //$NON-NLS-1$
 					break;
 
 				case 0x1000007: // Home key.

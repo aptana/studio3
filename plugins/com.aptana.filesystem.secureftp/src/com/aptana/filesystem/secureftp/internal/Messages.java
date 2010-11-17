@@ -55,12 +55,14 @@ import org.eclipse.osgi.util.NLS;
 	public static String FTPSConnectionFileManager_ServerSertificateError;
 
 	public static String FTPSConnectionFileManager_SpecifyPassword;
-	public static String SecureUtils_InvalidPrivateKey;
-	public static String SecureUtils_UnableToReadPrivateKey;
 	public static String SFTPConnectionFileManager_Authenticating;
 	public static String SFTPConnectionFileManager_ClosingConnection;
 	public static String SFTPConnectionFileManager_ConnectionHasBeenInitialized;
 	public static String SFTPConnectionFileManager_ConnectionNotInitialized;
+
+	public static String SFTPConnectionFileManager_CreateFile0Failed;
+	public static String SFTPConnectionFileManager_ErrorSendKeepAlive;
+
 	public static String SFTPConnectionFileManager_EstablishingConnection;
 	public static String SFTPConnectionFileManager_FailedAuthenticate;
 	public static String SFTPConnectionFileManager_FailedAuthenticatePublicKey;
@@ -92,12 +94,20 @@ import org.eclipse.osgi.util.NLS;
 	public static String SFTPConnectionFileManager_KeyRequirePassphrase;
 	public static String SFTPConnectionFileManager_PassphraseNotAccepted;
 	public static String SFTPConnectionFileManager_PasswordNotAccepted;
+
+	public static String SFTPConnectionFileManager_PermissionDenied0;
 	public static String SFTPConnectionFileManager_PublicKeyAuthentication;
 	public static String SFTPConnectionFileManager_RemoteFolderNotFound;
 	public static String SFTPConnectionFileManager_SFTPAuthentication;
 	public static String SFTPConnectionFileManager_SpecifyPassphrase;
 	public static String SFTPConnectionFileManager_SpecifyPassword;
 	public static String SFTPConnectionFileManager_UnableToReadPrivateKey;
+	public static String SFTPFileDownloadInputStream_ErrorDownload;
+
+	public static String SFTPFileUploadOutputStream_ErrorCloseStream;
+
+	public static String SFTPFileUploadOutputStream_ErrorUpload;
+
 	public static String SSHHostValidator_FailedLoadKnownHosts;
 
 	static {

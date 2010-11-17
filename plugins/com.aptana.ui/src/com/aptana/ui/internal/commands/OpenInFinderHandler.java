@@ -35,6 +35,7 @@
 package com.aptana.ui.internal.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +44,12 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.PlatformUtil;
@@ -65,7 +68,7 @@ public class OpenInFinderHandler extends AbstractHandler
 		if (context instanceof EvaluationContext)
 		{
 			EvaluationContext evContext = (EvaluationContext) event.getApplicationContext();
-			Object input = evContext.getVariable("showInInput"); //$NON-NLS-1$
+			Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 			if (input instanceof IFileEditorInput)
 			{
 				IFileEditorInput fei = (IFileEditorInput) input;
@@ -94,6 +97,11 @@ public class OpenInFinderHandler extends AbstractHandler
 					if (resource != null)
 					{
 						open(resource.getLocationURI());
+					}
+					else if (selected instanceof IFileStore)
+					{
+						IFileStore fileStore = (IFileStore) selected;
+						open(fileStore.toURI());
 					}
 				}
 			}
@@ -137,14 +145,18 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openInWindowsExplorer(File file)
 	{
+		// This works for Windows XP Pro! Can't run under ProcessBuilder or it does some quoting/mangling of args that
+		// breaks this!
 		String explorer = PlatformUtil.expandEnvironmentStrings("%SystemRoot%\\explorer.exe"); //$NON-NLS-1$
-		Map<Integer, String> result = ProcessUtil.runInBackground(explorer, null, "/select,\"" //$NON-NLS-1$
-				+ file.getAbsolutePath() + "\""); //$NON-NLS-1$
-		if (result == null || result.isEmpty())
+		try
+		{
+			Process p = Runtime.getRuntime().exec("\"" + explorer + "\" /select,\"" + file.getAbsolutePath() + "\"");
+			return p.exitValue() == 0;
+		}
+		catch (IOException e)
 		{
 			return false;
 		}
-		return result.keySet().iterator().next() == 0;
 	}
 
 	private boolean openInFinder(File file)
@@ -155,8 +167,7 @@ public class OpenInFinderHandler extends AbstractHandler
 		{
 			subcommand = "reveal"; //$NON-NLS-1$
 		}
-		// FIXME This doesn't necessarily push the window on top!
-		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")\ntell application \"Finder\" to activate"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		Map<Integer, String> result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.keySet().iterator().next() == 0)
 		{

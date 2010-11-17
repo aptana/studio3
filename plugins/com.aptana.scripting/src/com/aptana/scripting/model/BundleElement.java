@@ -44,8 +44,8 @@ import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.ProjectTemplate.Type;
 

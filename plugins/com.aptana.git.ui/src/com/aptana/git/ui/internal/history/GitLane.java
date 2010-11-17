@@ -73,16 +73,6 @@ class GitLane
 	}
 
 	/**
-	 * The SHA of the commit/parent this lane is tracking.
-	 * 
-	 * @return
-	 */
-	String sha()
-	{
-		return fSha;
-	}
-
-	/**
 	 * Index of the lane. Used to identify the lane for coloring and tracking.
 	 * 
 	 * @return
