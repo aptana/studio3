@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting.model;
 
+import java.util.List;
+
 public class WithDefaultsTests extends BundleTestBase
 {
 	/**
@@ -67,11 +69,11 @@ public class WithDefaultsTests extends BundleTestBase
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("Bundle Reference");
 		assertNotNull(entry);
 		
-		BundleElement[] bundles = entry.getBundles();
+		List<BundleElement> bundles = entry.getBundles();
 		assertNotNull(bundles);
-		assertEquals(1, bundles.length);
+		assertEquals(1, bundles.size());
 		
-		BundleElement bundle = bundles[0];
+		BundleElement bundle = bundles.get(0);
 		assertNotNull(bundle);
 		
 		// get command

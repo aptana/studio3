@@ -81,6 +81,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
@@ -235,8 +236,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		{
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 					.getScopeAtOffset(viewer.getDocument(), offset);
-			CommandElement[] commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
-			if (commands != null && commands.length > 0)
+			List<ContentAssistElement> commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
+			if (commands != null && commands.size() > 0)
 			{
 				Ruby ruby = Ruby.newInstance();
 

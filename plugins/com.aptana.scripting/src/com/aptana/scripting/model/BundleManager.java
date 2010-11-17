@@ -40,6 +40,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,14 +84,8 @@ public class BundleManager
 	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
 	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
 	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
-	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
-	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
-	static final MenuElement[] NO_MENUS = new MenuElement[0];
-	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
-	static final ProjectTemplate[] NO_PROJECT_TEMPLATES = new ProjectTemplate[0];
 
 	private static final File[] NO_FILES = new File[0];
-	private static final String[] NO_STRINGS = new String[0];
 
 	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
@@ -233,7 +228,7 @@ public class BundleManager
 	}
 
 	/**
-	 * addBundle
+	 * Add a new BundleElement to the scripting environment. Note this is called from the JRuby framework
 	 * 
 	 * @param bundle
 	 */
@@ -681,9 +676,9 @@ public class BundleManager
 	 * @param name
 	 * @return
 	 */
-	public CommandElement[] getBundleCommands(String name)
+	public List<CommandElement> getBundleCommands(String name)
 	{
-		CommandElement[] result = NO_COMMANDS;
+		List<CommandElement> result = Collections.emptyList();
 
 		synchronized (entryNamesLock)
 		{
@@ -705,9 +700,9 @@ public class BundleManager
 	 * @param name
 	 * @return
 	 */
-	public EnvironmentElement[] getBundleEnvs(String name)
+	public List<EnvironmentElement> getBundleEnvs(String name)
 	{
-		EnvironmentElement[] result = new EnvironmentElement[0];
+		List<EnvironmentElement> result = Collections.emptyList();
 
 		synchronized (entryNamesLock)
 		{
@@ -729,9 +724,9 @@ public class BundleManager
 	 * @param name
 	 * @return
 	 */
-	public SmartTypingPairsElement[] getBundlePairs(String name)
+	public List<SmartTypingPairsElement> getBundlePairs(String name)
 	{
-		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
+		List<SmartTypingPairsElement> result = Collections.emptyList();
 
 		synchronized (entryNamesLock)
 		{
@@ -766,7 +761,7 @@ public class BundleManager
 	 * @param bundlesDirectory
 	 * @return
 	 */
-	protected File[] getBundleDirectories(File bundlesDirectory)
+	protected List<File> getBundleDirectories(File bundlesDirectory)
 	{
 		File[] result = NO_FILES;
 
@@ -781,7 +776,7 @@ public class BundleManager
 			});
 		}
 
-		return result;
+		return Arrays.asList(result);
 	}
 
 	/**
@@ -924,9 +919,9 @@ public class BundleManager
 	 * @param name
 	 * @return
 	 */
-	public MenuElement[] getBundleMenus(String name)
+	public List<MenuElement> getBundleMenus(String name)
 	{
-		MenuElement[] result = NO_MENUS;
+		List<MenuElement> result = Collections.emptyList();
 
 		synchronized (entryNamesLock)
 		{
@@ -947,19 +942,21 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	public String[] getBundleNames()
+	public List<String> getBundleNames()
 	{
-		String[] result = NO_STRINGS;
+		List<String> result = Collections.emptyList();
 
 		synchronized (entryNamesLock)
 		{
 			if (this._entriesByName != null && this._entriesByName.size() > 0)
 			{
-				result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
+				List<String> names = new ArrayList<String>(this._entriesByName.keySet());
+
+				Collections.sort(names);
+
+				result = Collections.unmodifiableList(names);
 			}
 		}
-
-		Arrays.sort(result);
 
 		return result;
 	}
@@ -1006,7 +1003,7 @@ public class BundleManager
 	 * @param bundleDirectory
 	 * @return
 	 */
-	protected File[] getBundleScripts(File bundleDirectory)
+	protected List<File> getBundleScripts(File bundleDirectory)
 	{
 		List<File> result = new ArrayList<File>();
 
@@ -1023,20 +1020,20 @@ public class BundleManager
 			// check for scripts inside "commands" directory
 			File commandsDirectory = new File(bundleDirectory, COMMANDS_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(commandsDirectory)));
+			result.addAll(this.getScriptsFromDirectory(commandsDirectory));
 
 			// check for scripts inside "snippets" directory
 			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
+			result.addAll(this.getScriptsFromDirectory(snippetsDirectory));
 
 			// look for templates inside "templates" directory
 			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(templatesDirectory)));
+			result.addAll(this.getScriptsFromDirectory(templatesDirectory));
 		}
 
-		return result.toArray(new File[result.size()]);
+		return result;
 	}
 
 	/**
@@ -1044,16 +1041,16 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	public List<CommandElement> getCommands()
 	{
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		for (String name : this.getBundleNames())
 		{
-			result.addAll(Arrays.asList(this.getBundleCommands(name)));
+			result.addAll(this.getBundleCommands(name));
 		}
 
-		return result.toArray(new CommandElement[result.size()]);
+		return result;
 	}
 
 	/**
@@ -1062,16 +1059,15 @@ public class BundleManager
 	 * @param filter
 	 * @return
 	 */
-	public CommandElement[] getCommands(IModelFilter filter)
+	public List<CommandElement> getCommands(IModelFilter filter)
 	{
-		// If the user specified a filter,
-		// AND it with the IsExecutableCommandFilter
-		// to filter the commands that are executable on
-		// current platform
+		// If the user specified a filter, AND it with the IsExecutableCommandFilter to filter the commands that are
+		// executable on current platform
 		if (filter != null)
 		{
 			filter = new AndFilter(filter, new IsExecutableCommandFilter());
 		}
+
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		if (filter != null)
@@ -1088,7 +1084,7 @@ public class BundleManager
 			}
 		}
 
-		return result.toArray(new CommandElement[result.size()]);
+		return result;
 	}
 
 	/**
@@ -1097,26 +1093,20 @@ public class BundleManager
 	 * @param filter
 	 * @return
 	 */
-	public ContentAssistElement[] getContentAssists(IModelFilter filter)
+	public List<ContentAssistElement> getContentAssists(IModelFilter filter)
 	{
 		IModelFilter caFilter = new IModelFilter()
 		{
-
 			public boolean include(AbstractElement element)
 			{
 				return element instanceof ContentAssistElement;
 			}
 		};
-		if (filter != null)
-		{
-			filter = new AndFilter(filter, caFilter);
-		}
-		else
-		{
-			filter = caFilter;
-		}
+		
+		filter = (filter != null) ? new AndFilter(filter, caFilter) : caFilter;
 
 		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
+		
 		for (String name : this.getBundleNames())
 		{
 			for (CommandElement command : this.getBundleCommands(name))
@@ -1128,7 +1118,7 @@ public class BundleManager
 			}
 		}
 
-		return result.toArray(new ContentAssistElement[result.size()]);
+		return result;
 	}
 
 	/**
@@ -1253,7 +1243,7 @@ public class BundleManager
 	 * @param filter
 	 * @return
 	 */
-	public MenuElement[] getMenus(IModelFilter filter)
+	public List<MenuElement> getMenus(IModelFilter filter)
 	{
 		List<MenuElement> result = new ArrayList<MenuElement>();
 
@@ -1271,45 +1261,58 @@ public class BundleManager
 			}
 		}
 
-		return result.toArray(new MenuElement[result.size()]);
+		return result;
 	}
 
-	public ProjectTemplate[] getProjectTemplates()
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplates()
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		List<ProjectTemplate> templates;
 
-		BundleEntry bundleEntry;
-		ProjectTemplate[] templates;
 		for (String bundleName : this.getBundleNames())
 		{
-			bundleEntry = this.getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+
 			templates = bundleEntry.getProjectTemplates();
+
 			for (ProjectTemplate template : templates)
 			{
 				result.add(template);
 			}
 		}
 
-		return result.toArray(new ProjectTemplate[result.size()]);
+		return result;
 	}
 
-	public ProjectTemplate[] getProjectTemplatesByType(Type type)
+	/**
+	 * getProjectTemplatesByType
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplatesByType(Type type)
 	{
 		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		List<ProjectTemplate> templates;
 
-		BundleEntry bundleEntry;
-		ProjectTemplate[] templates;
 		for (String bundleName : this.getBundleNames())
 		{
-			bundleEntry = this.getBundleEntry(bundleName);
+			BundleEntry bundleEntry = this.getBundleEntry(bundleName);
+
 			templates = bundleEntry.getProjectTemplatesByType(type);
+
 			for (ProjectTemplate template : templates)
 			{
 				result.add(template);
 			}
 		}
 
-		return result.toArray(new ProjectTemplate[result.size()]);
+		return result;
 	}
 
 	/**
@@ -1385,7 +1388,7 @@ public class BundleManager
 	 * @param directory
 	 * @return
 	 */
-	protected File[] getScriptsFromDirectory(File directory)
+	protected List<File> getScriptsFromDirectory(File directory)
 	{
 		File[] result = NO_FILES;
 
@@ -1408,7 +1411,7 @@ public class BundleManager
 			});
 		}
 
-		return result;
+		return Arrays.asList(result);
 	}
 
 	/**
@@ -1561,10 +1564,10 @@ public class BundleManager
 
 		public IStatus run(IProgressMonitor monitor)
 		{
-			File[] bundleScripts = getBundleScripts(bundleDirectory);
-			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.length);
+			List<File> bundleScripts = getBundleScripts(bundleDirectory);
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size());
 
-			if (bundleScripts.length > 0)
+			if (bundleScripts.size() > 0)
 			{
 				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
 

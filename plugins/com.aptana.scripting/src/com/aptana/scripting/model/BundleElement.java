@@ -70,6 +70,7 @@ public class BundleElement extends AbstractElement
 	private Object commandLock = new Object();
 	private Object envLock = new Object();
 	private Object pairLock = new Object();
+	private Object templateLock = new Object();
 
 	private Map<String, String> _fileTypeRegistry;
 	private List<String> fileTypes;
@@ -98,8 +99,7 @@ public class BundleElement extends AbstractElement
 			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
 			String parentName = parentDirectory.getName();
 
-			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName)
-					|| BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
 			{
 				parentDirectory = parentDirectory.getParentFile();
 			}
@@ -166,33 +166,6 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * addSmartTypingPairs
-	 * 
-	 * @param pair
-	 */
-	public void addSmartTypingPairs(SmartTypingPairsElement pair)
-	{
-		if (pair != null)
-		{
-			synchronized (pairLock)
-			{
-				if (this._pairs == null)
-				{
-					this._pairs = new ArrayList<SmartTypingPairsElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._pairs.add(pair);
-			}
-
-			pair.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(pair);
-		}
-	}
-
-	/**
 	 * addMenu
 	 * 
 	 * @param snippet
@@ -216,6 +189,57 @@ public class BundleElement extends AbstractElement
 
 			// fire add event
 			BundleManager.getInstance().fireElementAddedEvent(menu);
+		}
+	}
+
+	/**
+	 * addProjectTemplates
+	 * 
+	 * @param type
+	 * @param name
+	 * @param location
+	 * @param description
+	 */
+	public void addProjectTemplate(String type, String name, String location, String description)
+	{
+		if (!StringUtil.isEmpty(type) && !StringUtil.isEmpty(name) && !StringUtil.isEmpty(location))
+		{
+			synchronized (templateLock)
+			{
+				if (this._projectTemplates == null)
+				{
+					this._projectTemplates = new ArrayList<ProjectTemplate>();
+				}
+
+				this._projectTemplates.add(new ProjectTemplate(type, name, location, description, _bundleDirectory));
+			}
+		}
+	}
+
+	/**
+	 * addSmartTypingPairs
+	 * 
+	 * @param pair
+	 */
+	public void addSmartTypingPairs(SmartTypingPairsElement pair)
+	{
+		if (pair != null)
+		{
+			synchronized (pairLock)
+			{
+				if (this._pairs == null)
+				{
+					this._pairs = new ArrayList<SmartTypingPairsElement>();
+				}
+
+				// NOTE: Should we prevent the same element from being added twice?
+				this._pairs.add(pair);
+			}
+
+			pair.setOwningBundle(this);
+
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(pair);
 		}
 	}
 
@@ -332,55 +356,15 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	public List<CommandElement> getCommands()
 	{
-		CommandElement[] result = BundleManager.NO_COMMANDS;
+		List<CommandElement> result = Collections.emptyList();
 
 		synchronized (commandLock)
 		{
 			if (this._commands != null && this._commands.size() > 0)
 			{
-				result = this._commands.toArray(new CommandElement[this._commands.size()]);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getEnvs
-	 * 
-	 * @return
-	 */
-	public EnvironmentElement[] getEnvs()
-	{
-		EnvironmentElement[] result = new EnvironmentElement[0];
-
-		synchronized (envLock)
-		{
-			if (this._envs != null && this._envs.size() > 0)
-			{
-				result = this._envs.toArray(new EnvironmentElement[this._envs.size()]);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getPairs
-	 * 
-	 * @return
-	 */
-	public SmartTypingPairsElement[] getPairs()
-	{
-		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
-
-		synchronized (pairLock)
-		{
-			if (this._pairs != null && this._pairs.size() > 0)
-			{
-				result = this._pairs.toArray(new SmartTypingPairsElement[this._pairs.size()]);
+				result = Collections.unmodifiableList(this._commands);
 			}
 		}
 
@@ -395,6 +379,21 @@ public class BundleElement extends AbstractElement
 	public String getCopyright()
 	{
 		return this._copyright;
+	}
+
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		if (this._decreaseIndentMarkers == null)
+		{
+			return Collections.emptyMap();
+		}
+
+		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
 	}
 
 	/**
@@ -443,6 +442,26 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public List<EnvironmentElement> getEnvs()
+	{
+		List<EnvironmentElement> result = Collections.emptyList();
+
+		synchronized (envLock)
+		{
+			if (this._envs != null && this._envs.size() > 0)
+			{
+				result = Collections.unmodifiableList(this._envs);
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getFileTypeRegistry
 	 * 
 	 * @return
@@ -450,6 +469,16 @@ public class BundleElement extends AbstractElement
 	public Map<String, String> getFileTypeRegistry()
 	{
 		return this._fileTypeRegistry;
+	}
+
+	/**
+	 * getFileTypes
+	 * 
+	 * @return
+	 */
+	List<String> getFileTypes()
+	{
+		return fileTypes;
 	}
 
 	/**
@@ -498,21 +527,6 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * getDecreaseIndentMarkers
-	 * 
-	 * @return
-	 */
-	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
-	{
-		if (this._decreaseIndentMarkers == null)
-		{
-			return Collections.emptyMap();
-		}
-
-		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
-	}
-
-	/**
 	 * getLicense
 	 * 
 	 * @return
@@ -551,15 +565,83 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public MenuElement[] getMenus()
+	public List<MenuElement> getMenus()
 	{
-		MenuElement[] result = BundleManager.NO_MENUS;
+		List<MenuElement> result = Collections.emptyList();
 
 		synchronized (menuLock)
 		{
 			if (this._menus != null && this._menus.size() > 0)
 			{
-				result = this._menus.toArray(new MenuElement[this._menus.size()]);
+				result = Collections.unmodifiableList(this._menus);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public List<SmartTypingPairsElement> getPairs()
+	{
+		List<SmartTypingPairsElement> result = Collections.emptyList();
+
+		synchronized (pairLock)
+		{
+			if (this._pairs != null && this._pairs.size() > 0)
+			{
+				result = Collections.unmodifiableList(this._pairs);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplates()
+	{
+		List<ProjectTemplate> result = Collections.emptyList();
+
+		synchronized (templateLock)
+		{
+			if (this._projectTemplates != null && this._projectTemplates.size() > 0)
+			{
+				result = Collections.unmodifiableList(this._projectTemplates);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplatesByType(Type type)
+	{
+		List<ProjectTemplate> result = Collections.emptyList();
+
+		synchronized (templateLock)
+		{
+			if (this._projectTemplates != null)
+			{
+				for (ProjectTemplate template : this._projectTemplates)
+				{
+					// type "all" is always included
+					if (template.getType() == type || template.getType() == Type.ALL)
+					{
+						result.add(template);
+					}
+				}
 			}
 		}
 
@@ -805,8 +887,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
-				&& endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store starting regular expression
 			if (this._foldingStartMarkers == null)
@@ -835,8 +916,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
-				&& endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store increasing regular expression
 			if (this._increaseIndentMarkers == null)
@@ -894,54 +974,5 @@ public class BundleElement extends AbstractElement
 	public void setVisible(boolean flag)
 	{
 		this._visible = flag;
-	}
-
-	/**
-	 * getFileTypes
-	 * 
-	 * @return
-	 */
-	List<String> getFileTypes()
-	{
-		return fileTypes;
-	}
-
-	public void addProjectTemplate(String type, String name, String location, String description)
-	{
-		if (!StringUtil.isEmpty(type) && !StringUtil.isEmpty(name) && !StringUtil.isEmpty(location))
-		{
-			if (_projectTemplates == null)
-			{
-				_projectTemplates = new ArrayList<ProjectTemplate>();
-			}
-			_projectTemplates.add(new ProjectTemplate(type, name, location, description, _bundleDirectory));
-		}
-	}
-
-	public ProjectTemplate[] getProjectTemplates()
-	{
-		if (_projectTemplates == null)
-		{
-			return BundleManager.NO_PROJECT_TEMPLATES;
-		}
-		return _projectTemplates.toArray(new ProjectTemplate[_projectTemplates.size()]);
-	}
-
-	public ProjectTemplate[] getProjectTemplatesByType(Type type)
-	{
-		if (_projectTemplates == null)
-		{
-			return BundleManager.NO_PROJECT_TEMPLATES;
-		}
-		List<ProjectTemplate> list = new ArrayList<ProjectTemplate>();
-		for (ProjectTemplate template : _projectTemplates)
-		{
-			// type "all" is always included
-			if (template.getType() == type || template.getType() == Type.ALL)
-			{
-				list.add(template);
-			}
-		}
-		return list.toArray(new ProjectTemplate[list.size()]);
 	}
 }

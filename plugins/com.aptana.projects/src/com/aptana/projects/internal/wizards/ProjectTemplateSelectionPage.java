@@ -34,6 +34,8 @@
  */
 package com.aptana.projects.internal.wizards;
 
+import java.util.List;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -66,10 +68,18 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private ProjectTemplate[] fTemplates;
 	private ProjectTemplate fSelectedTemplate;
 
-	public ProjectTemplateSelectionPage(String pageName, ProjectTemplate[] templates)
+	public ProjectTemplateSelectionPage(String pageName, List<ProjectTemplate> templates)
 	{
 		super(pageName);
-		fTemplates = templates;
+		
+		if (templates == null)
+		{
+			fTemplates = new ProjectTemplate[0];
+		}
+		else
+		{
+			fTemplates = templates.toArray(new ProjectTemplate[templates.size()]);
+		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
 	}

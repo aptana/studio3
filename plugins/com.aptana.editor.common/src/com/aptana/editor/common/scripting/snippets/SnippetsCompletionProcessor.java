@@ -163,7 +163,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	{
 		List<Template> templatesList = new LinkedList<Template>();
 		AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
-		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
+		List<CommandElement> commandsFromScope = BundleManager.getInstance().getCommands(filter);
 		for (CommandElement commandElement : commandsFromScope)
 		{
 			String[] triggers = commandElement.getTriggerTypeValues(TriggerType.PREFIX);

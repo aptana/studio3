@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -121,8 +122,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		ProjectTemplate[] templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
-		if (templates.length > 0)
+		List<ProjectTemplate> templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
+		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
 		}

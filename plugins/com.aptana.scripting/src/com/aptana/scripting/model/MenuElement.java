@@ -35,6 +35,7 @@
 package com.aptana.scripting.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.aptana.core.util.SourcePrinter;
@@ -90,15 +91,15 @@ public class MenuElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public synchronized MenuElement[] getChildren()
+	public synchronized List<MenuElement> getChildren()
 	{
-		MenuElement[] result = BundleManager.NO_MENUS;
+		List<MenuElement> result = Collections.emptyList();
 
 		synchronized (childrenLock)
 		{
 			if (this._children != null && this._children.size() > 0)
 			{
-				result = this._children.toArray(new MenuElement[this._children.size()]);
+				result = Collections.unmodifiableList(this._children);
 			}
 		}
 

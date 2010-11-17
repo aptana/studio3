@@ -35,6 +35,7 @@
 package com.aptana.scripting.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ContextTests extends BundleTestBase
@@ -51,12 +52,12 @@ public class ContextTests extends BundleTestBase
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.PROJECT);
 		
 		// get commands
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 		
 		// return the command we're interested in
-		return commands[0];
+		return commands.get(0);
 	}
 	
 	/**

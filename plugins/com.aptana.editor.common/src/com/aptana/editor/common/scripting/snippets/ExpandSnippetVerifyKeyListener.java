@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.util.List;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -106,8 +108,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 						int caretOffset = textViewer.getTextWidget().getCaretOffset();
 						String scope = getScope(document, caretOffset);
 						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-						CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
-						if (commandsFromScope.length > 0)
+						List<CommandElement> commandsFromScope = BundleManager.getInstance().getCommands(filter);
+						if (commandsFromScope.size() > 0)
 						{
 							// chop off portions of prefix from beginning until we have a match!
 							String prefix = SnippetsCompletionProcessor
@@ -136,7 +138,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		}
 	}
 
-	protected boolean hasMatchingSnippet(String prefix, CommandElement[] commandsFromScope)
+	protected boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)
 	{
 		for (CommandElement commandElement : commandsFromScope)
 		{
