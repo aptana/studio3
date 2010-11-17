@@ -1111,6 +1111,7 @@ public class FilteringProjectView extends GitProjectView
 			public void handleEvent(Event event)
 			{
 				// Paint the down arrow
+				// TODO Test on Windows/Linux to see if this looks right there
 				GC gc = event.gc;
 				final int width = 5;
 				final int x = event.x + 16;
