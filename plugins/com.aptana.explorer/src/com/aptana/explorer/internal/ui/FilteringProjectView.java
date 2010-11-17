@@ -1081,7 +1081,7 @@ public class FilteringProjectView extends GitProjectView
 
 		final Menu modeMenu = new Menu(search);
 		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
-		filenameItem.setText("Search by Filename");
+		filenameItem.setText(Messages.FilteringProjectView_SearchByFilenameLabel);
 		filenameItem.setSelection(fFilenameSearchMode);
 		filenameItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -1094,7 +1094,7 @@ public class FilteringProjectView extends GitProjectView
 		});
 
 		final MenuItem contentItem = new MenuItem(modeMenu, SWT.RADIO);
-		contentItem.setText("Search by File Content");
+		contentItem.setText(Messages.FilteringProjectView_SearchContentLabel);
 		contentItem.setSelection(!fFilenameSearchMode);
 		contentItem.addSelectionListener(new SelectionAdapter()
 		{
