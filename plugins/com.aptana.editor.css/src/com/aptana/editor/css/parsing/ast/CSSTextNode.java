@@ -32,32 +32,40 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.outline;
+package com.aptana.editor.css.parsing.ast;
 
-import org.eclipse.swt.graphics.Image;
-
-import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
-import com.aptana.editor.css.Activator;
-import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
-import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
-
-public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
+public class CSSTextNode extends CSSNode
 {
 
-	private static final Image SELECTOR_ICON = Activator.getImage("icons/selector.png"); //$NON-NLS-1$
-	private static final Image DECLARATION_ICON = Activator.getImage("icons/declaration.png"); //$NON-NLS-1$
+	private String fText;
+
+	public CSSTextNode(String text, int start, int end)
+	{
+		super(CSSNodeTypes.TEXT, start, end);
+		fText = text;
+	}
 
 	@Override
-	public Image getImage(Object element)
+	public String getText()
 	{
-		if (element instanceof CSSSelectorNode)
-		{
-			return SELECTOR_ICON;
-		}
-		if (element instanceof CSSDeclarationNode)
-		{
-			return DECLARATION_ICON;
-		}
-		return super.getImage(element);
+		return fText;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		return super.equals(obj) && (obj instanceof CSSTextNode) && fText.equals(((CSSTextNode) obj).fText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fText.hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return fText;
 	}
 }

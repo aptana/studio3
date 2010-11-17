@@ -42,10 +42,12 @@ import java.util.Stack;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
-import beaver.Symbol;
 import beaver.Scanner.Exception;
+import beaver.Symbol;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
+import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.html.parsing.HTMLTagScanner.TokenType;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -175,7 +177,7 @@ public class HTMLParser implements IParser
 		{
 			HTMLSpecialNode node = new HTMLSpecialNode(startTag, nested, startTag.getStart(), fCurrentSymbol.getEnd());
 			node.setEndNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
-			parseAttribute(node, startTag.value.toString());
+			parseAttribute(node, startTag);
 			fCurrentElement.addChild(node);
 		}
 	}
@@ -183,7 +185,7 @@ public class HTMLParser implements IParser
 	protected HTMLElementNode processCurrentTag()
 	{
 		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
-		parseAttribute(element, fCurrentSymbol.value.toString());
+		parseAttribute(element, fCurrentSymbol);
 		return element;
 	}
 
@@ -342,8 +344,9 @@ public class HTMLParser implements IParser
 		processLanguage(language, HTMLTokens.SCRIPT_END);
 	}
 
-	private void parseAttribute(HTMLElementNode element, String tag)
+	private void parseAttribute(HTMLElementNode element, Symbol tagSymbol)
 	{
+		String tag = tagSymbol.value.toString();
 		fTagScanner.setRange(new Document(tag), 0, tag.length());
 		IToken token;
 		Object data;
@@ -363,9 +366,32 @@ public class HTMLParser implements IParser
 			else if (data == TokenType.ATTR_VALUE)
 			{
 				// found a pair
-				value = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
+				int start = fTagScanner.getTokenOffset();
+				value = tag.substring(start, start + fTagScanner.getTokenLength());
 				// strips the quotation marks and any surrounding whitespaces
-				element.setAttribute(name, value.substring(1, value.length() - 1).trim());
+				value = value.substring(1, value.length() - 1).trim();
+				element.setAttribute(name, value);
+
+				// checks if we need to process the value as CSS
+				if (isCSSAttribute(name))
+				{
+					String text = element.getName() + " {" + value + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+					IParseNode node = ParserPoolFactory.parse(ICSSParserConstants.LANGUAGE, text);
+					// should always have a rule node
+					if (node.hasChildren())
+					{
+						IParseNode rule = node.getChild(0);
+						if (rule instanceof CSSRuleNode)
+						{
+							CSSDeclarationNode[] declarations = ((CSSRuleNode) rule).getDeclarations();
+							for (CSSDeclarationNode declaration : declarations)
+							{
+								addOffset(declaration, tagSymbol.getStart() + start - (element.getName().length() + 1));
+								element.addChild(declaration);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -428,6 +454,11 @@ public class HTMLParser implements IParser
 		{
 			addOffset(child, offset);
 		}
+	}
+
+	private static boolean isCSSAttribute(String name)
+	{
+		return name.equals("style"); //$NON-NLS-1$
 	}
 
 	private static boolean isJavaScript(HTMLElementNode node)

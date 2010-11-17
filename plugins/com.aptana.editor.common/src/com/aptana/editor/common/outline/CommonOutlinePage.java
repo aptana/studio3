@@ -146,7 +146,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		fEditor = editor;
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
-		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
+		fLabelProvider = new ThemedDelegatingLabelProvider(new CommonOutlineLabelProvider());
 	}
 
 	@Override
