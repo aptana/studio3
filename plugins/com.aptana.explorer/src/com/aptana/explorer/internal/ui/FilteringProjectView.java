@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -74,6 +75,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -85,12 +88,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.ide.StringMatcher;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.explorer.ExplorerPlugin;
@@ -133,7 +141,10 @@ public class FilteringProjectView extends GitProjectView
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
 	private IResource currentFilter = null;
-
+	/**
+	 * Determine if we're searching by filename or content in the search text box.
+	 */
+	private boolean fFilenameSearchMode;
 	private AbstractResourceBasedViewerFilter patternFilter;
 	private WorkbenchJob refreshJob;
 
@@ -155,6 +166,8 @@ public class FilteringProjectView extends GitProjectView
 	private Map<IProject, List<String>> projectSelections;
 	private Map<IProject, String> projectFilters;
 	private ArrayList<IConfigurationElement> fgElements;
+	private PathFilter filenameFilter;
+	private boolean filterViaSearch;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -286,6 +299,7 @@ public class FilteringProjectView extends GitProjectView
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
 
+		// FIXME Need to store filters in a way that we can store the filename search filter too!
 		IResource filter = getFilterResource();
 		if (filter != null)
 		{
@@ -889,6 +903,13 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected AbstractResourceBasedViewerFilter createPatternFilter(IResource filterResource)
 	{
+		if (fFilenameSearchMode && filterViaSearch)
+		{
+			filenameFilter.setResourceToFilterOn(selectedProject);
+			filterViaSearch = false;
+			return filenameFilter;
+		}
+
 		IProject project = filterResource.getProject();
 		Set<String> natures = new HashSet<String>();
 		try
@@ -1044,6 +1065,121 @@ public class FilteringProjectView extends GitProjectView
 			return (IResource) adapt.getAdapter(IResource.class);
 		}
 		return null;
+	}
+
+	@Override
+	protected Composite createSearchComposite(Composite myComposite)
+	{
+		Composite search = super.createSearchComposite(myComposite);
+
+		final ToolBar toolbar = new ToolBar(myComposite, SWT.FLAT);
+		createSearchMode(toolbar);
+
+		return search;
+	}
+
+	protected void createSearchMode(final ToolBar toolbar)
+	{
+		ToolItem modeMenuItem = new ToolItem(toolbar, SWT.DROP_DOWN);
+		modeMenuItem.setText("Mode");
+		modeMenuItem.setToolTipText("Mode");
+
+		final Menu modeMenu = new Menu(toolbar);
+		toolbar.setMenu(modeMenu);
+		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
+		filenameItem.setText("Filename");
+		filenameItem.setSelection(fFilenameSearchMode);
+		filenameItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = true;
+			}
+		});
+
+		final MenuItem contentItem = new MenuItem(modeMenu, SWT.RADIO);
+		contentItem.setText("Content");
+		contentItem.setSelection(!fFilenameSearchMode);
+		contentItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = false;
+			}
+		});
+
+		modeMenuItem.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				Point toolbarLocation = toolbar.getLocation();
+				toolbarLocation = toolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+				Point toolbarSize = toolbar.getSize();
+				modeMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
+				modeMenu.setVisible(true);
+			}
+		});
+	}
+
+	/**
+	 * Override search to handle filename search mode, which is actually a filter
+	 */
+	public void search(final String text, final boolean isCaseSensitive, final boolean isRegularExpression)
+	{
+		if (selectedProject == null)
+		{
+			return;
+		}
+
+		if (fFilenameSearchMode)
+		{
+			clearFilter();
+			filenameFilter = new PathFilter()
+			{
+				// FIXME StringMatcher is internal. Copy to an EPL plugin of ours?
+				@SuppressWarnings("restriction")
+				private StringMatcher matcher;
+				private Pattern pattern;
+
+				
+				@SuppressWarnings("restriction")
+				@Override
+				protected boolean match(String string)
+				{
+					if (isRegularExpression)
+					{
+						if (pattern == null)
+						{
+							pattern = Pattern.compile(text);
+						}
+						return pattern.matcher(string).find();
+					}
+					if (matcher == null)
+					{
+						matcher = new StringMatcher(text, !isCaseSensitive, false);
+					}
+					return matcher.match(string);
+				}
+
+				public String getPattern()
+				{
+					return text;
+				};
+			};
+			// We need some way to tell the job that uses the filter that this is the one to apply versus creating
+			// one for the hover
+			filterViaSearch = true;
+			setFilter(selectedProject);
+		}
+		else
+		{
+			super.search(text, isCaseSensitive, isRegularExpression);
+		}
 	}
 
 }
