@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -97,7 +98,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.ide.StringMatcher;
 import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.explorer.ExplorerPlugin;
@@ -112,7 +112,6 @@ import com.aptana.ui.widgets.SearchComposite;
  * 
  * @author cwilliams
  */
-@SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
 	/**
@@ -175,6 +174,7 @@ public class FilteringProjectView extends GitProjectView
 	 * Special boolean for us to tell whether we use our special filename filter or use the hover filter.
 	 */
 	private boolean filterViaSearch;
+	private SearchComposite search;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -1077,7 +1077,7 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	protected Composite createSearchComposite(Composite myComposite)
 	{
-		final SearchComposite search = (SearchComposite) super.createSearchComposite(myComposite);
+		search = (SearchComposite) super.createSearchComposite(myComposite);
 
 		final Menu modeMenu = new Menu(search);
 		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
@@ -1153,41 +1153,38 @@ public class FilteringProjectView extends GitProjectView
 		if (fFilenameSearchMode)
 		{
 			clearFilter();
-			filenameFilter = new PathFilter()
+			try
 			{
-				// FIXME StringMatcher is internal. Copy to an EPL plugin of ours?
-				@SuppressWarnings("restriction")
-				private StringMatcher matcher;
-				private Pattern pattern;
-
-				@SuppressWarnings("restriction")
-				@Override
-				protected boolean match(String string)
+				final Pattern pattern = search.createSearchPattern();
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				filenameFilter = new PathFilter()
 				{
-					if (isRegularExpression)
+					@Override
+					protected boolean match(String string)
 					{
 						if (pattern == null)
 						{
-							pattern = Pattern.compile(text);
+							return false;
 						}
 						return pattern.matcher(string).find();
 					}
-					if (matcher == null)
-					{
-						matcher = new StringMatcher(text, !isCaseSensitive, false);
-					}
-					return matcher.match(string);
-				}
 
-				public String getPattern()
-				{
-					return text;
+					public String getPattern()
+					{
+						// This is what we display in the "filtering for ..." label
+						return text;
+					};
 				};
-			};
-			// We need some way to tell the job that uses the filter that this is the one to apply versus creating
-			// one for the hover
-			filterViaSearch = true;
-			setFilter(selectedProject);
+				// We need some way to tell the job that uses the filter that this is the one to apply versus creating
+				// one for the hover
+				filterViaSearch = true;
+				setFilter(selectedProject);
+			}
+			catch (PatternSyntaxException e)
+			{
+				// TODO Show some UI popup or something to say regexp is bad?
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_RED));
+			}
 		}
 		else
 		{
