@@ -517,40 +517,6 @@ public class BundleManager
 	}
 
 	/**
-	 * fireElementModifiedEvent
-	 * 
-	 * @param element
-	 */
-	void fireElementModifiedEvent(AbstractElement element)
-	{
-		if (element != null)
-		{
-			boolean sendEvent = true;
-
-			if (element instanceof AbstractBundleElement)
-			{
-				sendEvent = (((AbstractBundleElement) element).getOwningBundle() != null);
-			}
-
-			if (sendEvent)
-			{
-				synchronized (elementListenersLock)
-				{
-					if (this._elementListeners != null)
-					{
-						for (ElementChangeListener listener : this._elementListeners)
-						{
-							listener.elementDeleted(element);
-							listener.elementAdded(element);
-							// listener.elementModified(element);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * fireScriptLoadedEvent
 	 * 
 	 * @param path
