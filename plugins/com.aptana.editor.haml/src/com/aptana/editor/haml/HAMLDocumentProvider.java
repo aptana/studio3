@@ -37,11 +37,9 @@ package com.aptana.editor.haml;
 import com.aptana.editor.common.CompositeDocumentProvider;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
-public class HAMLDocumentProvider extends CompositeDocumentProvider
-{
+public class HAMLDocumentProvider extends CompositeDocumentProvider {
 
-	protected HAMLDocumentProvider()
-	{
+	protected HAMLDocumentProvider() {
 		super(IHAMLConstants.CONTENT_TYPE_HAML, HAMLSourceConfiguration.getDefault(), RubySourceConfiguration
 				.getDefault(), HAMLPartitionerSwitchStrategy.getDefault());
 	}

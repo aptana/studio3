@@ -65,8 +65,7 @@ import com.aptana.theme.ThemePlugin;
  * @author Chris Williams
  * @author Max Stepanov
  */
-public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
-{
+public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
 	public final static String PREFIX = "__haml_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
@@ -92,8 +91,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private static HAMLSourceConfiguration instance;
 
-	static
-	{
+	static {
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(
 				"text.haml")); //$NON-NLS-1$
@@ -102,17 +100,14 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType("meta.prolog.haml")); //$NON-NLS-1$		
 	}
 
-	public static HAMLSourceConfiguration getDefault()
-	{
-		if (instance == null)
-		{
+	public static HAMLSourceConfiguration getDefault() {
+		if (instance == null) {
 			instance = new HAMLSourceConfiguration();
 		}
 		return instance;
 	}
 
-	private HAMLSourceConfiguration()
-	{
+	private HAMLSourceConfiguration() {
 		IToken ruby = new Token(HAML_RUBY);
 		partitioningRules = new IPredicateRule[] { new EndOfLineRule("/", new Token(HTML_COMMENT), '\\'), //$NON-NLS-1$
 				new SingleLineRule("/[", "]", new Token(HTML_COMMENT), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
@@ -125,7 +120,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				new EndOfLineRule("\\-", new Token(DEFAULT), '\\'), //$NON-NLS-1$
 				new EndOfLineRule("\\=", new Token(DEFAULT), '\\'), //$NON-NLS-1$
 				new EndOfLineRule("\\~", new Token(DEFAULT), '\\'), //$NON-NLS-1$
-				
+
 				new EndOfLineRule("-", ruby, ',', true), //$NON-NLS-1$
 				new EndOfLineRule("=", ruby, ',', true), //$NON-NLS-1$
 				new EndOfLineRule("~", ruby, ',', true), //$NON-NLS-1$
@@ -142,8 +137,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getContentTypes()
 	 */
-	public String[] getContentTypes()
-	{
+	public String[] getContentTypes() {
 		return TextUtils.combine(new String[][] { CONTENT_TYPES, RubySourceConfiguration.CONTENT_TYPES });
 	}
 
@@ -151,8 +145,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ITopContentTypesProvider#getTopContentTypes()
 	 */
-	public String[][] getTopContentTypes()
-	{
+	public String[][] getTopContentTypes() {
 		return TOP_CONTENT_TYPES;
 	}
 
@@ -160,8 +153,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getPartitioningRules()
 	 */
-	public IPredicateRule[] getPartitioningRules()
-	{
+	public IPredicateRule[] getPartitioningRules() {
 		return partitioningRules;
 	}
 
@@ -169,8 +161,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
-	public ISubPartitionScanner createSubPartitionScanner()
-	{
+	public ISubPartitionScanner createSubPartitionScanner() {
 		return new HAMLSubPartitionScanner();
 	}
 
@@ -178,15 +169,12 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#getDocumentDefaultContentType()
 	 */
-	public String getDocumentContentType(String contentType)
-	{
-		if (contentType.startsWith(PREFIX))
-		{
+	public String getDocumentContentType(String contentType) {
+		if (contentType.startsWith(PREFIX)) {
 			return IHAMLConstants.CONTENT_TYPE_HAML;
 		}
 		String result = RubySourceConfiguration.getDefault().getDocumentContentType(contentType);
-		if (result != null)
-		{
+		if (result != null) {
 			return result;
 		}
 		return null;
@@ -198,8 +186,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * com.aptana.editor.common.ISourceViewerConfiguration#setupPresentationReconciler(org.eclipse.jface.text.presentation
 	 * .PresentationReconciler, org.eclipse.jface.text.source.ISourceViewer)
 	 */
-	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
-	{
+	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer) {
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
 		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
@@ -222,39 +209,31 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, DOCTYPE);
 	}
 
-	protected ITokenScanner getCodeScanner()
-	{
-		if (fCodeScanner == null)
-		{
+	protected ITokenScanner getCodeScanner() {
+		if (fCodeScanner == null) {
 			fCodeScanner = new HAMLScanner();
 		}
 		return fCodeScanner;
 	}
 
-	protected ITokenScanner getCommentScanner()
-	{
-		if (fCommentScanner == null)
-		{
+	protected ITokenScanner getCommentScanner() {
+		if (fCommentScanner == null) {
 			fCommentScanner = new RuleBasedScanner();
 			fCommentScanner.setDefaultReturnToken(getToken("comment.line.slash.haml")); //$NON-NLS-1$
 		}
 		return fCommentScanner;
 	}
 
-	protected ITokenScanner getRubyCommentScanner()
-	{
-		if (fRubyCommentScanner == null)
-		{
+	protected ITokenScanner getRubyCommentScanner() {
+		if (fRubyCommentScanner == null) {
 			fRubyCommentScanner = new RuleBasedScanner();
 			fRubyCommentScanner.setDefaultReturnToken(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
 		}
 		return fRubyCommentScanner;
 	}
 
-	protected ITokenScanner getDocTypeScanner()
-	{
-		if (fDocTypeScanner == null)
-		{
+	protected ITokenScanner getDocTypeScanner() {
+		if (fDocTypeScanner == null) {
 			fDocTypeScanner = new RuleBasedScanner();
 			fDocTypeScanner.setRules(new IRule[] { new SingleCharacterRule('!', new Token(
 					"punctuation.definition.prolog.haml")) }); //$NON-NLS-1$
@@ -263,13 +242,11 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return fDocTypeScanner;
 	}
 
-	protected IToken getToken(String name)
-	{
+	protected IToken getToken(String name) {
 		return getThemeManager().getToken(name);
 	}
 
-	protected IThemeManager getThemeManager()
-	{
+	protected IThemeManager getThemeManager() {
 		return ThemePlugin.getDefault().getThemeManager();
 	}
 }

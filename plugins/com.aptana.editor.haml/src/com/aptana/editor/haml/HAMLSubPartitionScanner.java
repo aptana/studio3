@@ -49,22 +49,19 @@ import com.aptana.editor.ruby.RubySourceConfiguration;
 /**
  * @author Max Stepanov
  */
-public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner
-{
+public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner {
 
 	private static final int TYPE_RUBY = 1;
 	private static final int TYPE_OBJECT = 2;
 	private static final int TYPE_ATTRIBUTE = 3;
 
-	private static final String[] RB_SWITCH_SEQUENCES = new String[] { 
-		"\r\n", //$NON-NLS-1$
-		"\r", //$NON-NLS-1$
-		"\n" //$NON-NLS-1$
+	private static final String[] RB_SWITCH_SEQUENCES = new String[] { "\r\n", //$NON-NLS-1$
+			"\r", //$NON-NLS-1$
+			"\n" //$NON-NLS-1$
 	};
-	private static final String[] RB_SWITCH_ESCAPES = new String[] { 
-		",", //$NON-NLS-1$
-		",", //$NON-NLS-1$
-		"," //$NON-NLS-1$
+	private static final String[] RB_SWITCH_ESCAPES = new String[] { ",", //$NON-NLS-1$
+			",", //$NON-NLS-1$
+			"," //$NON-NLS-1$
 	};
 	private static final String[] OBJECT_SWITCH_SEQUENCES = new String[] { "]" }; //$NON-NLS-1$
 	private static final String[] ATTRIBUTE_SWITCH_SEQUENCES = new String[] { "}" }; //$NON-NLS-1$
@@ -74,20 +71,16 @@ public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner
 	/**
 	 *
 	 */
-	public HAMLSubPartitionScanner()
-	{
+	public HAMLSubPartitionScanner() {
 		super(new ISubPartitionScanner[] {
-					new SubPartitionScanner(HAMLSourceConfiguration.getDefault().getPartitioningRules(),
+				new SubPartitionScanner(HAMLSourceConfiguration.getDefault().getPartitioningRules(),
 						HAMLSourceConfiguration.CONTENT_TYPES, new Token(HAMLSourceConfiguration.DEFAULT)),
-					RubySourceConfiguration.getDefault().createSubPartitionScanner(),
-					RubySourceConfiguration.getDefault().createSubPartitionScanner(),
-					RubySourceConfiguration.getDefault().createSubPartitionScanner()
-				},
-				new IPartitionScannerSwitchStrategy[] { 
-					new PartitionScannerSwitchStrategy(RB_SWITCH_SEQUENCES, EMPTY),
-					new PartitionScannerSwitchStrategy(OBJECT_SWITCH_SEQUENCES, EMPTY),
-					new PartitionScannerSwitchStrategy(ATTRIBUTE_SWITCH_SEQUENCES, EMPTY)
-				});
+				RubySourceConfiguration.getDefault().createSubPartitionScanner(),
+				RubySourceConfiguration.getDefault().createSubPartitionScanner(),
+				RubySourceConfiguration.getDefault().createSubPartitionScanner() },
+				new IPartitionScannerSwitchStrategy[] { new PartitionScannerSwitchStrategy(RB_SWITCH_SEQUENCES, EMPTY),
+						new PartitionScannerSwitchStrategy(OBJECT_SWITCH_SEQUENCES, EMPTY),
+						new PartitionScannerSwitchStrategy(ATTRIBUTE_SWITCH_SEQUENCES, EMPTY) });
 	}
 
 	/*
@@ -95,37 +88,24 @@ public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner
 	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	@Override
-	public void setLastToken(IToken token)
-	{
-		if (!(token.getData() instanceof String))
-		{
+	public void setLastToken(IToken token) {
+		if (!(token.getData() instanceof String)) {
 			current = TYPE_DEFAULT;
 			return;
 		}
 		String contentType = (String) token.getData();
-		if (HAMLSourceConfiguration.HAML_RUBY.equals(contentType))
-		{
+		if (HAMLSourceConfiguration.HAML_RUBY.equals(contentType)) {
 			current = TYPE_RUBY;
-		}
-		else if (HAMLSourceConfiguration.OBJECT.equals(contentType))
-		{
+		} else if (HAMLSourceConfiguration.OBJECT.equals(contentType)) {
 			current = TYPE_OBJECT;
-		}
-		else if (HAMLSourceConfiguration.ATTRIBUTE.equals(contentType))
-		{
+		} else if (HAMLSourceConfiguration.ATTRIBUTE.equals(contentType)) {
 			current = TYPE_ATTRIBUTE;
-		}
-		else if (HAMLSourceConfiguration.DEFAULT.equals(contentType)
-				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
-		{
+		} else if (HAMLSourceConfiguration.DEFAULT.equals(contentType)
+				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
-		}
-		else
-		{
-			for (int i = 0; i < subPartitionScanners.length; ++i)
-			{
-				if (subPartitionScanners[i].hasContentType(contentType))
-				{
+		} else {
+			for (int i = 0; i < subPartitionScanners.length; ++i) {
+				if (subPartitionScanners[i].hasContentType(contentType)) {
 					current = i;
 					break;
 				}

@@ -49,18 +49,15 @@ import com.aptana.editor.ruby.RubySourceConfiguration;
  * @author Max Stepanov
  * @author cwilliams
  */
-public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration implements IHAMLConstants
-{
+public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfiguration implements IHAMLConstants {
 
-	static
-	{
+	static {
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(
 				"text.haml")); //$NON-NLS-1$
 	}
 
-	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor)
-	{
+	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
 		super(HAMLSourceConfiguration.getDefault(), RubySourceConfiguration.getDefault(), preferences, editor);
 	}
 
@@ -69,8 +66,7 @@ public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getTopContentType()
 	 */
 	@Override
-	protected String getTopContentType()
-	{
+	protected String getTopContentType() {
 		return IHAMLConstants.CONTENT_TYPE_HAML;
 	}
 
@@ -79,13 +75,11 @@ public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 	 * @see com.aptana.editor.common.CompositeSourceViewerConfiguration#getLanguageSpecification()
 	 */
 	@Override
-	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy()
-	{
+	protected IPartitionerSwitchStrategy getPartitionerSwitchStrategy() {
 		return HAMLPartitionerSwitchStrategy.getDefault();
 	}
 
-	protected String getStartEndTokenType()
-	{
+	protected String getStartEndTokenType() {
 		return "punctuation.section.embedded.ruby"; //$NON-NLS-1$
 	}
 }

@@ -38,11 +38,11 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 
 public class HAMLEditor extends AbstractThemeableEditor {
 
-    @Override
-    protected void initializeEditor() {
-        super.initializeEditor();
+	@Override
+	protected void initializeEditor() {
+		super.initializeEditor();
 
-        setSourceViewerConfiguration(new HAMLSourceViewerConfiguration(getPreferenceStore(), this));
-        setDocumentProvider(new HAMLDocumentProvider());
-    }
+		setSourceViewerConfiguration(new HAMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new HAMLDocumentProvider());
+	}
 }
