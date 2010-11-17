@@ -36,7 +36,7 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 
-public final class ProjectTemplate
+public final class ProjectTemplate implements IDisplayName
 {
 	public enum Type
 	{
@@ -71,6 +71,11 @@ public final class ProjectTemplate
 	public String getName()
 	{
 		return fName;
+	}
+	
+	public String getDisplayName()
+	{
+		return getName();
 	}
 
 	public String getSourceLocation()

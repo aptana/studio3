@@ -44,7 +44,7 @@ import java.util.Map;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractElement implements Comparable<AbstractElement>
+public abstract class AbstractElement implements Comparable<AbstractElement>, IDisplayName
 {
 	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
