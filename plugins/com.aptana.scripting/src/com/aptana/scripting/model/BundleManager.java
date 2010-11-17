@@ -173,8 +173,7 @@ public class BundleManager
 						}
 						else
 						{
-							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(),
-									null);
+							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
 						}
 					}
 					else
@@ -488,6 +487,50 @@ public class BundleManager
 					for (ElementChangeListener listener : this._elementListeners)
 					{
 						listener.elementAdded(element);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * fireElementBecameHiddenEvent
+	 * 
+	 * @param element
+	 */
+	void fireElementBecameHiddenEvent(AbstractElement element)
+	{
+		if (element != null)
+		{
+			synchronized (elementListenersLock)
+			{
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementBecameHidden(element);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * fireElementBecameVisibleEvent
+	 * 
+	 * @param element
+	 */
+	void fireElementBecameVisibleEvent(AbstractElement element)
+	{
+		if (element != null)
+		{
+			synchronized (elementListenersLock)
+			{
+				if (this._elementListeners != null)
+				{
+					for (ElementChangeListener listener : this._elementListeners)
+					{
+						listener.elementBecameVisible(element);
 					}
 				}
 			}
@@ -1426,26 +1469,22 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
-								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
 		if (result == false && message != null && message.length() > 0)
@@ -1629,8 +1668,7 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
-					new Object[] { script.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
