@@ -71,6 +71,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -90,8 +91,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
@@ -106,12 +105,14 @@ import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
  * 
  * @author cwilliams
  */
+@SuppressWarnings("restriction")
 public class FilteringProjectView extends GitProjectView
 {
 	/**
@@ -166,7 +167,13 @@ public class FilteringProjectView extends GitProjectView
 	private Map<IProject, List<String>> projectSelections;
 	private Map<IProject, String> projectFilters;
 	private ArrayList<IConfigurationElement> fgElements;
+	/**
+	 * The special filter used to filter the view when search is done for filename.
+	 */
 	private PathFilter filenameFilter;
+	/**
+	 * Special boolean for us to tell whether we use our special filename filter or use the hover filter.
+	 */
 	private boolean filterViaSearch;
 
 	/**
@@ -1070,24 +1077,11 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	protected Composite createSearchComposite(Composite myComposite)
 	{
-		Composite search = super.createSearchComposite(myComposite);
+		final SearchComposite search = (SearchComposite) super.createSearchComposite(myComposite);
 
-		final ToolBar toolbar = new ToolBar(myComposite, SWT.FLAT);
-		createSearchMode(toolbar);
-
-		return search;
-	}
-
-	protected void createSearchMode(final ToolBar toolbar)
-	{
-		ToolItem modeMenuItem = new ToolItem(toolbar, SWT.DROP_DOWN);
-		modeMenuItem.setText("Mode");
-		modeMenuItem.setToolTipText("Mode");
-
-		final Menu modeMenu = new Menu(toolbar);
-		toolbar.setMenu(modeMenu);
+		final Menu modeMenu = new Menu(search);
 		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
-		filenameItem.setText("Filename");
+		filenameItem.setText("Search by Filename");
 		filenameItem.setSelection(fFilenameSearchMode);
 		filenameItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -1100,7 +1094,7 @@ public class FilteringProjectView extends GitProjectView
 		});
 
 		final MenuItem contentItem = new MenuItem(modeMenu, SWT.RADIO);
-		contentItem.setText("Content");
+		contentItem.setText("Search by File Content");
 		contentItem.setSelection(!fFilenameSearchMode);
 		contentItem.addSelectionListener(new SelectionAdapter()
 		{
@@ -1112,18 +1106,38 @@ public class FilteringProjectView extends GitProjectView
 			}
 		});
 
-		modeMenuItem.addSelectionListener(new SelectionAdapter()
+		search.getTextControl().addListener(SWT.Paint, new Listener()
 		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
+			public void handleEvent(Event event)
 			{
-				Point toolbarLocation = toolbar.getLocation();
-				toolbarLocation = toolbar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-				Point toolbarSize = toolbar.getSize();
-				modeMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
-				modeMenu.setVisible(true);
+				// Paint the down arrow
+				GC gc = event.gc;
+				final int width = 5;
+				final int x = event.x + 16;
+				final int y = event.y + 10;
+				Color bg = gc.getBackground();
+				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
+				gc.setBackground(bg);
 			}
 		});
+
+		search.getTextControl().addMouseListener(new MouseAdapter()
+		{
+			public void mouseDown(MouseEvent e)
+			{
+				if (e.x >= 0 && e.x <= 18)
+				{
+					Point toolbarLocation = search.getLocation();
+					toolbarLocation = search.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+					Point toolbarSize = search.getSize();
+					modeMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
+					modeMenu.setVisible(true);
+				}
+			}
+		});
+
+		return search;
 	}
 
 	/**
@@ -1146,7 +1160,6 @@ public class FilteringProjectView extends GitProjectView
 				private StringMatcher matcher;
 				private Pattern pattern;
 
-				
 				@SuppressWarnings("restriction")
 				@Override
 				protected boolean match(String string)
