@@ -47,9 +47,6 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.scripting.model.AbstractElement;
-import com.aptana.scripting.model.BundleChangeListener;
-import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
@@ -59,7 +56,7 @@ import com.aptana.scripting.model.TriggerType;
 /**
  * FileWatcherRegistrant
  */
-public class FileWatcherRegistrant implements BundleChangeListener, ElementChangeListener, JNotifyListener
+public class FileWatcherRegistrant implements ElementChangeListener, JNotifyListener
 {
 	private static FileWatcherRegistrant INSTANCE;
 
@@ -123,14 +120,6 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 		}
 
 		files.add(file);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.BundleChangeListener#added(com.aptana.scripting.model.BundleElement)
-	 */
-	public void bundleAdded(BundleElement bundle)
-	{
 	}
 
 	/**
@@ -203,33 +192,32 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.BundleChangeListener#becameHidden(com.aptana.scripting.model.BundleEntry)
-	 */
-	public void bundlesBecameHidden(BundleEntry entry)
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.BundleChangeListener#becameVisible(com.aptana.scripting.model.BundleEntry)
-	 */
-	public void bundlesBecameVisible(BundleEntry entry)
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.BundleChangeListener#deleted(com.aptana.scripting.model.BundleElement)
-	 */
-	public void bundleDeleted(BundleElement bundle)
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.scripting.model.ElementChangeListener#elementAdded(com.aptana.scripting.model.AbstractElement)
 	 */
 	public void elementAdded(AbstractElement element)
+	{
+		// NOTE: we only handle elements that have changed visibility
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.scripting.model.ElementChangeListener#elementBecameHidden(com.aptana.scripting.model.AbstractElement)
+	 */
+	public void elementBecameHidden(AbstractElement element)
+	{
+		if (element instanceof CommandElement)
+		{
+			this.removeWatcher((CommandElement) element);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.scripting.model.ElementChangeListener#elementBecameVisible(com.aptana.scripting.model.AbstractElement)
+	 */
+	public void elementBecameVisible(AbstractElement element)
 	{
 		if (element instanceof CommandElement)
 		{
@@ -243,20 +231,24 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	 */
 	public void elementDeleted(AbstractElement element)
 	{
-		if (element instanceof CommandElement)
-		{
-			this.removeWatcher((CommandElement) element);
-		}
+		// NOTE: we only handle elements that have changed visibility
 	}
 
+	/**
+	 * execute
+	 * 
+	 * @param wd
+	 * @param type
+	 * @param properties
+	 */
 	private void execute(int wd, String type, String... properties)
 	{
 		// create property map
 		Map<String, String> propertyMap = new HashMap<String, String>();
-		
+
 		// add type
 		propertyMap.put("type", type);
-		
+
 		// add optional key/values
 		int length = properties.length & ~0x01;
 
@@ -412,7 +404,6 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	{
 		BundleManager manager = BundleManager.getInstance();
 
-		manager.addBundleChangeListener(this);
 		manager.addElementChangeListener(this);
 	}
 
@@ -423,7 +414,6 @@ public class FileWatcherRegistrant implements BundleChangeListener, ElementChang
 	{
 		BundleManager manager = BundleManager.getInstance();
 
-		manager.removeBundleChangeListener(this);
 		manager.removeElementChangeListener(this);
 
 		// remove all watches
