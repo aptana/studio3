@@ -51,6 +51,51 @@ import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleEntry
 {
+	public abstract class NameBasedProcessor<T extends IDisplayName> implements BundleProcessor
+	{
+		private Set<String> names = new HashSet<String>();
+		private List<T> result = new ArrayList<T>();
+
+		/**
+		 * Return a list of abstract element items from the specified bundle
+		 * 
+		 * @param bundle
+		 * @return
+		 */
+		protected abstract List<T> getElements(BundleElement bundle);
+
+		/**
+		 * Get the list of items that are visible
+		 * 
+		 * @return
+		 */
+		public List<T> getResult()
+		{
+			return result;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.scripting.model.BundleProcessor#processBundle(com.aptana.scripting.model.BundleEntry,
+		 * com.aptana.scripting.model.BundleElement)
+		 */
+		public boolean processBundle(BundleEntry entry, BundleElement bundle)
+		{
+			for (T command : getElements(bundle))
+			{
+				String name = command.getDisplayName();
+
+				if (names.contains(name) == false)
+				{
+					names.add(name);
+					result.add(command);
+				}
+			}
+
+			return true;
+		}
+	}
+
 	private String _name;
 	private List<BundleElement> _bundles;
 	private Comparator<BundleElement> _comparator = new Comparator<BundleElement>()
@@ -196,13 +241,13 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public BundleElement[] getBundles()
+	public List<BundleElement> getBundles()
 	{
-		BundleElement[] result;
+		List<BundleElement> result = Collections.emptyList();
 
 		synchronized (this._bundles)
 		{
-			result = this._bundles.toArray(new BundleElement[this._bundles.size()]);
+			result = Collections.unmodifiableList(this._bundles);
 		}
 
 		return result;
@@ -213,95 +258,19 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	public List<CommandElement> getCommands()
 	{
-		final Set<String> names = new HashSet<String>();
-		final List<CommandElement> result = new ArrayList<CommandElement>();
-
-		this.processBundles(new BundleProcessor()
+		NameBasedProcessor<CommandElement> processor = new NameBasedProcessor<CommandElement>()
 		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			protected List<CommandElement> getElements(BundleElement bundle)
 			{
-				for (CommandElement command : bundle.getCommands())
-				{
-					String name = command.getDisplayName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(command);
-					}
-				}
-
-				return true;
+				return bundle.getCommands();
 			}
-		});
+		};
 
-		return result.toArray(new CommandElement[result.size()]);
-	}
+		this.processBundles(processor);
 
-	/**
-	 * getEnvs
-	 * 
-	 * @return
-	 */
-	public EnvironmentElement[] getEnvs()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (EnvironmentElement command : bundle.getEnvs())
-				{
-					String name = command.getDisplayName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(command);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new EnvironmentElement[result.size()]);
-	}
-
-	/**
-	 * getPairs
-	 * 
-	 * @return
-	 */
-	public SmartTypingPairsElement[] getPairs()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (SmartTypingPairsElement command : bundle.getPairs())
-				{
-					String name = command.getDisplayName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(command);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new SmartTypingPairsElement[result.size()]);
+		return processor.getResult();
 	}
 
 	/**
@@ -323,6 +292,53 @@ public class BundleEntry
 		});
 
 		return Collections.unmodifiableList(result);
+	}
+
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
+
+		this.processBundles(new BundleProcessor()
+		{
+			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			{
+				Map<ScopeSelector, RubyRegexp> registry = bundle.getDecreaseIndentMarkers();
+
+				if (registry != null)
+				{
+					result.putAll(registry);
+				}
+
+				return true;
+			}
+		});
+
+		return result;
+	}
+
+	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public List<EnvironmentElement> getEnvs()
+	{
+		NameBasedProcessor<EnvironmentElement> processor = new NameBasedProcessor<EnvironmentElement>()
+		{
+			protected List<EnvironmentElement> getElements(BundleElement bundle)
+			{
+				return bundle.getEnvs();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
 	}
 
 	/**
@@ -435,33 +451,6 @@ public class BundleEntry
 	}
 
 	/**
-	 * getDecreaseIndentMarkers
-	 * 
-	 * @return
-	 */
-	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
-	{
-		final Map<ScopeSelector, RubyRegexp> result = new HashMap<ScopeSelector, RubyRegexp>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				Map<ScopeSelector, RubyRegexp> registry = bundle.getDecreaseIndentMarkers();
-
-				if (registry != null)
-				{
-					result.putAll(registry);
-				}
-
-				return true;
-			}
-		});
-
-		return result;
-	}
-
-	/**
 	 * getIncreaseIndentMarkers
 	 * 
 	 * @return
@@ -515,85 +504,19 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public MenuElement[] getMenus()
+	public List<MenuElement> getMenus()
 	{
-		final Set<String> names = new HashSet<String>();
-		final List<MenuElement> result = new ArrayList<MenuElement>();
-
-		this.processBundles(new BundleProcessor()
+		NameBasedProcessor<MenuElement> processor = new NameBasedProcessor<MenuElement>()
 		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
+			protected List<MenuElement> getElements(BundleElement bundle)
 			{
-				for (MenuElement menu : bundle.getMenus())
-				{
-					String name = menu.getDisplayName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(menu);
-					}
-				}
-
-				return true;
+				return bundle.getMenus();
 			}
-		});
+		};
 
-		return result.toArray(new MenuElement[result.size()]);
-	}
+		this.processBundles(processor);
 
-	public ProjectTemplate[] getProjectTemplates()
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (ProjectTemplate template : bundle.getProjectTemplates())
-				{
-					String name = template.getName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(template);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new ProjectTemplate[result.size()]);
-	}
-
-	public ProjectTemplate[] getProjectTemplatesByType(final Type type)
-	{
-		final Set<String> names = new HashSet<String>();
-		final List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
-
-		this.processBundles(new BundleProcessor()
-		{
-			public boolean processBundle(BundleEntry entry, BundleElement bundle)
-			{
-				for (ProjectTemplate template : bundle.getProjectTemplatesByType(type))
-				{
-					String name = template.getName();
-
-					if (names.contains(name) == false)
-					{
-						names.add(name);
-						result.add(template);
-					}
-				}
-
-				return true;
-			}
-		});
-
-		return result.toArray(new ProjectTemplate[result.size()]);
+		return processor.getResult();
 	}
 
 	/**
@@ -604,6 +527,67 @@ public class BundleEntry
 	public String getName()
 	{
 		return this._name;
+	}
+
+	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public List<SmartTypingPairsElement> getPairs()
+	{
+		NameBasedProcessor<SmartTypingPairsElement> processor = new NameBasedProcessor<SmartTypingPairsElement>()
+		{
+			protected List<SmartTypingPairsElement> getElements(BundleElement bundle)
+			{
+				return bundle.getPairs();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplates()
+	{
+		NameBasedProcessor<ProjectTemplate> processor = new NameBasedProcessor<ProjectTemplate>()
+		{
+			protected List<ProjectTemplate> getElements(BundleElement bundle)
+			{
+				return bundle.getProjectTemplates();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public List<ProjectTemplate> getProjectTemplatesByType(final Type type)
+	{
+		NameBasedProcessor<ProjectTemplate> processor = new NameBasedProcessor<ProjectTemplate>()
+		{
+			protected List<ProjectTemplate> getElements(BundleElement bundle)
+			{
+				return bundle.getProjectTemplatesByType(type);
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
 	}
 
 	/**
