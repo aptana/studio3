@@ -36,7 +36,13 @@ package com.aptana.ide.ui.io.navigator;
 
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 import com.aptana.ide.core.io.IConnectionPointCategory;
@@ -59,6 +65,21 @@ public class RemoteNavigatorView extends CommonNavigator implements IRefreshable
 		ColumnViewerToolTipSupport.enableFor(getCommonViewer());
 
 		hookToThemes();
+
+		final Tree tree = getCommonViewer().getTree();
+		tree.addMouseListener(new MouseAdapter()
+		{
+
+			@Override
+			public void mouseDown(MouseEvent e)
+			{
+				if (tree.getItem(new Point(e.x, e.y)) == null)
+				{
+					tree.deselectAll();
+					tree.notifyListeners(SWT.Selection, new Event());
+				}
+			}
+		});
 	}
 
 	public void setSelection(Object[] selectionPath)
