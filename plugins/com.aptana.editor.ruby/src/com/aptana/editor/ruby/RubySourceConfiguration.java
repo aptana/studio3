@@ -55,6 +55,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
@@ -81,8 +82,8 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IRubyConstants.CONTENT_TYPE_RUBY } };
 
 	private final IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
-			new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+			new PartitionerSwitchingIgnoreRule(new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT))), //$NON-NLS-1$
+			new PartitionerSwitchingIgnoreRule(new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
