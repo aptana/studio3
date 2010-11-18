@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting;
 
+import java.util.Properties;
+
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,6 +45,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundleMonitor;
@@ -145,7 +148,7 @@ public class ScriptingActivator extends Plugin
 		super.start(context);
 
 		plugin = this;
-
+		
 		Job startupJob = new Job("Start Ruble bundle manager") //$NON-NLS-1$
 		{
 			@Override
@@ -160,8 +163,16 @@ public class ScriptingActivator extends Plugin
 				// grabbing instance registers itself the bundle manager
 				FileWatcherRegistrant.getInstance();
 
-				// load all existing bundles
-				manager.loadBundles();
+				// load all existing bundles automatically, if we're not running
+				// unit tests
+				if (EclipseUtil.isTesting())
+				{
+					System.out.println("Running unit tests, so not auto-loading bundles");
+				}
+				else
+				{
+					manager.loadBundles();
+				}
 
 				// install key binding Manager
 				KeybindingsManager.install();
