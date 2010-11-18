@@ -52,16 +52,11 @@ public class ERBPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		{ "<%", "%>" } //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
-	private static final String[][] ESCAPE_PAIRS = new String[][] {
-		{ "#" , null }, //$NON-NLS-1$
-		{ "=begin", "=end" } //$NON-NLS-1$ //$NON-NLS-2$
-	};
-	
 	/**
 	 * 
 	 */
 	private ERBPartitionerSwitchStrategy() {
-		super(ERB_PAIRS, ESCAPE_PAIRS);
+		super(ERB_PAIRS);
 	}
 	
 	public static ERBPartitionerSwitchStrategy getDefault() {

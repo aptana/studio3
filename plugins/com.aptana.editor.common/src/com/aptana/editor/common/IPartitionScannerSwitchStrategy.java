@@ -42,5 +42,4 @@ package com.aptana.editor.common;
 public interface IPartitionScannerSwitchStrategy {
 
 	public char[][] getSwitchSequences();
-	public char[][][] getEscapeSequences();
 }

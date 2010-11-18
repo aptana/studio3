@@ -42,7 +42,8 @@ import org.eclipse.jface.text.rules.IToken;
  * A partitioner rule wrapper that allow ignoring switching rules in sequence characters.<br>
  * This rule is useful, for example, in ignoring PHP close tags inside strings and multi-line comments.
  * 
- * @author Max, Shalom
+ * @author Max Stepanov
+ * @author Shalom Gibly
  */
 public class PartitionerSwitchingIgnoreRule implements IPredicateRule
 {
