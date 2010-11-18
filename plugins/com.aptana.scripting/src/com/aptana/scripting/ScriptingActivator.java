@@ -34,8 +34,6 @@
  */
 package com.aptana.scripting;
 
-import java.util.Properties;
-
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
