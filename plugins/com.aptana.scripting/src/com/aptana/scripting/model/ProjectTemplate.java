@@ -36,72 +36,34 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 
-public final class ProjectTemplate implements IDisplayName
+import com.aptana.core.util.SourcePrinter;
+
+public final class ProjectTemplate extends AbstractBundleElement
 {
 	public enum Type
 	{
 		ALL, RUBY, PHP, WEB, PYTHON
 	}
 
-	private final Type fType;
-	private final String fName;
-	private final String fSourceLocation;
-	private final String fDescription;
-	private final File fDirectory;
+	private Type fType;
+	private String fName;
+	private String fSourceLocation;
+	private String fDescription;
 
-	public ProjectTemplate(String type, String name, String sourceLocation, String description, File directory)
+	/**
+	 * ProjectTemplate
+	 * 
+	 * @param path
+	 */
+	public ProjectTemplate(String path)
 	{
-		this(Type.valueOf(type.toUpperCase()), name, sourceLocation, description, directory);
+		super(path);
 	}
 
-	public ProjectTemplate(Type type, String name, String sourceLocation, String description, File directory)
-	{
-		fType = type;
-		fName = name;
-		fSourceLocation = sourceLocation;
-		fDescription = description;
-		fDirectory = directory;
-	}
-
-	public Type getType()
-	{
-		return fType;
-	}
-
-	public String getName()
-	{
-		return fName;
-	}
-	
-	public String getDisplayName()
-	{
-		return getName();
-	}
-
-	public String getSourceLocation()
-	{
-		return fSourceLocation;
-	}
-
-	public String getDescription()
-	{
-		return fDescription;
-	}
-
-	public File getDirectory()
-	{
-		return fDirectory;
-	}
-
-	@Override
-	public int hashCode()
-	{
-		int hash = 31 + getType().hashCode();
-		hash = 31 * hash + getName().hashCode();
-		hash = 31 * hash + getSourceLocation().hashCode();
-		return hash;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -110,18 +72,90 @@ public final class ProjectTemplate implements IDisplayName
 			return false;
 		}
 		ProjectTemplate other = (ProjectTemplate) obj;
-		return getType() == other.getType() && getName().equals(other.getName())
-				&& getSourceLocation().equals(other.getSourceLocation());
+		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName())
+				&& getLocation().equals(other.getLocation());
+	}
+	
+	/**
+	 * getDescription
+	 * 
+	 * @return
+	 */
+	public String getDescription()
+	{
+		return fDescription;
+	}
+
+	/**
+	 * getDirectory
+	 * 
+	 * @return
+	 */
+	public File getDirectory()
+	{
+		return this.getOwningBundle().getBundleDirectory();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.AbstractElement#getDisplayName()
+	 */
+	public String getDisplayName()
+	{
+		return fName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.CommandElement#getElementName()
+	 */
+	public String getElementName()
+	{
+		return "project_template";
+	}
+
+	/**
+	 * getLocation
+	 * 
+	 * @return
+	 */
+	public String getLocation()
+	{
+		return fSourceLocation;
+	}
+
+	/**
+	 * getType
+	 * 
+	 * @return
+	 */
+	public Type getType()
+	{
+		return fType;
 	}
 
 	@Override
-	public String toString()
+	public int hashCode()
 	{
-		StringBuilder text = new StringBuilder();
-		text.append("type = ").append(getType()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append("name = ").append(getName()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append("source location = ").append(getSourceLocation()).append("; "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append("bundle location = ").append(getDirectory()); //$NON-NLS-1$
-		return text.toString();
+		int hash = 31 + getType().hashCode();
+		hash = 31 * hash + getDisplayName().hashCode();
+		hash = 31 * hash + getLocation().hashCode();
+		return hash;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.CommandElement#printBody(com.aptana.core.util.SourcePrinter)
+	 */
+	protected void printBody(SourcePrinter printer)
+	{
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(this.getDisplayName());
+		printer.printWithIndent("location: ").println(this.getLocation());
+		
+		if (this.getDescription() != null)
+		{
+			printer.printWithIndent("description: ").println(this.getDescription());
+		}
 	}
 }
