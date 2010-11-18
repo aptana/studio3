@@ -40,8 +40,10 @@ import com.aptana.editor.ruby.RubySourceConfiguration;
 public class HAMLDocumentProvider extends CompositeDocumentProvider {
 
 	protected HAMLDocumentProvider() {
-		super(IHAMLConstants.CONTENT_TYPE_HAML, HAMLSourceConfiguration.getDefault(), RubySourceConfiguration
-				.getDefault(), HAMLPartitionerSwitchStrategy.getDefault());
+		super(IHAMLConstants.CONTENT_TYPE_HAML,
+				HAMLSourceConfiguration.getDefault(),
+				RubySourceConfiguration.getDefault(),
+				HAMLPartitionerSwitchStrategy.getDefault());
 	}
 
 }

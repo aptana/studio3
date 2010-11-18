@@ -46,6 +46,7 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 	private static HAMLPartitionerSwitchStrategy instance;
 	
 	private static final String[][] ERB_PAIRS = new String[][] {
+		{ "#{", "}" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "{", "}" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "[", "]" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
@@ -57,19 +58,11 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		{ "-", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
-	private static final String[][] ESCAPE_PAIRS = new String[][] {
-		{ "#" , null }, //$NON-NLS-1$
-		{ "=begin", "=end" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "#{" , "}" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "'" , "'" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "\"" , "\"" }, //$NON-NLS-1$ //$NON-NLS-2$
-	};
-	
 	/**
 	 * 
 	 */
 	private HAMLPartitionerSwitchStrategy() {
-		super(ERB_PAIRS, ESCAPE_PAIRS);
+		super(ERB_PAIRS);
 	}
 	
 	public static HAMLPartitionerSwitchStrategy getDefault() {
