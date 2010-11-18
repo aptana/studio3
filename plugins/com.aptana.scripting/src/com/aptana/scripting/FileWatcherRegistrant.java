@@ -184,7 +184,7 @@ public class FileWatcherRegistrant implements ElementChangeListener, JNotifyList
 				}
 				catch (JNotifyException e)
 				{
-					Activator.logError(e.getMessage(), e);
+					ScriptingActivator.logError(e.getMessage(), e);
 				}
 			}
 		}
@@ -385,7 +385,7 @@ public class FileWatcherRegistrant implements ElementChangeListener, JNotifyList
 							}
 							catch (JNotifyException e)
 							{
-								Activator.logError(e.getMessage(), e);
+								ScriptingActivator.logError(e.getMessage(), e);
 							}
 						}
 
@@ -425,7 +425,7 @@ public class FileWatcherRegistrant implements ElementChangeListener, JNotifyList
 			}
 			catch (JNotifyException e)
 			{
-				Activator.logError(e.getMessage(), e);
+				ScriptingActivator.logError(e.getMessage(), e);
 			}
 		}
 

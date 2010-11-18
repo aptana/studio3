@@ -82,7 +82,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		if (type == null)
 		{
-			Activator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
+			ScriptingActivator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
 			return;
 		}
 		try
@@ -99,7 +99,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 	}
 
@@ -127,7 +127,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 	}
 
@@ -157,7 +157,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 				}
 				catch (CoreException e)
 				{
-					Activator.logError(e.getMessage(), e);
+					ScriptingActivator.logError(e.getMessage(), e);
 				}
 			}
 		}

@@ -55,7 +55,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
@@ -167,7 +167,7 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
-		this._runType = Activator.getDefaultRunType();
+		this._runType = ScriptingActivator.getDefaultRunType();
 	}
 
 	/**

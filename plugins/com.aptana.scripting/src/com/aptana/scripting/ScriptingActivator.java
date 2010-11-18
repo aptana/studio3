@@ -51,10 +51,10 @@ import com.aptana.scripting.model.RunType;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin
+public class ScriptingActivator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
-	private static Activator plugin;
+	private static ScriptingActivator plugin;
 
 	/**
 	 * Context id set by workbench part to indicate they are scripting aware.
@@ -71,7 +71,7 @@ public class Activator extends Plugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static ScriptingActivator getDefault()
 	{
 		return plugin;
 	}
@@ -132,7 +132,7 @@ public class Activator extends Plugin
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public ScriptingActivator()
 	{
 	}
 
@@ -173,7 +173,7 @@ public class Activator extends Plugin
 				}
 				catch (JNotifyException e)
 				{
-					Activator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
+					ScriptingActivator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 				}
 
 				return Status.OK_STATUS;

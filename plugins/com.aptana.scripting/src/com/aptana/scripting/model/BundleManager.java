@@ -68,7 +68,7 @@ import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
 import com.aptana.scripting.model.ProjectTemplate.Type;
@@ -143,7 +143,7 @@ public class BundleManager
 			INSTANCE = new BundleManager();
 
 			// setup default application bundles path
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+			URL url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
 
 			if (url != null)
 			{
@@ -168,12 +168,12 @@ public class BundleManager
 						}
 						else
 						{
-							Activator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+							ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
 						}
 					}
 					else
 					{
-						Activator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+						ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
 					}
 				}
 				else

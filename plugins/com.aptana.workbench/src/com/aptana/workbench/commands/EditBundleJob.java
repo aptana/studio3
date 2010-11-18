@@ -59,7 +59,7 @@ import com.aptana.core.resources.IProjectContext;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundlePrecedence;
@@ -162,7 +162,7 @@ class EditBundleJob extends Job
 		if (userBundlesDir.toFile().mkdirs())
 			return userBundlesDir;
 
-		throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+		throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 				Messages.EditBundleJob_CantCreateUserBundlesDir_Error));
 	}
 
@@ -268,7 +268,7 @@ class EditBundleJob extends Job
 		{
 			// We really should never reach this state, since we shortcut right away for project level bundles; and user
 			// level bundles should already exist in the user bundles dir...
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 					Messages.EditBundleJob_BundleHasNoRepository_Error));
 		}
 		try
@@ -277,7 +277,7 @@ class EditBundleJob extends Job
 		}
 		catch (IOException e)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID, e.getMessage(), e));
 		}
 	}
 
@@ -289,7 +289,7 @@ class EditBundleJob extends Job
 		{
 			if (GitExecutable.instance() == null)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 						Messages.EditBundleJob_RequiresGitError));
 			}
 			// definitely looks like a git repo
@@ -307,7 +307,7 @@ class EditBundleJob extends Job
 		{
 			if (GitExecutable.instance() == null)
 			{
-				throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 						Messages.EditBundleJob_RequiresGitError));
 			}
 			// we couldn't determine git or SVN, so let's just assume git.
@@ -317,7 +317,7 @@ class EditBundleJob extends Job
 		// Non-zero exit code, so we probably had an error...
 		if (result.keySet().iterator().next() != 0)
 		{
-			throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
 					Messages.EditBundleJob_GitCloneFailed_Error + result.values().iterator().next()));
 		}
 	}

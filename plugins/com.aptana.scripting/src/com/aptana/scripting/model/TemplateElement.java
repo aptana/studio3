@@ -34,7 +34,7 @@
  */
 package com.aptana.scripting.model;
 
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 
 public class TemplateElement extends CommandElement
 {
@@ -87,7 +87,7 @@ public class TemplateElement extends CommandElement
 	@Override
 	public String getRunType()
 	{
-		return Activator.getDefaultRunType().getName();
+		return ScriptingActivator.getDefaultRunType().getName();
 	}
 
 	@Override
