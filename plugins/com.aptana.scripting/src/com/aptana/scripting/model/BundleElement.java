@@ -35,6 +35,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import org.jruby.RubyRegexp;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleElement extends AbstractElement
@@ -64,6 +66,7 @@ public class BundleElement extends AbstractElement
 	private List<CommandElement> _commands;
 	private List<EnvironmentElement> _envs;
 	private List<SmartTypingPairsElement> _pairs;
+	private List<ProjectTemplate> _projectTemplates;
 	private boolean _visible;
 
 	private Object menuLock = new Object();
@@ -80,8 +83,6 @@ public class BundleElement extends AbstractElement
 
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
-
-	private List<ProjectTemplate> _projectTemplates;
 
 	/**
 	 * Bundle
@@ -193,30 +194,6 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * addProjectTemplates
-	 * 
-	 * @param type
-	 * @param name
-	 * @param location
-	 * @param description
-	 */
-	public void addProjectTemplate(String type, String name, String location, String description)
-	{
-		if (!StringUtil.isEmpty(type) && !StringUtil.isEmpty(name) && !StringUtil.isEmpty(location))
-		{
-			synchronized (templateLock)
-			{
-				if (this._projectTemplates == null)
-				{
-					this._projectTemplates = new ArrayList<ProjectTemplate>();
-				}
-
-				this._projectTemplates.add(new ProjectTemplate(type, name, location, description, _bundleDirectory));
-			}
-		}
-	}
-
-	/**
 	 * addSmartTypingPairs
 	 * 
 	 * @param pair
@@ -243,6 +220,32 @@ public class BundleElement extends AbstractElement
 		}
 	}
 
+	/**
+	 * addProjectTemplate
+	 * 
+	 * @param template
+	 */
+	public void addProjectTemplate(ProjectTemplate template)
+	{
+		if (template != null)
+		{
+			synchronized (templateLock)
+			{
+				if (this._projectTemplates == null)
+				{
+					this._projectTemplates = new ArrayList<ProjectTemplate>();
+				}
+				
+				this._projectTemplates.add(template);
+			}
+			
+			template.setOwningBundle(this);
+			
+			// fire add event
+			BundleManager.getInstance().fireElementAddedEvent(template);
+		}
+	}
+	
 	/**
 	 * associateFileType
 	 * 
@@ -287,11 +290,6 @@ public class BundleElement extends AbstractElement
 		this._description = null;
 		this._license = null;
 		this._licenseUrl = null;
-		if (_projectTemplates != null)
-		{
-			_projectTemplates.clear();
-			_projectTemplates = null;
-		}
 	}
 
 	/**
@@ -792,9 +790,9 @@ public class BundleElement extends AbstractElement
 
 		synchronized (commandLock)
 		{
-			if (this._commands != null && (removed = this._commands.remove(command)))
+			if (this._commands != null)
 			{
-				AbstractElement.unregisterElement(command);
+				removed = this._commands.remove(command);
 			}
 		}
 
@@ -812,6 +810,9 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeElement(AbstractBundleElement element)
 	{
+		// make sure elements are no longer tracked in AbstractElement 
+		AbstractElement.unregisterElement(element);
+		
 		if (element instanceof CommandElement)
 		{
 			this.removeCommand((CommandElement) element);
@@ -819,6 +820,19 @@ public class BundleElement extends AbstractElement
 		else if (element instanceof MenuElement)
 		{
 			this.removeMenu((MenuElement) element);
+		}
+		else if (element instanceof ProjectTemplate)
+		{
+			this.removeProjectTemplate((ProjectTemplate) element);
+		}
+		else
+		{
+			String message = MessageFormat.format(
+				"Unable to remove element {0}: Unrecognized type",
+				element
+			);
+			
+			ScriptingActivator.logError(message, null);
 		}
 	}
 
@@ -833,10 +847,10 @@ public class BundleElement extends AbstractElement
 
 		synchronized (menuLock)
 		{
-			if (this._menus != null && (removed = this._menus.remove(menu)))
+			if (this._menus != null)
 			{
-				AbstractElement.unregisterElement(menu);
-
+				removed = this._menus.remove(menu);
+				
 				menu.removeChildren();
 			}
 		}
@@ -845,6 +859,29 @@ public class BundleElement extends AbstractElement
 		{
 			// fire delete event
 			BundleManager.getInstance().fireElementDeletedEvent(menu);
+		}
+	}
+	
+	/**
+	 * removeProjectTemplate
+	 * 
+	 * @param template
+	 */
+	public void removeProjectTemplate(ProjectTemplate template)
+	{
+		boolean removed = false;
+		
+		synchronized (templateLock)
+		{
+			if (this._projectTemplates != null)
+			{
+				removed = this._projectTemplates.remove(template);
+			}
+		}
+		
+		if (removed)
+		{
+			BundleManager.getInstance().fireElementDeletedEvent(template);
 		}
 	}
 

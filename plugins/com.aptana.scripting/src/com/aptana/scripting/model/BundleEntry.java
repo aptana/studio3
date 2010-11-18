@@ -51,7 +51,7 @@ import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleEntry
 {
-	public abstract class NameBasedProcessor<T extends IDisplayName> implements BundleProcessor
+	public abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
 	{
 		private Set<String> names = new HashSet<String>();
 		private List<T> result = new ArrayList<T>();
@@ -243,14 +243,7 @@ public class BundleEntry
 	 */
 	public List<BundleElement> getBundles()
 	{
-		List<BundleElement> result = Collections.emptyList();
-
-		synchronized (this._bundles)
-		{
-			result = Collections.unmodifiableList(this._bundles);
-		}
-
-		return result;
+		return Collections.unmodifiableList(this._bundles);
 	}
 
 	/**
@@ -291,7 +284,7 @@ public class BundleEntry
 			}
 		});
 
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 
 	/**
