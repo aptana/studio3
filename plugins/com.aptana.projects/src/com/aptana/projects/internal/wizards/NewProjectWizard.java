@@ -209,7 +209,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		if (templatesPage != null)
 		{
 			ProjectTemplate template = templatesPage.getSelectedTemplate();
-			if (template != null && !template.getSourceLocation().endsWith(".zip")) //$NON-NLS-1$
+			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
 			{
 				// assumes to be creating the project from a git URL
 				fromGit = true;
@@ -305,7 +305,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 
 	private void extractZip(ProjectTemplate template, IProject project)
 	{
-		File zip_path = new File(template.getDirectory(), template.getSourceLocation());
+		File zip_path = new File(template.getDirectory(), template.getLocation());
 		if (zip_path.exists())
 		{
 			ZipFile zipFile = null;
@@ -360,7 +360,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			path = path.append(projectDescription.getName());
 		}
-		Job job = new CloneJob(template.getSourceLocation(), path.toOSString(), true, true);
+		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
 		job.schedule();
 	}
 

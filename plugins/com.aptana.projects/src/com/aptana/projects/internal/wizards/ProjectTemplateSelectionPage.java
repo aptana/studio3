@@ -213,7 +213,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 			if (element instanceof ProjectTemplate)
 			{
 				ProjectTemplate template = (ProjectTemplate) element;
-				return template.getName();
+				return template.getDisplayName();
 			}
 			return super.getText(element);
 		}
