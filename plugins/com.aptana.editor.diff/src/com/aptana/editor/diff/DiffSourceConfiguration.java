@@ -305,7 +305,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, SEPARATOR);
 	}
 
-	protected ITokenScanner getOneTokenScanner(String token)
+	private ITokenScanner getOneTokenScanner(String token)
 	{
 		RuleBasedScanner multilineCommentScanner = new RuleBasedScanner();
 		multilineCommentScanner.setDefaultReturnToken(getToken(token));
@@ -313,7 +313,7 @@ public class DiffSourceConfiguration implements IPartitioningConfiguration, ISou
 		return multilineCommentScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
 		return new Token(name);
 	}

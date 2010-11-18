@@ -53,8 +53,7 @@ public class HAMLSourceViewerConfiguration extends CompositeSourceViewerConfigur
 
 	static {
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(
-				"text.haml")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType("text.haml")); //$NON-NLS-1$
 	}
 
 	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {

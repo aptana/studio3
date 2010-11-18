@@ -55,9 +55,10 @@ public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner {
 	private static final int TYPE_OBJECT = 2;
 	private static final int TYPE_ATTRIBUTE = 3;
 
-	private static final String[] RB_SWITCH_SEQUENCES = new String[] { "\r\n", //$NON-NLS-1$
-			"\r", //$NON-NLS-1$
-			"\n" //$NON-NLS-1$
+	private static final String[] RB_SWITCH_SEQUENCES = new String[] {
+		"\r\n", //$NON-NLS-1$
+		"\r", //$NON-NLS-1$
+		"\n" //$NON-NLS-1$
 	};
 	private static final String[] OBJECT_SWITCH_SEQUENCES = new String[] { "]" }; //$NON-NLS-1$
 	private static final String[] ATTRIBUTE_SWITCH_SEQUENCES = new String[] { "}" }; //$NON-NLS-1$

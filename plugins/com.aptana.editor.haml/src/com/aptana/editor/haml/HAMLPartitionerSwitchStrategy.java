@@ -51,11 +51,10 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 		{ "[", "]" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "=", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "~", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "-", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "-", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+		{ "-", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
 	/**

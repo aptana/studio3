@@ -66,21 +66,21 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 {
 
 	// FIXME Move out the translations strings as constants in IRubyConstants
-	public final static String PREFIX = "__rb_"; //$NON-NLS-1$
-	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public static final String PREFIX = "__rb_"; //$NON-NLS-1$
+	public static final String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public static final String SINGLE_LINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
 	public static final String MULTI_LINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public static final String REGULAR_EXPRESSION = PREFIX + "regular_expression"; //$NON-NLS-1$
 	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
-	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
-	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
+	public static final String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public static final String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLE_LINE_COMMENT, MULTI_LINE_COMMENT,
 			REGULAR_EXPRESSION, COMMAND, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IRubyConstants.CONTENT_TYPE_RUBY } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
+	private final IPredicateRule[] partitioningRules = new IPredicateRule[] {
 			new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
 			new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
@@ -112,6 +112,9 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 				"string.regexp.classic.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
 				"string.interpolated.ruby")); //$NON-NLS-1$
+	}
+	
+	private RubySourceConfiguration() {
 	}
 
 	public static RubySourceConfiguration getDefault()
@@ -273,7 +276,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		return doubleQuotedStringScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

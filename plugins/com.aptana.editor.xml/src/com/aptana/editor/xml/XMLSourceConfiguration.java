@@ -91,6 +91,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static XMLSourceConfiguration instance;
 
+	private XMLSourceConfiguration() {
+	}
+	
 	public static XMLSourceConfiguration getDefault()
 	{
 		if (instance == null)
@@ -215,7 +218,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return cdataScanner;
 	}
 
-	protected ITokenScanner getXMLScanner()
+	private ITokenScanner getXMLScanner()
 	{
 		if (xmlScanner == null)
 		{
@@ -224,7 +227,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return xmlScanner;
 	}
 
-	protected ITokenScanner getXMLTagScanner()
+	private ITokenScanner getXMLTagScanner()
 	{
 		if (xmlTagScanner == null)
 		{
@@ -233,7 +236,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return xmlTagScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

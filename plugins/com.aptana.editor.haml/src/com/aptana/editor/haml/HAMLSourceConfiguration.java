@@ -76,11 +76,20 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	public final static String HTML_COMMENT = PREFIX + "html_comment"; //$NON-NLS-1$
 	public final static String HAML_COMMENT = PREFIX + "haml_comment"; //$NON-NLS-1$
 
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, HTML_COMMENT, HAML_COMMENT, DOCTYPE,
-			HAML_RUBY, OBJECT, ATTRIBUTE };
+	public static final String[] CONTENT_TYPES = new String[] {
+		DEFAULT,
+		HTML_COMMENT,
+		HAML_COMMENT,
+		DOCTYPE,
+		HAML_RUBY,
+		OBJECT,
+		ATTRIBUTE
+	};
 
-	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IHAMLConstants.CONTENT_TYPE_HAML },
-			{ IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY } };
+	private static final String[][] TOP_CONTENT_TYPES = new String[][] {
+		{ IHAMLConstants.CONTENT_TYPE_HAML },
+		{ IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY }
+	};
 
 	private IPredicateRule[] partitioningRules;
 
