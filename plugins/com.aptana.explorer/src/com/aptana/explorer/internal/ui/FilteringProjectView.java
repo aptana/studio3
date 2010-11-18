@@ -1111,11 +1111,17 @@ public class FilteringProjectView extends GitProjectView
 			public void handleEvent(Event event)
 			{
 				// Paint the down arrow
-				// TODO Test on Windows/Linux to see if this looks right there
+				// TODO Test on Linux to see if this looks right there
 				GC gc = event.gc;
 				final int width = 5;
-				final int x = event.x + 16;
-				final int y = event.y + 10;
+				int x = 16;
+				int y = 10;
+				if (Platform.getOS().equals(Platform.OS_WIN32))
+				{
+					x = event.width - 7;
+					y = 10;
+				}
+				
 				Color bg = gc.getBackground();
 				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
@@ -1127,12 +1133,27 @@ public class FilteringProjectView extends GitProjectView
 		{
 			public void mouseDown(MouseEvent e)
 			{
-				if (e.x >= 0 && e.x <= 18)
+				boolean isOnPulldownSection = false;
+				int shift = 0;
+				if (Platform.getOS().equals(Platform.OS_WIN32))
 				{
-					Point toolbarLocation = search.getLocation();
-					toolbarLocation = search.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-					Point toolbarSize = search.getSize();
-					modeMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
+					Rectangle bounds = search.getTextControl().getBounds();
+					 if (e.x >= bounds.width - 20 && e.x <= bounds.width)
+					{
+						isOnPulldownSection = true;
+						shift = bounds.width - 20;
+					}
+				}
+				else if (e.x >= 0 && e.x <= 18)
+				{
+					isOnPulldownSection = true;
+				}
+				if (isOnPulldownSection)
+				{
+					Point searchLocation = search.getLocation();
+					searchLocation = search.getParent().toDisplay(searchLocation.x, searchLocation.y);
+					Point searchSize = search.getSize();
+					modeMenu.setLocation(searchLocation.x + shift, searchLocation.y + searchSize.y + 2);
 					modeMenu.setVisible(true);
 				}
 			}
