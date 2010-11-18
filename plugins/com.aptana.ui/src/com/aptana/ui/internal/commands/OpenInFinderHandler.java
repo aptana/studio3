@@ -133,9 +133,15 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openOnLinux(File file)
 	{
+		// Can only handle directories
+		if (file.isFile())
+		{
+			file = file.getParentFile();
+		}
+		
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, "\"" //$NON-NLS-1$ //$NON-NLS-2$
-				+ file.getAbsolutePath() + "\""); //$NON-NLS-1$
+		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$ //$NON-NLS-2$
+				file.getAbsolutePath()); //$NON-NLS-1$
 		if (result == null || result.isEmpty())
 		{
 			return false;
