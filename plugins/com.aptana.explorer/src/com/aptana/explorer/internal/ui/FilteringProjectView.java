@@ -1111,15 +1111,19 @@ public class FilteringProjectView extends GitProjectView
 			public void handleEvent(Event event)
 			{
 				// Paint the down arrow
-				// TODO Test on Linux to see if this looks right there
 				GC gc = event.gc;
 				final int width = 5;
 				int x = 16;
 				int y = 10;
-				if (Platform.getOS().equals(Platform.OS_WIN32))
+				if (Platform.getOS().equals(Platform.OS_WIN32)) // On windows, we need to draw on right side
 				{
 					x = event.width - 7;
 					y = 10;
+				}
+				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still doesn't overlap magnifying glass)
+				{
+					x = 0;
+					y = 15;
 				}
 				
 				Color bg = gc.getBackground();
@@ -1135,6 +1139,7 @@ public class FilteringProjectView extends GitProjectView
 			{
 				boolean isOnPulldownSection = false;
 				int shift = 0;
+				// Because on windows we draw on right side, we need to check different click area
 				if (Platform.getOS().equals(Platform.OS_WIN32))
 				{
 					Rectangle bounds = search.getTextControl().getBounds();
@@ -1144,7 +1149,7 @@ public class FilteringProjectView extends GitProjectView
 						shift = bounds.width - 20;
 					}
 				}
-				else if (e.x >= 0 && e.x <= 18)
+				else if (e.x <= 18)
 				{
 					isOnPulldownSection = true;
 				}
