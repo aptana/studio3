@@ -96,6 +96,144 @@ public class BundleEntry
 		}
 	}
 
+	private class VisibilityContext
+	{
+		private List<BundleElement> preVisibleBundles;
+		private List<CommandElement> preVisibleCommands;
+		private List<EnvironmentElement> preVisibleEnvs;
+		private List<MenuElement> preVisibleMenus;
+		private List<SmartTypingPairsElement> preVisiblePairs;
+		private List<ProjectTemplateElement> preVisibleProjectTemplates;
+
+		/**
+		 * VisibilityContext
+		 */
+		public VisibilityContext()
+		{
+			this.loadContext();
+		}
+
+		/**
+		 * fireBundleVisibilityEvents
+		 * 
+		 * @param beforeBundles
+		 */
+		private void fireBundleVisibilityEvents(List<BundleElement> beforeBundles, List<BundleElement> afterBundles)
+		{
+			BundleManager manager = BundleManager.getInstance();
+
+			Set<BundleElement> becameVisible = new HashSet<BundleElement>(afterBundles);
+			Set<BundleElement> becameHidden = new HashSet<BundleElement>(beforeBundles);
+
+			becameHidden.removeAll(becameVisible);
+			becameVisible.removeAll(beforeBundles);
+
+			// fire hidden events
+			if (becameHidden.size() > 0)
+			{
+				List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
+
+				// set visibility flag
+				for (BundleElement bundle : hiddenList)
+				{
+					bundle.setVisible(false);
+				}
+
+				// create new entry with these bundle elements. This is needed so the precedence
+				// rules can be applied to this collection
+				BundleEntry hiddenEntry = new BundleEntry(getName(), hiddenList);
+
+				// fire hidden event
+				manager.fireBundleBecameHiddenEvent(hiddenEntry);
+			}
+
+			// fire visible events
+			if (becameVisible.size() > 0)
+			{
+				List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
+
+				// set visibility flag
+				for (BundleElement bundle : visibleList)
+				{
+					bundle.setVisible(true);
+				}
+
+				// create new entry with these bundle elements. This is needed so the precedence
+				// rules can be applied to this collection
+				BundleEntry visibleEntry = new BundleEntry(getName(), visibleList);
+
+				// fire visible event
+				manager.fireBundleBecameVisibleEvent(visibleEntry);
+			}
+		}
+
+		/**
+		 * fireVisibilityEvents
+		 * 
+		 * @param <T>
+		 * @param elements
+		 */
+		private <T extends AbstractBundleElement> void fireElementVisibilityEvents(List<T> beforeElements, List<T> afterElements)
+		{
+			BundleManager manager = BundleManager.getInstance();
+
+			Set<T> becameVisible = new HashSet<T>(afterElements);
+			Set<T> becameHidden = new HashSet<T>(beforeElements);
+
+			becameHidden.removeAll(becameVisible);
+			becameVisible.removeAll(preVisibleBundles);
+
+			// fire hidden events
+			if (becameHidden.size() > 0)
+			{
+				// set visibility flag
+				for (T element : becameHidden)
+				{
+					// fire hidden event
+					manager.fireElementBecameHiddenEvent(element);
+				}
+			}
+
+			// fire visible events
+			if (becameVisible.size() > 0)
+			{
+				// set visibility flag
+				for (T element : becameVisible)
+				{
+					// fire visible event
+					manager.fireElementBecameVisibleEvent(element);
+				}
+			}
+		}
+
+		/**
+		 * fireVisibilityEvents
+		 */
+		public void fireVisibilityEvents()
+		{
+			fireBundleVisibilityEvents(preVisibleBundles, getContributingBundles());
+			fireElementVisibilityEvents(preVisibleCommands, getCommands());
+			fireElementVisibilityEvents(preVisibleEnvs, getEnvs());
+			fireElementVisibilityEvents(preVisibleMenus, getMenus());
+			fireElementVisibilityEvents(preVisiblePairs, getPairs());
+			fireElementVisibilityEvents(preVisibleProjectTemplates, getProjectTemplates());
+		}
+
+		/**
+		 * loadContext
+		 */
+		private void loadContext()
+		{
+			// get list of visible bundles before adding this new one
+			preVisibleBundles = getContributingBundles();
+			preVisibleCommands = getCommands();
+			preVisibleEnvs = getEnvs();
+			preVisibleMenus = getMenus();
+			preVisiblePairs = getPairs();
+			preVisibleProjectTemplates = getProjectTemplates();
+		}
+	}
+
 	private String _name;
 	private List<BundleElement> _bundles;
 	private Comparator<BundleElement> _comparator = new Comparator<BundleElement>()
@@ -157,82 +295,26 @@ public class BundleEntry
 	 */
 	public void addBundle(BundleElement bundle)
 	{
+		// make sure we have a bundle
 		if (bundle != null)
 		{
 			synchronized (this._bundles)
 			{
-				// get list of visible bundles before adding this new one
-				Set<BundleElement> preVisibleBundles = new HashSet<BundleElement>(this.getContributingBundles());
+				// only go through the add process and its side-effects if we don't have this bundle already
+				if (this.hasBundle(bundle) == false)
+				{
+					VisibilityContext context = new VisibilityContext();
 
-				// add the bundle
-				this._bundles.add(bundle);
+					// add the bundle
+					this._bundles.add(bundle);
 
-				// keep bundles in canonical order
-				Collections.sort(this._bundles, this._comparator);
+					// keep bundles in canonical order
+					Collections.sort(this._bundles, this._comparator);
 
-				// fire visibility change events
-				this.fireVisibilityEvents(preVisibleBundles);
-
-				// fire add event
-				BundleManager.getInstance().fireBundleAddedEvent(bundle);
+					// fire visibility change events
+					context.fireVisibilityEvents();
+				}
 			}
-		}
-	}
-
-	/**
-	 * fireVisibilityEvents
-	 * 
-	 * @param preVisibleBundles
-	 */
-	private void fireVisibilityEvents(Set<BundleElement> preVisibleBundles)
-	{
-		BundleManager manager = BundleManager.getInstance();
-
-		// get current list of visible bundles
-		Set<BundleElement> becameVisible = new HashSet<BundleElement>(this.getContributingBundles());
-
-		// determine which bundles lost visibility and which gained visibility
-		Set<BundleElement> becameHidden = new HashSet<BundleElement>(preVisibleBundles);
-
-		becameHidden.removeAll(becameVisible);
-		becameVisible.removeAll(preVisibleBundles);
-
-		// fire hidden events
-		if (becameHidden.size() > 0)
-		{
-			List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
-
-			// set visibility flag
-			for (BundleElement bundle : hiddenList)
-			{
-				bundle.setVisible(false);
-			}
-
-			// create new entry with these bundle elements. This is needed so the precedence
-			// rules can be applied to this collection
-			BundleEntry hiddenEntry = new BundleEntry(this.getName(), hiddenList);
-
-			// fire hidden event
-			manager.fireBundleBecameHiddenEvent(hiddenEntry);
-		}
-
-		// fire visible events
-		if (becameVisible.size() > 0)
-		{
-			List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
-
-			// set visibility flag
-			for (BundleElement bundle : visibleList)
-			{
-				bundle.setVisible(true);
-			}
-
-			// create new entry with these bundle elements. This is needed so the precedence
-			// rules can be applied to this collection
-			BundleEntry visibleEntry = new BundleEntry(this.getName(), visibleList);
-
-			// fire visible event
-			manager.fireBundleBecameVisibleEvent(visibleEntry);
 		}
 	}
 
@@ -653,8 +735,7 @@ public class BundleEntry
 
 		synchronized (this._bundles)
 		{
-			// get list of visible bundles before adding this new one
-			Set<BundleElement> preVisibleBundles = new HashSet<BundleElement>(this.getContributingBundles());
+			VisibilityContext context = new VisibilityContext();
 
 			result = this._bundles.remove(bundle);
 
@@ -664,7 +745,7 @@ public class BundleEntry
 				BundleManager.getInstance().fireBundleDeletedEvent(bundle);
 
 				// fire visibility change events
-				this.fireVisibilityEvents(preVisibleBundles);
+				context.fireVisibilityEvents();
 			}
 		}
 
