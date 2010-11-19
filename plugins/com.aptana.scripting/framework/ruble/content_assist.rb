@@ -37,7 +37,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(content_assist.path)
         
         if !bundle.nil?
-          bundle.add_command(content_assist)
+          bundle.add_child(content_assist)
         else
           log_warning("No bundle found for content_assist #{name}: #{content_assist.path}")
         end

@@ -24,7 +24,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(path)
 
         if !bundle.nil?
-          bundle.add_smart_typing_pairs(p)
+          bundle.add_child(p)
         else
           log_warning("No bundle found for smart_typing_pairs #{name}: #{path}")
         end

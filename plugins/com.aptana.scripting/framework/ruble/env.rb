@@ -25,7 +25,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(e.path)
 
         if !bundle.nil?
-          bundle.add_env(e)
+          bundle.add_child(e)
         else
           log_warning("No bundle found for env #{name}: #{e.path}")
         end

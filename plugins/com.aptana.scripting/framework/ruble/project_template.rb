@@ -35,7 +35,8 @@ module Ruble
       def define_template(name, &block)
         log_info("loading project template #{name}")
 
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         command = ProjectTemplate.new(name, path)
         block.call(command) if block_given?
 
@@ -43,7 +44,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(command.path)
         
         if !bundle.nil?
-          bundle.add_project_template(command)
+          bundle.add_child(command)
         else
           log_warning("No bundle found for project template #{name}: #{command.path}")
         end

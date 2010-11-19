@@ -16,28 +16,8 @@ module Ruble
       end
     end
 
-    def add_command(command)
-      @jobj.add_command command.java_object
-    end
-
-    def add_env(env)
-      @jobj.add_env env.java_object
-    end
-    
-    def add_smart_typing_pairs(p)
-      @jobj.add_smart_typing_pairs p.java_object
-    end
-
-    def add_menu(menu)
-      @jobj.add_menu menu.java_object
-    end
-
-    def add_snippet(snippet)
-      @jobj.add_snippet snippet.java_object
-    end
-    
-    def add_project_template(template)
-      @jobj.add_project_template template.java_object
+    def add_child(child)
+      @jobj.add_child child.java_object
     end
 
     def apply_defaults(obj)
