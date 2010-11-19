@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.scripting.model.ProjectTemplate;
+import com.aptana.scripting.model.ProjectTemplateElement;
 
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
 {
@@ -65,26 +65,26 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private TableViewer fTemplateSelectionViewer;
 	private Text fPreviewText;
 
-	private ProjectTemplate[] fTemplates;
-	private ProjectTemplate fSelectedTemplate;
+	private ProjectTemplateElement[] fTemplates;
+	private ProjectTemplateElement fSelectedTemplate;
 
-	public ProjectTemplateSelectionPage(String pageName, List<ProjectTemplate> templates)
+	public ProjectTemplateSelectionPage(String pageName, List<ProjectTemplateElement> templates)
 	{
 		super(pageName);
 		
 		if (templates == null)
 		{
-			fTemplates = new ProjectTemplate[0];
+			fTemplates = new ProjectTemplateElement[0];
 		}
 		else
 		{
-			fTemplates = templates.toArray(new ProjectTemplate[templates.size()]);
+			fTemplates = templates.toArray(new ProjectTemplateElement[templates.size()]);
 		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
 	}
 
-	public ProjectTemplate getSelectedTemplate()
+	public ProjectTemplateElement getSelectedTemplate()
 	{
 		if (fUseTemplateButton.getSelection())
 		{
@@ -141,7 +141,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		String text = null;
 		if (!selection.isEmpty())
 		{
-			fSelectedTemplate = (ProjectTemplate) selection.getFirstElement();
+			fSelectedTemplate = (ProjectTemplateElement) selection.getFirstElement();
 			text = fSelectedTemplate.getDescription();
 		}
 		fPreviewText.setText(text == null ? "" : text); //$NON-NLS-1$
@@ -210,9 +210,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		@Override
 		public String getText(Object element)
 		{
-			if (element instanceof ProjectTemplate)
+			if (element instanceof ProjectTemplateElement)
 			{
-				ProjectTemplate template = (ProjectTemplate) element;
+				ProjectTemplateElement template = (ProjectTemplateElement) element;
 				return template.getDisplayName();
 			}
 			return super.getText(element);

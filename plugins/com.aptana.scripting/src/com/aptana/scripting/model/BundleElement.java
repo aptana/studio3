@@ -49,7 +49,7 @@ import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptingActivator;
-import com.aptana.scripting.model.ProjectTemplate.Type;
+import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleElement extends AbstractElement
 {
@@ -66,7 +66,7 @@ public class BundleElement extends AbstractElement
 	private List<CommandElement> _commands;
 	private List<EnvironmentElement> _envs;
 	private List<SmartTypingPairsElement> _pairs;
-	private List<ProjectTemplate> _projectTemplates;
+	private List<ProjectTemplateElement> _projectTemplates;
 	private boolean _visible;
 
 	private Object menuLock = new Object();
@@ -225,7 +225,7 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param template
 	 */
-	public void addProjectTemplate(ProjectTemplate template)
+	public void addProjectTemplate(ProjectTemplateElement template)
 	{
 		if (template != null)
 		{
@@ -233,7 +233,7 @@ public class BundleElement extends AbstractElement
 			{
 				if (this._projectTemplates == null)
 				{
-					this._projectTemplates = new ArrayList<ProjectTemplate>();
+					this._projectTemplates = new ArrayList<ProjectTemplateElement>();
 				}
 				
 				this._projectTemplates.add(template);
@@ -603,9 +603,9 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplates()
+	public List<ProjectTemplateElement> getProjectTemplates()
 	{
-		List<ProjectTemplate> result = Collections.emptyList();
+		List<ProjectTemplateElement> result = Collections.emptyList();
 
 		synchronized (templateLock)
 		{
@@ -624,15 +624,15 @@ public class BundleElement extends AbstractElement
 	 * @param type
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplatesByType(Type type)
+	public List<ProjectTemplateElement> getProjectTemplatesByType(Type type)
 	{
-		List<ProjectTemplate> result = Collections.emptyList();
+		List<ProjectTemplateElement> result = Collections.emptyList();
 
 		synchronized (templateLock)
 		{
 			if (this._projectTemplates != null)
 			{
-				for (ProjectTemplate template : this._projectTemplates)
+				for (ProjectTemplateElement template : this._projectTemplates)
 				{
 					// type "all" is always included
 					if (template.getType() == type || template.getType() == Type.ALL)
@@ -821,9 +821,9 @@ public class BundleElement extends AbstractElement
 		{
 			this.removeMenu((MenuElement) element);
 		}
-		else if (element instanceof ProjectTemplate)
+		else if (element instanceof ProjectTemplateElement)
 		{
-			this.removeProjectTemplate((ProjectTemplate) element);
+			this.removeProjectTemplate((ProjectTemplateElement) element);
 		}
 		else
 		{
@@ -867,7 +867,7 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @param template
 	 */
-	public void removeProjectTemplate(ProjectTemplate template)
+	public void removeProjectTemplate(ProjectTemplateElement template)
 	{
 		boolean removed = false;
 		

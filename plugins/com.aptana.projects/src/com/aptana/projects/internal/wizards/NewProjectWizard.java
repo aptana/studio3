@@ -83,8 +83,8 @@ import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.ProjectTemplate;
-import com.aptana.scripting.model.ProjectTemplate.Type;
+import com.aptana.scripting.model.ProjectTemplateElement;
+import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -122,7 +122,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		List<ProjectTemplate> templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
+		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
 		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
@@ -208,7 +208,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		boolean fromGit = false;
 		if (templatesPage != null)
 		{
-			ProjectTemplate template = templatesPage.getSelectedTemplate();
+			ProjectTemplateElement template = templatesPage.getSelectedTemplate();
 			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
 			{
 				// assumes to be creating the project from a git URL
@@ -223,7 +223,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				doBasicCreateProject(newProjectHandle, description);
 				if (templatesPage != null)
 				{
-					ProjectTemplate template = templatesPage.getSelectedTemplate();
+					ProjectTemplateElement template = templatesPage.getSelectedTemplate();
 					if (template != null)
 					{
 						extractZip(template, newProjectHandle);
@@ -303,7 +303,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void extractZip(ProjectTemplate template, IProject project)
+	private void extractZip(ProjectTemplateElement template, IProject project)
 	{
 		File zip_path = new File(template.getDirectory(), template.getLocation());
 		if (zip_path.exists())
@@ -351,7 +351,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(ProjectTemplate template, IProjectDescription projectDescription)
+	private void doCloneFromGit(ProjectTemplateElement template, IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
 		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name

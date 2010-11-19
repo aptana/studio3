@@ -47,7 +47,7 @@ import java.util.Set;
 import org.jruby.RubyRegexp;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.ProjectTemplate.Type;
+import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleEntry
 {
@@ -547,11 +547,11 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplates()
+	public List<ProjectTemplateElement> getProjectTemplates()
 	{
-		NameBasedProcessor<ProjectTemplate> processor = new NameBasedProcessor<ProjectTemplate>()
+		NameBasedProcessor<ProjectTemplateElement> processor = new NameBasedProcessor<ProjectTemplateElement>()
 		{
-			protected List<ProjectTemplate> getElements(BundleElement bundle)
+			protected List<ProjectTemplateElement> getElements(BundleElement bundle)
 			{
 				return bundle.getProjectTemplates();
 			}
@@ -568,11 +568,11 @@ public class BundleEntry
 	 * @param type
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplatesByType(final Type type)
+	public List<ProjectTemplateElement> getProjectTemplatesByType(final Type type)
 	{
-		NameBasedProcessor<ProjectTemplate> processor = new NameBasedProcessor<ProjectTemplate>()
+		NameBasedProcessor<ProjectTemplateElement> processor = new NameBasedProcessor<ProjectTemplateElement>()
 		{
-			protected List<ProjectTemplate> getElements(BundleElement bundle)
+			protected List<ProjectTemplateElement> getElements(BundleElement bundle)
 			{
 				return bundle.getProjectTemplatesByType(type);
 			}

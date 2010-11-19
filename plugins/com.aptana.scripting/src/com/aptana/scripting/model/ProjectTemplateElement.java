@@ -38,7 +38,7 @@ import java.io.File;
 
 import com.aptana.core.util.SourcePrinter;
 
-public final class ProjectTemplate extends AbstractBundleElement
+public final class ProjectTemplateElement extends AbstractBundleElement
 {
 	public enum Type
 	{
@@ -55,7 +55,7 @@ public final class ProjectTemplate extends AbstractBundleElement
 	 * 
 	 * @param path
 	 */
-	public ProjectTemplate(String path)
+	public ProjectTemplateElement(String path)
 	{
 		super(path);
 	}
@@ -67,11 +67,11 @@ public final class ProjectTemplate extends AbstractBundleElement
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!(obj instanceof ProjectTemplate))
+		if (!(obj instanceof ProjectTemplateElement))
 		{
 			return false;
 		}
-		ProjectTemplate other = (ProjectTemplate) obj;
+		ProjectTemplateElement other = (ProjectTemplateElement) obj;
 		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName())
 				&& getLocation().equals(other.getLocation());
 	}

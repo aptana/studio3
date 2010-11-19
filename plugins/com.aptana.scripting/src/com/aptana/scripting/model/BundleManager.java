@@ -71,7 +71,7 @@ import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptingEngine;
-import com.aptana.scripting.model.ProjectTemplate.Type;
+import com.aptana.scripting.model.ProjectTemplateElement.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
@@ -1385,15 +1385,15 @@ public class BundleManager
 	 * 
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplates()
+	public List<ProjectTemplateElement> getProjectTemplates()
 	{
-		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		for (String name : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectTemplate template : bundleEntry.getProjectTemplates())
+			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
 			{
 				result.add(template);
 			}
@@ -1408,15 +1408,15 @@ public class BundleManager
 	 * @param type
 	 * @return
 	 */
-	public List<ProjectTemplate> getProjectTemplatesByType(Type type)
+	public List<ProjectTemplateElement> getProjectTemplatesByType(Type type)
 	{
-		List<ProjectTemplate> result = new ArrayList<ProjectTemplate>();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		for (String name : this.getBundleNames())
 		{
 			BundleEntry bundleEntry = this.getBundleEntry(name);
 
-			for (ProjectTemplate template : bundleEntry.getProjectTemplatesByType(type))
+			for (ProjectTemplateElement template : bundleEntry.getProjectTemplatesByType(type))
 			{
 				result.add(template);
 			}
