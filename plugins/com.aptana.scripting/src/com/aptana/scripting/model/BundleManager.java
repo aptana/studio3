@@ -105,7 +105,9 @@ public class BundleManager
 					sub.worked(1);
 				}
 			}
+
 			sub.done();
+
 			return Status.OK_STATUS;
 		}
 	}
@@ -144,28 +146,40 @@ public class BundleManager
 			if (rule instanceof SerialPerObjectRule)
 			{
 				SerialPerObjectRule vup = (SerialPerObjectRule) rule;
+
 				return fObject == vup.fObject;
 			}
+
 			return false;
 		}
 	}
 
-	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
-	static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
-	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	// split patterns
+	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	private static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
 
-	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
+	// special sub-directories within a bundle directory
+	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
+	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
 
-	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
+	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
+
+	// system property used to indicate the desired directory for user rubles
 	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
+
+	// project directory name where project bundles are located
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
+
+	// special file name used to define a bundle
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
+
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
+
+	// locations for user rubles
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
-
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
-
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
 
 	/**
@@ -271,6 +285,28 @@ public class BundleManager
 	}
 
 	/**
+	 * isSpecialDirectory
+	 * 
+	 * @param path
+	 * @return
+	 */
+	static boolean isSpecialDirectory(File path)
+	{
+		boolean result = false;
+
+		if (path != null)
+		{
+			String pathString = path.getName();
+
+			result = COMMANDS_DIRECTORY_NAME.equals(pathString) //
+				|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
+				|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
+		}
+
+		return result;
+	}
+
+	/**
 	 * counter to cycle through for use in enforcing max parallel bundle loads. We compare versus the number of
 	 * available processors reported by Java's Runtime.
 	 */
@@ -278,17 +314,18 @@ public class BundleManager
 	private static BundleManager INSTANCE;
 	private String applicationBundlesPath;
 	private String userBundlesPath;
-	private Map<File, List<BundleElement>> _bundlesByPath;
 
+	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
 	private List<BundleVisibilityListener> _bundleListeners;
 	private List<ElementVisibilityListener> _elementListeners;
+
 	private List<LoadCycleListener> _loadCycleListeners;
-	
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
 	private Object bundleListenersLock = new Object();
 	private Object elementListenersLock = new Object();
+
 	private Object loadCycleListenersLock = new Object();
 
 	/**
