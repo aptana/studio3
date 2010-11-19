@@ -34,7 +34,7 @@
  */
 package com.aptana.scripting.model;
 
-public interface ElementChangeListener
+public interface ElementVisibilityListener
 {
 	/**
 	 * This event fires whenever an AbstractElement is no longer visible according to the bundle precedence rules. Note

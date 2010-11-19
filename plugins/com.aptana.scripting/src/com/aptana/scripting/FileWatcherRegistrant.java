@@ -50,13 +50,13 @@ import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
-import com.aptana.scripting.model.ElementChangeListener;
+import com.aptana.scripting.model.ElementVisibilityListener;
 import com.aptana.scripting.model.TriggerType;
 
 /**
  * FileWatcherRegistrant
  */
-public class FileWatcherRegistrant implements ElementChangeListener, JNotifyListener
+public class FileWatcherRegistrant implements ElementVisibilityListener, JNotifyListener
 {
 	private static FileWatcherRegistrant INSTANCE;
 

@@ -282,7 +282,7 @@ public class BundleManager
 
 	private Map<String, BundleEntry> _entriesByName;
 	private List<BundleVisibilityListener> _bundleListeners;
-	private List<ElementChangeListener> _elementListeners;
+	private List<ElementVisibilityListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
 	
 	private Object bundlePathsLock = new Object();
@@ -387,7 +387,7 @@ public class BundleManager
 	 * 
 	 * @param listener
 	 */
-	public void addElementChangeListener(ElementChangeListener listener)
+	public void addElementChangeListener(ElementVisibilityListener listener)
 	{
 		if (listener != null)
 		{
@@ -395,7 +395,7 @@ public class BundleManager
 			{
 				if (this._elementListeners == null)
 				{
-					this._elementListeners = new ArrayList<ElementChangeListener>();
+					this._elementListeners = new ArrayList<ElementVisibilityListener>();
 				}
 
 				this._elementListeners.add(listener);
@@ -506,7 +506,7 @@ public class BundleManager
 			{
 				if (this._elementListeners != null)
 				{
-					for (ElementChangeListener listener : this._elementListeners)
+					for (ElementVisibilityListener listener : this._elementListeners)
 					{
 						listener.elementBecameHidden(element);
 					}
@@ -528,7 +528,7 @@ public class BundleManager
 			{
 				if (this._elementListeners != null)
 				{
-					for (ElementChangeListener listener : this._elementListeners)
+					for (ElementVisibilityListener listener : this._elementListeners)
 					{
 						listener.elementBecameVisible(element);
 					}
@@ -1807,7 +1807,7 @@ public class BundleManager
 	 * 
 	 * @param listener
 	 */
-	public void removeElementChangeListener(ElementChangeListener listener)
+	public void removeElementChangeListener(ElementVisibilityListener listener)
 	{
 		synchronized (elementListenersLock)
 		{
