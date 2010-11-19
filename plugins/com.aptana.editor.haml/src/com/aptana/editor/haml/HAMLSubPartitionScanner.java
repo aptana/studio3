@@ -47,6 +47,7 @@ import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
+ * @author Chris Williams
  * @author Max Stepanov
  */
 public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner {

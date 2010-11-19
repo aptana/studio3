@@ -56,6 +56,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
 import com.aptana.theme.IThemeManager;
@@ -171,7 +172,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @see com.aptana.editor.common.IPartitioningConfiguration#createSubPartitionScanner()
 	 */
 	public ISubPartitionScanner createSubPartitionScanner() {
-		return new HAMLSubPartitionScanner();
+		return new SubPartitionScanner(partitioningRules, CONTENT_TYPES, new Token(DEFAULT));
 	}
 
 	/*
@@ -252,10 +253,6 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	}
 
 	protected IToken getToken(String name) {
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager() {
-		return ThemePlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

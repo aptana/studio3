@@ -46,7 +46,7 @@ import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 public class SequenceCharacterScanner implements ICharacterScanner {
 
 	private ICharacterScanner characterScanner;
-	private char[][] sequences;
+	private char[][] switchSequences;
 	private boolean found = false;
 	private boolean eof = false;
 	private boolean ignored;
@@ -62,7 +62,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 
 	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy, boolean ignoreCase) {
 		this.characterScanner = characterScanner;
-		this.sequences = switchStrategy.getSwitchSequences();
+		this.switchSequences = switchStrategy.getSwitchSequences();
 		this.ignoreCase = ignoreCase;
 	}
 
@@ -87,7 +87,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		eof = false;
 		int c = characterScanner.read();
 		if (c != ICharacterScanner.EOF && !ignored) {
-			for (char[] sequence : sequences) {
+			for (char[] sequence : switchSequences) {
 				if (c == sequence[0] && sequenceDetected(sequence)) {
 					found = true;
 					eof = true;
@@ -119,8 +119,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		}
 	}
 
-	public void setSequenceIgnored(boolean ignored)
-	{
+	public void setSequenceIgnored(boolean ignored) {
 		this.ignored = ignored;
 	}
 

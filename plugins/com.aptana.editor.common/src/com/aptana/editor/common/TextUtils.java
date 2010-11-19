@@ -118,5 +118,20 @@ public final class TextUtils
 		}
 		return list.toArray(new char[list.size()][]);
 	}
+	
+	public static char[][] replace(char[][] arrays, char character, char[][] replacements) {
+		List<char[]> list = new ArrayList<char[]>();
+		for (char[] array : arrays) {
+			String string = String.valueOf(array);
+			if (string.indexOf(character) >= 0) {
+				for (char[] replacement : replacements) {
+					list.add(string.replaceAll(String.valueOf(character), String.valueOf(replacement)).toCharArray());
+				}
+			} else {
+				list.add(array);
+			}	
+		}
+		return list.toArray(new char[list.size()][]);
+	}
 
 }

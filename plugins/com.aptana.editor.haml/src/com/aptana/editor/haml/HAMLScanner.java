@@ -41,14 +41,13 @@ import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
 import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 public class HAMLScanner extends BufferedRuleBasedScanner {
 
@@ -107,11 +106,8 @@ public class HAMLScanner extends BufferedRuleBasedScanner {
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
-	protected IToken createToken(String string) {
-		return getThemeManager().getToken(string);
+	private IToken createToken(String string) {
+		return new Token(string);
 	}
 
-	protected IThemeManager getThemeManager() {
-		return ThemePlugin.getDefault().getThemeManager();
-	}
 }
