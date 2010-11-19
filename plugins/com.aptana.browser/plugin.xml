@@ -99,16 +99,86 @@
       <size
             category="com.aptana.browser.sizeCategory.mobile"
             height="460"
-            image="com.aptana.browser.backgroundImage.iphone"
-            name="%size.iphone.name"
+            image="com.aptana.browser.backgroundImage.iphone.vertical"
+            name="%size.iphone.name.vertical"
             width="320">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="320"
+            image="com.aptana.browser.backgroundImage.iphone.horizontal"
+            name="%size.iphone.name.horizontal"
+            width="460">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="748"
+            image="com.aptana.browser.backgroundImage.ipad.horizontal"
+            name="%size.ipad.name.horizontal"
+            width="1024">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="1024"
+            image="com.aptana.browser.backgroundImage.ipad.vertical"
+            name="%size.ipad.name.vertical"
+            width="748">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="800"
+            image="com.aptana.browser.backgroundImage.htc.touchhd.vertical"
+            name="%size.htc.touchhd.name.horizontal"
+            width="480">
+      </size>
+      <size
+            category="com.aptana.browser.sizeCategory.mobile"
+            height="854"
+            image="com.aptana.browser.backgroundImage.motorola.droid2.vertical"
+            name="%size.motorola.droid2.name.vertical"
+            width="480">
       </size>
       <backgroundImage
             bgcolor="true"
             horizontalIndent="35"
-            id="com.aptana.browser.backgroundImage.iphone"
+            id="com.aptana.browser.backgroundImage.iphone.vertical"
             path="images/iphone_ver.png"
             verticalIndent="150">
+      </backgroundImage>
+      <backgroundImage
+            bgcolor="true"
+            horizontalIndent="150"
+            id="com.aptana.browser.backgroundImage.iphone.horizontal"
+            path="images/iphone_horiz.png"
+            verticalIndent="35">
+      </backgroundImage>
+      <backgroundImage
+            bgcolor="true"
+            horizontalIndent="42"
+            id="com.aptana.browser.backgroundImage.ipad.horizontal"
+            path="images/ipad_horiz.png"
+            verticalIndent="62">
+      </backgroundImage>
+      <backgroundImage
+            bgcolor="true"
+            horizontalIndent="42"
+            id="com.aptana.browser.backgroundImage.ipad.vertical"
+            path="images/ipad_vert.png"
+            verticalIndent="42">
+      </backgroundImage>
+      <backgroundImage
+            bgcolor="false"
+            horizontalIndent="139"
+            id="com.aptana.browser.backgroundImage.htc.touchhd.vertical"
+            path="images/htc_touchhd_vert.png"
+            verticalIndent="128">
+      </backgroundImage>
+      <backgroundImage
+            bgcolor="false"
+            horizontalIndent="446"
+            id="com.aptana.browser.backgroundImage.motorola.droid2.vertical"
+            path="images/motorola_droid2_vert.png"
+            verticalIndent="204">
       </backgroundImage>
    </extension>
 
