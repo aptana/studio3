@@ -70,7 +70,7 @@ public class BundleVisibilityTests extends BundleTestBase
 	{
 		this._bundleListener = new BundleTestListener();
 		
-		BundleTestBase.getBundleManagerInstance().addBundleChangeListener(this._bundleListener);
+		BundleTestBase.getBundleManagerInstance().addBundleVisibilityListener(this._bundleListener);
 	}
 	
 	/**

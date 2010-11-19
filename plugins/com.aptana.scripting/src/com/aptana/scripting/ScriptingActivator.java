@@ -156,7 +156,7 @@ public class ScriptingActivator extends Plugin
 
 				// register file association listener
 				fileTypeListener = new FileTypeAssociationListener();
-				manager.addBundleChangeListener(fileTypeListener);
+				manager.addBundleVisibilityListener(fileTypeListener);
 
 				// grabbing instance registers itself the bundle manager
 				FileWatcherRegistrant.getInstance();
@@ -207,7 +207,7 @@ public class ScriptingActivator extends Plugin
 			if (fileTypeListener != null)
 			{
 				fileTypeListener.cleanup();
-				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
+				BundleManager.getInstance().removeBundleVisibilityListener(fileTypeListener);
 				fileTypeListener = null;
 			}
 

@@ -317,8 +317,8 @@ public class BundleManager
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
-	private List<BundleVisibilityListener> _bundleListeners;
-	private List<ElementVisibilityListener> _elementListeners;
+	private List<BundleVisibilityListener> _bundleVisibilityListeners;
+	private List<ElementVisibilityListener> _elementVisibilityListeners;
 
 	private List<LoadCycleListener> _loadCycleListeners;
 	private Object bundlePathsLock = new Object();
@@ -399,43 +399,43 @@ public class BundleManager
 	}
 
 	/**
-	 * addBundleChangeListener
+	 * addBundleVisibilityListener
 	 * 
 	 * @param listener
 	 */
-	public void addBundleChangeListener(BundleVisibilityListener listener)
+	public void addBundleVisibilityListener(BundleVisibilityListener listener)
 	{
 		if (listener != null)
 		{
 			synchronized (bundleListenersLock)
 			{
-				if (this._bundleListeners == null)
+				if (this._bundleVisibilityListeners == null)
 				{
-					this._bundleListeners = new ArrayList<BundleVisibilityListener>();
+					this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
 				}
 
-				this._bundleListeners.add(listener);
+				this._bundleVisibilityListeners.add(listener);
 			}
 		}
 	}
 
 	/**
-	 * addElementChangeListener
+	 * addElementVisibilityListener
 	 * 
 	 * @param listener
 	 */
-	public void addElementChangeListener(ElementVisibilityListener listener)
+	public void addElementVisibilityListener(ElementVisibilityListener listener)
 	{
 		if (listener != null)
 		{
 			synchronized (elementListenersLock)
 			{
-				if (this._elementListeners == null)
+				if (this._elementVisibilityListeners == null)
 				{
-					this._elementListeners = new ArrayList<ElementVisibilityListener>();
+					this._elementVisibilityListeners = new ArrayList<ElementVisibilityListener>();
 				}
 
-				this._elementListeners.add(listener);
+				this._elementVisibilityListeners.add(listener);
 			}
 		}
 	}
@@ -497,9 +497,9 @@ public class BundleManager
 		{
 			synchronized (bundleListenersLock)
 			{
-				if (this._bundleListeners != null)
+				if (this._bundleVisibilityListeners != null)
 				{
-					for (BundleVisibilityListener listener : this._bundleListeners)
+					for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 					{
 						listener.bundlesBecameHidden(entry);
 					}
@@ -519,9 +519,9 @@ public class BundleManager
 		{
 			synchronized (bundleListenersLock)
 			{
-				if (this._bundleListeners != null)
+				if (this._bundleVisibilityListeners != null)
 				{
-					for (BundleVisibilityListener listener : this._bundleListeners)
+					for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 					{
 						listener.bundlesBecameVisible(entry);
 					}
@@ -541,9 +541,9 @@ public class BundleManager
 		{
 			synchronized (elementListenersLock)
 			{
-				if (this._elementListeners != null)
+				if (this._elementVisibilityListeners != null)
 				{
-					for (ElementVisibilityListener listener : this._elementListeners)
+					for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 					{
 						listener.elementBecameHidden(element);
 					}
@@ -563,9 +563,9 @@ public class BundleManager
 		{
 			synchronized (elementListenersLock)
 			{
-				if (this._elementListeners != null)
+				if (this._elementVisibilityListeners != null)
 				{
-					for (ElementVisibilityListener listener : this._elementListeners)
+					for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 					{
 						listener.elementBecameVisible(element);
 					}
@@ -698,22 +698,16 @@ public class BundleManager
 	 */
 	public List<CommandElement> getBundleCommands(String name)
 	{
-		List<CommandElement> result = Collections.emptyList();
-		BundleEntry entry = null;
+		BundleEntry entry = this.getBundleEntry(name);
+		List<CommandElement> result;
 
-		synchronized (entryNamesLock)
-		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles for the given name
-				entry = this._entriesByName.get(name);
-			}
-			
-		}
-		
 		if (entry != null)
 		{
 			result = entry.getCommands();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -785,17 +779,16 @@ public class BundleManager
 	 */
 	public List<EnvironmentElement> getBundleEnvs(String name)
 	{
-		List<EnvironmentElement> result = Collections.emptyList();
+		BundleEntry entry = this.getBundleEntry(name);
+		List<EnvironmentElement> result;
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getEnvs();
-			}
+			result = entry.getEnvs();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -896,17 +889,12 @@ public class BundleManager
 	 */
 	protected List<String> getBundleLoadPaths(String name)
 	{
+		BundleEntry entry = this.getBundleEntry(name);
 		List<String> result = new ArrayList<String>();
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result.addAll(entry.getLoadPaths());
-			}
+			result.addAll(entry.getLoadPaths());
 		}
 
 		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
@@ -922,17 +910,16 @@ public class BundleManager
 	 */
 	public List<MenuElement> getBundleMenus(String name)
 	{
-		List<MenuElement> result = Collections.emptyList();
+		BundleEntry entry = this.getBundleEntry(name);
+		List<MenuElement> result;
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getMenus();
-			}
+			result = entry.getMenus();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -945,18 +932,26 @@ public class BundleManager
 	 */
 	public List<String> getBundleNames()
 	{
-		List<String> result = Collections.emptyList();
+		List<String> names = null;
+		List<String> result;
 
 		synchronized (entryNamesLock)
 		{
 			if (this._entriesByName != null && this._entriesByName.size() > 0)
 			{
-				List<String> names = new ArrayList<String>(this._entriesByName.keySet());
-
-				Collections.sort(names);
-
-				result = Collections.unmodifiableList(names);
+				names = new ArrayList<String>(this._entriesByName.keySet());
 			}
+		}
+		
+		if (names != null)
+		{
+			Collections.sort(names);
+			
+			result = Collections.unmodifiableList(names);
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -970,17 +965,16 @@ public class BundleManager
 	 */
 	public List<SmartTypingPairsElement> getBundlePairs(String name)
 	{
-		List<SmartTypingPairsElement> result = Collections.emptyList();
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SmartTypingPairsElement> result;
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getPairs();
-			}
+			result = entry.getPairs();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
@@ -1833,13 +1827,13 @@ public class BundleManager
 	 * 
 	 * @param listener
 	 */
-	public void removeBundleChangeListener(BundleVisibilityListener listener)
+	public void removeBundleVisibilityListener(BundleVisibilityListener listener)
 	{
 		synchronized (bundleListenersLock)
 		{
-			if (this._bundleListeners != null)
+			if (this._bundleVisibilityListeners != null)
 			{
-				this._bundleListeners.remove(listener);
+				this._bundleVisibilityListeners.remove(listener);
 			}
 		}
 	}
@@ -1853,9 +1847,9 @@ public class BundleManager
 	{
 		synchronized (elementListenersLock)
 		{
-			if (this._elementListeners != null)
+			if (this._elementVisibilityListeners != null)
 			{
-				this._elementListeners.remove(listener);
+				this._elementVisibilityListeners.remove(listener);
 			}
 		}
 	}

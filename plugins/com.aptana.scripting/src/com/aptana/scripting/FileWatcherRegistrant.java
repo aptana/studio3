@@ -386,7 +386,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		BundleManager manager = BundleManager.getInstance();
 
-		manager.addElementChangeListener(this);
+		manager.addElementVisibilityListener(this);
 	}
 
 	/**
@@ -396,7 +396,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		BundleManager manager = BundleManager.getInstance();
 
-		manager.removeElementChangeListener(this);
+		manager.removeElementVisibilityListener(this);
 
 		// remove all watches
 		for (int id : this._watcherIdFile.keySet())
