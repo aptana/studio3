@@ -450,28 +450,6 @@ public class BundleManager
 	}
 
 	/**
-	 * fireBundleAddedEvent
-	 * 
-	 * @param bundle
-	 */
-	void fireBundleAddedEvent(BundleElement bundle)
-	{
-		if (bundle != null)
-		{
-			synchronized (bundleListenersLock)
-			{
-				if (this._bundleListeners != null)
-				{
-					for (BundleChangeListener listener : this._bundleListeners)
-					{
-						listener.bundleAdded(bundle);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * fireBundleBecameHiddenEvent
 	 * 
 	 * @param bundle
@@ -509,28 +487,6 @@ public class BundleManager
 					for (BundleChangeListener listener : this._bundleListeners)
 					{
 						listener.bundlesBecameVisible(entry);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * fireBundleDeletedEvent
-	 * 
-	 * @param bundle
-	 */
-	void fireBundleDeletedEvent(BundleElement bundle)
-	{
-		if (bundle != null)
-		{
-			synchronized (bundleListenersLock)
-			{
-				if (this._bundleListeners != null)
-				{
-					for (BundleChangeListener listener : this._bundleListeners)
-					{
-						listener.bundleDeleted(bundle);
 					}
 				}
 			}

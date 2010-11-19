@@ -741,9 +741,6 @@ public class BundleEntry
 
 			if (result)
 			{
-				// fire bundle deleted event
-				BundleManager.getInstance().fireBundleDeletedEvent(bundle);
-
 				// fire visibility change events
 				context.fireVisibilityEvents();
 			}

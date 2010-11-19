@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
 import com.aptana.scripting.model.BundleChangeListener;
-import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 
 /**
@@ -52,13 +51,7 @@ import com.aptana.scripting.model.BundleEntry;
  */
 class FileTypeAssociationListener implements BundleChangeListener
 {
-
 	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
-
-	public void bundleDeleted(BundleElement bundle)
-	{
-		// nothing
-	}
 
 	public void bundlesBecameVisible(BundleEntry entry)
 	{
@@ -134,11 +127,6 @@ class FileTypeAssociationListener implements BundleChangeListener
 	protected List<String> getFileTypes(BundleEntry entry)
 	{
 		return entry.getFileTypes();
-	}
-
-	public void bundleAdded(BundleElement bundle)
-	{
-		// nothing
 	}
 
 	public void cleanup()

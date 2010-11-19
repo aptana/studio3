@@ -37,15 +37,6 @@ package com.aptana.scripting.model;
 public interface BundleChangeListener
 {
 	/**
-	 * This event fires whenever a new bundle is added to its bundle entry regardless of its resulting visibility. The
-	 * event fires after the becameHidden becameVisible events. When this event fires, the bundle element's visibility
-	 * flag will have been set.
-	 * 
-	 * @param bundle
-	 */
-	void bundleAdded(BundleElement bundle);
-
-	/**
 	 * This event fires whenever one or more bundles that were previously visible have become hidden by another bundle.
 	 * All bundles that have changed state are members of the specified bundle entry. The bundle entry can then be used
 	 * to calculate bundle properties following the bundle precedence rules. This can be done either via the helper
@@ -68,14 +59,4 @@ public interface BundleChangeListener
 	 * @param entry
 	 */
 	void bundlesBecameVisible(BundleEntry entry);
-
-	/**
-	 * This event fires whenever a bundle is removed from its bundle entry regardless of its visibility before deletion.
-	 * The event fires before the becameHidden becameVisible events fire. When this event fires, the bundle element's
-	 * visibility flag reflects its state before being deleted since all deleted bundle elements become hidden after
-	 * deletion.
-	 * 
-	 * @param bundle
-	 */
-	void bundleDeleted(BundleElement bundle);
 }
