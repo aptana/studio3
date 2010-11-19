@@ -626,7 +626,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<ProjectTemplateElement> getProjectTemplatesByType(Type type)
 	{
-		List<ProjectTemplateElement> result = Collections.emptyList();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		synchronized (templateLock)
 		{
