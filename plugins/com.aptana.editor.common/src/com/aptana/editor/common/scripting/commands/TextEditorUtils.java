@@ -34,12 +34,18 @@
  */
 package com.aptana.editor.common.scripting.commands;
 
+import java.lang.reflect.Method;
+
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import com.aptana.editor.common.extensions.IThemeableEditor;
 
 /**
  * This holds the TextEditor related utilities.
@@ -86,5 +92,28 @@ public abstract class TextEditorUtils
 			return textSelection.getOffset();
 		}
 		return -1;
+	}
+
+	public static ISourceViewer getSourceViewer(ITextEditor textEditor)
+	{
+		if (textEditor instanceof IThemeableEditor)
+		{
+			IThemeableEditor editor = (IThemeableEditor) textEditor;
+			return editor.getISourceViewer();
+		}
+		if (textEditor instanceof AbstractTextEditor)
+		{
+			try
+			{
+				Method m = AbstractTextEditor.class.getDeclaredMethod("getSourceViewer"); //$NON-NLS-1$
+				m.setAccessible(true);
+				return (ISourceViewer) m.invoke(textEditor);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
+		return null;
 	}
 }

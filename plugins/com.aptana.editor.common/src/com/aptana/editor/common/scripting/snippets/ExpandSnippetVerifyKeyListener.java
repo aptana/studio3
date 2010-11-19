@@ -103,7 +103,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 					if (!Character.isWhitespace(previousChar.charAt(0)))
 					{
 						int caretOffset = textViewer.getTextWidget().getCaretOffset();
-						String scope = getScope(document, caretOffset);
+						String scope = getScope(textViewer, caretOffset);
 						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
 						CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
 						if (commandsFromScope.length > 0)
@@ -166,12 +166,12 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			return false;
 	}
 
-	private static String getScope(IDocument document, int offset)
+	private static String getScope(ITextViewer viewer, int offset)
 	{
 		String scope = ""; //$NON-NLS-1$
 		try
 		{
-			scope = getDocumentScopeManager().getScopeAtOffset(document, offset);
+			scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
 		}
 		catch (BadLocationException e)
 		{

@@ -50,6 +50,7 @@ import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -156,11 +157,18 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			}
 		} else {
 			try {
-				IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 				int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
-				// Get the scope at caret offset
-				scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-						.getScopeAtOffset(document, caretOffset);
+				ISourceViewer viewer = TextEditorUtils.getSourceViewer(textEditor);
+				if (viewer == null)
+				{
+					IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+					scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
+				}
+				else
+				{
+					// Get the scope at caret offset
+					scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, caretOffset);
+				}
 			} catch (BadLocationException e) {
 				WorkbenchPlugin.log(e);
 			}

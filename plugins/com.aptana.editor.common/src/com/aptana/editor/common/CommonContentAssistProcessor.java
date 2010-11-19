@@ -57,6 +57,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -234,7 +235,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		try
 		{
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer.getDocument(), offset);
+					.getScopeAtOffset(viewer, offset);
 			CommandElement[] commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
 			if (commands != null && commands.length > 0)
 			{

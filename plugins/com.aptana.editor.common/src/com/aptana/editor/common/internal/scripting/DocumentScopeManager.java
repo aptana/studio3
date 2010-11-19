@@ -35,10 +35,19 @@
 
 package com.aptana.editor.common.internal.scripting;
 
+import java.lang.reflect.Field;
 import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.IPresentationRepairer;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.source.SourceViewer;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
@@ -54,26 +63,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 {
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
-
-	private static DocumentScopeManager instance;
-
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
-
-	/**
-	 * 
-	 */
-	private DocumentScopeManager()
-	{
-	}
-
-	public static DocumentScopeManager getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new DocumentScopeManager();
-		}
-		return instance;
-	}
 
 	/**
 	 * Store the filename for the document so we can dynamically look up the scope later.
@@ -111,7 +101,9 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
 	{
 		if (document == null)
+		{
 			return UNKNOWN;
+		}
 		ExtendedDocumentInfo info = infos.get(document);
 		if (info != null)
 		{
@@ -123,9 +115,76 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	public String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
 	{
-		// TODO We still don't append the token to end of scope, which Textmate does. Unfortunately I have no idea how
-		// we'd get that unless we ran a token scanner on the whole partition until we hit the token for our offset, and
-		// even then we need the token name, not the text attribute.
+		return getPartitionScopeFragmentsAtOffset(document, offset);
+	}
+
+	public String getScopeAtOffset(ITextViewer viewer, int offset) throws BadLocationException
+	{
+		IDocument document = viewer.getDocument();
+		String partitionFragment = getPartitionScopeFragmentsAtOffset(document, offset);
+		String tokenPortion = null;
+		try
+		{
+			Field f = SourceViewer.class.getDeclaredField("fPresentationReconciler"); //$NON-NLS-1$
+			f.setAccessible(true);
+			IPresentationReconciler reconciler = (IPresentationReconciler) f.get(viewer);
+			if (reconciler != null)
+			{
+				ITypedRegion region = document.getPartition(offset);
+				String contentType = region.getType();
+
+				IPresentationRepairer repairer = reconciler.getRepairer(contentType);
+				if (repairer instanceof DefaultDamagerRepairer)
+				{
+					DefaultDamagerRepairer ddr = (DefaultDamagerRepairer) repairer;
+					f = DefaultDamagerRepairer.class.getDeclaredField("fScanner"); //$NON-NLS-1$
+					f.setAccessible(true);
+					ITokenScanner fScanner = (ITokenScanner) f.get(ddr);
+					fScanner.setRange(document, region.getOffset(), region.getLength());
+					while (true)
+					{
+						IToken token = fScanner.nextToken();
+						if (token.isEOF())
+							break;
+						int tokenOffset = fScanner.getTokenOffset();
+						if (tokenOffset > offset)
+						{
+							break;
+						}
+						if (offset >= tokenOffset && offset <= (tokenOffset + fScanner.getTokenLength()))
+						{
+							Object data = token.getData();
+							if (data instanceof String)
+							{
+								tokenPortion = (String) data;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		if (tokenPortion != null)
+		{
+			if (tokenPortion.length() == 0)
+			{
+				return partitionFragment;
+			}
+
+			if (!partitionFragment.endsWith(tokenPortion))
+			{
+				return partitionFragment + " " + tokenPortion; //$NON-NLS-1$
+			}
+		}
+		return partitionFragment;
+	}
+
+	public String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException
+	{
 		QualifiedContentType contentType = getContentType(document, offset);
 		if (contentType != null)
 		{
@@ -145,6 +204,11 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	protected IContentTypeTranslator getContentTypeTranslator()
 	{
 		return CommonEditorPlugin.getDefault().getContentTypeTranslator();
+	}
+
+	public void dispose()
+	{
+		infos.clear();
 	}
 
 }
