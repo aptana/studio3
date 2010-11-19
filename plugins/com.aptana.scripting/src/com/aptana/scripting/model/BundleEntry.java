@@ -51,14 +51,70 @@ import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleEntry
 {
+	private abstract class ChildVisibilityContext<T extends AbstractBundleElement>
+	{
+		private List<T> preVisibleItems;
+
+		/**
+		 * VisibilityContext
+		 */
+		public ChildVisibilityContext()
+		{
+			this.preVisibleItems = this.getElements();
+		}
+
+		/**
+		 * fireVisibilityEvents
+		 */
+		public void fireVisibilityEvents()
+		{
+			BundleManager manager = BundleManager.getInstance();
+
+			Set<T> becameVisible = new HashSet<T>(this.getElements());
+			Set<T> becameHidden = new HashSet<T>(preVisibleItems);
+
+			becameHidden.removeAll(becameVisible);
+			becameVisible.removeAll(preVisibleItems);
+
+			// fire hidden events
+			if (becameHidden.size() > 0)
+			{
+				// set visibility flag
+				for (T element : becameHidden)
+				{
+					// fire hidden event
+					manager.fireElementBecameHiddenEvent(element);
+				}
+			}
+
+			// fire visible events
+			if (becameVisible.size() > 0)
+			{
+				// set visibility flag
+				for (T element : becameVisible)
+				{
+					// fire visible event
+					manager.fireElementBecameVisibleEvent(element);
+				}
+			}
+		}
+
+		/**
+		 * Return a list of abstract element items
+		 * 
+		 * @return
+		 */
+		public abstract List<T> getElements();
+	}
+
 	private class EntryVisibilityContext
 	{
 		private List<BundleElement> preVisibleBundles;
-		private VisibilityContext<CommandElement> commands;
-		private VisibilityContext<EnvironmentElement> envs;
-		private VisibilityContext<MenuElement> menus;
-		private VisibilityContext<SmartTypingPairsElement> pairs;
-		private VisibilityContext<ProjectTemplateElement> projectTemplates;
+		private ChildVisibilityContext<CommandElement> commands;
+		private ChildVisibilityContext<EnvironmentElement> envs;
+		private ChildVisibilityContext<MenuElement> menus;
+		private ChildVisibilityContext<SmartTypingPairsElement> pairs;
+		private ChildVisibilityContext<ProjectTemplateElement> projectTemplates;
 
 		/**
 		 * VisibilityContext
@@ -66,35 +122,35 @@ public class BundleEntry
 		public EntryVisibilityContext()
 		{
 			preVisibleBundles = getContributingBundles();
-			commands = new VisibilityContext<CommandElement>()
+			commands = new ChildVisibilityContext<CommandElement>()
 			{
 				public List<CommandElement> getElements()
 				{
 					return getCommands();
 				}
 			};
-			envs = new VisibilityContext<EnvironmentElement>()
+			envs = new ChildVisibilityContext<EnvironmentElement>()
 			{
 				public List<EnvironmentElement> getElements()
 				{
 					return getEnvs();
 				}
 			};
-			menus = new VisibilityContext<MenuElement>()
+			menus = new ChildVisibilityContext<MenuElement>()
 			{
 				public List<MenuElement> getElements()
 				{
 					return getMenus();
 				}
 			};
-			pairs = new VisibilityContext<SmartTypingPairsElement>()
+			pairs = new ChildVisibilityContext<SmartTypingPairsElement>()
 			{
 				public List<SmartTypingPairsElement> getElements()
 				{
 					return getPairs();
 				}
 			};
-			projectTemplates = new VisibilityContext<ProjectTemplateElement>()
+			projectTemplates = new ChildVisibilityContext<ProjectTemplateElement>()
 			{
 				public List<ProjectTemplateElement> getElements()
 				{
@@ -212,62 +268,6 @@ public class BundleEntry
 
 			return true;
 		}
-	}
-
-	private abstract class VisibilityContext<T extends AbstractBundleElement>
-	{
-		private List<T> preVisibleItems;
-
-		/**
-		 * VisibilityContext
-		 */
-		public VisibilityContext()
-		{
-			this.preVisibleItems = this.getElements();
-		}
-
-		/**
-		 * fireVisibilityEvents
-		 */
-		public void fireVisibilityEvents()
-		{
-			BundleManager manager = BundleManager.getInstance();
-
-			Set<T> becameVisible = new HashSet<T>(this.getElements());
-			Set<T> becameHidden = new HashSet<T>(preVisibleItems);
-
-			becameHidden.removeAll(becameVisible);
-			becameVisible.removeAll(preVisibleItems);
-
-			// fire hidden events
-			if (becameHidden.size() > 0)
-			{
-				// set visibility flag
-				for (T element : becameHidden)
-				{
-					// fire hidden event
-					manager.fireElementBecameHiddenEvent(element);
-				}
-			}
-
-			// fire visible events
-			if (becameVisible.size() > 0)
-			{
-				// set visibility flag
-				for (T element : becameVisible)
-				{
-					// fire visible event
-					manager.fireElementBecameVisibleEvent(element);
-				}
-			}
-		}
-
-		/**
-		 * Return a list of abstract element items
-		 * 
-		 * @return
-		 */
-		public abstract List<T> getElements();
 	}
 
 	private String _name;
