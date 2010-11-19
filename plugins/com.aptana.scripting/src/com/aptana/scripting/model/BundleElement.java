@@ -57,10 +57,10 @@ public class BundleElement extends AbstractElement
 	private String _license;
 	private String _licenseUrl;
 	private String _repository;
-
+	
+	private List<AbstractBundleElement> _children;
 	private File _bundleDirectory;
 	private BundlePrecedence _bundlePrecedence;
-	private List<AbstractBundleElement> _children;
 	private boolean _visible;
 
 	private Map<String, String> _fileTypeRegistry;
