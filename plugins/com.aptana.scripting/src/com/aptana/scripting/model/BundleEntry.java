@@ -584,6 +584,17 @@ public class BundleEntry
 	}
 
 	/**
+	 * hasBundle
+	 * 
+	 * @param bundle
+	 * @return
+	 */
+	public boolean hasBundle(BundleElement bundle)
+	{
+		return this._bundles.contains(bundle);
+	}
+
+	/**
 	 * processBundles
 	 * 
 	 * @param processor
