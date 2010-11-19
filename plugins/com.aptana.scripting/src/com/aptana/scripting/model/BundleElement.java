@@ -116,7 +116,7 @@ public class BundleElement extends AbstractElement
 			{
 				if (this._children.contains(element) == false)
 				{
-					BundleEntry.VisibilityContext context = this.getVisibilityContext();
+					BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
 
 					this._children.add(element);
 
@@ -585,14 +585,14 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	private BundleEntry.VisibilityContext getVisibilityContext()
+	private BundleEntry.VisibilityContext getVisibilityContext(Class<?> elementClass)
 	{
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(this.getDisplayName());
 		BundleEntry.VisibilityContext context = null;
 
 		if (entry != null)
 		{
-			context = entry.getVisibilityContext();
+			context = entry.getVisibilityContext(elementClass);
 		}
 
 		return context;
@@ -700,7 +700,7 @@ public class BundleElement extends AbstractElement
 
 		synchronized (this._children)
 		{
-			BundleEntry.VisibilityContext context = this.getVisibilityContext();
+			BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
 
 			removed = this._children.remove(element);
 

@@ -119,44 +119,67 @@ public class BundleEntry
 		/**
 		 * VisibilityContext
 		 */
-		public VisibilityContext()
+		public VisibilityContext(Class<?> elementClass)
 		{
-			preVisibleBundles = getContributingBundles();
-			commands = new ChildVisibilityContext<CommandElement>()
+			if (elementClass == null)
 			{
-				public List<CommandElement> getElements()
-				{
-					return getCommands();
-				}
-			};
-			envs = new ChildVisibilityContext<EnvironmentElement>()
+				preVisibleBundles = getContributingBundles();
+			}
+
+			if (elementClass == null || elementClass == CommandElement.class)
 			{
-				public List<EnvironmentElement> getElements()
+				commands = new ChildVisibilityContext<CommandElement>()
 				{
-					return getEnvs();
-				}
-			};
-			menus = new ChildVisibilityContext<MenuElement>()
+					public List<CommandElement> getElements()
+					{
+						return getCommands();
+					}
+				};
+			}
+
+			if (elementClass == null || elementClass == EnvironmentElement.class)
 			{
-				public List<MenuElement> getElements()
+				envs = new ChildVisibilityContext<EnvironmentElement>()
 				{
-					return getMenus();
-				}
-			};
-			pairs = new ChildVisibilityContext<SmartTypingPairsElement>()
+					public List<EnvironmentElement> getElements()
+					{
+						return getEnvs();
+					}
+				};
+			}
+
+			if (elementClass == null || elementClass == MenuElement.class)
 			{
-				public List<SmartTypingPairsElement> getElements()
+				menus = new ChildVisibilityContext<MenuElement>()
 				{
-					return getPairs();
-				}
-			};
-			projectTemplates = new ChildVisibilityContext<ProjectTemplateElement>()
+					public List<MenuElement> getElements()
+					{
+						return getMenus();
+					}
+				};
+			}
+
+			if (elementClass == null || elementClass == SmartTypingPairsElement.class)
 			{
-				public List<ProjectTemplateElement> getElements()
+				pairs = new ChildVisibilityContext<SmartTypingPairsElement>()
 				{
-					return getProjectTemplates();
-				}
-			};
+					public List<SmartTypingPairsElement> getElements()
+					{
+						return getPairs();
+					}
+				};
+			}
+
+			if (elementClass == null || elementClass == ProjectTemplateElement.class)
+			{
+				projectTemplates = new ChildVisibilityContext<ProjectTemplateElement>()
+				{
+					public List<ProjectTemplateElement> getElements()
+					{
+						return getProjectTemplates();
+					}
+				};
+			}
 		}
 
 		/**
@@ -216,12 +239,29 @@ public class BundleEntry
 		 */
 		public void fireVisibilityEvents()
 		{
-			fireBundleVisibilityEvents();
-			commands.fireVisibilityEvents();
-			envs.fireVisibilityEvents();
-			menus.fireVisibilityEvents();
-			pairs.fireVisibilityEvents();
-			projectTemplates.fireVisibilityEvents();
+			if (preVisibleBundles != null)
+			{
+				fireBundleVisibilityEvents();
+			}
+			
+			this.fireVisibilityEvents(commands);
+			this.fireVisibilityEvents(envs);
+			this.fireVisibilityEvents(menus);
+			this.fireVisibilityEvents(pairs);
+			this.fireVisibilityEvents(projectTemplates);
+		}
+		
+		/**
+		 * fireVisibilityEvents
+		 * 
+		 * @param context
+		 */
+		private void fireVisibilityEvents(ChildVisibilityContext<? extends AbstractBundleElement> context)
+		{
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
+			}
 		}
 	}
 
@@ -339,7 +379,7 @@ public class BundleEntry
 				// only go through the add process and its side-effects if we don't have this bundle already
 				if (this.hasBundle(bundle) == false)
 				{
-					VisibilityContext context = this.getVisibilityContext();
+					VisibilityContext context = this.getVisibilityContext(null);
 
 					// add the bundle
 					this._bundles.add(bundle);
@@ -706,9 +746,9 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public VisibilityContext getVisibilityContext()
+	public VisibilityContext getVisibilityContext(Class<?> elementClass)
 	{
-		return new VisibilityContext();
+		return new VisibilityContext(elementClass);
 	}
 
 	/**
@@ -781,7 +821,7 @@ public class BundleEntry
 
 		synchronized (this._bundles)
 		{
-			VisibilityContext context = this.getVisibilityContext();
+			VisibilityContext context = this.getVisibilityContext(null);
 
 			result = this._bundles.remove(bundle);
 
