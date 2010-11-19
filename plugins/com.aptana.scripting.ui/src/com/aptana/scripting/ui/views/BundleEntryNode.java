@@ -203,7 +203,7 @@ class BundleEntryNode extends BaseNode
 
 		for (BundleElement bundle : this._entry.getBundles())
 		{
-			if (bundle.hasCommands() || bundle.hasMenus())
+			if (bundle.hasChildren())
 			{
 				result = true;
 				break;

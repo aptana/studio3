@@ -205,6 +205,6 @@ class BundleNode extends BaseNode
 	 */
 	public boolean hasChildren()
 	{
-		return this._bundle.hasCommands() || this._bundle.hasMenus();
+		return this._bundle.hasChildren();
 	}
 }
