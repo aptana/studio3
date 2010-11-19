@@ -182,6 +182,9 @@ public class BundleManager
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
 
+	// singleton instance
+	private static BundleManager INSTANCE;
+
 	/**
 	 * getInstance
 	 * 
@@ -311,21 +314,21 @@ public class BundleManager
 	 * available processors reported by Java's Runtime.
 	 */
 	private int counter = 0;
-	private static BundleManager INSTANCE;
+
 	private String applicationBundlesPath;
 	private String userBundlesPath;
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
+	
 	private List<BundleVisibilityListener> _bundleVisibilityListeners;
 	private List<ElementVisibilityListener> _elementVisibilityListeners;
-
 	private List<LoadCycleListener> _loadCycleListeners;
+	
 	private Object bundlePathsLock = new Object();
 	private Object entryNamesLock = new Object();
 	private Object bundleListenersLock = new Object();
 	private Object elementListenersLock = new Object();
-
 	private Object loadCycleListenersLock = new Object();
 
 	/**
@@ -942,11 +945,11 @@ public class BundleManager
 				names = new ArrayList<String>(this._entriesByName.keySet());
 			}
 		}
-		
+
 		if (names != null)
 		{
 			Collections.sort(names);
-			
+
 			result = Collections.unmodifiableList(names);
 		}
 		else
