@@ -1823,7 +1823,7 @@ public class BundleManager
 	}
 
 	/**
-	 * removeBundleChangeListener
+	 * removeBundleVisibilityListener
 	 * 
 	 * @param listener
 	 */
@@ -1839,11 +1839,11 @@ public class BundleManager
 	}
 
 	/**
-	 * removeElementChangeListener
+	 * removeElementVisibilityListener
 	 * 
 	 * @param listener
 	 */
-	public void removeElementChangeListener(ElementVisibilityListener listener)
+	public void removeElementVisibilityListener(ElementVisibilityListener listener)
 	{
 		synchronized (elementListenersLock)
 		{
