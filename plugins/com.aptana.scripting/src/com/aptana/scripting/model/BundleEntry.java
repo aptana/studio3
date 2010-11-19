@@ -107,7 +107,7 @@ public class BundleEntry
 		public abstract List<T> getElements();
 	}
 
-	private class EntryVisibilityContext
+	public class VisibilityContext
 	{
 		private List<BundleElement> preVisibleBundles;
 		private ChildVisibilityContext<CommandElement> commands;
@@ -119,7 +119,7 @@ public class BundleEntry
 		/**
 		 * VisibilityContext
 		 */
-		public EntryVisibilityContext()
+		public VisibilityContext()
 		{
 			preVisibleBundles = getContributingBundles();
 			commands = new ChildVisibilityContext<CommandElement>()
@@ -339,7 +339,7 @@ public class BundleEntry
 				// only go through the add process and its side-effects if we don't have this bundle already
 				if (this.hasBundle(bundle) == false)
 				{
-					EntryVisibilityContext context = new EntryVisibilityContext();
+					VisibilityContext context = this.getVisibilityContext();
 
 					// add the bundle
 					this._bundles.add(bundle);
@@ -702,6 +702,16 @@ public class BundleEntry
 	}
 
 	/**
+	 * getVisibilityContext
+	 * 
+	 * @return
+	 */
+	public VisibilityContext getVisibilityContext()
+	{
+		return new VisibilityContext();
+	}
+
+	/**
 	 * hasBundle
 	 * 
 	 * @param bundle
@@ -771,7 +781,7 @@ public class BundleEntry
 
 		synchronized (this._bundles)
 		{
-			EntryVisibilityContext context = new EntryVisibilityContext();
+			VisibilityContext context = this.getVisibilityContext();
 
 			result = this._bundles.remove(bundle);
 
