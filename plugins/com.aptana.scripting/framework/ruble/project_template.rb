@@ -2,7 +2,7 @@ require "ruble/command"
 
 module Ruble
 
-  class ProjectTemplate < Command
+  class ProjectTemplate < BaseElement
     def initialize(name, path)
       super
     end    
@@ -12,7 +12,7 @@ module Ruble
     end    
     
     def type
-      @jojb.type.to_s
+      @jobj.type.to_s
     end
     
     def location=(location)
@@ -20,7 +20,7 @@ module Ruble
     end    
     
     def location
-      @jojb.location
+      @jobj.location
     end
     
     def description=(description)
@@ -28,11 +28,11 @@ module Ruble
     end    
     
     def description
-      @jojb.description
+      @jobj.description
     end
 
     class << self
-      def define_project_template(name, &block)
+      def define_template(name, &block)
         log_info("loading project template #{name}")
 
         path = block.binding.eval("__FILE__")
@@ -62,5 +62,5 @@ end
 # define top-level convenience methods
 
 def project_template(name, &block)
-  Ruble::Template.define_template(name, &block)
+  Ruble::ProjectTemplate.define_template(name, &block)
 end
