@@ -35,6 +35,7 @@
 
 package com.aptana.editor.common;
 
+
 /**
  * @author Max Stepanov
  *
@@ -48,6 +49,10 @@ public class NullPartitionerSwitchStrategy implements IPartitionerSwitchStrategy
 
 		public char[][] getSwitchSequences() {
 			return EMPTY_SWITCHES;
+		}
+
+		public SequenceBypassHandler getSequenceBypassHandler() {
+			return null;
 		}
 	};
 	

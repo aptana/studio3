@@ -35,6 +35,9 @@
 
 package com.aptana.editor.haml;
 
+import org.eclipse.jface.text.rules.ICharacterScanner;
+
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
 import com.aptana.editor.common.PartitionerSwitchStrategy;
 
 /**
@@ -45,23 +48,47 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 
 	private static HAMLPartitionerSwitchStrategy instance;
 	
-	private static final String[][] ERB_PAIRS = new String[][] {
-		{ "#{", "}" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "{", "}" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "[", "]" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "=", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String[][] HAML_PAIRS = new String[][] {
 		{ "=", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "~", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "-", "\r" }, //$NON-NLS-1$ //$NON-NLS-2$
 		{ "-", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
 	};
 	
+	private static final char ESCAPE = '\\';
+	private static final char COMMA = ',';
+	private static final char VERTICAL = '|';
+	
+	private static final SequenceBypassHandler START_BYPASS_HANDLER = new SequenceBypassHandler() {
+		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound) {
+			if (characterScanner.getColumn() > 0) {
+				characterScanner.unread();
+				int c = characterScanner.read();
+				if (ESCAPE == c) {
+					return true;
+				}
+			}
+			return false;
+		}
+	};
+
+	private static final SequenceBypassHandler END_BYPASS_HANDLER = new SequenceBypassHandler() {
+		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound) {
+			if (characterScanner.getColumn() > 0) {
+				characterScanner.unread();
+				int c = characterScanner.read();
+				if (COMMA == c || VERTICAL == c) {
+					return true;
+				}
+			}
+			return false;
+		}
+	};
+
 	/**
 	 * 
 	 */
 	private HAMLPartitionerSwitchStrategy() {
-		super(ERB_PAIRS);
+		super(HAML_PAIRS, START_BYPASS_HANDLER, END_BYPASS_HANDLER);
 	}
 	
 	public static HAMLPartitionerSwitchStrategy getDefault() {
@@ -75,7 +102,7 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
 	 */
 	public String[][] getSwitchTagPairs() {
-		return ERB_PAIRS;
+		return HAML_PAIRS;
 	}
 
 }

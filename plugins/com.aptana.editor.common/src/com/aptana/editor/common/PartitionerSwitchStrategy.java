@@ -35,15 +35,22 @@
 
 package com.aptana.editor.common;
 
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
+
 /**
  * @author Max Stepanov
  *
  */
 public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
 	
-	private char[][][] switchSequences;
-	
+	private final char[][][] switchSequences;
+	private final SequenceBypassHandler[] sequenceBypassHandlers;
+
 	protected PartitionerSwitchStrategy(String[][] switchSequencePairs) {
+		this(switchSequencePairs, null, null);
+	}
+
+	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, SequenceBypassHandler startBypassHandler, SequenceBypassHandler endBypassHandler) {
 		char[][] startSequences = new char[switchSequencePairs.length][];
 		char[][] endSequences = new char[switchSequencePairs.length][];
 		for (int i = 0; i < switchSequencePairs.length; ++i) {
@@ -52,6 +59,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 		}
 
 		switchSequences = new char[][][] { TextUtils.removeDuplicates(startSequences), TextUtils.removeDuplicates(endSequences) };
+		sequenceBypassHandlers = new SequenceBypassHandler[] { startBypassHandler, endBypassHandler };
 	}
 
 	/* (non-Javadoc)
@@ -61,6 +69,10 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 		return new IPartitionScannerSwitchStrategy() {
 			public char[][] getSwitchSequences() {
 				return switchSequences[0];
+			}
+
+			public SequenceBypassHandler getSequenceBypassHandler() {
+				return sequenceBypassHandlers[0];
 			}
 		};
 	}
@@ -72,6 +84,10 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 		return new IPartitionScannerSwitchStrategy() {
 			public char[][] getSwitchSequences() {
 				return switchSequences[1];
+			}
+
+			public SequenceBypassHandler getSequenceBypassHandler() {
+				return sequenceBypassHandlers[1];
 			}
 		};
 	}

@@ -42,15 +42,24 @@ package com.aptana.editor.common;
 public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchStrategy {
 
 	private char[][] switchSequences;
-	
+	private SequenceBypassHandler sequenceBypassHandler;
+
 	/**
 	 * 
 	 */
 	public PartitionScannerSwitchStrategy(String[] switchSequences) {
+		this(switchSequences, null);
+	}
+
+	/**
+	 * 
+	 */
+	public PartitionScannerSwitchStrategy(String[] switchSequences, SequenceBypassHandler sequenceBypassHandler) {
 		this.switchSequences = new char[switchSequences.length][];
 		for (int i = 0 ; i < switchSequences.length; ++i) {
 			this.switchSequences[i] = switchSequences[i].toCharArray();
 		}
+		this.sequenceBypassHandler = sequenceBypassHandler;
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +67,10 @@ public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchSt
 	 */
 	public char[][] getSwitchSequences() {
 		return switchSequences;
+	}
+
+	public SequenceBypassHandler getSequenceBypassHandler() {
+		return sequenceBypassHandler;
 	}
 
 }

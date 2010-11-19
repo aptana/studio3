@@ -59,8 +59,6 @@ import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.ruby.IRubyConstants;
 import com.aptana.editor.ruby.RubySourceConfiguration;
-import com.aptana.theme.IThemeManager;
-import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Chris Williams

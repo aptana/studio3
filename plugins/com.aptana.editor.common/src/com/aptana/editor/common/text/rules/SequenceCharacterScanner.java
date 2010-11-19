@@ -35,9 +35,12 @@
 
 package com.aptana.editor.common.text.rules;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.rules.ICharacterScanner;
 
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
+import com.aptana.editor.common.TextUtils;
 
 /**
  * @author Max Stepanov
@@ -46,6 +49,8 @@ import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 public class SequenceCharacterScanner implements ICharacterScanner {
 
 	private ICharacterScanner characterScanner;
+	private IPartitionScannerSwitchStrategy switchStrategy;
+	private SequenceBypassHandler sequenceBypassHandler;
 	private char[][] switchSequences;
 	private boolean found = false;
 	private boolean eof = false;
@@ -62,8 +67,9 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 
 	public SequenceCharacterScanner(ICharacterScanner characterScanner, IPartitionScannerSwitchStrategy switchStrategy, boolean ignoreCase) {
 		this.characterScanner = characterScanner;
-		this.switchSequences = switchStrategy.getSwitchSequences();
+		this.switchStrategy = switchStrategy;
 		this.ignoreCase = ignoreCase;
+		this.sequenceBypassHandler = switchStrategy.getSequenceBypassHandler();
 	}
 
 	/* (non-Javadoc)
@@ -87,12 +93,18 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		eof = false;
 		int c = characterScanner.read();
 		if (c != ICharacterScanner.EOF && !ignored) {
+			if (switchSequences == null) {
+				switchSequences = TextUtils.replace(switchStrategy.getSwitchSequences(), '\n', characterScanner.getLegalLineDelimiters());
+			}
 			for (char[] sequence : switchSequences) {
 				if (c == sequence[0] && sequenceDetected(sequence)) {
-					found = true;
-					eof = true;
 					characterScanner.unread();
-					return ICharacterScanner.EOF;
+					if (sequenceBypassHandler != null && !sequenceBypassHandler.bypassSequence(characterScanner, sequence)) {
+						found = true;
+						eof = true;
+						return ICharacterScanner.EOF;
+					}
+					Assert.isTrue(c == characterScanner.read());
 				}
 			}
 		}
