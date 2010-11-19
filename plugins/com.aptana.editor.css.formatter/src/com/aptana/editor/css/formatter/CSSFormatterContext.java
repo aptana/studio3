@@ -43,10 +43,6 @@ import com.aptana.formatter.nodes.IFormatterNode;
  */
 public class CSSFormatterContext extends FormatterContext
 {
-
-	/**
-	 * 
-	 */
 	private static final String WRAPPING_COMMENT_PREFIX = " * "; //$NON-NLS-1$
 
 	/**
