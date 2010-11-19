@@ -699,16 +699,21 @@ public class BundleManager
 	public List<CommandElement> getBundleCommands(String name)
 	{
 		List<CommandElement> result = Collections.emptyList();
+		BundleEntry entry = null;
 
 		synchronized (entryNamesLock)
 		{
 			if (this._entriesByName != null && this._entriesByName.containsKey(name))
 			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getCommands();
+				// grab all bundles for the given name
+				entry = this._entriesByName.get(name);
 			}
+			
+		}
+		
+		if (entry != null)
+		{
+			result = entry.getCommands();
 		}
 
 		return result;
