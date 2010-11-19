@@ -281,7 +281,7 @@ public class BundleManager
 	private Map<File, List<BundleElement>> _bundlesByPath;
 
 	private Map<String, BundleEntry> _entriesByName;
-	private List<BundleChangeListener> _bundleListeners;
+	private List<BundleVisibilityListener> _bundleListeners;
 	private List<ElementChangeListener> _elementListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
 	
@@ -366,7 +366,7 @@ public class BundleManager
 	 * 
 	 * @param listener
 	 */
-	public void addBundleChangeListener(BundleChangeListener listener)
+	public void addBundleChangeListener(BundleVisibilityListener listener)
 	{
 		if (listener != null)
 		{
@@ -374,7 +374,7 @@ public class BundleManager
 			{
 				if (this._bundleListeners == null)
 				{
-					this._bundleListeners = new ArrayList<BundleChangeListener>();
+					this._bundleListeners = new ArrayList<BundleVisibilityListener>();
 				}
 
 				this._bundleListeners.add(listener);
@@ -462,7 +462,7 @@ public class BundleManager
 			{
 				if (this._bundleListeners != null)
 				{
-					for (BundleChangeListener listener : this._bundleListeners)
+					for (BundleVisibilityListener listener : this._bundleListeners)
 					{
 						listener.bundlesBecameHidden(entry);
 					}
@@ -484,7 +484,7 @@ public class BundleManager
 			{
 				if (this._bundleListeners != null)
 				{
-					for (BundleChangeListener listener : this._bundleListeners)
+					for (BundleVisibilityListener listener : this._bundleListeners)
 					{
 						listener.bundlesBecameVisible(entry);
 					}
@@ -1835,7 +1835,7 @@ public class BundleManager
 	 * 
 	 * @param listener
 	 */
-	public void removeBundleChangeListener(BundleChangeListener listener)
+	public void removeBundleChangeListener(BundleVisibilityListener listener)
 	{
 		synchronized (bundleListenersLock)
 		{

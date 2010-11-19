@@ -39,7 +39,7 @@ import java.util.List;
 
 public class BundleVisibilityTests extends BundleTestBase
 {
-	public class BundleTestListener implements BundleChangeListener
+	public class BundleTestListener implements BundleVisibilityListener
 	{
 		List<BundleEntry> _hiddenEntries = new ArrayList<BundleEntry>();
 		List<BundleEntry> _visibleEntries = new ArrayList<BundleEntry>();

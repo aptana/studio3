@@ -40,7 +40,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.aptana.scripting.model.BundleChangeListener;
+import com.aptana.scripting.model.BundleVisibilityListener;
 import com.aptana.scripting.model.BundleEntry;
 
 /**
@@ -49,7 +49,7 @@ import com.aptana.scripting.model.BundleEntry;
  * 
  * @author cwilliams
  */
-class FileTypeAssociationListener implements BundleChangeListener
+class FileTypeAssociationListener implements BundleVisibilityListener
 {
 	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
 

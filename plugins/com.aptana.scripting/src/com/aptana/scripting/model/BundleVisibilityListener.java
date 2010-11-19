@@ -34,7 +34,7 @@
  */
 package com.aptana.scripting.model;
 
-public interface BundleChangeListener
+public interface BundleVisibilityListener
 {
 	/**
 	 * This event fires whenever one or more bundles that were previously visible have become hidden by another bundle.
