@@ -35,6 +35,10 @@ module Ruble
     def add_snippet(snippet)
       @jobj.add_snippet snippet.java_object
     end
+    
+    def add_project_template(template)
+      @jobj.add_project_template template.java_object
+    end
 
     def apply_defaults(obj)
       if obj.nil? == false
