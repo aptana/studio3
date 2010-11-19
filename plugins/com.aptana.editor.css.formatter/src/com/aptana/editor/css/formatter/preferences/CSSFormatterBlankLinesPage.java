@@ -48,7 +48,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterBlankLinesPage extends FormatterModifyTabPage
 {
-	private static final String BLANK_LINES_PREVIEW_NAME = "blank-lines-preview.css"; //$NON-NLS-1$
+	private static final String BLANK_LINES_PREVIEW_NAME = "preview.css"; //$NON-NLS-1$
 
 	public CSSFormatterBlankLinesPage(IFormatterModifyDialog dialog)
 	{

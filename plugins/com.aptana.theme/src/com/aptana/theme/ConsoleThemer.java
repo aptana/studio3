@@ -54,14 +54,14 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsole;
 
+import com.aptana.theme.extensions.ConsoleThemePageParticipant;
+
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
  */
 @SuppressWarnings("rawtypes")
 public class ConsoleThemer
 {
-
-	public static final String TEXTFONT_PROPERTY = "org.eclipse.jface.textfont"; //$NON-NLS-1$
 
 	// Usually (default eclipse colors, so, white-based background):
 	// error = red
@@ -254,7 +254,7 @@ public class ConsoleThemer
 		{
 			public void propertyChange(PropertyChangeEvent event)
 			{
-				if (event.getProperty().equals(TEXTFONT_PROPERTY))
+				if (event.getProperty().equals(JFaceResources.TEXT_FONT))
 				{
 					applyTheme();
 				}

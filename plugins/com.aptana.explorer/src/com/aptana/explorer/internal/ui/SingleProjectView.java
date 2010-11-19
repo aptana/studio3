@@ -916,7 +916,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return projects;
 	}
 
-	private Composite createSearchComposite(Composite myComposite)
+	protected Composite createSearchComposite(Composite myComposite)
 	{
 		SearchComposite search = new SearchComposite(myComposite, this);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));

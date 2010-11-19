@@ -56,7 +56,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 {
-	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "control-statements-preview.css"; //$NON-NLS-1$
+	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "preview.css"; //$NON-NLS-1$
 	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE,
 			CodeFormatterConstants.TAB };
 	private static final String[] TAB_OPTION_NAMES = new String[] {

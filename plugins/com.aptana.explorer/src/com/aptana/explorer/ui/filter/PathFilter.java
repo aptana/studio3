@@ -318,7 +318,7 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 	 *            the String to test
 	 * @return whether the string matches the pattern
 	 */
-	private boolean match(String string)
+	protected boolean match(String string)
 	{
 		if (regexp == null)
 		{
