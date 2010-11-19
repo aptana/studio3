@@ -1915,7 +1915,7 @@ public class BundleManager
 
 					if (bundle != null)
 					{
-						bundle.removeElement(bundleElement);
+						bundle.removeChild(bundleElement);
 					}
 					else
 					{
