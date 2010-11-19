@@ -57,7 +57,7 @@ public class BundleElement extends AbstractElement
 	private String _license;
 	private String _licenseUrl;
 	private String _repository;
-	
+
 	private List<AbstractBundleElement> _children;
 	private File _bundleDirectory;
 	private BundlePrecedence _bundlePrecedence;
@@ -71,7 +71,7 @@ public class BundleElement extends AbstractElement
 
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
-	
+
 	/**
 	 * Bundle
 	 * 
@@ -103,7 +103,7 @@ public class BundleElement extends AbstractElement
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
-	
+
 	/**
 	 * addChild
 	 * 
@@ -117,7 +117,14 @@ public class BundleElement extends AbstractElement
 			{
 				if (this._children.contains(element) == false)
 				{
+					BundleEntry.VisibilityContext context = this.getVisibilityContext();
+
 					this._children.add(element);
+
+					if (context != null)
+					{
+						context.fireVisibilityEvents();
+					}
 				}
 			}
 
@@ -575,6 +582,24 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getVisibilityContext
+	 * 
+	 * @return
+	 */
+	private BundleEntry.VisibilityContext getVisibilityContext()
+	{
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(this.getDisplayName());
+		BundleEntry.VisibilityContext context = null;
+
+		if (entry != null)
+		{
+			context = entry.getVisibilityContext();
+		}
+
+		return context;
+	}
+
+	/**
 	 * hasChildren
 	 * 
 	 * @return
@@ -663,30 +688,37 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * removeElement
+	 * removeChild
 	 * 
 	 * @param element
 	 */
-	public void removeElement(AbstractBundleElement element)
+	public void removeChild(AbstractBundleElement element)
 	{
 		boolean removed = false;
 
+		// disassociate element with this bundle
+		element.setOwningBundle(null);
+
 		synchronized (this._children)
 		{
-			// disassociate element with this bundle
-			element.setOwningBundle(null);
-			
+			BundleEntry.VisibilityContext context = this.getVisibilityContext();
+
 			removed = this._children.remove(element);
-			
-			// special case for menus so they can remove their children so they will fire events
-			if (element instanceof MenuElement)
+
+			if (context != null)
 			{
-				((MenuElement) element).removeChildren();
+				context.fireVisibilityEvents();
 			}
 		}
 
 		if (removed)
 		{
+			// special case for menus so they can remove their children so they will fire events
+			if (element instanceof MenuElement)
+			{
+				((MenuElement) element).removeChildren();
+			}
+
 			// make sure elements are no longer tracked in AbstractElement
 			AbstractElement.unregisterElement(element);
 		}
