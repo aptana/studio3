@@ -146,7 +146,7 @@ public class ScriptingActivator extends Plugin
 		super.start(context);
 
 		plugin = this;
-		
+
 		Job startupJob = new Job("Start Ruble bundle manager") //$NON-NLS-1$
 		{
 			@Override
@@ -165,7 +165,7 @@ public class ScriptingActivator extends Plugin
 				// unit tests
 				if (EclipseUtil.isTesting())
 				{
-					System.out.println("Running unit tests, so not auto-loading bundles");
+					System.out.println("Not auto-loading bundles since we are running unit tests"); //$NON-NLS-1$
 				}
 				else
 				{
