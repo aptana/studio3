@@ -588,10 +588,7 @@ public class BundleElement extends AbstractElement
 
 		synchronized (this._children)
 		{
-			if (this._children != null)
-			{
-				result = this._children.size() > 0;
-			}
+			result = this._children.size() > 0;
 		}
 
 		return result;
