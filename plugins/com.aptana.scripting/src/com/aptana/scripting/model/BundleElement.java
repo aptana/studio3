@@ -86,9 +86,8 @@ public class BundleElement extends AbstractElement
 			// calculate bundle's root directory
 			File pathFile = new File(path);
 			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
-			String parentName = parentDirectory.getName();
 
-			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName) || BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+			if (BundleManager.isSpecialDirectory(parentDirectory))
 			{
 				parentDirectory = parentDirectory.getParentFile();
 			}
