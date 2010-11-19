@@ -71,7 +71,7 @@ public class BundleElement extends AbstractElement
 
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
-
+	
 	/**
 	 * Bundle
 	 * 
@@ -103,7 +103,7 @@ public class BundleElement extends AbstractElement
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
-
+	
 	/**
 	 * addChild
 	 * 
