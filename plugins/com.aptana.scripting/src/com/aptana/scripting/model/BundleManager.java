@@ -494,28 +494,6 @@ public class BundleManager
 	}
 
 	/**
-	 * fireElementAddedEvent
-	 * 
-	 * @param element
-	 */
-	void fireElementAddedEvent(AbstractElement element)
-	{
-		if (element != null)
-		{
-			synchronized (elementListenersLock)
-			{
-				if (this._elementListeners != null)
-				{
-					for (ElementChangeListener listener : this._elementListeners)
-					{
-						listener.elementAdded(element);
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * fireElementBecameHiddenEvent
 	 * 
 	 * @param element
@@ -553,28 +531,6 @@ public class BundleManager
 					for (ElementChangeListener listener : this._elementListeners)
 					{
 						listener.elementBecameVisible(element);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * fireElementDeletedEvent
-	 * 
-	 * @param element
-	 */
-	void fireElementDeletedEvent(AbstractElement element)
-	{
-		if (element != null)
-		{
-			synchronized (elementListenersLock)
-			{
-				if (this._elementListeners != null)
-				{
-					for (ElementChangeListener listener : this._elementListeners)
-					{
-						listener.elementDeleted(element);
 					}
 				}
 			}

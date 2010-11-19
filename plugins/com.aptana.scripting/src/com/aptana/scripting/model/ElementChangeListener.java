@@ -37,14 +37,6 @@ package com.aptana.scripting.model;
 public interface ElementChangeListener
 {
 	/**
-	 * This event fires whenever an AbstractElement has been added to a bundle regardless of the visibility of the
-	 * bundle and/or element. This event fires after the becameHidden and becameVisible events fire.
-	 * 
-	 * @param element
-	 */
-	void elementAdded(AbstractElement element);
-
-	/**
 	 * This event fires whenever an AbstractElement is no longer visible according to the bundle precedence rules. Note
 	 * this event will fire for elements that have been deleted as well as elements that have become hidden due to the
 	 * bundle precedence rules.
@@ -61,12 +53,4 @@ public interface ElementChangeListener
 	 * @param element
 	 */
 	void elementBecameVisible(AbstractElement element);
-
-	/**
-	 * This event fires whenever an AbstractElement has been deleted from a bundle regardless of the visibility of the
-	 * bundle and/or element. This event fires before the becameHidden and becameVisible events fire.
-	 * 
-	 * @param element
-	 */
-	void elementDeleted(AbstractElement element);
 }

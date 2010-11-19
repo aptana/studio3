@@ -122,9 +122,6 @@ public class BundleElement extends AbstractElement
 			}
 
 			element.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(element);
 		}
 	}
 
@@ -217,7 +214,7 @@ public class BundleElement extends AbstractElement
 		if (StringUtil.isEmpty(name) == false)
 		{
 			// NOTE: we use getCommands here so we don't have to sync this block. getCommands returns a fresh List each
-			// time it is invoked and it handles the syncing for us
+			// time it is invoked and it handles syncing for us
 			List<CommandElement> commands = this.getCommands();
 
 			for (CommandElement command : commands)
@@ -552,7 +549,7 @@ public class BundleElement extends AbstractElement
 		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
 		// NOTE: we use getProjectTemplates here so we don't have to sync this block. getProjectTemplates returns a
-		// fresh List each time it is invoked and it handles the syncing for us
+		// fresh List each time it is invoked and it handles syncing for us
 		List<ProjectTemplateElement> templates = this.getProjectTemplates();
 
 		for (ProjectTemplateElement template : templates)
@@ -692,9 +689,6 @@ public class BundleElement extends AbstractElement
 		{
 			// make sure elements are no longer tracked in AbstractElement
 			AbstractElement.unregisterElement(element);
-
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(element);
 		}
 	}
 

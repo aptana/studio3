@@ -192,15 +192,6 @@ public class FileWatcherRegistrant implements ElementChangeListener, JNotifyList
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.ElementChangeListener#elementAdded(com.aptana.scripting.model.AbstractElement)
-	 */
-	public void elementAdded(AbstractElement element)
-	{
-		// NOTE: we only handle elements that have changed visibility
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see
 	 * com.aptana.scripting.model.ElementChangeListener#elementBecameHidden(com.aptana.scripting.model.AbstractElement)
 	 */
@@ -223,15 +214,6 @@ public class FileWatcherRegistrant implements ElementChangeListener, JNotifyList
 		{
 			this.addWatcher((CommandElement) element);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.ElementChangeListener#elementDeleted(com.aptana.scripting.model.AbstractElement)
-	 */
-	public void elementDeleted(AbstractElement element)
-	{
-		// NOTE: we only handle elements that have changed visibility
 	}
 
 	/**
