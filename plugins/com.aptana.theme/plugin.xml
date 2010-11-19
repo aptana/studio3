@@ -8,6 +8,9 @@
             class="com.aptana.theme.preferences.ThemePreferencePage"
             id="com.aptana.theme.preferencePage"
             name="%preferencePage.themes.name">
+         <keywordReference
+               id="com.aptana.theme.keywords">
+         </keywordReference>
       </page>
    </extension>
    <extension
@@ -39,6 +42,13 @@
       <initializer
             class="com.aptana.theme.internal.preferences.ThemerPreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="com.aptana.theme.keywords"
+            label="%keyword.label">
+      </keyword>
    </extension>
 
 </plugin>
