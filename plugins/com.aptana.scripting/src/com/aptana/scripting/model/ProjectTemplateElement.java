@@ -42,12 +42,11 @@ public final class ProjectTemplateElement extends AbstractBundleElement
 {
 	public enum Type
 	{
-		ALL, RUBY, PHP, WEB, PYTHON
+		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON
 	}
 
 	private Type fType;
-	private String fName;
-	private String fSourceLocation;
+	private String fLocation;
 	private String fDescription;
 
 	/**
@@ -72,10 +71,9 @@ public final class ProjectTemplateElement extends AbstractBundleElement
 			return false;
 		}
 		ProjectTemplateElement other = (ProjectTemplateElement) obj;
-		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName())
-				&& getLocation().equals(other.getLocation());
+		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName()) && getLocation().equals(other.getLocation());
 	}
-	
+
 	/**
 	 * getDescription
 	 * 
@@ -95,15 +93,6 @@ public final class ProjectTemplateElement extends AbstractBundleElement
 	{
 		return this.getOwningBundle().getBundleDirectory();
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.AbstractElement#getDisplayName()
-	 */
-	public String getDisplayName()
-	{
-		return fName;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -121,7 +110,7 @@ public final class ProjectTemplateElement extends AbstractBundleElement
 	 */
 	public String getLocation()
 	{
-		return fSourceLocation;
+		return fLocation;
 	}
 
 	/**
@@ -152,10 +141,47 @@ public final class ProjectTemplateElement extends AbstractBundleElement
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("name: ").println(this.getDisplayName());
 		printer.printWithIndent("location: ").println(this.getLocation());
-		
+
 		if (this.getDescription() != null)
 		{
 			printer.printWithIndent("description: ").println(this.getDescription());
+		}
+	}
+
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 */
+	public void setDescription(String description)
+	{
+		fDescription = description;
+	}
+
+	/**
+	 * setLocation
+	 * 
+	 * @param location
+	 */
+	public void setLocation(String location)
+	{
+		fLocation = location;
+	}
+
+	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
+	public void setType(String type)
+	{
+		try
+		{
+			fType = Type.valueOf(type.toUpperCase());
+		}
+		catch (Exception e)
+		{
+			fType = Type.UNDEFINED;
 		}
 	}
 }
