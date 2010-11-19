@@ -51,7 +51,7 @@ import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleEntry
 {
-	public abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
+	private abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
 	{
 		private Set<String> names = new HashSet<String>();
 		private List<T> result = new ArrayList<T>();
