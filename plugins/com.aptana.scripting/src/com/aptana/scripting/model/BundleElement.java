@@ -35,7 +35,6 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +47,6 @@ import org.jruby.RubyRegexp;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleElement extends AbstractElement
@@ -62,21 +60,11 @@ public class BundleElement extends AbstractElement
 
 	private File _bundleDirectory;
 	private BundlePrecedence _bundlePrecedence;
-	private List<MenuElement> _menus;
-	private List<CommandElement> _commands;
-	private List<EnvironmentElement> _envs;
-	private List<SmartTypingPairsElement> _pairs;
-	private List<ProjectTemplateElement> _projectTemplates;
+	private List<AbstractBundleElement> _children;
 	private boolean _visible;
 
-	private Object menuLock = new Object();
-	private Object commandLock = new Object();
-	private Object envLock = new Object();
-	private Object pairLock = new Object();
-	private Object templateLock = new Object();
-
 	private Map<String, String> _fileTypeRegistry;
-	private List<String> fileTypes;
+	private List<String> _fileTypes;
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
@@ -108,144 +96,38 @@ public class BundleElement extends AbstractElement
 			this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		}
 
+		// it will be extremely rare to have no children, so go ahead and pre-allocate the child list. This will also
+		// allow us to lock on the list instead of maintaining a separate lock object
+		this._children = new ArrayList<AbstractBundleElement>();
+
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
 
 	/**
-	 * addCommand
+	 * addChild
 	 * 
-	 * @param command
+	 * @param element
 	 */
-	public void addCommand(CommandElement command)
+	public void addChild(AbstractBundleElement element)
 	{
-		if (command != null)
+		if (element != null)
 		{
-			synchronized (commandLock)
+			synchronized (this._children)
 			{
-				if (this._commands == null)
+				if (this._children.contains(element) == false)
 				{
-					this._commands = new ArrayList<CommandElement>();
+					this._children.add(element);
 				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._commands.add(command);
 			}
 
-			command.setOwningBundle(this);
+			element.setOwningBundle(this);
 
 			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(command);
+			BundleManager.getInstance().fireElementAddedEvent(element);
 		}
 	}
 
-	/**
-	 * addEnv
-	 * 
-	 * @param env
-	 */
-	public void addEnv(EnvironmentElement env)
-	{
-		if (env != null)
-		{
-			synchronized (envLock)
-			{
-				if (this._envs == null)
-				{
-					this._envs = new ArrayList<EnvironmentElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._envs.add(env);
-			}
-
-			env.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(env);
-		}
-	}
-
-	/**
-	 * addMenu
-	 * 
-	 * @param snippet
-	 */
-	public void addMenu(MenuElement menu)
-	{
-		if (menu != null)
-		{
-			synchronized (menuLock)
-			{
-				if (this._menus == null)
-				{
-					this._menus = new ArrayList<MenuElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._menus.add(menu);
-			}
-
-			menu.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(menu);
-		}
-	}
-
-	/**
-	 * addSmartTypingPairs
-	 * 
-	 * @param pair
-	 */
-	public void addSmartTypingPairs(SmartTypingPairsElement pair)
-	{
-		if (pair != null)
-		{
-			synchronized (pairLock)
-			{
-				if (this._pairs == null)
-				{
-					this._pairs = new ArrayList<SmartTypingPairsElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._pairs.add(pair);
-			}
-
-			pair.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(pair);
-		}
-	}
-
-	/**
-	 * addProjectTemplate
-	 * 
-	 * @param template
-	 */
-	public void addProjectTemplate(ProjectTemplateElement template)
-	{
-		if (template != null)
-		{
-			synchronized (templateLock)
-			{
-				if (this._projectTemplates == null)
-				{
-					this._projectTemplates = new ArrayList<ProjectTemplateElement>();
-				}
-				
-				this._projectTemplates.add(template);
-			}
-			
-			template.setOwningBundle(this);
-			
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(template);
-		}
-	}
-	
 	/**
 	 * associateFileType
 	 * 
@@ -253,11 +135,12 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateFileType(String fileType)
 	{
-		if (fileTypes == null)
+		if (_fileTypes == null)
 		{
-			fileTypes = new ArrayList<String>();
+			_fileTypes = new ArrayList<String>();
 		}
-		fileTypes.add(fileType);
+
+		_fileTypes.add(fileType);
 	}
 
 	/**
@@ -331,17 +214,18 @@ public class BundleElement extends AbstractElement
 	{
 		CommandElement result = null;
 
-		synchronized (commandLock)
+		if (StringUtil.isEmpty(name) == false)
 		{
-			if (!StringUtil.isEmpty(name) && this._commands != null && this._commands.size() > 0)
+			// NOTE: we use getCommands here so we don't have to sync this block. getCommands returns a fresh List each
+			// time it is invoked and it handles the syncing for us
+			List<CommandElement> commands = this.getCommands();
+
+			for (CommandElement command : commands)
 			{
-				for (CommandElement command : this._commands)
+				if (name.equals(command.getDisplayName()))
 				{
-					if (name.equals(command.getDisplayName()))
-					{
-						result = command;
-						break;
-					}
+					result = command;
+					break;
 				}
 			}
 		}
@@ -356,13 +240,16 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<CommandElement> getCommands()
 	{
-		List<CommandElement> result = Collections.emptyList();
+		List<CommandElement> result = new ArrayList<CommandElement>();
 
-		synchronized (commandLock)
+		synchronized (this._children)
 		{
-			if (this._commands != null && this._commands.size() > 0)
+			for (AbstractBundleElement element : this._children)
 			{
-				result = Collections.unmodifiableList(this._commands);
+				if (element instanceof CommandElement)
+				{
+					result.add((CommandElement) element);
+				}
 			}
 		}
 
@@ -386,12 +273,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._decreaseIndentMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._decreaseIndentMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
+		return result;
 	}
 
 	/**
@@ -446,13 +339,16 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<EnvironmentElement> getEnvs()
 	{
-		List<EnvironmentElement> result = Collections.emptyList();
+		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
 
-		synchronized (envLock)
+		synchronized (this._children)
 		{
-			if (this._envs != null && this._envs.size() > 0)
+			for (AbstractBundleElement element : this._children)
 			{
-				result = Collections.unmodifiableList(this._envs);
+				if (element instanceof EnvironmentElement)
+				{
+					result.add((EnvironmentElement) element);
+				}
 			}
 		}
 
@@ -476,7 +372,7 @@ public class BundleElement extends AbstractElement
 	 */
 	List<String> getFileTypes()
 	{
-		return fileTypes;
+		return this._fileTypes;
 	}
 
 	/**
@@ -486,12 +382,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._foldingStartMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._foldingStartMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._foldingStartMarkers);
+		return result;
 	}
 
 	/**
@@ -501,12 +403,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._foldingStopMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._foldingStopMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._foldingStopMarkers);
+		return result;
 	}
 
 	/**
@@ -516,12 +424,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getIncreaseIndentMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._increaseIndentMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._increaseIndentMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._increaseIndentMarkers);
+		return result;
 	}
 
 	/**
@@ -565,13 +479,16 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<MenuElement> getMenus()
 	{
-		List<MenuElement> result = Collections.emptyList();
+		List<MenuElement> result = new ArrayList<MenuElement>();
 
-		synchronized (menuLock)
+		synchronized (this._children)
 		{
-			if (this._menus != null && this._menus.size() > 0)
+			for (AbstractBundleElement element : this._children)
 			{
-				result = Collections.unmodifiableList(this._menus);
+				if (element instanceof MenuElement)
+				{
+					result.add((MenuElement) element);
+				}
 			}
 		}
 
@@ -585,13 +502,16 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<SmartTypingPairsElement> getPairs()
 	{
-		List<SmartTypingPairsElement> result = Collections.emptyList();
+		List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
 
-		synchronized (pairLock)
+		synchronized (this._children)
 		{
-			if (this._pairs != null && this._pairs.size() > 0)
+			for (AbstractBundleElement element : this._children)
 			{
-				result = Collections.unmodifiableList(this._pairs);
+				if (element instanceof SmartTypingPairsElement)
+				{
+					result.add((SmartTypingPairsElement) element);
+				}
 			}
 		}
 
@@ -605,13 +525,16 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<ProjectTemplateElement> getProjectTemplates()
 	{
-		List<ProjectTemplateElement> result = Collections.emptyList();
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
-		synchronized (templateLock)
+		synchronized (this._children)
 		{
-			if (this._projectTemplates != null && this._projectTemplates.size() > 0)
+			for (AbstractBundleElement element : this._children)
 			{
-				result = Collections.unmodifiableList(this._projectTemplates);
+				if (element instanceof ProjectTemplateElement)
+				{
+					result.add((ProjectTemplateElement) element);
+				}
 			}
 		}
 
@@ -628,18 +551,16 @@ public class BundleElement extends AbstractElement
 	{
 		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
-		synchronized (templateLock)
+		// NOTE: we use getProjectTemplates here so we don't have to sync this block. getProjectTemplates returns a
+		// fresh List each time it is invoked and it handles the syncing for us
+		List<ProjectTemplateElement> templates = this.getProjectTemplates();
+
+		for (ProjectTemplateElement template : templates)
 		{
-			if (this._projectTemplates != null)
+			// type "all" is always included
+			if (template.getType() == type || template.getType() == Type.ALL)
 			{
-				for (ProjectTemplateElement template : this._projectTemplates)
-				{
-					// type "all" is always included
-					if (template.getType() == type || template.getType() == Type.ALL)
-					{
-						result.add(template);
-					}
-				}
+				result.add(template);
 			}
 		}
 
@@ -657,39 +578,19 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * hasCommands
+	 * hasChildren
 	 * 
 	 * @return
 	 */
-	public boolean hasCommands()
+	public boolean hasChildren()
 	{
 		boolean result = false;
 
-		synchronized (commandLock)
+		synchronized (this._children)
 		{
-			if (this._commands != null)
+			if (this._children != null)
 			{
-				result = this._commands.size() > 0;
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * hasMenus
-	 * 
-	 * @return
-	 */
-	public boolean hasMenus()
-	{
-		boolean result = false;
-
-		synchronized (menuLock)
-		{
-			if (this._menus != null)
-			{
-				result = this._menus.size() > 0;
+				result = this._children.size() > 0;
 			}
 		}
 
@@ -713,7 +614,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean isEmpty()
 	{
-		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false;
+		return this.hasMetadata() == false && this.hasChildren() == false;
 	}
 
 	/**
@@ -755,51 +656,15 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 
 		// output commands
-		synchronized (commandLock)
+		for (CommandElement command : this.getCommands())
 		{
-			if (this._commands != null)
-			{
-				for (CommandElement command : this._commands)
-				{
-					command.toSource(printer);
-				}
-			}
+			command.toSource(printer);
 		}
 
 		// output menus
-		synchronized (menuLock)
+		for (MenuElement menu : this.getMenus())
 		{
-			if (this._menus != null)
-			{
-				for (MenuElement menu : this._menus)
-				{
-					menu.toSource(printer);
-				}
-			}
-		}
-	}
-
-	/**
-	 * removeCommand
-	 * 
-	 * @param command
-	 */
-	public void removeCommand(CommandElement command)
-	{
-		boolean removed = false;
-
-		synchronized (commandLock)
-		{
-			if (this._commands != null)
-			{
-				removed = this._commands.remove(command);
-			}
-		}
-
-		if (removed)
-		{
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(command);
+			menu.toSource(printer);
 		}
 	}
 
@@ -810,78 +675,26 @@ public class BundleElement extends AbstractElement
 	 */
 	public void removeElement(AbstractBundleElement element)
 	{
-		// make sure elements are no longer tracked in AbstractElement 
-		AbstractElement.unregisterElement(element);
-		
-		if (element instanceof CommandElement)
+		boolean removed = false;
+
+		synchronized (this._children)
 		{
-			this.removeCommand((CommandElement) element);
-		}
-		else if (element instanceof MenuElement)
-		{
-			this.removeMenu((MenuElement) element);
-		}
-		else if (element instanceof ProjectTemplateElement)
-		{
-			this.removeProjectTemplate((ProjectTemplateElement) element);
-		}
-		else
-		{
-			String message = MessageFormat.format(
-				"Unable to remove element {0}: Unrecognized type",
-				element
-			);
+			removed = this._children.remove(element);
 			
-			ScriptingActivator.logError(message, null);
-		}
-	}
-
-	/**
-	 * removeMenu
-	 * 
-	 * @param command
-	 */
-	public void removeMenu(MenuElement menu)
-	{
-		boolean removed = false;
-
-		synchronized (menuLock)
-		{
-			if (this._menus != null)
+			// special case for menus so they can remove their children so they will fire events
+			if (element instanceof MenuElement)
 			{
-				removed = this._menus.remove(menu);
-				
-				menu.removeChildren();
+				((MenuElement) element).removeChildren();
 			}
 		}
 
 		if (removed)
 		{
+			// make sure elements are no longer tracked in AbstractElement
+			AbstractElement.unregisterElement(element);
+
 			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(menu);
-		}
-	}
-	
-	/**
-	 * removeProjectTemplate
-	 * 
-	 * @param template
-	 */
-	public void removeProjectTemplate(ProjectTemplateElement template)
-	{
-		boolean removed = false;
-		
-		synchronized (templateLock)
-		{
-			if (this._projectTemplates != null)
-			{
-				removed = this._projectTemplates.remove(template);
-			}
-		}
-		
-		if (removed)
-		{
-			BundleManager.getInstance().fireElementDeletedEvent(template);
+			BundleManager.getInstance().fireElementDeletedEvent(element);
 		}
 	}
 
