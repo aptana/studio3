@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -70,10 +72,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -85,6 +90,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
@@ -98,6 +105,7 @@ import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
@@ -133,7 +141,10 @@ public class FilteringProjectView extends GitProjectView
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
 	private IResource currentFilter = null;
-
+	/**
+	 * Determine if we're searching by filename or content in the search text box.
+	 */
+	private boolean fFilenameSearchMode;
 	private AbstractResourceBasedViewerFilter patternFilter;
 	private WorkbenchJob refreshJob;
 
@@ -155,6 +166,15 @@ public class FilteringProjectView extends GitProjectView
 	private Map<IProject, List<String>> projectSelections;
 	private Map<IProject, String> projectFilters;
 	private ArrayList<IConfigurationElement> fgElements;
+	/**
+	 * The special filter used to filter the view when search is done for filename.
+	 */
+	private PathFilter filenameFilter;
+	/**
+	 * Special boolean for us to tell whether we use our special filename filter or use the hover filter.
+	 */
+	private boolean filterViaSearch;
+	private SearchComposite search;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -286,6 +306,7 @@ public class FilteringProjectView extends GitProjectView
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
 
+		// FIXME Need to store filters in a way that we can store the filename search filter too!
 		IResource filter = getFilterResource();
 		if (filter != null)
 		{
@@ -889,6 +910,13 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected AbstractResourceBasedViewerFilter createPatternFilter(IResource filterResource)
 	{
+		if (fFilenameSearchMode && filterViaSearch)
+		{
+			filenameFilter.setResourceToFilterOn(selectedProject);
+			filterViaSearch = false;
+			return filenameFilter;
+		}
+
 		IProject project = filterResource.getProject();
 		Set<String> natures = new HashSet<String>();
 		try
@@ -1044,6 +1072,151 @@ public class FilteringProjectView extends GitProjectView
 			return (IResource) adapt.getAdapter(IResource.class);
 		}
 		return null;
+	}
+
+	@Override
+	protected Composite createSearchComposite(Composite myComposite)
+	{
+		search = (SearchComposite) super.createSearchComposite(myComposite);
+
+		final Menu modeMenu = new Menu(search);
+		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
+		filenameItem.setText(Messages.FilteringProjectView_SearchByFilenameLabel);
+		filenameItem.setSelection(fFilenameSearchMode);
+		filenameItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = true;
+			}
+		});
+
+		final MenuItem contentItem = new MenuItem(modeMenu, SWT.RADIO);
+		contentItem.setText(Messages.FilteringProjectView_SearchContentLabel);
+		contentItem.setSelection(!fFilenameSearchMode);
+		contentItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = false;
+			}
+		});
+
+		search.getTextControl().addListener(SWT.Paint, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				// Paint the down arrow
+				GC gc = event.gc;
+				final int width = 5;
+				int x = 16;
+				int y = 10;
+				if (Platform.getOS().equals(Platform.OS_WIN32)) // On windows, we need to draw on right side
+				{
+					x = event.width - 7;
+					y = 10;
+				}
+				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still doesn't overlap magnifying glass)
+				{
+					x = 0;
+					y = 15;
+				}
+				
+				Color bg = gc.getBackground();
+				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
+				gc.setBackground(bg);
+			}
+		});
+
+		search.getTextControl().addMouseListener(new MouseAdapter()
+		{
+			public void mouseDown(MouseEvent e)
+			{
+				boolean isOnPulldownSection = false;
+				int shift = 0;
+				// Because on windows we draw on right side, we need to check different click area
+				if (Platform.getOS().equals(Platform.OS_WIN32))
+				{
+					Rectangle bounds = search.getTextControl().getBounds();
+					 if (e.x >= bounds.width - 20 && e.x <= bounds.width)
+					{
+						isOnPulldownSection = true;
+						shift = bounds.width - 20;
+					}
+				}
+				else if (e.x <= 18)
+				{
+					isOnPulldownSection = true;
+				}
+				if (isOnPulldownSection)
+				{
+					Point searchLocation = search.getLocation();
+					searchLocation = search.getParent().toDisplay(searchLocation.x, searchLocation.y);
+					Point searchSize = search.getSize();
+					modeMenu.setLocation(searchLocation.x + shift, searchLocation.y + searchSize.y + 2);
+					modeMenu.setVisible(true);
+				}
+			}
+		});
+
+		return search;
+	}
+
+	/**
+	 * Override search to handle filename search mode, which is actually a filter
+	 */
+	public void search(final String text, final boolean isCaseSensitive, final boolean isRegularExpression)
+	{
+		if (selectedProject == null)
+		{
+			return;
+		}
+
+		if (fFilenameSearchMode)
+		{
+			clearFilter();
+			try
+			{
+				final Pattern pattern = search.createSearchPattern();
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				filenameFilter = new PathFilter()
+				{
+					@Override
+					protected boolean match(String string)
+					{
+						if (pattern == null)
+						{
+							return false;
+						}
+						return pattern.matcher(string).find();
+					}
+
+					public String getPattern()
+					{
+						// This is what we display in the "filtering for ..." label
+						return text;
+					};
+				};
+				// We need some way to tell the job that uses the filter that this is the one to apply versus creating
+				// one for the hover
+				filterViaSearch = true;
+				setFilter(selectedProject);
+			}
+			catch (PatternSyntaxException e)
+			{
+				// TODO Show some UI popup or something to say regexp is bad?
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_RED));
+			}
+		}
+		else
+		{
+			super.search(text, isCaseSensitive, isRegularExpression);
+		}
 	}
 
 }
