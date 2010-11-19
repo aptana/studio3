@@ -676,6 +676,9 @@ public class BundleElement extends AbstractElement
 
 		synchronized (this._children)
 		{
+			// disassociate element with this bundle
+			element.setOwningBundle(null);
+			
 			removed = this._children.remove(element);
 			
 			// special case for menus so they can remove their children so they will fire events
