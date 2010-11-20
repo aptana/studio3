@@ -39,6 +39,7 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
 import com.aptana.editor.common.PartitionerSwitchStrategy;
+import com.aptana.editor.common.TextUtils;
 
 /**
  * @author Max Stepanov
@@ -76,8 +77,33 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 			if (characterScanner.getColumn() > 0) {
 				characterScanner.unread();
 				int c = characterScanner.read();
-				if (COMMA == c || VERTICAL == c) {
+				if (COMMA == c) {
 					return true;
+				} else if (VERTICAL == c) {
+					char[][] newLineSequences = TextUtils.rsort(characterScanner.getLegalLineDelimiters());
+					int index = 0;
+					try {
+						// skip found sequence
+						for (; index < sequenceFound.length; ++index) {
+							characterScanner.read();
+						}
+						// search for newline, remember previous character to compare with vertical
+						int previous = 0;
+						while ((c = characterScanner.read()) != ICharacterScanner.EOF) {
+							++index;
+							for (char[] sequence : newLineSequences) {
+								if (c == sequence[0] && TextUtils.sequenceDetected(characterScanner, sequence, false)) {
+									return (VERTICAL == previous);
+								}
+							}
+							previous = c;
+						}
+					} finally {
+						for (int j = index; j > 0; --j) {
+							characterScanner.unread();
+						}
+					}
+
 				}
 			}
 			return false;
