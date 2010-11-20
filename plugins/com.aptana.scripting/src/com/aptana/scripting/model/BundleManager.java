@@ -320,22 +320,25 @@ public class BundleManager
 
 	private Map<File, List<BundleElement>> _bundlesByPath;
 	private Map<String, BundleEntry> _entriesByName;
-	
+
 	private List<BundleVisibilityListener> _bundleVisibilityListeners;
 	private List<ElementVisibilityListener> _elementVisibilityListeners;
 	private List<LoadCycleListener> _loadCycleListeners;
-	
-	private Object bundlePathsLock = new Object();
-	private Object entryNamesLock = new Object();
-	private Object bundleListenersLock = new Object();
-	private Object elementListenersLock = new Object();
-	private Object loadCycleListenersLock = new Object();
 
 	/**
 	 * BundleManager
 	 */
 	private BundleManager()
 	{
+		// NOTE: It is very likely that we have at least one bundle, so pre-create these maps. This gets rid of a number
+		// of null checks and allows us to lock on the field directly instead of using separate locks
+		this._bundlesByPath = new HashMap<File, List<BundleElement>>();
+		this._entriesByName = new HashMap<String, BundleEntry>();
+
+		// NOTE: similar logic for these guys too
+		this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
+		this._elementVisibilityListeners = new ArrayList<ElementVisibilityListener>();
+		this._loadCycleListeners = new ArrayList<LoadCycleListener>();
 	}
 
 	/**
@@ -349,14 +352,9 @@ public class BundleManager
 		{
 			File bundleFile = bundle.getBundleDirectory();
 
-			synchronized (bundlePathsLock)
+			// store bundle by path
+			synchronized (_bundlesByPath)
 			{
-				// store bundle by path
-				if (this._bundlesByPath == null)
-				{
-					this._bundlesByPath = new HashMap<File, List<BundleElement>>();
-				}
-
 				if (this._bundlesByPath.containsKey(bundleFile) == false)
 				{
 					List<BundleElement> bundles = new ArrayList<BundleElement>();
@@ -376,13 +374,8 @@ public class BundleManager
 			// store bundle by name
 			String name = bundle.getDisplayName();
 
-			synchronized (entryNamesLock)
+			synchronized (_entriesByName)
 			{
-				if (this._entriesByName == null)
-				{
-					this._entriesByName = new HashMap<String, BundleEntry>();
-				}
-
 				if (this._entriesByName.containsKey(name) == false)
 				{
 					BundleEntry entry = new BundleEntry(name);
@@ -410,13 +403,8 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			synchronized (bundleListenersLock)
+			synchronized (_bundleVisibilityListeners)
 			{
-				if (this._bundleVisibilityListeners == null)
-				{
-					this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
-				}
-
 				this._bundleVisibilityListeners.add(listener);
 			}
 		}
@@ -431,13 +419,8 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			synchronized (elementListenersLock)
+			synchronized (_elementVisibilityListeners)
 			{
-				if (this._elementVisibilityListeners == null)
-				{
-					this._elementVisibilityListeners = new ArrayList<ElementVisibilityListener>();
-				}
-
 				this._elementVisibilityListeners.add(listener);
 			}
 		}
@@ -452,13 +435,8 @@ public class BundleManager
 	{
 		if (listener != null)
 		{
-			synchronized (loadCycleListenersLock)
+			synchronized (_loadCycleListeners)
 			{
-				if (this._loadCycleListeners == null)
-				{
-					this._loadCycleListeners = new ArrayList<LoadCycleListener>();
-				}
-
 				this._loadCycleListeners.add(listener);
 			}
 		}
@@ -498,14 +476,11 @@ public class BundleManager
 	{
 		if (entry != null)
 		{
-			synchronized (bundleListenersLock)
+			synchronized (_bundleVisibilityListeners)
 			{
-				if (this._bundleVisibilityListeners != null)
+				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 				{
-					for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
-					{
-						listener.bundlesBecameHidden(entry);
-					}
+					listener.bundlesBecameHidden(entry);
 				}
 			}
 		}
@@ -520,14 +495,11 @@ public class BundleManager
 	{
 		if (entry != null)
 		{
-			synchronized (bundleListenersLock)
+			synchronized (_bundleVisibilityListeners)
 			{
-				if (this._bundleVisibilityListeners != null)
+				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 				{
-					for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
-					{
-						listener.bundlesBecameVisible(entry);
-					}
+					listener.bundlesBecameVisible(entry);
 				}
 			}
 		}
@@ -542,14 +514,11 @@ public class BundleManager
 	{
 		if (element != null)
 		{
-			synchronized (elementListenersLock)
+			synchronized (_elementVisibilityListeners)
 			{
-				if (this._elementVisibilityListeners != null)
+				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 				{
-					for (ElementVisibilityListener listener : this._elementVisibilityListeners)
-					{
-						listener.elementBecameHidden(element);
-					}
+					listener.elementBecameHidden(element);
 				}
 			}
 		}
@@ -564,14 +533,11 @@ public class BundleManager
 	{
 		if (element != null)
 		{
-			synchronized (elementListenersLock)
+			synchronized (_elementVisibilityListeners)
 			{
-				if (this._elementVisibilityListeners != null)
+				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 				{
-					for (ElementVisibilityListener listener : this._elementVisibilityListeners)
-					{
-						listener.elementBecameVisible(element);
-					}
+					listener.elementBecameVisible(element);
 				}
 			}
 		}
@@ -586,14 +552,11 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (loadCycleListenersLock)
+			synchronized (_loadCycleListeners)
 			{
-				if (this._loadCycleListeners != null)
+				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
-					for (LoadCycleListener listener : this._loadCycleListeners)
-					{
-						listener.scriptLoaded(script);
-					}
+					listener.scriptLoaded(script);
 				}
 			}
 		}
@@ -608,14 +571,11 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (loadCycleListenersLock)
+			synchronized (_loadCycleListeners)
 			{
-				if (this._loadCycleListeners != null)
+				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
-					for (LoadCycleListener listener : this._loadCycleListeners)
-					{
-						listener.scriptReloaded(script);
-					}
+					listener.scriptReloaded(script);
 				}
 			}
 		}
@@ -630,14 +590,11 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (loadCycleListenersLock)
+			synchronized (_loadCycleListeners)
 			{
-				if (this._loadCycleListeners != null)
+				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
-					for (LoadCycleListener listener : this._loadCycleListeners)
-					{
-						listener.scriptReloaded(script);
-					}
+					listener.scriptReloaded(script);
 				}
 			}
 		}
@@ -652,28 +609,25 @@ public class BundleManager
 	{
 		List<BundleElement> bundles = new ArrayList<BundleElement>();
 
-		synchronized (bundlePathsLock)
+		synchronized (_bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
+			String applicationBundlesPath = this.getApplicationBundlesPath();
+
+			for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
 			{
-				String applicationBundlesPath = this.getApplicationBundlesPath();
+				String path = entry.getKey().getAbsolutePath();
 
-				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
+				if (path.startsWith(applicationBundlesPath))
 				{
-					String path = entry.getKey().getAbsolutePath();
+					List<BundleElement> matchingBundles = entry.getValue();
 
-					if (path.startsWith(applicationBundlesPath))
+					if (matchingBundles != null)
 					{
-						List<BundleElement> matchingBundles = entry.getValue();
+						int size = matchingBundles.size();
 
-						if (matchingBundles != null)
+						if (size > 0)
 						{
-							int size = matchingBundles.size();
-
-							if (size > 0)
-							{
-								bundles.add(matchingBundles.get(size - 1));
-							}
+							bundles.add(matchingBundles.get(size - 1));
 						}
 					}
 				}
@@ -761,14 +715,11 @@ public class BundleManager
 	 */
 	public BundleEntry getBundleEntry(String name)
 	{
-		BundleEntry result = null;
+		BundleEntry result;
 
-		synchronized (entryNamesLock)
+		synchronized (_entriesByName)
 		{
-			if (this._entriesByName != null)
-			{
-				result = this._entriesByName.get(name);
-			}
+			result = this._entriesByName.get(name);
 		}
 
 		return result;
@@ -807,20 +758,17 @@ public class BundleManager
 	{
 		BundleElement result = null;
 
-		synchronized (bundlePathsLock)
+		synchronized (_bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
+			List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
+
+			if (bundles != null)
 			{
-				List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
+				int size = bundles.size();
 
-				if (bundles != null)
+				if (size > 0)
 				{
-					int size = bundles.size();
-
-					if (size > 0)
-					{
-						result = bundles.get(size - 1);
-					}
+					result = bundles.get(size - 1);
 				}
 			}
 		}
@@ -935,29 +883,14 @@ public class BundleManager
 	 */
 	public List<String> getBundleNames()
 	{
-		List<String> names = null;
-		List<String> result;
+		List<String> names;
 
-		synchronized (entryNamesLock)
+		synchronized (_entriesByName)
 		{
-			if (this._entriesByName != null && this._entriesByName.size() > 0)
-			{
-				names = new ArrayList<String>(this._entriesByName.keySet());
-			}
+			names = new ArrayList<String>(this._entriesByName.keySet());
 		}
 
-		if (names != null)
-		{
-			Collections.sort(names);
-
-			result = Collections.unmodifiableList(names);
-		}
-		else
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return names;
 	}
 
 	/**
@@ -1107,7 +1040,7 @@ public class BundleManager
 	}
 
 	/**
-	 * getContentAssists
+	 * getContentAssists - FIXME
 	 * 
 	 * @param filter
 	 * @return
@@ -1290,16 +1223,13 @@ public class BundleManager
 	{
 		List<MenuElement> result = new ArrayList<MenuElement>();
 
-		if (filter != null)
+		for (String name : this.getBundleNames())
 		{
-			for (String name : this.getBundleNames())
+			for (MenuElement menu : this.getBundleMenus(name))
 			{
-				for (MenuElement menu : this.getBundleMenus(name))
+				if (filter == null || filter.include(menu))
 				{
-					if (filter.include(menu))
-					{
-						result.add(menu);
-					}
+					result.add(menu);
 				}
 			}
 		}
@@ -1449,8 +1379,8 @@ public class BundleManager
 						// one and move on
 
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1; //$NON-NLS-1$
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1; //$NON-NLS-1$
 
 						if (newLength > existingLength)
 						{
@@ -1495,12 +1425,9 @@ public class BundleManager
 	{
 		boolean result = false;
 
-		synchronized (bundlePathsLock)
+		synchronized (_bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
-			{
-				result = this._bundlesByPath.containsKey(bundleDirectory);
-			}
+			result = this._bundlesByPath.containsKey(bundleDirectory);
 		}
 
 		return result;
@@ -1597,13 +1524,16 @@ public class BundleManager
 	public void loadBundle(final File bundleDirectory, boolean async)
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
+		
 		if (async)
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
+			
 			if (counter >= Runtime.getRuntime().availableProcessors())
 			{
 				counter = 0;
 			}
+			
 			job.schedule();
 		}
 		else
@@ -1633,13 +1563,15 @@ public class BundleManager
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
 			IPath location = project.getLocation();
+			
 			if (location == null)
 			{
 				// Log that it was null somehow to track down when this occurs?
 				continue;
 			}
+			
 			File projectDirectory = location.toFile();
-			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
+			File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
 
 			for (File bundle : this.getBundleDirectories(bundlesDirectory))
 			{
@@ -1791,9 +1723,9 @@ public class BundleManager
 			File bundleFile = bundle.getBundleDirectory();
 			String name = bundle.getDisplayName();
 
-			synchronized (bundlePathsLock)
+			synchronized (_bundlesByPath)
 			{
-				if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
+				if (this._bundlesByPath.containsKey(bundleFile))
 				{
 					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
 
@@ -1806,9 +1738,9 @@ public class BundleManager
 				}
 			}
 
-			synchronized (entryNamesLock)
+			synchronized (_entriesByName)
 			{
-				if (this._entriesByName != null && this._entriesByName.containsKey(name))
+				if (this._entriesByName.containsKey(name))
 				{
 					BundleEntry entry = this._entriesByName.get(name);
 
@@ -1832,12 +1764,9 @@ public class BundleManager
 	 */
 	public void removeBundleVisibilityListener(BundleVisibilityListener listener)
 	{
-		synchronized (bundleListenersLock)
+		synchronized (_bundleVisibilityListeners)
 		{
-			if (this._bundleVisibilityListeners != null)
-			{
-				this._bundleVisibilityListeners.remove(listener);
-			}
+			this._bundleVisibilityListeners.remove(listener);
 		}
 	}
 
@@ -1848,12 +1777,9 @@ public class BundleManager
 	 */
 	public void removeElementVisibilityListener(ElementVisibilityListener listener)
 	{
-		synchronized (elementListenersLock)
+		synchronized (_elementVisibilityListeners)
 		{
-			if (this._elementVisibilityListeners != null)
-			{
-				this._elementVisibilityListeners.remove(listener);
-			}
+			this._elementVisibilityListeners.remove(listener);
 		}
 	}
 
@@ -1864,12 +1790,9 @@ public class BundleManager
 	 */
 	public void removeLoadCycleListener(LoadCycleListener listener)
 	{
-		synchronized (loadCycleListenersLock)
+		synchronized (_loadCycleListeners)
 		{
-			if (this._loadCycleListeners != null)
-			{
-				this._loadCycleListeners.remove(listener);
-			}
+			this._loadCycleListeners.remove(listener);
 		}
 	}
 
@@ -1880,20 +1803,14 @@ public class BundleManager
 	{
 		// TODO: should unload all commands, menus, and snippets so events fire, but
 		// this is used for test only right now.
-		synchronized (bundlePathsLock)
+		synchronized (_bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
-			{
-				this._bundlesByPath.clear();
-			}
+			this._bundlesByPath.clear();
 		}
 
-		synchronized (entryNamesLock)
+		synchronized (_entriesByName)
 		{
-			if (this._entriesByName != null)
-			{
-				this._entriesByName.clear();
-			}
+			this._entriesByName.clear();
 		}
 	}
 
