@@ -94,10 +94,10 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 		int c = characterScanner.read();
 		if (c != ICharacterScanner.EOF && !ignored) {
 			if (switchSequences == null) {
-				switchSequences = TextUtils.replace(switchStrategy.getSwitchSequences(), '\n', characterScanner.getLegalLineDelimiters());
+				switchSequences = TextUtils.replace(switchStrategy.getSwitchSequences(), '\n', TextUtils.rsort(characterScanner.getLegalLineDelimiters()));
 			}
 			for (char[] sequence : switchSequences) {
-				if (c == sequence[0] && sequenceDetected(sequence)) {
+				if (c == sequence[0] && TextUtils.sequenceDetected(characterScanner, sequence, ignoreCase)) {
 					characterScanner.unread();
 					if (sequenceBypassHandler != null && !sequenceBypassHandler.bypassSequence(characterScanner, sequence)) {
 						found = true;
@@ -133,26 +133,6 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 
 	public void setSequenceIgnored(boolean ignored) {
 		this.ignored = ignored;
-	}
-
-	private boolean sequenceDetected(char[] sequence) {
-		for (int i = 1; i < sequence.length; ++i) {
-			int c = characterScanner.read();
-			if ((ignoreCase && Character.toLowerCase(c) != Character.toLowerCase(sequence[i]))
-					|| (!ignoreCase && c != sequence[i])) {
-				// Non-matching character detected, rewind the scanner back to the start.
-				// Do not unread the first character.
-				characterScanner.unread();
-				for (int j = i-1; j > 0; --j) {
-					characterScanner.unread();
-				}
-				return false;
-			}
-		}
-		for (int j = sequence.length-1; j > 0; --j) {
-			characterScanner.unread();
-		}
-		return true;
 	}
 
 }
