@@ -162,8 +162,13 @@ public class BundleEntry
 
 		/**
 		 * VisibilityContext
+		 * 
+		 * @param elementClass
+		 *            The abstract bundle element type to track for visibility changes. If this is null, then all
+		 *            element types will be tracked along with bundle elements (which are not descendants of
+		 *            AbstractBundleElement)
 		 */
-		public VisibilityContext(Class<?> elementClass)
+		public VisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 		{
 			if (elementClass == null)
 			{
@@ -744,7 +749,7 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public VisibilityContext getVisibilityContext(Class<?> elementClass)
+	public VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 	{
 		return new VisibilityContext(elementClass);
 	}

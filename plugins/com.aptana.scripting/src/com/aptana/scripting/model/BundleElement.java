@@ -568,7 +568,7 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	private BundleEntry.VisibilityContext getVisibilityContext(Class<?> elementClass)
+	private BundleEntry.VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 	{
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(this.getDisplayName());
 		BundleEntry.VisibilityContext context = null;
