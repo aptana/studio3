@@ -82,9 +82,11 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
 import com.aptana.scripting.model.ProjectTemplateElement.Type;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -122,7 +124,24 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
+		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		{
+			public boolean include(AbstractElement element)
+			{
+				boolean result = false;
+				
+				if (element instanceof ProjectTemplateElement)
+				{
+					ProjectTemplateElement template = (ProjectTemplateElement) element;
+					Type type = template.getType();
+					
+					result = type == Type.WEB || type == Type.ALL;
+				}
+				
+				return result;
+			}
+		});
+
 		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
@@ -145,8 +164,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return true;
 	}
 
-	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-			throws CoreException
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException
 	{
 		configElement = config;
 	}
@@ -247,8 +265,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
-				CreateProjectOperation op = new CreateProjectOperation(description,
-						Messages.NewProjectWizard_CreateOp_Title);
+				CreateProjectOperation op = new CreateProjectOperation(description, Messages.NewProjectWizard_CreateOp_Title);
 				try
 				{
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
@@ -283,20 +300,20 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
 				{
 					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
-							Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
+						Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
 				}
 				else
 				{
-					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
-							Messages.NewProjectWizard_CreationProblem, cause));
+					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID, Messages.NewProjectWizard_CreationProblem,
+						cause));
 				}
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.BLOCK);
 			}
 			else
 			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
-						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0, NLS.bind(
+					Messages.NewProjectWizard_InternalError, t.getMessage()), t));
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
