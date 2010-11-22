@@ -64,14 +64,14 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
-import com.aptana.scripting.model.ProjectTemplateElement.Type;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
@@ -186,9 +186,9 @@ public class BundleManager
 	private static BundleManager INSTANCE;
 
 	/**
-	 * getInstance
+	 * Return the singleton instance of BundleManager
 	 * 
-	 * @return
+	 * @return The singleton instance of BundleManager
 	 */
 	public static BundleManager getInstance()
 	{
@@ -196,11 +196,17 @@ public class BundleManager
 	}
 
 	/**
-	 * getInstance - used for unit testing
+	 * Return the singleton instance of BundleManager. Optional arguments allow for the explicit definition of the
+	 * directories used for application bundles and user bundles. However, this should only be used by unit tests. In
+	 * other words, don't use this unless you know what you're doing
 	 * 
 	 * @param applicationBundlesPath
+	 *            The path to use when looking for application bundles. Note this may be null in which case the standard
+	 *            default location will be used
 	 * @param userBundlesPath
-	 * @return
+	 *            The path to use when looking for user bundles. Note this may be null in which case the standard
+	 *            default location will be used
+	 * @return The singleton instance of BundleManager
 	 */
 	public static BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
 	{
@@ -288,10 +294,12 @@ public class BundleManager
 	}
 
 	/**
-	 * isSpecialDirectory
+	 * Determine if the specified path is one of the special directories in a bundle: commands, snippets, templates,
+	 * etc.
 	 * 
 	 * @param path
-	 * @return
+	 *            The path to test. This may be null, in which case this predicate will return false
+	 * @return A boolean indicating if the specified directory is "special"
 	 */
 	static boolean isSpecialDirectory(File path)
 	{
@@ -326,7 +334,8 @@ public class BundleManager
 	private List<LoadCycleListener> _loadCycleListeners;
 
 	/**
-	 * BundleManager
+	 * Create a new instance of BundleManager and initialize its internal structure. Note that this constructor is
+	 * private so it can only be instantiated within a static method in this class
 	 */
 	private BundleManager()
 	{
@@ -353,7 +362,7 @@ public class BundleManager
 			File bundleFile = bundle.getBundleDirectory();
 
 			// store bundle by path
-			synchronized (_bundlesByPath)
+			synchronized (this._bundlesByPath)
 			{
 				if (this._bundlesByPath.containsKey(bundleFile) == false)
 				{
@@ -374,7 +383,7 @@ public class BundleManager
 			// store bundle by name
 			String name = bundle.getDisplayName();
 
-			synchronized (_entriesByName)
+			synchronized (this._entriesByName)
 			{
 				if (this._entriesByName.containsKey(name) == false)
 				{
@@ -395,49 +404,64 @@ public class BundleManager
 	}
 
 	/**
-	 * addBundleVisibilityListener
+	 * Add a new listener to fire when any bundle changes visibility.
 	 * 
 	 * @param listener
+	 *            The listener to fire upon bundle visibility changes. A listener is added only once. Null values are
+	 *            ignored
 	 */
 	public void addBundleVisibilityListener(BundleVisibilityListener listener)
 	{
 		if (listener != null)
 		{
-			synchronized (_bundleVisibilityListeners)
+			synchronized (this._bundleVisibilityListeners)
 			{
-				this._bundleVisibilityListeners.add(listener);
+				if (this._bundleVisibilityListeners.contains(listener) == false)
+				{
+					this._bundleVisibilityListeners.add(listener);
+				}
 			}
 		}
 	}
 
 	/**
-	 * addElementVisibilityListener
+	 * Add a new listener to fire when any bundle element changes visibility.
 	 * 
 	 * @param listener
+	 *            The listener to fire upon element visibility changes. A listener is added only once. Null values are
+	 *            ignored
 	 */
 	public void addElementVisibilityListener(ElementVisibilityListener listener)
 	{
 		if (listener != null)
 		{
-			synchronized (_elementVisibilityListeners)
+			synchronized (this._elementVisibilityListeners)
 			{
-				this._elementVisibilityListeners.add(listener);
+				if (this._elementVisibilityListeners.contains(listener) == false)
+				{
+					this._elementVisibilityListeners.add(listener);
+				}
 			}
 		}
 	}
 
 	/**
-	 * addLoadCycleListener
+	 * Add a new listener to fire when any script is loaded, unloaded, or reloaded.
 	 * 
 	 * @param listener
+	 *            The listener to fire when scripts are processed. A listener is added only once. Null values are
+	 *            ignored
 	 */
 	public void addLoadCycleListener(LoadCycleListener listener)
 	{
 		if (listener != null)
 		{
-			synchronized (_loadCycleListeners)
+			synchronized (this._loadCycleListeners)
 			{
-				this._loadCycleListeners.add(listener);
+				if (this._loadCycleListeners.contains(listener) == false)
+				{
+					this._loadCycleListeners.add(listener);
+				}
 			}
 		}
 	}
@@ -468,15 +492,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireBundleBecameHiddenEvent
+	 * Fire a bundle-became-hidden visibility event to all listeners
 	 * 
 	 * @param bundle
+	 *            The bundle entry affected by this visibility event. Null values are ignored and do not cause the event
+	 *            to fire.
 	 */
 	void fireBundleBecameHiddenEvent(BundleEntry entry)
 	{
 		if (entry != null)
 		{
-			synchronized (_bundleVisibilityListeners)
+			synchronized (this._bundleVisibilityListeners)
 			{
 				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 				{
@@ -487,15 +513,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireBundleBecameVisibleEvent
+	 * Fire a bundle-became-visible visibility event to all listeners
 	 * 
 	 * @param bundle
+	 *            The bundle entry affected by this visibility event. Null values are ignored and do not cause the event
+	 *            to fire.
 	 */
 	void fireBundleBecameVisibleEvent(BundleEntry entry)
 	{
 		if (entry != null)
 		{
-			synchronized (_bundleVisibilityListeners)
+			synchronized (this._bundleVisibilityListeners)
 			{
 				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
 				{
@@ -506,15 +534,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireElementBecameHiddenEvent
+	 * Fire an element-became-hidden visibility event to all listeners
 	 * 
 	 * @param element
+	 *            The element affected by this visibility event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireElementBecameHiddenEvent(AbstractElement element)
 	{
 		if (element != null)
 		{
-			synchronized (_elementVisibilityListeners)
+			synchronized (this._elementVisibilityListeners)
 			{
 				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 				{
@@ -525,15 +555,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireElementBecameVisibleEvent
+	 * Fire an element-became-visible visibility event to all listeners
 	 * 
 	 * @param element
+	 *            The element affected by this visibility event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireElementBecameVisibleEvent(AbstractElement element)
 	{
 		if (element != null)
 		{
-			synchronized (_elementVisibilityListeners)
+			synchronized (this._elementVisibilityListeners)
 			{
 				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
 				{
@@ -544,15 +576,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireScriptLoadedEvent
+	 * Fire a script-loaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptLoadedEvent(File script)
 	{
 		if (script != null)
 		{
-			synchronized (_loadCycleListeners)
+			synchronized (this._loadCycleListeners)
 			{
 				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
@@ -563,15 +597,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireScriptReloadedEvent
+	 * Fire a script-reloaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptReloadedEvent(File script)
 	{
 		if (script != null)
 		{
-			synchronized (_loadCycleListeners)
+			synchronized (this._loadCycleListeners)
 			{
 				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
@@ -582,15 +618,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireScriptUnloadedEvent
+	 * Fire a script-unloaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptUnloadedEvent(File script)
 	{
 		if (script != null)
 		{
-			synchronized (_loadCycleListeners)
+			synchronized (this._loadCycleListeners)
 			{
 				for (LoadCycleListener listener : this._loadCycleListeners)
 				{
@@ -601,15 +639,15 @@ public class BundleManager
 	}
 
 	/**
-	 * getApplicationBundles
+	 * Return a list of all bundle elements categorized as application bundles
 	 * 
-	 * @return
+	 * @return A list of bundles. This list will always be defined
 	 */
 	public List<BundleElement> getApplicationBundles()
 	{
 		List<BundleElement> bundles = new ArrayList<BundleElement>();
 
-		synchronized (_bundlesByPath)
+		synchronized (this._bundlesByPath)
 		{
 			String applicationBundlesPath = this.getApplicationBundlesPath();
 
@@ -638,7 +676,7 @@ public class BundleManager
 	}
 
 	/**
-	 * getBuiltinsLoadPath
+	 * Return the path that contains application bundles
 	 * 
 	 * @return
 	 */
@@ -648,10 +686,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleCommands
+	 * Return a list of commands in the specified bundle name. Note that bundle precedence is taken into account, so
+	 * only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	public List<CommandElement> getBundleCommands(String name)
 	{
@@ -671,10 +711,38 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundles
+	 * Return a list of content assist elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<ContentAssistElement> getBundleContentAssists(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<ContentAssistElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getContentAssists();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of directories within the specified directory. Each directory returned in the list becomes a
+	 * candidate bundle determined by other methods.
 	 * 
 	 * @param bundlesDirectory
-	 * @return
+	 *            The directory to query for child directories. It is verified that the specified file is a directory
+	 *            and is readable. Null values are ignored
+	 * @return The list of directories within the specified directory
 	 */
 	protected List<File> getBundleDirectories(File bundlesDirectory)
 	{
@@ -695,29 +763,40 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleDirectory
+	 * Return the bundle directory that contains the specified script. If the script is the bundle.rb file, then its
+	 * parent is returned; otherwise, it is assumed that the script is within a special directory. In that case the
+	 * grandparent directory of the file is returned
 	 * 
 	 * @param script
-	 * @return
+	 *            The descendant script used to locate the bundle directory. Null values are ignored
+	 * @return The bundle directory or null if the specified script was null
 	 */
 	public File getBundleDirectory(File script)
 	{
-		String scriptPath = script.getAbsolutePath();
+		File result = null;
 
-		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+		if (script != null)
+		{
+			String scriptPath = script.getAbsolutePath();
+
+			result = scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+		}
+
+		return result;
 	}
 
 	/**
-	 * getBundle
+	 * Return the underlying bundle entry which contains all bundle elements of the specified name
 	 * 
 	 * @param name
-	 * @return
+	 *            The bundle name used to locate the bundle entry
+	 * @return The bundle entry or null if no bundle exists for the specified name
 	 */
 	public BundleEntry getBundleEntry(String name)
 	{
 		BundleEntry result;
 
-		synchronized (_entriesByName)
+		synchronized (this._entriesByName)
 		{
 			result = this._entriesByName.get(name);
 		}
@@ -726,10 +805,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleEnvs
+	 * Return a list of environment elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	public List<EnvironmentElement> getBundleEnvs(String name)
 	{
@@ -749,16 +830,17 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleFromPath
+	 * Find the bundle element contained within the specified directory
 	 * 
-	 * @param path
-	 * @return
+	 * @param bundleDirectory
+	 *            A bundle directory. Null values are ignored
+	 * @return The bundle element that is defined within the specified directory or null if none is defined
 	 */
 	public BundleElement getBundleFromPath(File bundleDirectory)
 	{
 		BundleElement result = null;
 
-		synchronized (_bundlesByPath)
+		synchronized (this._bundlesByPath)
 		{
 			List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
 
@@ -777,10 +859,11 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleFromPath
+	 * Find the bundle element contained within the specified directory
 	 * 
 	 * @param path
-	 * @return
+	 *            A bundle directory. Null values are ignored
+	 * @return The bundle element that is defined within the specified directory or null if none is defined
 	 */
 	public BundleElement getBundleFromPath(String path)
 	{
@@ -795,10 +878,11 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleLoadPaths
+	 * Return a list of paths to be used by ruby when locating imported scripts
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            The bundle directory from which load paths will be calculated
+	 * @return A list of ruby load paths
 	 */
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
@@ -833,10 +917,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleLoadPaths
+	 * Return a list of load paths for the specified bundle name. Note that bundle precedence is taken into account, so
+	 * only visible load paths are returned in this list
 	 * 
-	 * @param bundleDirectory
-	 * @return
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	protected List<String> getBundleLoadPaths(String name)
 	{
@@ -854,10 +940,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleCommands
+	 * Return a list of menu elements in the specified bundle name. Note that bundle precedence is taken into account,
+	 * so only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	public List<MenuElement> getBundleMenus(String name)
 	{
@@ -877,15 +965,15 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleNames
+	 * Return a list of names for all active bundles
 	 * 
-	 * @return
+	 * @return A list of bundle names
 	 */
 	public List<String> getBundleNames()
 	{
 		List<String> names;
 
-		synchronized (_entriesByName)
+		synchronized (this._entriesByName)
 		{
 			names = new ArrayList<String>(this._entriesByName.keySet());
 		}
@@ -894,10 +982,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundlePairs
+	 * Return a list of smart typing pairs elements in the specified bundle name. Note that bundle precedence is taken
+	 * into account, so only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	public List<SmartTypingPairsElement> getBundlePairs(String name)
 	{
@@ -917,10 +1007,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundlePrecedence
+	 * Determine the bundle precedence of the specified path. Note this method assumes that if a path is not an
+	 * application bundle nor a user bundle, then it is a project bundle. This may not be exactly true. A more thorough
+	 * check against the current workspace will be required to verify that case.
 	 * 
 	 * @param path
-	 * @return
+	 *            The path to use to determine bundle precedence
+	 * @return The BundlePrecedence type
 	 */
 	public BundlePrecedence getBundlePrecedence(File path)
 	{
@@ -928,10 +1021,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleScope
+	 * Determine the bundle precedence of the specified path. Note this method assumes that if a path is not an
+	 * application bundle nor a user bundle, then it is a project bundle. This may not be exactly true. A more thorough
+	 * check against the current workspace will be required to verify that case.
 	 * 
 	 * @param path
-	 * @return
+	 *            The path to use to determine bundle precedence
+	 * @return The BundlePrecedence type
 	 */
 	public BundlePrecedence getBundlePrecedence(String path)
 	{
@@ -953,10 +1049,12 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleScripts
+	 * Return a list of all scripts that need to be processed in a specified bundle directory. Note that the items are
+	 * returned in the following order: bundle.rb, commands, snippets, and then project templates.
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            The bundle directory used to search for scripts
+	 * @return A list of all active scripts in the specified bundle directory
 	 */
 	protected List<File> getBundleScripts(File bundleDirectory)
 	{
@@ -992,37 +1090,16 @@ public class BundleManager
 	}
 
 	/**
-	 * getCommands
-	 * 
-	 * @return
-	 */
-	public List<CommandElement> getCommands()
-	{
-		List<CommandElement> result = new ArrayList<CommandElement>();
-
-		for (String name : this.getBundleNames())
-		{
-			result.addAll(this.getBundleCommands(name));
-		}
-
-		return result;
-	}
-
-	/**
-	 * getCommands
+	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list
 	 * 
 	 * @param filter
-	 * @return
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
 	public List<CommandElement> getCommands(IModelFilter filter)
 	{
-		// If the user specified a filter, AND it with the IsExecutableCommandFilter to filter the commands that are
-		// executable on current platform
-		if (filter != null)
-		{
-			filter = new AndFilter(filter, new IsExecutableCommandFilter());
-		}
-
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		for (String name : this.getBundleNames())
@@ -1040,32 +1117,44 @@ public class BundleManager
 	}
 
 	/**
-	 * getContentAssists - FIXME
+	 * Get a list of all active and executable commands. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list. This method is convenience method and is equivalent to constructing
+	 * an AndFilter with an IsExecutableCommandFilter and the specified filter
 	 * 
 	 * @param filter
-	 * @return
+	 *            A filter to apply to each active command. Only commands which pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of commands that are visible, executable, and that pass the specified filter
+	 */
+	public List<CommandElement> getExecutableCommands(IModelFilter filter)
+	{
+		IModelFilter executableFilter = new IsExecutableCommandFilter();
+
+		filter = (filter == null) ? executableFilter : new AndFilter(filter, executableFilter);
+
+		return this.getCommands(filter);
+	}
+
+	/**
+	 * Return a list of all active content assist elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
 	public List<ContentAssistElement> getContentAssists(IModelFilter filter)
 	{
-		IModelFilter caFilter = new IModelFilter()
-		{
-			public boolean include(AbstractElement element)
-			{
-				return element instanceof ContentAssistElement;
-			}
-		};
-
-		filter = (filter != null) ? new AndFilter(filter, caFilter) : caFilter;
-
 		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
 
 		for (String name : this.getBundleNames())
 		{
-			for (CommandElement command : this.getBundleCommands(name))
+			for (ContentAssistElement assist : this.getBundleContentAssists(name))
 			{
-				if (filter.include(command))
+				if (filter == null || filter.include(assist))
 				{
-					result.add((ContentAssistElement) command);
+					result.add(assist);
 				}
 			}
 		}
@@ -1103,10 +1192,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getEnvs
+	 * Return a list of all active environment elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
 	 * 
 	 * @param filter
-	 * @return
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
 	public List<EnvironmentElement> getEnvs(IModelFilter filter)
 	{
@@ -1214,10 +1306,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getMenus
+	 * Return a list of all active top-level menu elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
 	 * 
 	 * @param filter
-	 * @return
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
 	public List<MenuElement> getMenus(IModelFilter filter)
 	{
@@ -1238,10 +1333,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getPairs
+	 * Return a list of all active smart typing pairs elements. Note that bundle precedence is taken into account, so
+	 * only visible elements are returned in this list
 	 * 
 	 * @param filter
-	 * @return
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
 	public List<SmartTypingPairsElement> getPairs(IModelFilter filter)
 	{
@@ -1262,11 +1360,15 @@ public class BundleManager
 	}
 
 	/**
-	 * getProjectTemplates
+	 * Return a list of all active project template elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
 	 * 
-	 * @return
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
 	 */
-	public List<ProjectTemplateElement> getProjectTemplates()
+	public List<ProjectTemplateElement> getProjectTemplates(IModelFilter filter)
 	{
 		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
 
@@ -1276,7 +1378,10 @@ public class BundleManager
 
 			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
 			{
-				result.add(template);
+				if (filter == null || filter.include(template))
+				{
+					result.add(template);
+				}
 			}
 		}
 
@@ -1284,39 +1389,18 @@ public class BundleManager
 	}
 
 	/**
-	 * getProjectTemplatesByType
-	 * 
-	 * @param type
-	 * @return
-	 */
-	public List<ProjectTemplateElement> getProjectTemplatesByType(Type type)
-	{
-		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
-
-		for (String name : this.getBundleNames())
-		{
-			BundleEntry bundleEntry = this.getBundleEntry(name);
-
-			for (ProjectTemplateElement template : bundleEntry.getProjectTemplatesByType(type))
-			{
-				result.add(template);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getScriptsFromDirectory
+	 * Return a list of ruby files contained within a specified directory. The resulting list is sorted by file name.
+	 * Note that the search for scripts is non-recursive and only includes children of the specified directory.
 	 * 
 	 * @param directory
-	 * @return
+	 *            The directory used to search for ruby files. Null values are ignored.
+	 * @return The list of scripts in the specified directory
 	 */
 	protected List<File> getScriptsFromDirectory(File directory)
 	{
 		File[] result = NO_FILES;
 
-		if (directory.exists() && directory.canRead())
+		if (directory != null && directory.exists() && directory.canRead())
 		{
 			result = directory.listFiles(new FileFilter()
 			{
@@ -1406,7 +1490,7 @@ public class BundleManager
 	}
 
 	/**
-	 * getUserBundlePath
+	 * Return the path that contains user bundles
 	 * 
 	 * @return
 	 */
@@ -1416,16 +1500,17 @@ public class BundleManager
 	}
 
 	/**
-	 * hasBndleAtPath
+	 * A predicate that returns if the specified bundle directory contains a bundle that has been processed
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            A directory that may contain a processed bundle
+	 * @return Returns true if the specified directory has a bundle element associated with it
 	 */
 	public boolean hasBundleAtPath(File bundleDirectory)
 	{
 		boolean result = false;
 
-		synchronized (_bundlesByPath)
+		synchronized (this._bundlesByPath)
 		{
 			result = this._bundlesByPath.containsKey(bundleDirectory);
 		}
@@ -1434,9 +1519,11 @@ public class BundleManager
 	}
 
 	/**
-	 * isValidBundleDirectory
+	 * Determine if the specified directory minimally defines a bundle. In order to return true, the specified directory
+	 * must exist, must be a directory, it must be readable, and it must contain a bundle.rb file
 	 * 
 	 * @param bundleDirectory
+	 *            The directory to test
 	 * @return
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
@@ -1487,9 +1574,9 @@ public class BundleManager
 	};
 
 	/**
-	 * loadApplicationBundles
+	 * Load all application bundles
 	 */
-	public void loadApplicationBundles()
+	protected void loadApplicationBundles()
 	{
 		String applicationBundles = this.getApplicationBundlesPath();
 
@@ -1505,35 +1592,24 @@ public class BundleManager
 	}
 
 	/**
-	 * loadBundle
+	 * Load the bundle in the specified directory
 	 * 
 	 * @param bundleDirectory
+	 *            The directory containing a bundle and its children
 	 */
-	public void loadBundle(final File bundleDirectory)
-	{
-		loadBundle(bundleDirectory, true);
-	}
-
-	/**
-	 * loadBundle FIXME This is a hack specifically for testing so we can still load bundles sync there as the tests
-	 * assume that they will! We should be able to return back the job or a listener or pass in a monitor so we can
-	 * monitor the status of the job and wait until it's finished!
-	 * 
-	 * @param bundleDirectory
-	 */
-	public void loadBundle(final File bundleDirectory, boolean async)
+	public void loadBundle(File bundleDirectory)
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
-		
-		if (async)
+
+		if (EclipseUtil.isTesting() == false)
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
-			
+
 			if (counter >= Runtime.getRuntime().availableProcessors())
 			{
 				counter = 0;
 			}
-			
+
 			job.schedule();
 		}
 		else
@@ -1543,7 +1619,7 @@ public class BundleManager
 	}
 
 	/**
-	 * loadBundles
+	 * Load all application, user, and project bundles
 	 */
 	public void loadBundles()
 	{
@@ -1556,20 +1632,20 @@ public class BundleManager
 	}
 
 	/**
-	 * loadProjectBundles
+	 * Load all project bundles
 	 */
-	public void loadProjectBundles()
+	protected void loadProjectBundles()
 	{
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
 			IPath location = project.getLocation();
-			
+
 			if (location == null)
 			{
 				// Log that it was null somehow to track down when this occurs?
 				continue;
 			}
-			
+
 			File projectDirectory = location.toFile();
 			File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
 
@@ -1581,9 +1657,11 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script. This is a convenience method for loadScript(File, boolean) and is equivalent to
+	 * invoking loadScript(script, true).
 	 * 
 	 * @param script
+	 *            The script to load
 	 */
 	public void loadScript(File script)
 	{
@@ -1591,10 +1669,14 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script. This is a convenience method for loadScript(File, boolean, List<String>) and is
+	 * equivalent to invoking loadScript(script, fireEvent, bundleLoadPaths) where bundleLoadPaths is calculated
+	 * getBundleDirectory and getBundleLoadPaths
 	 * 
 	 * @param script
+	 *            The script to load
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 */
 	public void loadScript(File script, boolean fireEvent)
 	{
@@ -1612,11 +1694,14 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script, possibly firing a script-load load cycle event
 	 * 
 	 * @param script
+	 *            The script to load
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 * @param loadPaths
+	 *            A list of paths for ruby to use to locate libraries when executing the script
 	 */
 	public void loadScript(File script, boolean fireEvent, List<String> loadPaths)
 	{
@@ -1650,9 +1735,9 @@ public class BundleManager
 	}
 
 	/**
-	 * loadUserBundles
+	 * Load all user bundles
 	 */
-	public void loadUserBundles()
+	protected void loadUserBundles()
 	{
 		String userBundles = this.getUserBundlesPath();
 
@@ -1668,22 +1753,28 @@ public class BundleManager
 	}
 
 	/**
-	 * reloadBundle
+	 * Reload the specified bundle. This is equivalent to calling unloadBundle(bundleDirectory) followed by
+	 * loadBundle(bundleDirectory)
 	 * 
 	 * @param bundle
+	 *            The bundle element to reload. Null values are ignored
 	 */
 	public void reloadBundle(BundleElement bundle)
 	{
-		File bundleDirectory = bundle.getBundleDirectory();
+		if (bundle != null)
+		{
+			File bundleDirectory = bundle.getBundleDirectory();
 
-		this.unloadBundle(bundleDirectory);
-		this.loadBundle(bundleDirectory);
+			this.unloadBundle(bundleDirectory);
+			this.loadBundle(bundleDirectory);
+		}
 	}
 
 	/**
-	 * reloadScript
+	 * Reload the specified script. A script-reloaded load cycle event will be fired.
 	 * 
 	 * @param script
+	 *            The script to re-process. Null values are ignored
 	 */
 	public void reloadScript(File script)
 	{
@@ -1712,9 +1803,10 @@ public class BundleManager
 	}
 
 	/**
-	 * removeBundle
+	 * Remove the specified bundle from the scripting environment
 	 * 
 	 * @param bundle
+	 *            The bundle to remove. Null values are ignored
 	 */
 	private void removeBundle(BundleElement bundle)
 	{
@@ -1723,7 +1815,7 @@ public class BundleManager
 			File bundleFile = bundle.getBundleDirectory();
 			String name = bundle.getDisplayName();
 
-			synchronized (_bundlesByPath)
+			synchronized (this._bundlesByPath)
 			{
 				if (this._bundlesByPath.containsKey(bundleFile))
 				{
@@ -1738,7 +1830,7 @@ public class BundleManager
 				}
 			}
 
-			synchronized (_entriesByName)
+			synchronized (this._entriesByName)
 			{
 				if (this._entriesByName.containsKey(name))
 				{
@@ -1758,66 +1850,72 @@ public class BundleManager
 	}
 
 	/**
-	 * removeBundleVisibilityListener
+	 * Remove a listener from the bundle visibility event list
 	 * 
 	 * @param listener
+	 *            The listener to remove. Null values are ignored
 	 */
 	public void removeBundleVisibilityListener(BundleVisibilityListener listener)
 	{
-		synchronized (_bundleVisibilityListeners)
+		synchronized (this._bundleVisibilityListeners)
 		{
 			this._bundleVisibilityListeners.remove(listener);
 		}
 	}
 
 	/**
-	 * removeElementVisibilityListener
+	 * Remove a listener from the element visibility event list
 	 * 
 	 * @param listener
+	 *            The listener to remove. Null values are ignored
 	 */
 	public void removeElementVisibilityListener(ElementVisibilityListener listener)
 	{
-		synchronized (_elementVisibilityListeners)
+		synchronized (this._elementVisibilityListeners)
 		{
 			this._elementVisibilityListeners.remove(listener);
 		}
 	}
 
 	/**
-	 * removeLoadCycleListener
+	 * Remove a listener from the script load cycle event list
 	 * 
 	 * @param listener
+	 *            The listener to remove. Null values are ignored
 	 */
 	public void removeLoadCycleListener(LoadCycleListener listener)
 	{
-		synchronized (_loadCycleListeners)
+		synchronized (this._loadCycleListeners)
 		{
 			this._loadCycleListeners.remove(listener);
 		}
 	}
 
 	/**
-	 * reset
+	 * Clear internal state in the bundle manager. This used for unit testing, so don't use this unless you know what
+	 * you're doing
 	 */
 	public void reset()
 	{
 		// TODO: should unload all commands, menus, and snippets so events fire, but
 		// this is used for test only right now.
-		synchronized (_bundlesByPath)
+		synchronized (this._bundlesByPath)
 		{
 			this._bundlesByPath.clear();
 		}
 
-		synchronized (_entriesByName)
+		synchronized (this._entriesByName)
 		{
 			this._entriesByName.clear();
 		}
 	}
 
 	/**
-	 * unloadBundle
+	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
+	 * everything all scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
+	 *            The directory (and its descendants) to unload
 	 */
 	public void unloadBundle(File bundleDirectory)
 	{
@@ -1839,9 +1937,11 @@ public class BundleManager
 	}
 
 	/**
-	 * unloadScript
+	 * Unload the specified script. This is a convenience method for unloadScript(File, boolean) and is equivalent to
+	 * invoking unloadScript(script, true).
 	 * 
 	 * @param script
+	 *            The script to unload
 	 */
 	public void unloadScript(File script)
 	{
@@ -1849,10 +1949,12 @@ public class BundleManager
 	}
 
 	/**
-	 * unloadScript
+	 * Unload the specified script.
 	 * 
 	 * @param script
+	 *            The script to unload. Null values are ignored and will not fire load cycle events.
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 */
 	public void unloadScript(File script, boolean fireEvent)
 	{
