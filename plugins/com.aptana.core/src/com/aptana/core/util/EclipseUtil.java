@@ -138,7 +138,7 @@ public class EclipseUtil
 	{
 		return getPluginVersion(STANDALONE_PLUGIN_ID) != null;
 	}
-	
+
 	/**
 	 * Determines if the IDE is running in a unit test
 	 * 
@@ -147,7 +147,7 @@ public class EclipseUtil
 	public static boolean isTesting()
 	{
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
-		
+
 		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
 	}
 }
