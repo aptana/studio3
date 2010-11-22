@@ -429,7 +429,7 @@ public class KeybindingsManager implements LoadCycleListener
 		};
 
 		// Get all commands with bindings
-		List<CommandElement> commands = bundleManager.getCommands(filter);
+		List<CommandElement> commands = bundleManager.getExecutableCommands(filter);
 		for (CommandElement commandElement : commands)
 		{
 			// Get key sequences

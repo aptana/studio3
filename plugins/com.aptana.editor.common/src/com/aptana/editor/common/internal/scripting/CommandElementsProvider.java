@@ -86,7 +86,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
 			IModelFilter filter = new ScopeFilter(contentTypeAtOffset);
 
-			List<CommandElement> commandsFromScope = BundleManager.getInstance().getCommands(filter);
+			List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
 			for (CommandElement commandElement : commandsFromScope)
 			{
 				if (commandElement instanceof SnippetElement)

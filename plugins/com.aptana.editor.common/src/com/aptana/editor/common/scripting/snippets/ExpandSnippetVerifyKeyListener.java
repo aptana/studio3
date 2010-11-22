@@ -108,7 +108,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 						int caretOffset = textViewer.getTextWidget().getCaretOffset();
 						String scope = getScope(document, caretOffset);
 						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-						List<CommandElement> commandsFromScope = BundleManager.getInstance().getCommands(filter);
+						List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
 						if (commandsFromScope.size() > 0)
 						{
 							// chop off portions of prefix from beginning until we have a match!

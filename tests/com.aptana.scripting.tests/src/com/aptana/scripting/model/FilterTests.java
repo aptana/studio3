@@ -61,7 +61,7 @@ public class FilterTests extends BundleTestBase
 	public void testScopeFilter()
 	{
 		ScopeFilter filter = new ScopeFilter("source.ruby");
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
 		assertEquals(1, commands.size());
@@ -74,7 +74,7 @@ public class FilterTests extends BundleTestBase
 	public void testHasTriggerFilter()
 	{
 		HasTriggerFilter filter = new HasTriggerFilter();
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
 		assertEquals(3, commands.size());
@@ -92,7 +92,7 @@ public class FilterTests extends BundleTestBase
 		HasTriggerFilter hasTriggerFilter = new HasTriggerFilter();
 		AndFilter filter = new AndFilter(scopeFilter, hasTriggerFilter);
 		
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
 		assertEquals(1, commands.size());
@@ -108,7 +108,7 @@ public class FilterTests extends BundleTestBase
 		ScopeFilter scopeFilter2 = new ScopeFilter("source.js");
 		OrFilter filter = new OrFilter(scopeFilter1, scopeFilter2);
 		
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
 		assertEquals(2, commands.size());
@@ -124,7 +124,7 @@ public class FilterTests extends BundleTestBase
 		HasTriggerFilter hasTriggerFilter = new HasTriggerFilter();
 		NotFilter filter = new NotFilter(hasTriggerFilter);
 		
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
 		assertEquals(1, commands.size());

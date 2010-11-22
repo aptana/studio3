@@ -80,7 +80,7 @@ public class PlatformSpecificCommandTests extends BundleTestBase
 	 */
 	protected CommandElement getCommand(final String name)
 	{
-		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getCommands(new IModelFilter()
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
 			{
