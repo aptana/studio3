@@ -47,7 +47,6 @@ import java.util.Set;
 import org.jruby.RubyRegexp;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleEntry
 {
@@ -105,6 +104,51 @@ public class BundleEntry
 		 * @return
 		 */
 		public abstract List<T> getElements();
+	}
+
+	private abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
+	{
+		private Set<String> names = new HashSet<String>();
+		private List<T> result = new ArrayList<T>();
+
+		/**
+		 * Return a list of abstract element items from the specified bundle
+		 * 
+		 * @param bundle
+		 * @return
+		 */
+		protected abstract List<T> getElements(BundleElement bundle);
+
+		/**
+		 * Get the list of items that are visible
+		 * 
+		 * @return
+		 */
+		public List<T> getResult()
+		{
+			return result;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see com.aptana.scripting.model.BundleProcessor#processBundle(com.aptana.scripting.model.BundleEntry,
+		 * com.aptana.scripting.model.BundleElement)
+		 */
+		public boolean processBundle(BundleEntry entry, BundleElement bundle)
+		{
+			for (T command : getElements(bundle))
+			{
+				String name = command.getDisplayName();
+
+				if (names.contains(name) == false)
+				{
+					names.add(name);
+					result.add(command);
+				}
+			}
+
+			return true;
+		}
 	}
 
 	public class VisibilityContext
@@ -243,14 +287,14 @@ public class BundleEntry
 			{
 				fireBundleVisibilityEvents();
 			}
-			
+
 			this.fireVisibilityEvents(commands);
 			this.fireVisibilityEvents(envs);
 			this.fireVisibilityEvents(menus);
 			this.fireVisibilityEvents(pairs);
 			this.fireVisibilityEvents(projectTemplates);
 		}
-		
+
 		/**
 		 * fireVisibilityEvents
 		 * 
@@ -262,51 +306,6 @@ public class BundleEntry
 			{
 				context.fireVisibilityEvents();
 			}
-		}
-	}
-
-	private abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
-	{
-		private Set<String> names = new HashSet<String>();
-		private List<T> result = new ArrayList<T>();
-
-		/**
-		 * Return a list of abstract element items from the specified bundle
-		 * 
-		 * @param bundle
-		 * @return
-		 */
-		protected abstract List<T> getElements(BundleElement bundle);
-
-		/**
-		 * Get the list of items that are visible
-		 * 
-		 * @return
-		 */
-		public List<T> getResult()
-		{
-			return result;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * @see com.aptana.scripting.model.BundleProcessor#processBundle(com.aptana.scripting.model.BundleEntry,
-		 * com.aptana.scripting.model.BundleElement)
-		 */
-		public boolean processBundle(BundleEntry entry, BundleElement bundle)
-		{
-			for (T command : getElements(bundle))
-			{
-				String name = command.getDisplayName();
-
-				if (names.contains(name) == false)
-				{
-					names.add(name);
-					result.add(command);
-				}
-			}
-
-			return true;
 		}
 	}
 
@@ -416,6 +415,26 @@ public class BundleEntry
 			protected List<CommandElement> getElements(BundleElement bundle)
 			{
 				return bundle.getCommands();
+			}
+		};
+
+		this.processBundles(processor);
+
+		return processor.getResult();
+	}
+
+	/**
+	 * getContentAssists
+	 * 
+	 * @return
+	 */
+	public List<ContentAssistElement> getContentAssists()
+	{
+		NameBasedProcessor<ContentAssistElement> processor = new NameBasedProcessor<ContentAssistElement>()
+		{
+			protected List<ContentAssistElement> getElements(BundleElement bundle)
+			{
+				return bundle.getContentAssists();
 			}
 		};
 
@@ -712,27 +731,6 @@ public class BundleEntry
 			protected List<ProjectTemplateElement> getElements(BundleElement bundle)
 			{
 				return bundle.getProjectTemplates();
-			}
-		};
-
-		this.processBundles(processor);
-
-		return processor.getResult();
-	}
-
-	/**
-	 * getProjectTemplates
-	 * 
-	 * @param type
-	 * @return
-	 */
-	public List<ProjectTemplateElement> getProjectTemplatesByType(final Type type)
-	{
-		NameBasedProcessor<ProjectTemplateElement> processor = new NameBasedProcessor<ProjectTemplateElement>()
-		{
-			protected List<ProjectTemplateElement> getElements(BundleElement bundle)
-			{
-				return bundle.getProjectTemplatesByType(type);
 			}
 		};
 
