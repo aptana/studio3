@@ -87,11 +87,6 @@ public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 		return !set.contains(element);
 	}
 
-	public boolean shouldConsumePreviousWhiteSpaces()
-	{
-		return false;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see

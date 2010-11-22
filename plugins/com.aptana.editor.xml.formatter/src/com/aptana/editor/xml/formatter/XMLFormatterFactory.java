@@ -61,7 +61,6 @@ public class XMLFormatterFactory extends AbstractScriptFormatterFactory
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.xml"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
-			// TODO - Add more...
 			XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, XMLFormatterConstants.FORMATTER_TAB_CHAR,
 			XMLFormatterConstants.FORMATTER_TAB_SIZE, XMLFormatterConstants.WRAP_COMMENTS,
 			XMLFormatterConstants.WRAP_COMMENTS_LENGTH, XMLFormatterConstants.INDENT_EXCLUDED_TAGS,

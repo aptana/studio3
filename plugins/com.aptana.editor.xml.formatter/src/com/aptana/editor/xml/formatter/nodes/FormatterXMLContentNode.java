@@ -41,6 +41,15 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
+/**
+ * Constructs a new content node for XML Element nodes. We construct a node for the content of an element node so we can
+ * control the new lines inside the element nodes appropriately.
+ * 
+ * @param document
+ * @param startOffset
+ * @param endOffset
+ */
+
 public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 {
 
@@ -49,19 +58,10 @@ public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 	/**
 	 * @param document
 	 */
-	public FormatterXMLContentNode(IFormatterDocument document,String parentElement)
+	public FormatterXMLContentNode(IFormatterDocument document, String parentElement)
 	{
 		super(document);
 		this.parentElement = parentElement;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
-	 */
-	protected boolean isIndenting()
-	{
-		return false;
 	}
 
 	/*
@@ -103,12 +103,4 @@ public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 		return !isAddingBeginNewLine();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountBefore()
-	 */
-	public int getSpacesCountBefore()
-	{
-		return 0;
-	}
 }

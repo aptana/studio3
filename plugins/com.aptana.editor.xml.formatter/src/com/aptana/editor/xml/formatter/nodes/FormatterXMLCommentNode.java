@@ -42,7 +42,7 @@ public class FormatterXMLCommentNode extends FormatterCommentNode
 {
 
 	/**
-	 * Constructs a new formatter node for HTML comments
+	 * Constructs a new formatter node for XML comments
 	 * 
 	 * @param document
 	 * @param startOffset
