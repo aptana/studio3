@@ -150,23 +150,6 @@ module Ruble
     def trigger
       @jobj.trigger
     end
-
-    # def trigger=(values)
-    #   if values.kind_of? Array
-    #     if values.length > 0
-    #       type = values[0];
-    #       
-    #       if type.kind_of? Symbol
-    #         values.shift
-    #         @jobj.setTrigger(type.to_s, values.to_java(:String))
-    #       else
-    #         @jobj.setTrigger("prefix", values.to_java(:String))
-    #       end
-    #     end
-    #   else
-    #     @jobj.setTrigger("prefix", values.to_java(:String))
-    #   end
-    # end
     
     def trigger=(values)
       if values.kind_of? Symbol
