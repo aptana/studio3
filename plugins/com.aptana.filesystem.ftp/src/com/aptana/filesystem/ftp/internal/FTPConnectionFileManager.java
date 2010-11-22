@@ -405,8 +405,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 						}
 					}						
 				}
-				Date lastModifiedServerInLocalTZ = file.lastModified();
 				if (file != null) {
+					Date lastModifiedServerInLocalTZ = file.lastModified();
 					if (serverSupportsFeature("MDTM")) { //$NON-NLS-1$
 						Date lastModifiedLocalTZ = ftpClient.modtime(file.getName());
 						if (lastModifiedLocalTZ != null) {
@@ -630,7 +630,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
 					Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
-					if (serverTimeZoneShift != 0) {
+					if (serverTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
 						ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverTimeZoneShift));
 					}
 					if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -705,7 +705,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					continue;
 				}
 				Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
-				if (serverTimeZoneShift != 0) {
+				if (serverTimeZoneShift != 0 && lastModifiedServerInLocalTZ != null) {
 					ftpFile.setLastModified(new Date(lastModifiedServerInLocalTZ.getTime()+serverTimeZoneShift));
 				}
 				if ((options & IExtendedFileStore.DETAILED) != 0) {
