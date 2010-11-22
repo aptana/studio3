@@ -38,7 +38,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +46,6 @@ import org.jruby.RubyRegexp;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.ProjectTemplateElement.Type;
 
 public class BundleElement extends AbstractElement
 {
@@ -209,6 +207,72 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getChildren
+	 * 
+	 * @return
+	 */
+	public List<AbstractBundleElement> getChildren()
+	{
+		return Collections.unmodifiableList(this._children);
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will not be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByExactType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		synchronized (this._children)
+		{
+			for (AbstractBundleElement child : this._children)
+			{
+				// NOTE: this will return true for children of type childType, but not for descendant types of
+				// childType.
+				if (childType == child.getClass())
+				{
+					result.add(childType.cast(child));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		synchronized (this._children)
+		{
+			for (AbstractBundleElement child : this._children)
+			{
+				// NOTE: isAssignableFrom is like instanceof where it will return true for instances of childType and
+				// its descendant types
+				if (childType.isAssignableFrom(child.getClass()))
+				{
+					result.add(childType.cast(child));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getCommandByName
 	 * 
 	 * @return
@@ -243,20 +307,17 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<CommandElement> getCommands()
 	{
-		List<CommandElement> result = new ArrayList<CommandElement>();
+		return this.getChildrenByType(CommandElement.class);
+	}
 
-		synchronized (this._children)
-		{
-			for (AbstractBundleElement element : this._children)
-			{
-				if (element instanceof CommandElement)
-				{
-					result.add((CommandElement) element);
-				}
-			}
-		}
-
-		return result;
+	/**
+	 * getContentAssists
+	 * 
+	 * @return
+	 */
+	public List<ContentAssistElement> getContentAssists()
+	{
+		return this.getChildrenByType(ContentAssistElement.class);
 	}
 
 	/**
@@ -342,20 +403,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<EnvironmentElement> getEnvs()
 	{
-		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
-
-		synchronized (this._children)
-		{
-			for (AbstractBundleElement element : this._children)
-			{
-				if (element instanceof EnvironmentElement)
-				{
-					result.add((EnvironmentElement) element);
-				}
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(EnvironmentElement.class);
 	}
 
 	/**
@@ -468,7 +516,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<String> getLoadPaths()
 	{
-		List<String> result = new LinkedList<String>();
+		List<String> result = new ArrayList<String>();
 
 		result.add(BundleUtils.getBundleLibDirectory(this.getBundleDirectory()));
 
@@ -482,20 +530,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<MenuElement> getMenus()
 	{
-		List<MenuElement> result = new ArrayList<MenuElement>();
-
-		synchronized (this._children)
-		{
-			for (AbstractBundleElement element : this._children)
-			{
-				if (element instanceof MenuElement)
-				{
-					result.add((MenuElement) element);
-				}
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(MenuElement.class);
 	}
 
 	/**
@@ -505,20 +540,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<SmartTypingPairsElement> getPairs()
 	{
-		List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
-
-		synchronized (this._children)
-		{
-			for (AbstractBundleElement element : this._children)
-			{
-				if (element instanceof SmartTypingPairsElement)
-				{
-					result.add((SmartTypingPairsElement) element);
-				}
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(SmartTypingPairsElement.class);
 	}
 
 	/**
@@ -528,46 +550,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<ProjectTemplateElement> getProjectTemplates()
 	{
-		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
-
-		synchronized (this._children)
-		{
-			for (AbstractBundleElement element : this._children)
-			{
-				if (element instanceof ProjectTemplateElement)
-				{
-					result.add((ProjectTemplateElement) element);
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getProjectTemplates
-	 * 
-	 * @param type
-	 * @return
-	 */
-	public List<ProjectTemplateElement> getProjectTemplatesByType(Type type)
-	{
-		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
-
-		// NOTE: we use getProjectTemplates here so we don't have to sync this block. getProjectTemplates returns a
-		// fresh List each time it is invoked and it handles syncing for us
-		List<ProjectTemplateElement> templates = this.getProjectTemplates();
-
-		for (ProjectTemplateElement template : templates)
-		{
-			// type "all" is always included
-			if (template.getType() == type || template.getType() == Type.ALL)
-			{
-				result.add(template);
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(ProjectTemplateElement.class);
 	}
 
 	/**
@@ -704,6 +687,7 @@ public class BundleElement extends AbstractElement
 
 			removed = this._children.remove(element);
 
+			// NOTE: We may want to move this into the "if (removed)" block below if this blocks for too long
 			if (context != null)
 			{
 				context.fireVisibilityEvents();
