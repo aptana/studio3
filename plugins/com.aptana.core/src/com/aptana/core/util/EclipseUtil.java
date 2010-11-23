@@ -146,8 +146,19 @@ public class EclipseUtil
 	 */
 	public static boolean isTesting()
 	{
+		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
+		if (application != null
+				&& (application.equals("org.eclipse.pde.junit.runtime.uitestapplication")  //$NON-NLS-1$
+						|| application.equals("org.eclipse.test.coretestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.test.uitestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.legacytestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplicationnonmain") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.nonuithreadtestapplication"))) //$NON-NLS-1$
+		{
+			return true;
+		}
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
-
 		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
 	}
 }

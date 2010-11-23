@@ -39,6 +39,7 @@ import junit.framework.TestSuite;
 
 import com.aptana.editor.common.EditorCommonTests;
 import com.aptana.editor.common.internal.peer.PeerTests;
+import com.aptana.editor.common.internal.scripting.DocumentScopeManagerTest;
 import com.aptana.editor.common.scripting.ScriptingInputOutputTest;
 import com.aptana.editor.common.scripting.commands.ScriptingCommandsTests;
 import com.aptana.editor.common.scripting.snippets.SnippetsTests;
@@ -61,6 +62,7 @@ public class AllTests
 		suite.addTest(ScriptingCommandsTests.suite());
 		suite.addTestSuite(ScriptingInputOutputTest.class);
 		suite.addTestSuite(RubyRegexpAutoIndentStrategyTest.class);
+		suite.addTestSuite(DocumentScopeManagerTest.class);
 		// $JUnit-END$
 		return suite;
 	}

@@ -234,8 +234,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer.getDocument(), offset);
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, offset);
 			List<ContentAssistElement> commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
 			if (commands != null && commands.size() > 0)
 			{
