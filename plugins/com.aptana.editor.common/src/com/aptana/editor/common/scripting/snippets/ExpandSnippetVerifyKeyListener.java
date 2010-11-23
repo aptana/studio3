@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.util.List;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -50,6 +52,7 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.HasTriggerFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -105,8 +108,8 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 						int caretOffset = textViewer.getTextWidget().getCaretOffset();
 						String scope = getScope(textViewer, caretOffset);
 						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-						CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
-						if (commandsFromScope.length > 0)
+						List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
+						if (commandsFromScope.size() > 0)
 						{
 							// chop off portions of prefix from beginning until we have a match!
 							String prefix = SnippetsCompletionProcessor
@@ -135,11 +138,11 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 		}
 	}
 
-	protected boolean hasMatchingSnippet(String prefix, CommandElement[] commandsFromScope)
+	protected boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)
 	{
 		for (CommandElement commandElement : commandsFromScope)
 		{
-			String[] triggers = commandElement.getTriggers();
+			String[] triggers = commandElement.getTriggerTypeValues(TriggerType.PREFIX);
 			if (triggers != null)
 			{
 				for (String trigger : triggers)

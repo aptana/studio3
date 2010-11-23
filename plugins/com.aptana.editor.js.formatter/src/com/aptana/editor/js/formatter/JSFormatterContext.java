@@ -82,10 +82,11 @@ public class JSFormatterContext extends FormatterContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
 	 */
-	public String getWrappingCommentPrefix()
+	public String getWrappingCommentPrefix(String text)
 	{
+		// TODO - Wrong when we wrap different types of comments, such as single-line.
 		return " * "; //$NON-NLS-1$
 	}
 }

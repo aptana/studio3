@@ -57,7 +57,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -82,6 +81,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
+import com.aptana.scripting.model.ContentAssistElement;
 import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommonContentAssistProcessor implements IContentAssistProcessor, ICommonContentAssistProcessor
@@ -234,10 +234,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(viewer, offset);
-			CommandElement[] commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
-			if (commands != null && commands.length > 0)
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, offset);
+			List<ContentAssistElement> commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
+			if (commands != null && commands.size() > 0)
 			{
 				Ruby ruby = Ruby.newInstance();
 

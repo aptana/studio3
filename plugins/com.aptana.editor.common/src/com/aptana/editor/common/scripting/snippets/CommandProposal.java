@@ -49,7 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
@@ -93,7 +93,7 @@ public class CommandProposal extends SnippetTemplateProposal
 			}
 			catch (BadLocationException e)
 			{
-				Activator.logError(e.getMessage(), e);
+				ScriptingActivator.logError(e.getMessage(), e);
 			}
 
 			ITextEditor textEditor = null;

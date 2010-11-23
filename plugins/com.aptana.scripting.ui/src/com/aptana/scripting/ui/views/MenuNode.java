@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.List;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
@@ -67,12 +69,12 @@ class MenuNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		MenuElement[] children = this._menu.getChildren();
-		Object[] result = new Object[children.length];
+		List<MenuElement> children = this._menu.getChildren();
+		Object[] result = new Object[children.size()];
 
 		for (int i = 0; i < result.length; i++)
 		{
-			result[i] = new MenuNode(children[i]);
+			result[i] = new MenuNode(children.get(i));
 		}
 
 		return result;

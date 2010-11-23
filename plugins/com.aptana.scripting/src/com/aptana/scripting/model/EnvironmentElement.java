@@ -40,20 +40,42 @@ import com.aptana.core.util.SourcePrinter;
 
 public class EnvironmentElement extends AbstractBundleElement
 {
-
 	private RubyProc _invokeBlock;
 
+	/**
+	 * EnvironmentElement
+	 * 
+	 * @param path
+	 */
 	public EnvironmentElement(String path)
 	{
 		super(path);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.AbstractElement#getElementName()
+	 */
 	@Override
 	protected String getElementName()
 	{
 		return "environment"; //$NON-NLS-1$
 	}
 
+	/**
+	 * getInvokeBlock
+	 * 
+	 * @return
+	 */
+	public RubyProc getInvokeBlock()
+	{
+		return _invokeBlock;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.AbstractElement#printBody(com.aptana.core.util.SourcePrinter)
+	 */
 	@Override
 	protected void printBody(SourcePrinter printer)
 	{
@@ -62,14 +84,13 @@ public class EnvironmentElement extends AbstractBundleElement
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
 	}
 
+	/**
+	 * setInvokeBlock
+	 * 
+	 * @param block
+	 */
 	public void setInvokeBlock(RubyProc block)
 	{
 		this._invokeBlock = block;
 	}
-
-	public RubyProc getInvokeBlock()
-	{
-		return _invokeBlock;
-	}
-
 }

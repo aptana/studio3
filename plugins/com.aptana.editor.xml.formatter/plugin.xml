@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.xml">
+         <formatterFactory
+               class="com.aptana.editor.xml.formatter.XMLFormatterFactory"
+               description="%xml_code_formatter_description"
+               id="com.aptana.editor.xml.formatterFactory"
+               name="%xml_code_formatter"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.xml.formatter.preferences.XMLFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

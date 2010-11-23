@@ -43,10 +43,6 @@ import com.aptana.formatter.nodes.IFormatterNode;
  */
 public class CSSFormatterContext extends FormatterContext
 {
-
-	/**
-	 * 
-	 */
 	private static final String WRAPPING_COMMENT_PREFIX = " * "; //$NON-NLS-1$
 
 	/**
@@ -87,9 +83,9 @@ public class CSSFormatterContext extends FormatterContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
 	 */
-	public String getWrappingCommentPrefix()
+	public String getWrappingCommentPrefix(String text)
 	{
 		return WRAPPING_COMMENT_PREFIX;
 	}

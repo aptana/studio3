@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundleMonitor;
@@ -51,10 +52,10 @@ import com.aptana.scripting.model.RunType;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin
+public class ScriptingActivator extends Plugin
 {
 	public static final String PLUGIN_ID = "com.aptana.scripting"; //$NON-NLS-1$
-	private static Activator plugin;
+	private static ScriptingActivator plugin;
 
 	/**
 	 * Context id set by workbench part to indicate they are scripting aware.
@@ -71,7 +72,7 @@ public class Activator extends Plugin
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static ScriptingActivator getDefault()
 	{
 		return plugin;
 	}
@@ -132,7 +133,7 @@ public class Activator extends Plugin
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public ScriptingActivator()
 	{
 	}
 
@@ -143,20 +144,35 @@ public class Activator extends Plugin
 	public void start(BundleContext context) throws Exception
 	{
 		super.start(context);
-		plugin = this;
-		Job startupJob = new Job("Start bundle manager") //$NON-NLS-1$
-		{
 
+		plugin = this;
+
+		Job startupJob = new Job("Start Ruble bundle manager") //$NON-NLS-1$
+		{
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				BundleManager manager = BundleManager.getInstance();
+
+				// register file association listener
 				fileTypeListener = new FileTypeAssociationListener();
-				BundleManager.getInstance().addBundleChangeListener(fileTypeListener);
+				manager.addBundleVisibilityListener(fileTypeListener);
 
-				// go ahead and process the workspace now to process bundles that exist already
-				BundleManager.getInstance().loadBundles();
+				// grabbing instance registers itself the bundle manager
+				FileWatcherRegistrant.getInstance();
 
-				// install Keybinding Manager
+				// load all existing bundles automatically, if we're not running
+				// unit tests
+				if (EclipseUtil.isTesting())
+				{
+					System.out.println("Not auto-loading bundles since we are running unit tests"); //$NON-NLS-1$
+				}
+				else
+				{
+					manager.loadBundles();
+				}
+
+				// install key binding Manager
 				KeybindingsManager.install();
 
 				// turn on project and file monitoring
@@ -166,11 +182,13 @@ public class Activator extends Plugin
 				}
 				catch (JNotifyException e)
 				{
-					Activator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
+					ScriptingActivator.logError(Messages.EarlyStartup_Error_Initializing_File_Monitoring, e);
 				}
+
 				return Status.OK_STATUS;
 			}
 		};
+
 		startupJob.schedule();
 	}
 
@@ -183,13 +201,18 @@ public class Activator extends Plugin
 		try
 		{
 			BundleMonitor.getInstance().endMonitoring();
+
 			KeybindingsManager.uninstall();
+
 			if (fileTypeListener != null)
 			{
 				fileTypeListener.cleanup();
-				BundleManager.getInstance().removeBundleChangeListener(fileTypeListener);
+				BundleManager.getInstance().removeBundleVisibilityListener(fileTypeListener);
+				fileTypeListener = null;
 			}
-			fileTypeListener = null;
+
+			FileWatcherRegistrant.shutdown();
+
 			// FIXME Clean up the bundle manager singleton!
 		}
 		catch (Exception e)

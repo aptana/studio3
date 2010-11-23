@@ -62,7 +62,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
 	}
-	
+
 	/**
 	 * getElementsByDirectory
 	 * 
@@ -72,23 +72,23 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public static AbstractElement[] getElementsByDirectory(String path)
 	{
 		List<AbstractElement> result = new LinkedList<AbstractElement>();
-		
+
 		if (path.endsWith(File.separator) == false)
 		{
 			path += File.separator;
 		}
-		
+
 		synchronized (ELEMENTS_BY_PATH)
 		{
-			 for (String key : ELEMENTS_BY_PATH.keySet())
-			 {
-				 if (key.startsWith(path))
-				 {
-					 result.addAll(ELEMENTS_BY_PATH.get(key));
-				 }
-			 }
+			for (String key : ELEMENTS_BY_PATH.keySet())
+			{
+				if (key.startsWith(path))
+				{
+					result.addAll(ELEMENTS_BY_PATH.get(key));
+				}
+			}
 		}
-		
+
 		return result.toArray(new AbstractElement[result.size()]);
 	}
 
@@ -143,7 +143,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-	
+
 	/**
 	 * unregisterElement
 	 * 
@@ -171,7 +171,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 						}
 					}
 				}
-				
+
 				LibraryCrossReference.getInstance().unregisterPath(path);
 			}
 		}
@@ -241,6 +241,17 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public String getPath()
 	{
 		return this._path;
+	}
+
+	/**
+	 * hasProperty
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public synchronized boolean hasProperty(String property)
+	{
+		return this._customProperties != null && this._customProperties.containsKey(property);
 	}
 
 	/**
@@ -339,7 +350,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		// close element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public String toString()
 	{

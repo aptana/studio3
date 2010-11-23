@@ -63,6 +63,7 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		pref.putInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		pref.put(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS, CodeFormatterConstants.SAME_LINE);
 		pref.putInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, 0);
+		pref.putInt(CSSFormatterConstants.LINES_AFTER_DECLARATION, 0);
 		pref.putInt(CSSFormatterConstants.PRESERVED_LINES, 1);
 
 		try

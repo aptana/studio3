@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting.model;
 
+import java.util.List;
+
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.HasTriggerFilter;
 import com.aptana.scripting.model.filters.NotFilter;
@@ -59,11 +61,11 @@ public class FilterTests extends BundleTestBase
 	public void testScopeFilter()
 	{
 		ScopeFilter filter = new ScopeFilter("source.ruby");
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("Ruby", commands[0].getDisplayName());
+		assertEquals(1, commands.size());
+		assertEquals("Ruby", commands.get(0).getDisplayName());
 	}
 
 	/**
@@ -72,13 +74,13 @@ public class FilterTests extends BundleTestBase
 	public void testHasTriggerFilter()
 	{
 		HasTriggerFilter filter = new HasTriggerFilter();
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(3, commands.length);
-		assertEquals("HTML", commands[0].getDisplayName());
-		assertEquals("JS", commands[1].getDisplayName());
-		assertEquals("CSS String", commands[2].getDisplayName());
+		assertEquals(3, commands.size());
+		assertEquals("HTML", commands.get(0).getDisplayName());
+		assertEquals("JS", commands.get(1).getDisplayName());
+		assertEquals("CSS String", commands.get(2).getDisplayName());
 	}
 
 	/**
@@ -90,11 +92,11 @@ public class FilterTests extends BundleTestBase
 		HasTriggerFilter hasTriggerFilter = new HasTriggerFilter();
 		AndFilter filter = new AndFilter(scopeFilter, hasTriggerFilter);
 		
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("JS", commands[0].getDisplayName());
+		assertEquals(1, commands.size());
+		assertEquals("JS", commands.get(0).getDisplayName());
 	}
 	
 	/**
@@ -106,12 +108,12 @@ public class FilterTests extends BundleTestBase
 		ScopeFilter scopeFilter2 = new ScopeFilter("source.js");
 		OrFilter filter = new OrFilter(scopeFilter1, scopeFilter2);
 		
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
-		assertEquals("Ruby", commands[0].getDisplayName());
-		assertEquals("JS", commands[1].getDisplayName());
+		assertEquals(2, commands.size());
+		assertEquals("Ruby", commands.get(0).getDisplayName());
+		assertEquals("JS", commands.get(1).getDisplayName());
 	}
 	
 	/**
@@ -122,10 +124,10 @@ public class FilterTests extends BundleTestBase
 		HasTriggerFilter hasTriggerFilter = new HasTriggerFilter();
 		NotFilter filter = new NotFilter(hasTriggerFilter);
 		
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(filter);
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(filter);
 		
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("Ruby", commands[0].getDisplayName());
+		assertEquals(1, commands.size());
+		assertEquals("Ruby", commands.get(0).getDisplayName());
 	}
 }

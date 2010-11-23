@@ -98,7 +98,7 @@ import com.aptana.formatter.preferences.PreferencesLookupDelegate;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
 
@@ -239,8 +239,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		ThemePlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fThemeListener);
 
 		IContextService contextService = (IContextService) getSite().getService(IContextService.class);
-		contextService.activateContext(Activator.SCRIPTING_CONTEXT_ID);
-		contextService.activateContext(Activator.EDITOR_CONTEXT_ID);
+		contextService.activateContext(ScriptingActivator.SCRIPTING_CONTEXT_ID);
+		contextService.activateContext(ScriptingActivator.EDITOR_CONTEXT_ID);
 	}
 
 	/*

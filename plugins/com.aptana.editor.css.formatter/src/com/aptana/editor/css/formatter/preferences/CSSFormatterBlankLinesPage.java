@@ -48,7 +48,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterBlankLinesPage extends FormatterModifyTabPage
 {
-	private static final String BLANK_LINES_PREVIEW_NAME = "blank-lines-preview.css"; //$NON-NLS-1$
+	private static final String BLANK_LINES_PREVIEW_NAME = "preview.css"; //$NON-NLS-1$
 
 	public CSSFormatterBlankLinesPage(IFormatterModifyDialog dialog)
 	{
@@ -61,6 +61,8 @@ public class CSSFormatterBlankLinesPage extends FormatterModifyTabPage
 				Messages.CSSFormatterBlankLinesPage_blankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
 		manager.createNumber(blankLinesGroup, CSSFormatterConstants.LINES_AFTER_ELEMENTS,
 				Messages.CSSFormatterBlankLinesPage_afterCSSRule);
+		manager.createNumber(blankLinesGroup, CSSFormatterConstants.LINES_AFTER_DECLARATION,
+				Messages.CSSFormatterBlankLinesPage_afterCSSDeclaration);
 
 		Group preserveLinesGroup = SWTFactory.createGroup(parent,
 				Messages.CSSFormatterBlankLinesPage_existingBlankLinesLabel, 2, 1, GridData.FILL_HORIZONTAL);

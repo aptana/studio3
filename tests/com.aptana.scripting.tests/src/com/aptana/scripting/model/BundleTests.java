@@ -106,17 +106,17 @@ public class BundleTests extends BundleTestBase
 	{
 		// confirm first bundle loaded properly
 		BundleEntry entry = this.getBundleEntry(bundleName, prec1);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals(command1, commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals(command1, commands.get(0).getInvoke());
 
 		// confirm second bundle overrides application
 		entry = this.getBundleEntry(bundleName, prec2);
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals(command2, commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals(command2, commands.get(0).getInvoke());
 	}
 
 	/**
@@ -134,14 +134,14 @@ public class BundleTests extends BundleTestBase
 		this.compareScopedBundles(bundleName, prec1, prec2, command1, command2);
 
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
-		BundleElement[] bundles = entry.getBundles();
-		assertEquals(2, bundles.length);
-		entry.removeBundle(bundles[1]);
+		List<BundleElement> bundles = entry.getBundles();
+		assertEquals(2, bundles.size());
+		entry.removeBundle(bundles.get(1));
 
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals(command1, commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals(command1, commands.get(0).getInvoke());
 	}
 
 	/**
@@ -173,10 +173,10 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithCommand";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 	}
 
 	/**
@@ -186,10 +186,10 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithMenu";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
-		MenuElement[] menus = entry.getMenus();
+		List<MenuElement> menus = entry.getMenus();
 
 		assertNotNull(menus);
-		assertEquals(1, menus.length);
+		assertEquals(1, menus.size());
 	}
 
 	/**
@@ -199,11 +199,11 @@ public class BundleTests extends BundleTestBase
 	{
 		String bundleName = "bundleWithSnippet";
 		BundleEntry entry = this.getBundleEntry(bundleName, BundlePrecedence.APPLICATION);
-		CommandElement[] snippets = entry.getCommands();
+		List<CommandElement> snippets = entry.getCommands();
 
 		assertNotNull(snippets);
-		assertEquals(1, snippets.length);
-		assertTrue(snippets[0] instanceof SnippetElement);
+		assertEquals(1, snippets.size());
+		assertTrue(snippets.get(0) instanceof SnippetElement);
 	}
 
 	/**
@@ -293,17 +293,17 @@ public class BundleTests extends BundleTestBase
 	{
 		// confirm first bundle loaded properly
 		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.USER);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("cd ..", commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals("cd ..", commands.get(0).getInvoke());
 
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("cd", commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals("cd", commands.get(0).getInvoke());
 	}
 
 	/**
@@ -315,17 +315,17 @@ public class BundleTests extends BundleTestBase
 		this.loadBundleEntry("bundleWithSameCommand", BundlePrecedence.USER);
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("cd", commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals("cd", commands.get(0).getInvoke());
 
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("cd", commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals("cd", commands.get(0).getInvoke());
 	}
 
 	/**
@@ -335,19 +335,19 @@ public class BundleTests extends BundleTestBase
 	{
 		// confirm first bundle loaded properly
 		BundleEntry entry = this.getBundleEntry("bundleWithCommand", BundlePrecedence.USER);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals("cd ..", commands[0].getInvoke());
+		assertEquals(1, commands.size());
+		assertEquals("cd ..", commands.get(0).getInvoke());
 
 		// confirm second bundle overrides application
 		this.loadBundleEntry("bundleWithDifferentCommand", BundlePrecedence.USER);
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
+		assertEquals(2, commands.size());
 
-		CommandElement command1 = commands[0];
-		CommandElement command2 = commands[1];
+		CommandElement command1 = commands.get(0);
+		CommandElement command2 = commands.get(1);
 
 		if (command1.getDisplayName().equals("MyCommand"))
 		{
@@ -427,10 +427,10 @@ public class BundleTests extends BundleTestBase
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
-		BundleElement[] bundles = entry.getBundles();
+		List<BundleElement> bundles = entry.getBundles();
 		assertNotNull(bundles);
-		assertEquals(1, bundles.length);
-		assertFalse(bundles[0].isReference());
+		assertEquals(1, bundles.size());
+		assertFalse(bundles.get(0).isReference());
 	}
 
 	/**
@@ -444,10 +444,10 @@ public class BundleTests extends BundleTestBase
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry(bundleName);
 		assertNotNull(entry);
 
-		BundleElement[] bundles = entry.getBundles();
+		List<BundleElement> bundles = entry.getBundles();
 		assertNotNull(bundles);
-		assertEquals(1, bundles.length);
-		assertFalse(bundles[0].isReference());
+		assertEquals(1, bundles.size());
+		assertFalse(bundles.get(0).isReference());
 	}
 
 	/**
@@ -460,10 +460,10 @@ public class BundleTests extends BundleTestBase
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("MyBundle");
 		assertNotNull(entry);
 
-		BundleElement[] bundles = entry.getBundles();
+		List<BundleElement> bundles = entry.getBundles();
 		assertNotNull(bundles);
-		assertEquals(1, bundles.length);
-		assertTrue(bundles[0].isReference());
+		assertEquals(1, bundles.size());
+		assertTrue(bundles.get(0).isReference());
 	}
 
 	public void testReferenceLoadingAcrossPrecendenceBounds()
@@ -475,12 +475,12 @@ public class BundleTests extends BundleTestBase
 		BundleEntry entry = BundleTestBase.getBundleManagerInstance().getBundleEntry("bundleWithCommand");
 		assertNotNull(entry);
 
-		BundleElement[] bundles = entry.getBundles();
+		List<BundleElement> bundles = entry.getBundles();
 		assertNotNull(bundles);
-		assertEquals(3, bundles.length);
+		assertEquals(3, bundles.size());
 
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(3, commands.length);
+		assertEquals(3, commands.size());
 	}
 }

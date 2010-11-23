@@ -34,7 +34,6 @@
  */
 package com.aptana.workbench.commands;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -81,6 +80,7 @@ import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
 import com.aptana.scripting.model.MenuElement;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.IModelFilter;
 import com.aptana.scripting.model.filters.NotFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -136,8 +136,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 	private static void fill(final Menu menu, ITextEditor textEditor, IContributionItem contributionItem) {
 		String scope = null;
 		List<MenuElement> menusFromScopeList = new LinkedList<MenuElement>();
-		MenuElement[] menusFromScope;
-		MenuElement[] menusFromOtherScopes = null;
+		List<MenuElement> menusFromScope;
+		List<MenuElement> menusFromOtherScopes = null;
 		if (textEditor == null) {
 			IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 			if (part != null) {
@@ -152,8 +152,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 					return true;
 				}
 			});
-			if (menusFromScope.length > 0) {
-				menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+			if (menusFromScope.size() > 0) {
+				menusFromScopeList.addAll(menusFromScope);
 			}
 		} else {
 			try {
@@ -178,8 +178,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 			if (scope != null) {
 				ScopeFilter filter = new ScopeFilter(scope);
 				menusFromScope = BundleManager.getInstance().getMenus(filter);
-				if (menusFromScope.length > 0) {
-					menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+				if (menusFromScope.size() > 0) {
+					menusFromScopeList.addAll(menusFromScope);
 				}
 			}
 
@@ -203,9 +203,9 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 					// Get menus
 					ScopeFilter topLevelContentTypesFilter = new ScopeFilter(topLevelContentTypes);
 					menusFromScope = BundleManager.getInstance().getMenus(topLevelContentTypesFilter);
-					if (menusFromScope.length > 0) {
+					if (menusFromScope.size() > 0) {
 						// Collect
-						menusFromScopeList.addAll(Arrays.asList(menusFromScope));
+						menusFromScopeList.addAll(menusFromScope);
 					}
 
 					// Next we use a negative filter to get menus that belong to
@@ -227,15 +227,13 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 					return menuElement1.getDisplayName().compareTo(menuElement2.getDisplayName());
 				}
 			});
-			menusFromScope = new MenuElement[menusFromScopeList.size()];
-			menusFromScopeList.toArray(menusFromScope);
 
 			// Now build the menu
-			buildMenu(menu, menusFromScope, textEditor, scope, contributionItem);
+			buildMenu(menu, menusFromScopeList, textEditor, scope, contributionItem);
 		}
 
 		// Are there any menus that belong to scopes other than top level scopes
-		if (menusFromOtherScopes != null && menusFromOtherScopes.length > 0) {
+		if (menusFromOtherScopes != null && menusFromOtherScopes.size() > 0) {
 			// Build the "Other" menu
 			MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);
 			separatorMenuItem.setData(contributionItem);
@@ -262,7 +260,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 	 * @param textEditor
 	 * @param scope
 	 */
-	private static void buildMenu(Menu menu, MenuElement[] menusFromScope, final ITextEditor textEditor, String scope,
+	private static void buildMenu(Menu menu, List<MenuElement> menusFromScope, final ITextEditor textEditor, String scope,
 			IContributionItem contributionItem) {
 		for (MenuElement menuForScope : menusFromScope) {
 			if (menuForScope.isHierarchicalMenu()) {
@@ -297,9 +295,11 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 						KeySequence keySequence = keySequences[0];
 						acceleratorText = "\t" + keySequence.format(); //$NON-NLS-1$
 					}
-					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0) {
-						String[] triggers = command.getTriggers();
-						if (triggers != null && triggers.length > 0) {
+					if (command instanceof SnippetElement || keySequences == null || keySequences.length == 0)
+					{
+						String[] triggers = command.getTriggerTypeValues(TriggerType.PREFIX);
+						if (triggers != null && triggers.length > 0)
+						{
 							// Use first trigger
 							displayName += " " + triggers[0] + getTabChar(); //$NON-NLS-1$
 						}
@@ -336,8 +336,8 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 						|| command.getScopeSelector().matches(scope));
 			}
 		}
-		if (menusFromScope.length > 0) {
-			MenuElement menuForScope = menusFromScope[0];
+		if (menusFromScope.size() > 0) {
+			MenuElement menuForScope = menusFromScope.get(0);
 			// if we're inside a bundle's main menu
 			if (menuForScope.getParent() != null && menuForScope.getParent().getParent() == null) {
 				MenuItem separatorMenuItem = new MenuItem(menu, SWT.SEPARATOR);

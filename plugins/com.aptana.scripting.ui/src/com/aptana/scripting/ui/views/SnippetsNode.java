@@ -34,7 +34,7 @@
  */
 package com.aptana.scripting.ui.views;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -65,13 +65,13 @@ class SnippetsNode extends BaseNode
 	 * 
 	 * @param elements
 	 */
-	public SnippetsNode(CommandElement[] elements)
+	public SnippetsNode(List<CommandElement> elements)
 	{
 		List<SnippetNode> snippets = new LinkedList<SnippetNode>();
 
 		if (elements != null)
 		{
-			Arrays.sort(elements);
+			Collections.sort(elements);
 
 			for (CommandElement command : elements)
 			{
