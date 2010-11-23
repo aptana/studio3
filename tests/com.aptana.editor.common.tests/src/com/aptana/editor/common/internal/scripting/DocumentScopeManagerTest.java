@@ -17,6 +17,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.ICommonConstants;
+import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
 import com.aptana.ui.UIUtils;
@@ -29,6 +30,9 @@ public class DocumentScopeManagerTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
+		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
+		c.addTranslation(new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN), new QualifiedContentType(
+				"text")); //$NON-NLS-1$
 		manager = new DocumentScopeManager();
 	}
 
@@ -41,8 +45,7 @@ public class DocumentScopeManagerTest extends TestCase
 	public void testGetScopeAtOffsetDocument() throws Exception
 	{
 		IDocument document = new Document("src");
-		assertEquals(ICommonConstants.CONTENT_TYPE_UKNOWN + " " + IDocument.DEFAULT_CONTENT_TYPE,
-				manager.getScopeAtOffset(document, 0));
+		assertEquals("text", manager.getScopeAtOffset(document, 0));
 	}
 
 	public void testGetContentTypeNullDocument() throws Exception

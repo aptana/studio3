@@ -109,7 +109,7 @@ public class ProgressStatistics
 		{
 			Entry<Long, Long> entry = itor.next();
 			dur += SPEED_RESOLUTION;
-			amount += ((Long) entry.getValue()).longValue();
+			amount += entry.getValue().longValue();
 		}
 
 		if (dur >= 1000)
@@ -166,7 +166,7 @@ public class ProgressStatistics
 	synchronized private void registerRecentSpeed(long key, long inc)
 	{
 		Long keyL = new Long(key);
-		Long currentValueL = (Long) m_recentSpeedMap.get(keyL);
+		Long currentValueL = m_recentSpeedMap.get(keyL);
 		long currentValue = 0L;
 		if (currentValueL != null)
 			currentValue = currentValueL.longValue();
