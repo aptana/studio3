@@ -37,9 +37,8 @@ package com.aptana.editor.xml.formatter.nodes;
 import java.util.Set;
 
 import com.aptana.editor.xml.formatter.XMLFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
 
 /**
  * Constructs a new content node for XML Element nodes. We construct a node for the content of an element node so we can
@@ -50,7 +49,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
  * @param endOffset
  */
 
-public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
+public class FormatterXMLContentNode extends FormatterTextNode
 {
 
 	private String parentElement;
@@ -58,40 +57,10 @@ public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 	/**
 	 * @param document
 	 */
-	public FormatterXMLContentNode(IFormatterDocument document, String parentElement)
+	public FormatterXMLContentNode(IFormatterDocument document, String parentElement, int startOffset, int endOffset)
 	{
-		super(document);
+		super(document, startOffset, endOffset);
 		this.parentElement = parentElement;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
-	 */
-	protected boolean isAddingBeginNewLine()
-	{
-		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(parentElement);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
-	 */
-	protected boolean isAddingEndNewLine()
-	{
-		return isAddingBeginNewLine();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
-	 * )
-	 */
-	protected int getBlankLinesAfter(IFormatterContext context)
-	{
-		return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
 	}
 
 	/*
@@ -100,7 +69,8 @@ public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 	 */
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
-		return !isAddingBeginNewLine();
+		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return set.contains(parentElement);
 	}
 
 }
