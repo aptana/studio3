@@ -40,6 +40,7 @@ import org.eclipse.swt.graphics.Image;
 import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
 
 public class XMLOutlineLabelProvider extends LabelProvider
 {
@@ -69,7 +70,17 @@ public class XMLOutlineLabelProvider extends LabelProvider
 		}
 		if (element instanceof XMLElementNode)
 		{
-			return ((XMLElementNode) element).getName();
+			XMLElementNode node = (XMLElementNode) element;
+			IParseNodeAttribute[] attributes = node.getAttributes();
+			
+			if (attributes != null && attributes.length > 0)
+			{
+				return node.getName() + " : " + attributes[0].getValue(); //$NON-NLS-1$
+			}
+			else
+			{
+				return node.getName();
+			}
 		}
 		return super.getText(element);
 	}
