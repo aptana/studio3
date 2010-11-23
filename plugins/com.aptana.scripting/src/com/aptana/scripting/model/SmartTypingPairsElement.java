@@ -98,7 +98,7 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 			
 			for (int i = 0; i < pairs.length; i++)
 			{
-				this._pairs[i++] = pairs[i].charAt(0);
+				this._pairs[i] = pairs[i].charAt(0);
 			}
 		}
 		else
