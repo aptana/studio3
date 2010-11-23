@@ -61,6 +61,8 @@ public class CSSFormatterBlankLinesPage extends FormatterModifyTabPage
 				Messages.CSSFormatterBlankLinesPage_blankLinesGroupLabel, 2, 1, GridData.FILL_HORIZONTAL);
 		manager.createNumber(blankLinesGroup, CSSFormatterConstants.LINES_AFTER_ELEMENTS,
 				Messages.CSSFormatterBlankLinesPage_afterCSSRule);
+		manager.createNumber(blankLinesGroup, CSSFormatterConstants.LINES_AFTER_DECLARATION,
+				Messages.CSSFormatterBlankLinesPage_afterCSSDeclaration);
 
 		Group preserveLinesGroup = SWTFactory.createGroup(parent,
 				Messages.CSSFormatterBlankLinesPage_existingBlankLinesLabel, 2, 1, GridData.FILL_HORIZONTAL);

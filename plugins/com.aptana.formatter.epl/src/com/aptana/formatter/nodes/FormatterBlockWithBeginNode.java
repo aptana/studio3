@@ -73,6 +73,14 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			context.decIndent();
 		}
+
+		context.setBlankLines(getBlankLinesAfter(context));
+
+	}
+
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return -1;
 	}
 
 	/**

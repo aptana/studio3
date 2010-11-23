@@ -52,18 +52,19 @@ public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	protected boolean isIndenting()
+	protected boolean isAddingBeginNewLine()
 	{
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
 	 */
-	protected boolean isAddingBeginNewLine()
+
+	protected boolean isAddingEndNewLine()
 	{
 		return true;
 	}
@@ -76,6 +77,6 @@ public class FormatterCSSDeclarationNode extends FormatterBlockWithBeginNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
+		return getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION);
 	}
 }
