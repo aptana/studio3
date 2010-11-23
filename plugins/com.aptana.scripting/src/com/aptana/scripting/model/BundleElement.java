@@ -110,19 +110,21 @@ public class BundleElement extends AbstractElement
 	{
 		if (element != null)
 		{
+			BundleEntry.VisibilityContext context = null;
+
 			synchronized (this._children)
 			{
 				if (this._children.contains(element) == false)
 				{
-					BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
+					context = this.getVisibilityContext(element.getClass());
 
 					this._children.add(element);
-
-					if (context != null)
-					{
-						context.fireVisibilityEvents();
-					}
 				}
+			}
+
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
 			}
 
 			element.setOwningBundle(this);
@@ -213,7 +215,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<AbstractBundleElement> getChildren()
 	{
-		return Collections.unmodifiableList(this._children);
+		return new ArrayList<AbstractBundleElement>(this._children);
 	}
 
 	/**
@@ -677,21 +679,16 @@ public class BundleElement extends AbstractElement
 	public void removeChild(AbstractBundleElement element)
 	{
 		boolean removed = false;
+		BundleEntry.VisibilityContext context = null;
 
 		// disassociate element with this bundle
 		element.setOwningBundle(null);
 
 		synchronized (this._children)
 		{
-			BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
+			context = this.getVisibilityContext(element.getClass());
 
 			removed = this._children.remove(element);
-
-			// NOTE: We may want to move this into the "if (removed)" block below if this blocks for too long
-			if (context != null)
-			{
-				context.fireVisibilityEvents();
-			}
 		}
 
 		if (removed)
@@ -704,6 +701,11 @@ public class BundleElement extends AbstractElement
 
 			// make sure elements are no longer tracked in AbstractElement
 			AbstractElement.unregisterElement(element);
+			
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
+			}
 		}
 	}
 

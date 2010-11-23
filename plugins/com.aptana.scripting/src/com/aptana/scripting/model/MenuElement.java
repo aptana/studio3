@@ -99,7 +99,7 @@ public class MenuElement extends AbstractBundleElement
 		{
 			if (this._children != null && this._children.size() > 0)
 			{
-				result = Collections.unmodifiableList(this._children);
+				result = new ArrayList<MenuElement>(this._children);
 			}
 		}
 
