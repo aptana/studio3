@@ -64,7 +64,7 @@ public class DocumentScopeManagerTest extends TestCase
 				manager.getContentType(document, 0));
 	}
 
-	public void testGetContentType2() throws Exception
+	public void testGetContentTypeAfterSettingDocumentScope() throws Exception
 	{
 		IDocument document = new Document("src")
 		{
