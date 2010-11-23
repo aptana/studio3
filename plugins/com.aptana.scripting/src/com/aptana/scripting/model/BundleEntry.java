@@ -405,7 +405,7 @@ public class BundleEntry
 	 */
 	public List<BundleElement> getBundles()
 	{
-		return Collections.unmodifiableList(this._bundles);
+		return new ArrayList<BundleElement>(this._bundles);
 	}
 
 	/**

@@ -45,6 +45,7 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -178,10 +179,8 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 			}
 
-			FormatterBlockWithBeginNode contentFormatterNode = new FormatterXMLContentNode(document, type);
-			contentFormatterNode.setBegin(createTextNode(document, textStartOffset, textEndOffset + 1));
-			push(contentFormatterNode);
-			checkedPop(contentFormatterNode, -1);
+			FormatterTextNode contentFormatterNode = new FormatterXMLContentNode(document, type, textStartOffset, textEndOffset + 1 );
+			formatterNode.addChild(contentFormatterNode);
 
 		}
 

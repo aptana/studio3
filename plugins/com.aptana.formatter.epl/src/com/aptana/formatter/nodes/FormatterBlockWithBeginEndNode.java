@@ -44,6 +44,11 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 		{
 			writeSpaces(visitor, context, getSpacesCountBefore());
 		}
+		int blankLines = context.getBlankLines();
+		if (blankLines > 0)
+		{
+			visitor.ensureLineStarted(context);
+		}
 		context.setBlankLines(getBlankLinesBefore(context));
 		boolean beginWithNewLine = isAddingBeginNewLine();
 		if (beginWithNewLine && !visitor.endsWithNewLine() && !shouldConsumePreviousWhiteSpaces())
@@ -65,19 +70,20 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 		{
 			context.incIndent();
 		}
-		
+
 		boolean childConsumesPreviousWhiteSpace = false;
-		
-		//Checks if the node has children and it if does, check whether it is consuming previous white spaces
-		if (!getBody().isEmpty()){
+
+		// Checks if the node has children and it if does, check whether it is consuming previous white spaces
+		if (!getBody().isEmpty())
+		{
 			childConsumesPreviousWhiteSpace = getBody().get(0).shouldConsumePreviousWhiteSpaces();
 		}
-		
-		if(!childConsumesPreviousWhiteSpace && beginWithNewLine)
+
+		if (!childConsumesPreviousWhiteSpace && beginWithNewLine)
 		{
 			visitor.writeLineBreak(context);
 		}
-		
+
 		super.accept(context, visitor);
 		if (indenting)
 		{
