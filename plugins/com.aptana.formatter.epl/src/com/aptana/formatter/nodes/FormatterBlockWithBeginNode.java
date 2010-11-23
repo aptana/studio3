@@ -37,6 +37,11 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			writeSpaces(visitor, context, getSpacesCountBefore());
 		}
+		int blankLines = context.getBlankLines();
+		if (blankLines > 0)
+		{
+			visitor.ensureLineStarted(context);
+		}
 		boolean addingNewLine = isAddingBeginNewLine();
 		if (addingNewLine && !visitor.endsWithNewLine())
 		{
