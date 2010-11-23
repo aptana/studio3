@@ -156,17 +156,26 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		int previousCloseTagOffset = getPreviousCloseTagOffset(endOffset, document);
 
-		if (node.getChildCount() == 0 && (previousCloseTagOffset + 1) != endOffset)
+		if (node.getChildCount() == 0)
 		{
 
 			int textStartOffset = getBeginWithoutWhiteSpaces(previousCloseTagOffset + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endOffset - 1, document);
 
-			// Case where nodes have only contain white spaces
-			if (textStartOffset >= endOffset)
+			
+			if (textStartOffset >= textEndOffset)
 			{
-				textStartOffset = previousCloseTagOffset + 1;
-				textEndOffset = endOffset - 1;
+				if (textStartOffset == endOffset)
+				{
+					//Set offset to create a blank text node when there is nothing so we can use shouldConsumePreviousWhiteSpaces to remove new line
+					textEndOffset = textStartOffset - 1;
+				}
+				else
+				{
+					// Case where nodes have only contain white spaces
+					textStartOffset = previousCloseTagOffset + 1;
+					textEndOffset = endOffset - 1;
+				}
 			}
 
 			FormatterBlockWithBeginNode contentFormatterNode = new FormatterXMLContentNode(document, type);

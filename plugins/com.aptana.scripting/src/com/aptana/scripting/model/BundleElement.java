@@ -110,19 +110,21 @@ public class BundleElement extends AbstractElement
 	{
 		if (element != null)
 		{
+			BundleEntry.VisibilityContext context = null;
+
 			synchronized (this._children)
 			{
 				if (this._children.contains(element) == false)
 				{
-					BundleEntry.VisibilityContext context = this.getVisibilityContext(element.getClass());
+					context = this.getVisibilityContext(element.getClass());
 
 					this._children.add(element);
-
-					if (context != null)
-					{
-						context.fireVisibilityEvents();
-					}
 				}
+			}
+
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
 			}
 
 			element.setOwningBundle(this);
