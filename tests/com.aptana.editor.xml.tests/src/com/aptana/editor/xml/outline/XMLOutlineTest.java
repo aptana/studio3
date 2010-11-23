@@ -74,7 +74,7 @@ public class XMLOutlineTest extends TestCase
 
 	public void testContent() throws Exception
 	{
-		String source = "<test x=\"100\" y=\"10\"></test>";
+		String source = "<test></test>";
 		ParseState parseState = new ParseState();
 		parseState.setEditState(source, source, 0, 0);
 		fParser.parse(parseState);
@@ -82,6 +82,19 @@ public class XMLOutlineTest extends TestCase
 		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
 		assertEquals(1, elements.length);
 		assertEquals("test", fLabelProvider.getText(elements[0]));
+		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));
+	}
+	
+	public void testContentWithAttributesShowsFirstAttributeValueInLabel() throws Exception
+	{
+		String source = "<test x=\"100\" y=\"10\"></test>";
+		ParseState parseState = new ParseState();
+		parseState.setEditState(source, source, 0, 0);
+		fParser.parse(parseState);
+
+		Object[] elements = fContentProvider.getElements(parseState.getParseResult());
+		assertEquals(1, elements.length);
+		assertEquals("test : 100", fLabelProvider.getText(elements[0]));
 		assertEquals(XMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(elements[0]));
 	}
 }
