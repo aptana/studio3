@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.formatter;
+package com.aptana.editor.xml.formatter;
 
 import java.net.URL;
 import java.util.Map;
@@ -43,30 +43,30 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.css.CSSSourceViewerConfiguration;
-import com.aptana.editor.css.formatter.preferences.CSSFormatterModifyDialog;
+import com.aptana.editor.xml.XMLSourceConfiguration;
+import com.aptana.editor.xml.XMLSourceViewerConfiguration;
+import com.aptana.editor.xml.formatter.preferences.XMLFormatterModifyDialog;
 import com.aptana.formatter.AbstractScriptFormatterFactory;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.preferences.PreferenceKey;
 import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 
-public class CSSFormatterFactory extends AbstractScriptFormatterFactory
+public class XMLFormatterFactory extends AbstractScriptFormatterFactory
 {
 
-	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(CSSFormatterPlugin.PLUGIN_ID,
-			CSSFormatterConstants.FORMATTER_ID);
+	private static final PreferenceKey FORMATTER_PREF_KEY = new PreferenceKey(XMLFormatterPlugin.PLUGIN_ID,
+			XMLFormatterConstants.FORMATTER_ID);
 
-	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.css"; //$NON-NLS-1$
+	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.xml"; //$NON-NLS-1$
 
 	private static final String[] KEYS = {
-			// TODO - Add more...
-			CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, CSSFormatterConstants.FORMATTER_TAB_CHAR,
-			CSSFormatterConstants.FORMATTER_TAB_SIZE, CSSFormatterConstants.WRAP_COMMENTS,
-			CSSFormatterConstants.WRAP_COMMENTS_LENGTH, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-			CSSFormatterConstants.LINES_AFTER_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES,
-			CSSFormatterConstants.LINES_AFTER_DECLARATION };
+			XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, XMLFormatterConstants.FORMATTER_TAB_CHAR,
+			XMLFormatterConstants.FORMATTER_TAB_SIZE, XMLFormatterConstants.WRAP_COMMENTS,
+			XMLFormatterConstants.WRAP_COMMENTS_LENGTH, XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+			XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, XMLFormatterConstants.LINES_AFTER_ELEMENTS,
+			XMLFormatterConstants.LINES_AFTER_NON_XML_ELEMENTS, XMLFormatterConstants.LINES_BEFORE_NON_XML_ELEMENTS,
+			XMLFormatterConstants.PRESERVED_LINES };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{
@@ -74,14 +74,14 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 		for (int i = 0; i < KEYS.length; ++i)
 		{
 			final String key = KEYS[i];
-			result[i] = new PreferenceKey(CSSFormatterPlugin.PLUGIN_ID, key);
+			result[i] = new PreferenceKey(XMLFormatterPlugin.PLUGIN_ID, key);
 		}
 		return result;
 	}
 
 	public IScriptFormatter createFormatter(String lineSeparator, Map<String, String> preferences)
 	{
-		return new CSSFormatter(lineSeparator, preferences, getMainContentType());
+		return new XMLFormatter(lineSeparator, preferences, getMainContentType());
 	}
 
 	public URL getPreviewContent()
@@ -91,13 +91,13 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IFormatterModifyDialog createDialog(IFormatterModifyDialogOwner dialogOwner)
 	{
-		return new CSSFormatterModifyDialog(dialogOwner, this);
+		return new XMLFormatterModifyDialog(dialogOwner, this);
 	}
 
 	public SourceViewerConfiguration createSimpleSourceViewerConfiguration(ISharedTextColors colorManager,
 			IPreferenceStore preferenceStore, ITextEditor editor, boolean configureFormatter)
 	{
-		return new CSSSourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
+		return new XMLSourceViewerConfiguration(preferenceStore, (AbstractThemeableEditor) editor);
 	}
 
 	public PreferenceKey getFormatterPreferenceKey()
@@ -107,7 +107,7 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 
 	public IPreferenceStore getPreferenceStore()
 	{
-		return CSSFormatterPlugin.getDefault().getPreferenceStore();
+		return XMLFormatterPlugin.getDefault().getPreferenceStore();
 	}
 
 	/*
@@ -116,7 +116,7 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 	 */
 	public Object getPartitioningConfiguration()
 	{
-		return CSSSourceConfiguration.getDefault();
+		return XMLSourceConfiguration.getDefault();
 	}
 
 }

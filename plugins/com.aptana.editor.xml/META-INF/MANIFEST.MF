@@ -23,7 +23,7 @@ Export-Package: com.aptana.editor.xml,
  com.aptana.editor.xml.contentassist.index;x-friends:="com.aptana.editor.svg",
  com.aptana.editor.xml.contentassist.model;x-friends:="com.aptana.editor.svg",
  com.aptana.editor.xml.parsing;x-friends:="com.aptana.editor.svg",
- com.aptana.editor.xml.parsing.ast;x-friends:="com.aptana.editor.svg",
+ com.aptana.editor.xml.parsing.ast,
  com.aptana.editor.xml.parsing.lexer;x-friends:="com.aptana.editor.svg"
 Bundle-Activator: com.aptana.editor.xml.XMLPlugin
 Bundle-ActivationPolicy: lazy

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+ xmlns:cc="http://web.resource.org/cc/"
+ xmlns="http://purl.org/rss/1.0/">
+    
+    <channel rdf:about="http://weblogs.java.net/blog/editors/">
+        <title>
+            Editor&apos;s Daily Blog
+        </title>
+        <link>
+            http://weblogs.java.net/blog/editors/
+        </link>
+        <description>
+            A daily update from our java.net editor, Chris Adamson, and other items from the java.net front page.
+        </description>
+        <dc:language>
+            en-us
+        </dc:language>
+        <dc:creator>
+        </dc:creator>
+        <dc:date>
+            2007-10-12T10:48:50+00:00
+        </dc:date>
+        <admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=3.01D"/>
+        
+        
+        <items>
+            <rdf:Seq>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/hammer_and_a_na.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/lay_my_head_dow.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/power_of_two.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/run_1.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/closer_to_fine.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/more_adventurou.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/does_he_love_yo.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/its_a_hit.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/close_call.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/10/go_ahead.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/09/everyday.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/09/the_space_betwe.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/09/the_best_of_wha.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/09/what_would_you.html"/>
+                <rdf:li rdf:resource="http://weblogs.java.net/blog/editors/archives/2007/09/out_of_my_hands.html"/>
+            </rdf:Seq>
+        </items>
+        
+    </channel>
+    
+</rdf:RDF>

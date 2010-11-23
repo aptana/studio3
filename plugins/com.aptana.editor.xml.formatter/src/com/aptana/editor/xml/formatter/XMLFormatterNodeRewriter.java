@@ -32,61 +32,26 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterNodeRewriter;
 import com.aptana.formatter.nodes.IFormatterNode;
 
-/**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class JSFormatterContext extends FormatterContext
+public class XMLFormatterNodeRewriter extends FormatterNodeRewriter
 {
-
-	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
-
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
-	 */
-	protected boolean isCountable(IFormatterNode node)
-	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
-	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
+	 * @see com.aptana.formatter.nodes.FormatterNodeRewriter#createCommentNode(com.aptana.formatter.IFormatterDocument,
+	 * int, int, java.lang.Object)
 	 */
-	public String getWrappingCommentPrefix(String text)
+	@Override
+	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
+			Object object)
 	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		// return new FormatterXMLCommentNode(document, startOffset, endOffset);
+		return null;
 	}
+
 }

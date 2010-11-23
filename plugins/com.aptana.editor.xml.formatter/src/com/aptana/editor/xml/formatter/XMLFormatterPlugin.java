@@ -32,61 +32,58 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.BundleContext;
 
 /**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * The activator class controls the plug-in life cycle
  */
-public class JSFormatterContext extends FormatterContext
+public class XMLFormatterPlugin extends AbstractUIPlugin
 {
 
-	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.editor.xml.formatter"; //$NON-NLS-1$
+
+	// The shared instance
+	private static XMLFormatterPlugin plugin;
 
 	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
+	 * The constructor
 	 */
-	protected boolean isCountable(IFormatterNode node)
+	public XMLFormatterPlugin()
 	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
-	public String getWrappingCommentPrefix(String text)
+	public void start(BundleContext context) throws Exception
 	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		super.start(context);
+		plugin = this;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception
+	{
+		plugin = null;
+		super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static XMLFormatterPlugin getDefault()
+	{
+		return plugin;
+	}
+
 }

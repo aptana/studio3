@@ -32,61 +32,75 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter.nodes;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import java.util.Set;
+
+import com.aptana.editor.xml.formatter.XMLFormatterConstants;
+import com.aptana.formatter.IFormatterContext;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 
 /**
- * A JavaScript formatter context.
+ * Constructs a new content node for XML Element nodes. We construct a node for the content of an element node so we can
+ * control the new lines inside the element nodes appropriately.
  * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @param document
+ * @param startOffset
+ * @param endOffset
  */
-public class JSFormatterContext extends FormatterContext
+
+public class FormatterXMLContentNode extends FormatterBlockWithBeginNode
 {
 
-	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
+	private String parentElement;
 
 	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
+	 * @param document
 	 */
-	protected boolean isCountable(IFormatterNode node)
+	public FormatterXMLContentNode(IFormatterDocument document, String parentElement)
 	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
+		super(document);
+		this.parentElement = parentElement;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
 	 */
-	public String getWrappingCommentPrefix(String text)
+	protected boolean isAddingBeginNewLine()
 	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return !set.contains(parentElement);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
+	 */
+	protected boolean isAddingEndNewLine()
+	{
+		return isAddingBeginNewLine();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
+	 * )
+	 */
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		return !isAddingBeginNewLine();
+	}
+
 }

@@ -32,61 +32,42 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter.preferences;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import java.net.URL;
 
-/**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class JSFormatterContext extends FormatterContext
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+
+import com.aptana.editor.xml.formatter.XMLFormatterConstants;
+import com.aptana.formatter.ui.IFormatterControlManager;
+import com.aptana.formatter.ui.IFormatterModifyDialog;
+import com.aptana.formatter.ui.preferences.FormatterModifyTabPage;
+import com.aptana.formatter.ui.util.SWTFactory;
+
+public class XMLFormatterCommentsPage extends FormatterModifyTabPage
 {
+	private static final String COMMENTS_PREVIEW_NAME = "preview.xml"; //$NON-NLS-1$
 
-	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
+	public XMLFormatterCommentsPage(IFormatterModifyDialog dialog)
 	{
-		super(indent);
+		super(dialog);
 	}
 
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
-	 */
-	protected boolean isCountable(IFormatterNode node)
+	protected void createOptions(IFormatterControlManager manager, Composite parent)
 	{
-		return node instanceof IFormatterContainerNode;
+		Group commentGroup = SWTFactory.createGroup(parent, Messages.XMLFormatterCommentsPage_commentsGroupLabel, 2, 1,
+				GridData.FILL_HORIZONTAL);
+		manager.createCheckbox(commentGroup, XMLFormatterConstants.WRAP_COMMENTS,
+				Messages.XMLFormatterCommentsPage_enableWrappingLabel, 2);
+		manager.createNumber(commentGroup, XMLFormatterConstants.WRAP_COMMENTS_LENGTH,
+				Messages.XMLFormatterCommentsPage_maxWidthLabel);
 	}
 
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
+	protected URL getPreviewContent()
 	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
+		return getClass().getResource(COMMENTS_PREVIEW_NAME);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
-	 */
-	public String getWrappingCommentPrefix(String text)
-	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
-	}
 }

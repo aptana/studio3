@@ -32,61 +32,42 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 
 /**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * XML code formatter constants.<br>
+ * Since the formatters will be saved in a unified XML file, it's important to have a unique key for every setting. The
+ * XML formatter constants are all starting with the {@link #FORMATTER_ID} string.
  */
-public class JSFormatterContext extends FormatterContext
+public interface XMLFormatterConstants
 {
 
 	/**
-	 * @param indent
+	 * XML formatter ID.
 	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
+	public static final String FORMATTER_ID = "xml.formatter"; //$NON-NLS-1$
 
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
-	 */
-	protected boolean isCountable(IFormatterNode node)
-	{
-		return node instanceof IFormatterContainerNode;
-	}
+	public static final String FORMATTER_TAB_CHAR = FORMATTER_ID + '.' + CodeFormatterConstants.FORMATTER_TAB_CHAR;
+	public static final String FORMATTER_TAB_SIZE = FORMATTER_ID + '.' + CodeFormatterConstants.FORMATTER_TAB_SIZE;
 
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
-	}
+	// Wrapping
+	public static final String WRAP_COMMENTS = FORMATTER_ID + ".wrap.comments"; //$NON-NLS-1$
+	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
-	 */
-	public String getWrappingCommentPrefix(String text)
-	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
-	}
+	// Indentation
+	public static final String INDENT_EXCLUDED_TAGS = FORMATTER_ID + ".indent.excluded"; //$NON-NLS-1$
+	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID + '.'
+			+ CodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
+
+	// New lines
+	public static final String NEW_LINES_EXCLUDED_TAGS = FORMATTER_ID + ".newline.excluded"; //$NON-NLS-1$
+
+	// Empty lines
+	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
+	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
+	public static final String LINES_BEFORE_NON_XML_ELEMENTS = FORMATTER_ID + ".line.before.non.xml"; //$NON-NLS-1$
+	public static final String LINES_AFTER_NON_XML_ELEMENTS = FORMATTER_ID + ".line.after.non.xml"; //$NON-NLS-1$
+
 }

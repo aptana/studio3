@@ -32,52 +32,48 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
 
 /**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * An XML formatter context.
  */
-public class JSFormatterContext extends FormatterContext
+public class XMLFormatterContext extends FormatterContext
 {
-
 	/**
 	 * @param indent
 	 */
-	public JSFormatterContext(int indent)
+	public XMLFormatterContext(int indent)
 	{
 		super(indent);
 	}
 
 	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
-	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
-	 */
-	protected boolean isCountable(IFormatterNode node)
-	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
+	 * Check if the char sequence starts with a '&lt!' sequence or a '&lt!--' sequence. If so, return the length of the
 	 * sequence; Otherwise, return 0.
 	 * 
 	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
+		int count = 0;
+		if (chars.length() > offset + 1)
+		{
+			if (chars.charAt(offset) == '<' && chars.charAt(offset + 1) == '!')
+			{
+				count = 2;
+			}
+			if (chars.length() > offset + 3)
+			{
+				if (chars.charAt(offset + 2) == '-' && chars.charAt(offset + 3) == '-')
+				{
+					count += 2;
+				}
+			}
+		}
+		return count;
 	}
 
 	/*
@@ -86,7 +82,6 @@ public class JSFormatterContext extends FormatterContext
 	 */
 	public String getWrappingCommentPrefix(String text)
 	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		return StringUtil.EMPTY;
 	}
 }

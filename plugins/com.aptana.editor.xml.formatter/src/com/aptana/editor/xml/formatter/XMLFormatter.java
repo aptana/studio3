@@ -32,10 +32,9 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.formatter;
+package com.aptana.editor.xml.formatter;
 
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
@@ -44,7 +43,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -53,6 +51,7 @@ import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
+import com.aptana.formatter.preferences.IPreferenceDelegate;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterMessages;
 import com.aptana.formatter.ui.ScriptFormattingContextProperties;
@@ -63,12 +62,11 @@ import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.ui.util.StatusLineMessageTimerManager;
 
 /**
- * CSS code formatter.
+ * XML code formatter.
  */
-public class CSSFormatter extends AbstractScriptFormatter implements IScriptFormatter
+public class XMLFormatter extends AbstractScriptFormatter implements IScriptFormatter
 {
 
-	private static final Pattern whiteSpaceAsterisk = Pattern.compile("[\\s\\*]"); //$NON-NLS-1$
 	private String lineSeparator;
 
 	/**
@@ -76,7 +74,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * 
 	 * @param preferences
 	 */
-	protected CSSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected XMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -108,11 +106,11 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
+				final XMLFormatterNodeBuilder builder = new XMLFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new CSSFormatterNodeRewriter(parseResult).rewrite(root);
-				IFormatterContext context = new CSSFormatterContext(0);
+				new XMLFormatterNodeRewriter().rewrite(root);
+				IFormatterContext context = new XMLFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
 				{
@@ -153,7 +151,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				{
 					if (!input.equals(output))
 					{
-						if (equalsIgnoreWhiteSpaceAndAsterisk(input, output))
+						if (equalsIgnoreWhitespaces(input, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
@@ -194,7 +192,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getIndentSize()
 	{
-		return getInt(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE);
+		return getInt(XMLFormatterConstants.FORMATTER_INDENTATION_SIZE);
 	}
 
 	/*
@@ -203,7 +201,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public String getIndentType()
 	{
-		return getString(CSSFormatterConstants.FORMATTER_TAB_CHAR);
+		return getString(XMLFormatterConstants.FORMATTER_TAB_CHAR);
 	}
 
 	/*
@@ -212,7 +210,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	public int getTabSize()
 	{
-		return getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE);
+		return getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE);
 	}
 
 	/**
@@ -229,14 +227,14 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 */
 	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
 	{
-		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
+		final XMLFormatterNodeBuilder builder = new XMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new CSSFormatterNodeRewriter(parseResult).rewrite(root);
-		IFormatterContext context = new CSSFormatterContext(indentationLevel);
+		new XMLFormatterNodeRewriter().rewrite(root);
+		IFormatterContext context = new XMLFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
-		writer.setWrapLength(getInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH));
-		writer.setLinesPreserve(getInt(CSSFormatterConstants.PRESERVED_LINES));
+		writer.setWrapLength(getInt(XMLFormatterConstants.WRAP_COMMENTS_LENGTH));
+		writer.setLinesPreserve(getInt(XMLFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
 		writer.flush(context);
 		return writer.getOutput();
@@ -245,28 +243,16 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	private FormatterDocument createFormatterDocument(String input, int offset)
 	{
 		FormatterDocument document = new FormatterDocument(input);
-		document.setInt(CSSFormatterConstants.FORMATTER_TAB_SIZE, getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE));
-		document.setBoolean(CSSFormatterConstants.WRAP_COMMENTS, getBoolean(CSSFormatterConstants.WRAP_COMMENTS));
-		document.setString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-				getString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
-		document.setInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS));
-		document.setInt(CSSFormatterConstants.LINES_AFTER_DECLARATION,
-				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
+		document.setInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE));
+		document.setBoolean(XMLFormatterConstants.WRAP_COMMENTS, getBoolean(XMLFormatterConstants.WRAP_COMMENTS));
+		document.setInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS));
+		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;
-	}
-
-	private boolean equalsIgnoreWhiteSpaceAndAsterisk(String in, String out)
-	{
-		if (in == null || out == null)
-		{
-			return in == out;
-		}
-
-		in = whiteSpaceAsterisk.matcher(in).replaceAll(StringUtil.EMPTY);
-		out = whiteSpaceAsterisk.matcher(out).replaceAll(StringUtil.EMPTY);
-		return in.equals(out);
 	}
 
 }

@@ -32,61 +32,34 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter.nodes;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.editor.xml.formatter.XMLFormatterConstants;
+import com.aptana.formatter.IFormatterDocument;
+import com.aptana.formatter.nodes.FormatterCommentNode;
 
-/**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class JSFormatterContext extends FormatterContext
+public class FormatterXMLCommentNode extends FormatterCommentNode
 {
 
 	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
-
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
+	 * Constructs a new formatter node for XML comments
 	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
+	 * @param document
+	 * @param startOffset
+	 * @param endOffset
 	 */
-	protected boolean isCountable(IFormatterNode node)
+	public FormatterXMLCommentNode(IFormatterDocument document, int startOffset, int endOffset)
 	{
-		return node instanceof IFormatterContainerNode;
-	}
-
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
+		super(document, startOffset, endOffset);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
+	 * @see com.aptana.formatter.nodes.FormatterCommentNode#getWrappingKey()
 	 */
-	public String getWrappingCommentPrefix(String text)
+	public String getWrappingKey()
 	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		return XMLFormatterConstants.WRAP_COMMENTS;
 	}
+
 }

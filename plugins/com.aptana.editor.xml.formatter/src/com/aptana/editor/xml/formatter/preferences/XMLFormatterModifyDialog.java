@@ -32,61 +32,38 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.editor.xml.formatter.preferences;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
+import com.aptana.formatter.IScriptFormatterFactory;
+import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
+import com.aptana.formatter.ui.preferences.FormatterModifyDialog;
 
 /**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * XML formatter settings dialog.
  */
-public class JSFormatterContext extends FormatterContext
+public class XMLFormatterModifyDialog extends FormatterModifyDialog
 {
-
 	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
-
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
+	 * Constructs a new XMLFormatterModifyDialog
 	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
+	 * @param dialogOwner
+	 * @param formatterFactory
 	 */
-	protected boolean isCountable(IFormatterNode node)
+	public XMLFormatterModifyDialog(IFormatterModifyDialogOwner dialogOwner, IScriptFormatterFactory formatterFactory)
 	{
-		return node instanceof IFormatterContainerNode;
+		super(dialogOwner, formatterFactory);
 	}
 
-	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
-	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
-	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
+	protected void addPages()
 	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
-	}
+		addTabPage(Messages.XMLFormatterModifyDialog_indentationTabName, new XMLFormatterIndentationPage(this));
+		addTabPage(Messages.XMLFormatterModifyDialog_newLinesTabName, new XMLFormatterNewLinesPage(this));
+		addTabPage(Messages.XMLFormatterModifyDialog_BlankLinesTabName, new XMLFormatterBlankLinesPage(this));
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
-	 */
-	public String getWrappingCommentPrefix(String text)
-	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
+		// TODO: Fix issue with comments not wrapping correctly with newlines
+		// Something like: /*
+		// border: 1px solid red;
+		// */
+		// addTabPage("Comments", new CSSFormatterCommentsPage(this));
 	}
 }
