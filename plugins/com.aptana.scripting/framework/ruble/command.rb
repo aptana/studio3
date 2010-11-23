@@ -150,9 +150,19 @@ module Ruble
     def trigger
       @jobj.trigger
     end
-
-    def trigger=(trigger)
-      @jobj.trigger = (trigger && trigger.kind_of?(Array)) ? trigger.to_java(:String) : trigger.to_s;
+    
+    def trigger=(values)
+      if values.kind_of? Symbol
+        @jobj.setTrigger(values.to_s)
+      elsif values.kind_of? Array
+        if values[0].kind_of? Symbol
+          @jobj.setTrigger(values.shift.to_s, values.to_java(:String))
+        else
+          @jobj.setTrigger("prefix", values.to_java(:String))
+        end
+      else
+        @jobj.setTrigger("prefix", [values].to_java(:String))
+      end
     end
 
     class << self
@@ -168,7 +178,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(command.path)
         
         if !bundle.nil?
-          bundle.add_command(command)
+          bundle.add_child(command)
         else
           log_warning("No bundle found for command #{name}: #{command.path}")
         end

@@ -32,61 +32,25 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.formatter;
+package com.aptana.scripting.model;
 
-import com.aptana.formatter.FormatterContext;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
-import com.aptana.formatter.nodes.IFormatterNode;
-
-/**
- * A JavaScript formatter context.
- * 
- * @author Shalom Gibly <sgibly@aptana.com>
- */
-public class JSFormatterContext extends FormatterContext
+public interface ElementVisibilityListener
 {
-
 	/**
-	 * @param indent
-	 */
-	public JSFormatterContext(int indent)
-	{
-		super(indent);
-	}
-
-	/**
-	 * Returns true only if the given node is a container node (of type {@link IFormatterContainerNode}).
+	 * This event fires whenever an AbstractElement is no longer visible according to the bundle precedence rules. Note
+	 * this event will fire for elements that have been deleted as well as elements that have become hidden due to the
+	 * bundle precedence rules.
 	 * 
-	 * @param node
-	 *            An {@link IFormatterNode}
-	 * @return True only if the given node is a container node; False, otherwise.
-	 * @see com.aptana.formatter.FormatterContext#isCountable(com.aptana.formatter.nodes.IFormatterNode)
+	 * @param element
 	 */
-	protected boolean isCountable(IFormatterNode node)
-	{
-		return node instanceof IFormatterContainerNode;
-	}
+	void elementBecameHidden(AbstractElement element);
 
 	/**
-	 * TODO
-	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
-	 * sequence; Otherwise, return 0.
+	 * This event fires whenever an AbstractElement has become visible according to the bundle precedence rules. Note
+	 * this event will fire for elements that have been added that are visible or when another bundle or command has
+	 * been deleted thus exposing the element due to bundle precedence
 	 * 
-	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
+	 * @param element
 	 */
-	public int getCommentStartLength(CharSequence chars, int offset)
-	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
-	 */
-	public String getWrappingCommentPrefix(String text)
-	{
-		// TODO - Wrong when we wrap different types of comments, such as single-line.
-		return " * "; //$NON-NLS-1$
-	}
+	void elementBecameVisible(AbstractElement element);
 }

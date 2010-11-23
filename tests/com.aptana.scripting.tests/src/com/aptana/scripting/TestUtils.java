@@ -90,7 +90,7 @@ public class TestUtils extends TestCase
 
 		try
 		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
+			URL url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), path, null);
 			URL fileURL = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(fileURL);
 			

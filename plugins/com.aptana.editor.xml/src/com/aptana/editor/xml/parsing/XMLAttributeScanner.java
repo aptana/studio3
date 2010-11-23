@@ -64,8 +64,8 @@ class XMLAttributeScanner extends RuleBasedScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// attribute values
-		rules.add(new MultiLineRule("\"", "\"", createToken(XMLTokenType.ATTRIBUTE), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("'", "'", createToken(XMLTokenType.ATTRIBUTE), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("\"", "\"", createToken(XMLTokenType.VALUE), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("'", "'", createToken(XMLTokenType.VALUE), '\\')); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// attribute names
 		rules.add(new XMLAttributeRule(createToken(XMLTokenType.ATTRIBUTE)));

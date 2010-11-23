@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.css.formatter.preferences.messages"; //$NON-NLS-1$
+	public static String CSSFormatterBlankLinesPage_afterCSSDeclaration;
 	public static String CSSFormatterBlankLinesPage_afterCSSRule;
 	public static String CSSFormatterBlankLinesPage_blankLinesGroupLabel;
 	public static String CSSFormatterBlankLinesPage_existingBlankLinesLabel;

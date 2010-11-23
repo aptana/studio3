@@ -34,63 +34,154 @@
  */
 package com.aptana.scripting.model;
 
-import org.jruby.RubyProc;
+import java.io.File;
 
 import com.aptana.core.util.SourcePrinter;
 
-public class EnvironmentElement extends AbstractBundleElement
+public final class ProjectTemplateElement extends AbstractBundleElement
 {
-	private RubyProc _invokeBlock;
+	public enum Type
+	{
+		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON
+	}
+
+	private Type fType;
+	private String fLocation;
+	private String fDescription;
 
 	/**
-	 * EnvironmentElement
+	 * ProjectTemplate
 	 * 
 	 * @param path
 	 */
-	public EnvironmentElement(String path)
+	public ProjectTemplateElement(String path)
 	{
 		super(path);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.AbstractElement#getElementName()
+	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	protected String getElementName()
+	public boolean equals(Object obj)
 	{
-		return "environment"; //$NON-NLS-1$
+		if (!(obj instanceof ProjectTemplateElement))
+		{
+			return false;
+		}
+		ProjectTemplateElement other = (ProjectTemplateElement) obj;
+		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName()) && getLocation().equals(other.getLocation());
 	}
 
 	/**
-	 * getInvokeBlock
+	 * getDescription
 	 * 
 	 * @return
 	 */
-	public RubyProc getInvokeBlock()
+	public String getDescription()
 	{
-		return _invokeBlock;
+		return fDescription;
+	}
+
+	/**
+	 * getDirectory
+	 * 
+	 * @return
+	 */
+	public File getDirectory()
+	{
+		return this.getOwningBundle().getBundleDirectory();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.scripting.model.AbstractElement#printBody(com.aptana.core.util.SourcePrinter)
+	 * @see com.aptana.scripting.model.CommandElement#getElementName()
 	 */
-	@Override
-	protected void printBody(SourcePrinter printer)
+	public String getElementName()
 	{
-		// output path and scope
-		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+		return "project_template";
 	}
 
 	/**
-	 * setInvokeBlock
+	 * getLocation
 	 * 
-	 * @param block
+	 * @return
 	 */
-	public void setInvokeBlock(RubyProc block)
+	public String getLocation()
 	{
-		this._invokeBlock = block;
+		return fLocation;
+	}
+
+	/**
+	 * getType
+	 * 
+	 * @return
+	 */
+	public Type getType()
+	{
+		return fType;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int hash = 31 + getType().hashCode();
+		hash = 31 * hash + getDisplayName().hashCode();
+		hash = 31 * hash + getLocation().hashCode();
+		return hash;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.scripting.model.CommandElement#printBody(com.aptana.core.util.SourcePrinter)
+	 */
+	protected void printBody(SourcePrinter printer)
+	{
+		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
+		printer.printWithIndent("name: ").println(this.getDisplayName());
+		printer.printWithIndent("location: ").println(this.getLocation());
+
+		if (this.getDescription() != null)
+		{
+			printer.printWithIndent("description: ").println(this.getDescription());
+		}
+	}
+
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 */
+	public void setDescription(String description)
+	{
+		fDescription = description;
+	}
+
+	/**
+	 * setLocation
+	 * 
+	 * @param location
+	 */
+	public void setLocation(String location)
+	{
+		fLocation = location;
+	}
+
+	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
+	public void setType(String type)
+	{
+		try
+		{
+			fType = Type.valueOf(type.toUpperCase());
+		}
+		catch (Exception e)
+		{
+			fType = Type.UNDEFINED;
+		}
 	}
 }

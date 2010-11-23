@@ -56,7 +56,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(snippet.path)
         
         if !bundle.nil?
-          bundle.add_command(snippet)
+          bundle.add_child(snippet)
         else
           log_warning("No bundle found for snippet #{name}: #{snippet.path}")
         end

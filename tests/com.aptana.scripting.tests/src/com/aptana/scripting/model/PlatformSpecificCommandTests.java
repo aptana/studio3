@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting.model;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.scripting.model.filters.IModelFilter;
@@ -78,7 +80,7 @@ public class PlatformSpecificCommandTests extends BundleTestBase
 	 */
 	protected CommandElement getCommand(final String name)
 	{
-		CommandElement[] commands = BundleTestBase.getBundleManagerInstance().getCommands(new IModelFilter()
+		List<CommandElement> commands = BundleTestBase.getBundleManagerInstance().getExecutableCommands(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
 			{
@@ -96,9 +98,9 @@ public class PlatformSpecificCommandTests extends BundleTestBase
 		});
 		
 		assertNotNull(commands);
-		assertTrue(commands.length == 1);
+		assertTrue(commands.size() == 1);
 		
-		return commands[0];
+		return commands.get(0);
 	}
 
 	/*

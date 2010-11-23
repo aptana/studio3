@@ -66,6 +66,7 @@ public interface CSSFormatterConstants
 
 	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
+	public static final String LINES_AFTER_DECLARATION = FORMATTER_ID + ".line.after.declaration"; //$NON-NLS-1$
 	public static final String PRESERVED_LINES = FORMATTER_ID + ".line.preserve"; //$NON-NLS-1$
 
 }

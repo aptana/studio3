@@ -19,7 +19,8 @@ module Ruble
       def define_template(name, &block)
         log_info("loading template #{name}")
 
-        path = block.binding.eval("__FILE__")
+        path = $0
+        path = block.binding.eval("__FILE__") if block
         command = Template.new(name, path)
         block.call(command) if block_given?
 
@@ -27,7 +28,7 @@ module Ruble
         bundle = BundleManager.bundle_from_path(command.path)
         
         if !bundle.nil?
-          bundle.add_command(command)
+          bundle.add_child(command)
         else
           log_warning("No bundle found for template #{name}: #{command.path}")
         end

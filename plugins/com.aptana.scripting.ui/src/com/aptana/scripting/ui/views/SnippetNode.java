@@ -39,6 +39,7 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class SnippetNode extends BaseNode
@@ -122,7 +123,7 @@ class SnippetNode extends BaseNode
 					break;
 
 				case TRIGGERS:
-					String[] triggers = this._snippet.getTriggers();
+					String[] triggers = this._snippet.getTriggerTypeValues(TriggerType.PREFIX);
 
 					if (triggers != null)
 					{

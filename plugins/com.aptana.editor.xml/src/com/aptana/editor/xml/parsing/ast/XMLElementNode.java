@@ -34,12 +34,16 @@
  */
 package com.aptana.editor.xml.parsing.ast;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.IParseNodeAttribute;
+import com.aptana.parsing.ast.ParseNodeAttribute;
 import com.aptana.parsing.lexer.IRange;
 
 public class XMLElementNode extends XMLNode
@@ -159,6 +163,27 @@ public class XMLElementNode extends XMLNode
 
 		return result;
 	}
+	
+
+	/* (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getAttributes()
+	 */
+	@Override
+	public IParseNodeAttribute[] getAttributes()
+	{
+		List<IParseNodeAttribute> attributes = new ArrayList<IParseNodeAttribute>();
+		
+		// NOTE: May want to cache this
+		if (fAttributes != null && fAttributes.size() > 0)
+		{
+			for (Map.Entry<String, String> entry : fAttributes.entrySet())
+			{
+				attributes.add(new ParseNodeAttribute(this, entry.getKey(), entry.getValue()));
+			}
+		}
+		
+		return attributes.toArray(new IParseNodeAttribute[attributes.size()]);
+	}
 
 	/**
 	 * getName
@@ -220,7 +245,8 @@ public class XMLElementNode extends XMLNode
 	{
 		if (fAttributes == null)
 		{
-			fAttributes = new HashMap<String, String>();
+			// NOTE: use linked hash map to preserve add order
+			fAttributes = new LinkedHashMap<String, String>();
 		}
 
 		fAttributes.put(name, value);

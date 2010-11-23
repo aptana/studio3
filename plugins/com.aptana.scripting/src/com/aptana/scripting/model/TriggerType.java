@@ -34,42 +34,73 @@
  */
 package com.aptana.scripting.model;
 
-public interface BundleChangeListener
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * EventTriggerType
+ */
+public enum TriggerType
 {
-	/**
-	 * This event fires whenever a new bundle is added to its bundle entry. The event fires after the becameHidden
-	 * becameVisible events fire. When this event fires, the bundle elements visibility flag has been set.
-	 * 
-	 * @param bundle
-	 */
-	void added(BundleElement bundle);
+	UNDEFINED("undefined"), // $NON-NLS-1$
+	PREFIX("prefix"), // $NON-NLS-1$
+	FILE_WATCHER("file_watcher"); // $NON-NLS-1$
+
+	private static Map<String, TriggerType> NAME_MAP;
+	private String _name;
 
 	/**
-	 * This event fires whenever one or more bundles that were previously visible have become hidden by another bundle.
-	 * All bundles that have changed state are members of the specified bundle entry. The bundle entry can then be used
-	 * to calculate bundle properties following the bundle precedence rules. This can be done either via the helper
-	 * methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}
-	 * 
-	 * @param entry
+	 * static initializer
 	 */
-	void becameHidden(BundleEntry entry);
+	static
+	{
+		NAME_MAP = new HashMap<String, TriggerType>();
+
+		for (TriggerType type : EnumSet.allOf(TriggerType.class))
+		{
+			NAME_MAP.put(type.getName(), type);
+		}
+	}
 
 	/**
-	 * This event fires whenever one or more bundles that were previously hidden have become visible by the deletion of
-	 * another bundle. All bundles that have changed state are members of the specified bundle entry. The bundle entry
-	 * can then be used to calculate bundle properties following the bundle precedence rules. This can be done either
-	 * via the helper methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}
+	 * get
 	 * 
-	 * @param entry
+	 * @param name
+	 * @return
 	 */
-	void becameVisible(BundleEntry entry);
+	public static final TriggerType get(String name)
+	{
+		return (NAME_MAP.containsKey(name)) ? NAME_MAP.get(name) : UNDEFINED;
+	}
 
 	/**
-	 * This event fires whenever a bundle is removed from its bundle entry. The event fires before the becameHidden
-	 * becameVisible events fire. When this event fires, the bundle element's visibility flag reflects its state before
-	 * being deleted since all deleted bundle elements become hidden after deletion.
+	 * EventTriggerType
 	 * 
-	 * @param bundle
+	 * @param name
 	 */
-	void deleted(BundleElement bundle);
+	private TriggerType(String name)
+	{
+		this._name = name;
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return this._name;
+	}
+
+	/**
+	 * getPropertyName
+	 * 
+	 * @return
+	 */
+	public String getPropertyName()
+	{
+		return this._name + "_values";
+	}
 }

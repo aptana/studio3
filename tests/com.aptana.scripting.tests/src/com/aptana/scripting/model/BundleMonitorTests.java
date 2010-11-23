@@ -35,6 +35,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -394,9 +395,9 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addCommand("simple-command.rb");
 
 		// and make sure that shows up
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 	}
 
 	/**
@@ -420,9 +421,9 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(entry);
 
 		// we should see the command now too
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 	}
 
 	/**
@@ -441,9 +442,9 @@ public abstract class BundleMonitorTests extends TestCase
 		this.addSnippet("simple-snippet.rb");
 
 		// and make sure that shows up
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 	}
 
 	/**
@@ -465,9 +466,9 @@ public abstract class BundleMonitorTests extends TestCase
 		assertNotNull(entry);
 
 		// we should see the snippet now too
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 	}
 
 	/**
@@ -483,16 +484,16 @@ public abstract class BundleMonitorTests extends TestCase
 		// make sure it created a bundle entry an a command
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.removeCommand();
 
 		// we should no commands now
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(0, commands.length);
+		assertEquals(0, commands.size());
 	}
 
 	/**
@@ -526,16 +527,16 @@ public abstract class BundleMonitorTests extends TestCase
 		// make sure it created a bundle entry an a command
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.removeSnippet();
 
 		// we should no commands now
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(0, commands.length);
+		assertEquals(0, commands.size());
 	}
 
 	/**
@@ -648,9 +649,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.removeCommandsDirectory();
 		
@@ -658,7 +659,7 @@ public abstract class BundleMonitorTests extends TestCase
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(0, commands.length);
+		assertEquals(0, commands.size());
 	}
 
 	/**
@@ -673,9 +674,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.removeSnippetsDirectory();
 		
@@ -683,7 +684,7 @@ public abstract class BundleMonitorTests extends TestCase
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(0, commands.length);
+		assertEquals(0, commands.size());
 	}
 
 	/**
@@ -698,9 +699,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.waitForAction(new FileSystemAction()
 		{
@@ -712,8 +713,8 @@ public abstract class BundleMonitorTests extends TestCase
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals(COMMAND_NAME + "2.rb", new File(commands[0].getPath()).getName());
+		assertEquals(1, commands.size());
+		assertEquals(COMMAND_NAME + "2.rb", new File(commands.get(0).getPath()).getName());
 	}
 
 	/**
@@ -728,9 +729,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
+		assertEquals(1, commands.size());
 
 		this.waitForAction(new FileSystemAction()
 		{
@@ -742,8 +743,8 @@ public abstract class BundleMonitorTests extends TestCase
 
 		commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(1, commands.length);
-		assertEquals(SNIPPET_NAME + "2.rb", new File(commands[0].getPath()).getName());
+		assertEquals(1, commands.size());
+		assertEquals(SNIPPET_NAME + "2.rb", new File(commands.get(0).getPath()).getName());
 	}
 
 	/**
@@ -759,9 +760,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
+		assertEquals(2, commands.size());
 
 		this.waitForAction(new FileSystemAction()
 		{
@@ -788,9 +789,9 @@ public abstract class BundleMonitorTests extends TestCase
 
 		BundleEntry entry = this._manager.getBundleEntry(BUNDLE_NAME);
 		assertNotNull(entry);
-		CommandElement[] commands = entry.getCommands();
+		List<CommandElement> commands = entry.getCommands();
 		assertNotNull(commands);
-		assertEquals(2, commands.length);
+		assertEquals(2, commands.size());
 
 		this.waitForAction(new FileSystemAction()
 		{

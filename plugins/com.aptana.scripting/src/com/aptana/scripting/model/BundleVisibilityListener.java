@@ -34,19 +34,29 @@
  */
 package com.aptana.scripting.model;
 
-public interface ElementChangeListener
+public interface BundleVisibilityListener
 {
 	/**
-	 * elementAdded
+	 * This event fires whenever one or more bundles that were previously visible have become hidden by another bundle.
+	 * All bundles that have changed state are members of the specified bundle entry. The bundle entry can then be used
+	 * to calculate bundle properties following the bundle precedence rules. This can be done either via the helper
+	 * methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}. Note that a bundle will be
+	 * included in the BundleEntry if it has been deleted or if it has been added but is not visible due to bundle
+	 * precedence.
 	 * 
-	 * @param element
+	 * @param entry
 	 */
-	void elementAdded(AbstractElement element);
+	void bundlesBecameHidden(BundleEntry entry);
 
 	/**
-	 * elementDeleted
+	 * This event fires whenever one or more bundles that were previously hidden have become visible by the deletion of
+	 * another bundle. All bundles that have changed state are members of the specified bundle entry. The bundle entry
+	 * can then be used to calculate bundle properties following the bundle precedence rules. This can be done either
+	 * via the helper methods on BundleEntry or through {@link BundleEntry#processBundles(BundleProcessor)}. Note that a
+	 * bundle will be included in the BundleEntry if it has been added and is visible or if another bundle has been
+	 * deleted thus exposing it due to bundle precedence.
 	 * 
-	 * @param element
+	 * @param entry
 	 */
-	void elementDeleted(AbstractElement element);
+	void bundlesBecameVisible(BundleEntry entry);
 }
