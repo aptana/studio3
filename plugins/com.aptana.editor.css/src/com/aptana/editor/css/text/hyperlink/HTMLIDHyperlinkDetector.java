@@ -81,7 +81,7 @@ public class HTMLIDHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		{
 			IDocument doc = textViewer.getDocument();
 			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
-					.getScopeAtOffset(doc, region.getOffset());
+					.getScopeAtOffset(textViewer, region.getOffset());
 			// Match scope against source.css
 			IScopeSelector selector = new ScopeSelector(ICSSConstants.CSS_SCOPE);
 			if (!selector.matches(scope))
