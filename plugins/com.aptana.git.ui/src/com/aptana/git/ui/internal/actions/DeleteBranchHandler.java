@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.DefaultToolTip;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -52,7 +51,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 		}
 		QuickMenuDialog dialog = new QuickMenuDialog(getShell());
 		dialog.setInput(listOfMaps);
-		if (dialog.open() == Window.OK)
+		if (dialog.open() != -1)
 		{
 			MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
 			deleteBranch(repo, item.getText());

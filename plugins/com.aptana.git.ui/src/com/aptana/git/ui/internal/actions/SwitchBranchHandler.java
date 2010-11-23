@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.window.DefaultToolTip;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
@@ -46,7 +45,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 		{
 			QuickMenuDialog dialog = new QuickMenuDialog(UIUtils.getActiveShell());
 			dialog.setInput(listOfMaps);
-			if (dialog.open() == Window.OK)
+			if (dialog.open() != -1)
 			{
 				MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
 				switchBranch(repo, item.getText());
