@@ -83,7 +83,7 @@ public class CommandElementsProvider implements ICommandElementsProvider
 		IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
 		try
 		{
-			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
+			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(textViewer, caretOffset);
 			IModelFilter filter = new ScopeFilter(contentTypeAtOffset);
 
 			List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);

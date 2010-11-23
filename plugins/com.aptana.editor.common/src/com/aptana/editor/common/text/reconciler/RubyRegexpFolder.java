@@ -45,10 +45,12 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.jruby.RubyRegexp;
 import org.jruby.RubyString;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
@@ -57,14 +59,15 @@ class RubyRegexpFolder
 {
 
 	private IDocument fDocument;
+	private AbstractThemeableEditor fEditor;
 
-	RubyRegexpFolder(IDocument document)
+	RubyRegexpFolder(AbstractThemeableEditor editor, IDocument document)
 	{
 		this.fDocument = document;
+		this.fEditor = editor;
 	}
 
-	public List<Position> emitFoldingRegions(IProgressMonitor monitor)
-			throws BadLocationException
+	public List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
 	{
 		int lineCount = fDocument.getNumberOfLines();
 		if (lineCount <= 1) // Quick hack fix for minified files. We need at least two lines to have folding!
@@ -82,7 +85,7 @@ class RubyRegexpFolder
 			// Check for cancellation
 			if (monitor != null && monitor.isCanceled())
 				return newPositions;
-			
+
 			IRegion lineRegion = fDocument.getLineInformation(currentLine);
 			int offset = lineRegion.getOffset();
 			String line = fDocument.get(offset, lineRegion.getLength());
@@ -154,6 +157,14 @@ class RubyRegexpFolder
 
 	protected String getScopeAtOffset(int offset) throws BadLocationException
 	{
+		if (fEditor != null)
+		{
+			ISourceViewer sv = fEditor.getISourceViewer();
+			if (sv != null)
+			{
+				return getDocumentScopeManager().getScopeAtOffset(sv, offset);
+			}
+		}
 		return getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 	}
 
