@@ -23,7 +23,7 @@ public interface IFormatterContext
 	void decIndent();
 
 	void resetIndent();
-	
+
 	void setIndent(int indent);
 
 	IFormatterContext copy();
@@ -73,9 +73,13 @@ public interface IFormatterContext
 	int getCommentStartLength(CharSequence chars, int offset);
 
 	/**
-	 * Returns a string that will be appended as a comment prefix when the formatter wrapps long comments.
+	 * Returns a string that will be appended as a comment prefix when the formatter wrapps long comments.<br>
+	 * The implementation of this interface may inspect the given text to determine the wrapping string prefix. For
+	 * example, decide between a multi-line comment and a single line comment prefix for JS or PHP.
 	 * 
+	 * @param text
+	 *            The comment text that appears on the line we are wrapping
 	 * @return A comment prefix to append when wrapping a long comment (may be empty).
 	 */
-	String getWrappingCommentPrefix();
+	String getWrappingCommentPrefix(String text);
 }
