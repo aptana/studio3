@@ -33,46 +33,38 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.haml;
+package com.aptana.editor.haml.internal;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
-import com.aptana.editor.common.PartitionerSwitchStrategy;
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
+import com.aptana.editor.common.PartitionScannerSwitchStrategy;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
+import com.aptana.editor.common.text.rules.CompositeSubPartitionScanner;
+import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.SubPartitionScanner;
+import com.aptana.editor.haml.HAMLSourceConfiguration;
+import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
  * @author Max Stepanov
- *
  */
-public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
+public class HAMLSubPartitionScanner extends CompositeSubPartitionScanner {
 
-	private static HAMLPartitionerSwitchStrategy instance;
-	
-	private static final String[][] HAML_PAIRS = new String[][] {
-		{ "=", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "~", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-		{ "-", "\n" }, //$NON-NLS-1$ //$NON-NLS-2$
-	};
-	
-	private static final char ESCAPE = '\\';
+	private static final int TYPE_RUBY_EVALUATION = 1;
+	private static final int TYPE_RUBY_ATTRIBUTES = 2;
+
+	private static final String[] RUBY_EVALUATION_SWITCH_SEQUENCES = new String[] { "\n" }; //$NON-NLS-1$
+	private static final String[] RUBY_ATTRIBUTES_SWITCH_SEQUENCES = new String[] { "}" }; //$NON-NLS-1$
+
 	private static final char COMMA = ',';
 	private static final char VERTICAL = '|';
-	
-	private static final SequenceBypassHandler START_BYPASS_HANDLER = new SequenceBypassHandler() {
-		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound) {
-			if (characterScanner.getColumn() > 0) {
-				characterScanner.unread();
-				int c = characterScanner.read();
-				if (ESCAPE == c) {
-					return true;
-				}
-			}
-			return false;
-		}
-	};
 
-	private static final SequenceBypassHandler END_BYPASS_HANDLER = new SequenceBypassHandler() {
+	private static final SequenceBypassHandler RUBY_BYPASS_HANDLER = new SequenceBypassHandler() {
 		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound) {
 			if (characterScanner.getColumn() > 0) {
 				characterScanner.unread();
@@ -111,24 +103,48 @@ public class HAMLPartitionerSwitchStrategy extends PartitionerSwitchStrategy {
 	};
 
 	/**
-	 * 
+	 *
 	 */
-	private HAMLPartitionerSwitchStrategy() {
-		super(HAML_PAIRS, START_BYPASS_HANDLER, END_BYPASS_HANDLER);
-	}
-	
-	public static HAMLPartitionerSwitchStrategy getDefault() {
-		if (instance == null) {
-			instance = new HAMLPartitionerSwitchStrategy();
-		}
-		return instance;
+	public HAMLSubPartitionScanner() {
+		super(
+			new ISubPartitionScanner[] {
+				new SubPartitionScanner(HAMLSourceConfiguration.getDefault().getPartitioningRules(),
+						HAMLSourceConfiguration.CONTENT_TYPES, new Token(HAMLSourceConfiguration.DEFAULT)),
+				RubySourceConfiguration.getDefault().createSubPartitionScanner(),
+				RubyAttributesSourceConfiguration.getDefault().createSubPartitionScanner()
+			},
+			new IPartitionScannerSwitchStrategy[] {
+				new PartitionScannerSwitchStrategy(RUBY_EVALUATION_SWITCH_SEQUENCES, RUBY_BYPASS_HANDLER),
+				new PartitionScannerSwitchStrategy(RUBY_ATTRIBUTES_SWITCH_SEQUENCES)
+			});
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.IPartitionerSwitchStrategy#getSwitchTagPairs()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
-	public String[][] getSwitchTagPairs() {
-		return HAML_PAIRS;
+	@Override
+	public void setLastToken(IToken token) {
+		if (!(token.getData() instanceof String)) {
+			current = TYPE_DEFAULT;
+			return;
+		}
+		String contentType = (String) token.getData();
+		if (HAMLSourceConfiguration.RUBY_EVALUATION.equals(contentType)) {
+			current = TYPE_RUBY_EVALUATION;
+		} else if (HAMLSourceConfiguration.RUBY_ATTRIBUTES.equals(contentType)) {
+			current = TYPE_RUBY_ATTRIBUTES;
+		} else if (HAMLSourceConfiguration.DEFAULT.equals(contentType)
+				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
+			current = TYPE_DEFAULT;
+		} else {
+			for (int i = 0; i < subPartitionScanners.length; ++i) {
+				if (subPartitionScanners[i].hasContentType(contentType)) {
+					current = i;
+					break;
+				}
+			}
+		}
 	}
 
 }

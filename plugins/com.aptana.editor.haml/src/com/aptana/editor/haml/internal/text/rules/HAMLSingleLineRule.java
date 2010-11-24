@@ -33,47 +33,70 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.haml;
+package com.aptana.editor.haml.internal.text.rules;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.source.ISourceViewer;
-
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.SimpleSourceViewerConfiguration;
-import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.haml.internal.RubyAttributesSourceConfiguration;
-import com.aptana.editor.ruby.RubySourceConfiguration;
+import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
 /**
  * @author Max Stepanov
+ *
  */
-public class HAMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration {
+public class HAMLSingleLineRule extends EndOfLineRule {
 
-	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-		super(preferences, editor);
+	private boolean fNoStartSequence;
+	
+	public HAMLSingleLineRule(String startSequence, IToken token) {
+		super(startSequence, token);
+	}
+
+	public HAMLSingleLineRule(IToken token) {
+		super(" ", token);
+		fNoStartSequence = true;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 * @see org.eclipse.jface.text.rules.PatternRule#doEvaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
 	 */
 	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration() {
-		return HAMLSourceConfiguration.getDefault();
+	protected IToken doEvaluate(ICharacterScanner scanner, boolean resume) {
+		if (!resume) {
+			if (fNoStartSequence) {
+				if (scanner.read() != ICharacterScanner.EOF) {
+					if (endSequenceDetected(scanner)) {
+						return fToken;
+					}
+					scanner.unread();
+				}
+				return Token.UNDEFINED;
+			}
+			int index = 0;
+			int c;
+			if (scanner.getColumn() != 0) {
+				return Token.UNDEFINED;
+			}
+			while ((c = scanner.read()) != ICharacterScanner.EOF && isWhitespace(c)) {
+				++index;
+			}
+			if (c != ICharacterScanner.EOF) {
+				scanner.unread();
+			}
+			IToken token = super.doEvaluate(scanner, resume);
+			if (token.isUndefined()) {
+				for (int j = index; j > 0; --j) {
+					scanner.unread();
+				}
+			}
+			return token;
+		}
+		return super.doEvaluate(scanner, resume);
+	}
+	
+	private static boolean isWhitespace(int c) {
+		return (c == ' ') || (c == '\t');
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
-	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(
-				new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				HAMLSourceConfiguration.CONTENT_TYPES,
-				RubySourceConfiguration.CONTENT_TYPES,
-				RubyAttributesSourceConfiguration.CONTENT_TYPES
-			});
-	}
 
 }

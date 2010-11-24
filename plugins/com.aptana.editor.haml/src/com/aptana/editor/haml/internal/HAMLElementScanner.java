@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.haml;
+package com.aptana.editor.haml.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,26 +45,20 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.text.rules.RegexpRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 
-public class HAMLScanner extends BufferedRuleBasedScanner {
+public class HAMLElementScanner extends BufferedRuleBasedScanner {
 
-	private static final boolean OPTIMIZE_REGEXP_RULES = true;
-
-	public HAMLScanner() {
+	public HAMLElementScanner() {
 		List<IRule> rules = new ArrayList<IRule>();
 
 		// Add generic whitespace rule.
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
-
-		// FIXME Must be at end of line (only \s*\n can follow)
-		rules.add(new SingleCharacterRule('|', createToken("punctuation.separator.continuation.haml"))); //$NON-NLS-1$
+		rules.add(new SingleCharacterRule('%', createToken("punctuation.definition.tag.haml"))); //$NON-NLS-1$
 
 		// tags
 		WordRule rule = new WordRule(new IWordDetector() {
-
 			public boolean isWordStart(char c) {
 				return c == '%';
 			}
@@ -84,7 +78,7 @@ public class HAMLScanner extends BufferedRuleBasedScanner {
 			public boolean isWordPart(char c) {
 				return Character.isLetterOrDigit(c) || c == '_' || c == '-';
 			}
-		}, createToken("entity.other.attribute-name.id")); //$NON-NLS-1$
+		}, createToken("entity.name.tag.id.haml")); //$NON-NLS-1$
 		rules.add(rule);
 
 		// classes
@@ -97,12 +91,9 @@ public class HAMLScanner extends BufferedRuleBasedScanner {
 			public boolean isWordPart(char c) {
 				return Character.isLetterOrDigit(c) || c == '_' || c == '-';
 			}
-		}, createToken("entity.other.attribute-name.class")); //$NON-NLS-1$
+		}, createToken("entity.name.tag.class.haml")); //$NON-NLS-1$
 		rules.add(rule);
 
-		// TODO Optimize by turning this into WordRules!
-		// escape character FIXME Must be at beginning of line (can only be preceded by spaces*)
-		rules.add(new RegexpRule("\\\\.", createToken("meta.escape.haml"), OPTIMIZE_REGEXP_RULES)); //$NON-NLS-1$ //$NON-NLS-2$
 		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 

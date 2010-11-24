@@ -33,47 +33,71 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.editor.haml;
+package com.aptana.editor.haml.internal.text.rules;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.common.ISourceViewerConfiguration;
-import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
-import com.aptana.editor.haml.internal.RubyAttributesSourceConfiguration;
-import com.aptana.editor.ruby.RubySourceConfiguration;
 
 /**
  * @author Max Stepanov
+ *
  */
-public class HAMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration {
+public class HAMLEscapeRule implements IPredicateRule {
 
-	protected HAMLSourceViewerConfiguration(IPreferenceStore preferences, AbstractThemeableEditor editor) {
-		super(preferences, editor);
+	private static final char ESCAPE = '\\';
+
+	private final IToken successToken;
+	
+	public HAMLEscapeRule(IToken token) {
+		this.successToken = token;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getSourceViewerConfiguration()
+	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
 	 */
-	@Override
-	public ISourceViewerConfiguration getSourceViewerConfiguration() {
-		return HAMLSourceConfiguration.getDefault();
+	public IToken getSuccessToken() {
+		return successToken;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.SimpleSourceViewerConfiguration#getConfiguredContentTypes(org.eclipse.jface.text.source.ISourceViewer)
+	 * @see org.eclipse.jface.text.rules.IRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner)
 	 */
-	@Override
-	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return TextUtils.combine(
-				new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
-				HAMLSourceConfiguration.CONTENT_TYPES,
-				RubySourceConfiguration.CONTENT_TYPES,
-				RubyAttributesSourceConfiguration.CONTENT_TYPES
-			});
+	public IToken evaluate(ICharacterScanner scanner) {
+		return evaluate(scanner, false);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner, boolean)
+	 */
+	public IToken evaluate(ICharacterScanner scanner, boolean resume) {
+		if (!resume) {
+			int c = scanner.read();
+			if (c != ICharacterScanner.EOF) {
+				if (ESCAPE == c) {
+					c = scanner.read();
+					if (c != ICharacterScanner.EOF && !isNewLine(scanner, c)) {
+						return successToken;
+					}
+					scanner.unread();
+				}
+				scanner.unread();
+			}
+		}
+		return Token.UNDEFINED;
+	}
+	
+	private static boolean isNewLine(ICharacterScanner characterScanner, int c) {
+		char[][] newLineSequences = TextUtils.rsort(characterScanner.getLegalLineDelimiters());
+		for (char[] sequence : newLineSequences) {
+			if (c == sequence[0]) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
