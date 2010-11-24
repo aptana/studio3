@@ -387,7 +387,7 @@ public class HTMLParser implements IParser
 							for (CSSDeclarationNode declaration : declarations)
 							{
 								addOffset(declaration, tagSymbol.getStart() + start - (element.getName().length() + 1));
-								element.addChild(declaration);
+								element.addCSSStyleNode(declaration);
 							}
 						}
 					}

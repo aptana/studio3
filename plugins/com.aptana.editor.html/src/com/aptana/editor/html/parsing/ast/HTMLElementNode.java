@@ -34,8 +34,10 @@
  */
 package com.aptana.editor.html.parsing.ast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -54,6 +56,7 @@ public class HTMLElementNode extends HTMLNode
 	private INameNode fNameNode;
 	private INameNode fEndNode;
 	private Map<String, String> fAttributes;
+	private List<IParseNode> fCSSStyleNodes;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
@@ -84,6 +87,7 @@ public class HTMLElementNode extends HTMLNode
 		}
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, String>();
+		fCSSStyleNodes = new ArrayList<IParseNode>();
 	}
 
 	@Override
@@ -93,6 +97,11 @@ public class HTMLElementNode extends HTMLNode
 		fNameNode = new NameNode(fNameNode.getName(), range.getStartingOffset() + offset, range.getEndingOffset()
 				+ offset);
 		super.addOffset(offset);
+	}
+
+	public void addCSSStyleNode(IParseNode node)
+	{
+		fCSSStyleNodes.add(node);
 	}
 
 	public String getName()
@@ -152,13 +161,18 @@ public class HTMLElementNode extends HTMLNode
 		fEndNode = new NameNode(fNameNode.getName(), start, end);
 	}
 
+	public IParseNode[] getCSSStyleNodes()
+	{
+		return fCSSStyleNodes.toArray(new IParseNode[fCSSStyleNodes.size()]);
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (!super.equals(obj))
+		if (!super.equals(obj) || !(obj instanceof HTMLElementNode))
+		{
 			return false;
-		if (!(obj instanceof HTMLElementNode))
-			return false;
+		}
 
 		HTMLElementNode other = (HTMLElementNode) obj;
 		return getName().equals(other.getName()) && fAttributes.equals(other.fAttributes);
