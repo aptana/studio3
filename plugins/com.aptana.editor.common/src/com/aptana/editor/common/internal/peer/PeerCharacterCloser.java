@@ -278,8 +278,18 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
 	{
+		// FIXME This is looking into ruby/javascript/CSS source when we're trying to do HTML <> matches. How should we limit this? Search across all partitions that match the current one only?		
 		try
 		{
+			String partition = document.getContentType(offset);
+			ITypedRegion[] partitions = document.computePartitioning(0, document.getLength());
+			for (ITypedRegion part : partitions)
+			{
+				if (part.getType().equals(partition))
+				{
+					// TODO go through the stack
+				}
+			}
 			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
 			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for
 														// comment scope matching

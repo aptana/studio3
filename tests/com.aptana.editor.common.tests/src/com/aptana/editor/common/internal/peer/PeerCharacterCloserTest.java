@@ -307,6 +307,37 @@ public class PeerCharacterCloserTest extends TestCase
 
 		assertTrue(event.doit); // Don't pair, insert single character!
 	}
+	
+	public void testignoresRubyHashesForHTMLTagPairs()
+	{
+		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n";
+		setDocument(src);
+		viewer.setSelectedRange(src.length(), 0);
+		closer = new PeerCharacterCloser(viewer)
+		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if ((offset >= 0 && offset <= 3) || (offset >= 89 && offset <= 90))
+					return "text.html.ruby source.erb.embedded.html";
+				if ((offset >= 4 && offset <= 24) || (offset >= 33 && offset <= 44) || (offset == 88))
+					return "text.html.ruby source.ruby.rails.embedded.html";
+				if ((offset >= 25 && offset <= 32) || (offset >= 45 && offset <= 87))
+					return "text.html.ruby source.ruby.rails.embedded.html string.quoted.single.ruby";
+				return "text.html.ruby";
+			}
+		};
+		VerifyEvent event = sendEvent('<');
+		// Make sure we pair this!
+		assertFalse("Should have paired the character!", event.doit);
+		assertEquals("<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n<>", document.get());
+	}
 
 	protected IDocument setDocument(String src)
 	{
