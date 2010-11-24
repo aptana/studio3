@@ -46,6 +46,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -79,6 +81,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.actions.CloseResourceAction;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.progress.UIJob;
@@ -529,7 +532,19 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		@Override
 		public Image getImage(Object element)
 		{
-			return isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;
+			String nature = element.toString();
+			try {
+				ImageRegistry reg = UIEplPlugin.getDefault().getImageRegistry();
+				if (reg.get(nature) == null)
+				{
+					ImageDescriptor d = IDEWorkbenchPlugin.getDefault().getProjectImageRegistry().getNatureImage(element.toString());
+					reg.put(nature, d);
+				}
+				return reg.get(nature);
+			}
+			catch(Exception e) {
+				return isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;				
+			}
 		}
 
 		public Font getFont(Object element)
