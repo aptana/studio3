@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.js.contentassist.index;
 
-
 public interface JSIndexConstants
 {
 	// the content format version of the JS index files
@@ -46,7 +45,8 @@ public interface JSIndexConstants
 	// 0.15 - Write user agent list from UserAgentManager to index as well
 	// 0.16 - Change field order when writing properties and functions (search optimization)
 	// 0.17 - Modified static properties in DOM files, changing them to instance where appropriate.
-	public static final double INDEX_VERSION = 0.17;
+	// 0.18 - Window now inherits from Global
+	public static final double INDEX_VERSION = 0.18;
 
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$
@@ -68,7 +68,7 @@ public interface JSIndexConstants
 	static final String EXAMPLES = PREFIX + "examples"; //$NON-NLS-1$
 
 	static final String[] ALL_CATEGORIES = new String[] { //
-		TYPE, //
+	TYPE, //
 		FUNCTION, //
 		PROPERTY, //
 		DESCRIPTION, //
