@@ -35,6 +35,8 @@
 package com.aptana.editor.js.formatter;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
@@ -91,6 +93,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
 
+	private static Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
 	private String lineSeparator;
 
 	/**
@@ -174,7 +177,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				{
 					if (!input.equals(output))
 					{
-						if (equalsIgnoreWhitespaces(input, output))
+						if (equalContent(input, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
@@ -203,6 +206,52 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			FormatterPlugin.logError(e);
 		}
 		return null;
+	}
+
+	/**
+	 * @param input
+	 * @param output
+	 * @return
+	 */
+	private boolean equalContent(String input, String output)
+	{
+		// first, strip out all the comments from the input and the output.
+		// save those comments for later comparison.
+		StringBuilder inputBuffer = new StringBuilder(input.length());
+		StringBuilder outputBuffer = new StringBuilder(output.length());
+		StringBuilder inputComments = new StringBuilder();
+		StringBuilder outputComments = new StringBuilder();
+		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
+		Matcher outputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(output);
+		int inputOffset = 0;
+		int outputOffset = 0;
+		while (inputCommentsMatcher.find())
+		{
+			inputComments.append(inputCommentsMatcher.group());
+			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
+			inputOffset = inputCommentsMatcher.end() + 1;
+		}
+		inputBuffer.append(input.subSequence(inputOffset, input.length()));
+		while (outputCommentsMatcher.find())
+		{
+			outputComments.append(outputCommentsMatcher.group());
+			outputBuffer.append(output.subSequence(outputOffset, outputCommentsMatcher.start()));
+			outputOffset = outputCommentsMatcher.end() + 1;
+
+		}
+		outputBuffer.append(output.subSequence(outputOffset, output.length()));
+		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
+				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
+	}
+
+	/**
+	 * Remove any whitespace, '*' or '//' from a comment string
+	 * 
+	 * @param inputComment
+	 */
+	private String stripComment(String comment)
+	{
+		return comment.replaceAll("\\s|\\*|//", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/*

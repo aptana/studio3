@@ -45,6 +45,7 @@ import com.aptana.formatter.nodes.AbstractFormatterNodeBuilder;
 import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -156,23 +157,30 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		int previousCloseTagOffset = getPreviousCloseTagOffset(endOffset, document);
 
-		if (node.getChildCount() == 0 && (previousCloseTagOffset + 1) != endOffset)
+		if (node.getChildCount() == 0)
 		{
 
 			int textStartOffset = getBeginWithoutWhiteSpaces(previousCloseTagOffset + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endOffset - 1, document);
 
-			// Case where nodes have only contain white spaces
-			if (textStartOffset >= endOffset)
+			
+			if (textStartOffset >= textEndOffset)
 			{
-				textStartOffset = previousCloseTagOffset + 1;
-				textEndOffset = endOffset - 1;
+				if (textStartOffset == endOffset)
+				{
+					//Set offset to create a blank text node when there is nothing so we can use shouldConsumePreviousWhiteSpaces to remove new line
+					textEndOffset = textStartOffset - 1;
+				}
+				else
+				{
+					// Case where nodes have only contain white spaces
+					textStartOffset = previousCloseTagOffset + 1;
+					textEndOffset = endOffset - 1;
+				}
 			}
 
-			FormatterBlockWithBeginNode contentFormatterNode = new FormatterXMLContentNode(document, type);
-			contentFormatterNode.setBegin(createTextNode(document, textStartOffset, textEndOffset + 1));
-			push(contentFormatterNode);
-			checkedPop(contentFormatterNode, -1);
+			FormatterTextNode contentFormatterNode = new FormatterXMLContentNode(document, type, textStartOffset, textEndOffset + 1 );
+			formatterNode.addChild(contentFormatterNode);
 
 		}
 
