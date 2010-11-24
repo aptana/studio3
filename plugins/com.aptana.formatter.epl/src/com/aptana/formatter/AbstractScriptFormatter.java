@@ -359,18 +359,6 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		try
 		{
-			char onOffset = document.getChar(offset);
-			if (onOffset == '\r')
-			{
-				if (document.getChar(offset + 1) != '\n')
-				{
-					return 0;
-				}
-			}
-			else if (onOffset == '\n')
-			{
-				return 0;
-			}
 			int lineNumber = document.getLineOfOffset(offset + 1);
 			if (lineNumber > 0)
 			{
