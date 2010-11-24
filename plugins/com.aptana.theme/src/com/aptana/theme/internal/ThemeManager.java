@@ -57,6 +57,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
@@ -171,6 +172,26 @@ public class ThemeManager implements IThemeManager
 		{
 			ThemePlugin.logError(e);
 		}
+		
+		// Set the bg/fg/selection colors for compare editors
+		prefs = new InstanceScope().getNode("org.eclipse.compare"); //$NON-NLS-1$
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND, StringConverter.asString(theme.getSelectionAgainstBG()));
+		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme.getForeground()));
+
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			ThemePlugin.logError(e);
+		}
 
 		// Also set the standard eclipse editor props, like fg, bg, selection fg, bg
 		prefs = new InstanceScope().getNode("com.aptana.editor.common"); //$NON-NLS-1$
@@ -209,10 +230,7 @@ public class ThemeManager implements IThemeManager
 
 	private static String toString(RGB selection)
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append(selection.red).append(THEME_NAMES_DELIMETER).append(selection.green)
-				.append(THEME_NAMES_DELIMETER).append(selection.blue);
-		return builder.toString();
+		return StringConverter.asString(selection);
 	}
 
 	public Theme getTheme(String name)

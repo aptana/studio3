@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -81,9 +82,11 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
+import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.ProjectTemplate;
-import com.aptana.scripting.model.ProjectTemplate.Type;
+import com.aptana.scripting.model.ProjectTemplateElement;
+import com.aptana.scripting.model.ProjectTemplateElement.Type;
+import com.aptana.scripting.model.filters.IModelFilter;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
 {
@@ -121,8 +124,25 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		ProjectTemplate[] templates = BundleManager.getInstance().getProjectTemplatesByType(Type.WEB);
-		if (templates.length > 0)
+		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		{
+			public boolean include(AbstractElement element)
+			{
+				boolean result = false;
+				
+				if (element instanceof ProjectTemplateElement)
+				{
+					ProjectTemplateElement template = (ProjectTemplateElement) element;
+					Type type = template.getType();
+					
+					result = type == Type.WEB || type == Type.ALL;
+				}
+				
+				return result;
+			}
+		});
+
+		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
 		}
@@ -144,8 +164,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return true;
 	}
 
-	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-			throws CoreException
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException
 	{
 		configElement = config;
 	}
@@ -207,8 +226,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		boolean fromGit = false;
 		if (templatesPage != null)
 		{
-			ProjectTemplate template = templatesPage.getSelectedTemplate();
-			if (template != null && !template.getSourceLocation().endsWith(".zip")) //$NON-NLS-1$
+			ProjectTemplateElement template = templatesPage.getSelectedTemplate();
+			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
 			{
 				// assumes to be creating the project from a git URL
 				fromGit = true;
@@ -222,7 +241,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				doBasicCreateProject(newProjectHandle, description);
 				if (templatesPage != null)
 				{
-					ProjectTemplate template = templatesPage.getSelectedTemplate();
+					ProjectTemplateElement template = templatesPage.getSelectedTemplate();
 					if (template != null)
 					{
 						extractZip(template, newProjectHandle);
@@ -246,8 +265,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
-				CreateProjectOperation op = new CreateProjectOperation(description,
-						Messages.NewProjectWizard_CreateOp_Title);
+				CreateProjectOperation op = new CreateProjectOperation(description, Messages.NewProjectWizard_CreateOp_Title);
 				try
 				{
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
@@ -282,29 +300,29 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
 				{
 					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
-							Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
+						Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
 				}
 				else
 				{
-					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
-							Messages.NewProjectWizard_CreationProblem, cause));
+					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID, Messages.NewProjectWizard_CreationProblem,
+						cause));
 				}
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.BLOCK);
 			}
 			else
 			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
-						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0, NLS.bind(
+					Messages.NewProjectWizard_InternalError, t.getMessage()), t));
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
 		}
 	}
 
-	private void extractZip(ProjectTemplate template, IProject project)
+	private void extractZip(ProjectTemplateElement template, IProject project)
 	{
-		File zip_path = new File(template.getDirectory(), template.getSourceLocation());
+		File zip_path = new File(template.getDirectory(), template.getLocation());
 		if (zip_path.exists())
 		{
 			ZipFile zipFile = null;
@@ -350,7 +368,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(ProjectTemplate template, IProjectDescription projectDescription)
+	private void doCloneFromGit(ProjectTemplateElement template, IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
 		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
@@ -359,7 +377,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			path = path.append(projectDescription.getName());
 		}
-		Job job = new CloneJob(template.getSourceLocation(), path.toOSString(), true, true);
+		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
 		job.schedule();
 	}
 

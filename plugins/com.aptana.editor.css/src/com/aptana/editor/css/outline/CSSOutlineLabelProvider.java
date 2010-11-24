@@ -34,14 +34,14 @@
  */
 package com.aptana.editor.css.outline;
 
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 
-public class CSSOutlineLabelProvider extends LabelProvider
+public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
 {
 
 	private static final Image SELECTOR_ICON = Activator.getImage("icons/selector.png"); //$NON-NLS-1$

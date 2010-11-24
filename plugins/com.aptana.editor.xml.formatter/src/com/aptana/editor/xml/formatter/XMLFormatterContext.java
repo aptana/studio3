@@ -32,21 +32,56 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting.model;
+package com.aptana.editor.xml.formatter;
 
-public interface ElementChangeListener
+import com.aptana.core.util.StringUtil;
+import com.aptana.formatter.FormatterContext;
+
+/**
+ * An XML formatter context.
+ */
+public class XMLFormatterContext extends FormatterContext
 {
 	/**
-	 * elementAdded
-	 * 
-	 * @param element
+	 * @param indent
 	 */
-	void elementAdded(AbstractElement element);
+	public XMLFormatterContext(int indent)
+	{
+		super(indent);
+	}
 
 	/**
-	 * elementDeleted
+	 * Check if the char sequence starts with a '&lt!' sequence or a '&lt!--' sequence. If so, return the length of the
+	 * sequence; Otherwise, return 0.
 	 * 
-	 * @param element
+	 * @see com.aptana.formatter.IFormatterContext#getCommentStartLength(CharSequence, int)
 	 */
-	void elementDeleted(AbstractElement element);
+	public int getCommentStartLength(CharSequence chars, int offset)
+	{
+		int count = 0;
+		if (chars.length() > offset + 1)
+		{
+			if (chars.charAt(offset) == '<' && chars.charAt(offset + 1) == '!')
+			{
+				count = 2;
+			}
+			if (chars.length() > offset + 3)
+			{
+				if (chars.charAt(offset + 2) == '-' && chars.charAt(offset + 3) == '-')
+				{
+					count += 2;
+				}
+			}
+		}
+		return count;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
+	 */
+	public String getWrappingCommentPrefix(String text)
+	{
+		return StringUtil.EMPTY;
+	}
 }

@@ -353,6 +353,10 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
+		if (document.getLength() <= offset + 1)
+		{
+			return 0;
+		}
 		try
 		{
 			int lineNumber = document.getLineOfOffset(offset + 1);

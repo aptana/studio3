@@ -69,6 +69,11 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		return fViewerConfiguration;
 	}
+	
+	protected ISourceViewer getSourceViewer()
+	{
+		return fSourceViewer;
+	}
 
 	/**
 	 * Returns the first offset greater than <code>offset</code> and smaller than <code>end</code> whose character is

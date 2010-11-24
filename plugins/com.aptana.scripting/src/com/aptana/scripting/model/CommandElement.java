@@ -55,7 +55,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
 import com.aptana.scripting.ScriptingEngine;
@@ -139,9 +139,9 @@ public class CommandElement extends AbstractBundleElement
 
 	private static final InputType[] NO_TYPES = new InputType[0];
 	private static final String[] NO_KEY_BINDINGS = new String[0];
+	private static final String[] NO_TRIGGER_VALUES = new String[0];
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
-	private String[] _triggers;
 	private Map<Platform, InvokeUnion> _invokeUnionMap;
 	private Map<Platform, String[]> _keyBindings;
 	private InputType[] _inputTypes;
@@ -167,7 +167,7 @@ public class CommandElement extends AbstractBundleElement
 		this._inputTypes = NO_TYPES;
 		this._outputType = OutputType.UNDEFINED;
 		this._workingDirectoryType = WorkingDirectoryType.UNDEFINED;
-		this._runType = Activator.getDefaultRunType();
+		this._runType = ScriptingActivator.getDefaultRunType();
 	}
 
 	/**
@@ -482,15 +482,44 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._runType.getName();
 	}
-
+	
 	/**
-	 * getTrigger
+	 * Get the values associated with the specified trigger type
 	 * 
+	 * @param type
 	 * @return
 	 */
-	public String[] getTriggers()
+	public String[] getTriggerTypeValues(TriggerType type)
 	{
-		return this._triggers;
+		String[] result = NO_TRIGGER_VALUES;
+		
+		if (type != null && type != TriggerType.UNDEFINED)
+		{
+			String propertyName = type.getPropertyName();
+			Object value = this.get(propertyName);
+			
+			if (value instanceof String[])
+			{
+				result = (String[]) value;
+			}
+			else if (value instanceof Object[])
+			{
+				Object[] objects = (Object[]) value;
+				
+				result = new String[objects.length];
+				
+				for (int i = 0; i < objects.length; i++)	
+				{
+					result[i] = objects[i].toString();
+				}
+			}
+			else if (value != null)
+			{
+				result = new String[] { value.toString() };
+			}
+		}
+		
+		return result;
 	}
 
 	/**
@@ -704,7 +733,7 @@ public class CommandElement extends AbstractBundleElement
 		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
 
 		// output a comma-delimited list of triggers, if any are defined
-		String[] triggers = this.getTriggers();
+		String[] triggers = this.getTriggerTypeValues(TriggerType.PREFIX);
 
 		if (triggers != null && triggers.length > 0)
 		{
@@ -971,21 +1000,28 @@ public class CommandElement extends AbstractBundleElement
 	/**
 	 * setTrigger
 	 * 
-	 * @param trigger
+	 * @param type
 	 */
-	public void setTrigger(String trigger)
+	public void setTrigger(String type)
 	{
-		this._triggers = new String[] { trigger };
+		this.setTrigger(type, NO_TRIGGER_VALUES);
 	}
-
+	
 	/**
 	 * setTrigger
 	 * 
-	 * @param triggers
+	 * @param trigger
 	 */
-	public void setTrigger(String[] triggers)
+	public void setTrigger(String type, String[] values)
 	{
-		this._triggers = triggers;
+		TriggerType triggerType = TriggerType.get(type);
+		
+		if (triggerType != TriggerType.UNDEFINED && values != null && values.length > 0)
+		{
+			String propertyName = triggerType.getPropertyName();
+			
+			this.put(propertyName, values);
+		}
 	}
 
 	/**

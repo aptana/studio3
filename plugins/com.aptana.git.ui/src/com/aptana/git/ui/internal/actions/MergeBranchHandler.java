@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 
 import com.aptana.git.core.model.GitExecutable;
@@ -48,7 +47,7 @@ public class MergeBranchHandler extends AbstractGitHandler
 		{
 			QuickMenuDialog dialog = new QuickMenuDialog(getShell());
 			dialog.setInput(listOfMaps);
-			if (dialog.open() == Window.OK)
+			if (dialog.open() != -1)
 			{
 				MenuDialogItem item = listOfMaps.get(dialog.getReturnCode());
 				mergeBranch(repo, item.getText());

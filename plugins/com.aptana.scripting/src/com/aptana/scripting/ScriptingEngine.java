@@ -82,7 +82,7 @@ public class ScriptingEngine
 	 */
 	private ScriptingEngine()
 	{
-		this._runType = Activator.getDefaultRunType();
+		this._runType = ScriptingActivator.getDefaultRunType();
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class ScriptingEngine
 			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
 					new Object[] { e.getMessage() });
 
-			Activator.logError(message, e);
+			ScriptingActivator.logError(message, e);
 			ScriptLogger.logError(message);
 		}
 
@@ -150,7 +150,7 @@ public class ScriptingEngine
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, LOADPATH_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, LOADPATH_ID);
 
 				if (extensionPoint != null)
 				{
@@ -182,7 +182,7 @@ public class ScriptingEngine
 											Messages.ScriptingEngine_Unable_To_Convert_Load_Path, new Object[] {
 													declaringPluginID, url });
 
-									Activator.logError(message, null);
+									ScriptingActivator.logError(message, null);
 								}
 							}
 						}
@@ -211,7 +211,7 @@ public class ScriptingEngine
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, FRAMEWORK_FILE_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, FRAMEWORK_FILE_ID);
 
 				if (extensionPoint != null)
 				{

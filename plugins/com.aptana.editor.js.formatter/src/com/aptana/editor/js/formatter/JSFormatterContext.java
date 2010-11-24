@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.js.formatter;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
@@ -68,7 +69,6 @@ public class JSFormatterContext extends FormatterContext
 	}
 
 	/**
-	 * TODO
 	 * Check if the char sequence starts with a /* sequence, a /** or a // sequence. If so, return the length of the
 	 * sequence; Otherwise, return 0.
 	 * 
@@ -76,16 +76,56 @@ public class JSFormatterContext extends FormatterContext
 	 */
 	public int getCommentStartLength(CharSequence chars, int offset)
 	{
-		// TODO - Implement this for JS once we have the comments support in.
-		return 2;
+		int sequenceLength = chars.length();
+		if (sequenceLength > offset)
+		{
+			char c = chars.charAt(offset);
+			if (c == '*')
+			{
+				return 1;
+			}
+			if (c == '/')
+			{
+				if (sequenceLength > offset + 1)
+				{
+					char secondChar = chars.charAt(offset + 1);
+					if (secondChar == '/')
+					{
+						// we have a single line comment
+						return 2;
+					}
+					else if (secondChar == '*')
+					{
+						// we have a multi-line comment, but we still need to determine its nature
+						if (sequenceLength > offset + 2 && chars.charAt(offset + 2) == '*')
+						{
+							return 3;
+						}
+						return 2;
+					}
+				}
+			}
+		}
+		return 0;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
 	 */
-	public String getWrappingCommentPrefix()
+	public String getWrappingCommentPrefix(String text)
 	{
-		return " * "; //$NON-NLS-1$
+		if (text != null)
+		{
+			if (text.startsWith("*") || text.startsWith("/*")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return " * "; //$NON-NLS-1$
+			}
+			if (text.startsWith("//")) //$NON-NLS-1$
+			{
+				return "// "; //$NON-NLS-1$
+			}
+		}
+		return StringUtil.EMPTY;
 	}
 }

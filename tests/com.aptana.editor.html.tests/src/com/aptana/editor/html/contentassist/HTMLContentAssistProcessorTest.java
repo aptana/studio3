@@ -252,6 +252,21 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals("<abbr></abbr>", fDocument.get());
 	}
 
+	public void testABBRCaseSensitiveProposal()
+	{
+		int offset = 2;
+		IDocument fDocument = createDocument("<A>");
+		char trigger = '\t';
+		ITextViewer viewer = createTextViewer(fDocument);
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
+		ICompletionProposal linkProposal = findProposal("abbr", proposals);
+
+		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
+		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals("<abbr></abbr>", fDocument.get());
+	}
+	
 	public void testElementWhichIsClosedProposal()
 	{
 		int offset = 1;

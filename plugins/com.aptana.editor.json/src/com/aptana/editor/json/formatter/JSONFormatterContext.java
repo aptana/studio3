@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.json.formatter;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.FormatterContext;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
@@ -73,10 +74,10 @@ public class JSONFormatterContext extends FormatterContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
 	 */
-	public String getWrappingCommentPrefix()
+	public String getWrappingCommentPrefix(String text)
 	{
-		return "";
+		return StringUtil.EMPTY;
 	}
 }

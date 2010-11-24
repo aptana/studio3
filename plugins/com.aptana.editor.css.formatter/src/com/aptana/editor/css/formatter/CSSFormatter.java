@@ -171,9 +171,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -250,6 +250,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
 				getString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 		document.setInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS));
+		document.setInt(CSSFormatterConstants.LINES_AFTER_DECLARATION,
+				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;
