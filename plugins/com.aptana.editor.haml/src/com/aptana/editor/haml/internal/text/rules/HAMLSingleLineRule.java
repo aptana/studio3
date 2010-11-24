@@ -53,7 +53,7 @@ public class HAMLSingleLineRule extends EndOfLineRule {
 	}
 
 	public HAMLSingleLineRule(IToken token) {
-		super(" ", token);
+		super(" ", token); //$NON-NLS-1$
 		fNoStartSequence = true;
 	}
 

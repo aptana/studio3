@@ -73,7 +73,7 @@ import com.aptana.editor.ruby.RubySourceConfiguration;
  */
 public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration {
 
-	public final static String PREFIX = "__haml_"; //$NON-NLS-1$
+	private final static String PREFIX = "__haml_"; //$NON-NLS-1$
 	public final static String DEFAULT = PREFIX + IDocument.DEFAULT_CONTENT_TYPE;
 	public final static String DOCTYPE = PREFIX + "doctype"; //$NON-NLS-1$
 	public final static String ELEMENT = PREFIX + "element"; //$NON-NLS-1$
@@ -132,19 +132,17 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	static {
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
-		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType("text.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HAML_COMMENT), new QualifiedContentType("comment.line.ruby.ruby")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType("comment.line.slash.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType("meta.prolog.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(ELEMENT), new QualifiedContentType("meta.tag.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(HTML_ATTRIBUTES), new QualifiedContentType("meta.section.attributes.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(RUBY_ATTRIBUTES), new QualifiedContentType("meta.section.attributes.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(RUBY_EVALUATION), new QualifiedContentType("meta.line.ruby.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(OBJECT), new QualifiedContentType("meta.section.object.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(INTERPOLATION), new QualifiedContentType("meta.section.other.haml")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType("text.haml", "meta.line.ruby.haml", "source.ruby.embedded.haml")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		// TODO:
-		// - INTERPOLATION
+		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(IHAMLConstants.TEXT_SCOPE));
+		c.addTranslation(new QualifiedContentType(HAML_COMMENT), new QualifiedContentType(IRubyConstants.LINE_COMMENT_SCOPE));
+		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType(IHAMLConstants.HTML_COMMENT_SCOPE));
+		c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType(IHAMLConstants.DOCTYPE_SCOPE));
+		c.addTranslation(new QualifiedContentType(ELEMENT), new QualifiedContentType(IHAMLConstants.TAG_SCOPE));
+		c.addTranslation(new QualifiedContentType(HTML_ATTRIBUTES), new QualifiedContentType(IHAMLConstants.RUBY_ATTRIBUTES_SCOPE));
+		c.addTranslation(new QualifiedContentType(RUBY_ATTRIBUTES), new QualifiedContentType(IHAMLConstants.RUBY_ATTRIBUTES_SCOPE)); 
+		c.addTranslation(new QualifiedContentType(RUBY_EVALUATION), new QualifiedContentType(IHAMLConstants.RUBY_EVAL_SCOPE)); 
+		c.addTranslation(new QualifiedContentType(OBJECT), new QualifiedContentType(IHAMLConstants.OBJECT_SCOPE)); 
+		c.addTranslation(new QualifiedContentType(INTERPOLATION), new QualifiedContentType(IHAMLConstants.INTERPOLATION_SCOPE)); 
+		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML, IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(IHAMLConstants.TEXT_SCOPE, IHAMLConstants.RUBY_EVAL_SCOPE, IHAMLConstants.EMBEDDED_RUBY_SCOPE)); 
 	}
 
 	public static HAMLSourceConfiguration getDefault() {
@@ -270,7 +268,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 				new SingleCharacterRule('!', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
 				new HAMLEscapeRule(getToken("meta.escape.haml")), //$NON-NLS-1$
 			});
-			fTextScanner.setDefaultReturnToken(getToken("text.haml")); //$NON-NLS-1$
+			fTextScanner.setDefaultReturnToken(getToken(IHAMLConstants.TEXT_SCOPE)); 
 		}
 		return fTextScanner;
 	}
@@ -303,8 +301,9 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 					// TODO: add word rules here for:
 					// - variable.other.readwrite.instance.ruby
 					// - constant.other.symbol.ruby
+					// - comma
 			});
-			fObjectScanner.setDefaultReturnToken(getToken("meta.section.object.haml")); //$NON-NLS-1$
+			fObjectScanner.setDefaultReturnToken(getToken(IHAMLConstants.OBJECT_SCOPE)); 
 		}
 		return fObjectScanner;
 	}
@@ -318,10 +317,10 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 					// TODO: add word rules here for:
 					// - single quoted string
 					// - double quoted string
-					// - a word
+					// - an HTML attribute name
 					// - equal sign
 			});
-			fHTMLAttributesScanner.setDefaultReturnToken(getToken("meta.section.object.haml")); //$NON-NLS-1$
+			fHTMLAttributesScanner.setDefaultReturnToken(getToken(IHAMLConstants.OBJECT_SCOPE)); 
 		}
 		return fHTMLAttributesScanner;
 	}
@@ -332,7 +331,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			fCommentScanner.setRules(new IRule[] {
 					new SingleCharacterRule('/', getToken("punctuation.section.comment.haml")) //$NON-NLS-1$
 			});
-			fCommentScanner.setDefaultReturnToken(getToken("comment.line.slash.haml")); //$NON-NLS-1$
+			fCommentScanner.setDefaultReturnToken(getToken(IHAMLConstants.HTML_COMMENT_SCOPE)); 
 		}
 		return fCommentScanner;
 	}
@@ -341,9 +340,9 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fHAMLCommentScanner == null) {
 			fHAMLCommentScanner = new RuleBasedScanner();
 			fHAMLCommentScanner.setRules(new IRule[] {
-					new MultiCharacterRule("-#", getToken("comment.line.number-sign.ruby")) //$NON-NLS-1$ //$NON-NLS-2$
+					new MultiCharacterRule("-#", getToken(IRubyConstants.LINE_COMMENT_SCOPE)) //$NON-NLS-1$ //$NON-NLS-2$
 			});
-			fHAMLCommentScanner.setDefaultReturnToken(getToken("meta.line.ruby.haml")); //$NON-NLS-1$
+			fHAMLCommentScanner.setDefaultReturnToken(getToken(IHAMLConstants.RUBY_EVAL_SCOPE)); 
 		}
 		return fHAMLCommentScanner;
 	}
@@ -354,7 +353,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			fDocTypeScanner.setRules(new IRule[] {
 					new SingleCharacterRule('!', getToken("punctuation.definition.prolog.haml")) //$NON-NLS-1$
 			});
-			fDocTypeScanner.setDefaultReturnToken(getToken("meta.prolog.haml")); //$NON-NLS-1$
+			fDocTypeScanner.setDefaultReturnToken(getToken(IHAMLConstants.DOCTYPE_SCOPE)); 
 		}
 		return fDocTypeScanner;
 	}

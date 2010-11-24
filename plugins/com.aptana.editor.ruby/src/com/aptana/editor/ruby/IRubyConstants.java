@@ -43,4 +43,8 @@ public interface IRubyConstants {
 
 	public String CONTENT_TYPE_RUBY = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
 	public String CONTENT_TYPE_RUBY_AMBIGUOUS = "com.aptana.contenttype.ruby.ambiguous"; //$NON-NLS-1$
+	public String SINGLE_QUOTED_STRING_SCOPE = "string.quoted.single.ruby";
+	public String DOUBLE_QUOTED_STRING_SCOPE = "string.quoted.double.ruby";
+	public String LINE_COMMENT_SCOPE = "comment.line.number-sign.ruby";
+	public String BLOCK_COMMENT_SCOPE = "comment.block.documentation.ruby";
 }

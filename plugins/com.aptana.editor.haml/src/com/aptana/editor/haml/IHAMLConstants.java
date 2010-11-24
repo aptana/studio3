@@ -42,4 +42,15 @@ package com.aptana.editor.haml;
 public interface IHAMLConstants {
 
 	public String CONTENT_TYPE_HAML = "com.aptana.contenttype.haml"; //$NON-NLS-1$
+	
+	public String RUBY_ATTRIBUTES_SCOPE = "meta.section.attributes.haml"; //$NON-NLS-1$
+	public String DOCTYPE_SCOPE = "meta.prolog.haml"; //$NON-NLS-1$
+	public String TAG_SCOPE = "meta.tag.haml"; //$NON-NLS-1$
+	public String TEXT_SCOPE = "text.haml"; //$NON-NLS-1$
+	public String RUBY_EVAL_SCOPE = "meta.line.ruby.haml"; //$NON-NLS-1$
+	public String HTML_COMMENT_SCOPE = "comment.line.slash.haml"; //$NON-NLS-1$
+	public String INTERPOLATION_SCOPE = "meta.section.other.haml"; //$NON-NLS-1$
+	public String EMBEDDED_RUBY_SCOPE = "source.ruby.embedded.haml"; //$NON-NLS-1$
+	public String OBJECT_SCOPE = "meta.section.object.haml"; //$NON-NLS-1$
+
 }

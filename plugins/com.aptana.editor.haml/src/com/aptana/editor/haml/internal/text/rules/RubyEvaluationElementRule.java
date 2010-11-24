@@ -54,13 +54,13 @@ public class RubyEvaluationElementRule implements IPredicateRule {
 	public RubyEvaluationElementRule(IToken token) {
 		successToken = token;
 		wordRule = new WordRule(new RubyEvaluationElementWordDetector(), Token.UNDEFINED);
-		wordRule.addWord("-", token);
-		wordRule.addWord("~", token);
-		wordRule.addWord("=", token);
-		wordRule.addWord("&=", token);
-		wordRule.addWord("&==", token);
-		wordRule.addWord("!=", token);
-		wordRule.addWord("!==", token);
+		wordRule.addWord("-", token); //$NON-NLS-1$
+		wordRule.addWord("~", token); //$NON-NLS-1$
+		wordRule.addWord("=", token); //$NON-NLS-1$
+		wordRule.addWord("&=", token); //$NON-NLS-1$
+		wordRule.addWord("&==", token); //$NON-NLS-1$
+		wordRule.addWord("!=", token); //$NON-NLS-1$
+		wordRule.addWord("!==", token); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
