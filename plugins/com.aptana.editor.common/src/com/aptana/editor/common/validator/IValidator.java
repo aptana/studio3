@@ -39,5 +39,15 @@ import java.net.URI;
 public interface IValidator
 {
 
-	public void parseForErrors(String source, URI path, IValidationManager manager);
+	/**
+	 * Parses the source for errors and warnings and add them to the validation manager.
+	 * 
+	 * @param source
+	 *            the source text
+	 * @param path
+	 *            the source path
+	 * @param manager
+	 *            the validation manager
+	 */
+	public void parse(String source, URI path, IValidationManager manager);
 }

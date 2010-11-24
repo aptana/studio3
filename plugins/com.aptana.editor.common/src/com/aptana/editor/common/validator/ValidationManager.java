@@ -74,7 +74,7 @@ public class ValidationManager implements IValidationManager
 		if (validatorRefs.length > 0)
 		{
 			IValidator validator = validatorRefs[0].getValidator();
-			validator.parseForErrors(source, path, this);
+			validator.parse(source, path, this);
 		}
 	}
 

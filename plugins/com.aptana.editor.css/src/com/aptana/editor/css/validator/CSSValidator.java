@@ -92,7 +92,7 @@ public class CSSValidator implements IValidator
 		loadAptanaCSSProfile();
 	}
 
-	public void parseForErrors(String source, URI path, IValidationManager manager)
+	public void parse(String source, URI path, IValidationManager manager)
 	{
 		String report = getReport(source, path);
 		processErrorsInReport(report, path, manager);
