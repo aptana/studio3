@@ -111,5 +111,7 @@ public interface ISourceElementRequestor
 
 	public void acceptYield(String name);
 
-	public void acceptBlock(int startOffset, int endOffset);
+	public void enterBlock(int startOffset, int endOffset);
+
+	public void exitBlock(int endOffset);
 }
