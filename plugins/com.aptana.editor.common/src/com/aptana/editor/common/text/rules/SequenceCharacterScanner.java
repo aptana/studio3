@@ -99,7 +99,7 @@ public class SequenceCharacterScanner implements ICharacterScanner {
 			for (char[] sequence : switchSequences) {
 				if (c == sequence[0] && TextUtils.sequenceDetected(characterScanner, sequence, ignoreCase)) {
 					characterScanner.unread();
-					if (sequenceBypassHandler != null && !sequenceBypassHandler.bypassSequence(characterScanner, sequence)) {
+					if (sequenceBypassHandler == null || !sequenceBypassHandler.bypassSequence(characterScanner, sequence)) {
 						found = true;
 						eof = true;
 						return ICharacterScanner.EOF;

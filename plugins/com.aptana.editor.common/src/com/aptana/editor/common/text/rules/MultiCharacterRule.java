@@ -40,39 +40,43 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
 /**
- * Optimized rule to match a single character. Faster than a RegexpRule for one char.
+ * Optimized rule to match a a sequence of characters. Faster than a RegexpRule for fixed sequence.
  * 
- * @author Chris Williams
+ * @author Max Stepanov
  */
-public class SingleCharacterRule implements IPredicateRule
-{
+public class MultiCharacterRule implements IPredicateRule {
 
 	private IToken successToken;
-	private char c;
+	private char[] sequence;
 
-	public SingleCharacterRule(char c, IToken successToken)
-	{
-		this.c = c;
+	public MultiCharacterRule(String sequence, IToken successToken) {
+		this(sequence.toCharArray(), successToken);
+	}
+
+	public MultiCharacterRule(char[] sequence, IToken successToken) {
+		this.sequence = sequence;
 		this.successToken = successToken;
 	}
 
-	public IToken evaluate(ICharacterScanner scanner, boolean resume)
-	{
-		if (c == (char) scanner.read())
-		{
-			return getSuccessToken();
+	public IToken evaluate(ICharacterScanner scanner, boolean resume) {
+		int index = 0;
+		for (char c : sequence) {
+			++index;
+			if (c != scanner.read()) {
+				for (int j = index; j > 0; --j) {
+					scanner.unread();
+				}
+				return Token.UNDEFINED;
+			}
 		}
-		scanner.unread();
-		return Token.UNDEFINED;
+		return getSuccessToken();
 	}
 
-	public IToken getSuccessToken()
-	{
+	public IToken getSuccessToken() {
 		return successToken;
 	}
 
-	public IToken evaluate(ICharacterScanner scanner)
-	{
+	public IToken evaluate(ICharacterScanner scanner) {
 		return evaluate(scanner, false);
 	}
 }

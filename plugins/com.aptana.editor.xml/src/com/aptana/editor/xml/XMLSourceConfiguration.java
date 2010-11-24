@@ -75,7 +75,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IXMLConstants.CONTENT_TYPE_XML } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
+	private final IPredicateRule[] partitioningRules = new IPredicateRule[] { //
 		new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<!--", "-->", new Token(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
