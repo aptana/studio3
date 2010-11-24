@@ -62,6 +62,6 @@ public class JSFormatterModifyDialog extends FormatterModifyDialog
 		addTabPage(Messages.JSFormatterModifyDialog_intentationTabName, new JSFormatterIndentationTabPage(this));
 		addTabPage(Messages.JSFormatterModifyDialog_blankLinesTabName, new JSFormatterBlankLinesPage(this));
 		addTabPage(Messages.JSFormatterModifyDialog_bracesTabName, new JSFormatterBracesPage(this));
-		// addTabPage(Messages.JSFormatterModifyDialog_commentsTabName, new JSFormatterCommentsPage(this));
+		 addTabPage(Messages.JSFormatterModifyDialog_commentsTabName, new JSFormatterCommentsPage(this));
 	}
 }
