@@ -2153,7 +2153,7 @@
                 <description>File size (in bytes) of the document.</description>
             </property>
             
-            <property name="forms" type="Array" access="read" visibility="basic">
+            <property name="forms" type="Form[]" access="read" visibility="basic">
                 <availability>
                     <specification name="HTML DOM Level 1"/>
                 </availability>
