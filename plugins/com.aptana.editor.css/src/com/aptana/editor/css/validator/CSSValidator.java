@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.css.css.StyleReport;
 import org.w3c.css.css.StyleReportFactory;
 import org.w3c.css.css.StyleSheet;
@@ -267,6 +268,7 @@ public class CSSValidator implements IValidator
 				}
 				message = MessageFormat.format("{0} : {1} for {2}", errorsubtype, skippedstring, property); //$NON-NLS-1$
 			}
+			message = StringEscapeUtils.unescapeHtml(message);
 
 			// there is no info on the line offset or the length of the errored text
 			manager.addError(message, lineNumber, 0, 0, sourcePath);

@@ -10,6 +10,7 @@ Bundle-ClassPath: .,
  css-validator.jar,
  velocity.jar
 Export-Package: com.eaio.uuid,
+ org.apache.commons.lang,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
  org.apache.derby.catalog.types,
