@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.workbench.hyperlink.StacktraceHyperlinkDetector">
+      </detector>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:com.aptana.scripting.menu?after=additions">
+         <dynamic
+               class="com.aptana.workbench.commands.EditorCommandsMenuContributor"
+               id="com.aptana.editor.common.dynamic">
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:com.aptana.scripting.popup.menu?after=commands">
+         <dynamic
+               class="com.aptana.workbench.commands.EditorCommandsMenuContributor"
+               id="com.aptana.editor.common.dynamic">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <instanceof
+                        value="org.eclipse.ui.texteditor.ITextEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="com.aptana.editor.common.CommonTextEditorActionContributor"
+            class="com.aptana.workbench.commands.EditorCommandsMenuContributor$Factory">
+         <adapter
+               type="com.aptana.editor.common.IEditorCommandsMenuContributor">
+         </adapter>
+      </factory>
+   </extension>
+
+</plugin>

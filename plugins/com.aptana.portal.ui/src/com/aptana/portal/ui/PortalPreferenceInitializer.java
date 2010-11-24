@@ -48,6 +48,7 @@ public class PortalPreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IPreferenceStore preferenceStore = PortalUIPlugin.getDefault().getPreferenceStore();
-		preferenceStore.setDefault(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, true);
+		// TODO - Change this to true once the Toolbox server-side is ready!
+		preferenceStore.setDefault(IPortalPreferences.SHOULD_OPEN_DEV_TOOLBOX, false);
 	}
 }

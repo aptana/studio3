@@ -67,7 +67,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
-
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -89,7 +88,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void setDocument(IDocument document)
 	{
-		folder = new RubyRegexpFolder(document);
+		folder = new RubyRegexpFolder(fEditor, document);
 		fEditor.getFileService().setDocument(document);
 	}
 

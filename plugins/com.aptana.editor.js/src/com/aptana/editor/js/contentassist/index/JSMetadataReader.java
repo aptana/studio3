@@ -49,6 +49,7 @@ import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.ExceptionElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -64,10 +65,15 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
  */
 public class JSMetadataReader extends MetadataReader
 {
+	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
+	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
+	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
+
 	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
 	private static final Pattern TYPE_PATTERN = Pattern
-			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
+		.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
 	// state flags
 	private boolean _parsingCtors;
@@ -162,32 +168,63 @@ public class JSMetadataReader extends MetadataReader
 	{
 		String typeName = attributes.getValue("type"); //$NON-NLS-1$
 
-		if (this.isValidIdentifier(typeName))
+		if (this.isValidTypeIdentifier(typeName))
 		{
-			String className = "Class<" + typeName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+			String[] parts = DOT_PATTERN.split(typeName);
+			String accumulatedTypeName = parts[0];
+			TypeElement type = this.getType(accumulatedTypeName);
+			TypeElement clas = this.getType(getTypeClass(accumulatedTypeName));
 
-			// create a new class documentation object
-			TypeElement type = this.getType(typeName);
-			TypeElement clas = this.getType(className);
+			for (int i = 1; i < parts.length; i++)
+			{
+				// grab name part
+				String propertyName = parts[i];
+
+				// update accumulated type name
+				accumulatedTypeName += "." + propertyName; //$NON-NLS-1$
+
+				// try to grab the property off of the current type
+				PropertyElement property = type.getProperty(propertyName);
+
+				// create property, if we didn't have one
+				if (property == null)
+				{
+					property = new PropertyElement();
+
+					property.setName(propertyName);
+					property.setIsClassProperty(true);
+					property.addType(accumulatedTypeName);
+
+					type.addProperty(property);
+					// clas.addProperty(property);
+				}
+
+				// make sure to save last type we visited
+				this._typesByName.put(type.getName(), type);
+				this._typesByName.put(clas.getName(), clas);
+
+				// create new types
+				type = this.getType(accumulatedTypeName);
+				clas = this.getType(getTypeClass(accumulatedTypeName));
+			}
 
 			// set optional superclass
 			String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
 
 			if (superclass != null && superclass.length() > 0)
 			{
-				String[] types = superclass.split("\\s+"); //$NON-NLS-1$
+				String[] types = WHITESPACE_PATTERN.split(superclass);
 
 				for (String superType : types)
 				{
 					if (this.isValidTypeIdentifier(superType))
 					{
 						type.addParentType(superType);
-						clas.addParentType("Class<" + superType + ">"); //$NON-NLS-1$ //$NON-NLS-2$
+						clas.addParentType(getTypeClass(superType)); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 					else
 					{
-						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Supertype_Name,
-								superType, typeName);
+						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Supertype_Name, superType, typeName);
 
 						Activator.logError(message, null);
 					}
@@ -341,8 +378,10 @@ public class JSMetadataReader extends MetadataReader
 
 			// grab and set properties
 			parameter.setName(parameterName);
+			
+			String types = attributes.getValue("type"); //$NON-NLS-1$
 
-			for (String type : attributes.getValue("type").split("\\s*[,|]\\s*")) //$NON-NLS-1$ //$NON-NLS-2$
+			for (String type : PARAMETER_TYPE_DELIMITER_PATTERN.split(types))
 			{
 				if (this.isValidTypeIdentifier(type))
 				{
@@ -350,8 +389,7 @@ public class JSMetadataReader extends MetadataReader
 				}
 				else
 				{
-					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, type,
-							parameterName);
+					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, type, parameterName);
 
 					Activator.logError(message, null);
 				}
@@ -401,23 +439,17 @@ public class JSMetadataReader extends MetadataReader
 			}
 
 			// set types
-			String type = attributes.getValue("type"); //$NON-NLS-1$
-			String[] types = type.split("\\s*\\|\\s*"); //$NON-NLS-1$
+			String types = attributes.getValue("type"); //$NON-NLS-1$
 
-			for (String propertyType : types)
+			for (String propertyType : PROPERTY_TYPE_DELIMITER_PATTERN.split(types))
 			{
 				if (this.isValidTypeIdentifier(propertyType))
 				{
-					ReturnTypeElement returnType = new ReturnTypeElement();
-
-					returnType.setType(propertyType);
-
-					property.addType(returnType);
+					property.addType(propertyType);
 				}
 				else
 				{
-					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type,
-							propertyType, propertyName);
+					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName);
 
 					Activator.logError(message, null);
 				}
@@ -867,8 +899,7 @@ public class JSMetadataReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(Activator.getDefault().getBundle(),
-					Path.fromPortableString(JS_METADATA_SCHEMA), false);
+			return FileLocator.openStream(Activator.getDefault().getBundle(), Path.fromPortableString(JS_METADATA_SCHEMA), false);
 		}
 		catch (IOException e)
 		{
@@ -896,6 +927,11 @@ public class JSMetadataReader extends MetadataReader
 		}
 
 		return result;
+	}
+
+	private String getTypeClass(String accumulatedTypeName)
+	{
+		return JSTypeConstants.GENERIC_CLASS_OPEN + accumulatedTypeName + JSTypeConstants.GENERIC_CLOSE;
 	}
 
 	/**

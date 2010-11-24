@@ -234,7 +234,7 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 
 	protected String getScopeAtOffset(IDocument d, int offset) throws BadLocationException
 	{
-		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d, offset);
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(getSourceViewer(), offset);
 	}
 
 	protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
@@ -266,9 +266,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		for (int i = lineNumber - 1; i >= 0; i--)
 		{
 			IRegion region = d.getLineInformation(i);
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d,
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(getSourceViewer(),
 					region.getOffset());
-			String endScope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(d,
+			String endScope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(getSourceViewer(),
 					region.getOffset() + region.getLength());
 			RubyRegexp increaseIndentRegexp = getIncreaseIndentRegexp(scope);
 			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(endScope);

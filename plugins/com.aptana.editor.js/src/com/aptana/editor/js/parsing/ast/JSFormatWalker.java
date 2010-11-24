@@ -36,8 +36,8 @@ package com.aptana.editor.js.parsing.ast;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.parsing.ast.IParseNode;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class JSFormatWalker extends JSTreeWalker
 {

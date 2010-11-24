@@ -65,7 +65,8 @@ public class CSSFormatterFactory extends AbstractScriptFormatterFactory
 			CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, CSSFormatterConstants.FORMATTER_TAB_CHAR,
 			CSSFormatterConstants.FORMATTER_TAB_SIZE, CSSFormatterConstants.WRAP_COMMENTS,
 			CSSFormatterConstants.WRAP_COMMENTS_LENGTH, CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
-			CSSFormatterConstants.LINES_AFTER_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES };
+			CSSFormatterConstants.LINES_AFTER_ELEMENTS, CSSFormatterConstants.PRESERVED_LINES,
+			CSSFormatterConstants.LINES_AFTER_DECLARATION };
 
 	public PreferenceKey[] getPreferenceKeys()
 	{

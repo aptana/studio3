@@ -92,7 +92,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
@@ -213,7 +213,7 @@ public class KeybindingsManager implements LoadCycleListener
 	{
 		public void contextManagerChanged(ContextManagerEvent contextManagerEvent)
 		{
-			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
+			setEnabled(contextManagerEvent.getContextManager().getActiveContextIds().contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
 		}
 	};
 
@@ -350,7 +350,7 @@ public class KeybindingsManager implements LoadCycleListener
 				// Set the initial enabled state of KeybindingsManager
 				IContextService contextService = (IContextService) workbench.getService(IContextService.class);
 				contextService.addContextManagerListener(contextManagerListener);
-				setEnabled(contextService.getActiveContextIds().contains(Activator.SCRIPTING_CONTEXT_ID));
+				setEnabled(contextService.getActiveContextIds().contains(ScriptingActivator.SCRIPTING_CONTEXT_ID));
 
 				return Status.OK_STATUS;
 			}
@@ -429,7 +429,7 @@ public class KeybindingsManager implements LoadCycleListener
 		};
 
 		// Get all commands with bindings
-		CommandElement[] commands = bundleManager.getCommands(filter);
+		List<CommandElement> commands = bundleManager.getExecutableCommands(filter);
 		for (CommandElement commandElement : commands)
 		{
 			// Get key sequences
@@ -715,7 +715,7 @@ public class KeybindingsManager implements LoadCycleListener
 						}
 						catch (NotDefinedException nde)
 						{
-							Activator.logError(nde.getMessage(), nde);
+							ScriptingActivator.logError(nde.getMessage(), nde);
 						}
 					}
 				}
@@ -754,7 +754,7 @@ public class KeybindingsManager implements LoadCycleListener
 							}
 							catch (CommandException e)
 							{
-								Activator.logError(e.getMessage(), e);
+								ScriptingActivator.logError(e.getMessage(), e);
 							}
 						}
 					}
@@ -794,7 +794,7 @@ public class KeybindingsManager implements LoadCycleListener
 									}
 									catch (CommandException ex)
 									{
-										Activator.logError(ex.getMessage(), ex);
+										ScriptingActivator.logError(ex.getMessage(), ex);
 									}
 								}
 							}

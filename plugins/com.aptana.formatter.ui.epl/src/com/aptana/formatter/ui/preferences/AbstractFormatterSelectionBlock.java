@@ -481,7 +481,10 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 
 		// Previews area
 		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
-		previewPane.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData previewGridData = new GridData(GridData.FILL_BOTH);
+		previewGridData.heightHint = 300;
+		previewGridData.widthHint = 450;
+		previewPane.setLayoutData(previewGridData);
 		previewStackLayout = new StackLayout();
 		previewPane.setLayout(previewStackLayout);
 

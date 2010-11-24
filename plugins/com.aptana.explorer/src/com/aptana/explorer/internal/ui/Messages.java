@@ -42,6 +42,10 @@ public class Messages extends NLS
 
 	public static String FilteringProjectView_LBL_FilteringFor;
 
+	public static String FilteringProjectView_SearchByFilenameLabel;
+
+	public static String FilteringProjectView_SearchContentLabel;
+
 	public static String GitProjectView_BranchDirtyTooltipMessage;
 	public static String GitProjectView_ChangedFilesFilterTooltip;
 	public static String GitProjectView_createNewBranchOption;

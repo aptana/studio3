@@ -34,7 +34,8 @@
  */
 package com.aptana.preview;
 
-import org.eclipse.ui.IEditorInput;
+import java.net.URI;
+
 import org.eclipse.ui.IEditorPart;
 
 public interface IEditorPreviewDelegate
@@ -51,11 +52,11 @@ public interface IEditorPreviewDelegate
 	public void dispose();
 	
 	/**
-	 * Checks if a change in another editor input should trigger the target editor to update its preview content.
+	 * Checks if a content change from an url should trigger the target editor to update its preview content.
 	 * 
-	 * @param editorInput
-	 *            the particular editor input that has changed
+	 * @param uri
+	 *            the uri which content has changed
 	 * @return true if this editor should update its preview, false otherwise
 	 */
-	public boolean isEditorInputLinked(IEditorInput editorInput);
+	public boolean isLinked(URI uri);
 }

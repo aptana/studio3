@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="processConfigurations" name="Process Configurations" schema="schema/processConfigurations.exsd"/>
+   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
@@ -163,11 +164,12 @@
       </menuContribution>
    </extension>
    <extension
-         point="com.aptana.org.eclipse.tm.terminal.terminalHyperlinkDetectors">
+         point="com.aptana.terminal.terminalHyperlinkDetectors">
       <detector
-            class="com.aptana.terminal.internal.URLHyperlinkDetector">
+            class="com.aptana.terminal.internal.hyperlink.URLHyperlinkDetector">
       </detector>
    </extension>
+
    <extension
          point="com.aptana.scripting.frameworkFiles">
       <file

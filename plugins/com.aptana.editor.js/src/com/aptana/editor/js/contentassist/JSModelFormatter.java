@@ -221,7 +221,7 @@ public class JSModelFormatter
 		}
 		else
 		{
-			buffer.append(JSTypeConstants.UNDEFINED_TYPE);
+			buffer.append(JSTypeConstants.NO_TYPE);
 		}
 	}
 

@@ -33,11 +33,21 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 	protected List<IFormatterNode> begin = null;
 	protected IFormatterTextNode end;
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#accept(com.aptana.formatter.IFormatterContext,
+	 * com.aptana.formatter.IFormatterWriter)
+	 */
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
 		if (shouldConsumePreviousWhiteSpaces() && getSpacesCountBefore() > 0)
 		{
 			writeSpaces(visitor, context, getSpacesCountBefore());
+		}
+		int blankLines = context.getBlankLines();
+		if (blankLines > 0)
+		{
+			visitor.ensureLineStarted(context);
 		}
 		context.setBlankLines(getBlankLinesBefore(context));
 		boolean beginWithNewLine = isAddingBeginNewLine();
@@ -61,30 +71,39 @@ public abstract class FormatterBlockWithBeginEndNode extends FormatterBlockNode
 			context.incIndent();
 		}
 
-		if (beginWithNewLine)
+		boolean childConsumesPreviousWhiteSpace = false;
+
+		// Checks if the node has children and it if does, check whether it is consuming previous white spaces
+		if (!getBody().isEmpty())
+		{
+			childConsumesPreviousWhiteSpace = getBody().get(0).shouldConsumePreviousWhiteSpaces();
+		}
+
+		if (!childConsumesPreviousWhiteSpace && beginWithNewLine)
 		{
 			visitor.writeLineBreak(context);
 		}
+
 		super.accept(context, visitor);
 		if (indenting)
 		{
 			context.decIndent();
 		}
-
+		boolean endWithNewLine = isAddingEndNewLine();
+		if (endWithNewLine && !visitor.endsWithNewLine())
+		{
+			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
+			// a new-line.
+			visitor.writeLineBreak(context);
+		}
 		if (end != null)
 		{
-			boolean endWithNewLine = isAddingEndNewLine();
-			if (endWithNewLine && !visitor.endsWithNewLine())
-			{
-				// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
-				// a new-line.
-				visitor.writeLineBreak(context);
-			}
 			visitor.write(context, end.getStartOffset(), end.getEndOffset());
-			// if (endWithNewLine)
-			// {
-			// visitor.writeLineBreak(context);
-			// }
+		}
+		// For this node, we write the spaces after the 'end' node.
+		if (getSpacesCountAfter() > 0)
+		{
+			writeSpaces(visitor, context, getSpacesCountAfter());
 		}
 		context.setBlankLines(getBlankLinesAfter(context));
 	}

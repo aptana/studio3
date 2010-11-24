@@ -38,16 +38,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.ProjectTemplate.Type;
 
 public class BundleElement extends AbstractElement
 {
@@ -58,29 +56,19 @@ public class BundleElement extends AbstractElement
 	private String _licenseUrl;
 	private String _repository;
 
+	private List<AbstractBundleElement> _children;
 	private File _bundleDirectory;
 	private BundlePrecedence _bundlePrecedence;
-	private List<MenuElement> _menus;
-	private List<CommandElement> _commands;
-	private List<EnvironmentElement> _envs;
-	private List<SmartTypingPairsElement> _pairs;
 	private boolean _visible;
 
-	private Object menuLock = new Object();
-	private Object commandLock = new Object();
-	private Object envLock = new Object();
-	private Object pairLock = new Object();
-
 	private Map<String, String> _fileTypeRegistry;
-	private List<String> fileTypes;
+	private List<String> _fileTypes;
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
 
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
-
-	private List<ProjectTemplate> _projectTemplates;
 
 	/**
 	 * Bundle
@@ -96,10 +84,8 @@ public class BundleElement extends AbstractElement
 			// calculate bundle's root directory
 			File pathFile = new File(path);
 			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
-			String parentName = parentDirectory.getName();
 
-			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName)
-					|| BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+			if (BundleManager.isSpecialDirectory(parentDirectory))
 			{
 				parentDirectory = parentDirectory.getParentFile();
 			}
@@ -107,115 +93,41 @@ public class BundleElement extends AbstractElement
 			this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		}
 
+		// it will be extremely rare to have no children, so go ahead and pre-allocate the child list. This will also
+		// allow us to lock on the list instead of maintaining a separate lock object
+		this._children = new ArrayList<AbstractBundleElement>();
+
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
 
 	/**
-	 * addCommand
+	 * addChild
 	 * 
-	 * @param command
+	 * @param element
 	 */
-	public void addCommand(CommandElement command)
+	public void addChild(AbstractBundleElement element)
 	{
-		if (command != null)
+		if (element != null)
 		{
-			synchronized (commandLock)
-			{
-				if (this._commands == null)
-				{
-					this._commands = new ArrayList<CommandElement>();
-				}
+			BundleEntry.VisibilityContext context = null;
 
-				// NOTE: Should we prevent the same element from being added twice?
-				this._commands.add(command);
+			synchronized (this._children)
+			{
+				if (this._children.contains(element) == false)
+				{
+					context = this.getVisibilityContext(element.getClass());
+
+					this._children.add(element);
+				}
 			}
 
-			command.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(command);
-		}
-	}
-
-	/**
-	 * addEnv
-	 * 
-	 * @param env
-	 */
-	public void addEnv(EnvironmentElement env)
-	{
-		if (env != null)
-		{
-			synchronized (envLock)
+			if (context != null)
 			{
-				if (this._envs == null)
-				{
-					this._envs = new ArrayList<EnvironmentElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._envs.add(env);
+				context.fireVisibilityEvents();
 			}
 
-			env.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(env);
-		}
-	}
-
-	/**
-	 * addSmartTypingPairs
-	 * 
-	 * @param pair
-	 */
-	public void addSmartTypingPairs(SmartTypingPairsElement pair)
-	{
-		if (pair != null)
-		{
-			synchronized (pairLock)
-			{
-				if (this._pairs == null)
-				{
-					this._pairs = new ArrayList<SmartTypingPairsElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._pairs.add(pair);
-			}
-
-			pair.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(pair);
-		}
-	}
-
-	/**
-	 * addMenu
-	 * 
-	 * @param snippet
-	 */
-	public void addMenu(MenuElement menu)
-	{
-		if (menu != null)
-		{
-			synchronized (menuLock)
-			{
-				if (this._menus == null)
-				{
-					this._menus = new ArrayList<MenuElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._menus.add(menu);
-			}
-
-			menu.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(menu);
+			element.setOwningBundle(this);
 		}
 	}
 
@@ -226,11 +138,12 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateFileType(String fileType)
 	{
-		if (fileTypes == null)
+		if (_fileTypes == null)
 		{
-			fileTypes = new ArrayList<String>();
+			_fileTypes = new ArrayList<String>();
 		}
-		fileTypes.add(fileType);
+
+		_fileTypes.add(fileType);
 	}
 
 	/**
@@ -263,11 +176,6 @@ public class BundleElement extends AbstractElement
 		this._description = null;
 		this._license = null;
 		this._licenseUrl = null;
-		if (_projectTemplates != null)
-		{
-			_projectTemplates.clear();
-			_projectTemplates = null;
-		}
 	}
 
 	/**
@@ -301,6 +209,72 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getChildren
+	 * 
+	 * @return
+	 */
+	public List<AbstractBundleElement> getChildren()
+	{
+		return new ArrayList<AbstractBundleElement>(this._children);
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will not be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByExactType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		synchronized (this._children)
+		{
+			for (AbstractBundleElement child : this._children)
+			{
+				// NOTE: this will return true for children of type childType, but not for descendant types of
+				// childType.
+				if (childType == child.getClass())
+				{
+					result.add(childType.cast(child));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		synchronized (this._children)
+		{
+			for (AbstractBundleElement child : this._children)
+			{
+				// NOTE: isAssignableFrom is like instanceof where it will return true for instances of childType and
+				// its descendant types
+				if (childType.isAssignableFrom(child.getClass()))
+				{
+					result.add(childType.cast(child));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getCommandByName
 	 * 
 	 * @return
@@ -309,17 +283,18 @@ public class BundleElement extends AbstractElement
 	{
 		CommandElement result = null;
 
-		synchronized (commandLock)
+		if (StringUtil.isEmpty(name) == false)
 		{
-			if (!StringUtil.isEmpty(name) && this._commands != null && this._commands.size() > 0)
+			// NOTE: we use getCommands here so we don't have to sync this block. getCommands returns a fresh List each
+			// time it is invoked and it handles syncing for us
+			List<CommandElement> commands = this.getCommands();
+
+			for (CommandElement command : commands)
 			{
-				for (CommandElement command : this._commands)
+				if (name.equals(command.getDisplayName()))
 				{
-					if (name.equals(command.getDisplayName()))
-					{
-						result = command;
-						break;
-					}
+					result = command;
+					break;
 				}
 			}
 		}
@@ -332,59 +307,19 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	public List<CommandElement> getCommands()
 	{
-		CommandElement[] result = BundleManager.NO_COMMANDS;
-
-		synchronized (commandLock)
-		{
-			if (this._commands != null && this._commands.size() > 0)
-			{
-				result = this._commands.toArray(new CommandElement[this._commands.size()]);
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(CommandElement.class);
 	}
 
 	/**
-	 * getEnvs
+	 * getContentAssists
 	 * 
 	 * @return
 	 */
-	public EnvironmentElement[] getEnvs()
+	public List<ContentAssistElement> getContentAssists()
 	{
-		EnvironmentElement[] result = new EnvironmentElement[0];
-
-		synchronized (envLock)
-		{
-			if (this._envs != null && this._envs.size() > 0)
-			{
-				result = this._envs.toArray(new EnvironmentElement[this._envs.size()]);
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getPairs
-	 * 
-	 * @return
-	 */
-	public SmartTypingPairsElement[] getPairs()
-	{
-		SmartTypingPairsElement[] result = new SmartTypingPairsElement[0];
-
-		synchronized (pairLock)
-		{
-			if (this._pairs != null && this._pairs.size() > 0)
-			{
-				result = this._pairs.toArray(new SmartTypingPairsElement[this._pairs.size()]);
-			}
-		}
-
-		return result;
+		return this.getChildrenByType(ContentAssistElement.class);
 	}
 
 	/**
@@ -395,6 +330,27 @@ public class BundleElement extends AbstractElement
 	public String getCopyright()
 	{
 		return this._copyright;
+	}
+
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		Map<ScopeSelector, RubyRegexp> result;
+
+		if (this._decreaseIndentMarkers == null)
+		{
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._decreaseIndentMarkers);
+		}
+
+		return result;
 	}
 
 	/**
@@ -443,6 +399,16 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public List<EnvironmentElement> getEnvs()
+	{
+		return this.getChildrenByType(EnvironmentElement.class);
+	}
+
+	/**
 	 * getFileTypeRegistry
 	 * 
 	 * @return
@@ -453,18 +419,34 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getFileTypes
+	 * 
+	 * @return
+	 */
+	List<String> getFileTypes()
+	{
+		return this._fileTypes;
+	}
+
+	/**
 	 * getFoldingStartMarkers
 	 * 
 	 * @return
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._foldingStartMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._foldingStartMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._foldingStartMarkers);
+		return result;
 	}
 
 	/**
@@ -474,12 +456,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._foldingStopMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
+		}
+		else
+		{
+			result = Collections.unmodifiableMap(this._foldingStopMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._foldingStopMarkers);
+		return result;
 	}
 
 	/**
@@ -489,27 +477,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getIncreaseIndentMarkers()
 	{
+		Map<ScopeSelector, RubyRegexp> result;
+
 		if (this._increaseIndentMarkers == null)
 		{
-			return Collections.emptyMap();
+			result = Collections.emptyMap();
 		}
-
-		return Collections.unmodifiableMap(this._increaseIndentMarkers);
-	}
-
-	/**
-	 * getDecreaseIndentMarkers
-	 * 
-	 * @return
-	 */
-	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
-	{
-		if (this._decreaseIndentMarkers == null)
+		else
 		{
-			return Collections.emptyMap();
+			result = Collections.unmodifiableMap(this._increaseIndentMarkers);
 		}
 
-		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
+		return result;
 	}
 
 	/**
@@ -539,7 +518,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<String> getLoadPaths()
 	{
-		List<String> result = new LinkedList<String>();
+		List<String> result = new ArrayList<String>();
 
 		result.add(BundleUtils.getBundleLibDirectory(this.getBundleDirectory()));
 
@@ -551,19 +530,29 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public MenuElement[] getMenus()
+	public List<MenuElement> getMenus()
 	{
-		MenuElement[] result = BundleManager.NO_MENUS;
+		return this.getChildrenByType(MenuElement.class);
+	}
 
-		synchronized (menuLock)
-		{
-			if (this._menus != null && this._menus.size() > 0)
-			{
-				result = this._menus.toArray(new MenuElement[this._menus.size()]);
-			}
-		}
+	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public List<SmartTypingPairsElement> getPairs()
+	{
+		return this.getChildrenByType(SmartTypingPairsElement.class);
+	}
 
-		return result;
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @return
+	 */
+	public List<ProjectTemplateElement> getProjectTemplates()
+	{
+		return this.getChildrenByType(ProjectTemplateElement.class);
 	}
 
 	/**
@@ -577,40 +566,35 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * hasCommands
+	 * getVisibilityContext
 	 * 
 	 * @return
 	 */
-	public boolean hasCommands()
+	private BundleEntry.VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 	{
-		boolean result = false;
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(this.getDisplayName());
+		BundleEntry.VisibilityContext context = null;
 
-		synchronized (commandLock)
+		if (entry != null)
 		{
-			if (this._commands != null)
-			{
-				result = this._commands.size() > 0;
-			}
+			context = entry.getVisibilityContext(elementClass);
 		}
 
-		return result;
+		return context;
 	}
 
 	/**
-	 * hasMenus
+	 * hasChildren
 	 * 
 	 * @return
 	 */
-	public boolean hasMenus()
+	public boolean hasChildren()
 	{
 		boolean result = false;
 
-		synchronized (menuLock)
+		synchronized (this._children)
 		{
-			if (this._menus != null)
-			{
-				result = this._menus.size() > 0;
-			}
+			result = this._children.size() > 0;
 		}
 
 		return result;
@@ -633,7 +617,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean isEmpty()
 	{
-		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false;
+		return this.hasMetadata() == false && this.hasChildren() == false;
 	}
 
 	/**
@@ -675,94 +659,53 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 
 		// output commands
-		synchronized (commandLock)
+		for (CommandElement command : this.getCommands())
 		{
-			if (this._commands != null)
-			{
-				for (CommandElement command : this._commands)
-				{
-					command.toSource(printer);
-				}
-			}
+			command.toSource(printer);
 		}
 
 		// output menus
-		synchronized (menuLock)
+		for (MenuElement menu : this.getMenus())
 		{
-			if (this._menus != null)
-			{
-				for (MenuElement menu : this._menus)
-				{
-					menu.toSource(printer);
-				}
-			}
+			menu.toSource(printer);
 		}
 	}
 
 	/**
-	 * removeCommand
-	 * 
-	 * @param command
-	 */
-	public void removeCommand(CommandElement command)
-	{
-		boolean removed = false;
-
-		synchronized (commandLock)
-		{
-			if (this._commands != null && (removed = this._commands.remove(command)))
-			{
-				AbstractElement.unregisterElement(command);
-			}
-		}
-
-		if (removed)
-		{
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(command);
-		}
-	}
-
-	/**
-	 * removeElement
+	 * removeChild
 	 * 
 	 * @param element
 	 */
-	public void removeElement(AbstractBundleElement element)
-	{
-		if (element instanceof CommandElement)
-		{
-			this.removeCommand((CommandElement) element);
-		}
-		else if (element instanceof MenuElement)
-		{
-			this.removeMenu((MenuElement) element);
-		}
-	}
-
-	/**
-	 * removeMenu
-	 * 
-	 * @param command
-	 */
-	public void removeMenu(MenuElement menu)
+	public void removeChild(AbstractBundleElement element)
 	{
 		boolean removed = false;
+		BundleEntry.VisibilityContext context = null;
 
-		synchronized (menuLock)
+		// disassociate element with this bundle
+		element.setOwningBundle(null);
+
+		synchronized (this._children)
 		{
-			if (this._menus != null && (removed = this._menus.remove(menu)))
-			{
-				AbstractElement.unregisterElement(menu);
+			context = this.getVisibilityContext(element.getClass());
 
-				menu.removeChildren();
-			}
+			removed = this._children.remove(element);
 		}
 
 		if (removed)
 		{
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(menu);
+			// special case for menus so they can remove their children so they will fire events
+			if (element instanceof MenuElement)
+			{
+				((MenuElement) element).removeChildren();
+			}
+
+			// make sure elements are no longer tracked in AbstractElement
+			AbstractElement.unregisterElement(element);
+			
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
+			}
 		}
 	}
 
@@ -805,8 +748,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
-				&& endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store starting regular expression
 			if (this._foldingStartMarkers == null)
@@ -835,8 +777,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
-				&& endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
 			// store increasing regular expression
 			if (this._increaseIndentMarkers == null)
@@ -894,54 +835,5 @@ public class BundleElement extends AbstractElement
 	public void setVisible(boolean flag)
 	{
 		this._visible = flag;
-	}
-
-	/**
-	 * getFileTypes
-	 * 
-	 * @return
-	 */
-	List<String> getFileTypes()
-	{
-		return fileTypes;
-	}
-
-	public void addProjectTemplate(String type, String name, String location, String description)
-	{
-		if (!StringUtil.isEmpty(type) && !StringUtil.isEmpty(name) && !StringUtil.isEmpty(location))
-		{
-			if (_projectTemplates == null)
-			{
-				_projectTemplates = new ArrayList<ProjectTemplate>();
-			}
-			_projectTemplates.add(new ProjectTemplate(type, name, location, description, _bundleDirectory));
-		}
-	}
-
-	public ProjectTemplate[] getProjectTemplates()
-	{
-		if (_projectTemplates == null)
-		{
-			return BundleManager.NO_PROJECT_TEMPLATES;
-		}
-		return _projectTemplates.toArray(new ProjectTemplate[_projectTemplates.size()]);
-	}
-
-	public ProjectTemplate[] getProjectTemplatesByType(Type type)
-	{
-		if (_projectTemplates == null)
-		{
-			return BundleManager.NO_PROJECT_TEMPLATES;
-		}
-		List<ProjectTemplate> list = new ArrayList<ProjectTemplate>();
-		for (ProjectTemplate template : _projectTemplates)
-		{
-			// type "all" is always included
-			if (template.getType() == type || template.getType() == Type.ALL)
-			{
-				list.add(template);
-			}
-		}
-		return list.toArray(new ProjectTemplate[list.size()]);
 	}
 }

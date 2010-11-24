@@ -135,6 +135,16 @@ public class CSSParserTest extends TestCase
 	}
 
 	/**
+	 * Test media with statement
+	 * 
+	 * @throws Exception
+	 */
+	public void testMediaStatement() throws Exception
+	{
+		parseTest("@media test{body {testing: 10;}}" + EOL); //$NON-NLS-1$
+	}
+
+	/**
 	 * Test empty page
 	 * 
 	 * @throws Exception

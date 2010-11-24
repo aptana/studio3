@@ -41,8 +41,8 @@ import java.util.List;
 
 import beaver.Symbol;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class DocumentationBlock extends Symbol
 {

@@ -132,7 +132,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onclick" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -201,7 +201,7 @@
 	    </constructors>  
 		<properties>
 			
-			<property name="onclick" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -360,7 +360,7 @@
 				</browsers>
 			</property>
 			
-			<property name="links" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="links" type="Link[]" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 					<specification name="W3C" version="HTML 4.0"/>
@@ -492,7 +492,7 @@
 				<deprecated>Deprecated in "Document". Use "fgColor" as part of "Body" instead.</deprecated>
 			</property>
 			
-			<property name="forms" type="Array" scope="instance" access="read" visibility="basic">
+			<property name="forms" type="Form[]" scope="instance" access="read" visibility="basic">
 				<description>Array of all of the form objects in the document.</description>
 				<browsers>
 					<browser platform="IE" version="3.0+"/>
@@ -507,7 +507,7 @@
 				</availability>
 			</property>
 			
-			<property name="images" type="Array" scope="instance" access="read" visibility="basic">
+			<property name="images" type="Image[]" scope="instance" access="read" visibility="basic">
 				<description>Array of all of the images in the document.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -546,7 +546,7 @@
 				</browsers>
 			</property>
 			
-			<property name="plugins" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="plugins" type="Plugin[]" scope="instance" access="read-write" visibility="basic">
 				<description>Array of all of the plug-ins contained in the document.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -981,7 +981,7 @@
 	    </constructors>  
 		
 		<properties>
-			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read-write" visibility="basic">
 				<references>
 					<reference name="Input.onchange"/>
 					<reference name="Event"/>
@@ -1045,7 +1045,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="elements" type="Array" scope="instance" access="read" visibility="basic">
+			<property name="elements" type="HTMLElement[]" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 					<specification name="W3C" version="HTML 4.0"/>
@@ -1075,7 +1075,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onreset" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onreset" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 				</availability>
@@ -1096,7 +1096,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onsubmit" type="Object" scope="static" access="read-write" visibility="basic">
+			<property name="onsubmit" type="Object" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -1700,7 +1700,7 @@
 				</browsers>
 			</property>
 			
-			<property name="all" type="Array" scope="instance" access="read" visibility="basic">
+			<property name="all" type="HTMLElement[]" scope="instance" access="read" visibility="basic">
 				<description>List of all elements within the current element. Behaves similarly to document.all.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -1708,7 +1708,7 @@
 				</browsers>
 			</property>
 			
-			<property name="children" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="children" type="HTMLElement[]" scope="instance" access="read-write" visibility="basic">
 				<description>The direct child elements of the current element.</description>
 				<browsers>
 					<browser platform="IE" version="4.0+"/>
@@ -2125,7 +2125,7 @@
 	    </constructors>  
 		
 		<properties>
-			<property name="onabort" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onabort" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 				</availability>
@@ -2140,7 +2140,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onerror" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onerror" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 				</availability>
@@ -2155,7 +2155,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onload" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onload" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 				</availability>
@@ -2333,7 +2333,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onblur" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onblur" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -2354,7 +2354,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -2375,7 +2375,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onclick" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 					<specification name="enhanced in JavaScript 1.1"/>
@@ -2397,7 +2397,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onfocus" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onfocus" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -3099,7 +3099,7 @@
 				</browsers>
 			</property>
 			
-			<property name="layers" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="layers" type="Layer[]" scope="instance" access="read-write" visibility="basic">
 				<description>Array of child layers of the current layer.</description>
 				<browsers>
 					<browser platform="Netscape" version="4.0+"/>
@@ -3984,7 +3984,7 @@
 				</browsers>
 			</property>
 			
-			<property name="plugins" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="plugins" type="Plugin[]" scope="instance" access="read-write" visibility="basic">
 				<description>Array of plugins installed in the browser.</description>
 				<browsers>
 					<browser platform="Mozilla" version="1.0+"/>
@@ -4311,7 +4311,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onclick" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -4401,7 +4401,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onclick" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 					<specification name="enhanced in JavaScript 1.1"/>
@@ -4592,7 +4592,7 @@
 	    </constructors>  
 		<properties>
 			
-			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -4804,7 +4804,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onclick" type="Object" scope="static" access="read-write" visibility="basic">
+			<property name="onclick" type="Object" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 					<specification name="enhanced in JavaScript 1.1"/>
@@ -4875,7 +4875,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -4943,7 +4943,7 @@
 	      </constructor>
 	    </constructors>  
 		<properties>
-			<property name="onchange" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -5081,7 +5081,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onabort" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onabort" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the loading of the element is cancelled before it finishes loading.</description>
 	            <browsers>
 	               <browser platform="IE" version="4.0+"/>
@@ -5090,28 +5090,28 @@
 	           </browsers>
 	        </property>
 			
-			<property name="onafterprint" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onafterprint" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires immediately after a user prints or print previews a document.</description>
 	            <browsers>
 	               <browser platform="IE" version="4.0+"/>
 	           </browsers>
 	        </property>
 			
-			<property name="onbeforeprint" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onbeforeprint" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires immediately before a user prints or print previews a document.</description>
 	         	<browsers>
 	            	<browser platform="IE" version="4.0+" />
 	          	</browsers>
 	     	</property>
 			
-			<property name="onbeforeunload" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onbeforeunload" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires immediately before a document is unloaded.</description>
 	         	<browsers>
 	            	<browser platform="IE" version="4.0+" />
 	          	</browsers>
 	     	</property>
 			
-			<property name="onblur" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onblur" type="Function" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="HTML DOM Level 0"/>
 				</availability>
@@ -5134,7 +5134,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onchange" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onchange" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the value of the element changes.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5146,7 +5146,7 @@
 				</browsers>
 	    	</property>
 			
-			<property name="onclick" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onclick" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the element is clicked.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5158,7 +5158,7 @@
 				</browsers>
 	     	</property>
 			
-			<property name="onclose" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onclose" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the user closes the window.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5170,14 +5170,14 @@
 				</browsers>
 	     	</property>
 			
-			<property name="ondragdrop" type="Function" scope="static" access="read" visibility="basic">
+			<property name="ondragdrop" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when a user drops a file onto the window.</description>
 				<browsers>
 					<browser platform="Netscape" version="4.0+" />
 				</browsers>
 	     	</property>
 			
-			<property name="onerror" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onerror" type="Function" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 					<specification name="buggy in Netscape 6/6.1"/>
@@ -5193,7 +5193,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onfocus" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onfocus" type="Function" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.1"/>
 				</availability>
@@ -5216,14 +5216,14 @@
 				</browsers>
 			</property>
 			
-			<property name="onhelp" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onhelp" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when a user presses the F1 key to activate help.</description>
 				<browsers>
 	           		<browser platform="IE" version="4.0+" />
 				</browsers>
 	     	</property>
 			
-			<property name="onkeydown" type="Function"  scope="static" access="read" visibility="basic">
+			<property name="onkeydown" type="Function"  scope="instance" access="read" visibility="basic">
 				<description>Fires when a user presses down on a key while the element has focus.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5235,7 +5235,7 @@
 				</browsers>
 		    </property>
 					
-			<property name="onkeypress" type="Function"  scope="static" access="read" visibility="basic">
+			<property name="onkeypress" type="Function"  scope="instance" access="read" visibility="basic">
 				<description>Fires when a user presses a key or holds down the key while the element has focus.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5247,7 +5247,7 @@
 				</browsers>
 	        </property>
 				
-			<property name="onkeyup" type="Function"  scope="static" access="read" visibility="basic">
+			<property name="onkeyup" type="Function"  scope="instance" access="read" visibility="basic">
 				<description>Fires when a user releases a key while the element has focus.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5259,7 +5259,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onload" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onload" type="Function" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -5280,7 +5280,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onmousedown" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onmousedown" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when a user clicks down on the mouse button while the element has focus.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5292,7 +5292,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onmousemove" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onmousemove" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the mouse moves while the pointer over the element.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5304,7 +5304,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onmouseout" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onmouseout" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the mouse pointer moves off of the element.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5316,7 +5316,7 @@
 				</browsers>
 	        </property>
 									
-	        <property name="onmouseover" type="Function" scope="static" access="read" visibility="basic">
+	        <property name="onmouseover" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the mouse pointer moves over the element.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5328,7 +5328,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onmouseup" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onmouseup" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the user releases the mouse button while the element has focus.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5340,7 +5340,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onmove" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onmove" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Event handler for window move events.</description>
 				<browsers>
 					<browser platform="Mozilla" version="1.0+"/>
@@ -5351,7 +5351,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onreset" type="Function"  scope="static" access="read" visibility="basic">
+			<property name="onreset" type="Function"  scope="instance" access="read" visibility="basic">
 				<description>Fires when the form data is reset.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5363,7 +5363,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onresize" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onresize" type="Function" scope="instance" access="read" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.2"/>
 				</availability>
@@ -5378,7 +5378,7 @@
 				</browsers>
 			</property>
 			
-			<property name="onscroll" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onscroll" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when a user scrolls the element.</description>
 	            <browsers>
 	                <browser platform="IE" version="4.0+" />
@@ -5387,7 +5387,7 @@
 	            </browsers>
 	        </property>
 			
-			<property name="onselect" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onselect" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the element is selected.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5399,7 +5399,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onsubmit" type="Function" scope="static" access="read" visibility="basic">
+			<property name="onsubmit" type="Function" scope="instance" access="read" visibility="basic">
 				<description>Fires when the form data is submitted.</description>
 				<browsers>
 	           		<browser platform="IE" version="2.0+" />
@@ -5411,7 +5411,7 @@
 				</browsers>
 	        </property>
 			
-			<property name="onunload" type="Function" scope="static" access="read-write" visibility="basic">
+			<property name="onunload" type="Function" scope="instance" access="read-write" visibility="basic">
 				<availability>
 					<specification name="JavaScript 1.0"/>
 				</availability>
@@ -5490,7 +5490,7 @@
 				</browsers>
 			</property>
 			
-			<property name="frames" type="Array" scope="instance" access="read-write" visibility="basic">
+			<property name="frames" type="Frame[]" scope="instance" access="read-write" visibility="basic">
 				<description>An array of the frames in the current window.</description>
 				<browsers>
 					<browser platform="IE" version="3.0+"/>
@@ -6016,7 +6016,7 @@
 				</browsers>
 			</method>
 			
-			<method name = "getComputedStyle" scope = "static" visibility = "basic">
+			<method name = "getComputedStyle" scope = "instance" visibility = "basic">
                 <parameters>
                     <parameter name = "elt" type = "Element" usage = "required">
                         <description>Document element to get the style information for.</description>

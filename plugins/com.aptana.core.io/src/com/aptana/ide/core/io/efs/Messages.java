@@ -41,8 +41,6 @@ public class Messages extends NLS // NO_UCD
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.efs.messages"; //$NON-NLS-1$
 
-	public static String EFSUtils_Copying; // NO_UCD
-
 	public static String VirtualFile_ListingDirectory; // NO_UCD
 	public static String VirtualFileSystem_ERR_FetchFileTree; // NO_UCD
 

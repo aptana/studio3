@@ -19,6 +19,7 @@
 %terminals IMPORTANT, PROPERTY, SELECTOR, HASH, INCLUDES, DASHMATCH;
 
 %typeof IDENTIFIER, PROPERTY, STRING, URL, IMPORTANT, NUMBER, PERCENTAGE, LENGTH, EMS, EXS, ANGLE, TIME, FREQUENCY, COLOR, HASH, CLASS = "String";
+%typeof Statement = "CSSNode";
 %typeof Declaration, Declaration2 = "CSSDeclarationNode";
 %typeof Expression, Function, Term = "CSSExpressionNode";
 %typeof ImportWord, Identifier, IdentiferOrString, Separator, Primitive, TypeOrUniversalSelector, AttributeValueOperator = "String";
@@ -132,18 +133,21 @@ Import
 		:}
 	|	IMPORT.i ImportWord.s List.m SEMICOLON.e
 		{:
-			return new CSSImportNode(s, m, i.getStart(), e.getEnd());
+			List<CSSTextNode> words = (List<CSSTextNode>) m.value;
+			return new CSSImportNode(s, words.toArray(new CSSTextNode[words.size()]), i.getStart(), e.getEnd());
 		:}
 	;
 
 Media
 	=	MEDIA.m List.l LCURLY RCURLY.r
 		{:
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			List<CSSTextNode> media = (List<CSSTextNode>) l.value;
+			return new CSSMediaNode(media.toArray(new CSSTextNode[media.size()]), m.getStart(), r.getEnd());
 		:}
-	|	MEDIA.m List.l LCURLY Statements RCURLY.r
+	|	MEDIA.m List.l LCURLY Statements.s RCURLY.r
 		{:
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			List<CSSTextNode> media = (List<CSSTextNode>) l.value;
+			return new CSSMediaNode(media.toArray(new CSSTextNode[media.size()]), s, m.getStart(), r.getEnd());
 		:}
 	;
 
@@ -213,8 +217,17 @@ Function
 	;
 
 List
-	=	List COMMA IDENTIFIER
-	|	IDENTIFIER
+	=	List COMMA IDENTIFIER.i
+	{:
+		((List<CSSTextNode>) _symbols[offset + 1].value).add(new CSSTextNode(i, _symbol_i.getStart(), _symbol_i.getEnd()));
+		return _symbols[offset + 1];
+	:}
+	|	IDENTIFIER.i
+	{:
+		List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+		list.add(new CSSTextNode(i, _symbol_i.getStart(), _symbol_i.getEnd()));
+		return new Symbol(list);
+	:}
 	;
 
 Declarations

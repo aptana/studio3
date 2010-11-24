@@ -50,7 +50,7 @@ import com.aptana.formatter.ui.util.SWTFactory;
 
 public class CSSFormatterBracesPage extends FormatterModifyTabPage
 {
-	private static final String BRACES_PREVIEW_NAME = "braces-preview.css"; //$NON-NLS-1$
+	private static final String BRACES_PREVIEW_NAME = "preview.css"; //$NON-NLS-1$
 	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SAME_LINE,
 			CodeFormatterConstants.NEW_LINE };
 	private static final String[] TAB_OPTION_NAMES = new String[] {

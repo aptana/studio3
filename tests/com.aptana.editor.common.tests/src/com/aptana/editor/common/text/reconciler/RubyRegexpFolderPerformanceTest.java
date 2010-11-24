@@ -63,7 +63,7 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 
 		String src = readFile("yui.css");
 		IDocument document = new Document(src);
-		RubyRegexpFolder folder = new RubyRegexpFolder(document)
+		RubyRegexpFolder folder = new RubyRegexpFolder(null, document)
 		{
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)

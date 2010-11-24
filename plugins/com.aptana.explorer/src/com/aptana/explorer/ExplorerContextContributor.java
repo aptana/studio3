@@ -210,19 +210,27 @@ public class ExplorerContextContributor implements ContextContributor
 
 	private CommonNavigator getAppExplorer()
 	{
-		IViewReference[] refs = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.getViewReferences();
-		for (IViewReference ref : refs)
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (window != null)
 		{
-			if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+			IViewReference[] refs = window.getActivePage().getViewReferences();
+
+			for (IViewReference ref : refs)
 			{
-				IViewPart part = ref.getView(false);
-				if (part instanceof CommonNavigator)
+				if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+
 				{
-					return (CommonNavigator) part;
+					IViewPart part = ref.getView(false);
+
+					if (part instanceof CommonNavigator)
+					{
+						return (CommonNavigator) part;
+					}
 				}
 			}
 		}
+
 		return null;
 	}
 }

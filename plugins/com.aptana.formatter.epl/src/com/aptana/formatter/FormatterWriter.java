@@ -226,7 +226,7 @@ public class FormatterWriter implements IFormatterWriter
 							StringBuilder tempIndentBuffer = new StringBuilder();
 							indentGenerator.generateIndent(context.getIndent(), tempIndentBuffer);
 							writer.replace(prevWordEnd, wordBegin, lineDelimiter + tempIndentBuffer
-									+ context.getWrappingCommentPrefix());
+									+ context.getWrappingCommentPrefix(text));
 							start = prevWordEnd + lineDelimiter.length();
 							offset = calculateOffset(start);
 						}

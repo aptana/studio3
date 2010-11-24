@@ -44,8 +44,29 @@ import org.osgi.framework.Bundle;
 
 public class EclipseUtil
 {
-
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
+
+	/**
+	 * Retrieves the bundle version of a plugin.
+	 * 
+	 * @param plugin
+	 *            the plugin to retrieve from
+	 * @return the bundle version, or null if not found.
+	 */
+	public static String getPluginVersion(Plugin plugin)
+	{
+		if (plugin == null)
+		{
+			return null;
+		}
+
+		Bundle bundle = plugin.getBundle();
+		if (bundle == null)
+		{
+			return null;
+		}
+		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
+	}
 
 	/**
 	 * Retrieves the bundle version of a plugin based on its id.
@@ -70,27 +91,10 @@ public class EclipseUtil
 	}
 
 	/**
-	 * Retrieves the bundle version of a plugin.
+	 * Retrieves the product version from the Platform aboutText property
 	 * 
-	 * @param plugin
-	 *            the plugin to retrieve from
-	 * @return the bundle version, or null if not found.
+	 * @return
 	 */
-	public static String getPluginVersion(Plugin plugin)
-	{
-		if (plugin == null)
-		{
-			return null;
-		}
-
-		Bundle bundle = plugin.getBundle();
-		if (bundle == null)
-		{
-			return null;
-		}
-		return bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION).toString();
-	}
-
 	public static String getProductVersion()
 	{
 		String version = null;
@@ -125,8 +129,36 @@ public class EclipseUtil
 		return version;
 	}
 
+	/**
+	 * Determines if the IDE is running as a standalone app versus as a plugin
+	 * 
+	 * @return
+	 */
 	public static boolean isStandalone()
 	{
 		return getPluginVersion(STANDALONE_PLUGIN_ID) != null;
+	}
+
+	/**
+	 * Determines if the IDE is running in a unit test
+	 * 
+	 * @return
+	 */
+	public static boolean isTesting()
+	{
+		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
+		if (application != null
+				&& (application.equals("org.eclipse.pde.junit.runtime.uitestapplication")  //$NON-NLS-1$
+						|| application.equals("org.eclipse.test.coretestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.test.uitestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.legacytestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplication") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplicationnonmain") //$NON-NLS-1$
+						|| application.equals("org.eclipse.pde.junit.runtime.nonuithreadtestapplication"))) //$NON-NLS-1$
+		{
+			return true;
+		}
+		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
+		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
 	}
 }

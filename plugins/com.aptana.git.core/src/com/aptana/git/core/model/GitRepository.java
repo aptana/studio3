@@ -87,7 +87,7 @@ public class GitRepository
 	/**
 	 * Filename to store ignores of files.
 	 */
-	private static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
+	public static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
 	/**
 	 * File used to associate SHAs and refs when git pack-refs has been used.
 	 */

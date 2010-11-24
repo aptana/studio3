@@ -58,6 +58,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 	private static final String PROPERTY_TYPE = "."; //$NON-NLS-1$
 
 	private Map<String, JSOutlineItem> fItemsByScope;
+	private JSOutlineItem fLastAddedItem;
 
 	private static final Set<String> CLASS_EXTENDERS;
 	static
@@ -95,6 +96,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		if (parentElement instanceof AbstractThemeableEditor || parentElement instanceof ParseRootNode)
 		{
 			fItemsByScope.clear();
+			fLastAddedItem = null;
 			return super.getChildren(parentElement);
 		}
 		else if (parentElement instanceof JSOutlineItem)
@@ -192,6 +194,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				fItemsByScope.put(path, item);
 			}
 			elements.add(item);
+			fLastAddedItem = item;
 		}
 	}
 
@@ -211,6 +214,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		}
 		elements.add(item);
 		item.addVirtualChild(target);
+		fLastAddedItem = item;
 	}
 
 	private void processNode(Collection<JSOutlineItem> elements, IParseNode node)
@@ -310,8 +314,20 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 				else if (rhsType == JSNodeTypes.INVOKE && rhs.getChildCount() == 2)
 				{
 					IParseNode child = rhs.getChild(0);
-					Reference reference = new Reference(lhs.getParent(), lhs, lhs.getText(), CONTAINER_TYPE);
-					addValue(elements, reference, child);
+					if (CLASS_EXTENDERS.contains(child.toString()))
+					{
+						processInvoke(elements, rhs);
+						if (fLastAddedItem != null)
+						{
+							fLastAddedItem.setLabel(lhs.getText());
+							fLastAddedItem.setRange(lhs.getNameNode().getNameRange());
+						}
+					}
+					else
+					{
+						Reference reference = new Reference(lhs.getParent(), lhs, lhs.getText(), CONTAINER_TYPE);
+						addValue(elements, reference, child);
+					}
 				}
 				break;
 			case JSNodeTypes.GET_PROPERTY:

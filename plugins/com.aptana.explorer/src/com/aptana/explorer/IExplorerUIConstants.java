@@ -36,5 +36,20 @@ package com.aptana.explorer;
 
 public interface IExplorerUIConstants
 {
+	/**
+	 * ID of the App Explorer view.
+	 */
 	public static final String VIEW_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
+
+	/**
+	 * ID of the drop-down menu for the App Explorer's "gear". Plugins can modify the menu using the
+	 * "menu:com.aptana.explorer.gear" URI.
+	 */
+	public static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
+
+	/**
+	 * ID of the drop-down menu for the App Explorer's deployment options. Plugins can modify the menu using the
+	 * "menu: com.aptana.explorer.deploy" URI.
+	 */
+	public static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 }

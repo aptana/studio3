@@ -204,7 +204,7 @@ public class EarlyStartup implements IStartup
 				Utils.openTerminalEditor(workbenchWindow, TerminalEditor.ID, true);
 			}
 		} catch (CoreException e) {
-			Activator.logError("Skip opening terminal editor", e.getCause()); //$NON-NLS-1$
+			Activator.log("Skip opening terminal editor", e.getCause()); //$NON-NLS-1$
 		}
 	}
 }

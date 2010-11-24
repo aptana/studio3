@@ -53,15 +53,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.filewatcher.FileWatcher;
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 
 public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVisitor, JNotifyListener
 {
 	// TODO: use constants from BundleManager for bundles, commands, and snippets directory names
 	private static final Pattern USER_BUNDLE_PATTERN = Pattern.compile(".+?[/\\\\]bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern USER_FILE_PATTERN = Pattern.compile(".+?[/\\\\](?:commands|snippets|templates)/[^/\\\\]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 	private static final Pattern BUNDLE_PATTERN = Pattern.compile("/.+?/bundles/.+?/bundle\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+	private static final Pattern FILE_PATTERN = Pattern.compile("/.+?/bundles/.+?/(?:commands|snippets|templates)/[^/]+\\.rb$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
 
 	private static BundleMonitor INSTANCE;
 
@@ -125,7 +125,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 				}
 				catch (JNotifyException e)
 				{
-					Activator.logError(Messages.BundleMonitor_ERROR_REGISTERING_FILE_WATCHER, e);
+					ScriptingActivator.logError(Messages.BundleMonitor_ERROR_REGISTERING_FILE_WATCHER, e);
 				}
 			}
 			else
@@ -134,7 +134,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 						Messages.BundleMonitor_INVALID_WATCHER_PATH,
 						userBundlesPath);
 
-				Activator.logError(message, null);
+				ScriptingActivator.logError(message, null);
 			}
 
 			this._registered = true;
@@ -477,7 +477,7 @@ public class BundleMonitor implements IResourceChangeListener, IResourceDeltaVis
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
+			ScriptingActivator.logError(Messages.BundleMonitor_Error_Processing_Resource_Change, e);
 		}
 	}
 
