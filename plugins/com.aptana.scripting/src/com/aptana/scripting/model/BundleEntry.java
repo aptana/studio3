@@ -53,9 +53,15 @@ public class BundleEntry
 	private abstract class ChildVisibilityContext<T extends AbstractBundleElement>
 	{
 		private List<T> preVisibleItems;
+		private Set<T> becameHidden;
+		private Set<T> becameVisible;
 
 		/**
-		 * VisibilityContext
+		 * Note that the context update and event firing are divided into separate steps synchronization purposes. It is
+		 * expected that a lock will be made prior to creating this context, children will be added/removed, the context
+		 * will be updated to record the visibility changes (via updateContext), the lock will be released, and then the
+		 * visibility events will fire. Having the events fire outside of the lock prevents potential deadlocks that the
+		 * listeners could cause
 		 */
 		public ChildVisibilityContext()
 		{
@@ -63,20 +69,15 @@ public class BundleEntry
 		}
 
 		/**
-		 * fireVisibilityEvents
+		 * Fire events for each element that has become visible or has become hidden. It is assumed that updateContext
+		 * has been called prior to this method
 		 */
 		public void fireVisibilityEvents()
 		{
 			BundleManager manager = BundleManager.getInstance();
 
-			Set<T> becameVisible = new HashSet<T>(this.getElements());
-			Set<T> becameHidden = new HashSet<T>(preVisibleItems);
-
-			becameHidden.removeAll(becameVisible);
-			becameVisible.removeAll(preVisibleItems);
-
 			// fire hidden events
-			if (becameHidden.size() > 0)
+			if (becameHidden != null && becameHidden.size() > 0)
 			{
 				// set visibility flag
 				for (T element : becameHidden)
@@ -87,7 +88,7 @@ public class BundleEntry
 			}
 
 			// fire visible events
-			if (becameVisible.size() > 0)
+			if (becameVisible != null && becameVisible.size() > 0)
 			{
 				// set visibility flag
 				for (T element : becameVisible)
@@ -104,6 +105,19 @@ public class BundleEntry
 		 * @return
 		 */
 		public abstract List<T> getElements();
+
+		/**
+		 * Update the context to determine which elements have become visible and which elements have become hidden.
+		 * This should be called before fireVisibilityEvents.
+		 */
+		public void updateContext()
+		{
+			becameVisible = new HashSet<T>(this.getElements());
+			becameHidden = new HashSet<T>(preVisibleItems);
+
+			becameHidden.removeAll(becameVisible);
+			becameVisible.removeAll(preVisibleItems);
+		}
 	}
 
 	private abstract class NameBasedProcessor<T extends AbstractElement> implements BundleProcessor
@@ -154,6 +168,9 @@ public class BundleEntry
 	public class VisibilityContext
 	{
 		private List<BundleElement> preVisibleBundles;
+		private Set<BundleElement> becameVisible;
+		private Set<BundleElement> becameHidden;
+
 		private ChildVisibilityContext<CommandElement> commands;
 		private ChildVisibilityContext<EnvironmentElement> envs;
 		private ChildVisibilityContext<MenuElement> menus;
@@ -162,6 +179,18 @@ public class BundleEntry
 
 		/**
 		 * VisibilityContext
+		 */
+		public VisibilityContext()
+		{
+			this(null);
+		}
+
+		/**
+		 * Note that the context update and event firing are divided into separate steps synchronization purposes. It is
+		 * expected that a lock will be made prior to creating this context, children will be added/removed, the context
+		 * will be updated to record the visibility changes (via updateContext), the lock will be released, and then the
+		 * visibility events will fire. Having the events fire outside of the lock prevents potential deadlocks that the
+		 * listeners could cause
 		 * 
 		 * @param elementClass
 		 *            The abstract bundle element type to track for visibility changes. If this is null, then all
@@ -238,14 +267,8 @@ public class BundleEntry
 		{
 			BundleManager manager = BundleManager.getInstance();
 
-			Set<BundleElement> becameVisible = new HashSet<BundleElement>(getContributingBundles());
-			Set<BundleElement> becameHidden = new HashSet<BundleElement>(preVisibleBundles);
-
-			becameHidden.removeAll(becameVisible);
-			becameVisible.removeAll(preVisibleBundles);
-
 			// fire hidden events
-			if (becameHidden.size() > 0)
+			if (becameHidden != null && becameHidden.size() > 0)
 			{
 				List<BundleElement> hiddenList = new ArrayList<BundleElement>(becameHidden);
 
@@ -264,7 +287,7 @@ public class BundleEntry
 			}
 
 			// fire visible events
-			if (becameVisible.size() > 0)
+			if (becameVisible != null && becameVisible.size() > 0)
 			{
 				List<BundleElement> visibleList = new ArrayList<BundleElement>(becameVisible);
 
@@ -310,6 +333,48 @@ public class BundleEntry
 			if (context != null)
 			{
 				context.fireVisibilityEvents();
+			}
+		}
+
+		/**
+		 * updateBundleContext
+		 */
+		private void updateBundleContext()
+		{
+			becameVisible = new HashSet<BundleElement>(getContributingBundles());
+			becameHidden = new HashSet<BundleElement>(preVisibleBundles);
+
+			becameHidden.removeAll(becameVisible);
+			becameVisible.removeAll(preVisibleBundles);
+		}
+
+		/**
+		 * updateContext
+		 */
+		public void updateContext()
+		{
+			if (preVisibleBundles != null)
+			{
+				updateBundleContext();
+			}
+
+			this.updateContext(commands);
+			this.updateContext(envs);
+			this.updateContext(menus);
+			this.updateContext(pairs);
+			this.updateContext(projectTemplates);
+		}
+
+		/**
+		 * updateContext
+		 * 
+		 * @param context
+		 */
+		private void updateContext(ChildVisibilityContext<? extends AbstractBundleElement> context)
+		{
+			if (context != null)
+			{
+				context.updateContext();
 			}
 		}
 	}
@@ -378,12 +443,14 @@ public class BundleEntry
 		// make sure we have a bundle
 		if (bundle != null)
 		{
+			VisibilityContext context = null;
+
 			synchronized (this._bundles)
 			{
 				// only go through the add process and its side-effects if we don't have this bundle already
-				if (this.hasBundle(bundle) == false)
+				if (this._bundles.contains(bundle) == false)
 				{
-					VisibilityContext context = this.getVisibilityContext(null);
+					context = this.getVisibilityContext();
 
 					// add the bundle
 					this._bundles.add(bundle);
@@ -391,9 +458,14 @@ public class BundleEntry
 					// keep bundles in canonical order
 					Collections.sort(this._bundles, this._comparator);
 
-					// fire visibility change events
-					context.fireVisibilityEvents();
+					context.updateContext();
 				}
+			}
+
+			// fire visibility change events
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
 			}
 		}
 	}
@@ -405,7 +477,14 @@ public class BundleEntry
 	 */
 	public List<BundleElement> getBundles()
 	{
-		return new ArrayList<BundleElement>(this._bundles);
+		List<BundleElement> result;
+
+		synchronized (this._bundles)
+		{
+			result = new ArrayList<BundleElement>(this._bundles);
+		}
+
+		return result;
 	}
 
 	/**
@@ -749,20 +828,19 @@ public class BundleEntry
 	 * 
 	 * @return
 	 */
-	public VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
+	public VisibilityContext getVisibilityContext()
 	{
-		return new VisibilityContext(elementClass);
+		return new VisibilityContext();
 	}
 
 	/**
-	 * hasBundle
+	 * getVisibilityContext
 	 * 
-	 * @param bundle
 	 * @return
 	 */
-	public boolean hasBundle(BundleElement bundle)
+	public VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 	{
-		return this._bundles.contains(bundle);
+		return new VisibilityContext(elementClass);
 	}
 
 	/**
@@ -772,14 +850,8 @@ public class BundleEntry
 	 */
 	protected void processBundles(BundleProcessor processor)
 	{
-		List<BundleElement> bundles;
+		List<BundleElement> bundles = this.getBundles();
 
-		// make local copy so we don't potentially deadlock
-		synchronized (this._bundles)
-		{
-			bundles = new ArrayList<BundleElement>(this._bundles);
-		}
-			
 		// walk list of bundles in decreasing bundle scope precedence, processing
 		// references before declarations
 		for (int i = bundles.size() - 1; i >= 0; i--)
@@ -806,12 +878,9 @@ public class BundleEntry
 	{
 		BundleManager manager = BundleManager.getInstance();
 
-		synchronized (this._bundles)
+		for (BundleElement bundle : this.getBundles())
 		{
-			for (BundleElement bundle : this._bundles)
-			{
-				manager.reloadBundle(bundle);
-			}
+			manager.reloadBundle(bundle);
 		}
 	}
 
@@ -823,19 +892,23 @@ public class BundleEntry
 	 */
 	public boolean removeBundle(BundleElement bundle)
 	{
+		VisibilityContext context = null;
 		boolean result;
 
 		synchronized (this._bundles)
 		{
-			VisibilityContext context = this.getVisibilityContext(null);
+			context = this.getVisibilityContext();
 
-			result = this._bundles.remove(bundle);
-
-			if (result)
+			if (result = this._bundles.remove(bundle))
 			{
-				// fire visibility change events
-				context.fireVisibilityEvents();
+				context.updateContext();
 			}
+		}
+
+		if (result && context != null)
+		{
+			// fire visibility change events
+			context.fireVisibilityEvents();
 		}
 
 		return result;
@@ -848,9 +921,9 @@ public class BundleEntry
 	 */
 	public int size()
 	{
-		int size = 0;
+		int size;
 
-		if (this._bundles != null)
+		synchronized (this._bundles)
 		{
 			size = this._bundles.size();
 		}

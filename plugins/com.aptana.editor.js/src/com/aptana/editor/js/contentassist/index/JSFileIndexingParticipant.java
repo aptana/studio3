@@ -259,6 +259,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
 			type.setName(JSTypeConstants.WINDOW_TYPE);
+			type.addParentType(JSTypeConstants.GLOBAL_TYPE);
 
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 
