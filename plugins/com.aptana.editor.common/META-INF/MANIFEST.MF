@@ -31,7 +31,7 @@ Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.contentassist,
  com.aptana.editor.common.extensions,
- com.aptana.editor.common.internal.peer;x-friends:=com.aptana.editor.erb.tests,
+ com.aptana.editor.common.internal.peer;x-friends:="com.aptana.editor.erb.tests",
  com.aptana.editor.common.outline,
  com.aptana.editor.common.parsing,
  com.aptana.editor.common.preferences,
@@ -43,6 +43,7 @@ Export-Package: com.aptana.editor.common,
  com.aptana.editor.common.text,
  com.aptana.editor.common.text.hyperlink,
  com.aptana.editor.common.text.reconciler,
- com.aptana.editor.common.text.rules
+ com.aptana.editor.common.text.rules,
+ com.aptana.editor.common.validator
 Eclipse-ExtensibleAPI: true
 Bundle-ClassPath: .

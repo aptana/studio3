@@ -35,6 +35,7 @@
 package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -42,6 +43,7 @@ import java.util.StringTokenizer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -69,6 +71,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
@@ -79,6 +83,7 @@ import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+import com.aptana.core.resources.AbstractUniformResource;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.extensions.FindBarEditorExtension;
 import com.aptana.editor.common.extensions.IThemeableEditor;
@@ -92,6 +97,8 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.validator.IValidationListener;
+import com.aptana.editor.common.validator.ResourceValidationListener;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
@@ -101,6 +108,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.UIUtils;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -188,6 +196,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ThemeableEditorExtension fThemeableEditorColorsExtension;
 
 	private IPropertyChangeListener fThemeListener;
+
+	private IValidationListener fValidationListener;
 
 	/**
 	 * AbstractThemeableEditor
@@ -512,12 +522,41 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				fOutlinePage = null;
 			}
 			fCommandElementsProvider = null;
-			fFileService = null;
+			if (fFileService != null)
+			{
+				fFileService.clear();
+				fFileService.removeValidationListener(fValidationListener);
+				fFileService = null;
+			}
 		}
 		finally
 		{
 			super.dispose();
 		}
+	}
+
+	@Override
+	protected void doSetInput(final IEditorInput input) throws CoreException
+	{
+		super.doSetInput(input);
+
+		Object resource;
+		if (input instanceof IFileEditorInput)
+		{
+			resource = ((IFileEditorInput) input).getFile();
+		}
+		else
+		{
+			resource = new AbstractUniformResource()
+			{
+
+				public URI getURI()
+				{
+					return UIUtils.getURI(input);
+				}
+			};
+		}
+		getFileService().setResource(resource);
 	}
 
 	@Override
@@ -552,6 +591,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		if (fFileService == null)
 		{
 			fFileService = createFileService();
+			fValidationListener = new ResourceValidationListener();
+			fFileService.addValidationListener(fValidationListener);
 		}
 		return fFileService;
 	}
