@@ -37,68 +37,40 @@ package com.aptana.editor.html.formatter.nodes;
 import java.util.Set;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
 
 /**
- * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
- * be indented.
+ * Constructs a new content node for FormatterHTMLElementNode. We construct a node for the content of an element node so
+ * we can control the new lines inside the element nodes appropriately.
  * 
- * @author Shalom Gibly <sgibly@aptana.com>
+ * @param document
+ * @param startOffset
+ * @param endOffset
  */
-public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
+
+public class FormatterHTMLContentNode extends FormatterTextNode
 {
-	private String element;
-	private boolean children;
+
+	private String parentElement;
 
 	/**
 	 * @param document
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document, String element, boolean hasChildrenInAST)
+	public FormatterHTMLContentNode(IFormatterDocument document, String parentElement, int startOffset, int endOffset)
 	{
-		super(document);
-		this.element = element;
-		this.children = hasChildrenInAST;
+		super(document, startOffset, endOffset);
+		this.parentElement = parentElement;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
 	 */
-	protected boolean isIndenting()
-	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS);
-		return !set.contains(element);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
-	 */
-	protected boolean isAddingBeginNewLine()
-	{
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
-	 */
-	protected boolean isAddingEndNewLine()
+	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return (!set.contains(element) || children);
+		return set.contains(parentElement);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode#getBlankLinesAfter(com.aptana.formatter.IFormatterContext
-	 * )
-	 */
-	protected int getBlankLinesAfter(IFormatterContext context)
-	{
-		return getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
-	}
 }

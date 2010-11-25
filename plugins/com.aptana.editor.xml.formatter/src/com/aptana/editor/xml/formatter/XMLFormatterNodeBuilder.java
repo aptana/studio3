@@ -147,7 +147,7 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		IRange beginNodeRange = node.getNameNode().getNameRange();
 		int endOffset = getOpenTagOffset(node.getEndingOffset(), document);
 
-		formatterNode = new FormatterXMLElementNode(document, type);
+		formatterNode = new FormatterXMLElementNode(document, type, node.hasChildren());
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
@@ -163,12 +163,12 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int textStartOffset = getBeginWithoutWhiteSpaces(previousCloseTagOffset + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endOffset - 1, document);
 
-			
 			if (textStartOffset >= textEndOffset)
 			{
 				if (textStartOffset == endOffset)
 				{
-					//Set offset to create a blank text node when there is nothing so we can use shouldConsumePreviousWhiteSpaces to remove new line
+					// Set offset to create a blank text node when there is nothing so we can use
+					// shouldConsumePreviousWhiteSpaces to remove new line
 					textEndOffset = textStartOffset - 1;
 				}
 				else
@@ -179,7 +179,8 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				}
 			}
 
-			FormatterTextNode contentFormatterNode = new FormatterXMLContentNode(document, type, textStartOffset, textEndOffset + 1 );
+			FormatterTextNode contentFormatterNode = new FormatterXMLContentNode(document, type, textStartOffset,
+					textEndOffset + 1);
 			formatterNode.addChild(contentFormatterNode);
 
 		}
