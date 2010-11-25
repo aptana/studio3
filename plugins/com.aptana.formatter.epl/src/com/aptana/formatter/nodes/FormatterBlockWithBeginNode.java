@@ -43,7 +43,7 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 			visitor.ensureLineStarted(context);
 		}
 		boolean addingNewLine = isAddingBeginNewLine();
-		if (addingNewLine && !visitor.endsWithNewLine())
+		if (addingNewLine && !visitor.isInBlankLine())
 		{
 			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
 			// a new-line.

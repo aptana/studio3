@@ -127,4 +127,13 @@ public class FormatterIndentDetector implements IFormatterWriter
 	{
 		// empty
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#isInBlankLine()
+	 */
+	public boolean isInBlankLine()
+	{
+		return false;
+	}
 }
