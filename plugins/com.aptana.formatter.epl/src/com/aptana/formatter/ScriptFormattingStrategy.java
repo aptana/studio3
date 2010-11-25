@@ -15,6 +15,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TypedPosition;
 import org.eclipse.jface.text.formatter.ContextBasedFormattingStrategy;
@@ -23,6 +24,7 @@ import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -53,21 +55,32 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final IProject project;
 		final String formatterId;
 		final boolean isSlave;
+		final boolean isSelection;
+		final IRegion selectedRegion;
+		final IFormattingContext context;
 
 		/**
+		 * @param context
 		 * @param document
 		 * @param partition
 		 * @param project
+		 * @param formatterId
 		 * @param isSlave
+		 * @param isSelection
+		 * @param selectedRegion
+		 *            - Should be valid when isSelection is true.
 		 */
-		public FormatJob(IDocument document, TypedPosition partition, IProject project, String formatterId,
-				Boolean isSlave)
+		public FormatJob(IFormattingContext context, IDocument document, TypedPosition partition, IProject project,
+				String formatterId, Boolean isSlave, Boolean isSelection, IRegion selectedRegion)
 		{
+			this.context = context;
 			this.document = document;
 			this.partition = partition;
 			this.project = project;
 			this.formatterId = formatterId;
 			this.isSlave = (isSlave != null) ? isSlave : false;
+			this.isSelection = (isSelection != null) ? isSelection : false;
+			this.selectedRegion = selectedRegion;
 		}
 
 	}
@@ -108,13 +121,24 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 	{
 		final IDocument document = job.document;
 		final TypedPosition partition = job.partition;
-
+		final IRegion region = job.selectedRegion;
 		if (document != null && partition != null)
 		{
 			Map partitioners = null;
 			try
 			{
-				int offset = partition.getOffset();
+				int offset = 0;
+				int length = 0;
+				if (job.isSelection && !job.isSlave)
+				{
+					offset = region.getOffset();
+					length = region.getLength();
+				}
+				else
+				{
+					offset = partition.getOffset();
+					length = partition.getLength();
+				}
 
 				final IScriptFormatterFactory formatterFactory = selectFormatterFactory(job);
 				if (formatterFactory != null)
@@ -127,11 +151,11 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 						((IScriptFormatterExtension) formatter).initialize(job.project);
 					}
 					formatter.setIsSlave(job.isSlave);
-					final int indentationLevel = (offset != 0) ? formatter.detectIndentationLevel(document, offset) : 0;
-					int length = partition.getLength();
+					final int indentationLevel = (offset != 0) ? formatter.detectIndentationLevel(document, offset,
+							job.isSelection, job.context) : 0;
 					if (job.isSlave)
 					{
-						for (; length + offset > partition.offset; length--)
+						for (; length + offset > offset; length--)
 						{
 							char c = document.getChar(offset + length - 1);
 							if (c == ' ' || c == '\t')
@@ -141,7 +165,8 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 							break;
 						}
 					}
-					final TextEdit edit = formatter.format(document.get(), offset, length, indentationLevel);
+					final TextEdit edit = formatter.format(document.get(), offset, length, indentationLevel,
+							job.isSelection, job.context);
 					if (edit != null)
 					{
 						if (edit.getChildrenSize() > 20)
@@ -149,6 +174,14 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 							partitioners = TextUtilities.removeDocumentPartitioners(document);
 						}
 						edit.apply(document);
+						if (job.isSelection)
+						{
+							IRegion updatedRegion = edit.getRegion();
+							if (edit.getLength() > 0)
+							{
+								job.context.setProperty(FormattingContextProperties.CONTEXT_REGION, updatedRegion);
+							}
+						}
 					}
 				}
 			}
@@ -217,7 +250,14 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final String formatterId = (String) context.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID);
 		final Boolean isSlave = (Boolean) context
 				.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE);
-		fJobs.addLast(new FormatJob(document, partition, project, formatterId, isSlave));
+		final Boolean isSelection = !(Boolean) context.getProperty(FormattingContextProperties.CONTEXT_DOCUMENT);
+		IRegion selectionRegion = null;
+		if (isSelection != null && isSelection)
+		{
+			selectionRegion = (IRegion) context.getProperty(FormattingContextProperties.CONTEXT_REGION);
+		}
+		fJobs.addLast(new FormatJob(context, document, partition, project, formatterId, isSlave, isSelection,
+				selectionRegion));
 	}
 
 	@Override

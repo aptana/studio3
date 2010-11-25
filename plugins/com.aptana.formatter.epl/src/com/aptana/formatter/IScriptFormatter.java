@@ -12,6 +12,7 @@
 package com.aptana.formatter;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.formatter.ui.FormatterException;
@@ -27,9 +28,11 @@ public interface IScriptFormatter
 	 * 
 	 * @param document
 	 * @param offset
+	 * @param context 
+	 * @param isSelection 
 	 * @return
 	 */
-	int detectIndentationLevel(IDocument document, int offset);
+	int detectIndentationLevel(IDocument document, int offset, boolean isSelection, IFormattingContext context);
 
 	/**
 	 * Format <code>source</code>, and returns a text edit that correspond to the difference between the given string
@@ -46,8 +49,9 @@ public interface IScriptFormatter
 	 *            the length of the region to format
 	 * @param indentationLevel
 	 *            the additional indent level
+	 * @param context 
 	 */
-	TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException;
+	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection, IFormattingContext context) throws FormatterException;
 
 	/**
 	 * Set a flag on this formatter to indicate that it will be running as a slave formatter by the multi-pass
