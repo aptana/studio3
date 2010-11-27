@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="Tidy.jar"/>
 	<classpathentry exported="true" kind="lib" path="velocity.jar"/>
 	<classpathentry exported="true" kind="lib" path="css-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="derby.jar"/>

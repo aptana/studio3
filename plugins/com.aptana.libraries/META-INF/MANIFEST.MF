@@ -8,7 +8,8 @@ Bundle-ClassPath: .,
  derby.jar,
  uuid.jar,
  css-validator.jar,
- velocity.jar
+ velocity.jar,
+ Tidy.jar
 Export-Package: com.eaio.uuid,
  org.apache.commons.lang,
  org.apache.derby.authentication,
@@ -133,6 +134,9 @@ Export-Package: com.eaio.uuid,
  org.w3c.css.util,
  org.w3c.css.util.xml,
  org.w3c.css.values,
- org.w3c.www.mime
+ org.w3c.dom,
+ org.w3c.tidy,
+ org.w3c.www.mime,
+ org.xml.sax
 Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
