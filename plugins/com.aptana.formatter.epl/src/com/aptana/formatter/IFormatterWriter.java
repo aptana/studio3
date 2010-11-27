@@ -58,4 +58,9 @@ public interface IFormatterWriter
 
 	void setPreserveSpaces(boolean preserve);
 
+	/**
+	 * @return true if the visitor is currently in a line that contains only whitespace characters (till the new line chars).
+	 */
+	boolean isInBlankLine();
+
 }

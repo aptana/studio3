@@ -440,4 +440,39 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		return this.isSlave;
 	}
+
+	/**
+	 * Left trim the String output.
+	 * 
+	 * @param str
+	 * @param keptChars
+	 *            The number of whitespace chars to keep.
+	 * @return The output without the white-spaces at its beginning.
+	 */
+	protected static String leftTrim(String str, int keptChars)
+	{
+		int whitespaceChars = countLeftWhitespaceChars(str);
+		if (whitespaceChars >= keptChars)
+		{
+			whitespaceChars -= keptChars;
+		}
+		return str.substring(whitespaceChars);
+	}
+
+	/**
+	 * Count the number of whitespace characters that appear in the start of the given string.
+	 * 
+	 * @param str
+	 * @return The number of prefix whitespace chars in the string.
+	 */
+	protected static int countLeftWhitespaceChars(String str)
+	{
+		int i = 0;
+		int length = str.length();
+		while (i < length && Character.isWhitespace(str.charAt(i)))
+		{
+			i++;
+		}
+		return i;
+	}
 }
