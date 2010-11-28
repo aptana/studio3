@@ -34,6 +34,13 @@
  */
 package com.aptana.ui.preferences;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+
 public class AptanaPreferencePage extends GenericRootPreferencePage
 {
 
@@ -43,5 +50,38 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	protected String getPageId()
 	{
 		return PAGE_ID;
+	}
+	
+	/**
+	 * Creates a field editor group for use in grouping items on a page
+	 * 
+	 * @param appearanceComposite
+	 * @param string
+	 * @return Composite
+	 */
+	public static Composite createGroup(Composite appearanceComposite, String string)
+	{
+		Font font = appearanceComposite.getFont();
+		Group group = new Group(appearanceComposite, SWT.NONE);
+		group.setFont(font);
+		group.setText(string);
+		GridLayout layout = new GridLayout();
+		layout.marginWidth = 5;
+		layout.marginHeight = 5;
+		layout.numColumns = 2;
+		group.setLayout(layout);
+
+		Composite c = new Composite(group, SWT.NONE);
+		layout = new GridLayout();
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.numColumns = 2;
+		c.setLayout(layout);
+
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		group.setLayoutData(gd);
+
+		return c;
 	}
 }

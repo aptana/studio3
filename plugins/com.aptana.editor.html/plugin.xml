@@ -111,4 +111,14 @@
             super="com.aptana.editor.common.occurrence">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.html.preferences.HTMLPreferencePage"
+            id="com.aptana.editor.html.preferences.HTMLPreferencePage"
+            name="HTML">
+      </page>
+   </extension>
+
 </plugin>

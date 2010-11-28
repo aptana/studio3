@@ -84,4 +84,15 @@ public interface IPreferenceConstants
 	 * The preference key for determining if task tags should be treated in a case-sensitive manner when detecting them.
 	 */
 	public static final String TASK_TAGS_CASE_SENSITIVE = CommonEditorPlugin.PLUGIN_ID + ".taskTagsCaseSensitive"; //$NON-NLS-1$
+	
+	/**
+	 * Enable highlighting of occurrences of selected text
+	 */
+	public static final String EDITOR_MARK_OCCURRENCES = CommonEditorPlugin.PLUGIN_ID + ".editorMarkOccurrences"; //$NON-NLS-1$
+
+	/**
+	 * EDITOR_MARK_OCCURRENCES_COLOR
+	 */
+	public static final String EDITOR_MARK_OCCURRENCES_COLOR = CommonEditorPlugin.PLUGIN_ID + ".editorMarkOccurrencesColor"; //$NON-NLS-1$
+
 }

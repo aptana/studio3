@@ -54,6 +54,155 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
 
+	/**
+	 * EditorsPreferencePage_Advanced
+	 */
+	public static String EditorsPreferencePage_Advanced;
+
+	/**
+	 * EditorsPreferencePage_CodeAssist
+	 */
+	public static String EditorsPreferencePage_CodeAssist;
+
+	/**
+	 * EditorsPreferencePage_DelayBeforeShowing
+	 */
+	public static String EditorsPreferencePage_DelayBeforeShowing;
+	
+	/**
+	 * EditorsPreferencePage_EditLink
+	 */
+	public static String EditorsPreferencePage_EditLink;
+	public static String EditorsPreferencePage_EmailAddressForBugReports;
+
+	/**
+	 * EditorsPreferencePage_EnableCodeDragAndDrop
+	 */
+	public static String EditorsPreferencePage_EnableCodeDragAndDrop;
+
+	/**
+	 * EditorsPreferencePage_EnableCodePairMatching
+	 */
+	public static String EditorsPreferencePage_EnableCodePairMatching;
+
+	/**
+	 * EditorsPreferencePage_EnableSourceColorizing
+	 */
+	public static String EditorsPreferencePage_EnableSourceColorizing;
+
+	/**
+	 * EditorsPreferencePage_EnableUnicode
+	 */
+	public static String EditorsPreferencePage_EnableUnicode;
+
+	/**
+	 * EditorsPreferencePage_EnableWordWrap
+	 */
+	public static String EditorsPreferencePage_EnableWordWrap;
+
+	/**
+	 * EditorsPreferencePage_Formatting
+	 */
+	public static String EditorsPreferencePage_Formatting;
+	
+	/**
+	 * EditorsPreferencePage_General
+	 */
+	public static String EditorsPreferencePage_General;
+	public static String EditorsPreferencePage_HomeEndBehavior;
+
+	public static String EditorsPreferencePage_INF_ErrorParsingOSGIFrameworkVersion;
+	/**
+	 * EditorsPreferencePage_InsertSelectedProposal
+	 */
+	public static String EditorsPreferencePage_InsertSelectedProposal;
+
+	/**
+	 * EditorsPreferencePage_InsertSpaces
+	 */
+	public static String EditorsPreferencePage_InsertSpaces;
+	public static String EditorsPreferencePage_JumpsStartEnd;
+	
+	/**
+	 * EditorsPreferencePage_MarkOccurrences
+	 */
+	public static String EditorsPreferencePage_MarkOccurrences;
+
+	/**
+	 * EditorsPreferencePage_MaxColorizeColumns
+	 */
+	public static String EditorsPreferencePage_MaxColorizeColumns;
+
+	/**
+	 * EditorsPreferencePage_OptimizeProfileReparsing
+	 */
+	public static String EditorsPreferencePage_OptimizeProfileReparsing;
+
+	/**
+	 * EditorsPreferencePage_PreferenceDescription
+	 */
+	public static String EditorsPreferencePage_PreferenceDescription;
+
+	/**
+	 * EditorsPreferencePage_ShowLocations
+	 */
+	public static String EditorsPreferencePage_ShowLocations;
+
+	/**
+	 * EditorsPreferencePage_ShowSpacesAs
+	 */
+	public static String EditorsPreferencePage_ShowSpacesAs;
+
+	/**
+	 * EditorsPreferencePage_ShowTabsAs
+	 */
+	public static String EditorsPreferencePage_ShowTabsAs;
+	
+	/**
+	 * EditorsPreferencePage_TabInsertion
+	 */
+	public static String EditorsPreferencePage_TabInsertion;
+	public static String EditorsPreferencePage_ToggleBetween;
+	
+	/**
+	 * EditorsPreferencePage_UseSpaces
+	 */
+	public static String EditorsPreferencePage_UseSpaces;
+	
+	/**
+	 * EditorsPreferencePage_UseTabs
+	 */
+	public static String EditorsPreferencePage_UseTabs;
+
+	/**
+	 * EditorsPreferencePage_WhitespaceMarkers
+	 */
+	public static String EditorsPreferencePage_WhitespaceMarkers;
+
+	/**
+	 * EditorsPreferencePage_EnableOccurrenceHighlight
+	 */
+	public static String EditorsPreferencePage_EnableOccurrenceHighlight;
+	public static String EditorsPreferencePage_LBL_Colorization;
+	public static String EditorsPreferencePage_LBL_Less;
+	public static String EditorsPreferencePage_LBL_More;
+	public static String EditorsPreferencePage_LBL_PianoKeyColorDifference;
+
+	/**
+	 * EditorsPreferencePage_OccurrenceBackgroundColor
+	 */
+	public static String EditorsPreferencePage_OccurrenceBackgroundColor;
+
+	/**
+	 * EditorsPreferencePage_SmartHomeKeyPositioning
+	 */
+	public static String EditorsPreferencePage_SmartHomeKeyPositioning;
+	
+	/**
+	 * EditorsPreferencePage_GeneralTextEditorPrefLink
+	 */
+	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
+	
 	static
 	{
 		// initialize resource bundle

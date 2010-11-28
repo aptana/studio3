@@ -745,4 +745,15 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		return fOutlinePage != null;
 	}
+
+	/**
+	 * Returns true if the editor's preferences are set to mark element occurrences.
+	 * 
+	 * @return True, if mark occurrences is on; False, in case it's off.
+	 */
+	public boolean isMarkingOccurrences()
+	{
+		IPreferenceStore store = getPreferenceStore();
+		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
+	}
 }

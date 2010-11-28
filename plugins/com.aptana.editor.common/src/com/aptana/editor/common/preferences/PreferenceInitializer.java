@@ -64,6 +64,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
+
+		// mark occurrences
+		store.setDefault(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+
 	}
 
 }
