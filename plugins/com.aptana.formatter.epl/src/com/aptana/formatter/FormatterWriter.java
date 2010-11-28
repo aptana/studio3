@@ -614,4 +614,25 @@ public class FormatterWriter implements IFormatterWriter
 		}
 		return false;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#isInBlankLine()
+	 */
+	public boolean isInBlankLine()
+	{
+		for (int i = writer.length() - 1; i >= 0; i--)
+		{
+			char c = writer.charAt(i);
+			if (c == '\n' || c == '\r')
+			{
+				return true;
+			}
+			if (!Character.isWhitespace(c))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }
