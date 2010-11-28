@@ -104,5 +104,27 @@
          </includes>
       </viewerContentBinding>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ide.ui.io.filesystemObjectContribution"
+            objectClass="com.aptana.ide.ui.io.navigator.FileSystemObject">
+         <action
+               class="com.aptana.projects.actions.PromoteToProjectAction"
+               icon="icons/folder_project.gif"
+               id="com.aptana.projects.actions.PromoteToProjectAction"
+               label="%action.label.PromoteToProject"
+               menubarPath="group.edit"
+               style="push"
+               tooltip="%action.tooltip.PromoteToProject">
+         </action>
+         <visibility>
+            <objectState
+                  name="isLocal"
+                  value="true">
+            </objectState>
+         </visibility>
+      </objectContribution>      
+   </extension>
 </plugin>
