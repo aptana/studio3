@@ -34,19 +34,12 @@
  */
 package com.aptana.editor.common.parsing;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 
-import com.aptana.core.resources.IUniformResource;
 import com.aptana.editor.common.outline.IParseListener;
-import com.aptana.editor.common.validator.IValidationItem;
-import com.aptana.editor.common.validator.IValidationListener;
 import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
@@ -60,11 +53,7 @@ public class FileService
 	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 	private String fLanguage;
-
-	private Object fResource;
-	private URI fResourceUri;
 	private ValidationManager fValidationManager;
-	private List<IValidationListener> fValidationListeners;
 
 	public FileService(String language)
 	{
@@ -76,7 +65,6 @@ public class FileService
 		this.fLanguage = language;
 		this.fParseState = parseState;
 		fValidationManager = new ValidationManager();
-		fValidationListeners = new ArrayList<IValidationListener>();
 	}
 
 	public void dispose()
@@ -84,8 +72,6 @@ public class FileService
 		fDocument = null;
 		fParseState.clearEditState();
 		fLastSourceHash = 0;
-		fResource = null;
-		fResourceUri = null;
 		fValidationManager.dispose();
 	}
 
@@ -97,19 +83,6 @@ public class FileService
 	public void addListener(IParseListener listener)
 	{
 		listeners.add(listener);
-	}
-
-	public void addValidationListener(IValidationListener listener)
-	{
-		if (!fValidationListeners.contains(listener))
-		{
-			fValidationListeners.add(listener);
-		}
-	}
-
-	public void removeValidationListener(IValidationListener listener)
-	{
-		fValidationListeners.remove(listener);
 	}
 
 	/**
@@ -167,12 +140,7 @@ public class FileService
 						listener.parseFinished();
 					}
 
-					if (fResourceUri != null)
-					{
-						fValidationManager.validate(source, fLanguage, fResourceUri);
-						List<IValidationItem> items = fValidationManager.getItems();
-						fireValidationChanged(items.toArray(new IValidationItem[items.size()]));
-					}
+					fValidationManager.validate(source, fLanguage);
 				}
 				catch (Exception e)
 				{
@@ -212,22 +180,6 @@ public class FileService
 	 */
 	public void setResource(Object resource)
 	{
-		fResource = resource;
-		if (fResource instanceof IResource)
-		{
-			fResourceUri = ((IResource) fResource).getLocationURI();
-		}
-		else if (fResource instanceof IUniformResource)
-		{
-			fResourceUri = ((IUniformResource) fResource).getURI();
-		}
-	}
-
-	private void fireValidationChanged(IValidationItem[] items)
-	{
-		for (IValidationListener listener : fValidationListeners)
-		{
-			listener.validationChanged(fResource, items);
-		}
+		fValidationManager.setResource(resource);
 	}
 }

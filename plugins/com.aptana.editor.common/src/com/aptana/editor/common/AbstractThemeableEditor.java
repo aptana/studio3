@@ -97,8 +97,6 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
-import com.aptana.editor.common.validator.IValidationListener;
-import com.aptana.editor.common.validator.ResourceValidationListener;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
@@ -196,8 +194,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private ThemeableEditorExtension fThemeableEditorColorsExtension;
 
 	private IPropertyChangeListener fThemeListener;
-
-	private IValidationListener fValidationListener;
 
 	/**
 	 * AbstractThemeableEditor
@@ -525,7 +521,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			if (fFileService != null)
 			{
 				fFileService.dispose();
-				fFileService.removeValidationListener(fValidationListener);
 				fFileService = null;
 			}
 		}
@@ -591,8 +586,6 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		if (fFileService == null)
 		{
 			fFileService = createFileService();
-			fValidationListener = new ResourceValidationListener();
-			fFileService.addValidationListener(fValidationListener);
 		}
 		return fFileService;
 	}

@@ -35,6 +35,7 @@
 package com.aptana.editor.common.validator;
 
 import java.net.URI;
+import java.util.List;
 
 public interface IValidator
 {
@@ -48,6 +49,7 @@ public interface IValidator
 	 *            the source path
 	 * @param manager
 	 *            the validation manager
+	 * @return a list of validation items
 	 */
-	public void parse(String source, URI path, IValidationManager manager);
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager);
 }

@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.validator;
 
+import java.util.Map;
+
 /**
  * @author Ingo Muschenetz
  */
@@ -81,4 +83,11 @@ public interface IValidationItem
 	 * @return the source path
 	 */
 	String getSourcePath();
+
+	/**
+	 * Creates a map of marker attributes.
+	 * 
+	 * @return the attributes in a map
+	 */
+	Map<String, Object> createMarkerAttributes();
 }

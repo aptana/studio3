@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.common.validator;
 
+import java.net.URI;
 import java.util.List;
 
 public interface IValidationManager
@@ -53,7 +54,7 @@ public interface IValidationManager
 	 * @param sourcePath
 	 *            the source path
 	 */
-	public void addError(String message, int lineNumber, int lineOffset, int length, String sourcePath);
+	public void addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
 	 * Adds a validation warning.
@@ -69,7 +70,7 @@ public interface IValidationManager
 	 * @param sourcePath
 	 *            the source path
 	 */
-	public void addWarning(String message, int lineNumber, int lineOffset, int length, String sourcePath);
+	public void addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
 	 * Gets the list of current validation items.

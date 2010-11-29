@@ -68,7 +68,7 @@ public class ValidatorReference
 		return language;
 	}
 
-	public IValidator getValidator()
+	public synchronized IValidator getValidator()
 	{
 		if (validator == null)
 		{

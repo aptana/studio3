@@ -34,6 +34,11 @@
  */
 package com.aptana.editor.common.validator;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.core.resources.IMarker;
+
 public class ValidationItem implements IValidationItem
 {
 
@@ -82,5 +87,17 @@ public class ValidationItem implements IValidationItem
 	public String getSourcePath()
 	{
 		return sourcePath;
+	}
+
+	public Map<String, Object> createMarkerAttributes()
+	{
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put(IMarker.SEVERITY, getSeverity());
+		attributes.put(IMarker.CHAR_START, getOffset());
+		attributes.put(IMarker.CHAR_END, getOffset() + getLength());
+		attributes.put(IMarker.MESSAGE, getMessage());
+		attributes.put(IMarker.LINE_NUMBER, getLineNumber());
+
+		return attributes;
 	}
 }
