@@ -25,24 +25,12 @@ public final class Messages extends NLS
 		// Do not instantiate
 	}
 
-	/**
-	 * WizardFolderImportPage_ExistingFolderAsNewProject
-	 */
 	public static String WizardFolderImportPage_ExistingFolderAsNewProject;
 
-	/**
-	 * WizardFolderImportPage_SelectFolder
-	 */
 	public static String WizardFolderImportPage_SelectFolder;
 
-	/**
-	 * WizardFolderImportPage_ProjectName
-	 */
 	public static String WizardFolderImportPage_ProjectName;
 
-	/**
-	 * WizardFolderImportPage_ErrorInitializingFolderImportWizard
-	 */
 	public static String WizardFolderImportPage_ErrorInitializingFolderImportWizard;
 
 	static

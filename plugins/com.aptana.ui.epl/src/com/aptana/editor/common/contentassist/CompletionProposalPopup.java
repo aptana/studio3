@@ -957,7 +957,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (oldProposal instanceof ICompletionProposalExtension2 && fViewer != null)
 				((ICompletionProposalExtension2) oldProposal).unselected(fViewer);
 
-			// Commented out code from original
 			if (proposals == null || proposals.length == 0) {
 				fEmptyProposal.fOffset= fFilterOffset;
 				fEmptyProposal.fDisplayString= fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$

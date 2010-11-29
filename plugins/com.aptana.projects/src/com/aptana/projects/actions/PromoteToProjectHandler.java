@@ -36,57 +36,59 @@ package com.aptana.projects.actions;
 
 import java.io.File;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IViewActionDelegate;
-import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.projects.internal.wizards.PromoteToProjectWizard;
 import com.aptana.ui.SWTUtils;
 
-public class PromoteToProjectAction implements IViewActionDelegate {
+public class PromoteToProjectHandler extends AbstractHandler
+{
 
-    private IStructuredSelection fSelection;
+	private IStructuredSelection fSelection;
 
-    public PromoteToProjectAction() {
-    }
+	public PromoteToProjectHandler()
+	{
+	}
 
-    public void init(IViewPart view) {
-    }
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection)
+		{
+			fSelection = (IStructuredSelection) selection;
+		}
 
-    public void run(IAction action) {
-        if (fSelection == null) {
-            return;
-        }
-        Object obj = fSelection.getFirstElement();
+		if (fSelection == null)
+		{
+			return null;
+		}
+		Object obj = fSelection.getFirstElement();
 
-        File file = null;
-        if (obj instanceof IAdaptable) {
-            file = (File) ((IAdaptable) obj).getAdapter(File.class);
-        }
-        if (file != null) {
-            // uses the parent folder if the file is not a directory
-            String path = file.isDirectory() ? file.getPath() : file
-                    .getParentFile().getPath();
+		File file = null;
+		if (obj instanceof IAdaptable)
+		{
+			file = (File) ((IAdaptable) obj).getAdapter(File.class);
+		}
+		if (file != null)
+		{
+			// uses the parent folder if the file is not a directory
+			String path = file.isDirectory() ? file.getPath() : file.getParentFile().getPath();
 
-            PromoteToProjectWizard wizard = new PromoteToProjectWizard(path);
-			WizardDialog dialog = new WizardDialog(Display.getCurrent()
-                    .getActiveShell(), wizard);
-            dialog.create();
-            SWTUtils.center(Display.getCurrent()
-                    .getActiveShell(), dialog.getShell());
-            dialog.open();
-        }
-    }
+			PromoteToProjectWizard wizard = new PromoteToProjectWizard(path);
+			WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+			dialog.create();
+			SWTUtils.center(Display.getCurrent().getActiveShell(), dialog.getShell());
+			dialog.open();
+		}
 
-    public void selectionChanged(IAction action, ISelection selection) {
-        if (selection instanceof IStructuredSelection) {
-            fSelection = (IStructuredSelection) selection;
-        }
-    }
-
+		return null;
+	}
 }
