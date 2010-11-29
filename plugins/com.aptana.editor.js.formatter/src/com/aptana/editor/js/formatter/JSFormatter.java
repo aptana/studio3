@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -110,7 +111,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	/**
 	 * Detects the indentation level.
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 		int indent = 0;
 		try
@@ -160,7 +162,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
 	 */
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
 		IParser parser = checkoutParser();
@@ -172,7 +175,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset);
+				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -293,8 +296,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
+			boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -312,7 +321,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			StatusLineMessageTimerManager.setErrorMessage(
 					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
 		}
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	private FormatterDocument createFormatterDocument(String input, int offset)

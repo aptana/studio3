@@ -41,6 +41,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterForeignElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
+import com.aptana.editor.html.formatter.nodes.FormatterHTMLContentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
@@ -52,6 +53,7 @@ import com.aptana.formatter.nodes.FormatterBlockNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.FormatterCommentNode;
+import com.aptana.formatter.nodes.FormatterTextNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.INameNode;
 import com.aptana.parsing.ast.IParseNode;
@@ -145,8 +147,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode))
 				{
 					FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
-					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
-							.getEndingOffset() + 1));
+					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(),
+							elementNode.getEndingOffset() + 1));
 					push(formatterNode);
 					checkedPop(formatterNode, -1);
 				}
@@ -279,9 +281,10 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			endOffset = endNodeRange.getStartingOffset();
 		}
 
-		formatterNode = new FormatterDefaultElementNode(document, type);
-		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
-				.getEndingOffset() + 1));
+		boolean createdContentNode = false;
+		formatterNode = new FormatterDefaultElementNode(document, type, node.hasChildren());
+		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
+				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
 		if (node.getNodeType() == HTMLNodeTypes.SPECIAL)
 		{
@@ -301,12 +304,50 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			// Recursively call this method till we are done with all the children under this node.
 			addNodes(node.getChildren());
+
+			int endNodeStartingOffset = endNode.getNameRange().getStartingOffset();
+			int textStartOffset = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
+			int textEndOffset = getEndWithoutWhiteSpaces(endNodeStartingOffset - 1, document);
+
+			// Create content node when the HTMLElementNode does not have any children
+			if (!node.hasChildren())
+			{
+				if (textStartOffset >= textEndOffset)
+				{
+					if (textStartOffset == endOffset)
+					{
+						// Set offset to create a blank text node when there is nothing so we can use
+						// shouldConsumePreviousWhiteSpaces to remove new line
+						textEndOffset = textStartOffset - 1;
+					}
+					else
+					{
+						// Case where nodes have only contain white spaces
+						textStartOffset = beginNodeRange.getEndingOffset() + 1;
+						textEndOffset = endOffset - 1;
+					}
+				}
+				FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, type, textStartOffset,
+						textEndOffset + 1);
+				formatterNode.addChild(contentFormatterNode);
+				createdContentNode = true;
+
+			}
+
 		}
-		checkedPop(formatterNode, endOffset);
+
+		if (createdContentNode)
+		{
+			checkedPop(formatterNode, -1);
+		}
+		else
+		{
+			checkedPop(formatterNode, endOffset);
+		}
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
 	}
-	
+
 	/**
 	 * @param i
 	 * @param document2
@@ -343,4 +384,5 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		return offset;
 	}
+
 }

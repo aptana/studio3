@@ -53,7 +53,7 @@ public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 	 */
 	public FormatterSpecialElementNode(IFormatterDocument document, String element)
 	{
-		super(document, element);
+		super(document, element, false);
 	}
 
 	/*
