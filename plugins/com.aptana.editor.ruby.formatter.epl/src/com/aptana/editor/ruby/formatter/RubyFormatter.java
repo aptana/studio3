@@ -58,7 +58,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 
 	private final String lineDelimiter;
 
-	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences, String mainContentType)
+	public RubyFormatter(String lineDelimiter, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineDelimiter = lineDelimiter;

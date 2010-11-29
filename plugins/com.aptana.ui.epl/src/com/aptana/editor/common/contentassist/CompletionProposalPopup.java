@@ -303,30 +303,19 @@ public class CompletionProposalPopup implements IContentAssistListener
 					fComputedProposals = computeProposals(fInvocationOffset, autoActivated);
 
 					int count = (fComputedProposals == null ? 0 : fComputedProposals.length);
-					if (count == 0)
+
+					if (count == 1 && !autoActivated && canAutoInsert(fComputedProposals[0]))
 					{
 
-						// if (!autoActivated)
-						// control.getDisplay().beep();
-
+						insertProposal(fComputedProposals[0], (char) 0, 0, fInvocationOffset);
 						hide();
 
 					}
 					else
 					{
-
-						if (count == 1 && !autoActivated && canAutoInsert(fComputedProposals[0]))
-						{
-
-							insertProposal(fComputedProposals[0], (char) 0, 0, fInvocationOffset);
-							hide();
-
-						}
-						else
-						{
-							createPopup();
-						}
+						createPopup();
 					}
+
 				}
 			});
 		}
@@ -610,6 +599,19 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	int defaultIndex = -1;
 	private char fLastKeyPressed;
+
+	/**
+	 * The (reusable) empty proposal.
+	 *
+	 * @since 3.2
+	 */
+	private final EmptyProposal fEmptyProposal= new EmptyProposal();
+	/**
+	 * The text for the empty proposal, or <code>null</code> to use the default text.
+	 *
+	 * @since 3.2
+	 */
+	private String fEmptyMessage= null;
 
 	private void handleSetData(Event event)
 	{
@@ -955,12 +957,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (oldProposal instanceof ICompletionProposalExtension2 && fViewer != null)
 				((ICompletionProposalExtension2) oldProposal).unselected(fViewer);
 
-			// Commented out code from original
-//			if (proposals == null || proposals.length == 0) {
-//				fEmptyProposal.fOffset= fFilterOffset;
-//				fEmptyProposal.fDisplayString= fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
-//				proposals= new ICompletionProposal[] { fEmptyProposal };
-//			}
+			if (proposals == null || proposals.length == 0) {
+				fEmptyProposal.fOffset= fFilterOffset;
+				fEmptyProposal.fDisplayString= fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
+				proposals= new ICompletionProposal[] { fEmptyProposal };
+			}
 
 			fFilteredProposals= proposals;
 			final int newLen= proposals.length;
@@ -2071,4 +2072,83 @@ public class CompletionProposalPopup implements IContentAssistListener
 	{
 		fActivationKey = activationKey;
 	}
+	
+	/**
+	 * The empty proposal displayed if there is nothing else to show.
+	 *
+	 * @since 3.2
+	 */
+	private static final class EmptyProposal implements ICompletionProposal, ICompletionProposalExtension {
+
+		String fDisplayString;
+		int fOffset;
+		/*
+		 * @see ICompletionProposal#apply(IDocument)
+		 */
+		public void apply(IDocument document) {
+		}
+
+		/*
+		 * @see ICompletionProposal#getSelection(IDocument)
+		 */
+		public Point getSelection(IDocument document) {
+			return new Point(fOffset, 0);
+		}
+
+		/*
+		 * @see ICompletionProposal#getContextInformation()
+		 */
+		public IContextInformation getContextInformation() {
+			return null;
+		}
+
+		/*
+		 * @see ICompletionProposal#getImage()
+		 */
+		public Image getImage() {
+			return null;
+		}
+
+		/*
+		 * @see ICompletionProposal#getDisplayString()
+		 */
+		public String getDisplayString() {
+			return fDisplayString;
+		}
+
+		/*
+		 * @see ICompletionProposal#getAdditionalProposalInfo()
+		 */
+		public String getAdditionalProposalInfo() {
+			return null;
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#apply(org.eclipse.jface.text.IDocument, char, int)
+		 */
+		public void apply(IDocument document, char trigger, int offset) {
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#isValidFor(org.eclipse.jface.text.IDocument, int)
+		 */
+		public boolean isValidFor(IDocument document, int offset) {
+			return false;
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#getTriggerCharacters()
+		 */
+		public char[] getTriggerCharacters() {
+			return null;
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#getContextInformationPosition()
+		 */
+		public int getContextInformationPosition() {
+			return -1;
+		}
+	}
+	
 }

@@ -55,5 +55,40 @@
             language="text/ruby">
       </parser>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="com.aptana.ruby.blockPair.occurrences"
+            colorPreferenceKey="rubyBlockPairOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="rubyBlockPairOccurrenceIndicationHighlighting"
+            highlightPreferenceValue="true"
+            isGoToNextNavigationTarget="true"
+            isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
+            isGoToPreviousNavigationTarget="true"
+            isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
+            label="%blockPairOccurrence.label"
+            overviewRulerPreferenceKey="rubyBlockPairOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="showOccurrenceInNextPrevDropdownToolbarAction"
+            textPreferenceKey="rubyBlockPairOccurrenceIndication"
+            textPreferenceValue="false"
+            textStylePreferenceKey="rubyBlockPairOccurrenceIndicationTextStyle"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="rubyBlockPairOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.ruby.blockPair.occurrences"
+            super="com.aptana.editor.common.occurrence">
+      </type>
+   </extension>
 
 </plugin>

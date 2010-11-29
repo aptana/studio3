@@ -104,5 +104,36 @@
          </includes>
       </viewerContentBinding>
    </extension>
-
+   <extension
+     point="org.eclipse.ui.commands">
+	   <command
+	        defaultHandler="com.aptana.projects.actions.PromoteToProjectHandler"
+	        id="com.aptana.projects.promote"
+	        name="%PromoteToProject_tooltip">
+	  </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution
+            allPopups="true"
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.edit">
+         <command
+               commandId="com.aptana.projects.promote"
+               icon="icons/folder_project.gif"
+               id="com.aptana.projects.PromoteToProject"
+               label="%PromoteToProject_label"
+               tooltip="%PromoteToProject_tooltip">
+			<visibleWhen>
+               <with
+                     variable="activeMenuSelection">
+                  <iterate>
+                     <adapt
+                           type="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+   </menuContribution>
+	</extension>
 </plugin>

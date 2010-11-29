@@ -79,10 +79,13 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		modelStack.push(script);
 	}
 
-	public void acceptBlock(int startOffset, int endOffset)
+	public void enterBlock(int startOffset, int endOffset)
 	{
 		RubyElement parent = modelStack.peek();
-		parent.addChild(new RubyBlock(startOffset, endOffset));
+		RubyBlock block = new RubyBlock(startOffset, endOffset);
+
+		parent.addChild(block);
+		modelStack.push(block);
 	}
 
 	public void acceptConstructorReference(String name, int argCount, int offset)
@@ -196,31 +199,37 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		RubyElement parent = getCurrentType();
 		if (fieldInfo.name.startsWith("@@")) //$NON-NLS-1$
 		{
-			handle = new RubyClassVariable(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+			handle = new RubyClassVariable(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+					fieldInfo.nameSourceEnd);
 		}
 		else if (fieldInfo.name.startsWith("@")) //$NON-NLS-1$
 		{
-			handle = new RubyInstanceVariable(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+			handle = new RubyInstanceVariable(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+					fieldInfo.nameSourceEnd);
 		}
 		else if (fieldInfo.name.startsWith("$")) //$NON-NLS-1$
 		{
 			parent = script;
-			handle = new RubyGlobal(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+			handle = new RubyGlobal(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+					fieldInfo.nameSourceEnd);
 		}
 		else if (Character.isUpperCase(fieldInfo.name.charAt(0)))
 		{
-			handle = new RubyConstant(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+			handle = new RubyConstant(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+					fieldInfo.nameSourceEnd);
 		}
 		else
 		{
 			parent = modelStack.peek();
 			if (fieldInfo.isDynamic)
 			{
-				handle = new RubyDynamicVariable(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+				handle = new RubyDynamicVariable(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+						fieldInfo.nameSourceEnd);
 			}
 			else
 			{
-				handle = new RubyLocalVariable(fieldInfo.name, fieldInfo.nameSourceStart, fieldInfo.nameSourceEnd);
+				handle = new RubyLocalVariable(fieldInfo.name, fieldInfo.declarationStart, fieldInfo.nameSourceStart,
+						fieldInfo.nameSourceEnd);
 			}
 		}
 		// for field, checks if it has been stored in the parent once
@@ -233,8 +242,8 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 
 	public void enterMethod(MethodInfo methodInfo)
 	{
-		RubyMethod method = new RubyMethod(methodInfo.name, methodInfo.parameterNames, methodInfo.nameSourceStart,
-				methodInfo.nameSourceEnd);
+		RubyMethod method = new RubyMethod(methodInfo.name, methodInfo.parameterNames, methodInfo.declarationStart,
+				methodInfo.nameSourceStart, methodInfo.nameSourceEnd);
 		method.setVisibility(methodInfo.visibility);
 		method.setIsSingleton(methodInfo.isClassLevel);
 		getCurrentType().addChild(method);
@@ -250,11 +259,13 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 		RubyType handle;
 		if (typeInfo.isModule)
 		{
-			handle = new RubyModule(typeInfo.name, typeInfo.nameSourceStart, typeInfo.nameSourceEnd);
+			handle = new RubyModule(typeInfo.name, typeInfo.declarationStart, typeInfo.nameSourceStart,
+					typeInfo.nameSourceEnd);
 		}
 		else
 		{
-			handle = new RubyType(typeInfo.name, typeInfo.nameSourceStart, typeInfo.nameSourceEnd);
+			handle = new RubyType(typeInfo.name, typeInfo.declarationStart, typeInfo.nameSourceStart,
+					typeInfo.nameSourceEnd);
 		}
 		handle.setSuperclassName(typeInfo.superclass);
 		handle.setIncludedModuleNames(typeInfo.modules);
@@ -296,6 +307,12 @@ public class RubyStructureBuilder implements ISourceElementRequestor
 	{
 		RubyElement element = modelStack.pop();
 		element.setLocation(element.getStartingOffset(), endOffset + 1);
+	}
+
+	public void exitBlock(int endOffset)
+	{
+		RubyElement element = modelStack.pop();
+		element.setLocation(element.getStartingOffset(), endOffset);
 	}
 
 	private static IRubyElement findChild(RubyElement parent, int type, String name)

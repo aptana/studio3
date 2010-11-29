@@ -32,21 +32,63 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.ruby.parsing.ast;
+package com.aptana.projects.actions;
 
-import com.aptana.editor.ruby.core.IRubyElement;
+import java.io.File;
 
-public class RubyGlobal extends RubyField
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.handlers.HandlerUtil;
+
+import com.aptana.projects.internal.wizards.PromoteToProjectWizard;
+import com.aptana.ui.SWTUtils;
+
+public class PromoteToProjectHandler extends AbstractHandler
 {
 
-	public RubyGlobal(String name, int start, int nameStart, int nameEnd)
+	private IStructuredSelection fSelection;
+
+	public PromoteToProjectHandler()
 	{
-		super(name, start, nameStart, nameEnd);
 	}
 
-	@Override
-	public short getNodeType()
+	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		return IRubyElement.GLOBAL;
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection)
+		{
+			fSelection = (IStructuredSelection) selection;
+		}
+
+		if (fSelection == null)
+		{
+			return null;
+		}
+		Object obj = fSelection.getFirstElement();
+
+		File file = null;
+		if (obj instanceof IAdaptable)
+		{
+			file = (File) ((IAdaptable) obj).getAdapter(File.class);
+		}
+		if (file != null)
+		{
+			// uses the parent folder if the file is not a directory
+			String path = file.isDirectory() ? file.getPath() : file.getParentFile().getPath();
+
+			PromoteToProjectWizard wizard = new PromoteToProjectWizard(path);
+			WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+			dialog.create();
+			SWTUtils.center(Display.getCurrent().getActiveShell(), dialog.getShell());
+			dialog.open();
+		}
+
+		return null;
 	}
 }
