@@ -111,7 +111,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new HAMLSingleLineRule("/", new Token(HTML_COMMENT)), //$NON-NLS-1$
 			new HAMLSingleLineRule("-#", new Token(HAML_COMMENT)), //$NON-NLS-1$
 			new HAMLSingleLineRule("!!!", new Token(DOCTYPE)), //$NON-NLS-1$
-			new HAMLEscapeRule(new Token(null)),
+			new HAMLEscapeRule(new Token("")),
 			new SingleLineRule("#{", "}", new Token(INTERPOLATION)), //$NON-NLS-1$ //$NON-NLS-2$
 			new HAMLElementRule(new Token(ELEMENT)),
 			new RubyEvaluationElementRule(new Token(RUBY_EVALUATION)),
