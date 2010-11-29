@@ -60,6 +60,7 @@ import org.w3c.css.util.ApplContext;
 import org.w3c.css.util.Utf8Properties;
 
 import com.aptana.core.util.URLEncoder;
+import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.css.Activator;
@@ -93,11 +94,12 @@ public class CSSValidator implements IValidator
 		loadAptanaCSSProfile();
 	}
 
-	public void parse(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		String report = getReport(source, path);
 		processErrorsInReport(report, path, manager);
 		processWarningsInReport(report, path, manager);
+		return manager.getItems();
 	}
 
 	private void processErrorsInReport(String report, URI sourceUri, IValidationManager manager)
@@ -122,7 +124,7 @@ public class CSSValidator implements IValidator
 			// gets the URI
 			int uriStart = report.indexOf("<uri>", errorListStart) + "<uri>".length(); //$NON-NLS-1$ //$NON-NLS-2$
 			int uriEnd = report.indexOf("</uri>", uriStart); //$NON-NLS-1$
-			String uri = report.substring(uriStart, uriEnd);
+			String uri = new String(report.substring(uriStart, uriEnd));
 
 			// finds the end of this list
 			int errorListEnd = report.indexOf(endTag, errorListStart);
@@ -131,11 +133,11 @@ public class CSSValidator implements IValidator
 			if (uri != null && URLEncoder.encode(uri, null, null).equals(sourcePath))
 			{
 				// extracts the error list
-				String listString = report.substring(errorListStart, errorListEnd);
+				String listString = new String(report.substring(errorListStart, errorListEnd));
 				// finds the errors
 				String[] errors = getContent(ERROR_PATTERN, listString);
 				// add errors
-				addErrors(errors, uri, manager);
+				addErrors(errors, sourceUri, manager);
 			}
 
 			// advances past the current error list
@@ -165,7 +167,7 @@ public class CSSValidator implements IValidator
 			// gets the URI
 			int uriStart = report.indexOf("<uri>", warningListStart) + "<uri>".length(); //$NON-NLS-1$ //$NON-NLS-2$
 			int uriEnd = report.indexOf("</uri>", uriStart); //$NON-NLS-1$
-			String uri = report.substring(uriStart, uriEnd);
+			String uri = new String(report.substring(uriStart, uriEnd));
 
 			// finds the end of this list
 			int warningListEnd = report.indexOf(endTag, warningListStart);
@@ -173,11 +175,11 @@ public class CSSValidator implements IValidator
 			if (uri != null && URLEncoder.encode(uri, null, null).equals(sourcePath))
 			{
 				// extracts the warning list
-				String listString = report.substring(warningListStart, warningListEnd);
+				String listString = new String(report.substring(warningListStart, warningListEnd));
 				// finds the warnings
 				String[] warnings = getContent(WARNING_PATTERN, listString);
 				// adds errors
-				addWarnings(warnings, uri, manager);
+				addWarnings(warnings, sourceUri, manager);
 			}
 
 			// advance past the current warning list
@@ -242,7 +244,7 @@ public class CSSValidator implements IValidator
 	 * @param manager
 	 *            the validation manager
 	 */
-	private static void addErrors(String[] errors, String sourcePath, IValidationManager manager)
+	private static void addErrors(String[] errors, URI sourcePath, IValidationManager manager)
 	{
 		Map<String, String> map;
 		for (String error : errors)
@@ -285,7 +287,7 @@ public class CSSValidator implements IValidator
 	 * @param manager
 	 *            the validation manager
 	 */
-	private static void addWarnings(String[] warnings, String sourcePath, IValidationManager manager)
+	private static void addWarnings(String[] warnings, URI sourcePath, IValidationManager manager)
 	{
 		Map<String, String> map;
 		String last = ""; //$NON-NLS-1$

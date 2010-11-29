@@ -41,12 +41,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.w3c.tidy.Tidy;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.html.Activator;
@@ -57,15 +60,14 @@ public class HTMLTidyValidator implements IValidator
 	private static final Pattern PATTERN = Pattern
 			.compile("\\s*line\\s+(\\d+)\\s*column\\s+(\\d+)\\s*-\\s*(Warning|Error):\\s*(.+)$"); //$NON-NLS-1$
 
-	public void parse(String source, URI path, IValidationManager manager)
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		String report = parseWithTidy(source);
 		if (StringUtil.isEmpty(report))
 		{
-			return;
+			return Collections.emptyList();
 		}
 
-		String uri = path.toString();
 		BufferedReader reader = null;
 		try
 		{
@@ -75,7 +77,7 @@ public class HTMLTidyValidator implements IValidator
 			{
 				if (line.startsWith("line")) //$NON-NLS-1$
 				{
-					parseTidyOutput(line, uri, manager);
+					parseTidyOutput(line, path, manager);
 				}
 			}
 		}
@@ -97,6 +99,7 @@ public class HTMLTidyValidator implements IValidator
 				}
 			}
 		}
+		return manager.getItems();
 	}
 
 	private static String parseWithTidy(String source)
@@ -118,7 +121,7 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void parseTidyOutput(String report, String path, IValidationManager manager)
+	private static void parseTidyOutput(String report, URI path, IValidationManager manager)
 	{
 		Matcher matcher = PATTERN.matcher(report);
 

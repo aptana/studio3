@@ -552,27 +552,4 @@
             name="com.aptana.editor.common.occurrence">
       </type>
    </extension>
-   <extension
-         id="problem"
-         name="Aptana Problem"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
-      <attribute
-            name="id">
-      </attribute>
-      <attribute
-            name="flags">
-      </attribute>
-      <attribute
-            name="arguments">
-      </attribute>
-   </extension>
 </plugin>
