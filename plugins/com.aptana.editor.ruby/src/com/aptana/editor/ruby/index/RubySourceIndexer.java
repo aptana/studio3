@@ -252,7 +252,7 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.REF, getSimpleName(moduleName));
 
 		if (typeStack != null && !typeStack.isEmpty())
-		{			
+		{
 			TypeInfo info = typeStack.peek();
 			String[] enclosingTypes = getEnclosingTypeNames(info.name);
 			addIncludedModuleReference(getSimpleName(info.name), enclosingTypes, moduleName);
@@ -376,7 +376,12 @@ public class RubySourceIndexer implements ISourceElementRequestor
 		addIndex(IRubyIndexConstants.CONSTRUCTOR_REF, createMethodKey(simpleTypeName, argCount));
 	}
 
-	public void acceptBlock(int startOffset, int endOffset)
+	public void enterBlock(int startOffset, int endOffset)
 	{
+	}
+
+	public void exitBlock(int endOffset)
+	{
+		// no-op
 	}
 }

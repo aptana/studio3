@@ -40,9 +40,9 @@ import com.aptana.editor.ruby.core.IRubyField;
 public class RubyField extends NamedMember implements IRubyField
 {
 
-	public RubyField(String name, int start, int end)
+	public RubyField(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 	}
 
 	@Override
