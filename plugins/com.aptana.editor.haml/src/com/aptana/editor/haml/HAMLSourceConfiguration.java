@@ -55,6 +55,7 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
@@ -263,12 +264,14 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fTextScanner == null) {
 			fTextScanner = new RuleBasedScanner();
 			fTextScanner.setRules(new IRule[] {
-				new SingleCharacterRule('/', getToken("punctuation.terminator.tag.haml")), //$NON-NLS-1$
-				new SingleCharacterRule('>', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
-				new SingleCharacterRule('<', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
-				new SingleCharacterRule('&', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
-				new SingleCharacterRule('!', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
-				new HAMLEscapeRule(getToken("meta.escape.haml")), //$NON-NLS-1$
+					new CharacterMapRule()
+					.add('/', getToken("punctuation.terminator.tag.haml")) //$NON-NLS-1$
+					.add('/', getToken("punctuation.terminator.tag.haml")) //$NON-NLS-1$
+					.add('>', getToken("punctuation.other.tag.haml")) //$NON-NLS-1$
+					.add('<', getToken("punctuation.other.tag.haml")) //$NON-NLS-1$
+					.add('&', getToken("punctuation.other.tag.haml")) //$NON-NLS-1$
+					.add('!', getToken("punctuation.other.tag.haml")), //$NON-NLS-1$
+					new HAMLEscapeRule(getToken("meta.escape.haml")), //$NON-NLS-1$
 			});
 			fTextScanner.setDefaultReturnToken(getToken(IHAMLConstants.TEXT_SCOPE)); 
 		}
@@ -286,10 +289,10 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fInterpolationScanner == null) {
 			fInterpolationScanner = new RuleBasedScanner();
 			fInterpolationScanner.setRules(new IRule[] {
-					new MultiCharacterRule("#{", getToken("punctuation.section.other.haml")), //$NON-NLS-1$ //$NON-NLS-2$
-					new SingleCharacterRule('}', getToken("punctuation.section.other.haml")) //$NON-NLS-1$
+					new MultiCharacterRule("#{", getToken("punctuation.section.embedded.ruby")), //$NON-NLS-1$ //$NON-NLS-2$
+					new SingleCharacterRule('}', getToken("punctuation.section.embedded.ruby")) //$NON-NLS-1$
 			});
-			fInterpolationScanner.setDefaultReturnToken(getToken("string.interpolated.ruby.haml")); //$NON-NLS-1$
+			fInterpolationScanner.setDefaultReturnToken(getToken("source.ruby.embedded.source")); //$NON-NLS-1$
 		}
 		return fInterpolationScanner;
 	}
@@ -298,8 +301,9 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fObjectScanner == null) {
 			fObjectScanner = new RuleBasedScanner();
 			fObjectScanner.setRules(new IRule[] {
-					new SingleCharacterRule('[', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
-					new SingleCharacterRule(']', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
+					new CharacterMapRule()
+					.add('[', getToken("punctuation.section.other.haml")) //$NON-NLS-1$
+					.add(']', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
 					// TODO: add word rules here for:
 					// - variable.other.readwrite.instance.ruby
 					// - constant.other.symbol.ruby
@@ -314,8 +318,9 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fHTMLAttributesScanner == null) {
 			fHTMLAttributesScanner = new RuleBasedScanner();
 			fHTMLAttributesScanner.setRules(new IRule[] {
-					new SingleCharacterRule('(', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
-					new SingleCharacterRule(')', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
+					new CharacterMapRule()
+					.add('(', getToken("punctuation.section.other.haml")) //$NON-NLS-1$
+					.add(')', getToken("punctuation.section.other.haml")), //$NON-NLS-1$
 					// TODO: add word rules here for:
 					// - single quoted string
 					// - double quoted string

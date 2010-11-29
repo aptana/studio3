@@ -61,9 +61,10 @@ public class CharacterMapRule implements IPredicateRule
 	 * @param c
 	 * @param token
 	 */
-	public void add(char c, IToken token)
+	public CharacterMapRule add(char c, IToken token)
 	{
 		characterTokenMap.put(c, token);
+		return this;
 	}
 
 	/*

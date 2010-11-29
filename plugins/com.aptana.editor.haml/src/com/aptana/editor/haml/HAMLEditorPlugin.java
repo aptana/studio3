@@ -40,18 +40,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends Plugin {
+public class HAMLEditorPlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.haml"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static HAMLEditorPlugin plugin;
 	
 	/**
 	 * The constructor
 	 */
-	public Activator() {
+	public HAMLEditorPlugin() {
 	}
 
 	/*
@@ -77,7 +77,7 @@ public class Activator extends Plugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static HAMLEditorPlugin getDefault() {
 		return plugin;
 	}
 
