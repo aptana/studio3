@@ -55,8 +55,7 @@ public class SequenceCharacterScannerTest extends TestCase
 		super.setUp();
 
 		ruleBasedScanner = new RuleBasedScanner();
-		IPartitionScannerSwitchStrategy switchStrategy = new PartitionScannerSwitchStrategy(
-				new String[] { "</script>" }, new String[][] {});
+		IPartitionScannerSwitchStrategy switchStrategy = new PartitionScannerSwitchStrategy(new String[] { "</script>" });
 		scanner = new SequenceCharacterScanner(ruleBasedScanner, switchStrategy, true);
 	}
 

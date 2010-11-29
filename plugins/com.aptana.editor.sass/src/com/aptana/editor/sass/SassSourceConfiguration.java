@@ -179,7 +179,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 	}
 
-	protected ITokenScanner getCodeScanner()
+	private ITokenScanner getCodeScanner()
 	{
 		if (fCodeScanner == null)
 		{
@@ -188,7 +188,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return fCodeScanner;
 	}
 
-	protected ITokenScanner getCommentScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		if (commentScanner == null)
 		{
@@ -197,7 +197,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return commentScanner;
 	}
 
-	protected ITokenScanner getDoubleQuotedStringScanner()
+	private ITokenScanner getDoubleQuotedStringScanner()
 	{
 		if (doubleQuotedStringScanner == null)
 		{
@@ -206,7 +206,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return doubleQuotedStringScanner;
 	}
 
-	protected ITokenScanner getSingleQuotedStringScanner()
+	private ITokenScanner getSingleQuotedStringScanner()
 	{
 		if (singleQuotedStringScanner == null)
 		{
@@ -215,7 +215,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return singleQuotedStringScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
 		return new Token(name);
 	}

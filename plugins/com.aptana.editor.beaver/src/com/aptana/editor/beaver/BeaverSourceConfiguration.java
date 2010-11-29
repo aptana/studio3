@@ -79,6 +79,9 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 
 	private static BeaverSourceConfiguration instance;
 
+	private BeaverSourceConfiguration() {
+	}
+	
 	/**
 	 * getDefault
 	 * 
@@ -138,7 +141,7 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getDTDScanner()
+	private ITokenScanner getDTDScanner()
 	{
 		if (beaverScanner == null)
 		{
@@ -163,7 +166,7 @@ public class BeaverSourceConfiguration implements IPartitioningConfiguration, IS
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

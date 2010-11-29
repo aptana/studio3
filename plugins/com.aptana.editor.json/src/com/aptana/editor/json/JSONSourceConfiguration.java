@@ -66,6 +66,9 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 	private static JSONSourceConfiguration instance;
 
+	private JSONSourceConfiguration() {
+	}
+	
 	/**
 	 * getDefault
 	 * 
@@ -122,7 +125,7 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getDTDScanner()
+	private ITokenScanner getDTDScanner()
 	{
 		if (beaverScanner == null)
 		{
@@ -147,7 +150,8 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	@SuppressWarnings("unused")
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}
