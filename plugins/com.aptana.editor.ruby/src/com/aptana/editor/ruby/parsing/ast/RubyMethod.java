@@ -48,9 +48,9 @@ public class RubyMethod extends NamedMember implements IRubyMethod
 	private boolean isSingleton;
 	private Set<String> blockVars;
 
-	public RubyMethod(String name, String[] parameters, int start, int end)
+	public RubyMethod(String name, String[] parameters, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 		fParameters = parameters;
 		blockVars = new HashSet<String>();
 	}

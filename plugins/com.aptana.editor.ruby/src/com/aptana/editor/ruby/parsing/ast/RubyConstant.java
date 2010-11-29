@@ -39,9 +39,9 @@ import com.aptana.editor.ruby.core.IRubyElement;
 public class RubyConstant extends RubyField
 {
 
-	public RubyConstant(String name, int start, int end)
+	public RubyConstant(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 	}
 
 	@Override

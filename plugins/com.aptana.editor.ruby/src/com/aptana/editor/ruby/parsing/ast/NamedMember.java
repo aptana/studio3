@@ -42,10 +42,10 @@ public class NamedMember extends RubyElement implements IRubyMember
 {
 	private INameNode fNameNode;
 
-	public NamedMember(String name, int start, int end)
+	public NamedMember(String name, int start, int nameStart, int nameEnd)
 	{
-		super(start, end);
-		fNameNode = new NameNode(name, start, end);
+		super(start, nameEnd);
+		fNameNode = new NameNode(name, nameStart, nameEnd);
 	}
 
 	@Override
