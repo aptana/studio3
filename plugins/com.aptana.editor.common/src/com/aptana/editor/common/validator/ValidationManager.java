@@ -36,6 +36,7 @@ package com.aptana.editor.common.validator;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -53,7 +54,7 @@ public class ValidationManager implements IValidationManager
 		fItems = new ArrayList<IValidationItem>();
 	}
 
-	public void clear()
+	public void dispose()
 	{
 		fDocument = null;
 		fItems.clear();
@@ -68,13 +69,12 @@ public class ValidationManager implements IValidationManager
 	{
 		fItems.clear();
 
-		ValidatorReference[] validatorRefs = ValidatorLoader.getInstance().getValidators(language);
+		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
 		// using the first one for now
 		// TODO: change to match the user selection in preferences
-		if (validatorRefs.length > 0)
+		if (!validatorRefs.isEmpty())
 		{
-			IValidator validator = validatorRefs[0].getValidator();
-			validator.parse(source, path, this);
+			validatorRefs.get(0).getValidator().parse(source, path, this);
 		}
 	}
 
@@ -88,9 +88,9 @@ public class ValidationManager implements IValidationManager
 		addItem(IMarker.SEVERITY_WARNING, message, lineNumber, lineOffset, length, sourcePath);
 	}
 
-	public IValidationItem[] getItems()
+	public List<IValidationItem> getItems()
 	{
-		return fItems.toArray(new IValidationItem[fItems.size()]);
+		return Collections.unmodifiableList(fItems);
 	}
 
 	private void addItem(int severity, String message, int lineNumber, int lineOffset, int length, String sourcePath)

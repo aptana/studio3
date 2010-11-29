@@ -62,6 +62,7 @@ public class FileService
 	private String fLanguage;
 
 	private Object fResource;
+	private URI fResourceUri;
 	private ValidationManager fValidationManager;
 	private List<IValidationListener> fValidationListeners;
 
@@ -78,13 +79,14 @@ public class FileService
 		fValidationListeners = new ArrayList<IValidationListener>();
 	}
 
-	public void clear()
+	public void dispose()
 	{
 		fDocument = null;
 		fParseState.clearEditState();
 		fLastSourceHash = 0;
 		fResource = null;
-		fValidationManager.clear();
+		fResourceUri = null;
+		fValidationManager.dispose();
 	}
 
 	/**
@@ -165,20 +167,11 @@ public class FileService
 						listener.parseFinished();
 					}
 
-					// updates the validations
-					URI uri = null;
-					if (fResource instanceof IResource)
+					if (fResourceUri != null)
 					{
-						uri = ((IResource) fResource).getLocationURI();
-					}
-					else if (fResource instanceof IUniformResource)
-					{
-						uri = ((IUniformResource) fResource).getURI();
-					}
-					if (uri != null)
-					{
-						fValidationManager.validate(source, fLanguage, uri);
-						fireValidationChanged(fValidationManager.getItems());
+						fValidationManager.validate(source, fLanguage, fResourceUri);
+						List<IValidationItem> items = fValidationManager.getItems();
+						fireValidationChanged(items.toArray(new IValidationItem[items.size()]));
 					}
 				}
 				catch (Exception e)
@@ -220,6 +213,14 @@ public class FileService
 	public void setResource(Object resource)
 	{
 		fResource = resource;
+		if (fResource instanceof IResource)
+		{
+			fResourceUri = ((IResource) fResource).getLocationURI();
+		}
+		else if (fResource instanceof IUniformResource)
+		{
+			fResourceUri = ((IUniformResource) fResource).getURI();
+		}
 	}
 
 	private void fireValidationChanged(IValidationItem[] items)

@@ -48,7 +48,7 @@ import org.w3c.css.values.CssNumber;
 public abstract class SizeOrFixedCSSProperty extends TypeOrFixedCSSProperty
 {
 
-	private static ICSSValueTypeConverter[] CONVERTERS_ARRAY = new ICSSValueTypeConverter[] { new NumberToLenghtConverter() };
+	private static ICSSValueTypeConverter[] CONVERTERS_ARRAY = new ICSSValueTypeConverter[] { new NumberToLengthConverter() };
 
 	public SizeOrFixedCSSProperty(String propertyName)
 	{

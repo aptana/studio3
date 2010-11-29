@@ -35,6 +35,7 @@
 package com.aptana.editor.common.validator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ class ValidatorLoader
 		readExtensionRegistry();
 	}
 
-	public static ValidatorLoader getInstance()
+	public static synchronized ValidatorLoader getInstance()
 	{
 		if (instance == null)
 		{
@@ -74,14 +75,14 @@ class ValidatorLoader
 		return instance;
 	}
 
-	public ValidatorReference[] getValidators(String language)
+	public List<ValidatorReference> getValidators(String language)
 	{
 		List<ValidatorReference> list = validators.get(language);
 		if (list == null)
 		{
-			return new ValidatorReference[0];
+			return Collections.emptyList();
 		}
-		return list.toArray(new ValidatorReference[list.size()]);
+		return Collections.unmodifiableList(list);
 	}
 
 	private void readExtensionRegistry()

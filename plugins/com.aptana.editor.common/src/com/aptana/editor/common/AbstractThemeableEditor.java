@@ -524,7 +524,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			fCommandElementsProvider = null;
 			if (fFileService != null)
 			{
-				fFileService.clear();
+				fFileService.dispose();
 				fFileService.removeValidationListener(fValidationListener);
 				fFileService = null;
 			}

@@ -62,7 +62,7 @@
          <attribute name="language" type="string" use="required">
             <annotation>
                <documentation>
-                  The language the validator supports
+                  The language (e.g. text/html) which the validator supports
                </documentation>
             </annotation>
          </attribute>

@@ -85,71 +85,68 @@ public class ResourceValidationListener implements IValidationListener
 		}
 	}
 
-	private void updateValidation(Object source, IValidationItem[] items)
+	private synchronized void updateValidation(Object source, IValidationItem[] items)
 	{
-		synchronized (this) // prevents simultaneous error updates on the same file
+		if (source == null)
 		{
-			if (source == null)
-			{
-				return;
-			}
+			return;
+		}
 
-			IResource workspaceResource = null;
-			IUniformResource externalResource = null;
-			boolean isExternal = false;
-			if (source instanceof IResource)
+		IResource workspaceResource = null;
+		IUniformResource externalResource = null;
+		boolean isExternal = false;
+		if (source instanceof IResource)
+		{
+			workspaceResource = (IResource) source;
+		}
+		else if (source instanceof IUniformResource)
+		{
+			externalResource = (IUniformResource) source;
+			isExternal = true;
+		}
+		else
+		{
+			// invalid source
+			return;
+		}
+
+		try
+		{
+			String markerType = IValidationConstants.PROBLEM_MARKER;
+			// deletes the old markers
+			if (isExternal)
 			{
-				workspaceResource = (IResource) source;
-			}
-			else if (source instanceof IUniformResource)
-			{
-				externalResource = (IUniformResource) source;
-				isExternal = true;
+				MarkerUtils.deleteMarkers(externalResource, markerType, true);
 			}
 			else
 			{
-				// invalid source
-				return;
+				workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
 			}
 
-			try
+			// adds the new ones
+			IMarker marker;
+			for (IValidationItem item : items)
 			{
-				String markerType = IValidationConstants.PROBLEM_MARKER;
-				// deletes the old markers
 				if (isExternal)
 				{
-					MarkerUtils.deleteMarkers(externalResource, markerType, true);
+					marker = MarkerUtils.createMarker(externalResource, null, markerType);
+					// don't persist on external file
+					marker.setAttribute(IMarker.TRANSIENT, true);
 				}
 				else
 				{
-					workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+					marker = workspaceResource.createMarker(markerType);
 				}
-
-				// adds the new ones
-				IMarker marker;
-				for (IValidationItem item : items)
-				{
-					if (isExternal)
-					{
-						marker = MarkerUtils.createMarker(externalResource, null, markerType);
-						// don't persist on external file
-						marker.setAttribute(IMarker.TRANSIENT, true);
-					}
-					else
-					{
-						marker = workspaceResource.createMarker(markerType);
-					}
-					marker.setAttribute(IMarker.SEVERITY, item.getSeverity());
-					marker.setAttribute(IMarker.CHAR_START, item.getOffset());
-					marker.setAttribute(IMarker.CHAR_END, item.getOffset() + item.getLength());
-					marker.setAttribute(IMarker.MESSAGE, item.getMessage());
-					marker.setAttribute(IMarker.LINE_NUMBER, item.getLineNumber());
-				}
+				marker.setAttribute(IMarker.SEVERITY, item.getSeverity());
+				marker.setAttribute(IMarker.CHAR_START, item.getOffset());
+				marker.setAttribute(IMarker.CHAR_END, item.getOffset() + item.getLength());
+				marker.setAttribute(IMarker.MESSAGE, item.getMessage());
+				marker.setAttribute(IMarker.LINE_NUMBER, item.getLineNumber());
 			}
-			catch (CoreException e)
-			{
-				CommonEditorPlugin.logError(e);
-			}
+		}
+		catch (CoreException e)
+		{
+			CommonEditorPlugin.logError(e);
 		}
 	}
 

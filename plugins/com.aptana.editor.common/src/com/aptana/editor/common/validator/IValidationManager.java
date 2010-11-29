@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.validator;
 
+import java.util.List;
+
 public interface IValidationManager
 {
 
@@ -72,7 +74,7 @@ public interface IValidationManager
 	/**
 	 * Gets the list of current validation items.
 	 * 
-	 * @return the items in an array
+	 * @return the items as a list
 	 */
-	public IValidationItem[] getItems();
+	public List<IValidationItem> getItems();
 }
