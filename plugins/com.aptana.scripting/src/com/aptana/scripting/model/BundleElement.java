@@ -63,12 +63,18 @@ public class BundleElement extends AbstractElement
 
 	private Map<String, String> _fileTypeRegistry;
 	private List<String> _fileTypes;
+	private Object fileTypeRegistryLock = new Object();
+	private Object fileTypesLock = new Object();
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
+	private Object foldingStartMarkersLock = new Object();
+	private Object foldingStopMarkersLock = new Object();
 
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
+	private Object increaseIndentMarkersLock = new Object();
+	private Object decreaseIndentMarkersLock = new Object();
 
 	/**
 	 * Bundle
@@ -119,6 +125,11 @@ public class BundleElement extends AbstractElement
 					context = this.getVisibilityContext(element.getClass());
 
 					this._children.add(element);
+
+					if (context != null)
+					{
+						context.updateContext();
+					}
 				}
 			}
 
@@ -138,12 +149,15 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateFileType(String fileType)
 	{
-		if (_fileTypes == null)
+		synchronized (fileTypesLock)
 		{
-			_fileTypes = new ArrayList<String>();
-		}
+			if (this._fileTypes == null)
+			{
+				this._fileTypes = new ArrayList<String>();
+			}
 
-		_fileTypes.add(fileType);
+			this._fileTypes.add(fileType);
+		}
 	}
 
 	/**
@@ -156,13 +170,16 @@ public class BundleElement extends AbstractElement
 	{
 		if (!StringUtil.isEmpty(filePattern) && !StringUtil.isEmpty(scope))
 		{
-			// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
-			if (this._fileTypeRegistry == null)
+			synchronized (fileTypeRegistryLock)
 			{
-				this._fileTypeRegistry = new HashMap<String, String>();
-			}
+				// Store the file type -> scope mapping for later lookup when we need to set up the scope in the editor
+				if (this._fileTypeRegistry == null)
+				{
+					this._fileTypeRegistry = new HashMap<String, String>();
+				}
 
-			this._fileTypeRegistry.put(filePattern, scope);
+				this._fileTypeRegistry.put(filePattern, scope);
+			}
 		}
 	}
 
@@ -215,7 +232,14 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<AbstractBundleElement> getChildren()
 	{
-		return new ArrayList<AbstractBundleElement>(this._children);
+		List<AbstractBundleElement> result;
+
+		synchronized (this._children)
+		{
+			result = new ArrayList<AbstractBundleElement>(this._children);
+		}
+
+		return result;
 	}
 
 	/**
@@ -230,16 +254,13 @@ public class BundleElement extends AbstractElement
 	{
 		List<T> result = new ArrayList<T>();
 
-		synchronized (this._children)
+		for (AbstractBundleElement child : this.getChildren())
 		{
-			for (AbstractBundleElement child : this._children)
+			// NOTE: this will return true for children of type childType, but not for descendant types of
+			// childType.
+			if (childType == child.getClass())
 			{
-				// NOTE: this will return true for children of type childType, but not for descendant types of
-				// childType.
-				if (childType == child.getClass())
-				{
-					result.add(childType.cast(child));
-				}
+				result.add(childType.cast(child));
 			}
 		}
 
@@ -258,16 +279,13 @@ public class BundleElement extends AbstractElement
 	{
 		List<T> result = new ArrayList<T>();
 
-		synchronized (this._children)
+		for (AbstractBundleElement child : this.getChildren())
 		{
-			for (AbstractBundleElement child : this._children)
+			// NOTE: isAssignableFrom is like instanceof where it will return true for instances of childType and
+			// its descendant types
+			if (childType.isAssignableFrom(child.getClass()))
 			{
-				// NOTE: isAssignableFrom is like instanceof where it will return true for instances of childType and
-				// its descendant types
-				if (childType.isAssignableFrom(child.getClass()))
-				{
-					result.add(childType.cast(child));
-				}
+				result.add(childType.cast(child));
 			}
 		}
 
@@ -285,11 +303,7 @@ public class BundleElement extends AbstractElement
 
 		if (StringUtil.isEmpty(name) == false)
 		{
-			// NOTE: we use getCommands here so we don't have to sync this block. getCommands returns a fresh List each
-			// time it is invoked and it handles syncing for us
-			List<CommandElement> commands = this.getCommands();
-
-			for (CommandElement command : commands)
+			for (CommandElement command : this.getCommands())
 			{
 				if (name.equals(command.getDisplayName()))
 				{
@@ -341,13 +355,16 @@ public class BundleElement extends AbstractElement
 	{
 		Map<ScopeSelector, RubyRegexp> result;
 
-		if (this._decreaseIndentMarkers == null)
+		synchronized (decreaseIndentMarkersLock)
 		{
-			result = Collections.emptyMap();
-		}
-		else
-		{
-			result = Collections.unmodifiableMap(this._decreaseIndentMarkers);
+			if (this._decreaseIndentMarkers == null)
+			{
+				result = Collections.emptyMap();
+			}
+			else
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._decreaseIndentMarkers);
+			}
 		}
 
 		return result;
@@ -415,7 +432,21 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<String, String> getFileTypeRegistry()
 	{
-		return this._fileTypeRegistry;
+		Map<String, String> result;
+
+		synchronized (fileTypeRegistryLock)
+		{
+			if (this._fileTypeRegistry != null)
+			{
+				result = new HashMap<String, String>(this._fileTypeRegistry);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -425,7 +456,21 @@ public class BundleElement extends AbstractElement
 	 */
 	List<String> getFileTypes()
 	{
-		return this._fileTypes;
+		List<String> result;
+
+		synchronized (fileTypesLock)
+		{
+			if (this._fileTypes != null)
+			{
+				result = new ArrayList<String>(this._fileTypes);
+			}
+			else
+			{
+				result = Collections.emptyList();
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -437,13 +482,16 @@ public class BundleElement extends AbstractElement
 	{
 		Map<ScopeSelector, RubyRegexp> result;
 
-		if (this._foldingStartMarkers == null)
+		synchronized (foldingStartMarkersLock)
 		{
-			result = Collections.emptyMap();
-		}
-		else
-		{
-			result = Collections.unmodifiableMap(this._foldingStartMarkers);
+			if (this._foldingStartMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._foldingStartMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
 
 		return result;
@@ -458,13 +506,16 @@ public class BundleElement extends AbstractElement
 	{
 		Map<ScopeSelector, RubyRegexp> result;
 
-		if (this._foldingStopMarkers == null)
+		synchronized (foldingStopMarkersLock)
 		{
-			result = Collections.emptyMap();
-		}
-		else
-		{
-			result = Collections.unmodifiableMap(this._foldingStopMarkers);
+			if (this._foldingStopMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._foldingStopMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
 
 		return result;
@@ -479,13 +530,16 @@ public class BundleElement extends AbstractElement
 	{
 		Map<ScopeSelector, RubyRegexp> result;
 
-		if (this._increaseIndentMarkers == null)
+		synchronized (increaseIndentMarkersLock)
 		{
-			result = Collections.emptyMap();
-		}
-		else
-		{
-			result = Collections.unmodifiableMap(this._increaseIndentMarkers);
+			if (this._increaseIndentMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._increaseIndentMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
 
 		return result;
@@ -688,12 +742,19 @@ public class BundleElement extends AbstractElement
 		{
 			context = this.getVisibilityContext(element.getClass());
 
-			removed = this._children.remove(element);
+			if (removed = this._children.remove(element) && context != null)
+			{
+				context.updateContext();
+			}
 		}
 
 		if (removed)
 		{
-			// special case for menus so they can remove their children so they will fire events
+			// NOTE: We currently have only one element type that has children, so we special case it here. However, if
+			// more elements fall into this category, then we should introduce a removeChildren method in the element
+			// hierarchy and then call that on all element types
+
+			// special case for menus so they can remove their children to fire events for each
 			if (element instanceof MenuElement)
 			{
 				((MenuElement) element).removeChildren();
@@ -701,7 +762,7 @@ public class BundleElement extends AbstractElement
 
 			// make sure elements are no longer tracked in AbstractElement
 			AbstractElement.unregisterElement(element);
-			
+
 			if (context != null)
 			{
 				context.fireVisibilityEvents();
@@ -750,21 +811,27 @@ public class BundleElement extends AbstractElement
 	{
 		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
-			// store starting regular expression
-			if (this._foldingStartMarkers == null)
+			synchronized (foldingStartMarkersLock)
 			{
-				this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				// store starting regular expression
+				if (this._foldingStartMarkers == null)
+				{
+					this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
 			}
 
-			this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
-
-			// store ending regular expression
-			if (this._foldingStopMarkers == null)
+			synchronized (foldingStopMarkersLock)
 			{
-				this._foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-			}
+				// store ending regular expression
+				if (this._foldingStopMarkers == null)
+				{
+					this._foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
 
-			this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+				this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+			}
 		}
 	}
 
@@ -779,21 +846,27 @@ public class BundleElement extends AbstractElement
 	{
 		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
-			// store increasing regular expression
-			if (this._increaseIndentMarkers == null)
+			synchronized (increaseIndentMarkersLock)
 			{
-				this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				// store increasing regular expression
+				if (this._increaseIndentMarkers == null)
+				{
+					this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
 			}
 
-			this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
-
-			// store decreasing regular expression
-			if (this._decreaseIndentMarkers == null)
+			synchronized (decreaseIndentMarkersLock)
 			{
-				this._decreaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-			}
+				// store decreasing regular expression
+				if (this._decreaseIndentMarkers == null)
+				{
+					this._decreaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
 
-			this._decreaseIndentMarkers.put(new ScopeSelector(scope), endRegexp);
+				this._decreaseIndentMarkers.put(new ScopeSelector(scope), endRegexp);
+			}
 		}
 	}
 

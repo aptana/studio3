@@ -38,6 +38,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -83,7 +84,8 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	/**
 	 * Detects the indentation level.
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 
 		int indent = 0;
@@ -134,7 +136,8 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
 	 */
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
 		IParser parser = checkoutParser();
@@ -146,7 +149,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset);
+				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -169,9 +172,9 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
-					ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -225,8 +228,14 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
+			boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final XMLFormatterNodeBuilder builder = new XMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -237,7 +246,12 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		writer.setLinesPreserve(getInt(XMLFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
 		writer.flush(context);
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	private FormatterDocument createFormatterDocument(String input, int offset)
@@ -246,10 +260,10 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(XMLFormatterConstants.WRAP_COMMENTS, getBoolean(XMLFormatterConstants.WRAP_COMMENTS));
 		document.setInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS));
-		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-				getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
-				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
+				XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;

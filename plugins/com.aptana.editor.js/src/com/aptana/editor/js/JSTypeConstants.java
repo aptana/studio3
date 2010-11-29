@@ -43,6 +43,7 @@ public class JSTypeConstants
 	public static final String BOOLEAN_TYPE = "Boolean"; //$NON-NLS-1$
 	public static final String CLASS_TYPE = "Class"; //$NON-NLS-1$
 	public static final String FUNCTION_TYPE = "Function"; //$NON-NLS-1$
+	public static final String GLOBAL_TYPE = "Global"; //$NON-NLS-1$
 	public static final String NUMBER_TYPE = "Number"; //$NON-NLS-1$
 	public static final String OBJECT_TYPE = "Object"; //$NON-NLS-1$
 	public static final String REG_EXP_TYPE = "RegExp"; //$NON-NLS-1$

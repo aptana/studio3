@@ -359,18 +359,6 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		try
 		{
-			char onOffset = document.getChar(offset);
-			if (onOffset == '\r')
-			{
-				if (document.getChar(offset + 1) != '\n')
-				{
-					return 0;
-				}
-			}
-			else if (onOffset == '\n')
-			{
-				return 0;
-			}
 			int lineNumber = document.getLineOfOffset(offset + 1);
 			if (lineNumber > 0)
 			{
@@ -451,5 +439,40 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	public boolean isSlave()
 	{
 		return this.isSlave;
+	}
+
+	/**
+	 * Left trim the String output.
+	 * 
+	 * @param str
+	 * @param keptChars
+	 *            The number of whitespace chars to keep.
+	 * @return The output without the white-spaces at its beginning.
+	 */
+	protected static String leftTrim(String str, int keptChars)
+	{
+		int whitespaceChars = countLeftWhitespaceChars(str);
+		if (whitespaceChars >= keptChars)
+		{
+			whitespaceChars -= keptChars;
+		}
+		return str.substring(whitespaceChars);
+	}
+
+	/**
+	 * Count the number of whitespace characters that appear in the start of the given string.
+	 * 
+	 * @param str
+	 * @return The number of prefix whitespace chars in the string.
+	 */
+	protected static int countLeftWhitespaceChars(String str)
+	{
+		int i = 0;
+		int length = str.length();
+		while (i < length && Character.isWhitespace(str.charAt(i)))
+		{
+			i++;
+		}
+		return i;
 	}
 }

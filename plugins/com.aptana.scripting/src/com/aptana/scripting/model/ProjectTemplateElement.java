@@ -38,7 +38,7 @@ import java.io.File;
 
 import com.aptana.core.util.SourcePrinter;
 
-public final class ProjectTemplateElement extends AbstractBundleElement
+public class ProjectTemplateElement extends AbstractBundleElement
 {
 	public enum Type
 	{
