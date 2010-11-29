@@ -58,9 +58,9 @@ public class RubyType extends NamedMember implements IRubyType
 	 */
 	private String superclassName;
 
-	public RubyType(String name, int start, int end)
+	public RubyType(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 		includedModuleNames = EMPTY_ARRAY;
 	}
 

@@ -39,9 +39,9 @@ import com.aptana.editor.ruby.core.IRubyElement;
 public class RubyGlobal extends RubyField
 {
 
-	public RubyGlobal(String name, int start, int end)
+	public RubyGlobal(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 	}
 
 	@Override

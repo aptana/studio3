@@ -535,9 +535,12 @@ public class SourceElementVisitor extends InOrderVisitor
 	@Override
 	public Object visitIterNode(IterNode iVisited)
 	{
-		requestor.acceptBlock(iVisited.getPosition().getStartOffset(), iVisited.getPosition().getEndOffset() - 1);
+		requestor.enterBlock(iVisited.getPosition().getStartOffset(), iVisited.getPosition().getEndOffset() - 1);
 
-		return super.visitIterNode(iVisited);
+		Object ins = super.visitIterNode(iVisited);
+		
+		requestor.exitBlock(iVisited.getPosition().getEndOffset() - 1);
+		return ins;
 	}
 
 	@Override
