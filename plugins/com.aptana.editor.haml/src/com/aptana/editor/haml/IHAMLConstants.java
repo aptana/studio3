@@ -51,6 +51,7 @@ public interface IHAMLConstants {
 	public String HTML_COMMENT_SCOPE = "comment.line.slash.haml"; //$NON-NLS-1$
 	public String INTERPOLATION_SCOPE = "meta.section.other.haml"; //$NON-NLS-1$
 	public String EMBEDDED_RUBY_SCOPE = "source.ruby.embedded.haml"; //$NON-NLS-1$
-	public String OBJECT_SCOPE = "meta.section.object.haml"; //$NON-NLS-1$
+	public String OBJECT_SCOPE = "meta.section.object.haml"; //$NON-NLS-1$	
+	public String HAML_COMMENT_SCOPE = RUBY_EVAL_SCOPE + " " + EMBEDDED_RUBY_SCOPE; //$NON-NLS-1$
 
 }

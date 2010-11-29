@@ -38,6 +38,7 @@ package com.aptana.editor.haml;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -57,6 +58,7 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.MultiCharacterRule;
 import com.aptana.editor.common.text.rules.SingleCharacterRule;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 import com.aptana.editor.haml.internal.HAMLElementScanner;
 import com.aptana.editor.haml.internal.HAMLSubPartitionScanner;
 import com.aptana.editor.haml.internal.RubyAttributesSourceConfiguration;
@@ -133,7 +135,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 	static {
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IHAMLConstants.CONTENT_TYPE_HAML), new QualifiedContentType(IHAMLConstants.TEXT_SCOPE));
-		c.addTranslation(new QualifiedContentType(HAML_COMMENT), new QualifiedContentType(IRubyConstants.LINE_COMMENT_SCOPE));
+		c.addTranslation(new QualifiedContentType(HAML_COMMENT), new QualifiedContentType(IHAMLConstants.HAML_COMMENT_SCOPE));
 		c.addTranslation(new QualifiedContentType(HTML_COMMENT), new QualifiedContentType(IHAMLConstants.HTML_COMMENT_SCOPE));
 		c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType(IHAMLConstants.DOCTYPE_SCOPE));
 		c.addTranslation(new QualifiedContentType(ELEMENT), new QualifiedContentType(IHAMLConstants.TAG_SCOPE));
@@ -220,38 +222,38 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		RubySourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 		RubyAttributesSourceConfiguration.getDefault().setupPresentationReconciler(reconciler, sourceViewer);
 
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getTextScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getTextScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getHTMLCommentScanner());
+		dr = new ThemeingDamagerRepairer(getHTMLCommentScanner());
 		reconciler.setDamager(dr, HTML_COMMENT);
 		reconciler.setRepairer(dr, HTML_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getHAMLCommentScanner());
+		dr = new ThemeingDamagerRepairer(getHAMLCommentScanner());
 		reconciler.setDamager(dr, HAML_COMMENT);
 		reconciler.setRepairer(dr, HAML_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getDocTypeScanner());
+		dr = new ThemeingDamagerRepairer(getDocTypeScanner());
 		reconciler.setDamager(dr, DOCTYPE);
 		reconciler.setRepairer(dr, DOCTYPE);
 
-		dr = new DefaultDamagerRepairer(getElementScanner());
+		dr = new ThemeingDamagerRepairer(getElementScanner());
 		reconciler.setDamager(dr, ELEMENT);
 		reconciler.setRepairer(dr, ELEMENT);
 
-		dr = new DefaultDamagerRepairer(getInterpolationScanner());
+		dr = new ThemeingDamagerRepairer(getInterpolationScanner());
 		reconciler.setDamager(dr, INTERPOLATION);
 		reconciler.setRepairer(dr, INTERPOLATION);
 
-		dr = new DefaultDamagerRepairer(getObjectScanner());
+		dr = new ThemeingDamagerRepairer(getObjectScanner());
 		reconciler.setDamager(dr, OBJECT);
 		reconciler.setRepairer(dr, OBJECT);
 
-		dr = new DefaultDamagerRepairer(getHTMLAttributesScanner());
+		dr = new ThemeingDamagerRepairer(getHTMLAttributesScanner());
 		reconciler.setDamager(dr, HTML_ATTRIBUTES);
 		reconciler.setRepairer(dr, HTML_ATTRIBUTES);
 
@@ -329,6 +331,7 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fCommentScanner == null) {
 			fCommentScanner = new RuleBasedScanner();
 			fCommentScanner.setRules(new IRule[] {
+					// TODO Use CommentScanner so we pick up task tags
 					new SingleCharacterRule('/', getToken("punctuation.section.comment.haml")) //$NON-NLS-1$
 			});
 			fCommentScanner.setDefaultReturnToken(getToken(IHAMLConstants.HTML_COMMENT_SCOPE)); 
@@ -340,9 +343,10 @@ public class HAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		if (fHAMLCommentScanner == null) {
 			fHAMLCommentScanner = new RuleBasedScanner();
 			fHAMLCommentScanner.setRules(new IRule[] {
-					new MultiCharacterRule("-#", getToken(IRubyConstants.LINE_COMMENT_SCOPE)) //$NON-NLS-1$ //$NON-NLS-2$
+					// TODO Use CommentScanner so we pick up task tags
+					new EndOfLineRule("#", getToken(IRubyConstants.LINE_COMMENT_SCOPE)) //$NON-NLS-1$
 			});
-			fHAMLCommentScanner.setDefaultReturnToken(getToken(IHAMLConstants.RUBY_EVAL_SCOPE)); 
+			fHAMLCommentScanner.setDefaultReturnToken(getToken(""));  //$NON-NLS-1$
 		}
 		return fHAMLCommentScanner;
 	}
