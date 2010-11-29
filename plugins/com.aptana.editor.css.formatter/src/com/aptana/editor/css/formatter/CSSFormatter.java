@@ -77,7 +77,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * 
 	 * @param preferences
 	 */
-	protected CSSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected CSSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;

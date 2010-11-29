@@ -73,7 +73,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * @param preferences
 	 * @param mainContentType
 	 */
-	protected JSONFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected JSONFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 

@@ -46,6 +46,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -94,7 +95,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
 
-	private static Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
+	private static final Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
+	private static final Pattern COMMENTS_STRIPPING_PATTERN = Pattern.compile("\\s|\\*|//"); //$NON-NLS-1$
+
 	private String lineSeparator;
 
 	/**
@@ -102,7 +105,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * 
 	 * @param preferences
 	 */
-	protected JSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -254,7 +257,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	private String stripComment(String comment)
 	{
-		return comment.replaceAll("\\s|\\*|//", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return COMMENTS_STRIPPING_PATTERN.matcher(comment).replaceAll(StringUtil.EMPTY);
 	}
 
 	/*
