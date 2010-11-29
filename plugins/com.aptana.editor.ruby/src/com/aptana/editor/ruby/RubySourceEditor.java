@@ -265,8 +265,7 @@ public class RubySourceEditor extends AbstractThemeableEditor
 		{
 			for (Position pos : positions)
 			{
-				// FIXME Create a new occurrence type for these!
-				occurrences.put(new Annotation("com.aptana.html.tagPair.occurrences", false, null), pos);
+				occurrences.put(new Annotation(IRubyConstants.BLOCK_PAIR_OCCURRENCES_ID, false, null), pos);
 			}
 
 			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())

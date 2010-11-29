@@ -37,10 +37,15 @@ package com.aptana.editor.ruby;
 
 /**
  * @author Max Stepanov
- *
  */
-public interface IRubyConstants {
+public interface IRubyConstants
+{
 
 	public String CONTENT_TYPE_RUBY = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
 	public String CONTENT_TYPE_RUBY_AMBIGUOUS = "com.aptana.contenttype.ruby.ambiguous"; //$NON-NLS-1$
+
+	/**
+	 * ID of the marker/annotation type used to highlight do/end, def/end, class/end, module/end pairs
+	 */
+	public String BLOCK_PAIR_OCCURRENCES_ID = "com.aptana.ruby.blockPair.occurrences"; //$NON-NLS-1$
 }
