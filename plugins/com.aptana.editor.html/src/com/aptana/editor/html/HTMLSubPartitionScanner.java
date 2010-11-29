@@ -61,8 +61,6 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 	private static final String[] CSS_SWITCH_SEQUENCES = new String[] { "</style>" }; //$NON-NLS-1$
 	private static final String[] SVG_SWITCH_SEQUENCES = new String[] { "</svg>" }; //$NON-NLS-1$
 
-	private static final String[][] EMPTY = new String[0][];
-
 	/**
 	 * HTMLSubPartitionScanner
 	 */
@@ -80,9 +78,9 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 				SVGSourceConfiguration.getDefault().createSubPartitionScanner() //
 			}, //
 			new IPartitionScannerSwitchStrategy[] { //
-				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES, EMPTY), //
-				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES, EMPTY), //
-				new PartitionScannerSwitchStrategy(SVG_SWITCH_SEQUENCES, EMPTY) //
+				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES), //
+				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES), //
+				new PartitionScannerSwitchStrategy(SVG_SWITCH_SEQUENCES) //
 			} //
 		);
 	}

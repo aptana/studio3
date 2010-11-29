@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2009 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,14 +32,17 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
+package com.aptana.editor.haml;
 
-import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
+import com.aptana.editor.common.AbstractThemeableEditor;
 
-public class HTMLPartitionScanner extends SourceConfigurationPartitionScanner {
-	
-	public HTMLPartitionScanner() {
-		super(HTMLSourceConfiguration.getDefault());
+public class HAMLEditor extends AbstractThemeableEditor {
+
+	@Override
+	protected void initializeEditor() {
+		super.initializeEditor();
+
+		setSourceViewerConfiguration(new HAMLSourceViewerConfiguration(getPreferenceStore(), this));
+		setDocumentProvider(new HAMLDocumentProvider());
 	}
-	
 }

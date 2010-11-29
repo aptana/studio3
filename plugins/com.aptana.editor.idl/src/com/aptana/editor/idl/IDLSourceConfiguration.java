@@ -78,6 +78,9 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static IDLSourceConfiguration instance;
 
+	private IDLSourceConfiguration() {
+	}
+	
 	/**
 	 * getDefault
 	 * 
@@ -147,7 +150,7 @@ public class IDLSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}
