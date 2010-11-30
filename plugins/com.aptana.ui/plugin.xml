@@ -85,6 +85,9 @@
          <newWizardShortcut
                id="org.eclipse.ui.wizards.new.folder">
          </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard">
+         </newWizardShortcut>
          <actionSet
                id="org.eclipse.ui.NavigateActionSet">
          </actionSet>
