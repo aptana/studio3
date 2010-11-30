@@ -35,14 +35,18 @@
 package com.aptana.editor.js.formatter;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -91,6 +95,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
 
+	private static final Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
+	private static final Pattern COMMENTS_STRIPPING_PATTERN = Pattern.compile("\\s|\\*|//"); //$NON-NLS-1$
+
 	private String lineSeparator;
 
 	/**
@@ -98,7 +105,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * 
 	 * @param preferences
 	 */
-	protected JSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -107,7 +114,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	/**
 	 * Detects the indentation level.
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 		int indent = 0;
 		try
@@ -157,7 +165,8 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
 	 */
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
 		IParser parser = checkoutParser();
@@ -169,12 +178,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset);
+				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
 				if (output != null)
 				{
 					if (!input.equals(output))
 					{
-						if (equalsIgnoreWhitespaces(input, output))
+						if (equalContent(input, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
@@ -203,6 +212,52 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			FormatterPlugin.logError(e);
 		}
 		return null;
+	}
+
+	/**
+	 * @param input
+	 * @param output
+	 * @return
+	 */
+	private boolean equalContent(String input, String output)
+	{
+		// first, strip out all the comments from the input and the output.
+		// save those comments for later comparison.
+		StringBuilder inputBuffer = new StringBuilder(input.length());
+		StringBuilder outputBuffer = new StringBuilder(output.length());
+		StringBuilder inputComments = new StringBuilder();
+		StringBuilder outputComments = new StringBuilder();
+		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
+		Matcher outputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(output);
+		int inputOffset = 0;
+		int outputOffset = 0;
+		while (inputCommentsMatcher.find())
+		{
+			inputComments.append(inputCommentsMatcher.group());
+			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
+			inputOffset = inputCommentsMatcher.end() + 1;
+		}
+		inputBuffer.append(input.subSequence(inputOffset, input.length()));
+		while (outputCommentsMatcher.find())
+		{
+			outputComments.append(outputCommentsMatcher.group());
+			outputBuffer.append(output.subSequence(outputOffset, outputCommentsMatcher.start()));
+			outputOffset = outputCommentsMatcher.end() + 1;
+
+		}
+		outputBuffer.append(output.subSequence(outputOffset, output.length()));
+		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
+				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
+	}
+
+	/**
+	 * Remove any whitespace, '*' or '//' from a comment string
+	 * 
+	 * @param inputComment
+	 */
+	private String stripComment(String comment)
+	{
+		return COMMENTS_STRIPPING_PATTERN.matcher(comment).replaceAll(StringUtil.EMPTY);
 	}
 
 	/*
@@ -244,8 +299,14 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
+			boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -263,7 +324,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			StatusLineMessageTimerManager.setErrorMessage(
 					FormatterMessages.Formatter_formatterErrorCompletedWithErrors, ERROR_DISPLAY_TIMEOUT, true);
 		}
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	private FormatterDocument createFormatterDocument(String input, int offset)

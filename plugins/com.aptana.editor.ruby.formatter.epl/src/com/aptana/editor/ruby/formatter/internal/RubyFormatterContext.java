@@ -45,9 +45,9 @@ public class RubyFormatterContext extends FormatterContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix()
+	 * @see com.aptana.formatter.IFormatterContext#getWrappingCommentPrefix(java.lang.String)
 	 */
-	public String getWrappingCommentPrefix()
+	public String getWrappingCommentPrefix(String text)
 	{
 		return "# "; //$NON-NLS-1$
 	}

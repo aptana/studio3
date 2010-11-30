@@ -95,6 +95,9 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 
 	private static MarkdownSourceConfiguration instance;
 
+	private MarkdownSourceConfiguration() {
+	}
+	
 	public static MarkdownSourceConfiguration getDefault()
 	{
 		if (instance == null)
@@ -204,7 +207,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	}
 
 	@SuppressWarnings("nls")
-	protected IPredicateRule createSeparatorRule(char c, int leadingSpaces, int spaces2)
+	private IPredicateRule createSeparatorRule(char c, int leadingSpaces, int spaces2)
 	{
 		String string = "";
 		for (int x = 0; x < leadingSpaces; x++)
@@ -229,7 +232,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 	}
 
 	@SuppressWarnings("nls")
-	protected IPredicateRule createListRule(int leadingSpaces, char c)
+	private IPredicateRule createListRule(int leadingSpaces, char c)
 	{
 		// [ ]{0,3}([*+-])(?=\s)
 		String str = "";
@@ -241,7 +244,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return new BlockLevelRule(str, null, new Token(UNNUMBERED_LIST));
 	}
 
-	protected SingleLineRule createSetexHeadingRule(char c, int level)
+	private SingleLineRule createSetexHeadingRule(char c, int level)
 	{
 		String token = HEADING_1;
 		if (level == 2)
@@ -253,7 +256,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return rule;
 	}
 
-	protected SingleLineRule createATXHeadingRule(int hashes)
+	private SingleLineRule createATXHeadingRule(int hashes)
 	{
 		String header = ""; //$NON-NLS-1$
 		for (int i = 0; i < hashes; i++)
@@ -334,7 +337,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return headingScanner;
 	}
 
-	protected ITokenScanner getMarkdownScanner()
+	private ITokenScanner getMarkdownScanner()
 	{
 		if (xmlScanner == null)
 		{
@@ -343,7 +346,7 @@ public class MarkdownSourceConfiguration implements IPartitioningConfiguration, 
 		return xmlScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

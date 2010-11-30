@@ -44,4 +44,12 @@ public interface IFormatterNode
 	 * @return The number of spaces to maintain.
 	 */
 	int getSpacesCountBefore();
+
+	/**
+	 * Returns the number of spaces that will be inserted after this node.<br>
+	 * Note that a node that arrive after this node might consume these spaces if it's defined to do so.
+	 * 
+	 * @return The number of spaces to insert.
+	 */
+	int getSpacesCountAfter();
 }

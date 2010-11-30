@@ -34,8 +34,10 @@
  */
 package com.aptana.explorer.internal.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,6 +66,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
@@ -99,6 +102,8 @@ import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.navigator.ICommonFilterDescriptor;
+import org.eclipse.ui.navigator.INavigatorFilterService;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.wizards.IWizardDescriptor;
@@ -144,11 +149,14 @@ import com.aptana.ui.widgets.SearchComposite;
 public abstract class SingleProjectView extends CommonNavigator implements SearchComposite.Client, IProjectContext
 {
 
-	private static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
+	/**
+	 * Pref key to track whether we turned off ".*" filename filter that is on by default.
+	 */
+	private static final String TURNED_OFF_DOT_STAR_FILE_FILTER = "turnedOffDotStarFileFilter"; //$NON-NLS-1$
+
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
-	private static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
 
@@ -279,7 +287,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				Point toolbarLocation = commandsToolBar.getLocation();
 				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, GEAR_MENU_ID);
+				final MenuManager commandsMenuManager = new MenuManager(null, IExplorerUIConstants.GEAR_MENU_ID);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(commandsMenuManager,
 						MenuUtil.menuUri(commandsMenuManager.getId()));
@@ -380,7 +388,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		// Git branching
 		// Git misc
 		// Misc project/properties
-		
+
 		// Stick Delete in Properties area
 		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
 		{
@@ -434,7 +442,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = deployToolBar.getSize();
 				// FIXME Move declaration/filling of menu to ext pt, that means removing fillDeployMenu!
-				final MenuManager deployMenuManager = new MenuManager(null, DEPLOY_MENU_ID);
+				final MenuManager deployMenuManager = new MenuManager(null, IExplorerUIConstants.DEPLOY_MENU_ID);
 				fillDeployMenu(deployMenuManager);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
@@ -908,7 +916,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return projects;
 	}
 
-	private Composite createSearchComposite(Composite myComposite)
+	protected Composite createSearchComposite(Composite myComposite)
 	{
 		SearchComposite search = new SearchComposite(myComposite, this);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -927,8 +935,43 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		viewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		super.createPartControl(viewer);
+		turnOffDotStarFileFilterOnFirstStartup();
 		getCommonViewer().setInput(detectSelectedProject());
 		fixNavigatorManager();
+	}
+
+	private void turnOffDotStarFileFilterOnFirstStartup()
+	{
+		if (!Platform.getPreferencesService().getBoolean(ExplorerPlugin.PLUGIN_ID, TURNED_OFF_DOT_STAR_FILE_FILTER,
+				false, null))
+		{
+			INavigatorFilterService filterService = getCommonViewer().getNavigatorContentService().getFilterService();
+			ICommonFilterDescriptor[] descs = filterService.getVisibleFilterDescriptors();
+			List<String> ids = new ArrayList<String>();
+			for (ICommonFilterDescriptor desc : descs)
+			{
+				// Remove the .* filter
+				if (!desc.getId().equals("org.eclipse.ui.navigator.resources.filters.startsWithDot")) //$NON-NLS-1$
+				{
+					ids.add(desc.getId());
+				}
+			}
+
+			filterService.setActiveFilterIds(ids.toArray(new String[0]));
+			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
+			getCommonViewer().setFilters(visibleFilters);
+
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
+			prefs.putBoolean(TURNED_OFF_DOT_STAR_FILE_FILTER, true);
+			try
+			{
+				prefs.flush();
+			}
+			catch (BackingStoreException e)
+			{
+				// ignore
+			}
+		}
 	}
 
 	@Override

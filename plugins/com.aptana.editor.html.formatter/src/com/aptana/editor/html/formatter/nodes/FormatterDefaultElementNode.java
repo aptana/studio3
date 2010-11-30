@@ -50,14 +50,16 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 {
 	private String element;
+	private boolean children;
 
 	/**
 	 * @param document
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document, String element)
+	public FormatterDefaultElementNode(IFormatterDocument document, String element, boolean hasChildrenInAST)
 	{
 		super(document);
 		this.element = element;
+		this.children = hasChildrenInAST;
 	}
 
 	/*
@@ -76,8 +78,7 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingBeginNewLine()
 	{
-		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return true;
 	}
 
 	/*
@@ -86,7 +87,8 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingEndNewLine()
 	{
-		return isAddingBeginNewLine();
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return (!set.contains(element) || children);
 	}
 
 	/*

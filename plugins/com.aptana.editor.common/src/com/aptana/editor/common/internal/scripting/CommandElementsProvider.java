@@ -39,7 +39,6 @@ import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
@@ -80,13 +79,13 @@ public class CommandElementsProvider implements ICommandElementsProvider
 	{
 		List<CommandElement> commandElements = new LinkedList<CommandElement>();
 		int caretOffset = TextEditorUtils.getCaretOffset(textEditor);
-		IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+
 		try
 		{
-			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, caretOffset);
+			String contentTypeAtOffset = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(textViewer, caretOffset);
 			IModelFilter filter = new ScopeFilter(contentTypeAtOffset);
 
-			CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
+			List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
 			for (CommandElement commandElement : commandsFromScope)
 			{
 				if (commandElement instanceof SnippetElement)

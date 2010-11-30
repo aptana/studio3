@@ -232,12 +232,12 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	protected Control createContents(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
-		composite.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true));
+		composite.setLayout(new GridLayout());
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		Group group = new Group(composite, SWT.SHADOW_IN);
-		group.setLayout(new GridLayout(1, false));
-		group.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, true));
+		group.setLayout(new GridLayout());
+		group.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		createThemeListControls(group);
 		createGlobalColorControls(group);

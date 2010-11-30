@@ -130,6 +130,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		c.addTranslation(new QualifiedContentType(HTML_DOCTYPE), new QualifiedContentType(
 				"meta.tag.sgml.html", "meta.tag.sgml.doctype.html")); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	private HTMLSourceConfiguration() {
+	}
 
 	public static HTMLSourceConfiguration getDefault()
 	{
@@ -250,12 +253,12 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, CDATA);
 	}
 
-	protected ITokenScanner getHTMLCommentScanner()
+	private ITokenScanner getHTMLCommentScanner()
 	{
 		return new CommentScanner(getToken("comment.block.html")); //$NON-NLS-1$
 	}
 
-	protected ITokenScanner getHTMLScanner()
+	private ITokenScanner getHTMLScanner()
 	{
 		if (htmlScanner == null)
 		{
@@ -274,7 +277,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return cdataScanner;
 	}
 
-	protected ITokenScanner getHTMLTagScanner()
+	private ITokenScanner getHTMLTagScanner()
 	{
 		if (tagScanner == null)
 		{
@@ -283,7 +286,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return tagScanner;
 	}
 
-	protected ITokenScanner getDoctypeScanner()
+	private ITokenScanner getDoctypeScanner()
 	{
 		if (docTypeScanner == null)
 		{
@@ -292,7 +295,7 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		return docTypeScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

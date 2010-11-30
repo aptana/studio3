@@ -40,30 +40,18 @@ import org.eclipse.osgi.util.NLS;
 
 	private static final String BUNDLE_NAME = "com.aptana.filesystem.ftp.internal.messages"; //$NON-NLS-1$
 
-	public static String BaseFTPConnectionFileManager_symlink_resolve_failed;
-
-	public static String BaseFTPConnectionFileManager_cant_move;
 	public static String BaseFTPConnectionFileManager_connection_check_failed;
-	public static String BaseFTPConnectionFileManager_creating_folder;
-	public static String BaseFTPConnectionFileManager_creating_folders;
-	public static String BaseFTPConnectionFileManager_deleting;
-	public static String BaseFTPConnectionFileManager_file_already_exists;
-	public static String BaseFTPConnectionFileManager_file_is_directory;
-	public static String BaseFTPConnectionFileManager_gethering_details;
-	public static String BaseFTPConnectionFileManager_listing_directory;
-	public static String BaseFTPConnectionFileManager_moving;
-	public static String BaseFTPConnectionFileManager_no_such_file;
-	public static String BaseFTPConnectionFileManager_opening_file;
-	public static String BaseFTPConnectionFileManager_parent_doesnt_exist;
-	public static String BaseFTPConnectionFileManager_parent_is_not_directory;
-	public static String BaseFTPConnectionFileManager_putting_changes;
-	public static String BaseFTPConnectionFileManager_permission_denied;
+
+	public static String BaseFTPConnectionFileManager_ErrorDetectOwnerGroup;
+
+	public static String BaseFTPConnectionFileManager_GetheringServerDetails;
 	public static String FTPConnectionFileManager_already_initialized;
 	public static String FTPConnectionFileManager_authenticating;
-	public static String FTPConnectionFileManager_checking_connection;
 	public static String FTPConnectionFileManager_closing_connection;
 	public static String FTPConnectionFileManager_connecting;
 	public static String FTPConnectionFileManager_connection_failed;
+
+	public static String FTPConnectionFileManager_CreateFile0Failed;
 	public static String FTPConnectionFileManager_creating_directory_failed;
 	public static String FTPConnectionFileManager_deleting_directory_failed;
 	public static String FTPConnectionFileManager_deleting_failed;

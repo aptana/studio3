@@ -37,9 +37,9 @@ package com.aptana.editor.ruby.parsing.ast;
 public class RubyModule extends RubyType
 {
 
-	public RubyModule(String name, int start, int end)
+	public RubyModule(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 	}
 
 	@Override

@@ -239,6 +239,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
+	private DocumentScopeManager fDocumentScopeManager;
 
 	/**
 	 * The constructor
@@ -276,11 +277,17 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			differentiator.dispose();
 
 			removePartListener();
+			
+			if (fDocumentScopeManager != null)
+			{
+				fDocumentScopeManager.dispose();
+			}
 		}
 		finally
 		{
+			fDocumentScopeManager = null;
 			differentiator = null;
-			plugin = null;
+			plugin = null;			
 			super.stop(context);
 		}
 	}
@@ -388,9 +395,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return store;
 	}
 
-	public IDocumentScopeManager getDocumentScopeManager()
+	public synchronized IDocumentScopeManager getDocumentScopeManager()
 	{
-		return DocumentScopeManager.getInstance();
+		if (fDocumentScopeManager == null)
+		{
+			fDocumentScopeManager = new DocumentScopeManager();
+		}
+		return fDocumentScopeManager;
 	}
 
 	public IContentTypeTranslator getContentTypeTranslator()

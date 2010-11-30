@@ -42,6 +42,8 @@ import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 
+import com.aptana.editor.common.TextUtils;
+
 public class RegexpRule implements IPredicateRule
 {
 
@@ -161,7 +163,7 @@ public class RegexpRule implements IPredicateRule
 
 	private String readNextLine(ICharacterScanner scanner)
 	{
-		char[][] lineDelims = scanner.getLegalLineDelimiters();
+		char[][] lineDelims = TextUtils.rsort(scanner.getLegalLineDelimiters());
 		StringBuilder builder = new StringBuilder();
 		int c;
 		while ((c = scanner.read()) != ICharacterScanner.EOF)

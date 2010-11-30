@@ -36,6 +36,7 @@ package com.aptana.scripting.model.filters;
 
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.CommandElement;
+import com.aptana.scripting.model.TriggerType;
 
 public class HasTriggerFilter implements IModelFilter
 {
@@ -50,7 +51,7 @@ public class HasTriggerFilter implements IModelFilter
 		if (element instanceof CommandElement)
 		{
 			CommandElement node = (CommandElement) element;
-			String[] triggers = node.getTriggers();
+			String[] triggers = node.getTriggerTypeValues(TriggerType.PREFIX);
 			
 			result = (triggers != null && triggers.length > 0);
 		}

@@ -63,6 +63,7 @@ import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.OutputType;
 import com.aptana.scripting.model.SnippetElement;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.HasTriggerFilter;
 import com.aptana.scripting.model.filters.ScopeFilter;
@@ -162,10 +163,10 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	{
 		List<Template> templatesList = new LinkedList<Template>();
 		AndFilter filter = new AndFilter(new ScopeFilter(contextTypeId), new HasTriggerFilter());
-		CommandElement[] commandsFromScope = BundleManager.getInstance().getCommands(filter);
+		List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
 		for (CommandElement commandElement : commandsFromScope)
 		{
-			String[] triggers = commandElement.getTriggers();
+			String[] triggers = commandElement.getTriggerTypeValues(TriggerType.PREFIX);
 			if (triggers != null)
 			{
 				for (String trigger : triggers)

@@ -37,8 +37,12 @@ package com.aptana.browser;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.browser.internal.BrowserConfigurationManager;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -47,11 +51,13 @@ import org.osgi.framework.BundleContext;
 public class BrowserPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.browser";
+	public static final String PLUGIN_ID = "com.aptana.browser"; //$NON-NLS-1$
 
 	// The shared instance
 	private static BrowserPlugin plugin;
-	
+
+	private BrowserConfigurationManager browserConfigManager;
+
 	/**
 	 * The constructor
 	 */
@@ -65,6 +71,7 @@ public class BrowserPlugin extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		browserConfigManager = new BrowserConfigurationManager();
 	}
 
 	/*
@@ -73,6 +80,10 @@ public class BrowserPlugin extends AbstractUIPlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
+		if (browserConfigManager != null) {
+			browserConfigManager.clear();
+			browserConfigManager = null;
+		}
 		super.stop(context);
 	}
 
@@ -83,6 +94,10 @@ public class BrowserPlugin extends AbstractUIPlugin {
 	 */
 	public static BrowserPlugin getDefault() {
 		return plugin;
+	}
+
+	public static BrowserConfigurationManager getBrowserConfigurationManager() {
+		return getDefault().browserConfigManager;
 	}
 
 	public static void log(Throwable e) {
@@ -100,5 +115,4 @@ public class BrowserPlugin extends AbstractUIPlugin {
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
-
 }

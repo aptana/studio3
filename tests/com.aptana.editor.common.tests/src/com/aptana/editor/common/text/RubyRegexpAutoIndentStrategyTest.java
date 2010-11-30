@@ -182,6 +182,43 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 		assertEquals("\n\t\t", command.text);
 		assertTrue(command.doit);
 	}
+	
+	// https://aptana.lighthouseapp.com/projects/35272/tickets/1218
+	public void testStudio3_1218()
+	{
+		RubyRegexpAutoIndentStrategy strategy = new AlwaysMatchRubyRegexpAutoIndentStrategy()
+		{
+			@Override
+			protected boolean matchesRegexp(RubyRegexp regexp, String lineContent)
+			{
+				return false;
+			}
+		};
+		IDocument document = new Document("/**\n * \n **/function name() {\n}\n");
+		
+		// After end of block comment, don't add a star
+		DocumentCommand command = createNewlineCommand(12);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n ", command.text);
+		assertTrue(command.doit);
+		
+		// Inside block comment, add star
+		command = createNewlineCommand(6);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n * ", command.text);
+		assertTrue(command.doit);
+		
+		// Newline inside end of block comment
+		command = createNewlineCommand(10);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n * ", command.text);
+		assertTrue(command.doit);
+		
+		command = createNewlineCommand(11);
+		strategy.customizeDocumentCommand(document, command);
+		assertEquals("\n *", command.text);
+		assertTrue(command.doit);
+	}
 
 	protected DocumentCommand createNewlineCommand(int offset)
 	{

@@ -35,6 +35,9 @@
 
 package com.aptana.ui;
 
+import java.net.URI;
+
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -42,7 +45,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -136,6 +143,30 @@ public final class UIUtils
 	public static IWorkbenchWindow getActiveWorkbenchWindow()
 	{
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+	}
+
+	/**
+	 * Returns the URI for the specific editor input.
+	 * 
+	 * @param input
+	 *            the editor input
+	 * @return the URI, or null if none could be determined
+	 */
+	public static URI getURI(IEditorInput input)
+	{
+		if (input instanceof IFileEditorInput)
+		{
+			return ((IFileEditorInput) input).getFile().getLocationURI();
+		}
+		if (input instanceof IURIEditorInput)
+		{
+			return ((IURIEditorInput) input).getURI();
+		}
+		if (input instanceof IPathEditorInput)
+		{
+			return URIUtil.toURI(((IPathEditorInput) input).getPath());
+		}
+		return null;
 	}
 
 	/**

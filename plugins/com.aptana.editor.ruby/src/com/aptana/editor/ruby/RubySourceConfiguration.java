@@ -55,6 +55,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
+import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
@@ -66,23 +67,23 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 {
 
 	// FIXME Move out the translations strings as constants in IRubyConstants
-	public final static String PREFIX = "__rb_"; //$NON-NLS-1$
-	public final static String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public static final String PREFIX = "__rb_"; //$NON-NLS-1$
+	public static final String DEFAULT = "__rb" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
 	public static final String SINGLE_LINE_COMMENT = PREFIX + "singleline_comment"; //$NON-NLS-1$
 	public static final String MULTI_LINE_COMMENT = PREFIX + "multiline_comment"; //$NON-NLS-1$
 	public static final String REGULAR_EXPRESSION = PREFIX + "regular_expression"; //$NON-NLS-1$
 	public static final String COMMAND = PREFIX + "command"; //$NON-NLS-1$
-	public final static String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
-	public final static String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
+	public static final String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public static final String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
 
 	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, SINGLE_LINE_COMMENT, MULTI_LINE_COMMENT,
 			REGULAR_EXPRESSION, COMMAND, STRING_SINGLE, STRING_DOUBLE };
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IRubyConstants.CONTENT_TYPE_RUBY } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] {
-			new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT)), //$NON-NLS-1$
-			new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
+	private final IPredicateRule[] partitioningRules = new IPredicateRule[] {
+			new PartitionerSwitchingIgnoreRule(new EndOfLineRule("#", new Token(SINGLE_LINE_COMMENT))), //$NON-NLS-1$
+			new PartitionerSwitchingIgnoreRule(new MultiLineRule("=begin", "=end", new Token(MULTI_LINE_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("/", "/", new Token(REGULAR_EXPRESSION), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\"", "\"", new Token(STRING_DOUBLE), '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 			new SingleLineRule("\'", "\'", new Token(STRING_SINGLE), '\\') }; //$NON-NLS-1$ //$NON-NLS-2$
@@ -102,16 +103,19 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(IRubyConstants.CONTENT_TYPE_RUBY), new QualifiedContentType(
 				"source.ruby.rails")); //$NON-NLS-1$ // FIXME Should just be source.ruby! Rails bundle should contribute the more specific scope
-		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType("string.quoted.single.ruby")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType("string.quoted.double.ruby")); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(IRubyConstants.SINGLE_QUOTED_STRING_SCOPE)); //$NON-NLS-1$
+		c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(IRubyConstants.DOUBLE_QUOTED_STRING_SCOPE)); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(SINGLE_LINE_COMMENT), new QualifiedContentType(
-				"comment.line.number-sign.ruby")); //$NON-NLS-1$
+				IRubyConstants.LINE_COMMENT_SCOPE)); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(MULTI_LINE_COMMENT), new QualifiedContentType(
-				"comment.block.documentation.ruby")); //$NON-NLS-1$
+				IRubyConstants.BLOCK_COMMENT_SCOPE)); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(REGULAR_EXPRESSION), new QualifiedContentType(
 				"string.regexp.classic.ruby")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(COMMAND), new QualifiedContentType(
 				"string.interpolated.ruby")); //$NON-NLS-1$
+	}
+	
+	private RubySourceConfiguration() {
 	}
 
 	public static RubySourceConfiguration getDefault()
@@ -220,7 +224,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		if (multiLineCommentScanner == null)
 		{
-			multiLineCommentScanner = new CommentScanner(getToken("comment.block.documentation.ruby")); //$NON-NLS-1$
+			multiLineCommentScanner = new CommentScanner(getToken(IRubyConstants.BLOCK_COMMENT_SCOPE)); //$NON-NLS-1$
 		}
 		return multiLineCommentScanner;
 	}
@@ -229,7 +233,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 	{
 		if (singleLineCommentScanner == null)
 		{
-			singleLineCommentScanner = new CommentScanner(getToken("comment.line.number-sign.ruby")); //$NON-NLS-1$
+			singleLineCommentScanner = new CommentScanner(getToken(IRubyConstants.LINE_COMMENT_SCOPE)); //$NON-NLS-1$
 		}
 		return singleLineCommentScanner;
 	}
@@ -258,7 +262,7 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		if (singleQuotedStringScanner == null)
 		{
 			singleQuotedStringScanner = new RuleBasedScanner();
-			singleQuotedStringScanner.setDefaultReturnToken(getToken("string.quoted.single.ruby")); //$NON-NLS-1$
+			singleQuotedStringScanner.setDefaultReturnToken(getToken(IRubyConstants.SINGLE_QUOTED_STRING_SCOPE)); //$NON-NLS-1$
 		}
 		return singleQuotedStringScanner;
 	}
@@ -268,12 +272,12 @@ public class RubySourceConfiguration implements IPartitioningConfiguration, ISou
 		if (doubleQuotedStringScanner == null)
 		{
 			doubleQuotedStringScanner = new RuleBasedScanner();
-			doubleQuotedStringScanner.setDefaultReturnToken(getToken("string.quoted.double.ruby")); //$NON-NLS-1$
+			doubleQuotedStringScanner.setDefaultReturnToken(getToken(IRubyConstants.DOUBLE_QUOTED_STRING_SCOPE)); //$NON-NLS-1$
 		}
 		return doubleQuotedStringScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

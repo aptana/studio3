@@ -101,4 +101,13 @@ public abstract class AbstractFormatterNode implements IFormatterNode
 	{
 		return 0;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getSpacesCountAfter()
+	 */
+	public int getSpacesCountAfter()
+	{
+		return 0;
+	}
 }

@@ -89,7 +89,7 @@
             isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
             isGoToPreviousNavigationTarget="true"
             isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
-            label="HTML Tag Pair Occurrences"
+            label="%specification.tagpair.label"
             overviewRulerPreferenceKey="htmlTagPairOccurrenceIndicationInOverviewRuler"
             overviewRulerPreferenceValue="true"
             presentationLayer="4"
@@ -110,5 +110,13 @@
             name="com.aptana.html.tagPair.occurrences"
             super="com.aptana.editor.common.occurrence">
       </type>
+   </extension>
+   <extension
+         point="com.aptana.editor.common.validator">
+      <validator
+            class="com.aptana.editor.html.validator.HTMLTidyValidator"
+            language="text/html"
+            name="%validator.tidy.name">
+      </validator>
    </extension>
 </plugin>

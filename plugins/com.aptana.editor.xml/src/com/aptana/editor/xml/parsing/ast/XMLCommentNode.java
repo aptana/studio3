@@ -39,14 +39,40 @@ package com.aptana.editor.xml.parsing.ast;
  */
 public class XMLCommentNode extends XMLNode
 {
-	/**
-	 * XMLCommentNode
-	 * 
-	 * @param start
-	 * @param end
-	 */
-	public XMLCommentNode(int start, int end)
+
+	private String fText;
+
+	public XMLCommentNode(String text, int start, int end)
 	{
 		super(XMLNodeType.COMMENT, start, end);
+		fText = text;
+	}
+
+	@Override
+	public String getText()
+	{
+		return fText;
+	}
+
+	@Override
+	public String toString()
+	{
+		return fText;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof XMLCommentNode))
+		{
+			return false;
+		}
+		return fText.equals(((XMLCommentNode) obj).fText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fText.hashCode();
 	}
 }

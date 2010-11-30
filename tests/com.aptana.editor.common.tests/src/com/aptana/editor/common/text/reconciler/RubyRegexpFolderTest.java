@@ -71,7 +71,7 @@ public class RubyRegexpFolderTest extends TestCase
 		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
 				+ "\n" + ".one-liner { color: orange; }\n" + "\n" + "#id { \n" + "	font-family: monospace;\n" + "}";
 		IDocument document = new Document(src);
-		RubyRegexpFolder folder = new RubyRegexpFolder(document)
+		RubyRegexpFolder folder = new RubyRegexpFolder(null, document)
 		{
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)

@@ -39,9 +39,9 @@ import com.aptana.editor.ruby.core.IRubyElement;
 public class RubyLocalVariable extends RubyField
 {
 
-	public RubyLocalVariable(String name, int start, int end)
+	public RubyLocalVariable(String name, int start, int nameStart, int nameEnd)
 	{
-		super(name, start, end);
+		super(name, start, nameStart, nameEnd);
 	}
 
 	@Override

@@ -36,6 +36,7 @@ package com.aptana.editor.common.internal.scripting;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -109,7 +110,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	private void collectTemplates()
 	{
 		final String filename = getFileName();
-		CommandElement[] commands = BundleManager.getInstance().getCommands(new IModelFilter()
+		List<CommandElement> commands = BundleManager.getInstance().getExecutableCommands(new IModelFilter()
 		{
 			@SuppressWarnings("nls")
 			public boolean include(AbstractElement element)
@@ -130,12 +131,12 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 				return false;
 			}
 		});
-		if (commands != null && commands.length > 0)
+		if (commands != null && commands.size() > 0)
 		{
-			templates = new TemplateElement[commands.length];
-			for (int i = 0; i < commands.length; i++)
+			templates = new TemplateElement[commands.size()];
+			for (int i = 0; i < commands.size(); i++)
 			{
-				templates[i] = (TemplateElement) commands[i];
+				templates[i] = (TemplateElement) commands.get(i);
 			}
 		}
 		else

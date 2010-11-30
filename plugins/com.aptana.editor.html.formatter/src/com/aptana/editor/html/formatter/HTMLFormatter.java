@@ -37,6 +37,7 @@ package com.aptana.editor.html.formatter;
 import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -83,7 +84,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * 
 	 * @param preferences
 	 */
-	protected HTMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected HTMLFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -92,7 +93,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	/**
 	 * Detects the indentation level.
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 		IParser parser = checkoutParser();
 		IParseState parseState = new HTMLParseState();
@@ -129,7 +131,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		return indent;
 	}
 
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		if (!ScriptFormatterManager.hasFormatterFor(getMainContentType()))
 		{
@@ -155,7 +158,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			checkinParser(parser, mainContentType);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel);
+				final String output = format(input, parseResult, indentationLevel, isSelection);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -234,8 +237,14 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseNode parseResult, int indentationLevel) throws Exception
+	private String format(String input, IParseNode parseResult, int indentationLevel, boolean isSelection)
+			throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final HTMLFormatterNodeBuilder builder = new HTMLFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -246,7 +255,12 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		writer.setLinesPreserve(getInt(HTMLFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
 		writer.flush(context);
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	private FormatterDocument createFormatterDocument(String input)

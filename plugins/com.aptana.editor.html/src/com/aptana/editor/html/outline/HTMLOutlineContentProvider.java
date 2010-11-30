@@ -37,6 +37,7 @@ package com.aptana.editor.html.outline;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				if (attribute != null && attribute.length() > 0)
 				{
 					return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
+				}
+			}
+			else
+			{
+				IParseNode[] styleNodes = item.getCSSStyleNodes();
+				if (styleNodes.length > 0)
+				{
+					List<IParseNode> children = new ArrayList<IParseNode>();
+					children.addAll(Arrays.asList(styleNodes));
+					children.addAll(Arrays.asList(item.getChildren()));
+					return filter(children.toArray(new IParseNode[children.size()]));
 				}
 			}
 		}

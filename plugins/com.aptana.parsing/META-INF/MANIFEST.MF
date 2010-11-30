@@ -6,13 +6,12 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
- beaver,
+ beaver;visibility:=reexport,
  com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.parsing,
  com.aptana.parsing.ast,
- com.aptana.parsing.io,
  com.aptana.parsing.lexer,
  com.aptana.parsing.xpath,
  com.aptana.sax,

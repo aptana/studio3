@@ -40,6 +40,7 @@ import java.util.Set;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.outline.IParseListener;
+import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
@@ -52,6 +53,7 @@ public class FileService
 	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 	private String fLanguage;
+	private ValidationManager fValidationManager;
 
 	public FileService(String language)
 	{
@@ -62,6 +64,15 @@ public class FileService
 	{
 		this.fLanguage = language;
 		this.fParseState = parseState;
+		fValidationManager = new ValidationManager();
+	}
+
+	public void dispose()
+	{
+		fDocument = null;
+		fParseState.clearEditState();
+		fLastSourceHash = 0;
+		fValidationManager.dispose();
 	}
 
 	/**
@@ -128,6 +139,8 @@ public class FileService
 					{
 						listener.parseFinished();
 					}
+
+					fValidationManager.validate(source, fLanguage);
 				}
 				catch (Exception e)
 				{
@@ -137,7 +150,7 @@ public class FileService
 			}
 		}
 	}
-	
+
 	/**
 	 * removeListener
 	 * 
@@ -156,5 +169,17 @@ public class FileService
 	public void setDocument(IDocument document)
 	{
 		fDocument = document;
+		fValidationManager.setDocument(document);
+	}
+
+	/**
+	 * Sets the resource the file service is currently handling.
+	 * 
+	 * @param resource
+	 *            should either be an {IResource} for workspace resource or {IUniformResource} for external resource
+	 */
+	public void setResource(Object resource)
+	{
+		fValidationManager.setResource(resource);
 	}
 }

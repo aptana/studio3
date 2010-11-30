@@ -44,7 +44,10 @@ public interface JSIndexConstants
 	// 0.14 - Fix to StringUtil.join to not include null values in final string
 	// 0.15 - Write user agent list from UserAgentManager to index as well
 	// 0.16 - Change field order when writing properties and functions (search optimization)
-	public static final double INDEX_VERSION = 0.16;
+	// 0.17 - Modified static properties in DOM files, changing them to instance where appropriate.
+	// 0.18 - Window now inherits from Global
+	// 0.19 - Fix Document.forms type in dom_2.xml
+	public static final double INDEX_VERSION = 0.19;
 
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$
@@ -66,7 +69,7 @@ public interface JSIndexConstants
 	static final String EXAMPLES = PREFIX + "examples"; //$NON-NLS-1$
 
 	static final String[] ALL_CATEGORIES = new String[] { //
-		TYPE, //
+	TYPE, //
 		FUNCTION, //
 		PROPERTY, //
 		DESCRIPTION, //

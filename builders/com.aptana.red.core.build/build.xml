@@ -136,6 +136,8 @@
 			<path>
 				<fileset dir="${baseLocation}/dropins/eclipse/plugins" defaultexcludes="true">
 					<include name="com.aptana.swt.webkitbrowser.macosx.x86_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.win32.x86_*.jar" />
+					<include name="com.aptana.swt.webkitbrowser.linux.x86_*.jar" />
 				</fileset>
 			</path>
 			<sequential>

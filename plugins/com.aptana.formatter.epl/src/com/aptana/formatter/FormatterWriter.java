@@ -226,7 +226,7 @@ public class FormatterWriter implements IFormatterWriter
 							StringBuilder tempIndentBuffer = new StringBuilder();
 							indentGenerator.generateIndent(context.getIndent(), tempIndentBuffer);
 							writer.replace(prevWordEnd, wordBegin, lineDelimiter + tempIndentBuffer
-									+ context.getWrappingCommentPrefix());
+									+ context.getWrappingCommentPrefix(text));
 							start = prevWordEnd + lineDelimiter.length();
 							offset = calculateOffset(start);
 						}
@@ -613,5 +613,26 @@ public class FormatterWriter implements IFormatterWriter
 					&& writer.charAt(writerLength - 1) == lineDelimiter.charAt(1);
 		}
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#isInBlankLine()
+	 */
+	public boolean isInBlankLine()
+	{
+		for (int i = writer.length() - 1; i >= 0; i--)
+		{
+			char c = writer.charAt(i);
+			if (c == '\n' || c == '\r')
+			{
+				return true;
+			}
+			if (!Character.isWhitespace(c))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }

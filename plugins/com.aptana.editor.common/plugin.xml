@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="userAgent" name="%extension-point.name" schema="schema/userAgent.exsd"/>
+   <extension-point id="validator" name="Validator" schema="schema/validator.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
        <command
@@ -197,29 +198,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:com.aptana.scripting.menu?after=additions">
-         <dynamic
-               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
-               id="com.aptana.editor.common.dynamic">
-         </dynamic>
-      </menuContribution>
-      <menuContribution
-            locationURI="popup:com.aptana.scripting.popup.menu?after=commands">
-         <dynamic
-               class="com.aptana.editor.common.scripting.commands.EditorCommandsMenuContributor"
-               id="com.aptana.editor.common.dynamic">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <instanceof
-                        value="org.eclipse.ui.texteditor.ITextEditor">
-                  </instanceof>
-               </with>
-            </visibleWhen>
-         </dynamic>
-      </menuContribution>
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=edit">
          <menu

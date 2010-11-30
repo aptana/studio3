@@ -36,8 +36,8 @@ package com.aptana.editor.js.sdoc.model;
 
 import java.util.List;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
-import com.aptana.parsing.io.SourcePrinter;
 
 public class ParamTag extends TagWithTypes
 {

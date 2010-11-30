@@ -116,7 +116,7 @@ public class CSSParser extends Parser implements IParser {
 			{
 					final Symbol _symbol_p = _symbols[offset + 1];
 					final ArrayList _list_p = (ArrayList) _symbol_p.value;
-					final beaver.Symbol[] p = _list_p == null ? new beaver.Symbol[0] : (beaver.Symbol[]) _list_p.toArray(new beaver.Symbol[_list_p.size()]);
+					final CSSNode[] p = _list_p == null ? new CSSNode[0] : (CSSNode[]) _list_p.toArray(new CSSNode[_list_p.size()]);
 					
 			return new ParseRootNode(ICSSParserConstants.LANGUAGE, p, _symbol_p.getStart(), _symbol_p.getEnd());
 			}
@@ -127,11 +127,11 @@ public class CSSParser extends Parser implements IParser {
 			}
 			case 2: // Statements = Statements Statement
 			{
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2]); return _symbols[offset + 1];
+					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 2].value); return _symbols[offset + 1];
 			}
 			case 3: // Statements = Statement
 			{
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1]); return new Symbol(lst);
+					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
 			}
 			case 12: // CharSet = CHARSET.c STRING.s SEMICOLON.e
 			{
@@ -156,32 +156,32 @@ public class CSSParser extends Parser implements IParser {
 					final Symbol i = _symbols[offset + 1];
 					final Symbol _symbol_s = _symbols[offset + 2];
 					final String s = (String) _symbol_s.value;
-					final Symbol _symbol_m = _symbols[offset + 3];
-					final ArrayList _list_m = (ArrayList) _symbol_m.value;
-					final String[] m = _list_m == null ? new String[0] : (String[]) _list_m.toArray(new String[_list_m.size()]);
+					final Symbol m = _symbols[offset + 3];
 					final Symbol e = _symbols[offset + 4];
 					
-			return new CSSImportNode(s, m, i.getStart(), e.getEnd());
+			List<CSSTextNode> words = (List<CSSTextNode>) m.value;
+			return new CSSImportNode(s, words.toArray(new CSSTextNode[words.size()]), i.getStart(), e.getEnd());
 			}
 			case 15: // Media = MEDIA.m List.l LCURLY RCURLY.r
 			{
 					final Symbol m = _symbols[offset + 1];
-					final Symbol _symbol_l = _symbols[offset + 2];
-					final ArrayList _list_l = (ArrayList) _symbol_l.value;
-					final String[] l = _list_l == null ? new String[0] : (String[]) _list_l.toArray(new String[_list_l.size()]);
+					final Symbol l = _symbols[offset + 2];
 					final Symbol r = _symbols[offset + 4];
 					
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			List<CSSTextNode> media = (List<CSSTextNode>) l.value;
+			return new CSSMediaNode(media.toArray(new CSSTextNode[media.size()]), m.getStart(), r.getEnd());
 			}
-			case 16: // Media = MEDIA.m List.l LCURLY Statements RCURLY.r
+			case 16: // Media = MEDIA.m List.l LCURLY Statements.s RCURLY.r
 			{
 					final Symbol m = _symbols[offset + 1];
-					final Symbol _symbol_l = _symbols[offset + 2];
-					final ArrayList _list_l = (ArrayList) _symbol_l.value;
-					final String[] l = _list_l == null ? new String[0] : (String[]) _list_l.toArray(new String[_list_l.size()]);
+					final Symbol l = _symbols[offset + 2];
+					final Symbol _symbol_s = _symbols[offset + 4];
+					final ArrayList _list_s = (ArrayList) _symbol_s.value;
+					final CSSNode[] s = _list_s == null ? new CSSNode[0] : (CSSNode[]) _list_s.toArray(new CSSNode[_list_s.size()]);
 					final Symbol r = _symbols[offset + 5];
 					
-			return new CSSMediaNode(l, m.getStart(), r.getEnd());
+			List<CSSTextNode> media = (List<CSSTextNode>) l.value;
+			return new CSSMediaNode(media.toArray(new CSSTextNode[media.size()]), s, m.getStart(), r.getEnd());
 			}
 			case 17: // Page = PAGE.p LCURLY RCURLY.r
 			{
@@ -280,13 +280,22 @@ public class CSSParser extends Parser implements IParser {
 					
 			return new CSSFunctionNode(e, l.getStart(), r.getEnd());
 			}
-			case 31: // List = List COMMA IDENTIFIER
+			case 31: // List = List COMMA IDENTIFIER.i
 			{
-					((ArrayList) _symbols[offset + 1].value).add(_symbols[offset + 3].value); return _symbols[offset + 1];
+					final Symbol _symbol_i = _symbols[offset + 3];
+					final String i = (String) _symbol_i.value;
+					
+		((List<CSSTextNode>) _symbols[offset + 1].value).add(new CSSTextNode(i, _symbol_i.getStart(), _symbol_i.getEnd()));
+		return _symbols[offset + 1];
 			}
-			case 32: // List = IDENTIFIER
+			case 32: // List = IDENTIFIER.i
 			{
-					ArrayList lst = new ArrayList(); lst.add(_symbols[offset + 1].value); return new Symbol(lst);
+					final Symbol _symbol_i = _symbols[offset + 1];
+					final String i = (String) _symbol_i.value;
+					
+		List<CSSTextNode> list = new ArrayList<CSSTextNode>();
+		list.add(new CSSTextNode(i, _symbol_i.getStart(), _symbol_i.getEnd()));
+		return new Symbol(list);
 			}
 			case 34: // Declarations = Subdeclarations.l Declaration2.d
 			{

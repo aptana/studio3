@@ -34,13 +34,13 @@
  */
 package com.aptana.editor.js.outline;
 
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
 import com.aptana.editor.js.Activator;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 
-public class JSOutlineLabelProvider extends LabelProvider
+public class JSOutlineLabelProvider extends CommonOutlineLabelProvider
 {
 	private static final Image ARRAY_ICON = Activator.getImage("icons/array-literal.png"); //$NON-NLS-1$
 	private static final Image BOOLEAN_ICON = Activator.getImage("icons/boolean.png"); //$NON-NLS-1$

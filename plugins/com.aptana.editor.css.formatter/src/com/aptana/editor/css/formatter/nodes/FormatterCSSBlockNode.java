@@ -43,12 +43,15 @@ import com.aptana.formatter.ui.CodeFormatterConstants;
 public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 {
 
+	private boolean isDeclaration;
+
 	/**
 	 * @param document
 	 */
-	public FormatterCSSBlockNode(IFormatterDocument document)
+	public FormatterCSSBlockNode(IFormatterDocument document, boolean isDeclarationNode)
 	{
 		super(document);
+		isDeclaration = isDeclarationNode;
 	}
 
 	/*
@@ -98,6 +101,10 @@ public class FormatterCSSBlockNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
+		if (isDeclaration)
+		{
+			return getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION);
+		}
 		return getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS);
 	}
 

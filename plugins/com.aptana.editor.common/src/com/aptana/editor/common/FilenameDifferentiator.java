@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -62,9 +61,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
-
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.ui.io.IRemoteFileStoreEditorInput;
 
 /**
  * This is a special class that listens to editors and makes sure that the tab name is unique. If two tabs share same
@@ -264,14 +260,10 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 		{
 			return ((IPathEditorInput) input).getPath();
 		}
-		if (input instanceof IRemoteFileStoreEditorInput)
-		{
-			IFileStore fileStore = ((IRemoteFileStoreEditorInput) input).getRemoteFileStore();
-			if (fileStore instanceof IExtendedFileStore)
-			{
-				URI uri = ((IExtendedFileStore) fileStore).toCanonicalURI();
-				return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
-			}
+		
+		URI uri = (URI) input.getAdapter(URI.class);
+		if (uri != null) {
+			return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
 		}
 		if (input instanceof IURIEditorInput)
 		{

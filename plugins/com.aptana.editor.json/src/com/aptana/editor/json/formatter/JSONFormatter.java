@@ -38,6 +38,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -72,7 +73,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * @param preferences
 	 * @param mainContentType
 	 */
-	protected JSONFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected JSONFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 
@@ -100,7 +101,8 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.AbstractScriptFormatter#detectIndentationLevel(org.eclipse.jface.text.IDocument, int)
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 		int indent = 0;
 
@@ -152,7 +154,8 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
 	 */
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
 		IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), input);
@@ -161,7 +164,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		{
 			if (parseResult != null)
 			{
-				String output = format(input, parseResult, indentationLevel, offset);
+				String output = format(input, parseResult, indentationLevel, offset, isSelection);
 
 				if (output != null)
 				{
@@ -178,7 +181,8 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		}
 		catch (Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus, ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
 			FormatterPlugin.logError(e);
 		}
 
@@ -197,32 +201,43 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
+			boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
+
 		// create document as a means for retrieving source
 		FormatterDocument document = createFormatterDocument(input, offset);
-		
+
 		// create format node builder and generate root node
 		JSONFormatterNodeBuilder builder = new JSONFormatterNodeBuilder();
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		
+
 		// include comments
 		JSONFormatterNodeRewriter rewriter = new JSONFormatterNodeRewriter();
 		rewriter.rewrite(root);
-		
+
 		// create a formatting context
 		IFormatterContext context = new JSONFormatterContext(indentationLevel);
-		
+
 		// create writer to walk the formatter tree and to emit source
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
-		
+
 		// walk the formatter tree
 		root.accept(context, writer);
-		
+
 		// make sure to emit any remaining text at the end of the file
 		writer.flush(context);
-
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	/*

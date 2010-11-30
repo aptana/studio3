@@ -84,7 +84,7 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 		{
 			return NO_MARKER_DELTAS;
 		}
-		return (IMarkerDelta[]) matching.toArray(new IMarkerDelta[matching.size()]);
+		return matching.toArray(new IMarkerDelta[matching.size()]);
 	}
 
 	/**

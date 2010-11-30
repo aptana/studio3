@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -57,13 +58,14 @@ public class RubyFormatter extends AbstractScriptFormatter
 
 	private final String lineDelimiter;
 
-	public RubyFormatter(String lineDelimiter, Map<String, ? extends Object> preferences, String mainContentType)
+	public RubyFormatter(String lineDelimiter, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineDelimiter = lineDelimiter;
 	}
 
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 		try
 		{
@@ -132,7 +134,8 @@ public class RubyFormatter extends AbstractScriptFormatter
 		return getInt(RubyFormatterConstants.FORMATTER_TAB_SIZE);
 	}
 
-	public TextEdit format(String source, int offset, int length, int indent) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indent, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = source.substring(offset, offset + length);
 		if (isSlave())
@@ -181,7 +184,7 @@ public class RubyFormatter extends AbstractScriptFormatter
 		{
 			if (!(result instanceof NullParserResult))
 			{
-				String output = format(input, result, indent);
+				String output = format(input, result, indent, isSelection);
 				if (output != null)
 				{
 					output = trimLeft(output);
@@ -272,8 +275,13 @@ public class RubyFormatter extends AbstractScriptFormatter
 	 * @return
 	 * @throws Exception
 	 */
-	private String format(String input, ParserResult result, int indent) throws Exception
+	private String format(String input, ParserResult result, int indent, boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final RubyFormatterNodeBuilder builder = new RubyFormatterNodeBuilder();
 		final FormatterDocument document = createDocument(input);
 		IFormatterContainerNode root = builder.build(result, document);
@@ -284,7 +292,12 @@ public class RubyFormatter extends AbstractScriptFormatter
 		writer.setLinesPreserve(getInt(RubyFormatterConstants.LINES_PRESERVE));
 		root.accept(context, writer);
 		writer.flush(context);
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			output = leftTrim(output, spacesCount);
+		}
+		return output;
 	}
 
 	private FormatterDocument createDocument(String input)

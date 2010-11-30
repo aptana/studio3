@@ -37,6 +37,7 @@ package com.aptana.explorer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.viewers.ISelection;
@@ -197,7 +198,11 @@ public class ExplorerContextContributor implements ContextContributor
 				// TODO Should we handle IAdaptables that can be adapted to IResources?
 				if (selected instanceof IResource)
 				{
-					builder.append("'").append(((IResource) selected).getLocation().toOSString()).append("' "); //$NON-NLS-1$ //$NON-NLS-2$
+					IPath location = ((IResource) selected).getLocation();
+					if (location != null)
+					{
+						builder.append("'").append(location.toOSString()).append("' "); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 		}
@@ -210,19 +215,27 @@ public class ExplorerContextContributor implements ContextContributor
 
 	private CommonNavigator getAppExplorer()
 	{
-		IViewReference[] refs = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.getViewReferences();
-		for (IViewReference ref : refs)
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+		if (window != null)
 		{
-			if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+			IViewReference[] refs = window.getActivePage().getViewReferences();
+
+			for (IViewReference ref : refs)
 			{
-				IViewPart part = ref.getView(false);
-				if (part instanceof CommonNavigator)
+				if (ref.getId().equals(IExplorerUIConstants.VIEW_ID))
+
 				{
-					return (CommonNavigator) part;
+					IViewPart part = ref.getView(false);
+
+					if (part instanceof CommonNavigator)
+					{
+						return (CommonNavigator) part;
+					}
 				}
 			}
 		}
+
 		return null;
 	}
 }

@@ -544,7 +544,7 @@ public class BundleConverter
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 		return Collections.emptyMap();
 	}
