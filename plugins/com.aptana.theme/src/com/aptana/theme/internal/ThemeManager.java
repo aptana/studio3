@@ -165,7 +165,7 @@ public class ThemeManager implements IThemeManager
 		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
 		// TODO Move this stuff over to theme change listeners in the HTML/Ruby editor plugins?
-		prefs.putBoolean("htmlTagPairOccurrenceIndicationColor", false); //$NON-NLS-1$
+		prefs.putBoolean("htmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
 		prefs.putBoolean("htmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
 		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
 		prefs.put("htmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
