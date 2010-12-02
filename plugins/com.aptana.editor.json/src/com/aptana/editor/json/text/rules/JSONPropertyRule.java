@@ -58,8 +58,8 @@ public class JSONPropertyRule implements IRule
 	 */
 	public JSONPropertyRule(IToken singleQuotedToken, IToken doubleQuotedToken, IToken token)
 	{
-		this._singleQuotedRule = new SingleLineRule("\"", "\"", singleQuotedToken);
-		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken);
+		this._singleQuotedRule = new SingleLineRule("'", "'", singleQuotedToken, '\\');
+		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken, '\\');
 		this._token = token;
 	}
 
