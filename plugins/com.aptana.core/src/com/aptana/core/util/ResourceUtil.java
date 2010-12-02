@@ -206,32 +206,81 @@ public class ResourceUtil
 	}
 
 	/**
-	 * Add a builder to the given project.
+	 * Add a builder to the given project. Return boolean indicating if it was added (if already exists on project we'll
+	 * return a false. if there's an error, we'll throw a CoreException).
 	 * 
 	 * @param project
 	 * @param id
 	 * @throws CoreException
 	 */
-	public static void addBuilder(IProject project, String id) throws CoreException
+	public static boolean addBuilder(IProject project, String id) throws CoreException
 	{
 		IProjectDescription desc = project.getDescription();
-		ICommand[] commands = desc.getBuildSpec();
+		if (addBuilder(desc, id))
+		{
+			project.setDescription(desc, null);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Add a builder to the given project description. Does NOT save/set on project. Return boolean indicating if it was
+	 * added (if already exists on description we'll return a false).
+	 * 
+	 * @param description
+	 * @param builderId
+	 * @throws CoreException
+	 */
+	public static boolean addBuilder(IProjectDescription description, String builderId)
+	{
+		ICommand[] commands = description.getBuildSpec();
+		boolean addBuilder = true;
 		// Don't add duplicate
 		for (int i = 0; i < commands.length; ++i)
 		{
-			if (commands[i].getBuilderName().equals(id))
+			if (commands[i].getBuilderName().equals(builderId))
 			{
-				return;
+				addBuilder = false;
+				break;
 			}
 		}
 		// add builder to project
-		ICommand command = desc.newCommand();
-		command.setBuilderName(id);
-		ICommand[] nc = new ICommand[commands.length + 1];
-		// Add it before other builders.
-		System.arraycopy(commands, 0, nc, 1, commands.length);
-		nc[0] = command;
-		desc.setBuildSpec(nc);
-		project.setDescription(desc, null);
+		if (addBuilder)
+		{
+			ICommand command = description.newCommand();
+			command.setBuilderName(builderId);
+			ICommand[] nc = new ICommand[commands.length + 1];
+			// Add it before other builders.
+			System.arraycopy(commands, 0, nc, 1, commands.length);
+			nc[0] = command;
+			description.setBuildSpec(nc);
+		}
+		return addBuilder;
+	}
+
+	public static boolean addNature(IProjectDescription description, String natureId)
+	{
+		String[] natures = description.getNatureIds();
+		boolean addNature = true;
+		// Don't add duplicate
+		for (int i = 0; i < natures.length; ++i)
+		{
+			if (natures[i].equals(natureId))
+			{
+				addNature = false;
+				break;
+			}
+		}
+		// add nature to project
+		if (addNature)
+		{
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = natureId;
+			description.setNatureIds(newNatures);
+		}
+
+		return addNature;
 	}
 }

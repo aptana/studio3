@@ -30,13 +30,13 @@ import org.eclipse.core.runtime.SubMonitor;
  * 
  * @author cwilliams
  */
-class IndexFilesOfProjectJob extends IndexRequestJob
+public class IndexFilesOfProjectJob extends IndexRequestJob
 {
 
 	private final IProject project;
 	private final Set<IFile> files;
 
-	protected IndexFilesOfProjectJob(IProject project, Set<IFile> files)
+	public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
 		super(MessageFormat.format(Messages.IndexFilesOfProjectJob_Name, project.getName()), project.getLocationURI());
 		this.project = project;

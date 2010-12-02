@@ -2,19 +2,5 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="com.aptana.index.core.fileIndexingParticipants" name="%extension-point.name" schema="schema/fileIndexingParticipants.exsd"/>
-   <extension-point id="com.aptana.index.core.indexFilterParticipants" name="%extension-point.indexfilter.name" schema="schema/indexFilterParticipants.exsd"/>
-   <extension
-         id="com.aptana.ide.core.unifiedBuilder"
-         name="Aptana Unified Builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            callOnEmptyDelta="true"
-            hasNature="false"
-            isConfigurable="false">
-         <run
-               class="com.aptana.index.core.UnifiedBuilder">
-         </run>
-      </builder>
-   </extension>
-   
+   <extension-point id="com.aptana.index.core.indexFilterParticipants" name="%extension-point.indexfilter.name" schema="schema/indexFilterParticipants.exsd"/>  
 </plugin>

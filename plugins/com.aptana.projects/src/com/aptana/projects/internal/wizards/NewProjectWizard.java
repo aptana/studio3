@@ -80,8 +80,8 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.git.ui.CloneJob;
-import com.aptana.index.core.UnifiedBuilder;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
 import com.aptana.scripting.model.AbstractElement;

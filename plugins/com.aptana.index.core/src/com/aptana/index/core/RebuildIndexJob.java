@@ -19,10 +19,10 @@ import org.eclipse.core.filesystem.IFileStore;
  * 
  * @author cwilliams
  */
-class RebuildIndexJob extends IndexContainerJob
+public class RebuildIndexJob extends IndexContainerJob
 {
 
-	protected RebuildIndexJob(URI containerURI)
+	public RebuildIndexJob(URI containerURI)
 	{
 		super(containerURI);
 	}
