@@ -5728,6 +5728,20 @@
                     <browser platform="Safari" version="1.2+" />
                 </browsers>
             </property>
+            <property name="Error" type="Class&lt;Error&gt;" access="read-only" visibility="basic">
+                <availability>
+                    <specification name="JavaScript" version="1.5"/>
+                </availability>
+                <description>A function responsible for creating new instances of Error objects</description>
+                <browsers>
+					<browser platform="IE" version="5.0+"/>
+					<browser platform="Mozilla" version="1.0+"/>
+					<browser platform="Netscape" version="6.0+"/>
+					<browser platform="Opera" version="7.0+" />
+					<browser platform="Chrome" version="5.0+" />
+					<browser platform="Safari" version="1.0+" />
+                </browsers>
+            </property>
             <property name="Function" type="Class&lt;Function&gt;" access="read-only" visibility="basic">
                 <availability>
                     <specification name="JavaScript" version="1.0"/>
