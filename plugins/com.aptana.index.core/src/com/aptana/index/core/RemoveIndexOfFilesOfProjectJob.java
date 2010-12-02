@@ -26,9 +26,9 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 	private final IProject project;
 	private final Set<IFile> files;
 
-	public RemoveIndexOfFilesOfProjectJob(IProject project, Set<IFile> files)
+	RemoveIndexOfFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
-		super(MessageFormat.format("Removing entries for files in index of project {0}", project.getName()), project
+		super(MessageFormat.format(Messages.RemoveIndexOfFilesOfProjectJob_Name, project.getName()), project
 				.getLocationURI());
 		this.project = project;
 		this.files = files;

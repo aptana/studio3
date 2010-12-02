@@ -36,9 +36,9 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 	private final IProject project;
 	private final Set<IFile> files;
 
-	public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
+	protected IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
-		super(MessageFormat.format("Indexing files in project {0}", project.getName()), project.getLocationURI());
+		super(MessageFormat.format(Messages.IndexFilesOfProjectJob_Name, project.getName()), project.getLocationURI());
 		this.project = project;
 		this.files = files;
 	}
@@ -84,7 +84,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError("An error occurred while saving an index", e);
+				IndexActivator.logError("An error occurred while saving an index", e); //$NON-NLS-1$
 			}
 			sub.done();
 		}
