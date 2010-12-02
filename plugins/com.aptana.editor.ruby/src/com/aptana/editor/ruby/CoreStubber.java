@@ -79,6 +79,7 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexContainerJob;
 import com.aptana.index.core.IndexManager;
 
+// TODO Move this to com.aptana.ruby.core plugin!
 public class CoreStubber extends Job
 {
 
@@ -269,6 +270,8 @@ public class CoreStubber extends Job
 				project.accept(visitor, IResource.NONE);
 				if (visitor.found())
 				{
+					// TODO If this project doesn't have the ruby nature, add it!
+//					RubyProjectNature.add(project, new NullProgressMonitor());
 					return true;
 				}
 			}
