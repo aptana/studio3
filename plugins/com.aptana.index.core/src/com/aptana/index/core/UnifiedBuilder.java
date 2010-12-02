@@ -46,7 +46,6 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException
 	{
-		System.out.println("Cleaning");
 		super.clean(monitor);
 		SubMonitor sub = SubMonitor.convert(monitor, 2);
 		removeProblemsAndTasksFor(getProject());
@@ -66,12 +65,13 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			return uri;
 		}
-		IndexActivator.logError(MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}",
+		IndexActivator.logError(MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
 				getProject().getRawLocationURI(), getProject().getFullPath()), null);
 		uri = getProject().getRawLocationURI();
 		return uri;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException
 	{
@@ -97,7 +97,6 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 	private void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 4);
-		System.out.println("incremental build on " + delta);
 		if (delta != null)
 		{
 			ResourceCollector resourceCollector = new ResourceCollector();
@@ -129,8 +128,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 
 	private void fullBuild(IProgressMonitor monitor) throws CoreException
 	{
-		System.out.println("full build");
-		// TODO Remove all markers/tasks? Index participants seem to do this for themselves!
+		// Remove all markers/tasks? Index participants seem to do this for themselves!
 		// FIXME Run rebuild index, or IndexProject?
 		RebuildIndexJob job = new RebuildIndexJob(getURI());
 		job.run(monitor);

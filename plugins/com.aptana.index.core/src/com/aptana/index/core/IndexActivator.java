@@ -9,8 +9,6 @@
  */
 package com.aptana.index.core;
 
-import org.eclipse.core.resources.ISaveContext;
-import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -20,7 +18,6 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("deprecation")
 public class IndexActivator extends Plugin
 {
 
@@ -57,33 +54,6 @@ public class IndexActivator extends Plugin
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
-
-	ISaveParticipant saveParticipant = new ISaveParticipant()
-	{
-
-		public void doneSaving(ISaveContext context)
-		{
-
-		}
-
-		public void prepareToSave(ISaveContext context) throws CoreException
-		{
-
-		}
-
-		public void rollback(ISaveContext context)
-		{
-
-		}
-
-		public void saving(ISaveContext context) throws CoreException
-		{
-			if (context.getKind() == ISaveContext.FULL_SAVE)
-			{
-				context.needDelta();
-			}
-		}
-	};
 
 	/**
 	 * The constructor
