@@ -64,7 +64,6 @@ public class DiskIndex
 	private Map<String, Map<String, Object>> categoryTables;
 
 	private int streamEnd;
-	private String cachedCategoryName;
 	private String[][] cachedChunks;
 	private String[] categoriesToDiscard;
 
@@ -569,15 +568,7 @@ public class DiskIndex
 		}
 	}
 
-	/**
-	 * getCachedCategoryName
-	 * 
-	 * @return
-	 */
-	protected String getCachedCategoryName()
-	{
-		return this.cachedCategoryName;
-	}
+	
 
 	/**
 	 * getCategories
@@ -1151,9 +1142,6 @@ public class DiskIndex
 			}
 
 			this.categoryTables.put(categoryName, categoryTable);
-			// cache the table as long as its not too big
-			// in practice, some tables can be greater than 500K when they contain more than 10K elements
-			this.cachedCategoryName = categoryTable.size() < 20000 ? categoryName : null;
 		}
 		catch (IOException ioe)
 		{
@@ -1243,7 +1231,7 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	synchronized String readDocumentName(int docNumber) throws IOException
+	private synchronized String readDocumentName(int docNumber) throws IOException
 	{
 		if (this.cachedChunks == null)
 		{
@@ -1297,7 +1285,7 @@ public class DiskIndex
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("unchecked")
+	private @SuppressWarnings("unchecked")
 	synchronized List<Integer> readDocumentNumbers(Object arrayOffset) throws IOException
 	{
 		// arrayOffset is either a cached array of docNumbers or an Integer offset in the file
