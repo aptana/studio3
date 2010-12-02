@@ -20,9 +20,10 @@ import org.eclipse.core.runtime.SubMonitor;
 public class UnifiedBuilder extends IncrementalProjectBuilder
 {
 
+	public static final String ID = "com.aptana.ide.core.unifiedBuilder"; //$NON-NLS-1$
+
 	public UnifiedBuilder()
 	{
-		// TODO Auto-generated constructor stub
 	}
 
 	private static void removeProblemsAndTasksFor(IResource resource)
