@@ -100,30 +100,43 @@ public class RubyFileIndexingParticipant extends AbstractFileIndexingParticipant
 				return;
 			}
 
-			// create parser and associated parse state
-			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
-
-			if (pool != null)
-			{
-				RubyParser parser = (RubyParser) pool.checkOut();
-
-				RubySourceParser sourceParser = parser.getSourceParser();
-				ParserResult result = sourceParser.parse(store.getName(), source);
-
-				pool.checkIn(parser);
-				sub.worked(40);
-
-				Node root = result.getAST();
-				ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
-				SourceElementVisitor visitor = new SourceElementVisitor(builder);
-				visitor.acceptNode(root);
-				sub.worked(20);
-				detectTasks(store, result.getCommentNodes(), sub.newChild(10));
-			}
+			indexSource(index, source, store, sub.newChild(70));
 		}
 		catch (Throwable e)
 		{
 			RubyEditorPlugin.log(e);
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	public void indexSource(final Index index, String source, IFileStore store, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 70);
+		try
+		{
+			// create parser and associated parse state
+			IParserPool pool = ParserPoolFactory.getInstance().getParserPool(IRubyParserConstants.LANGUAGE);
+			if (pool == null)
+			{
+				return;
+			}
+			RubyParser parser = (RubyParser) pool.checkOut();
+
+			RubySourceParser sourceParser = parser.getSourceParser();
+			ParserResult result = sourceParser.parse(store.getName(), source);
+
+			pool.checkIn(parser);
+			sub.worked(40);
+
+			Node root = result.getAST();
+			ISourceElementRequestor builder = new RubySourceIndexer(index, store.toURI());
+			SourceElementVisitor visitor = new SourceElementVisitor(builder);
+			visitor.acceptNode(root);
+			sub.worked(20);
+			detectTasks(store, result.getCommentNodes(), sub.newChild(10));
 		}
 		finally
 		{
