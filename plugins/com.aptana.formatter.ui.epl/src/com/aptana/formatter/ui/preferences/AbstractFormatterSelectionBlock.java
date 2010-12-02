@@ -44,7 +44,6 @@ import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -52,7 +51,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
@@ -74,8 +72,8 @@ import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.util.ExceptionHandler;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
-import com.aptana.formatter.ui.util.SWTFactory;
-import com.aptana.formatter.ui.util.SWTUtil;
+import com.aptana.ui.SWTUtils;
+import com.aptana.ui.UIPlugin;
 
 /**
  * Abstract formatter option block that displays multiple languages and let the user select a profile and a language to
@@ -93,6 +91,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	private Button fNewButton;
 	private Button fLoadButton;
 	private Button fSaveButton;
+	private Button fEditButton;
+	private Button fDefaultButton;
 
 	// Have this one static to keep the selection when re-opening the preferences in the same Studio session.
 	private static int selectedFormatter;
@@ -222,17 +222,13 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		PixelConverter fPixConv = new PixelConverter(parent);
 		fComposite = createComposite(parent, numColumns);
 
-		final Group group = SWTFactory.createGroup(fComposite,
-				FormatterMessages.AbstractFormatterSelectionBlock_profilesGroup, numColumns, numColumns,
-				GridData.FILL_BOTH);
-
-		Label profileLabel = new Label(group, SWT.NONE);
+		Label profileLabel = new Label(fComposite, SWT.NONE);
 		profileLabel.setText(FormatterMessages.AbstractFormatterSelectionBlock_activeProfile);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
 		data.horizontalSpan = numColumns;
 		profileLabel.setLayoutData(data);
 
-		fProfileCombo = createProfileCombo(group, 3, fPixConv.convertWidthInCharsToPixels(20));
+		fProfileCombo = createProfileCombo(fComposite, 1, fPixConv.convertWidthInCharsToPixels(20));
 		updateComboFromProfiles();
 		fProfileCombo.addSelectionListener(new SelectionAdapter()
 		{
@@ -243,18 +239,20 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 
-		fNewButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_newProfile,
-				GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fNewButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fNewButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/add.gif")); //$NON-NLS-1$
+		fNewButton.setToolTipText(FormatterMessages.AbstractFormatterSelectionBlock_newProfile);
 		fNewButton.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				createNewProfile(group.getShell());
+				createNewProfile(fComposite.getShell());
 			}
 		});
 
-		fDeleteButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_removeProfile,
-				GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fDeleteButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fDeleteButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/delete.gif")); //$NON-NLS-1$
+		fDeleteButton.setToolTipText(FormatterMessages.AbstractFormatterSelectionBlock_removeProfile);
 		fDeleteButton.addSelectionListener(new SelectionListener()
 		{
 
@@ -272,10 +270,11 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			{
 				IProfileManager profileManager = getProfileManager();
 				IProfile selected = profileManager.getSelected();
-				if (MessageDialog.openQuestion(group.getShell(),
-						FormatterMessages.AbstractFormatterSelectionBlock_confirmRemoveLabel, NLS.bind(
-								FormatterMessages.AbstractFormatterSelectionBlock_confirmRemoveMessage, selected
-										.getName())))
+				if (MessageDialog.openQuestion(
+						fComposite.getShell(),
+						FormatterMessages.AbstractFormatterSelectionBlock_confirmRemoveLabel,
+						NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_confirmRemoveMessage,
+								selected.getName())))
 				{
 					profileManager.deleteProfile(selected);
 					updateComboFromProfiles();
@@ -285,26 +284,28 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		});
 
 		// add a filler
-		createLabel(group, "", 3); //$NON-NLS-1$
 
-		fLoadButton = createButton(group, FormatterMessages.AbstractFormatterSelectionBlock_importProfile,
-				GridData.HORIZONTAL_ALIGN_END);
+		fLoadButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fLoadButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/import.gif")); //$NON-NLS-1$
+		fLoadButton.setToolTipText(FormatterMessages.AbstractFormatterSelectionBlock_importProfile);
 		fLoadButton.addSelectionListener(new SelectionListener()
 		{
 
 			public void widgetSelected(SelectionEvent e)
 			{
-				doImport(group);
+				doImport(fComposite);
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
-				doImport(group);
+				doImport(fComposite);
 			}
 
 		});
 
-		fSaveButton = createButton(group, FormatterMessages.FormatterModifyDialog_export, SWT.PUSH);
+		fSaveButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fSaveButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/export.gif")); //$NON-NLS-1$
+		fSaveButton.setToolTipText(FormatterMessages.FormatterModifyDialog_export);
 		fSaveButton.addSelectionListener(new SelectionAdapter()
 		{
 			public void widgetSelected(SelectionEvent e)
@@ -313,7 +314,85 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			}
 		});
 
-		configurePreview(group, numColumns);
+		createLabel(fComposite, "", 3); //$NON-NLS-1$
+
+		// Edit
+		fEditButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fEditButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/pencil.gif")); //$NON-NLS-1$
+		fEditButton.setToolTipText(FormatterMessages.AbstractFormatterSelectionBlock_edit);
+		fEditButton.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				editButtonPressed();
+			}
+		});
+
+		// Restore Defaults
+		fDefaultButton = createButton(fComposite, GridData.HORIZONTAL_ALIGN_BEGINNING);
+		fDefaultButton.setImage(SWTUtils.getImage(UIPlugin.getDefault(), "/icons/arrow_undo.png")); //$NON-NLS-1$
+		fDefaultButton.setToolTipText(FormatterMessages.AbstractFormatterSelectionBlock_defaults);
+		fDefaultButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				IScriptFormatterFactory formatter = getSelectedFormatter();
+				if (formatter == null)
+				{
+					return;
+				}
+				PreferenceKey[] preferenceKeys = formatter.getPreferenceKeys();
+				IProfileManager manager = getProfileManager();
+				if (!MessageDialog.openQuestion(
+						fDefaultButton.getShell(),
+						FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsTitle,
+						NLS.bind(FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsMessage,
+								formatter.getName())))
+				{
+					return;
+				}
+				List<IProfile> builtInProfiles = manager.getBuiltInProfiles();
+				String defaultProfileId = manager.getDefaultProfileID();
+				IProfile defaultProfile = null;
+				for (IProfile profile : builtInProfiles)
+				{
+					if (profile.getID().equals(defaultProfileId))
+					{
+						defaultProfile = profile;
+						break;
+					}
+				}
+				if (defaultProfile != null)
+				{
+					Map<String, String> defaultSettings = defaultProfile.getSettings();
+					Map<String, String> activeSettings = manager.getSelected().getSettings();
+					IScopeContext context = new InstanceScope();
+					for (PreferenceKey key : preferenceKeys)
+					{
+						String name = key.getName();
+						if (defaultSettings.containsKey(name))
+						{
+							String value = defaultSettings.get(name);
+							activeSettings.put(name, value);
+							key.setStoredValue(context, value);
+						}
+						else
+						{
+							activeSettings.remove(name);
+						}
+					}
+					manager.getSelected().setSettings(activeSettings);
+					manager.markDirty();
+					// Apply the preferences. This will update the preview as well.
+					applyPreferences();
+				}
+			}
+		});
+		IProfileManager profileManager = getProfileManager();
+		fDefaultButton.setEnabled(!profileManager.getSelected().isBuiltInProfile());
+
+		configurePreview(fComposite, numColumns);
 		updateButtons();
 		applyPreferences();
 
@@ -327,8 +406,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	 */
 	protected void createNewProfile(Shell shell)
 	{
-		final CreateProfileDialog p = new CreateProfileDialog(shell, getProfileManager(), profileManager
-				.getProfileVersioner());
+		final CreateProfileDialog p = new CreateProfileDialog(shell, getProfileManager(),
+				profileManager.getProfileVersioner());
 		if (p.open() != Window.OK)
 		{
 			return;
@@ -451,34 +530,6 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		rightPanel.setLayout(layout);
 		rightPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		// Buttons panel
-		Composite buttons = new Composite(rightPanel, SWT.NONE);
-		layout = new GridLayout(2, true);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		buttons.setLayout(layout);
-		final Button editBt = new Button(buttons, SWT.PUSH);
-		editBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_edit);
-		GridData editLayoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		editBt.setLayoutData(editLayoutData);
-		final Button defaultsBt = new Button(buttons, SWT.PUSH);
-		defaultsBt.setText(FormatterMessages.AbstractFormatterSelectionBlock_defaults);
-		GridData defaultLauoutData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
-		defaultsBt.setLayoutData(defaultLauoutData);
-
-		Point defaultSize = defaultsBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		Point editSize = editBt.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		if (defaultSize.x > editSize.x)
-		{
-			editLayoutData.widthHint = defaultSize.x;
-		}
-		else
-		{
-			defaultLauoutData.widthHint = editSize.x;
-		}
-		IProfileManager profileManager = getProfileManager();
-		defaultsBt.setEnabled(!profileManager.getSelected().isBuiltInProfile());
-
 		// Previews area
 		final Composite previewPane = new Composite(rightPanel, SWT.BORDER);
 		GridData previewGridData = new GridData(GridData.FILL_BOTH);
@@ -547,78 +598,12 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 					previewStackLayout.topControl = fSelectedPreviewViewer.getControl();
 					previewPane.layout();
 					updatePreview();
-					defaultsBt.setEnabled(!profile.isBuiltInProfile());
+					fDefaultButton.setEnabled(!profile.isBuiltInProfile());
 				}
 			}
 		};
 		profileManager.addPropertyChangeListener(profileChangeListener);
 
-		// Edit
-		editBt.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-				editButtonPressed();
-			}
-		});
-
-		// Restore Defaults
-		defaultsBt.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				IScriptFormatterFactory formatter = getSelectedFormatter();
-				if (formatter == null)
-				{
-					return;
-				}
-				PreferenceKey[] preferenceKeys = formatter.getPreferenceKeys();
-				IProfileManager manager = getProfileManager();
-				if (!MessageDialog.openQuestion(defaultsBt.getShell(),
-						FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsTitle, NLS.bind(
-								FormatterMessages.AbstractFormatterSelectionBlock_confirmDefaultsMessage, formatter
-										.getName())))
-				{
-					return;
-				}
-				List<IProfile> builtInProfiles = manager.getBuiltInProfiles();
-				String defaultProfileId = manager.getDefaultProfileID();
-				IProfile defaultProfile = null;
-				for (IProfile profile : builtInProfiles)
-				{
-					if (profile.getID().equals(defaultProfileId))
-					{
-						defaultProfile = profile;
-						break;
-					}
-				}
-				if (defaultProfile != null)
-				{
-					Map<String, String> defaultSettings = defaultProfile.getSettings();
-					Map<String, String> activeSettings = manager.getSelected().getSettings();
-					IScopeContext context = new InstanceScope();
-					for (PreferenceKey key : preferenceKeys)
-					{
-						String name = key.getName();
-						if (defaultSettings.containsKey(name))
-						{
-							String value = defaultSettings.get(name);
-							activeSettings.put(name, value);
-							key.setStoredValue(context, value);
-						}
-						else
-						{
-							activeSettings.remove(name);
-						}
-					}
-					manager.getSelected().setSettings(activeSettings);
-					manager.markDirty();
-					// Apply the preferences. This will update the preview as well.
-					applyPreferences();
-				}
-			}
-		});
 	}
 
 	/*
@@ -669,8 +654,8 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 			if (dialog != null)
 			{
 				IProfile profile = manager.getSelected();
-				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(), profile
-						.getName());
+				String title = NLS.bind(FormatterMessages.FormatterModifyDialog_dialogTitle, factory.getName(),
+						profile.getName());
 				dialog.setProfileManager(manager, title);
 				dialog.setPreferences(profile.getSettings());
 				if (dialog.open() == Window.OK)
@@ -764,14 +749,12 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 		return combo;
 	}
 
-	private static Button createButton(Composite composite, String text, final int style)
+	private static Button createButton(Composite composite, final int style)
 	{
 		final Button button = new Button(composite, SWT.PUSH);
 		button.setFont(composite.getFont());
-		button.setText(text);
 
 		final GridData gd = new GridData(style);
-		gd.widthHint = SWTUtil.getButtonWidthHint(button);
 		button.setLayoutData(gd);
 		return button;
 	}
