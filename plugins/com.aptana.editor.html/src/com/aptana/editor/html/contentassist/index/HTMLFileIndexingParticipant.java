@@ -174,7 +174,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param current
 	 */
-	private void processNode(Index index, IFileStore file, String source, IParseNode current)
+	protected void processNode(Index index, IFileStore file, String source, IParseNode current)
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
@@ -236,7 +236,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param parent
 	 * @param monitor
 	 */
-	private void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
+	public void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
 	{
 		if (parent != null)
 		{
