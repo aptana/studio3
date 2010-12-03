@@ -124,13 +124,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.erb"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.html"
          download-size="0"
          install-size="0"
@@ -139,13 +132,6 @@
 
    <plugin
          id="com.aptana.editor.js"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.ruby"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -359,13 +345,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.jrubyparser"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.portablegit.win32"
          os="win32"
          download-size="0"
@@ -387,19 +366,11 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.haml"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.index.core.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
 
    <plugin
          id="com.aptana.projects"
@@ -501,13 +472,6 @@
 
    <plugin
          id="com.aptana.editor.js.formatter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.ruby.formatter.epl"
          download-size="0"
          install-size="0"
          version="0.0.0"
