@@ -98,29 +98,6 @@ public class RHTMLFileIndexingParticipant extends AbstractFileIndexingParticipan
 		}
 	}
 
-	// private String replaceNonRubyCodeWithWhitespace(String source)
-	// {
-	// Pattern p = Pattern.compile("(%|-)?%>.*?<%(%|=)?", Pattern.MULTILINE);
-	// Matcher m = p.matcher(source);
-	// int start = 0;
-	// while (m.find(start))
-	// {
-	// int length = m.group().length();
-	// for ()
-	// start = m.end();
-	// }
-	//
-	// source = source.gsub(/(%|-)?%>.*?<%(%|=)?/m) {|m| ';' + (' ' * (m.length - 1))}
-	// source = source.gsub(/^.*?<%(%|=)?/m) {|m| ' ' * m.length }
-	// int lastChunk = source.rindex(/(%|-)?%>.*?$/m, -1);
-	// if (lastChunk != -1)
-	// {
-	// blah = source.length - last_chunk;
-	// source = source[0...last_chunk] + (' ' * blah);
-	// }
-	// source;
-	// }
-
 	public static String replaceNonRubyCodeWithWhitespace(String source)
 	{
 		List<String> code = getRubyCodeChunks(source);
