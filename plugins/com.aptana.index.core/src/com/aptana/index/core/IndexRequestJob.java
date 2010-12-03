@@ -55,7 +55,7 @@ abstract class IndexRequestJob extends Job
 	 * @param name
 	 * @param containerURI
 	 */
-	public IndexRequestJob(String name, URI containerURI)
+	protected IndexRequestJob(String name, URI containerURI)
 	{
 		super(name);
 		this.containerURI = containerURI;
@@ -69,9 +69,9 @@ abstract class IndexRequestJob extends Job
 	 * 
 	 * @param containerURI
 	 */
-	public IndexRequestJob(URI containerURI)
+	protected IndexRequestJob(URI containerURI)
 	{
-		this(MessageFormat.format("Indexing {0}", containerURI.toString()), containerURI);
+		this(MessageFormat.format(Messages.IndexRequestJob_Name, containerURI.toString()), containerURI);
 	}
 
 	/*

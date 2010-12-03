@@ -41,8 +41,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -80,27 +83,23 @@ public class ResourceUtil
 			}
 			catch (IOException e)
 			{
-				String message = MessageFormat.format(
-					Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
-					new Object[] { url }
-				);
-				
+				String message = MessageFormat.format(Messages.ResourceUtils_URL_To_File_URL_Conversion_Error,
+						new Object[] { url });
+
 				CorePlugin.logError(message, e);
 			}
 			catch (URISyntaxException e)
 			{
-				String message = MessageFormat.format(
-					Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
-					new Object [] { url }
-				);
-				
+				String message = MessageFormat.format(Messages.ResourceUtils_File_URL_To_URI_Conversion_Error,
+						new Object[] { url });
+
 				CorePlugin.logError(message, e);
 			}
 		}
 
 		return result;
 	}
-	
+
 	/**
 	 * resourcePathToString
 	 * 
@@ -111,7 +110,7 @@ public class ResourceUtil
 	{
 		String result = null;
 		File file = resourcePathToFile(url);
-		
+
 		if (file != null)
 		{
 			result = file.getAbsolutePath();
@@ -134,7 +133,7 @@ public class ResourceUtil
 		if (SCHEME_FILE.equals(url.getProtocol()))
 		{
 			String pathString = url.toExternalForm().substring(5);
-			
+
 			// ensure there is a leading slash to handle common malformed URLs such as file:c:/tmp
 			if (pathString.indexOf('/') != 0)
 			{
@@ -145,7 +144,7 @@ public class ResourceUtil
 				// URL encodes UNC path with two slashes, but URI uses four (see bug 207103)
 				pathString = ensureUNCPath(pathString);
 			}
-			
+
 			return new URI(SCHEME_FILE, null, pathString, null);
 		}
 		try
@@ -155,7 +154,8 @@ public class ResourceUtil
 		catch (URISyntaxException e)
 		{
 			// try multi-argument URI constructor to perform encoding
-			return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+			return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(),
+					url.getQuery(), url.getRef());
 		}
 	}
 
@@ -166,7 +166,7 @@ public class ResourceUtil
 	{
 		int len = path.length();
 		StringBuffer result = new StringBuffer(len);
-		
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (i >= len || path.charAt(i) != '/')
@@ -174,12 +174,12 @@ public class ResourceUtil
 				result.append('/');
 			}
 		}
-		
+
 		result.append(path);
-		
+
 		return result.toString();
 	}
-	
+
 	/**
 	 * Returns the value that is currently stored for the line separator. In case an IProject reference is given, the
 	 * returned value will be the one that was, potentially, set specifically to that project.
@@ -203,5 +203,84 @@ public class ResourceUtil
 		IScopeContext[] scopeContext = new IScopeContext[] { scope };
 		IEclipsePreferences node = scopeContext[0].getNode(Platform.PI_RUNTIME);
 		return node.get(Platform.PREF_LINE_SEPARATOR, System.getProperty("line.separator")); //$NON-NLS-1$
+	}
+
+	/**
+	 * Add a builder to the given project. Return boolean indicating if it was added (if already exists on project we'll
+	 * return a false. if there's an error, we'll throw a CoreException).
+	 * 
+	 * @param project
+	 * @param id
+	 * @throws CoreException
+	 */
+	public static boolean addBuilder(IProject project, String id) throws CoreException
+	{
+		IProjectDescription desc = project.getDescription();
+		if (addBuilder(desc, id))
+		{
+			project.setDescription(desc, null);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Add a builder to the given project description. Does NOT save/set on project. Return boolean indicating if it was
+	 * added (if already exists on description we'll return a false).
+	 * 
+	 * @param description
+	 * @param builderId
+	 * @throws CoreException
+	 */
+	public static boolean addBuilder(IProjectDescription description, String builderId)
+	{
+		ICommand[] commands = description.getBuildSpec();
+		boolean addBuilder = true;
+		// Don't add duplicate
+		for (int i = 0; i < commands.length; ++i)
+		{
+			if (commands[i].getBuilderName().equals(builderId))
+			{
+				addBuilder = false;
+				break;
+			}
+		}
+		// add builder to project
+		if (addBuilder)
+		{
+			ICommand command = description.newCommand();
+			command.setBuilderName(builderId);
+			ICommand[] nc = new ICommand[commands.length + 1];
+			// Add it before other builders.
+			System.arraycopy(commands, 0, nc, 1, commands.length);
+			nc[0] = command;
+			description.setBuildSpec(nc);
+		}
+		return addBuilder;
+	}
+
+	public static boolean addNature(IProjectDescription description, String natureId)
+	{
+		String[] natures = description.getNatureIds();
+		boolean addNature = true;
+		// Don't add duplicate
+		for (int i = 0; i < natures.length; ++i)
+		{
+			if (natures[i].equals(natureId))
+			{
+				addNature = false;
+				break;
+			}
+		}
+		// add nature to project
+		if (addNature)
+		{
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = natureId;
+			description.setNatureIds(newNatures);
+		}
+
+		return addNature;
 	}
 }

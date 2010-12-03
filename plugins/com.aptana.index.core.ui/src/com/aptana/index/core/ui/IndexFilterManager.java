@@ -36,6 +36,7 @@ package com.aptana.index.core.ui;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,14 +49,17 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.IndexProjectJob;
 import com.aptana.index.core.ui.preferences.IPreferenceConstants;
 
 public class IndexFilterManager
@@ -186,17 +190,26 @@ public class IndexFilterManager
 		}
 
 		// update project indexes that were affected by our changes
-		IndexManager manager = IndexManager.getInstance();
-
-		// TODO: Should we keep tabs on the indexing jobs we create here and
-		// cancel them if we're generating a new job for the same project?
-		for (IProject p : projects)
+		for (final IProject p : projects)
 		{
-			// remove project index
-			manager.removeIndex(p.getLocationURI());
+			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName()))
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					try
+					{
+						p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+					}
+					catch (CoreException e)
+					{
+						return e.getStatus();
+					}
+					return Status.OK_STATUS;
+				}
 
-			// and then re-build it
-			new IndexProjectJob(p).schedule();
+			};
+			job.schedule();
 		}
 	}
 
@@ -206,7 +219,7 @@ public class IndexFilterManager
 	 * @param fileStores
 	 * @return
 	 */
-	public Set<IFileStore> applyFilter(Set<IFileStore> fileStores)
+	protected Set<IFileStore> applyFilter(Set<IFileStore> fileStores)
 	{
 		if (this._filteredItems != null && this._filteredItems.isEmpty() == false && fileStores != null)
 		{
@@ -281,7 +294,7 @@ public class IndexFilterManager
 	/**
 	 * loadFilteredItems
 	 */
-	public Set<IFileStore> loadFilteredItems()
+	private Set<IFileStore> loadFilteredItems()
 	{
 		Set<IFileStore> filteredItems = new HashSet<IFileStore>();
 

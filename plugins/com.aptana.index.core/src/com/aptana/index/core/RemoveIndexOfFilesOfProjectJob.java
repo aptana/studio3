@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
+public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 {
 
 	private final IProject project;
@@ -28,7 +28,7 @@ class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 
 	public RemoveIndexOfFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
-		super(MessageFormat.format("Removing entries for files in index of project {0}", project.getName()), project
+		super(MessageFormat.format(Messages.RemoveIndexOfFilesOfProjectJob_Name, project.getName()), project
 				.getLocationURI());
 		this.project = project;
 		this.files = files;

@@ -39,8 +39,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -64,7 +66,6 @@ import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.IndexProjectJob;
 
 public class MetadataLoader extends Job
 {
@@ -140,10 +141,10 @@ public class MetadataLoader extends Job
 		JSMetadataReader reader = new JSMetadataReader();
 
 		this.loadMetadata(monitor, reader, "/metadata/js_core.xml", //$NON-NLS-1$
-			"/metadata/dom_0.xml", //$NON-NLS-1$
-			"/metadata/dom_2.xml", //$NON-NLS-1$
-			"/metadata/dom_3.xml", //$NON-NLS-1$
-			"/metadata/dom_5.xml" //$NON-NLS-1$
+				"/metadata/dom_0.xml", //$NON-NLS-1$
+				"/metadata/dom_2.xml", //$NON-NLS-1$
+				"/metadata/dom_3.xml", //$NON-NLS-1$
+				"/metadata/dom_5.xml" //$NON-NLS-1$
 		);
 
 		JSIndexWriter indexer = new JSIndexWriter();
@@ -180,33 +181,25 @@ public class MetadataLoader extends Job
 	 */
 	private void rebuildProjectIndexes()
 	{
-		IndexManager manager = IndexManager.getInstance();
-
-		// TODO: We are temporarily deleting the entire project index
-		// because it appears that Index#removeCategories doesn't clean up
-		// the index's list of documents. This prevents the files from
-		// being indexed during the timestamp comparison step in Index.
-		boolean deleteIndex = true;
-
-		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		Job job = new Job("Rebuilding indices")
 		{
-			if (deleteIndex)
-			{
-				manager.removeIndex(project.getLocationURI());
-			}
-			else
-			{
-				Index index = manager.getIndex(project.getLocationURI());
 
-				if (index != null)
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				IWorkspace ws = ResourcesPlugin.getWorkspace();
+				try
 				{
-					index.removeCategories(JSIndexConstants.ALL_CATEGORIES);
+					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 				}
+				catch (CoreException e)
+				{
+					return e.getStatus();
+				}
+				return Status.OK_STATUS;
 			}
-
-			// re-index
-			new IndexProjectJob(project).schedule();
-		}
+		};
+		job.schedule();
 	}
 
 	/*
@@ -216,7 +209,8 @@ public class MetadataLoader extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID, IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
+		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID,
+				IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
 
 		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
 		{

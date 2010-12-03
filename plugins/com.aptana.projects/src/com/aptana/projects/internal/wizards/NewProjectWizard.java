@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -79,6 +80,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
+import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
@@ -222,6 +224,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		final IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
 		description.setLocationURI(location);
 		description.setNatureIds(new String[] { WebProjectNature.ID });
+		// Add Unified Builder
+		ICommand command = description.newCommand();
+		command.setBuilderName(UnifiedBuilder.ID);
+		description.setBuildSpec(new ICommand[] { command });
 
 		boolean fromGit = false;
 		if (templatesPage != null)

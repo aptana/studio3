@@ -24,5 +24,17 @@
             name="arguments">
       </attribute>
    </extension>
-
+  <extension
+         id="unifiedBuilder"
+         name="Aptana Unified Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="true"
+            hasNature="false"
+            isConfigurable="false">
+         <run
+               class="com.aptana.core.build.UnifiedBuilder">
+         </run>
+      </builder>
+   </extension>
 </plugin>

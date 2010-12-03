@@ -54,5 +54,14 @@
             language="text/erb">
       </parser>
    </extension>
+   <extension
+         point="com.aptana.index.core.fileIndexingParticipants">
+      <fileIndexingParticipant
+            class="com.aptana.editor.erb.html.RHTMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html.erb">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
+   </extension>
 
 </plugin>

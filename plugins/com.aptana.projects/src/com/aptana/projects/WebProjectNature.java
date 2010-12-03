@@ -38,6 +38,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.util.ResourceUtil;
+
 public class WebProjectNature implements IProjectNature
 {
 
@@ -47,10 +50,12 @@ public class WebProjectNature implements IProjectNature
 
 	public void configure() throws CoreException
 	{
+		ResourceUtil.addBuilder(getProject(), UnifiedBuilder.ID);
 	}
 
 	public void deconfigure() throws CoreException
 	{
+		// TODO Remove builder?
 	}
 
 	public IProject getProject()
