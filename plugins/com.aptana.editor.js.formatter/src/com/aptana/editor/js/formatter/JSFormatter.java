@@ -223,8 +223,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	{
 		// first, strip out all the comments from the input and the output.
 		// save those comments for later comparison.
-		StringBuilder inputBuffer = new StringBuilder(input.length());
-		StringBuilder outputBuffer = new StringBuilder(output.length());
+		int inputLength = input.length();
+		int outputLength = output.length();
+		StringBuilder inputBuffer = new StringBuilder(inputLength);
+		StringBuilder outputBuffer = new StringBuilder(outputLength);
 		StringBuilder inputComments = new StringBuilder();
 		StringBuilder outputComments = new StringBuilder();
 		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
@@ -237,7 +239,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
 			inputOffset = inputCommentsMatcher.end() + 1;
 		}
-		inputBuffer.append(input.subSequence(inputOffset, input.length()));
+		if (inputOffset < inputLength)
+		{
+			inputBuffer.append(input.subSequence(inputOffset, inputLength));
+		}
 		while (outputCommentsMatcher.find())
 		{
 			outputComments.append(outputCommentsMatcher.group());
@@ -245,7 +250,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			outputOffset = outputCommentsMatcher.end() + 1;
 
 		}
-		outputBuffer.append(output.subSequence(outputOffset, output.length()));
+		if (outputOffset < outputLength)
+		{
+			outputBuffer.append(output.subSequence(outputOffset, outputLength));
+		}
 		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
 				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
 	}
