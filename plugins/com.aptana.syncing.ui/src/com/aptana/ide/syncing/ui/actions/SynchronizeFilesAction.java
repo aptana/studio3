@@ -38,6 +38,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 
@@ -73,7 +74,7 @@ public class SynchronizeFilesAction extends BaseSyncAction
 					dialog.open();
 					dialog.setHandler(new SyncEventHandlerAdapter()
 					{
-						public void syncDone(VirtualFileSyncPair item)
+						public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 						{
 							Object file = source.getAdapter(IResource.class);
 							if (file != null && file instanceof IResource)

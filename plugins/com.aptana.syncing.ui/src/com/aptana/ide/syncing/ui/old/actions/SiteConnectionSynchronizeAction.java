@@ -37,6 +37,7 @@ package com.aptana.ide.syncing.ui.old.actions;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -77,7 +78,7 @@ public class SiteConnectionSynchronizeAction implements IObjectActionDelegate
 			dialog.open();
 			dialog.setHandler(new SyncEventHandlerAdapter()
 			{
-				public void syncDone(VirtualFileSyncPair item)
+				public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 				{
 					Object file = source.getAdapter(IResource.class);
 					if (file != null && file instanceof IResource)

@@ -81,6 +81,8 @@ public final class Messages extends NLS
 	 */
 	public static String Synchronizer_Downloading;
 
+	public static String Synchronizer_Downloading_Files;
+
 	/**
 	 * Synchronizer_Error
 	 */
@@ -135,6 +137,8 @@ public final class Messages extends NLS
 	 */
 	public static String Synchronizer_ServerFileManagerCannotBeNull;
 
+	public static String Synchronizer_Skipping_File;
+
 	public static String Synchronizer_Source_Newer;
 
 	/**
@@ -142,12 +146,16 @@ public final class Messages extends NLS
 	 */
 	public static String Synchronizer_Success;
 
+	public static String Synchronizer_Synchronizing;
+
 	public static String Synchronizer_Times_Modified;
 
 	/**
 	 * Synchronizer_Uploading
 	 */
 	public static String Synchronizer_Uploading;
+
+	public static String Synchronizer_Uploading_Files;
 
 	static
 	{
