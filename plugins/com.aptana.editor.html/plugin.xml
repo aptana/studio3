@@ -113,6 +113,10 @@
    </extension>
    <extension
          point="com.aptana.editor.common.validator">
+      <language
+            name="%validator.language.html.name"
+            type="text/html">
+      </language>
       <validator
             class="com.aptana.editor.html.validator.HTMLTidyValidator"
             language="text/html"

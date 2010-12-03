@@ -47,11 +47,11 @@ public class ValidatorReference
 	private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
 	private final String name;
-	private final String language;
+	private final ValidatorLanguage language;
 	private final IConfigurationElement configElement;
 	private IValidator validator;
 
-	public ValidatorReference(String name, String language, IConfigurationElement configElement)
+	public ValidatorReference(String name, ValidatorLanguage language, IConfigurationElement configElement)
 	{
 		this.name = name;
 		this.language = language;
@@ -63,7 +63,7 @@ public class ValidatorReference
 		return name;
 	}
 
-	public String getLanguage()
+	public ValidatorLanguage getLanguage()
 	{
 		return language;
 	}

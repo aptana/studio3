@@ -47,21 +47,26 @@ import org.eclipse.core.runtime.RegistryFactory;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
-class ValidatorLoader
+public class ValidatorLoader
 {
 
 	private static final String EXTENSION_POINT_ID = CommonEditorPlugin.PLUGIN_ID + ".validator"; //$NON-NLS-1$
 	private static final String ELEMENT_VALIDATOR = "validator"; //$NON-NLS-1$
+	private static final String ELEMENT_LANGUAGE = "language"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
+	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 	private static final String ATTR_LANGUAGE = "language"; //$NON-NLS-1$
 
-	// maps language to the list of validators that support it
+	// maps the languages by type
+	private Map<String, ValidatorLanguage> languages;
+	// maps language type to the list of validators that support it
 	private Map<String, List<ValidatorReference>> validators;
 
 	private static ValidatorLoader instance;
 
 	private ValidatorLoader()
 	{
+		languages = new HashMap<String, ValidatorLanguage>();
 		validators = new HashMap<String, List<ValidatorReference>>();
 		readExtensionRegistry();
 	}
@@ -75,9 +80,16 @@ class ValidatorLoader
 		return instance;
 	}
 
-	public List<ValidatorReference> getValidators(String language)
+	public List<ValidatorLanguage> getLanguages()
 	{
-		List<ValidatorReference> list = validators.get(language);
+		List<ValidatorLanguage> result = new ArrayList<ValidatorLanguage>();
+		result.addAll(languages.values());
+		return result;
+	}
+
+	public List<ValidatorReference> getValidators(String languageType)
+	{
+		List<ValidatorReference> list = validators.get(languageType);
 		if (list == null)
 		{
 			return Collections.emptyList();
@@ -91,29 +103,53 @@ class ValidatorLoader
 		if (registry != null)
 		{
 			IConfigurationElement[] elements = registry.getConfigurationElementsFor(EXTENSION_POINT_ID);
-			for (IConfigurationElement element : elements)
+			processLanguages(elements);
+			processValidators(elements);
+		}
+	}
+
+	private void processLanguages(IConfigurationElement[] elements)
+	{
+		for (IConfigurationElement element : elements)
+		{
+			if (ELEMENT_LANGUAGE.equals(element.getName()))
 			{
-				if (ELEMENT_VALIDATOR.equals(element.getName()))
+				String type = element.getAttribute(ATTR_TYPE);
+				if (StringUtil.isEmpty(type))
 				{
-					String name = element.getAttribute(ATTR_NAME);
-					if (StringUtil.isEmpty(name))
-					{
-						continue;
-					}
-					String language = element.getAttribute(ATTR_LANGUAGE);
-					if (StringUtil.isEmpty(language))
-					{
-						continue;
-					}
-					ValidatorReference validator = new ValidatorReference(name, language, element);
-					List<ValidatorReference> list = validators.get(language);
-					if (list == null)
-					{
-						list = new ArrayList<ValidatorReference>();
-						validators.put(language, list);
-					}
-					list.add(validator);
+					continue;
 				}
+				String name = element.getAttribute(ATTR_NAME);
+				languages.put(type, new ValidatorLanguage(type, name));
+			}
+		}
+	}
+
+	private void processValidators(IConfigurationElement[] elements)
+	{
+		for (IConfigurationElement element : elements)
+		{
+			if (ELEMENT_VALIDATOR.equals(element.getName()))
+			{
+				String name = element.getAttribute(ATTR_NAME);
+				if (StringUtil.isEmpty(name))
+				{
+					continue;
+				}
+				String languageType = element.getAttribute(ATTR_LANGUAGE);
+				ValidatorLanguage language = languages.get(languageType);
+				if (language == null)
+				{
+					continue;
+				}
+				ValidatorReference validator = new ValidatorReference(name, language, element);
+				List<ValidatorReference> list = validators.get(language);
+				if (list == null)
+				{
+					list = new ArrayList<ValidatorReference>();
+					validators.put(languageType, list);
+				}
+				list.add(validator);
 			}
 		}
 	}

@@ -19,6 +19,7 @@
       <complexType>
          <sequence>
             <element ref="validator"/>
+            <element ref="language" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -62,8 +63,11 @@
          <attribute name="language" type="string" use="required">
             <annotation>
                <documentation>
-                  The language (e.g. text/html) which the validator supports
+                  The language type which the validator supports
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.editor.common.validator/language/@type"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
@@ -73,6 +77,28 @@
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.aptana.editor.common.validator.IValidator"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="language">
+      <complexType>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The language type (e.g. text/html)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  A display name for the language (e.g. HTML)
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
                </appinfo>
             </annotation>
          </attribute>
