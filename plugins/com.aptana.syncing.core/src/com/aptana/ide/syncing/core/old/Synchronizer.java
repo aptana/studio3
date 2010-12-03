@@ -54,6 +54,7 @@ import org.eclipse.core.internal.filesystem.Policy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.ILoggable;
 import com.aptana.core.ILogger;
@@ -755,8 +756,8 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		monitor = Policy.monitorFor(monitor);
 		Policy.checkCanceled(monitor);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Downloading_Files, fileList.length); 
 
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
@@ -767,15 +768,17 @@ public class Synchronizer implements ILoggable
 			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
 			setSyncItemDirection(item, false, false);
+			SubMonitor childMonitor = subMonitor.newChild(1);
+			childMonitor.setTaskName(getSyncStatus(item));
 
 			// fire event
-			if (!syncEvent(item, i, totalItems, monitor))
+			if (!syncEvent(item, i, totalItems, childMonitor))
 			{
 				delete = false;
 				break;
 			}
 
-			Policy.checkCanceled(monitor);
+			Policy.checkCanceled(childMonitor);
 
 			switch (item.getSyncState())
 			{
@@ -795,7 +798,7 @@ public class Synchronizer implements ILoggable
 							this._clientFileDeletedCount++;
 						}
 					}
-					syncDone(item, monitor);
+					syncDone(item, childMonitor);
 					break;
 
 				case SyncState.ServerItemOnly:
@@ -814,24 +817,24 @@ public class Synchronizer implements ILoggable
 						}
 
 						logSuccess();
-						syncDone(item, monitor);
+						syncDone(item, childMonitor);
 					}
 					else
 					{
 						logDownloading(serverFile);
 						try
 						{
-							SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, monitor);
+							SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
 							Synchronizer.this._serverFileTransferedCount++;
 							_newFilesDownloaded.add(targetClientFile);
 
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						catch (CoreException e)
 						{
 							logError(e);
-							if (!syncError(item, e, monitor))
+							if (!syncError(item, e, childMonitor))
 							{
 								result = false;
 								break FILE_LOOP;
@@ -856,21 +859,21 @@ public class Synchronizer implements ILoggable
 						}
 
 						logSuccess();
-						syncDone(item, monitor);
+						syncDone(item, childMonitor);
 					}
 					else
 					{
 						try
 						{
-							SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, monitor);
+							SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, childMonitor);
 							Synchronizer.this._serverFileTransferedCount++;
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						catch (CoreException e)
 						{
 							logError(e);
-							if (!syncError(item, e, monitor))
+							if (!syncError(item, e, childMonitor))
 							{
 								result = false;
 								break FILE_LOOP;
@@ -880,12 +883,27 @@ public class Synchronizer implements ILoggable
 					break;
 
 				default:
-					syncDone(item, monitor);
+					syncDone(item, childMonitor);
 					break;
 			}
 		}
 
 		return result;
+	}
+
+	/**
+	 * Returns a string describing what's going on during the synchronization
+	 * @param item
+	 * @return
+	 */
+	private String getSyncStatus(VirtualFileSyncPair item)
+	{
+		if(item.getSyncDirection() == VirtualFileSyncPair.Direction_ClientToServer)
+			return MessageFormat.format(Messages.Synchronizer_Uploading, item.getRelativePath());
+		if(item.getSyncDirection() == VirtualFileSyncPair.Direction_ServerToClient)
+			return MessageFormat.format(Messages.Synchronizer_Downloading, item.getRelativePath());
+		else
+			return MessageFormat.format(Messages.Synchronizer_Skipping_File, item.getRelativePath());
 	}
 
 	/**
@@ -929,8 +947,8 @@ public class Synchronizer implements ILoggable
 		// reset stats
 		this.reset();
 
-		monitor = Policy.monitorFor(monitor);
 		Policy.checkCanceled(monitor);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Synchronizing, fileList.length);
 
 		// process all items in our list
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
@@ -941,19 +959,22 @@ public class Synchronizer implements ILoggable
 			final IFileStore serverFile = item.getDestinationFile();
 			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
+			SubMonitor childMonitor = subMonitor.newChild(1);
+			childMonitor.setTaskName(getSyncStatus(item));
+
 			try
 			{
 
 				setSyncItemDirection(item, false, true);
 
 				// fire event
-				if (!syncEvent(item, i, totalItems, monitor))
+				if (!syncEvent(item, i, totalItems, childMonitor))
 				{
 					result = false;
 					break FILE_LOOP;
 				}
 
-				Policy.checkCanceled(monitor);
+				Policy.checkCanceled(childMonitor);
 
 				switch (item.getSyncState())
 				{
@@ -964,22 +985,22 @@ public class Synchronizer implements ILoggable
 						{
 							EFSUtils.setModificationTime(clientFileInfo.getLastModified(), serverFile);
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						else
 						{
 							try
 							{
-								SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, monitor);
+								SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, childMonitor);
 								Synchronizer.this._clientFileTransferedCount++;
 								logSuccess();
-								syncDone(item, monitor);
+								syncDone(item, childMonitor);
 							}
 							catch (CoreException e)
 							{
 								logError(e);
 
-								if (!syncError(item, e, monitor))
+								if (!syncError(item, e, childMonitor))
 								{
 									result = false;
 									break FILE_LOOP;
@@ -1006,7 +1027,7 @@ public class Synchronizer implements ILoggable
 								this._clientFileDeletedCount++;
 							}
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						else
 						{
@@ -1026,7 +1047,7 @@ public class Synchronizer implements ILoggable
 								}
 
 								logSuccess();
-								syncDone(item, monitor);
+								syncDone(item, childMonitor);
 							}
 							else
 							{
@@ -1034,17 +1055,17 @@ public class Synchronizer implements ILoggable
 								logUploading(clientFile);
 								try
 								{
-									SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, monitor);
+									SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
 									Synchronizer.this._clientFileTransferedCount++;
 									_newFilesUploaded.add(targetServerFile);
 									logSuccess();
-									syncDone(item, monitor);
+									syncDone(item, childMonitor);
 								}
 								catch (CoreException e)
 								{
 									logError(e);
 
-									if (!syncError(item, e, monitor))
+									if (!syncError(item, e, childMonitor))
 									{
 										result = false;
 										break FILE_LOOP;
@@ -1063,22 +1084,22 @@ public class Synchronizer implements ILoggable
 							EFSUtils.setModificationTime(serverFileInfo.getLastModified(), clientFile);
 
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						else
 						{
 							try
 							{
-								SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, monitor);
+								SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, childMonitor);
 								Synchronizer.this._serverFileTransferedCount++;
 								logSuccess();
-								syncDone(item, monitor);
+								syncDone(item, childMonitor);
 							}
 							catch (CoreException e)
 							{
 								logError(e);
 
-								if (!syncError(item, e, monitor))
+								if (!syncError(item, e, childMonitor))
 								{
 									result = false;
 									break FILE_LOOP;
@@ -1105,7 +1126,7 @@ public class Synchronizer implements ILoggable
 								this._serverFileDeletedCount++;
 							}
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						else
 						{
@@ -1127,7 +1148,7 @@ public class Synchronizer implements ILoggable
 								}
 
 								logSuccess();
-								syncDone(item, monitor);
+								syncDone(item, childMonitor);
 							}
 							else
 							{
@@ -1136,17 +1157,17 @@ public class Synchronizer implements ILoggable
 
 								try
 								{
-									SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, monitor);
+									SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
 									Synchronizer.this._serverFileTransferedCount++;
 									_newFilesDownloaded.add(targetClientFile);
 									logSuccess();
-									syncDone(item, monitor);
+									syncDone(item, childMonitor);
 								}
 								catch (CoreException e)
 								{
 									logError(e);
 
-									if (!syncError(item, e, monitor))
+									if (!syncError(item, e, childMonitor))
 									{
 										result = false;
 										break FILE_LOOP;
@@ -1160,7 +1181,7 @@ public class Synchronizer implements ILoggable
 						result = false;
 						SyncingPlugin.logError(StringUtil.format(Messages.Synchronizer_FullSyncCRCMismatches, item
 								.getRelativePath()), null);
-						if (!syncError(item, null, monitor))
+						if (!syncError(item, null, childMonitor))
 						{
 							break FILE_LOOP;
 						}
@@ -1179,11 +1200,11 @@ public class Synchronizer implements ILoggable
 				SyncingPlugin.logError(Messages.Synchronizer_ErrorDuringSync, ex);
 				result = false;
 
-				if (!syncError(item, ex, monitor))
+				if (!syncError(item, ex, childMonitor))
 				{
 					break FILE_LOOP;
 				}
-			}
+			}			
 		}
 
 		return result;
@@ -1256,9 +1277,9 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		monitor = Policy.monitorFor(monitor);
 		Policy.checkCanceled(monitor);
-
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Uploading_Files, fileList.length); 
+		
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
 			final VirtualFileSyncPair item = fileList[i];
@@ -1268,15 +1289,17 @@ public class Synchronizer implements ILoggable
 			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
 			setSyncItemDirection(item, true, false);
+			SubMonitor childMonitor = subMonitor.newChild(1);
+			childMonitor.setTaskName(getSyncStatus(item));
 
 			// fire event
-			if (!syncEvent(item, i, totalItems, monitor))
+			if (!syncEvent(item, i, totalItems, childMonitor))
 			{
 				result = false;
 				break;
 			}
 
-			Policy.checkCanceled(monitor);
+			Policy.checkCanceled(childMonitor);
 
 			switch (item.getSyncState())
 			{
@@ -1296,7 +1319,7 @@ public class Synchronizer implements ILoggable
 							_newFilesUploaded.add(targetServerFile);
 						}
 
-						syncDone(item, monitor);
+						syncDone(item, childMonitor);
 					}
 					else
 					{
@@ -1304,17 +1327,17 @@ public class Synchronizer implements ILoggable
 
 						try
 						{
-							SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, monitor);
+							SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
 							Synchronizer.this._clientFileTransferedCount++;
 							_newFilesUploaded.add(targetServerFile);
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						catch (CoreException e)
 						{
 							logError(e);
 
-							if (!syncError(item, e, monitor))
+							if (!syncError(item, e, childMonitor))
 							{
 								result = false;
 								break FILE_LOOP;
@@ -1330,7 +1353,7 @@ public class Synchronizer implements ILoggable
 					{
 						// Need to query if directory first because deletion makes isDirectory always return false.
 						boolean wasDirectory = serverFileInfo.isDirectory();
-						serverFile.delete(EFS.NONE, monitor);
+						serverFile.delete(EFS.NONE, childMonitor);
 						if (wasDirectory)
 						{
 							this._serverDirectoryDeletedCount++;
@@ -1340,7 +1363,7 @@ public class Synchronizer implements ILoggable
 							this._serverFileDeletedCount++;
 						}
 					}
-					syncDone(item, monitor);
+					syncDone(item, childMonitor);
 					break;
 
 				case SyncState.ClientItemIsNewer:
@@ -1358,7 +1381,7 @@ public class Synchronizer implements ILoggable
 						{
 							logError(e);
 
-							if (!syncError(item, e, monitor))
+							if (!syncError(item, e, childMonitor))
 							{
 								result = false;
 								break FILE_LOOP;
@@ -1366,22 +1389,22 @@ public class Synchronizer implements ILoggable
 						}
 
 						logSuccess();
-						syncDone(item, monitor);
+						syncDone(item, childMonitor);
 					}
 					else
 					{
 						try
 						{
-							SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, monitor);
+							SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, childMonitor);
 							Synchronizer.this._clientFileTransferedCount++;
 							logSuccess();
-							syncDone(item, monitor);
+							syncDone(item, childMonitor);
 						}
 						catch (CoreException e)
 						{
 							logError(e);
 
-							if (!syncError(item, e, monitor))
+							if (!syncError(item, e, childMonitor))
 							{
 								result = false;
 								break FILE_LOOP;
@@ -1392,7 +1415,7 @@ public class Synchronizer implements ILoggable
 					break;
 
 				default:
-					syncDone(item, monitor);
+					syncDone(item, childMonitor);
 					break;
 			}
 		}
@@ -1572,7 +1595,7 @@ public class Synchronizer implements ILoggable
 	{
 		if (this._eventHandler != null)
 		{
-			this._eventHandler.syncDone(item);
+			this._eventHandler.syncDone(item, monitor);
 		}
 
 		if (monitor != null)
@@ -1583,17 +1606,17 @@ public class Synchronizer implements ILoggable
 
 	private boolean syncError(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
-		return this._eventHandler == null || this._eventHandler.syncErrorEvent(item, e);
+		return this._eventHandler == null || this._eventHandler.syncErrorEvent(item, e, monitor);
 	}
 
 	private boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 	{
-		return this._eventHandler == null || this._eventHandler.syncEvent(item, index, totalItems);
+		return this._eventHandler == null || this._eventHandler.syncEvent(item, index, totalItems, monitor);
 	}
 
 	private boolean syncContinue(IProgressMonitor monitor)
 	{
-		return this._eventHandler == null || this._eventHandler.syncContinue();
+		return this._eventHandler == null || this._eventHandler.syncContinue(monitor);
 	}
 
 	private static String getTimestamp()

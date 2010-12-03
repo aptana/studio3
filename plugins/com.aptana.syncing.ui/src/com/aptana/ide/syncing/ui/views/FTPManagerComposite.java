@@ -40,6 +40,7 @@ import java.util.List;
 
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -556,7 +557,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 			dialog.open();
 			dialog.setHandler(new SyncEventHandlerAdapter()
 			{
-				public void syncDone(VirtualFileSyncPair item)
+				public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 				{
 					IOUIPlugin.refreshNavigatorView(fSource.getCurrentInput());
 					IOUIPlugin.refreshNavigatorView(fTarget.getCurrentInput());

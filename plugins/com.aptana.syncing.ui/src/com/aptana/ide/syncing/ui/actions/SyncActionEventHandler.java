@@ -71,20 +71,20 @@ class SyncActionEventHandler extends SyncEventHandlerAdapterWithProgressMonitor
 	}
 
 	@Override
-	public void syncDone(VirtualFileSyncPair item)
+	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{
-		super.syncDone(item);
+		super.syncDone(item, monitor);
 		fSyncDoneCount++;
 		checkDone();
 	}
 
 	@Override
-	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e)
+	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
 		showError(e.getLocalizedMessage(), e);
 		fSyncDoneCount++;
 		checkDone();
-		return fContinue && super.syncErrorEvent(item, e);
+		return fContinue && super.syncErrorEvent(item, e, monitor);
 	}
 
 	@Override

@@ -1173,7 +1173,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 				syncer.setEventHandler(new SyncEventHandlerAdapterWithProgressMonitor(monitor)
 				{
 
-					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems)
+					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 					{
 						if (item != null)
 						{
@@ -1199,7 +1199,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 								});
 							}
 						}
-						return super.syncEvent(item, index, totalItems);
+						return super.syncEvent(item, index, totalItems, monitor);
 					}
 
 				});
@@ -1751,7 +1751,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 			// cancels the previous job if exists
 			syncJob.cancel();
 		}
-		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this);
+		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(Messages.SmartSyncDialog_Endpoints, end1, end2));
 		syncJob.schedule();
 	}
 
@@ -1759,7 +1759,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	{
 		if (handler != null)
 		{
-			handler.syncDone(null);
+			handler.syncDone(null, null);
 		}
 		if (source != null && dest != null)
 		{
