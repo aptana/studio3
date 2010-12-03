@@ -3,7 +3,7 @@
 <plugin>
    <extension
          id="problem"
-         name="Aptana Problem"
+         name="%problem.marker.name"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
@@ -26,7 +26,7 @@
    </extension>
   <extension
          id="unifiedBuilder"
-         name="Aptana Unified Builder"
+         name="%builder.name"
          point="org.eclipse.core.resources.builders">
       <builder
             callOnEmptyDelta="true"
