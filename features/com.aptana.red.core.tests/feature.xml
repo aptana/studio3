@@ -99,14 +99,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.ruby.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.css.tests"
          download-size="0"
          install-size="0"
@@ -173,14 +165,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.erb.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin
