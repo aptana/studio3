@@ -20,7 +20,6 @@
    <requires>
       <import plugin="org.junit"/>
       <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
@@ -31,7 +30,6 @@
       <import plugin="com.aptana.git.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.git.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.erb" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.findbar" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.text" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.ui.epl" version="1.0.0" match="greaterOrEqual"/>
@@ -92,14 +90,6 @@
 
    <plugin
          id="com.aptana.editor.common.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.ruby.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -173,14 +163,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.erb.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
          unpack="false"/>
 
    <plugin

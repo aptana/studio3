@@ -104,7 +104,8 @@ public class ProjectsPlugin extends AbstractUIPlugin
 						// FIXME These should be constants on the nature classes, but the dependencies would get
 						// inverted...
 						if (p.hasNature(WebProjectNature.ID) || p.hasNature("com.aptana.ruby.core.rubynature") //$NON-NLS-1$
-								|| p.hasNature("org.radrails.rails.core.railsnature")) //$NON-NLS-1$
+								|| p.hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
+								|| p.hasNature("com.aptana.editor.php.phpNature")) //$NON-NLS-1$
 						{
 							ResourceUtil.addBuilder(p, UnifiedBuilder.ID);
 						}

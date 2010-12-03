@@ -78,4 +78,15 @@ public interface IValidationManager
 	 * @return the items as a list
 	 */
 	public List<IValidationItem> getItems();
+
+	/**
+	 * Checks if the validation message should be ignored for the particular language.
+	 * 
+	 * @param message
+	 *            the validation message
+	 * @param language
+	 *            the language type
+	 * @return true if the message needs to be ignored, false otherwise
+	 */
+	public boolean isIgnored(String message, String language);
 }

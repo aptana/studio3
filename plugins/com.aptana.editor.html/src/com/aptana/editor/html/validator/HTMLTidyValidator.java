@@ -53,6 +53,7 @@ import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 
 public class HTMLTidyValidator implements IValidator
 {
@@ -132,7 +133,7 @@ public class HTMLTidyValidator implements IValidator
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
 
-			if (message != null)
+			if (message != null && !manager.isIgnored(message, IHTMLParserConstants.LANGUAGE))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{

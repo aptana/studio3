@@ -32,42 +32,26 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.common.preferences;
+package com.aptana.editor.common.validator;
 
-import org.eclipse.osgi.util.NLS;
-
-public class Messages extends NLS
+public final class ValidatorLanguage
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
+	private final String type;
+	private final String name;
 
-	public static String TasksPreferencePage_CaseSensitiveLabel;
-	public static String TasksPreferencePage_Description;
-	public static String TasksPreferencePage_EditTagTitle;
-	public static String TasksPreferencePage_NewTagTitle;
-	public static String TasksPreferencePage_PriorityColumnHeader;
-	public static String TasksPreferencePage_TagNameColumnHeader;
-	public static String TaskTagInputDialog_NameLabel;
-	public static String TaskTagInputDialog_NonEmptyNameError;
-	public static String TaskTagInputDialog_PriorityLabel;
-	public static String TaskTagInputDialog_UniqueNameError;
-	public static String UserAgentPreferencePage_Select_All;
-	public static String UserAgentPreferencePage_Select_None;
-	public static String UserAgentPreferencePage_Select_User_Agents;
-
-	public static String ValidationPreferencePage_ERR_EmptyExpression;
-	public static String ValidationPreferencePage_Filter_Description;
-	public static String ValidationPreferencePage_Ignore_Message;
-	public static String ValidationPreferencePage_Ignore_Title;
-	public static String ValidationPreferencePage_LBL_Filter;
-	public static String ValidationPreferencePage_LBL_Validators;
-
-	static
+	public ValidatorLanguage(String type, String name)
 	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		this.type = type;
+		this.name = name;
 	}
 
-	private Messages()
+	public String getType()
 	{
+		return type;
+	}
+
+	public String getName()
+	{
+		return name;
 	}
 }

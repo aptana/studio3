@@ -50,11 +50,15 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 public class ValidationManager implements IValidationManager
 {
@@ -63,10 +67,30 @@ public class ValidationManager implements IValidationManager
 	private Object fResource;
 	private URI fResourceUri;
 	private List<IValidationItem> fItems;
+	private String fCurrentLanguage;
+
+	private IPropertyChangeListener fPropertyListener = new IPropertyChangeListener()
+	{
+
+		public void propertyChange(PropertyChangeEvent event)
+		{
+			String property = event.getProperty();
+			if (fCurrentLanguage != null)
+			{
+				if (getSelectedValidatorsPrefKey(fCurrentLanguage).equals(property)
+						|| getFilterExpressionsPrefKey(fCurrentLanguage).equals(property))
+				{
+					// re-validate
+					validate(fDocument.get(), fCurrentLanguage);
+				}
+			}
+		}
+	};
 
 	public ValidationManager()
 	{
 		fItems = new ArrayList<IValidationItem>();
+		CommonEditorPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
 	}
 
 	public void dispose()
@@ -75,6 +99,7 @@ public class ValidationManager implements IValidationManager
 		fResource = null;
 		fResourceUri = null;
 		fItems.clear();
+		CommonEditorPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 	}
 
 	public void setDocument(IDocument document)
@@ -104,15 +129,38 @@ public class ValidationManager implements IValidationManager
 	public void validate(String source, String language)
 	{
 		fItems.clear();
+		fCurrentLanguage = language;
 
-		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
-		// using the first one for now
-		// TODO: change to match the user selection in preferences
-		if (!validatorRefs.isEmpty() && fResourceUri != null)
+		if (fResourceUri != null)
 		{
-			validatorRefs.get(0).getValidator().validate(source, fResourceUri, this);
-			update(fItems.toArray(new IValidationItem[fItems.size()]));
+			List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
+			String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+					.getString(getSelectedValidatorsPrefKey(fCurrentLanguage));
+			if (StringUtil.isEmpty(list))
+			{
+				// by default use the first validator that supports the language
+				if (validatorRefs.size() > 0)
+				{
+					validatorRefs.get(0).getValidator().validate(source, fResourceUri, this);
+				}
+			}
+			else
+			{
+				String[] selectedValidators = list.split(","); //$NON-NLS-1$
+				for (String name : selectedValidators)
+				{
+					for (ValidatorReference validator : validatorRefs)
+					{
+						if (validator.getName().equals(name))
+						{
+							validator.getValidator().validate(source, fResourceUri, this);
+							break;
+						}
+					}
+				}
+			}
 		}
+		update(fItems.toArray(new IValidationItem[fItems.size()]));
 	}
 
 	public void addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
@@ -128,6 +176,24 @@ public class ValidationManager implements IValidationManager
 	public List<IValidationItem> getItems()
 	{
 		return Collections.unmodifiableList(fItems);
+	}
+
+	public boolean isIgnored(String message, String language)
+	{
+		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+				.getString(getFilterExpressionsPrefKey(fCurrentLanguage));
+		if (!StringUtil.isEmpty(list))
+		{
+			String[] expressions = list.split("####"); //$NON-NLS-1$
+			for (String expression : expressions)
+			{
+				if (message.matches(expression))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private void addItem(int severity, String message, int lineNumber, int lineOffset, int length, URI sourcePath)
@@ -239,5 +305,15 @@ public class ValidationManager implements IValidationManager
 			return ResourcesPlugin.getWorkspace().getRuleFactory().markerRule((IResource) resource);
 		}
 		return null;
+	}
+
+	private static String getSelectedValidatorsPrefKey(String language)
+	{
+		return language + ":" + IPreferenceConstants.SELECTED_VALIDATORS; //$NON-NLS-1$
+	}
+
+	private static String getFilterExpressionsPrefKey(String language)
+	{
+		return language + ":" + IPreferenceConstants.FILTER_EXPRESSIONS; //$NON-NLS-1$
 	}
 }
