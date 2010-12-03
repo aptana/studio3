@@ -1016,7 +1016,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		TriggerType triggerType = TriggerType.get(type);
 		
-		if (triggerType != TriggerType.UNDEFINED && values != null && values.length > 0)
+		if (triggerType != TriggerType.UNDEFINED && values != null)
 		{
 			String propertyName = triggerType.getPropertyName();
 			
