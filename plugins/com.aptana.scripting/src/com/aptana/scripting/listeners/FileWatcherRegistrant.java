@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.scripting;
+package com.aptana.scripting.listeners;
 
 import java.io.File;
 import java.util.Collections;
@@ -46,6 +46,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import com.aptana.filewatcher.FileWatcher;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandContext;
