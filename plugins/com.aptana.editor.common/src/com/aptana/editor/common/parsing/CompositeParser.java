@@ -97,14 +97,19 @@ public class CompositeParser implements IParser
 					List<IParseNode> newList = new ArrayList<IParseNode>();
 					IParseNode[] children = parent.getChildren();
 					boolean found = false;
+					int start = node.getStartingOffset();
+					int end = node.getEndingOffset();
 					for (IParseNode child : children)
 					{
-						if (!found && child.getStartingOffset() > node.getStartingOffset())
+						if (!found && child.getStartingOffset() > start)
 						{
 							found = true;
 							newList.add(node);
 						}
-						newList.add(child);
+						if (child.getStartingOffset() <= start || child.getEndingOffset() > end)
+						{
+							newList.add(child);
+						}
 					}
 					if (!found)
 					{
