@@ -125,7 +125,7 @@
 	<target name="install.red.core" unless="dont.install.red.core">
 		<antcall target="run.director">
 			<param name="p2.installIU" value="com.aptana.feature.feature.group" />
-			<param name="p2.repo" value="file:${red-core.p2.repo}" />
+			<param name="p2.repo" value="file:${studio3.p2.repo}" />
 		</antcall>
 	</target>
 	<!-- - - - - - - - - - - - - - - - - - 
