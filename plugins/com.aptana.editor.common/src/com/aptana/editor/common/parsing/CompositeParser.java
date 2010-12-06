@@ -82,6 +82,10 @@ public class CompositeParser implements IParser
 			getAllNodes(result, list);
 
 			IParseNode[] embeddedNodes = fEmbeddedlanguageRoot.getChildren();
+			if (embeddedNodes.length == 0)
+			{
+				embeddedNodes = new IParseNode[] { fEmbeddedlanguageRoot };
+			}
 			IParseNode parent;
 			for (IParseNode node : embeddedNodes)
 			{
