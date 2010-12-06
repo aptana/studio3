@@ -101,6 +101,7 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public static ILineBreakpoint createLineBreakpoint(IResource resource, int line, Map attributes, boolean register)
 			throws CoreException {
 		return new JSDebugLineBreakpoint(resource, line, attributes, register);
@@ -128,6 +129,7 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public static ILineBreakpoint createLineBreakpoint(IUniformResource resource, int line, Map attributes,
 			boolean register) throws CoreException {
 		return new JSDebugLineBreakpoint(resource, line, attributes, register);
@@ -143,7 +145,7 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 * @throws CoreException
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static ILineBreakpoint createLineBreakpointForResource(Object resource, int line, Map attributes,
 			boolean register) throws CoreException {
 		URI location = null;

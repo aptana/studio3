@@ -94,7 +94,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (IJSStackFrame.class == adapter) {
 			return this;

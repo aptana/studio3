@@ -53,9 +53,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.util.FirefoxUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.ide.core.FirefoxUtils;
 
 /**
  * @author Max Stepanov
@@ -77,7 +77,7 @@ public final class FirebugUtils {
 	}
 
 	public static boolean registerEditor(String id, String name, IPath path, String cmdLine) {
-		File profile = FirefoxUtils.findDefaultProfileLocation();
+		File profile = FirefoxUtil.findDefaultProfileLocation();
 		if (profile == null) {
 			return false;
 		}

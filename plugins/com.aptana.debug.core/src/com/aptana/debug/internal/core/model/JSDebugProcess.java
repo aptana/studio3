@@ -39,7 +39,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -86,6 +85,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess, IDebugEv
 	 * @param label
 	 * @param attributes
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugProcess(ILaunch launch, String label, Map attributes) {
 		this(launch, null, false, label, attributes);
 	}
@@ -98,6 +98,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess, IDebugEv
 	 * @param label
 	 * @param attributes
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugProcess(ILaunch launch, Process process, String label, Map attributes) {
 		this(launch, process, true, label, attributes);
 	}
@@ -111,6 +112,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess, IDebugEv
 	 * @param label
 	 * @param attributes
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugProcess(ILaunch launch, Process process, boolean killProcessOnTerminate, String label, Map attributes) {
 		this.launch = launch;
 		this.process = process;
@@ -142,13 +144,12 @@ public class JSDebugProcess extends PlatformObject implements IProcess, IDebugEv
 	 * 
 	 * @param attributes
 	 */
+	@SuppressWarnings("rawtypes")
 	private void initializeAttributes(Map attributes) {
 		setAttribute(IProcess.ATTR_PROCESS_TYPE, "javascript"); //$NON-NLS-1$
 		if (attributes != null) {
-			Iterator keys = attributes.keySet().iterator();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
-				setAttribute(key, (String) attributes.get(key));
+			for (Object key : attributes.keySet()) {
+				setAttribute((String) key, (String) attributes.get(key));
 			}
 		}
 	}
@@ -280,7 +281,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess, IDebugEv
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IProcess.class) {
 			return this;

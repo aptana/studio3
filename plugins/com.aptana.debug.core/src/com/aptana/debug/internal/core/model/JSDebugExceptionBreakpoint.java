@@ -50,6 +50,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
@@ -79,6 +80,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugExceptionBreakpoint(IResource resource, String exceptionTypeName) throws CoreException {
 		this(resource, exceptionTypeName, new HashMap(), true);
 	}
@@ -90,6 +92,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	 * @param exceptionTypeName
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugExceptionBreakpoint(IUniformResource resource, String exceptionTypeName) throws CoreException {
 		this(resource, exceptionTypeName, new HashMap(), true);
 	}
@@ -108,6 +111,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugExceptionBreakpoint(final IResource resource, final String exceptionTypeName, final Map attributes,
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -138,6 +142,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	 * @param register
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugExceptionBreakpoint(final IUniformResource resource, final String exceptionTypeName,
 			final Map attributes, final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -151,7 +156,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(
 						Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1,
-								PathUtils.getPath(resource), exceptionTypeName));
+								ResourceUtil.getPath(resource), exceptionTypeName));
 				ensureMarker().setAttributes(attributes);
 
 				register(register);

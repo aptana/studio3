@@ -60,9 +60,6 @@
             public="true"
             sourceLocatorId="com.aptana.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
-         <fileExtension
-               default="true"
-               extension="html"/>
       </launchConfigurationType>
       <launchConfigurationType
             delegate="com.aptana.debug.core.JSRemoteLaunchConfigurationDelegate"
@@ -72,9 +69,6 @@
             public="true"
             sourceLocatorId="com.aptana.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
-         <fileExtension
-               default="true"
-               extension="html"/>
       </launchConfigurationType>
    </extension>
    <extension

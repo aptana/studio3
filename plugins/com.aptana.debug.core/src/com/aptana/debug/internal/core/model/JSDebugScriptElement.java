@@ -35,7 +35,6 @@
 package com.aptana.debug.internal.core.model;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.debug.core.model.IDebugTarget;
@@ -132,8 +131,8 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	 * @param scriptElement
 	 */
 	protected void insertElement(JSDebugScriptElement scriptElement) {
-		for (Iterator i = children.iterator(); i.hasNext();) {
-			JSDebugScriptElement element = (JSDebugScriptElement) i.next();
+		for (IJSScriptElement i : children) {
+			JSDebugScriptElement element = (JSDebugScriptElement) i; 
 			if (element.isScriptElementInside(scriptElement)) {
 				element.insertElement(scriptElement);
 				return;

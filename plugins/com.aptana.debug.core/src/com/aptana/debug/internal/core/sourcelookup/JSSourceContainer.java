@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -74,7 +75,7 @@ public class JSSourceContainer extends AbstractSourceContainer {
 			if (osFile.exists()) {
 				try {
 					IPath canonicalPath = new Path(osFile.getCanonicalPath());
-					IFile[] files = fRoot.findFilesForLocation(canonicalPath);
+					IFile[] files = fRoot.findFilesForLocationURI(URIUtil.toURI(canonicalPath.makeAbsolute()));
 					if (files.length > 0) {
 						for (int i = 0; i < files.length; i++) {
 							sources.add(files[i]);

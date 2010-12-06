@@ -100,6 +100,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugWatchpoint(IJSVariable variable) throws CoreException {
 		this(ResourcesPlugin.getWorkspace().getRoot(), variable, new HashMap(), true);
 	}
@@ -118,6 +119,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugWatchpoint(final IResource resource, final IJSVariable variable, final Map attributes,
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -228,6 +230,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	 * <li>auto disabled = false
 	 * <ul>
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void addDefaultAccessAndModification(Map attributes) {
 		boolean[] values = new boolean[] { false, true }; // getDefaultAccessAndModificationValues();
 		attributes.put(ACCESS, (values[0] ? Boolean.TRUE : Boolean.FALSE));

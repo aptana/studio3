@@ -50,6 +50,7 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
@@ -82,6 +83,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugLineBreakpoint(IResource resource, int lineNumber) throws CoreException {
 		this(resource, lineNumber, new HashMap(), true);
 	}
@@ -93,6 +95,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 * @param lineNumber
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugLineBreakpoint(IUniformResource resource, int lineNumber) throws CoreException {
 		this(resource, lineNumber, new HashMap(), true);
 	}
@@ -113,6 +116,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 * @throws CoreException
 	 *             if unable to create the breakpoint
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugLineBreakpoint(final IResource resource, final int lineNumber, final Map attributes,
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -142,6 +146,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	 * @param register
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSDebugLineBreakpoint(final IUniformResource resource, final int lineNumber, final Map attributes,
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
@@ -154,7 +159,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 				attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
-						PathUtils.getPath(resource), Integer.toString(lineNumber)));
+						ResourceUtil.getPath(resource), Integer.toString(lineNumber)));
 				ensureMarker().setAttributes(attributes);
 
 				register(register);

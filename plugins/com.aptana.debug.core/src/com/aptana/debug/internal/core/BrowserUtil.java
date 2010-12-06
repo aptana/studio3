@@ -50,12 +50,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.IStatusHandler;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.util.FirefoxUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.core.util.VersionUtil;
 import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.internal.core.browsers.Firefox;
 import com.aptana.debug.internal.core.browsers.InternetExplorer;
-import com.aptana.ide.core.FirefoxUtils;
 
 /**
  * @author Max Stepanov
@@ -68,21 +69,20 @@ public final class BrowserUtil {
 	 */
 	public static final String DEBUGGER_LAUNCH_URL = "http://www.aptana.com/?debugger=true&port="; //$NON-NLS-1$
 
-	private static final String[] EXTENSION_ID = { "debugger@aptana.com", //$NON-NLS-1$
-			"firebug@software.joehewitt.com" //$NON-NLS-1$
+	private static final String[] EXTENSION_ID = {
+		"debugger@aptana.com", //$NON-NLS-1$
+		"firebug@software.joehewitt.com" //$NON-NLS-1$
 	};
 
-	private static final String[] EXTENSION_LOCAL_PATH = { "/res/firefox/aptanadebugger.xpi", //$NON-NLS-1$
-			"/res/firefox/firebug.xpi", //$NON-NLS-1$
-			"/res/ie/AptanaDebugger.dll" //$NON-NLS-1$
+	private static final String[] EXTENSION_LOCAL_PATH = {
+		"/res/firefox/aptanadebugger.xpi", //$NON-NLS-1$
+		"/res/firefox/firebug.xpi", //$NON-NLS-1$
+		"/res/ie/AptanaDebugger.dll" //$NON-NLS-1$
 	};
 
 	private static final String FIREBUG_MIN_VERSION = "1.1.0"; //$NON-NLS-1$
-
 	private static final String IE_PLUGIN_ID = JSDebugPlugin.PLUGIN_ID + ".ie"; //$NON-NLS-1$
-
 	private static final String EXTENSIONS = "extensions/"; //$NON-NLS-1$
-
 	private static final String DEBUGGER_FILE = "chrome/aptanadebugger.jar"; //$NON-NLS-1$
 
 	private static final long INSTALL_TIMEOUT = 5000;
@@ -184,13 +184,13 @@ public final class BrowserUtil {
 		 * Firefox
 		 */
 		if (Firefox.isBrowserExecutable(browserExecutable)) {
-			File profile = FirefoxUtils.findDefaultProfileLocation();
+			File profile = FirefoxUtil.findDefaultProfileLocation();
 			if (profile != null) {
 				boolean available = false;
-				if (FirefoxUtils.getExtensionVersion(EXTENSION_ID[0], profile) != null) {
-					String version = FirefoxUtils.getExtensionVersion(EXTENSION_ID[1], profile);
+				if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) != null) {
+					String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 					// Check for compatible Firebug version
-					if (version != null && StringUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) { //$NON-NLS-1$
+					if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) { //$NON-NLS-1$
 						File extension = new File(new File(profile, EXTENSIONS), EXTENSION_ID[1]);
 						available = extension.exists() && !new File(extension, DEBUGGER_FILE).exists();
 					}
@@ -334,14 +334,13 @@ public final class BrowserUtil {
 
 			boolean installed = false;
 			if (Firefox.isBrowserExecutable(browserExecutable)) {
-				File profile = FirefoxUtils.findDefaultProfileLocation();
+				File profile = FirefoxUtil.findDefaultProfileLocation();
 				if (profile != null) {
 					try {
 						/*
 						 * Check for previous debugger versions
 						 */
-						String version = FirefoxUtils.getExtensionVersion(
-								"{85c7d2bd-b7c6-4644-95b2-9145a8505c4d}", profile); //$NON-NLS-1$
+						String version = FirefoxUtil.getExtensionVersion("{85c7d2bd-b7c6-4644-95b2-9145a8505c4d}", profile); //$NON-NLS-1$
 						if (version != null) {
 							prompter
 									.handleStatus(
@@ -357,8 +356,8 @@ public final class BrowserUtil {
 											"warning_" + "Previous version of Firebug extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
 							return false;
 						}
-						version = FirefoxUtils.getExtensionVersion(EXTENSION_ID[1], profile);
-						if (version != null && StringUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) { //$NON-NLS-1$
+						version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
+						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) { //$NON-NLS-1$
 							prompter
 									.handleStatus(
 											installDebuggerPromptStatus,
@@ -366,11 +365,11 @@ public final class BrowserUtil {
 							return false;
 						}
 
-						if (FirefoxUtils.getExtensionVersion(EXTENSION_ID[0], profile) == null) {
+						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) == null) {
 							installed = Firefox.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
 									EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], new File(profile, EXTENSIONS));
 						}
-						if (FirefoxUtils.getExtensionVersion(EXTENSION_ID[1], profile) == null) {
+						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile) == null) {
 							installed = Firefox.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
 									EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], new File(profile, EXTENSIONS));
 						}
@@ -391,7 +390,8 @@ public final class BrowserUtil {
 				if (installed && Platform.OS_MACOSX.equals(Platform.getOS())) {
 					/* workaround for FF install bug on Mac */
 					try {
-						execProcess(new String[] { "/usr/bin/open", //$NON-NLS-1$
+						execProcess(new String[] {
+								"/usr/bin/open", //$NON-NLS-1$
 								"-b", //$NON-NLS-1$
 								getMacOSXApplicationIdentifier(browserExecutable), "about:blank" }, -1); //$NON-NLS-1$
 						try {
@@ -438,14 +438,15 @@ public final class BrowserUtil {
 							&& !PlatformUtil.isUserAdmin()) {
 						PlatformUtil.runAsAdmin("regsvr32.exe", new String[] { //$NON-NLS-1$
 								"/s", //$NON-NLS-1$
-										dllPath.toOSString() });
+								dllPath.toOSString() });
 						// Delay to let dll be registered
 						try {
 							Thread.sleep(2000);
 						} catch (InterruptedException e) {
 						}
 					} else {
-						execProcess(new String[] { "regsvr32.exe", //$NON-NLS-1$
+						execProcess(new String[] {
+								"regsvr32.exe", //$NON-NLS-1$
 								"/s", //$NON-NLS-1$
 								dllPath.toOSString() }, -1);
 					}

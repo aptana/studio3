@@ -45,9 +45,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +84,7 @@ import org.osgi.framework.Constants;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDebugConstants;
@@ -105,7 +104,6 @@ import com.aptana.debug.internal.core.IFileContentRetriever;
 import com.aptana.debug.internal.core.LocalResourceMapper;
 import com.aptana.debug.internal.core.Util;
 import com.aptana.debug.internal.core.xhr.XHRService;
-import com.aptana.ide.core.PathUtils;
 
 /**
  * @author Max Stepanov
@@ -306,6 +304,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter) {
 		if (adapter == IFileContentRetriever.class) {
 			return getFileContentRetriever();
@@ -476,7 +475,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			String type = args[3];
 			if (SRC.equals(type) && args.length >= 6) {
 				String fileName = resolveSourceFile(Util.decodeData(args[4]));
-				IFile file = PathUtils.findWorkspaceFile(fileName);
+				IFile file = ResourceUtil.findWorkspaceFile(fileName);
 				if (file != null) {
 					fileName = file.getFullPath().makeRelative().toString();
 				}
@@ -491,7 +490,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 										: Messages.JSDebugTarget_EvalScript);
 					}
 					String fileName = resolveSourceFile(Util.decodeData(subargs[2]));
-					IFile file = PathUtils.findWorkspaceFile(fileName);
+					IFile file = ResourceUtil.findWorkspaceFile(fileName);
 					if (file != null) {
 						fileName = file.getFullPath().makeRelative().toString();
 					}
@@ -686,7 +685,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				JSDebugScriptElement topScriptElement = (JSDebugScriptElement) topScriptElements.get(fileName);
 				if (topScriptElement == null) {
 					String name = fileName;
-					IFile file = PathUtils.findWorkspaceFile(fileName);
+					IFile file = ResourceUtil.findWorkspaceFile(fileName);
 					if (file != null) {
 						name = file.getFullPath().toString();
 					}
@@ -1052,17 +1051,13 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	private void handleDetailFormattersChange() throws DebugException {
-		Collection detailformatters = JSDetailFormattersManager.getDefault().getDetailFormatters();
 		StringBuffer sb = new StringBuffer(DETAIL_FORMATTERS);
-		if (!detailformatters.isEmpty()) {
-			for (Iterator i = detailformatters.iterator(); i.hasNext();) {
-				DetailFormatter detailFormatter = (DetailFormatter) i.next();
-				if (!detailFormatter.isEnabled()) {
-					continue;
-				}
-				sb.append(MessageFormat.format("*{0}|{1}", //$NON-NLS-1$
-						detailFormatter.getTypeName(), Util.encodeData(detailFormatter.getSnippet())));
+		for (DetailFormatter detailFormatter : JSDetailFormattersManager.getDefault().getDetailFormatters()) {
+			if (!detailFormatter.isEnabled()) {
+				continue;
 			}
+			sb.append(MessageFormat.format("*{0}|{1}", //$NON-NLS-1$
+					detailFormatter.getTypeName(), Util.encodeData(detailFormatter.getSnippet())));
 		}
 		connection.sendCommandAndWait(sb.toString());
 	}
@@ -1712,7 +1707,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 									.getAttribute(IDebugConstants.BREAKPOINT_LOCATION));
 							fileMatched = new URI(Util.fixupURI(filename)).equals(breakpointURI);
 						} else {
-							IFile file = PathUtils.findWorkspaceFile(filename);
+							IFile file = ResourceUtil.findWorkspaceFile(filename);
 							if (file != null) {
 								fileMatched = file.equals(marker.getResource());
 							} else {

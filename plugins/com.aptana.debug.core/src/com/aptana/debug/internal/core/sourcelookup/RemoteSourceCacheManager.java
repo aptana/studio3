@@ -36,7 +36,6 @@ package com.aptana.debug.internal.core.sourcelookup;
 
 import java.net.URI;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugEvent;
@@ -126,8 +125,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	private void updateStorageContent(IDebugTarget target, boolean clear) {
 		fileContentRetriever = (IFileContentRetriever) target.getAdapter(IFileContentRetriever.class);
 		if (fileContentRetriever != null) {
-			for (Iterator i = cache.values().iterator(); i.hasNext();) {
-				RemoteFileStorage storage = (RemoteFileStorage) i.next();
+			for (RemoteFileStorage storage : cache.values()) {
 				if (clear) {
 					if (storage.getFileContentRetriever() == fileContentRetriever) {
 						storage.setFileContentRetriever(null);
