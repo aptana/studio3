@@ -52,7 +52,7 @@ public class CoreTests
 		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
 		suite.addTest(com.aptana.plist.tests.AllTests.suite());
 		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-//		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite()); // FIXME Disables for now as it's causing hudson build to time out
+		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite()); // FIXME Disables for now as it's causing hudson build to time out
 		// $JUnit-END$
 		return suite;
 	}
