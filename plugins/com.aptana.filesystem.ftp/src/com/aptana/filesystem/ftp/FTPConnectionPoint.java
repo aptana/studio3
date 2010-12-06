@@ -104,7 +104,10 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 		}
 		child = memento.getChild(ELEMENT_PATH);
 		if (child != null) {
-			path = Path.fromPortableString(child.getTextData());
+			String text = child.getTextData();
+			if (text != null) {
+				path = Path.fromPortableString(text);
+			}
 		}
 		child = memento.getChild(ELEMENT_LOGIN);
 		if (child != null) {
@@ -347,7 +350,7 @@ public class FTPConnectionPoint extends ConnectionPoint implements IBaseFTPConne
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IConnectionFileManager.class == adapter) {

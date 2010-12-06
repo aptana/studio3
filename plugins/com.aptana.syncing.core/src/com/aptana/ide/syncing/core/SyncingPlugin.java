@@ -53,120 +53,142 @@ import com.aptana.core.CorePlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class SyncingPlugin extends Plugin {
+@SuppressWarnings("deprecation")
+public class SyncingPlugin extends Plugin
+{
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.syncing.core"; //$NON-NLS-1$
 
 	// The shared instance
 	private static SyncingPlugin plugin;
-	
+
 	/**
 	 * The constructor
 	 */
-	public SyncingPlugin() {
+	public SyncingPlugin()
+	{
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception
+	{
 		super.start(context);
 		plugin = this;
 
-		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this,
-				new WorkspaceSaveParticipant());
-		if (lastState != null) {
+		ISavedState lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, new WorkspaceSaveParticipant());
+		if (lastState != null)
+		{
 			IPath location = lastState.lookup(new Path(SiteConnectionManager.STATE_FILENAME));
-			if (location != null) {
+			if (location != null)
+			{
 				SiteConnectionManager.getInstance().loadState(getStateLocation().append(location));
 			}
-            location = lastState.lookup(new Path(DefaultSiteConnection.STATE_FILENAME));
-            if (location != null) {
-                DefaultSiteConnection.getInstance().loadState(getStateLocation().append(location));
-            }
+			location = lastState.lookup(new Path(DefaultSiteConnection.STATE_FILENAME));
+			if (location != null)
+			{
+				DefaultSiteConnection.getInstance().loadState(getStateLocation().append(location));
+			}
 		}
 
 		// For 1.5 compatibility
-        lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(
-                CorePlugin.getDefault(), new ISaveParticipant() {
+		lastState = ResourcesPlugin.getWorkspace().addSaveParticipant(CorePlugin.getDefault(), new ISaveParticipant()
+		{
 
-                    public void doneSaving(ISaveContext context) {
-                    }
+			public void doneSaving(ISaveContext context)
+			{
+			}
 
-                    public void prepareToSave(ISaveContext context) throws CoreException {
-                    }
+			public void prepareToSave(ISaveContext context) throws CoreException
+			{
+			}
 
-                    public void rollback(ISaveContext context) {
-                    }
+			public void rollback(ISaveContext context)
+			{
+			}
 
-                    public void saving(ISaveContext context) throws CoreException {
-                    }
-                });
-        if (lastState != null) {
-            IPath location = lastState.lookup(new Path("save")); //$NON-NLS-1$
-            if (location != null) {
-                IPath absoluteLocation = CorePlugin.getDefault().getStateLocation().append(location);
-                // only loads it once
-                SiteConnectionManager.getInstance().loadState(absoluteLocation);
-                File file = absoluteLocation.toFile();
-                if (!file.renameTo(new File(absoluteLocation.toOSString() + ".bak"))) { //$NON-NLS-1$
-                    file.delete();
-                }
-            }
-        }
+			public void saving(ISaveContext context) throws CoreException
+			{
+			}
+		});
+		if (lastState != null)
+		{
+			IPath location = lastState.lookup(new Path("save")); //$NON-NLS-1$
+			if (location != null)
+			{
+				IPath absoluteLocation = CorePlugin.getDefault().getStateLocation().append(location);
+				// only loads it once
+				SiteConnectionManager.getInstance().loadState(absoluteLocation);
+				File file = absoluteLocation.toFile();
+				if (!file.renameTo(new File(absoluteLocation.toOSString() + ".bak"))) { //$NON-NLS-1$
+					file.delete();
+				}
+			}
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception {
+	public void stop(BundleContext context) throws Exception
+	{
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
-        ResourcesPlugin.getWorkspace().removeSaveParticipant(CorePlugin.getDefault());
+		ResourcesPlugin.getWorkspace().removeSaveParticipant(CorePlugin.getDefault());
 		plugin = null;
 		super.stop(context);
 	}
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
-	public static SyncingPlugin getDefault() {
+	public static SyncingPlugin getDefault()
+	{
 		return plugin;
 	}
 
 	/**
 	 * Returns the site Connection Manager instance
+	 * 
 	 * @return
 	 */
-	public static ISiteConnectionManager getSiteConnectionManager() {
+	public static ISiteConnectionManager getSiteConnectionManager()
+	{
 		return SiteConnectionManager.getInstance();
 	}
 
-	public static void log(IStatus status) {
+	public static void log(IStatus status)
+	{
 		getDefault().getLog().log(status);
 	}
 
-   public static void logError(String msg, Exception e) {
-        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-    }
+	public static void logError(String msg, Exception e)
+	{
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+	}
 
+	private class WorkspaceSaveParticipant implements ISaveParticipant
+	{
 
-	private class WorkspaceSaveParticipant implements ISaveParticipant {
-
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#prepareToSave(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void prepareToSave(ISaveContext context) throws CoreException {
+		public void prepareToSave(ISaveContext context) throws CoreException
+		{
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#saving(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void saving(ISaveContext context) throws CoreException {
+		public void saving(ISaveContext context) throws CoreException
+		{
 			int saveNum = context.getSaveNumber();
 			IPath savePath = new Path(SiteConnectionManager.STATE_FILENAME).addFileExtension(Integer.toString(saveNum));
 			SiteConnectionManager.getInstance().saveState(getStateLocation().append(savePath));
@@ -178,30 +200,34 @@ public class SyncingPlugin extends Plugin {
 
 			context.needSaveNumber();
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#doneSaving(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void doneSaving(ISaveContext context) {
+		public void doneSaving(ISaveContext context)
+		{
 			int prevNum = context.getPreviousSaveNumber();
 			IPath prevSavePath = new Path(SiteConnectionManager.STATE_FILENAME).addFileExtension(Integer
 					.toString(prevNum));
 			getStateLocation().append(prevSavePath).toFile().delete();
 
 			prevSavePath = new Path(DefaultSiteConnection.STATE_FILENAME).addFileExtension(Integer.toString(prevNum));
-            getStateLocation().append(prevSavePath).toFile().delete();
+			getStateLocation().append(prevSavePath).toFile().delete();
 		}
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
 		 * @see org.eclipse.core.resources.ISaveParticipant#rollback(org.eclipse.core.resources.ISaveContext)
 		 */
-		public void rollback(ISaveContext context) {
+		public void rollback(ISaveContext context)
+		{
 			int saveNum = context.getSaveNumber();
 			IPath savePath = new Path(SiteConnectionManager.STATE_FILENAME).addFileExtension(Integer.toString(saveNum));
 			getStateLocation().append(savePath).toFile().delete();
 
 			savePath = new Path(DefaultSiteConnection.STATE_FILENAME).addFileExtension(Integer.toString(saveNum));
-            getStateLocation().append(savePath).toFile().delete();
+			getStateLocation().append(savePath).toFile().delete();
 		}
 	}
 }

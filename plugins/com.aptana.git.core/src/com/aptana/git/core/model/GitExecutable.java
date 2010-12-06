@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.File;
@@ -22,12 +56,13 @@ import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 
 public class GitExecutable
 {
-	protected static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
+	private static final String GIT_EXECUTABLE = "git"; //$NON-NLS-1$
 	protected static final String GIT_EXECUTABLE_WIN32 = GIT_EXECUTABLE+".exe"; //$NON-NLS-1$
 	public static final String MIN_GIT_VERSION = "1.6.0"; //$NON-NLS-1$
 	private static ArrayList<IPath> fgLocations;
@@ -41,9 +76,9 @@ public class GitExecutable
 		this.gitPath = gitPath;
 	}
 
-	public static GitExecutable instance()
+	public synchronized static GitExecutable instance()
 	{
-		// FIXME Singletons are bad! hid behind an interface and grab the global instance of this from the plugin?
+		// FIXME Singletons are bad! hide behind an interface and grab the global instance of this from the plugin?
 		if (fgExecutable == null)
 		{
 			fgExecutable = GitExecutable.find();
@@ -72,7 +107,7 @@ public class GitExecutable
 	
 	private static IPath getPreferenceGitPath() {
 		String pref = new InstanceScope().getNode(GitPlugin.PLUGIN_ID).get(IPreferenceConstants.GIT_EXECUTABLE_PATH, null);
-		if (pref != null && !pref.isEmpty()) {
+		if (!StringUtil.isEmpty(pref)) {
 			IPath path = Path.fromOSString(pref);
 			if (path.toFile().isDirectory()) {
 				boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
@@ -119,7 +154,7 @@ public class GitExecutable
 		
 		boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 		IPath path = ExecutableUtil.find(isWin32 ? GIT_EXECUTABLE_WIN32 : GIT_EXECUTABLE, false, searchLocations(), new FileFilter() {
-			@Override
+
 			public boolean accept(File pathname) {
 				return acceptBinary(Path.fromOSString(pathname.getAbsolutePath()));
 			}
@@ -143,7 +178,7 @@ public class GitExecutable
 		GitPlugin.logInfo(string);
 	}
 
-	private static List<IPath> searchLocations()
+	private synchronized static List<IPath> searchLocations()
 	{
 		if (fgLocations == null)
 		{
@@ -156,12 +191,12 @@ public class GitExecutable
 			}
 			else
 			{
-				fgLocations.add(Path.fromOSString("/opt/local/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/sw/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/opt/git/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString("/usr/local/git/bin/git")); //$NON-NLS-1$
-				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin/git"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/opt/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/sw/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/opt/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("/usr/local/git/bin")); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("~/bin"))); //$NON-NLS-1$
 			}
 		}
 		return fgLocations;
@@ -213,7 +248,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public String outputForCommand(IPath workingDir, String... args)
+	protected String outputForCommand(IPath workingDir, String... args)
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
@@ -241,24 +276,12 @@ public class GitExecutable
 	 * 
 	 * @param workingDirectory
 	 * @param input
-	 * @param amendEnvironment
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(IPath workingDirectory, String input,
-			Map<String, String> amendEnvironment, String... args)
+	protected Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
 	{
-		Map<String, String> env = new HashMap<String, String>();
-		env.putAll(ShellExecutable.getEnvironment());
-		if (amendEnvironment != null) {
-			env.putAll(amendEnvironment);
-		}
-
-		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
-		if (git_ssh != null) {
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
-		}
-		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, env, args);
+		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}
 
 	/**

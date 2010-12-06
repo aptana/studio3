@@ -1,12 +1,47 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Method;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -28,6 +63,7 @@ import net.contentobjects.jnotify.JNotifyException;
 import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,7 +74,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
@@ -48,11 +84,32 @@ import com.aptana.git.core.model.GitRef.TYPE;
 public class GitRepository
 {
 
+	/**
+	 * Filename to store ignores of files.
+	 */
+	public static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
+	/**
+	 * File used to associate SHAs and refs when git pack-refs has been used.
+	 */
+	private static final String PACKED_REFS = "packed-refs"; //$NON-NLS-1$
+	/**
+	 * The file used
+	 */
 	private static final String COMMIT_EDITMSG = "COMMIT_EDITMSG"; //$NON-NLS-1$
+	/**
+	 * The most important file in git. This holds the current file state. When this changes, the state of files in the
+	 * repo has changed.
+	 */
 	private static final String INDEX = "index"; //$NON-NLS-1$
-	static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
-	private static final String COMMIT_FILE_ENCODING = "UTF-8"; //$NON-NLS-1$
-	private static final String HEAD = "HEAD"; //$NON-NLS-1$
+	/**
+	 * File created prior to merges (which happen as part of pull, which is just fetch + merge).
+	 */
+	private static final String ORIG_HEAD = "ORIG_HEAD"; //$NON-NLS-1$
+	/**
+	 * A file created when we hit merge conflicts that need to be manually resolved.
+	 */
+	private static final String MERGE_HEAD_FILENAME = "MERGE_HEAD"; //$NON-NLS-1$
+	static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
 
@@ -62,7 +119,7 @@ public class GitRepository
 	private GitRevSpecifier _headRef;
 	private GitIndex index;
 	private boolean hasChanged;
-	GitRevSpecifier currentBranch;
+	private GitRevSpecifier currentBranch;
 	private Set<Integer> fileWatcherIds = new HashSet<Integer>();
 	private int remoteDirCreationWatchId = -1;
 	private HashSet<IGitRepositoryListener> listeners;
@@ -98,8 +155,14 @@ public class GitRepository
 						@Override
 						public void fileCreated(int wd, String rootPath, String name)
 						{
-							if (name != null && name.equals(INDEX))
+							if (name == null)
+								return;
+							if (name.equals(INDEX))
 								refreshIndex();
+							else if (name.equals(ORIG_HEAD)) // this is done before merges (or pulls, which are just
+																// fetch + merge)
+								firePullEvent(); // we're conflating the two events here because I don't have the ideas
+													// separated in the listeners yet.
 						}
 
 						@Override
@@ -219,6 +282,8 @@ public class GitRepository
 				@Override
 				public void fileDeleted(int wd, String rootPath, final String name)
 				{
+					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+						return;
 					// Remove branch in model!
 					final GitRevSpecifier rev = new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name));
 					branches.remove(rev);
@@ -245,6 +310,8 @@ public class GitRepository
 				@Override
 				public void fileCreated(int wd, String rootPath, final String name)
 				{
+					if (name == null || name.endsWith(".lock")) //$NON-NLS-1$
+						return;
 					// a branch has been added
 					addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + name)));
 
@@ -278,13 +345,12 @@ public class GitRepository
 	/**
 	 * @throws JNotifyException
 	 */
-	protected void addRemotesFileWatcher() throws JNotifyException
+	private void addRemotesFileWatcher() throws JNotifyException
 	{
 		fileWatcherIds.add(FileWatcher.addWatch(gitFile(GitRef.REFS_REMOTES).getAbsolutePath(), IJNotify.FILE_ANY,
 				true, new JNotifyListener()
 				{
 
-					@Override
 					public void fileRenamed(int wd, String rootPath, String oldName, String newName)
 					{
 						if (newName == null)
@@ -312,10 +378,9 @@ public class GitRepository
 					// Determine if filename is referring to a remote branch, and not the remote itself.
 					private boolean isProbablyBranch(String newName)
 					{
-						return newName != null && newName.indexOf(File.separator) != -1;
+						return newName != null && newName.indexOf(File.separator) != -1 && !newName.endsWith(".lock"); //$NON-NLS-1$
 					}
 
-					@Override
 					public void fileModified(int wd, String rootPath, String name)
 					{
 						if (name == null)
@@ -340,7 +405,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileDeleted(int wd, String rootPath, final String name)
 					{
 						// if path is longer than one segment, then remote branch was deleted. Means we probably
@@ -363,7 +427,6 @@ public class GitRepository
 						}
 					}
 
-					@Override
 					public void fileCreated(int wd, String rootPath, final String name)
 					{
 						if (isProbablyBranch(name))
@@ -452,7 +515,7 @@ public class GitRepository
 		// Return local branches first!
 		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
 		{
-			@Override
+
 			public int compare(String o1, String o2)
 			{
 				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -519,16 +582,6 @@ public class GitRepository
 	private void readCurrentBranch()
 	{
 		this.currentBranch = addBranch(headRef());
-	}
-
-	public String parseReference(String parent)
-	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rev-parse", //$NON-NLS-1$
-				"--verify", parent); //$NON-NLS-1$
-		int exitValue = result.keySet().iterator().next();
-		if (exitValue != 0)
-			return null;
-		return result.values().iterator().next();
 	}
 
 	private boolean reloadRefs()
@@ -655,7 +708,7 @@ public class GitRepository
 		return index;
 	}
 
-	void fireBranchChangeEvent(String oldBranchName, String newBranchName)
+	private void fireBranchChangeEvent(String oldBranchName, String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -664,7 +717,7 @@ public class GitRepository
 			listener.branchChanged(e);
 	}
 
-	void fireBranchRemovedEvent(String oldBranchName)
+	private void fireBranchRemovedEvent(String oldBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -673,7 +726,7 @@ public class GitRepository
 			listener.branchRemoved(e);
 	}
 
-	void fireBranchAddedEvent(String newBranchName)
+	private void fireBranchAddedEvent(String newBranchName)
 	{
 		if (listeners == null || listeners.isEmpty())
 			return;
@@ -693,83 +746,6 @@ public class GitRepository
 			return;
 		for (IGitRepositoryListener listener : listeners)
 			listener.indexChanged(e);
-	}
-
-	public boolean hasMerges()
-	{
-		return mergeHeadFile().exists();
-	}
-
-	boolean executeHook(String name)
-	{
-		return executeHook(name, new String[0]);
-	}
-
-	boolean executeHook(String name, String... arguments)
-	{
-		IPath hookPath = gitDirPath();
-		hookPath = hookPath.append("hooks").append(name); //$NON-NLS-1$
-		File hook = hookPath.toFile();
-		if (!hook.exists() || !hook.isFile())
-			return true;
-
-		try
-		{
-			Method method = File.class.getMethod("canExecute", (Class[]) null); //$NON-NLS-1$
-			if (method != null)
-			{
-				Boolean canExecute = (Boolean) method.invoke(hook, (Object[]) null);
-				if (!canExecute)
-					return true;
-			}
-		}
-		catch (Exception e)
-		{
-			// ignore
-		}
-
-		Map<String, String> env = new HashMap<String, String>();
-		env.put(GitEnv.GIT_DIR, gitDirPath().toOSString());
-		env.put(GitEnv.GIT_INDEX_FILE, gitFile(INDEX).getAbsolutePath());
-
-		int ret = 1;
-		Map<Integer, String> result = ProcessUtil.runInBackground(hookPath.toOSString(), workingDirectory(), env,
-				arguments);
-		ret = result.keySet().iterator().next();
-		return ret == 0;
-	}
-
-	String commitMessageFile()
-	{
-		return gitFile(COMMIT_EDITMSG).getAbsolutePath();
-	}
-
-	void writetoCommitFile(String commitMessage)
-	{
-		File commitMessageFile = new File(commitMessageFile());
-		OutputStream out = null;
-		try
-		{
-			out = new FileOutputStream(commitMessageFile);
-			out.write(commitMessage.getBytes(COMMIT_FILE_ENCODING));
-			out.flush();
-		}
-		catch (IOException ioe)
-		{
-			GitPlugin.logError(ioe.getMessage(), ioe);
-		}
-		finally
-		{
-			try
-			{
-				if (out != null)
-					out.close();
-			}
-			catch (IOException e)
-			{
-				// ignore
-			}
-		}
 	}
 
 	public void lazyReload()
@@ -894,35 +870,63 @@ public class GitRepository
 	}
 
 	/**
-	 * Determine if the passed in branch has a remote tracking branch.
-	 * 
-	 * @param branchName
-	 * @return
-	 */
-	public boolean trackingRemote(String branchName)
-	{
-		return remoteTrackingBranch(branchName) != null;
-	}
-
-	/**
 	 * Returns the remote tracking branch name for the branch passed in. Returns null if there is none.
 	 * 
 	 * @param branchName
 	 * @return
 	 */
-	public GitRef remoteTrackingBranch(String branchName)
+	private GitRef remoteTrackingBranch(String branchName)
 	{
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
-				"^branch\\." + branchName + "\\.remote"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (output == null || output.trim().length() == 0)
+		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
+		// TODO Store the config contents and only read it again when last mod changes?
+		File configFile = gitFile("config");
+		String contents = "";
+		try
 		{
-			// FIXME Doesn't seem to handle case where we init locally and then add origin and push there...
-			// See http://kernel.org/pub/software/scm/git/docs/git-pull.html#REMOTES
-			// Git will look in a few places and assume use of remote defined
+			contents = IOUtil.read(new FileInputStream(configFile));
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName);
+		if (index == -1)
+		{
 			return null;
 		}
-		String remoteSubname = output.substring(14 + branchName.length()).trim();
-		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteSubname + "/" + branchName); //$NON-NLS-1$
+		int precedingBracket = contents.lastIndexOf('[', index);
+		if (precedingBracket == -1)
+		{
+			precedingBracket = 0;
+		}
+		int trailingBracket = contents.indexOf('[', index);
+		if (trailingBracket == -1)
+		{
+			trailingBracket = contents.length();
+		}
+		String branchDetails = contents.substring(precedingBracket, trailingBracket);
+		String remoteBranchName = null;
+		String remoteName = "origin";
+		String[] lines = branchDetails.split("\\r?\\n|\\r");
+		for (String line : lines)
+		{
+			line = line.trim();
+			if (line.startsWith("remote = "))
+			{
+				remoteName = line.substring(9);
+			}
+			else if (line.startsWith("[branch \""))
+			{
+				remoteBranchName = line.substring(9, line.length() - 2);
+			}
+		}
+		if (remoteBranchName == null)
+		{
+			return null;
+		}
+		return GitRef.refFromString(GitRef.REFS_REMOTES + remoteName + "/" + remoteBranchName); //$NON-NLS-1$
 	}
 
 	/**
@@ -1165,12 +1169,12 @@ public class GitRepository
 		return shas;
 	}
 
-	File mergeHeadFile()
+	private File mergeHeadFile()
 	{
 		return gitFile(MERGE_HEAD_FILENAME);
 	}
 
-	File gitFile(String string)
+	private File gitFile(String string)
 	{
 		return gitDirPath().append(string).toFile();
 	}
@@ -1256,4 +1260,89 @@ public class GitRepository
 		return index().getChangedResources();
 	}
 
+	public IFile getFileForChangedFile(ChangedFile file)
+	{
+		return index().getResourceForChangedFile(file);
+	}
+
+	/**
+	 * Attempts to resolve the ref to it's SHA. takes in something like refs/heads/master or refs/remotes/origin/master
+	 * and returns it's SHA. Checks for the refs/* file and failing that looks in packed-refs. If this fails, it will
+	 * return the ref's original string (i.e. refs/heads/master)
+	 * 
+	 * @param ref
+	 * @return
+	 */
+	public String toSHA(GitRef ref)
+	{
+		File sha1File = gitFile(ref.ref());
+		// If the file doesn't exist, it's inside packed-refs!
+		try
+		{
+			if (!sha1File.isFile())
+			{
+				File packedRefs = gitFile(PACKED_REFS);
+				String packedRefContents = IOUtil.read(new FileInputStream(packedRefs));
+				// each line is 40 char sha, space, ref name
+				int index = packedRefContents.indexOf(ref.ref());
+				if (index != -1)
+				{
+					return new String(packedRefContents.substring(index - 41, index - 1));
+				}
+			}
+			else
+			{
+				return IOUtil.read(new FileInputStream(sha1File));
+			}
+		}
+		catch (FileNotFoundException e)
+		{
+			// ignore
+			e.printStackTrace();
+		}
+		return ref.ref();
+	}
+
+	/**
+	 * Add the filename to .gitignore
+	 * 
+	 * @param resource
+	 * @return
+	 */
+	public boolean ignoreResource(IResource resource)
+	{
+		IPath relativePath = relativePath(resource);
+		return ignore(relativePath.toPortableString());
+	}
+
+	/**
+	 * Adds a pattern to the repo's .gitignore file.
+	 * 
+	 * @param pattern
+	 * @return
+	 */
+	public boolean ignore(String pattern)
+	{
+		File gitIgnore = new File(workingDirectory().toFile(), GITIGNORE);
+		PrintWriter writer = null;
+		try
+		{
+			// FIXME Don't write duplicate entries!
+			writer = new PrintWriter(new FileWriter(gitIgnore, true));
+			writer.println(pattern);
+			return true;
+		}
+		catch (IOException e)
+		{
+			GitPlugin.logError(e.getMessage(), e);
+			return false;
+		}
+		finally
+		{
+			if (writer != null)
+			{
+				writer.close();
+			}
+		}
+	}
 }

@@ -23,7 +23,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IEventConsumer;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
-import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
@@ -389,7 +388,7 @@ final class ContentAssistSubjectControlAdapter implements IContentAssistSubjectC
 	 * @param offset
 	 *            a document offset
 	 * @return the auto activation characters
-	 * @see IContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 * @see import org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
 	 */
 	char[] getContextInformationAutoActivationCharacters(ContentAssistant contentAssistant, int offset)
 	{

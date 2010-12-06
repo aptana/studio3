@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui;
 
 import java.lang.reflect.InvocationTargetException;
@@ -11,19 +45,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -33,12 +65,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
 import com.aptana.git.ui.internal.GitColors;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.ThemePlugin;
 import com.aptana.ui.IDialogConstants;
 import com.aptana.ui.PopupSchedulingRule;
 
@@ -75,42 +106,36 @@ public class GitUIPlugin extends AbstractUIPlugin
 		themeChangeListener = new IPreferenceChangeListener()
 		{
 
-			@SuppressWarnings("restriction")
-			@Override
 			public void preferenceChange(PreferenceChangeEvent event)
 			{
 				if (event.getKey().equals(IThemeManager.THEME_CHANGED))
 				{
-					IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
-					// Quick Diff colors
-					prefs.put("changeIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("additionIndicationColor", toString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
-					prefs.put("deletionIndicationColor", toString(GitColors.redBG().getRGB())); //$NON-NLS-1$
-
-					try
+					PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 					{
-						prefs.flush();
-					}
-					catch (BackingStoreException e)
-					{
-						GitUIPlugin.logError(e.getMessage(), e);
-					}
 
-					Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-					IPreferenceStore prefStore = org.eclipse.debug.internal.ui.DebugUIPlugin.getDefault().getPreferenceStore();
-					PreferenceConverter.setDefault(prefStore, org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_BAKGROUND_COLOR, theme.getBackground());
-					PreferenceConverter.setDefault(prefStore, org.eclipse.debug.internal.ui.preferences.IDebugPreferenceConstants.CONSOLE_SYS_OUT_COLOR, theme.getForeground());
+						public void run()
+						{
+							IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
+							// Quick Diff colors
+							prefs.put("changeIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("additionIndicationColor", StringConverter.asString(GitColors.greenBG().getRGB())); //$NON-NLS-1$
+							prefs.put("deletionIndicationColor", StringConverter.asString(GitColors.redBG().getRGB())); //$NON-NLS-1$
+
+							try
+							{
+								prefs.flush();
+							}
+							catch (BackingStoreException e)
+							{
+								GitUIPlugin.logError(e.getMessage(), e);
+							}
+						}
+					});
+
 				}
 			}
-
-			private String toString(RGB selection)
-			{
-				StringBuilder builder = new StringBuilder();
-				builder.append(selection.red).append(',').append(selection.green).append(',').append(selection.blue);
-				return builder.toString();
-			}
 		};
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
 		checkHasGit();
 	}
 
@@ -124,8 +149,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		{
 			if (themeChangeListener != null)
 			{
-				new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
-						themeChangeListener);
+				new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
 			}
 			themeChangeListener = null;
 		}
@@ -135,35 +159,42 @@ public class GitUIPlugin extends AbstractUIPlugin
 			super.stop(context);
 		}
 	}
-	
-	private void checkHasGit() {
-		if (Platform.WS_WIN32.equals(Platform.getOS())) {
-			if (GitExecutable.instance() == null) {
-				UIJob job = new UIJob(Messages.GitUIPlugin_0) {
+
+	private void checkHasGit()
+	{
+		if (Platform.WS_WIN32.equals(Platform.getOS()))
+		{
+			if (GitExecutable.instance() == null)
+			{
+				UIJob job = new UIJob(Messages.GitUIPlugin_0)
+				{
 					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						while(true) {
-							MessageDialog dlg = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-									Messages.GitUIPlugin_1,
-									null,
-									Messages.GitUIPlugin_2,
-									MessageDialog.WARNING,
-									new String[] { IDialogConstants.SKIP_LABEL, Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, 2);
-							switch (dlg.open()) {
-							case 0:
-								return Status.OK_STATUS;
-							case 1:
-								if (installPortableGit(monitor)) {
+					public IStatus runInUIThread(IProgressMonitor monitor)
+					{
+						while (true)
+						{
+							MessageDialog dlg = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+									.getShell(), Messages.GitUIPlugin_1, null, Messages.GitUIPlugin_2,
+									MessageDialog.WARNING, new String[] { IDialogConstants.SKIP_LABEL,
+											Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, 2);
+							switch (dlg.open())
+							{
+								case 0:
 									return Status.OK_STATUS;
-								}
-								break;
-							case 2:
-								if (browseGitLocation()) {
-									return Status.OK_STATUS;
-								}
-								break;
-							default:
-								break;
+								case 1:
+									if (installPortableGit(monitor))
+									{
+										return Status.OK_STATUS;
+									}
+									break;
+								case 2:
+									if (browseGitLocation())
+									{
+										return Status.OK_STATUS;
+									}
+									break;
+								default:
+									break;
 							}
 						}
 					}
@@ -174,60 +205,80 @@ public class GitUIPlugin extends AbstractUIPlugin
 			}
 		}
 	}
-	
-	private boolean installPortableGit(IProgressMonitor monitor) {
-		ProgressMonitorDialog dlg = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
-		try {
-			dlg.run(true, false, new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					try {
+
+	private boolean installPortableGit(IProgressMonitor monitor)
+	{
+		ProgressMonitorDialog dlg = new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getShell());
+		try
+		{
+			dlg.run(true, false, new IRunnableWithProgress()
+			{
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				{
+					try
+					{
 						monitor.beginTask(Messages.GitUIPlugin_4, IProgressMonitor.UNKNOWN);
 						monitor.worked(1);
 						PortableGit.install();
-					} finally {
+					}
+					finally
+					{
 						monitor.done();
 					}
 				}
 			});
-		} catch (InvocationTargetException e) {
+		}
+		catch (InvocationTargetException e)
+		{
 			logError(e);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e)
+		{
 		}
 		IPath path = PortableGit.getLocation();
-		if (path != null) {
+		if (path != null)
+		{
 			GitExecutable.setPreferenceGitPath(path);
 			return true;
-		} else {
+		}
+		else
+		{
 			MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-					Messages.GitUIPlugin_5,
-					Messages.GitUIPlugin_6);
+					Messages.GitUIPlugin_5, Messages.GitUIPlugin_6);
 		}
 		return false;
 	}
-	
-	private boolean browseGitLocation() {
+
+	private boolean browseGitLocation()
+	{
 		Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		while(true) {
+		while (true)
+		{
 			FileDialog dlg = new FileDialog(shell, SWT.APPLICATION_MODAL | SWT.OPEN);
 			String gitExecutable = "git.exe"; //$NON-NLS-1$
-			dlg.setFilterExtensions(new String[] { gitExecutable }); 
+			dlg.setFilterExtensions(new String[] { gitExecutable });
 			dlg.setFilterNames(new String[] { Messages.GitUIPlugin_7 });
 			dlg.setFileName(gitExecutable);
 			dlg.setFilterPath(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin")); //$NON-NLS-1$
 			dlg.setText(Messages.GitUIPlugin_8);
 			String result = dlg.open();
-			if (result != null) {
+			if (result != null)
+			{
 				IPath path = Path.fromOSString(result);
-				if (GitExecutable.acceptBinary(path)) {
+				if (GitExecutable.acceptBinary(path))
+				{
 					GitExecutable.setPreferenceGitPath(path);
 					return true;
-				} else {
-					MessageDialog.openWarning(shell,
-							Messages.GitUIPlugin_9,
+				}
+				else
+				{
+					MessageDialog.openWarning(shell, Messages.GitUIPlugin_9,
 							NLS.bind(Messages.GitUIPlugin_10, GitExecutable.MIN_GIT_VERSION));
 				}
-			} else {
+			}
+			else
+			{
 				return false;
 			}
 		}
@@ -241,16 +292,6 @@ public class GitUIPlugin extends AbstractUIPlugin
 	public static GitUIPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	public static void logInfo(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.INFO, getPluginId(), string));
-	}
-
-	public static void trace(String string)
-	{
-		getDefault().getLog().log(new Status(IStatus.OK, getPluginId(), string));
 	}
 
 	public static String getPluginId()
@@ -268,7 +309,7 @@ public class GitUIPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(e.getStatus());
 	}
 
-	public static void logError(Exception e)
+	private static void logError(Exception e)
 	{
 		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), "", e)); //$NON-NLS-1$
 	}

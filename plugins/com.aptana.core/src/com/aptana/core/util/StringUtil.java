@@ -1,9 +1,44 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.core.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -21,6 +56,35 @@ public abstract class StringUtil
 	public static final String EMPTY = ""; //$NON-NLS-1$
 
 	/**
+	 * characterInstanceCount
+	 * 
+	 * @param source
+	 * @param c
+	 * @return
+	 */
+	public static int characterInstanceCount(String source, char c)
+	{
+		int result = -1;
+
+		if (source != null)
+		{
+			int length = source.length();
+
+			result = 0;
+
+			for (int i = 0; i < length; i++)
+			{
+				if (source.charAt(i) == c)
+				{
+					result++;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
 	 * 
 	 * @param delimiter
@@ -29,7 +93,7 @@ public abstract class StringUtil
 	 *            The array of items to join
 	 * @return The resulting string
 	 */
-	public static String join(String delimiter, String ... items)
+	public static String join(String delimiter, String... items)
 	{
 		if (items == null)
 		{
@@ -38,20 +102,42 @@ public abstract class StringUtil
 
 		int length = items.length;
 		String result = ""; //$NON-NLS-1$
+
 		if (length > 0)
 		{
 			StringBuilder sb = new StringBuilder();
+			String item;
+
 			for (int i = 0; i < length - 1; i++)
 			{
-				sb.append(items[i]).append(delimiter);
+				item = items[i];
+
+				if (item != null)
+				{
+					sb.append(item);
+				}
+
+				sb.append(delimiter);
 			}
-			sb.append(items[length - 1]);
+
+			item = items[length - 1];
+
+			if (item != null)
+			{
+				sb.append(item);
+			}
 
 			result = sb.toString();
 		}
+
 		return result;
 	}
-	
+
+	public static String join(String delimiter, Collection<String> items)
+	{
+		return join(delimiter, items.toArray(new String[items.size()]));
+	}
+
 	/**
 	 * Create a string by concatenating the elements of a string array using a delimited between each item
 	 * 
@@ -67,7 +153,7 @@ public abstract class StringUtil
 		{
 			return null;
 		}
-		
+
 		int length = items.size();
 		String result = ""; //$NON-NLS-1$
 		if (length > 0)
@@ -78,7 +164,7 @@ public abstract class StringUtil
 				sb.append(items.get(i)).append(delimiter);
 			}
 			sb.append(items.get(length - 1));
-			
+
 			result = sb.toString();
 		}
 		return result;
@@ -130,7 +216,7 @@ public abstract class StringUtil
 	public static String ellipsify(String message)
 	{
 		return message + "..."; //$NON-NLS-1$
-	}	
+	}
 
 	/**
 	 * Given a raw input string template, this will do a mass search and replace for the map of variables to values.
@@ -206,7 +292,7 @@ public abstract class StringUtil
 		return null;
 	}
 
-	/**
+/**
 	 * Sanitizes raw HTML to escape '&', '<' and '>' so that it is suitable for embedding into HTML.
 	 * 
 	 * @param raw
@@ -228,7 +314,7 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 != null) : (s2 == null) ? true : !s1.equals(s2);
 	}
-	
+
 	/**
 	 * Compares two strings for equality taking into account that none, one, or both may be null
 	 * 
@@ -240,7 +326,7 @@ public abstract class StringUtil
 	{
 		return (s1 == null) ? (s2 == null) : (s2 != null) ? s1.equals(s2) : false;
 	}
-	
+
 	/**
 	 * Formats the string with replacement values
 	 * 
@@ -301,4 +387,24 @@ public abstract class StringUtil
 		return MessageFormat.format(str, replacements);
 	}
 
+	public static boolean contains(String[] set, String toFind)
+	{
+		if (set == null)
+		{
+			return false;
+		}
+		for (String value : set)
+		{
+			if (value.equals(toFind))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isEmpty(String text)
+	{
+		return text == null || text.trim().length() == 0;
+	}
 }

@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.core.util;
 
 import java.io.IOException;
@@ -12,8 +46,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.internal.InputStreamGobbler;
-import com.aptana.core.internal.OutputStreamThread;
 
 /**
  * A Utility for launching process synch and async via ProcessBuilder. Does not go through the Eclipse launching
@@ -37,18 +69,23 @@ public abstract class ProcessUtil
 		return result.values().iterator().next();
 	}
 
+	/**
+	 * @deprecated Please use {@link IOUtil#read(InputStream, String)} instead with a value of "UTF-8".
+	 * @param stream
+	 * @return
+	 */
 	public static String read(InputStream stream)
 	{
 		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
 	}
 
-	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String[] args)
+	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String... args)
 	{
 		return runInBackground(command, workingDir, null, args);
 	}
 
 	public static Map<Integer, String> runInBackground(String command, IPath workingDir, Map<String, String> env,
-			String[] args)
+			String... args)
 	{
 		return runInBackground(command, workingDir, null, env, args);
 	}
@@ -116,7 +153,7 @@ public abstract class ProcessUtil
 		{
 			CorePlugin.logError(e.getMessage(), e);
 		}
-		return null;		
+		return null;
 	}
 
 	/**
@@ -130,7 +167,7 @@ public abstract class ProcessUtil
 	 * @return
 	 */
 	public static Map<Integer, String> runInBackground(String command, IPath workingDirectory, String input,
-			Map<String, String> environment, String[] arguments)
+			Map<String, String> environment, String... arguments)
 	{
 		try
 		{
@@ -150,6 +187,7 @@ public abstract class ProcessUtil
 
 	/**
 	 * Launches the process and returns a handle to the active Process.
+	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param environment
@@ -158,14 +196,15 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(String command, IPath workingDirectory, Map<String,String> environment, String... arguments) throws IOException, CoreException {
+	public static Process run(String command, IPath workingDirectory, Map<String, String> environment,
+			String... arguments) throws IOException, CoreException
+	{
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
 		return run(commands, workingDirectory, environment);
 	}
 
 	/**
-	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param arguments
@@ -173,12 +212,15 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(String command, IPath workingDirectory, String... arguments) throws IOException, CoreException {
+	public static Process run(String command, IPath workingDirectory, String... arguments) throws IOException,
+			CoreException
+	{
 		return run(command, workingDirectory, null, arguments);
 	}
 
 	/**
 	 * Launches the process and returns a handle to the active Process.
+	 * 
 	 * @param command
 	 * @param workingDirectory
 	 * @param environment
@@ -186,12 +228,16 @@ public abstract class ProcessUtil
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public static Process run(List<String> command, IPath workingDirectory, Map<String,String> environment) throws IOException, CoreException {
+	public static Process run(List<String> command, IPath workingDirectory, Map<String, String> environment)
+			throws IOException, CoreException
+	{
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		if (workingDirectory != null) {
+		if (workingDirectory != null)
+		{
 			processBuilder.directory(workingDirectory.toFile());
 		}
-		if (environment != null && !environment.isEmpty()) {
+		if (environment != null && !environment.isEmpty())
+		{
 			processBuilder.environment().putAll(environment);
 		}
 		return processBuilder.start();

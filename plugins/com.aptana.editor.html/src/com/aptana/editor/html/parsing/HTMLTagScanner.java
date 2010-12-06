@@ -47,8 +47,8 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
 
 class HTMLTagScanner extends RuleBasedScanner
@@ -75,13 +75,11 @@ class HTMLTagScanner extends RuleBasedScanner
 		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return Character.isLetter(c) || c == '-' || c == ':';
 			}
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return Character.isLetter(c);
@@ -103,10 +101,12 @@ class HTMLTagScanner extends RuleBasedScanner
 		// tag name
 		rules.add(new WordRule(new WordDetector(), token, true));
 		// special characters
-		rules.add(new SingleCharacterRule('<', token));
-		rules.add(new SingleCharacterRule('>', token));
-		rules.add(new SingleCharacterRule('=', token));
-
+		CharacterMapRule rule = new CharacterMapRule();
+		rule.add('<', token);
+		rule.add('>', token);
+		rule.add('=', token);
+		rules.add(rule);
+		
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(token);
 	}
@@ -119,13 +119,11 @@ class HTMLTagScanner extends RuleBasedScanner
 	private static class WordDetector implements IWordDetector
 	{
 
-		@Override
 		public boolean isWordPart(char c)
 		{
 			return Character.isLetterOrDigit(c);
 		}
 
-		@Override
 		public boolean isWordStart(char c)
 		{
 			return Character.isLetter(c);

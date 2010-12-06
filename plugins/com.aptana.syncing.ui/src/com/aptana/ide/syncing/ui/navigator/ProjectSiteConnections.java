@@ -56,7 +56,7 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 public class ProjectSiteConnections extends PlatformObject implements IWorkbenchAdapter {
 
     private static ImageDescriptor IMAGE_DESCRIPTOR = SyncingUIPlugin
-            .getImageDescriptor("icons/full/obj16/ftp.png"); //$NON-NLS-1$
+            .getImageDescriptor("icons/full/obj16/connection.png"); //$NON-NLS-1$
 
     private IProject fProject;
 
@@ -65,12 +65,10 @@ public class ProjectSiteConnections extends PlatformObject implements IWorkbench
     }
 
     public Object[] getChildren(Object o) {
-        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fProject, true);
+        ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(fProject, true, true);
         List<ProjectSiteConnection> targets = new ArrayList<ProjectSiteConnection>();
-        for (int i = 0; i < sites.length; ++i) {
-        	if (sites[i].getDestination() != null) {
-        		targets.add(new ProjectSiteConnection(fProject, sites[i]));
-        	}
+        for (ISiteConnection site : sites) {
+        	targets.add(new ProjectSiteConnection(fProject, site));
         }
         return targets.toArray(new ProjectSiteConnection[targets.size()]);
     }
@@ -87,7 +85,7 @@ public class ProjectSiteConnections extends PlatformObject implements IWorkbench
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
         if (adapter == IProject.class || adapter == IContainer.class) {
             return fProject;

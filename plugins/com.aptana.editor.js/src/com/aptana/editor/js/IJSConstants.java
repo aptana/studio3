@@ -36,10 +36,9 @@
 package com.aptana.editor.js;
 
 /**
- * @author Max Stepanov
- *
+ * IJSConstants
  */
-public interface IJSConstants {
-
+public interface IJSConstants
+{
 	public String CONTENT_TYPE_JS = "com.aptana.contenttype.js"; //$NON-NLS-1$
 }

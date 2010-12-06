@@ -52,9 +52,10 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -158,27 +159,27 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(getCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getCommentScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, COMMENT);
 		reconciler.setRepairer(dr, COMMENT);
 
-		dr = new DefaultDamagerRepairer(getSingleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getSingleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_SINGLE);
 		reconciler.setRepairer(dr, STRING_SINGLE);
 
-		dr = new DefaultDamagerRepairer(getDoubleQuotedStringScanner());
+		dr = new ThemeingDamagerRepairer(getDoubleQuotedStringScanner());
 		reconciler.setDamager(dr, STRING_DOUBLE);
 		reconciler.setRepairer(dr, STRING_DOUBLE);
 	}
 
-	protected ITokenScanner getCodeScanner()
+	private ITokenScanner getCodeScanner()
 	{
 		if (fCodeScanner == null)
 		{
@@ -187,17 +188,16 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return fCodeScanner;
 	}
 
-	protected ITokenScanner getCommentScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		if (commentScanner == null)
 		{
-			commentScanner = new RuleBasedScanner();
-			commentScanner.setDefaultReturnToken(getToken("comment.sass")); //$NON-NLS-1$
+			commentScanner = new CommentScanner(getToken("comment.sass")); //$NON-NLS-1$
 		}
 		return commentScanner;
 	}
 
-	protected ITokenScanner getDoubleQuotedStringScanner()
+	private ITokenScanner getDoubleQuotedStringScanner()
 	{
 		if (doubleQuotedStringScanner == null)
 		{
@@ -206,7 +206,7 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return doubleQuotedStringScanner;
 	}
 
-	protected ITokenScanner getSingleQuotedStringScanner()
+	private ITokenScanner getSingleQuotedStringScanner()
 	{
 		if (singleQuotedStringScanner == null)
 		{
@@ -215,13 +215,8 @@ public class SassSourceConfiguration implements IPartitioningConfiguration, ISou
 		return singleQuotedStringScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

@@ -1,8 +1,47 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.outline;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -11,32 +50,40 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
+import org.eclipse.ui.dialogs.PatternFilter;
+import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.actions.BaseToggleLinkingAction;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.ThemedDelegatingLabelProvider;
-import com.aptana.editor.common.theme.TreeThemer;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
+import com.aptana.theme.IControlThemerFactory;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.ThemedDelegatingLabelProvider;
 
 public class CommonOutlinePage extends ContentOutlinePage implements IPropertyChangeListener
 {
@@ -76,32 +123,86 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	}
 
 	private static final String OUTLINE_CONTEXT = "com.aptana.editor.common.outline"; //$NON-NLS-1$
+	private static final String INITIAL_FILTER_TEXT = Messages.CommonOutlinePage_InitialFilterText;
+	private static final int FILTER_REFRESH_DELAY = 200;
 
 	private AbstractThemeableEditor fEditor;
 
+	private Composite fMainControl;
+	private Text fSearchBox;
 	private TreeViewer fTreeViewer;
 	private CommonOutlineContentProvider fContentProvider;
 	private ILabelProvider fLabelProvider;
 
+	private PatternFilter fFilter;
+	private WorkbenchJob fFilterRefreshJob;
 	private ToggleLinkingAction fToggleLinkingAction;
 
 	private IPreferenceStore fPrefs;
-
-	private TreeThemer treeThemer;
 
 	public CommonOutlinePage(AbstractThemeableEditor editor, IPreferenceStore prefs)
 	{
 		fEditor = editor;
 		fPrefs = prefs;
 		fContentProvider = new CommonOutlineContentProvider();
-		fLabelProvider = new ThemedDelegatingLabelProvider(new LabelProvider());
+		fLabelProvider = new ThemedDelegatingLabelProvider(new CommonOutlineLabelProvider());
 	}
 
 	@Override
 	public void createControl(Composite parent)
 	{
-		fTreeViewer = new TreeViewer(parent, SWT.VIRTUAL | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		fMainControl = new Composite(parent, SWT.NONE);
+		fMainControl.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 2).create());
+		fMainControl.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		fSearchBox = new Text(fMainControl, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+		fSearchBox.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).indent(0, 3).create());
+		fSearchBox.setText(INITIAL_FILTER_TEXT);
+		fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		fSearchBox.addModifyListener(new ModifyListener()
+		{
+
+			public void modifyText(ModifyEvent e)
+			{
+				String text = fSearchBox.getText();
+				if (INITIAL_FILTER_TEXT.equals(text))
+				{
+					fFilter.setPattern(null);
+				}
+				else
+				{
+					fFilter.setPattern(text);
+				}
+				// refresh the content on a delay
+				fFilterRefreshJob.cancel();
+				fFilterRefreshJob.schedule(FILTER_REFRESH_DELAY);
+			}
+		});
+		fSearchBox.addFocusListener(new FocusListener()
+		{
+
+			public void focusLost(FocusEvent e)
+			{
+				if (fSearchBox.getText().length() == 0)
+				{
+					fSearchBox.setText(INITIAL_FILTER_TEXT);
+				}
+				fSearchBox.setForeground(fSearchBox.getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+			}
+
+			public void focusGained(FocusEvent e)
+			{
+				if (fSearchBox.getText().equals(INITIAL_FILTER_TEXT))
+				{
+					fSearchBox.setText(""); //$NON-NLS-1$
+				}
+				fSearchBox.setForeground(null);
+			}
+		});
+
+		fTreeViewer = new TreeViewer(fMainControl, SWT.VIRTUAL | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		fTreeViewer.addSelectionChangedListener(this);
+		fTreeViewer.getControl().setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		((IContextService) getSite().getService(IContextService.class)).activateContext(OUTLINE_CONTEXT);
 
@@ -112,10 +213,34 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.setLabelProvider(fLabelProvider);
 		viewer.setInput(fEditor);
 		viewer.setComparator(isSortingEnabled() ? new ViewerComparator() : null);
-		viewer.addDoubleClickListener(new IDoubleClickListener()
+		fFilter = new PatternFilter()
 		{
 
 			@Override
+			protected boolean isLeafMatch(Viewer viewer, Object element)
+			{
+				String label = null;
+				if (element instanceof CommonOutlineItem)
+				{
+					label = ((CommonOutlineItem) element).getLabel();
+				}
+				else if (element instanceof IParseNode)
+				{
+					label = ((IParseNode) element).getText();
+				}
+
+				if (label == null)
+				{
+					return true;
+				}
+				return wordMatches(label);
+			}
+		};
+		fFilter.setIncludeLeadingWildcard(true);
+		viewer.addFilter(fFilter);
+		viewer.addDoubleClickListener(new IDoubleClickListener()
+		{
+
 			public void doubleClick(DoubleClickEvent event)
 			{
 				IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -131,12 +256,10 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		viewer.getTree().addKeyListener(new KeyListener()
 		{
 
-			@Override
 			public void keyPressed(KeyEvent e)
 			{
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				if (e.keyCode == '\r' && isLinkedWithEditor())
@@ -166,16 +289,37 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		actionBars.updateActionBars();
 
 		fPrefs.addPropertyChangeListener(this);
+		fFilterRefreshJob = new WorkbenchJob("Refresh Filter") //$NON-NLS-1$
+		{
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				if (isDisposed())
+				{
+					return Status.CANCEL_STATUS;
+				}
+
+				fTreeViewer.refresh();
+				String text = fSearchBox.getText();
+				if (!StringUtil.isEmpty(text) && !INITIAL_FILTER_TEXT.equals(text))
+				{
+					fTreeViewer.expandAll();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		fFilterRefreshJob.setSystem(true);
 	}
 
 	@Override
 	public Control getControl()
 	{
-		if (fTreeViewer == null)
+		if (fMainControl == null)
 		{
 			return null;
 		}
-		return fTreeViewer.getControl();
+		return fMainControl;
 	}
 
 	@Override
@@ -197,7 +341,7 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 	@Override
 	public void setFocus()
 	{
-		fTreeViewer.getControl().setFocus();
+		getControl().setFocus();
 	}
 
 	@Override
@@ -211,20 +355,18 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private void hookToThemes()
 	{
-		treeThemer = new TreeThemer(getTreeViewer());
-		treeThemer.apply();
+		getIControlThemerFactory().apply(getTreeViewer());
 	}
 
-	protected IThemeManager getThemeManager()
+	protected IControlThemerFactory getIControlThemerFactory()
 	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
 	@Override
 	public void dispose()
 	{
-		treeThemer.dispose();
-		treeThemer = null;
+		getIControlThemerFactory().dispose(getTreeViewer());
 		fPrefs.removePropertyChangeListener(this);
 		super.dispose();
 	}
@@ -238,7 +380,6 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 		}
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
 		String property = event.getProperty();
@@ -326,8 +467,8 @@ public class CommonOutlinePage extends ContentOutlinePage implements IPropertyCh
 
 	private boolean isDisposed()
 	{
-		TreeViewer viewer = getTreeViewer();
-		return viewer == null || viewer.getControl() == null || viewer.getControl().isDisposed();
+		Control control = getControl();
+		return control == null || control.isDisposed();
 	}
 
 	private void registerActions(IActionBars actionBars)

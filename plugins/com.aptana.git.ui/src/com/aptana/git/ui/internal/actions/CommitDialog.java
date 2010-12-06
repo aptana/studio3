@@ -1,20 +1,54 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -22,6 +56,8 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.StatusDialog;
+import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -34,7 +70,6 @@ import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TableDropTargetEffect;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -56,6 +91,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -69,10 +105,11 @@ import com.aptana.git.core.model.ChangedFile;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.DiffFormatter;
 import com.aptana.git.ui.GitUIPlugin;
-import com.aptana.git.ui.actions.RevertAction;
 
-public class CommitDialog extends StatusDialog
+class CommitDialog extends StatusDialog
 {
+	private static final String CHANGED_FILE_DATA_KEY = "changedFile"; //$NON-NLS-1$
+
 	private GitRepository gitRepository;
 	private Text commitMessage;
 	private String fMessage;
@@ -86,7 +123,10 @@ public class CommitDialog extends StatusDialog
 	private Browser diffArea;
 	private ChangedFile fLastDiffFile;
 
-	public CommitDialog(Shell parentShell, GitRepository gitRepository)
+	private StagingButtons unstageButtons;
+	private StagingButtons stageButtons;
+
+	protected CommitDialog(Shell parentShell, GitRepository gitRepository)
 	{
 		super(parentShell);
 		Assert.isNotNull(gitRepository, "Must have a non-null git repository!"); //$NON-NLS-1$
@@ -114,7 +154,8 @@ public class CommitDialog extends StatusDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite container = (Composite) super.createDialogArea(parent);
-		parent.getShell().setText(Messages.CommitDialog_Changes);
+		parent.getShell().setText(
+				MessageFormat.format(Messages.CommitDialog_Changes, this.gitRepository.currentBranch()));
 
 		container.setLayout(new GridLayout(1, true));
 
@@ -135,14 +176,36 @@ public class CommitDialog extends StatusDialog
 		validate();
 		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 		{
-			@Override
 			public void run()
 			{
 				packTable(stagedTable);
 				packTable(unstagedTable);
+				// Select the first item in staged if there is one
+				if (unstagedTable.getItemCount() > 0)
+				{
+					unstagedTable.select(0);
+					ChangedFile file = getChangedFile(unstagedTable.getItem(0));
+					updateDiff(false, file);
+					stageButtons.updateSelectionButton();
+				}
+				else if (stagedTable.getItemCount() > 0)
+				{
+					stagedTable.select(0);
+					ChangedFile file = getChangedFile(stagedTable.getItem(0));
+					updateDiff(true, file);
+					unstageButtons.updateSelectionButton();
+				}
 			}
 		});
 		return container;
+	}
+
+	@Override
+	public void create()
+	{
+		super.create();
+		// forces initial validation when the dialog first comes up
+		validate();
 	}
 
 	/**
@@ -204,6 +267,7 @@ public class CommitDialog extends StatusDialog
 					Messages.CommitDialog_UnstageSelected);
 			createTableComposite(composite, staged);
 			buttons.setTable(stagedTable, staged);
+			unstageButtons = buttons;
 		}
 		else
 		{
@@ -212,6 +276,7 @@ public class CommitDialog extends StatusDialog
 					Messages.CommitDialog_StageAll, Messages.CommitDialog_StageSelectedMarker,
 					Messages.CommitDialog_StageSelected);
 			buttons.setTable(unstagedTable, staged);
+			stageButtons = buttons;
 		}
 	}
 
@@ -310,7 +375,7 @@ public class CommitDialog extends StatusDialog
 		// Drag and Drop
 		// FIXME If user drags and drops while we're still crunching on last drag/drop then we end up hanging
 		// Seems to be related to manipulating the table here before we receive the index changed callback
-		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		Transfer[] types = new Transfer[] { LocalSelectionTransfer.getTransfer() };
 
 		// Drag Source
 		DragSource source = new DragSource(table, DND.DROP_MOVE);
@@ -321,23 +386,15 @@ public class CommitDialog extends StatusDialog
 			{
 				DragSource ds = (DragSource) event.widget;
 				draggingFromTable = ds.getControl();
+
+				LocalSelectionTransfer.getTransfer().setSelection(
+						new StructuredSelection(((Table) draggingFromTable).getSelection()));
+				LocalSelectionTransfer.getTransfer().setSelectionSetTime(event.time & 0xFFFFFFFFL);
 			}
 
 			public void dragSetData(DragSourceEvent event)
 			{
-				// Get the selected items in the drag source
-				DragSource ds = (DragSource) event.widget;
-				Table table = (Table) ds.getControl();
-				TableItem[] selection = table.getSelection();
-				// Create a comma separated string of the paths of the changed files we're dragging
-				StringBuffer buff = new StringBuffer();
-				for (int i = 0, n = selection.length; i < n; i++)
-				{
-					buff.append(selection[i].getText(1)).append(","); //$NON-NLS-1$
-				}
-				if (buff.length() > 0)
-					buff.deleteCharAt(buff.length() - 1);
-				event.data = buff.toString();
+				// do nothing
 			}
 		});
 
@@ -362,7 +419,7 @@ public class CommitDialog extends StatusDialog
 				// Allow dropping text only
 				for (int i = 0, n = event.dataTypes.length; i < n; i++)
 				{
-					if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i]))
+					if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataTypes[i]))
 					{
 						event.currentDataType = event.dataTypes[i];
 					}
@@ -375,31 +432,14 @@ public class CommitDialog extends StatusDialog
 				event.feedback = DND.FEEDBACK_SCROLL;
 			}
 
+			@SuppressWarnings("unchecked")
 			public void drop(DropTargetEvent event)
 			{
-				if (!TextTransfer.getInstance().isSupportedType(event.currentDataType))
+				if (!LocalSelectionTransfer.getTransfer().isSupportedType(event.currentDataType))
 					return;
 				// Get the dropped data
-				String data = (String) event.data;
-				// Translate the comma delimited paths back into the matching ChangedFile objects
-				Map<String, ChangedFile> draggedFiles = new HashMap<String, ChangedFile>();
-				StringTokenizer tokenizer = new StringTokenizer(data, ","); //$NON-NLS-1$
-				while (tokenizer.hasMoreTokens())
-				{
-					String path = tokenizer.nextToken();
-					ChangedFile changedFile = findChangedFile(path);
-					draggedFiles.put(path, changedFile);
-				}
-
-				// Actually stage or unstage the files
-				if (staged)
-				{
-					stageFiles(draggedFiles);
-				}
-				else
-				{
-					unstageFiles(draggedFiles);
-				}
+				IStructuredSelection selection = (IStructuredSelection) event.data;
+				moveItems(!staged, ((List<TableItem>) selection.toList()).toArray(new TableItem[selection.size()]));
 			}
 		});
 
@@ -412,8 +452,7 @@ public class CommitDialog extends StatusDialog
 				if (e.item == null)
 					return;
 				TableItem item = (TableItem) e.item;
-				String filePath = item.getText(1);
-				updateDiff(staged, filePath);
+				updateDiff(staged, getChangedFile(item));
 			}
 		});
 		// Allow double-clicking to toggle staged/unstaged
@@ -453,7 +492,6 @@ public class CommitDialog extends StatusDialog
 		table.addListener(SWT.EraseItem, new Listener()
 		{
 
-			@Override
 			public void handleEvent(Event event)
 			{
 				// Only draw the text custom
@@ -466,7 +504,6 @@ public class CommitDialog extends StatusDialog
 		table.addListener(SWT.PaintItem, new Listener()
 		{
 
-			@Override
 			public void handleEvent(Event event)
 			{
 				// Only draw the text custom
@@ -524,55 +561,66 @@ public class CommitDialog extends StatusDialog
 			{
 				public void menuAboutToShow(IMenuManager manager)
 				{
-
 					TableItem[] selected = myTable.getSelection();
 					List<IResource> files = new ArrayList<IResource>();
-					final List<String> filePaths = new ArrayList<String>();
+					final List<ChangedFile> changedFiles = new ArrayList<ChangedFile>();
 					for (TableItem item : selected)
 					{
-						String filePath = item.getText(1);
-
-						IPath workingDirectory = gitRepository.workingDirectory();
-
-						IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(
-								workingDirectory.append(filePath));
+						ChangedFile file = getChangedFile(item);
 						if (file != null)
 						{
-							files.add(file);
-							filePaths.add(filePath);
+							changedFiles.add(file);
+							IFile iFile = gitRepository.getFileForChangedFile(file);
+							if (iFile != null)
+							{
+								files.add(iFile);
+							}
 						}
 					}
-					RevertAction revertAction = new RevertAction()
-					{
-						// need to remove the file(s) from staged table once action runs
-						@Override
-						protected void doOperation(GitRepository repo, final List<ChangedFile> changedFiles)
-						{
-							super.doOperation(repo, changedFiles);
-							PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+					
+					ContributionItem ci = new ContributionItem() {
+						public void fill(Menu menu, int index) {
+							MenuItem item = new MenuItem(menu, SWT.NONE);
+							item.setText(Messages.CommitDialog_RevertLabel);
+							// need to remove the file(s) from staged table once action runs
+							item.addSelectionListener(new SelectionAdapter()
 							{
-
 								@Override
-								public void run()
+								public void widgetSelected(SelectionEvent e)
 								{
-									// If this file was shown in diff area, we need to blank the diff area!
-									if (fLastDiffFile != null)
+									// need to make a copy because operation will actually change input files.
+									final List<ChangedFile> copy = new ArrayList<ChangedFile>(changedFiles);
+									for (ChangedFile cf : changedFiles)
 									{
-										for (ChangedFile file : changedFiles)
-										{
-											if (file != null && file.equals(fLastDiffFile))
-											{
-												updateDiff(null, Messages.CommitDialog_NoFileSelected);
-											}
-										}
+										copy.add(new ChangedFile(cf));
 									}
-									removeDraggedFilesFromSource(unstagedTable, filePaths);
+									
+									gitRepository.index().discardChangesForFiles(changedFiles);
+									
+									PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
+									{
+
+										public void run()
+										{
+											// If this file was shown in diff area, we need to blank the diff area!
+											if (fLastDiffFile != null)
+											{
+												for (ChangedFile file : copy)
+												{
+													if (file != null && file.equals(fLastDiffFile))
+													{
+														updateDiff(null, Messages.CommitDialog_NoFileSelected);
+													}
+												}
+											}
+											removeDraggedFilesFromSource(unstagedTable, copy);
+										}
+									});
 								}
 							});
 						}
-					};
-					revertAction.selectionChanged(null, new StructuredSelection(files));
-					manager.add(revertAction);
+			    	};
+					manager.add(ci);
 					// Other plug-ins can contribute there actions here
 					manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 				}
@@ -584,19 +632,64 @@ public class CommitDialog extends StatusDialog
 		return table;
 	}
 
-	protected synchronized void unstageFiles(final Map<String, ChangedFile> files)
+	private synchronized void unstageFiles(final Collection<ChangedFile> files)
 	{
-		toggleStageStatus(files, false);
-		gitRepository.index().unstageFiles(files.values());
+		// TODO Add a listener to the repo on creation and have toggleStageStatus get invoked with diff!
+		// Temporarily disable the tables
+		stagedTable.setEnabled(false);
+		unstagedTable.setEnabled(false);
+		// make a copy so we can erase from original table correctly since their flags get changed by operation
+		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
+		Collections.copy(copy, new ArrayList<ChangedFile>(files));
+		if (gitRepository.index().unstageFiles(files))
+		{
+			getParentShell().getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					toggleStageStatus(copy, false);
+					stagedTable.setEnabled(true);
+					unstagedTable.setEnabled(true);
+				}
+			});
+		}
+		else
+		{
+			stagedTable.setEnabled(true);
+			unstagedTable.setEnabled(true);
+		}
 	}
 
-	protected synchronized void stageFiles(final Map<String, ChangedFile> files)
+	private synchronized void stageFiles(final Collection<ChangedFile> files)
 	{
-		toggleStageStatus(files, true);
-		gitRepository.index().stageFiles(files.values());
+		// Temporarily disable the tables
+		stagedTable.setEnabled(false);
+		unstagedTable.setEnabled(false);
+		// make a copy so we can erase from original table correctly since their flags get changed by operation
+		final List<ChangedFile> copy = new ArrayList<ChangedFile>(files);
+		Collections.copy(copy, new ArrayList<ChangedFile>(files));
+		if (gitRepository.index().stageFiles(files))
+		{
+			getParentShell().getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					toggleStageStatus(copy, true);
+					stagedTable.setEnabled(true);
+					unstagedTable.setEnabled(true);
+				}
+			});
+		}
+		else
+		{
+			stagedTable.setEnabled(true);
+			unstagedTable.setEnabled(true);
+		}
 	}
 
-	private void toggleStageStatus(Map<String, ChangedFile> files, boolean stage)
+	private void toggleStageStatus(Collection<ChangedFile> files, boolean stage)
 	{
 		Table to = stagedTable;
 		Table from = unstagedTable;
@@ -606,14 +699,14 @@ public class CommitDialog extends StatusDialog
 			to = unstagedTable;
 		}
 		to.setRedraw(false);
-		for (ChangedFile changedFile : files.values())
+		for (ChangedFile changedFile : files)
 		{
 			createTableItem(to, changedFile, true); // add it to our new table
 		}
 		packTable(to);
 		to.setRedraw(true);
-		to.redraw();
-		removeDraggedFilesFromSource(from, files.keySet());
+		// to.redraw();
+		removeDraggedFilesFromSource(from, files);
 		workaroundEmptyTableDropEffectBug(from);
 		validate();
 	}
@@ -622,12 +715,11 @@ public class CommitDialog extends StatusDialog
 	 * Update the diff area.
 	 * 
 	 * @param staged
-	 * @param filePath
+	 * @param file
 	 * @see #updateDiff(ChangedFile, String)
 	 */
-	private void updateDiff(final boolean staged, String filePath)
+	private void updateDiff(final boolean staged, ChangedFile file)
 	{
-		ChangedFile file = findChangedFile(filePath);
 		if (file == null)
 			return;
 		if (gitRepository.index().hasBinaryAttributes(file) && !file.getStatus().equals(ChangedFile.Status.DELETED))
@@ -667,7 +759,7 @@ public class CommitDialog extends StatusDialog
 	 * @param diff
 	 * @see #updateDiff(boolean, String)
 	 */
-	protected void updateDiff(ChangedFile file, String diff)
+	private void updateDiff(ChangedFile file, String diff)
 	{
 		if (diffArea != null && !diffArea.isDisposed())
 		{
@@ -676,18 +768,13 @@ public class CommitDialog extends StatusDialog
 		}
 	}
 
-	protected ChangedFile findChangedFile(String path)
-	{
-		return gitRepository.index().findChangedFile(path);
-	}
-
 	/**
 	 * Creates a table item for a ChangedFile in Git
 	 * 
 	 * @param table
 	 * @param file
 	 */
-	protected void createTableItem(Table table, ChangedFile file, boolean sort)
+	private void createTableItem(Table table, ChangedFile file, boolean sort)
 	{
 		TableItem item = null;
 		if (sort)
@@ -726,6 +813,7 @@ public class CommitDialog extends StatusDialog
 		// item.setText(0, text);
 		item.setImage(0, image);
 		item.setText(1, file.getPath());
+		item.setData(CHANGED_FILE_DATA_KEY, file);
 	}
 
 	private void packTable(Table table)
@@ -741,9 +829,9 @@ public class CommitDialog extends StatusDialog
 		}
 	}
 
-	protected void validate()
+	private void validate()
 	{
-		if (commitMessage.getText().length() < 3)
+		if (commitMessage.getText().length() < 1)
 		{
 			updateStatus(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), Messages.CommitDialog_EnterMessage_Error));
 			return;
@@ -784,14 +872,28 @@ public class CommitDialog extends StatusDialog
 	 * @param sourceTable
 	 * @param draggedFiles
 	 */
-	protected void removeDraggedFilesFromSource(Table sourceTable, Collection<String> draggedFiles)
+	private void removeDraggedFilesFromSource(Table sourceTable, Collection<ChangedFile> draggedFiles)
 	{
-		List<Integer> toRemove = new ArrayList<Integer>();
+		if (draggedFiles == null || draggedFiles.isEmpty())
+		{
+			return;
+		}
 		TableItem[] items = sourceTable.getItems();
+		if (draggedFiles.size() == items.length)
+		{
+			// shortcut for moving all
+			sourceTable.setRedraw(false);
+			sourceTable.removeAll();
+			packTable(sourceTable);
+			sourceTable.setRedraw(true);
+			return;
+		}
+
+		List<Integer> toRemove = new ArrayList<Integer>();
 		for (int i = 0; i < items.length; i++)
 		{
 			TableItem item = items[i];
-			if (draggedFiles.contains(item.getText(1)))
+			if (draggedFiles.contains(getChangedFile(item)))
 			{
 				toRemove.add(i);
 			}
@@ -807,6 +909,11 @@ public class CommitDialog extends StatusDialog
 		packTable(sourceTable);
 		sourceTable.setRedraw(true);
 		sourceTable.redraw();
+	}
+
+	private ChangedFile getChangedFile(TableItem item)
+	{
+		return (ChangedFile) item.getData(CHANGED_FILE_DATA_KEY);
 	}
 
 	/**
@@ -840,16 +947,15 @@ public class CommitDialog extends StatusDialog
 	 * @param staged
 	 * @param selected
 	 */
-	private void moveItems(final boolean staged, TableItem[] selected)
+	private void moveItems(final boolean staged, TableItem... selected)
 	{
-		Map<String, ChangedFile> selectedFiles = new HashMap<String, ChangedFile>();
+		Set<ChangedFile> selectedFiles = new HashSet<ChangedFile>();
 		for (TableItem item : selected)
 		{
-			String path = item.getText(1);
-			ChangedFile file = findChangedFile(path);
+			ChangedFile file = getChangedFile(item);
 			if (file == null)
 				continue;
-			selectedFiles.put(path, file);
+			selectedFiles.add(file);
 		}
 		if (selectedFiles.isEmpty())
 			return;
@@ -944,12 +1050,10 @@ public class CommitDialog extends StatusDialog
 			comp.setLayoutData(data);
 		}
 
-		@Override
 		public void widgetDefaultSelected(SelectionEvent e)
 		{
 		}
 
-		@Override
 		public void widgetSelected(SelectionEvent e)
 		{
 			Object source = e.getSource();
@@ -998,8 +1102,8 @@ public class CommitDialog extends StatusDialog
 				{
 					table.select(table.getItemCount() - 1);
 				}
-				String filePath = table.getSelection()[0].getText(1);
-				updateDiff(!staged, filePath);
+				ChangedFile file = getChangedFile(table.getSelection()[0]);
+				updateDiff(staged, file);
 			}
 			else
 			{

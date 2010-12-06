@@ -1,38 +1,60 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.sass;
-
-import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 
-import com.aptana.editor.sass.SassCodeScanner;
+import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
 @SuppressWarnings("nls")
-public class SassCodeScannerTest extends TestCase
+public class SassCodeScannerTest extends AbstractTokenScannerTestCase
 {
-
-	private SassCodeScanner scanner;
-
 	@Override
-	protected void setUp() throws Exception
+	protected ITokenScanner createTokenScanner()
 	{
-		super.setUp();
-		scanner = new SassCodeScanner()
+		return new SassCodeScanner()
 		{
 			protected IToken createToken(String string)
 			{
-				return getToken(string);
+				return SassCodeScannerTest.this.getToken(string);
 			};
 		};
-	}
-
-	@Override
-	protected void tearDown() throws Exception
-	{
-		scanner = null;
-		super.tearDown();
 	}
 
 	public void testH1Through6()
@@ -47,12 +69,10 @@ public class SassCodeScannerTest extends TestCase
 			assertToken(Token.WHITESPACE, i + 2, 1);
 		}
 	}
-	
+
 	public void testCSS3PropertyNames()
 	{
-		String src = "border-radius: 1px\n" +
-				"border-image-width: 1px\n" +
-				"box-decoration-break: clone";
+		String src = "border-radius: 1px\n" + "border-image-width: 1px\n" + "box-decoration-break: clone";
 		IDocument document = new Document(src);
 		scanner.setRange(document, 0, src.length());
 
@@ -72,9 +92,9 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 63, 1);
 		assertToken(Token.WHITESPACE, 64, 1);
 	}
-	
+
 	// FIXME Test actual Sass, not CSS!
-	
+
 	public void testSmallCaps()
 	{
 		String src = "small { font: small-caps; }";
@@ -93,7 +113,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 25, 1);
 		assertToken(getToken("punctuation.section.property-list.css"), 26, 1);
 	}
-	
+
 	public void testVariableDefinition()
 	{
 		String src = "!blue = #3bbfce";
@@ -106,7 +126,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 7, 1);
 		assertToken(getToken("constant.other.color.rgb-value.css"), 8, 7);
 	}
-	
+
 	public void testVariableUsage()
 	{
 		String src = ".content_navigation\n  border-color = !blue";
@@ -121,7 +141,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 36, 1);
 		assertToken(getToken("variable.other.sass"), 37, 5);
 	}
-	
+
 	public void testMixinDefinition()
 	{
 		String src = "=table-scaffolding\n  th\n    text-align: center";
@@ -137,7 +157,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(Token.WHITESPACE, 39, 1);
 		assertToken(getToken("support.constant.property-value.css"), 40, 6);
 	}
-	
+
 	public void testMixinUsage()
 	{
 		String src = "#data\n  +table-scaffolding";
@@ -147,7 +167,7 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("entity.other.attribute-name.id.css"), 0, 5);
 		assertToken(Token.WHITESPACE, 5, 3);
 		assertToken(getToken("variable.other.sass"), 8, 18);
-	}	
+	}
 
 	public void testBasicTokenizing()
 	{
@@ -197,8 +217,8 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 25, 1);
 		assertToken(Token.WHITESPACE, 26, 1);
 		assertToken(getToken("support.function.misc.css"), 27, 3);
-		assertToken(getToken("punctuation.section.function.css"), 30, 2);
-//		assertToken(getToken("punctuation.section.function.css"), 31, 1);
+		assertToken(getToken("punctuation.section.function.css"), 30, 1);
+		assertToken(getToken("punctuation.section.function.css"), 31, 1);
 		assertToken(getToken("punctuation.terminator.rule.css"), 32, 1);
 		assertToken(Token.WHITESPACE, 33, 3);
 		// line 3
@@ -227,16 +247,16 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.separator.key-value.css"), 139, 1);
 		assertToken(Token.WHITESPACE, 140, 1);
 		assertToken(getToken("support.constant.font-name.css"), 141, 7);
-		assertToken(getToken(null), 148, 1);
+		assertToken(getToken("punctuation.separator.css"), 148, 1);
 		assertToken(Token.WHITESPACE, 149, 1);
 		assertToken(getToken("support.constant.font-name.css"), 150, 6);
-		assertToken(getToken(null), 156, 1);
+		assertToken(getToken("punctuation.separator.css"), 156, 1);
 		assertToken(Token.WHITESPACE, 157, 1);
 		assertToken(getToken("support.constant.font-name.css"), 158, 5);
-		assertToken(getToken(null), 163, 1);
+		assertToken(getToken("punctuation.separator.css"), 163, 1);
 		assertToken(Token.WHITESPACE, 164, 1);
 		assertToken(getToken("support.constant.font-name.css"), 165, 9);
-		assertToken(getToken(null), 174, 1);
+		assertToken(getToken("punctuation.separator.css"), 174, 1);
 		assertToken(Token.WHITESPACE, 175, 1);
 		assertToken(getToken("support.constant.font-name.css"), 176, 10);
 		assertToken(getToken("punctuation.terminator.rule.css"), 186, 1);
@@ -307,17 +327,5 @@ public class SassCodeScannerTest extends TestCase
 		assertToken(getToken("punctuation.section.property-list.css"), 336, 1);
 		assertToken(Token.WHITESPACE, 337, 3);
 		// line 20
-	}
-
-	private IToken getToken(String string)
-	{
-		return new Token(string);
-	}
-
-	private void assertToken(IToken token, int offset, int length)
-	{
-		assertEquals(token.getData(), scanner.nextToken().getData());
-		assertEquals(offset, scanner.getTokenOffset());
-		assertEquals(length, scanner.getTokenLength());
 	}
 }

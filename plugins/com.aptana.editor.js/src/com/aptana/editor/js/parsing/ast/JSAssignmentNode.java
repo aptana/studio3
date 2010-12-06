@@ -1,10 +1,48 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.parsing.ast;
+
+import beaver.Symbol;
 
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.parsing.ast.IParseNode;
 
 public class JSAssignmentNode extends JSNode
 {
+	private Symbol _operator;
+
 	/**
 	 * JSAssignmentNode
 	 * 
@@ -12,13 +50,13 @@ public class JSAssignmentNode extends JSNode
 	 * @param assignOperator
 	 * @param right
 	 */
-	public JSAssignmentNode(JSNode left, String assignOperator, JSNode right)
+	public JSAssignmentNode(JSNode left, Symbol assignOperator, JSNode right)
 	{
-		this.start = left.getStart();
-		this.end = right.getEnd();
+		this._operator = assignOperator;
 
 		short type = DEFAULT_TYPE;
-		JSTokenType token = JSTokenType.get(assignOperator);
+		JSTokenType token = JSTokenType.get((String) assignOperator.value);
+
 		switch (token)
 		{
 			case EQUAL:
@@ -58,67 +96,48 @@ public class JSAssignmentNode extends JSNode
 				type = JSNodeTypes.SUBTRACT_AND_ASSIGN;
 				break;
 		}
-		setType(type);
 
-		setChildren(new JSNode[] { left, right });
+		this.setNodeType(type);
+		this.setChildren(new JSNode[] { left, right });
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.parsing.ast.JSNode#toString()
+	 * @see com.aptana.editor.js.parsing.ast.JSNode#accept(com.aptana.editor.js.parsing.ast.JSTreeWalker)
 	 */
 	@Override
-	public String toString()
+	public void accept(JSTreeWalker walker)
 	{
-		StringBuilder text = new StringBuilder();
-		String operator = "???"; //$NON-NLS-1$
-		switch (getType())
-		{
-			case JSNodeTypes.ASSIGN:
-				operator = "="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.ADD_AND_ASSIGN:
-				operator = "+="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.ARITHMETIC_SHIFT_RIGHT_AND_ASSIGN:
-				operator = ">>>="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_AND_AND_ASSIGN:
-				operator = "&="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_OR_AND_ASSIGN:
-				operator = "|="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.BITWISE_XOR_AND_ASSIGN:
-				operator = "^="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.DIVIDE_AND_ASSIGN:
-				operator = "/="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.MOD_AND_ASSIGN:
-				operator = "%="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.MULTIPLY_AND_ASSIGN:
-				operator = "*="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SHIFT_LEFT_AND_ASSIGN:
-				operator = "<<="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SHIFT_RIGHT_AND_ASSIGN:
-				operator = ">>="; //$NON-NLS-1$
-				break;
-			case JSNodeTypes.SUBTRACT_AND_ASSIGN:
-				operator = "-="; //$NON-NLS-1$
-				break;
+		walker.visit(this);
+	}
 
-		}
-		IParseNode[] children = getChildren();
-		text.append(children[0]);
-		text.append(" ").append(operator).append(" "); //$NON-NLS-1$ //$NON-NLS-2$
-		text.append(children[1]);
+	/**
+	 * getLeftHandSide
+	 * 
+	 * @return
+	 */
+	public IParseNode getLeftHandSide()
+	{
+		return this.getChild(0);
+	}
 
-		this.appendSemicolon(text);
+	/**
+	 * getOperator
+	 * 
+	 * @return
+	 */
+	public Symbol getOperator()
+	{
+		return this._operator;
+	}
 
-		return text.toString();
+	/**
+	 * getRightHandSide
+	 * 
+	 * @return
+	 */
+	public IParseNode getRightHandSide()
+	{
+		return this.getChild(1);
 	}
 }

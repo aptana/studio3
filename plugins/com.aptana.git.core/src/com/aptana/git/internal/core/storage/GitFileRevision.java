@@ -25,7 +25,8 @@ import org.eclipse.team.core.history.provider.FileRevision;
 public abstract class GitFileRevision extends FileRevision
 {
 
-	protected final String path;
+	private static final String DEV_NULL = "/dev/null"; //$NON-NLS-1$
+	private final String path;
 
 	GitFileRevision(final String fileName)
 	{
@@ -34,6 +35,10 @@ public abstract class GitFileRevision extends FileRevision
 
 	public String getName()
 	{
+		if (path.equals(DEV_NULL))
+		{
+			return path;
+		}
 		final int last = path.lastIndexOf(File.separator);
 		return last >= 0 ? path.substring(last + 1) : path;
 	}
@@ -58,5 +63,22 @@ public abstract class GitFileRevision extends FileRevision
 		{
 			return null;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof GitFileRevision)
+		{
+			GitFileRevision other = (GitFileRevision) obj;
+			return other.path.equals(path);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return path.hashCode();
 	}
 }

@@ -8,7 +8,7 @@
             class="com.aptana.editor.xml.XMLEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
-            extensions="xml,tld,pt,cpt,dtml,rss,opml"
+            extensions="tld,pt,cpt,dtml,rss,opml"
             id="com.aptana.editor.xml"
             name="%editor.xml.name">
          <contentTypeBinding
@@ -26,6 +26,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.xml.parsing.XMLParser"
+            content-type="com.aptana.contenttype.xml"
             language="text/xml">
       </parser>
    </extension>

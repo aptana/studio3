@@ -43,15 +43,14 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
+import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WhitespaceRule;
 import org.eclipse.jface.text.rules.WordRule;
 
-import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.CharacterMapRule;
 import com.aptana.editor.common.text.rules.ExtendedWordRule;
 import com.aptana.editor.common.text.rules.RegexpRule;
-import com.aptana.editor.common.text.rules.SingleCharacterRule;
 import com.aptana.editor.common.text.rules.WhitespaceDetector;
-import com.aptana.editor.common.theme.IThemeManager;
 
 public class XMLTagScanner extends RuleBasedScanner
 {
@@ -73,13 +72,11 @@ public class XMLTagScanner extends RuleBasedScanner
 		WordRule wordRule = new ExtendedWordRule(new IWordDetector()
 		{
 
-			@Override
 			public boolean isWordPart(char c)
 			{
 				return Character.isLetter(c) || c == '-' || c == ':';
 			}
 
-			@Override
 			public boolean isWordStart(char c)
 			{
 				return Character.isLetter(c);
@@ -96,8 +93,11 @@ public class XMLTagScanner extends RuleBasedScanner
 		};
 		rules.add(wordRule);
 
-		rules.add(new SingleCharacterRule('>', createToken("punctuation.definition.tag.xml"))); //$NON-NLS-1$
-		rules.add(new SingleCharacterRule('=', createToken("punctuation.separator.key-value.xml"))); //$NON-NLS-1$
+		CharacterMapRule rule = new CharacterMapRule();
+		rule.add('>', createToken("punctuation.definition.tag.xml")); //$NON-NLS-1$
+		rule.add('=', createToken("punctuation.separator.key-value.xml")); //$NON-NLS-1$
+		rules.add(rule);
+		// FIXME Use a word/extend word rule here to avoid slow regexp rule?
 		rules.add(new RegexpRule("<(/)?", createToken("punctuation.definition.tag.xml"), true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Tag names
@@ -109,12 +109,7 @@ public class XMLTagScanner extends RuleBasedScanner
 
 	protected IToken createToken(String string)
 	{
-		return getThemeManager().getToken(string);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(string);
 	}
 
 	/**

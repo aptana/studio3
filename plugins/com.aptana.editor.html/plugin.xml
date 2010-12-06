@@ -41,26 +41,86 @@
    </extension>
 
    <extension
-         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
-      <hyperlinkDetector
-            activate="true"
-            class="com.aptana.editor.html.HyperlinkDetector"
-            id="com.aptana.editor.html.hyperlinkDetector"
-            name="%hyperlinkDetector.name"
-            targetId="com.aptana.editor.html">
-      </hyperlinkDetector>
-   </extension>
-   <extension
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.html.contentassist.index.HTMLFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.html">
+         </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
    <extension
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.html.parsing.HTMLParser"
+            content-type="com.aptana.contenttype.html"
             language="text/html">
       </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.html.text.hyperlink.CSSClassHyperlinkDetector"
+            id="com.aptana.editor.html.hyperlinkDetector"
+            name="%hyperlinkDetector.cssclass.name"
+            targetId="com.aptana.editor.html">
+      </hyperlinkDetector>
+   </extension>
+   <extension
+         point="com.aptana.preview.editors">
+      <editor
+            targetId="com.aptana.editor.html">
+         <previewDelegate
+               class="com.aptana.editor.html.preview.HTMLEditorPreviewDelegate">
+         </previewDelegate>
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="com.aptana.html.tagPair.occurrences"
+            colorPreferenceKey="htmlTagPairOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="htmlTagPairOccurrenceIndicationHighlighting"
+            highlightPreferenceValue="true"
+            isGoToNextNavigationTarget="true"
+            isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
+            isGoToPreviousNavigationTarget="true"
+            isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
+            label="%specification.tagpair.label"
+            overviewRulerPreferenceKey="htmlTagPairOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="showOccurrenceInNextPrevDropdownToolbarAction"
+            textPreferenceKey="htmlTagPairOccurrenceIndication"
+            textPreferenceValue="false"
+            textStylePreferenceKey="htmlTagPairOccurrenceIndicationTextStyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="htmlTagPairOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.html.tagPair.occurrences"
+            super="com.aptana.editor.common.occurrence">
+      </type>
+   </extension>
+   <extension
+         point="com.aptana.editor.common.validator">
+      <language
+            name="%validator.language.html.name"
+            type="text/html">
+      </language>
+      <validator
+            class="com.aptana.editor.html.validator.HTMLTidyValidator"
+            language="text/html"
+            name="%validator.tidy.name">
+      </validator>
    </extension>
 </plugin>

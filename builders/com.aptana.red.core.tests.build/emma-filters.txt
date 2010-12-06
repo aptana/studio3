@@ -3,3 +3,6 @@
 -*Messages
 -net.contentobjects.*
 -com.aptana.red.core.tests.all.*
+-com.aptana.editor.epl.tests.*
+-com.aptana.editor.js.tests.*
+-cef.*

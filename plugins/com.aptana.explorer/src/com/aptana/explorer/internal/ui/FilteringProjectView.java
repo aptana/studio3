@@ -1,12 +1,51 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.explorer.internal.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
@@ -16,10 +55,16 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -27,10 +72,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -42,6 +90,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IMemento;
@@ -49,9 +99,13 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+
 import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
+import com.aptana.explorer.ui.filter.PathFilter;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * Adds focus filtering and a free form text filter to the Project view.
@@ -60,6 +114,15 @@ import com.aptana.explorer.ExplorerPlugin;
  */
 public class FilteringProjectView extends GitProjectView
 {
+	/**
+	 * Attribute/element names for filter extensions.
+	 */
+	private static final String ELEMENT_PRIORITY = "priority"; //$NON-NLS-1$
+	private static final String ELEMENT_CLASS = "class"; //$NON-NLS-1$
+	private static final String ELEMENT_NATURE = "nature"; //$NON-NLS-1$
+	private static final String FILTERS_EXT_PT_ID = "filters"; //$NON-NLS-1$
+	private static final String ELEMENT_FILTER = "filter"; //$NON-NLS-1$
+
 	/**
 	 * Memento names for saving state of view and restoring it across launches.
 	 */
@@ -77,9 +140,12 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	private static final long SOFT_MAX_EXPAND_TIME = 200;
 
-	private String currentFilterText = ""; //$NON-NLS-1$
-
-	private PathFilter patternFilter;
+	private IResource currentFilter = null;
+	/**
+	 * Determine if we're searching by filename or content in the search text box.
+	 */
+	private boolean fFilenameSearchMode;
+	private AbstractResourceBasedViewerFilter patternFilter;
 	private WorkbenchJob refreshJob;
 
 	/**
@@ -99,6 +165,16 @@ public class FilteringProjectView extends GitProjectView
 	private Map<IProject, List<String>> projectExpansions;
 	private Map<IProject, List<String>> projectSelections;
 	private Map<IProject, String> projectFilters;
+	private ArrayList<IConfigurationElement> fgElements;
+	/**
+	 * The special filter used to filter the view when search is done for filename.
+	 */
+	private PathFilter filenameFilter;
+	/**
+	 * Special boolean for us to tell whether we use our special filename filter or use the hover filter.
+	 */
+	private boolean filterViaSearch;
+	private SearchComposite search;
 
 	/**
 	 * Constructs a new FilteringProjectView.
@@ -120,7 +196,6 @@ public class FilteringProjectView extends GitProjectView
 		customComposite.setLayout(gridLayout);
 
 		super.createPartControl(customComposite);
-		patternFilter = new PathFilter();
 		createRefreshJob();
 
 		// Add eyeball hover
@@ -230,11 +305,16 @@ public class FilteringProjectView extends GitProjectView
 		}
 		projectExpansions.put(project, expanded);
 		projectSelections.put(project, selected);
-	
-		String filter = getFilterString();
+
+		// FIXME Need to store filters in a way that we can store the filename search filter too!
+		IResource filter = getFilterResource();
 		if (filter != null)
 		{
-			projectFilters.put(project, filter);
+			projectFilters.put(project, filter.getLocation().toPortableString());
+		}
+		else
+		{
+			projectFilters.remove(project);
 		}
 	}
 
@@ -281,12 +361,12 @@ public class FilteringProjectView extends GitProjectView
 				if (e.x >= lastDrawnX && e.x <= lastDrawnX + eyeball.getBounds().width)
 				{
 					// Ok, now we need to turn on the filter!
-					String text = getResourceNameToFilterBy();
+					IResource text = getResourceToFilterBy();
 					if (text != null)
 					{
 						fExpandedElements = getCommonViewer().getExpandedElements();
 						hoveredItem = null;
-						setFilterText(text);
+						setFilter(text);
 					}
 				}
 			}
@@ -366,7 +446,7 @@ public class FilteringProjectView extends GitProjectView
 					int endOfItemX = hoveredItem.getBounds().width + hoveredItem.getBounds().x;
 					lastDrawnX = Math.max(endOfClientAreaX, endOfItemX) - (IMAGE_MARGIN + eyeball.getBounds().width);
 					int itemHeight = tree.getItemHeight();
-					int imageHeight = eyeball.getBounds().height;					
+					int imageHeight = eyeball.getBounds().height;
 					int y = hoveredItem.getBounds().y + (itemHeight - imageHeight) / 2;
 					event.gc.drawImage(eyeball, lastDrawnX, y);
 				}
@@ -404,7 +484,7 @@ public class FilteringProjectView extends GitProjectView
 	@Override
 	protected void removeFilter()
 	{
-		clearText();
+		clearFilter();
 		super.removeFilter();
 	}
 
@@ -440,7 +520,8 @@ public class FilteringProjectView extends GitProjectView
 		for (IProject project : projects)
 		{
 			if (project.isAccessible()
-					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters.get(project) == null))
+					&& !(projectExpansions.get(project).isEmpty() && projectSelections.get(project).isEmpty() && projectFilters
+							.get(project) == null))
 			{
 				IMemento projectMemento = memento.createChild(TAG_PROJECT);
 				projectMemento.putString(KEY_NAME, project.getName());
@@ -520,17 +601,20 @@ public class FilteringProjectView extends GitProjectView
 		List<String> expansions = projectExpansions.get(project);
 		List<String> selections = projectSelections.get(project);
 		viewer.getControl().setRedraw(false);
+		// FIXME Reconstruct filter into IResource
 		String filter = projectFilters.get(project);
 		if (filter == null || filter.length() == 0)
 		{
-			if (currentFilterText != null && currentFilterText.length() > 0)
+			if (currentFilter != null)
 			{
-				clearText();
+				clearFilter();
 			}
 		}
-		else if (!filter.equals(currentFilterText))
+		else
 		{
-			setFilterText(filter);
+			IResource filterResource = project.getWorkspace().getRoot()
+					.getFileForLocation(Path.fromPortableString(filter));
+			setFilter(filterResource);
 		}
 		if (selections != null)
 		{
@@ -568,7 +652,7 @@ public class FilteringProjectView extends GitProjectView
 		updateProjectMementoCache(oldProject);
 		super.projectChanged(oldProject, newProject);
 		// Restore the displayed project state.
-		restoreStateJob(newProject);		
+		restoreStateJob(newProject);
 	}
 
 	@Override
@@ -584,7 +668,6 @@ public class FilteringProjectView extends GitProjectView
 		fResourceListener = new IResourceChangeListener()
 		{
 
-			@Override
 			public void resourceChanged(IResourceChangeEvent event)
 			{
 				if (selectedProject == null || !selectedProject.exists())
@@ -601,10 +684,13 @@ public class FilteringProjectView extends GitProjectView
 						PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
 						{
 
-							@Override
 							public void run()
 							{
-								getCommonViewer().refresh();
+								if (getCommonViewer() != null && getCommonViewer().getTree() != null
+										&& getCommonViewer().getTree().isDisposed())
+								{
+									getCommonViewer().refresh();
+								}
 							}
 						});
 						return;
@@ -621,25 +707,23 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	/**
-	 * Clears the text in the filter text widget.
+	 * Clears the filter.
 	 */
-	protected void clearText()
+	protected void clearFilter()
 	{
-		currentFilterText = ""; //$NON-NLS-1$
-		textChanged();
+		currentFilter = null;
+		filterChanged();
 	}
 
 	/**
-	 * Set the text in the filter control.
+	 * Set the filter.
 	 * 
-	 * @param string
+	 * @param resource
 	 */
-	protected void setFilterText(String string)
+	protected void setFilter(IResource resource)
 	{
-		currentFilterText = string;
-		showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
-				new Object[] { currentFilterText }));
-		textChanged();
+		currentFilter = resource;
+		filterChanged();
 	}
 
 	/**
@@ -652,9 +736,9 @@ public class FilteringProjectView extends GitProjectView
 	}
 
 	/**
-	 * Update the receiver after the text has changed.
+	 * Update the receiver after the filter has changed.
 	 */
-	protected void textChanged()
+	protected void filterChanged()
 	{
 		// cancel currently running job first, to prevent unnecessary redraw
 		if (refreshJob != null)
@@ -672,7 +756,7 @@ public class FilteringProjectView extends GitProjectView
 	 */
 	protected long getRefreshJobDelay()
 	{
-		return 200;
+		return 100;
 	}
 
 	protected WorkbenchJob doCreateRefreshJob()
@@ -685,25 +769,6 @@ public class FilteringProjectView extends GitProjectView
 					return Status.CANCEL_STATUS;
 				}
 
-				String text = getFilterString();
-				if (text == null)
-				{
-					return Status.OK_STATUS;
-				}
-
-				boolean initial = currentFilterText == null || currentFilterText.equals(""); //$NON-NLS-1$
-				if (initial)
-				{
-					patternFilter.setPattern(null);
-					getCommonViewer().removeFilter(patternFilter);
-				}
-				else
-				{
-					getCommonViewer().removeFilter(patternFilter);
-					patternFilter.setPattern(text);
-					getCommonViewer().addFilter(patternFilter);
-				}
-
 				Control redrawFalseControl = getCommonViewer().getControl();
 				try
 				{
@@ -713,22 +778,38 @@ public class FilteringProjectView extends GitProjectView
 					// dancing scrollbar
 					redrawFalseControl.setRedraw(false);
 					// collapse all
-					TreeItem[] is = getCommonViewer().getTree().getItems();
-					for (int i = 0; i < is.length; i++)
+					getCommonViewer().collapseAll();
+					// Now apply/remove the filter. This will trigger a refresh!
+					IResource filterResource = getFilterResource();
+					try
 					{
-						TreeItem item = is[i];
-						if (item.getExpanded())
+						if (filterResource == null)
 						{
-							getCommonViewer().setExpandedState(item.getData(), false);
+							if (patternFilter != null)
+							{
+								getCommonViewer().removeFilter(patternFilter);
+								patternFilter = null;
+							}
+						}
+						else
+						{
+							if (patternFilter != null)
+							{
+								getCommonViewer().removeFilter(patternFilter);
+							}
+							patternFilter = createPatternFilter(filterResource);
+							showFilterLabel(eyeball, NLS.bind(Messages.FilteringProjectView_LBL_FilteringFor,
+									new Object[] { patternFilter.getPattern() }));
+							getCommonViewer().addFilter(patternFilter);
 						}
 					}
-					try {
-						getCommonViewer().refresh(true);
-					} catch (Exception e) {
+					catch (Exception e)
+					{
 						// ignore. This seems to just happen on windows and appears to be benign
 					}
 
-					if (text.length() > 0 && !initial)
+					// Now set up expansion of elements
+					if (filterResource != null)
 					{
 						/*
 						 * Expand elements one at a time. After each is expanded, check to see if the filter text has
@@ -820,78 +901,127 @@ public class FilteringProjectView extends GitProjectView
 		};
 	}
 
-	protected String getFilterString()
+	/**
+	 * Based on the registered filters, we grab the one that has the highest priority and matches one of the project
+	 * natures. Defaults to {@link PathFilter} in case no match is made.
+	 * 
+	 * @param filterResource
+	 * @return
+	 */
+	protected AbstractResourceBasedViewerFilter createPatternFilter(IResource filterResource)
 	{
-		return currentFilterText;
-	}
+		if (fFilenameSearchMode && filterViaSearch)
+		{
+			filenameFilter.setResourceToFilterOn(selectedProject);
+			filterViaSearch = false;
+			return filenameFilter;
+		}
 
-	private String getResourceNameToFilterBy()
-	{
-		String text = hoveredItem.getText();
-		IResource resource = getResource(hoveredItem);
-		if (resource != null)
+		IProject project = filterResource.getProject();
+		Set<String> natures = new HashSet<String>();
+		try
 		{
-			text = resource.getName(); // if we can, use the raw filename so we don't pick up decorators added
-		}
-		// Try and strip filename down to the resource name!
-		if (text.endsWith("_controller.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_controller_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_controller_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_helper_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_helper_test.rb")); //$NON-NLS-1$
-			text = Inflector.singularize(text);
-		}
-		else if (text.endsWith("_test.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_test.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith("_spec.rb")) //$NON-NLS-1$
-		{
-			text = text.substring(0, text.indexOf("_spec.rb")); //$NON-NLS-1$
-		}
-		else if (text.endsWith(".yml")) //$NON-NLS-1$
-		{
-			if (resource != null)
+			for (String natureId : project.getDescription().getNatureIds())
 			{
-				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("fixtures")) //$NON-NLS-1$
+				natures.add(natureId);
+			}
+		}
+		catch (CoreException e1)
+		{
+			// ignore
+		}
+
+		final List<AbstractResourceBasedViewerFilter> filters = new ArrayList<AbstractResourceBasedViewerFilter>();
+		final List<Integer> priorities = new ArrayList<Integer>();
+		for (IConfigurationElement element : getResourceBasedFilters())
+		{
+			if (natures.contains(element.getAttribute(ELEMENT_NATURE)))
+			{
+				try
 				{
-					text = text.substring(0, text.indexOf(".yml")); //$NON-NLS-1$
-					text = Inflector.singularize(text);
+					AbstractResourceBasedViewerFilter participant = (AbstractResourceBasedViewerFilter) element
+							.createExecutableExtension(ELEMENT_CLASS);
+					String rawPriority = element.getAttribute(ELEMENT_PRIORITY);
+					Integer priority;
+					try
+					{
+						priority = Integer.parseInt(rawPriority);
+					}
+					catch (NumberFormatException e)
+					{
+						priority = 50;
+					}
+					filters.add(participant);
+					priorities.add(priority);
+				}
+				catch (CoreException e)
+				{
+					ExplorerPlugin.logError(e);
 				}
 			}
 		}
-		else if (text.endsWith(".rb")) //$NON-NLS-1$
+
+		AbstractResourceBasedViewerFilter patternFilter;
+		if (filters.isEmpty())
 		{
-			text = text.substring(0, text.indexOf(".rb")); //$NON-NLS-1$
+			patternFilter = new PathFilter();
+		}
+		else if (filters.size() > 1)
+		{
+			List<AbstractResourceBasedViewerFilter> copy = new ArrayList<AbstractResourceBasedViewerFilter>(filters);
+			Collections.sort(copy, new Comparator<AbstractResourceBasedViewerFilter>()
+			{
+				public int compare(AbstractResourceBasedViewerFilter arg0, AbstractResourceBasedViewerFilter arg1)
+				{
+					return priorities.get(filters.indexOf(arg0)).compareTo(priorities.get(filters.indexOf(arg1)));
+				}
+			});
+			patternFilter = copy.get(0);
 		}
 		else
 		{
-			// We need to grab the full path, so we can determine the resource name!
-			if (resource != null)
+			patternFilter = filters.get(0);
+		}
+		patternFilter.setResourceToFilterOn(filterResource);
+		return patternFilter;
+	}
+
+	private synchronized Collection<IConfigurationElement> getResourceBasedFilters()
+	{
+		if (fgElements == null)
+		{
+			fgElements = new ArrayList<IConfigurationElement>();
+			IExtensionRegistry registry = Platform.getExtensionRegistry();
+			if (registry != null)
 			{
-				IPath path = resource.getProjectRelativePath();
-				if (path.segmentCount() >= 3 && path.segment(1).equals("views")) //$NON-NLS-1$
+				IExtensionPoint extensionPoint = registry
+						.getExtensionPoint(ExplorerPlugin.PLUGIN_ID, FILTERS_EXT_PT_ID);
+				if (extensionPoint != null)
 				{
-					text = path.segment(2);
-					text = Inflector.singularize(text);
+					for (IExtension extension : extensionPoint.getExtensions())
+					{
+						for (IConfigurationElement element : extension.getConfigurationElements())
+						{
+							if (ELEMENT_FILTER.equals(element.getName()))
+							{
+								fgElements.add(element);
+							}
+						}
+					}
 				}
 			}
 		}
-		return text;
+		return fgElements;
+	}
+
+	protected IResource getFilterResource()
+	{
+		return currentFilter;
+	}
+
+	private IResource getResourceToFilterBy()
+	{
+		return getResource(hoveredItem);
 	}
 
 	private void removeHoveredItem()
@@ -918,7 +1048,7 @@ public class FilteringProjectView extends GitProjectView
 
 	protected Color getHoverBackgroundColor()
 	{
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlight());
+		return ThemePlugin.getDefault().getColorManager().getColor(getActiveTheme().getLineHighlightAgainstBG());
 	}
 
 	protected Theme getActiveTheme()
@@ -928,8 +1058,7 @@ public class FilteringProjectView extends GitProjectView
 
 	private boolean filterOn()
 	{
-		return getFilterString() != null && getFilterString().trim().length() > 0
-				&& !getFilterString().equals(Messages.SingleProjectView_InitialFileFilterText);
+		return getFilterResource() != null;
 	}
 
 	protected IResource getResource(final TreeItem t)
@@ -943,6 +1072,151 @@ public class FilteringProjectView extends GitProjectView
 			return (IResource) adapt.getAdapter(IResource.class);
 		}
 		return null;
+	}
+
+	@Override
+	protected Composite createSearchComposite(Composite myComposite)
+	{
+		search = (SearchComposite) super.createSearchComposite(myComposite);
+
+		final Menu modeMenu = new Menu(search);
+		final MenuItem filenameItem = new MenuItem(modeMenu, SWT.RADIO);
+		filenameItem.setText(Messages.FilteringProjectView_SearchByFilenameLabel);
+		filenameItem.setSelection(fFilenameSearchMode);
+		filenameItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = true;
+			}
+		});
+
+		final MenuItem contentItem = new MenuItem(modeMenu, SWT.RADIO);
+		contentItem.setText(Messages.FilteringProjectView_SearchContentLabel);
+		contentItem.setSelection(!fFilenameSearchMode);
+		contentItem.addSelectionListener(new SelectionAdapter()
+		{
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				fFilenameSearchMode = false;
+			}
+		});
+
+		search.getTextControl().addListener(SWT.Paint, new Listener()
+		{
+			public void handleEvent(Event event)
+			{
+				// Paint the down arrow
+				GC gc = event.gc;
+				final int width = 5;
+				int x = 16;
+				int y = 10;
+				if (Platform.getOS().equals(Platform.OS_WIN32)) // On windows, we need to draw on right side
+				{
+					x = event.width - 7;
+					y = 10;
+				}
+				else if (Platform.getOS().equals(Platform.OS_LINUX)) // draw near bottom at far-left on Linux (still doesn't overlap magnifying glass)
+				{
+					x = 0;
+					y = 15;
+				}
+				
+				Color bg = gc.getBackground();
+				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				gc.fillPolygon(new int[] { x, y, x + width, y, x + (width / 2), y + width - 1 });
+				gc.setBackground(bg);
+			}
+		});
+
+		search.getTextControl().addMouseListener(new MouseAdapter()
+		{
+			public void mouseDown(MouseEvent e)
+			{
+				boolean isOnPulldownSection = false;
+				int shift = 0;
+				// Because on windows we draw on right side, we need to check different click area
+				if (Platform.getOS().equals(Platform.OS_WIN32))
+				{
+					Rectangle bounds = search.getTextControl().getBounds();
+					 if (e.x >= bounds.width - 20 && e.x <= bounds.width)
+					{
+						isOnPulldownSection = true;
+						shift = bounds.width - 20;
+					}
+				}
+				else if (e.x <= 18)
+				{
+					isOnPulldownSection = true;
+				}
+				if (isOnPulldownSection)
+				{
+					Point searchLocation = search.getLocation();
+					searchLocation = search.getParent().toDisplay(searchLocation.x, searchLocation.y);
+					Point searchSize = search.getSize();
+					modeMenu.setLocation(searchLocation.x + shift, searchLocation.y + searchSize.y + 2);
+					modeMenu.setVisible(true);
+				}
+			}
+		});
+
+		return search;
+	}
+
+	/**
+	 * Override search to handle filename search mode, which is actually a filter
+	 */
+	public void search(final String text, final boolean isCaseSensitive, final boolean isRegularExpression)
+	{
+		if (selectedProject == null)
+		{
+			return;
+		}
+
+		if (fFilenameSearchMode)
+		{
+			clearFilter();
+			try
+			{
+				final Pattern pattern = search.createSearchPattern();
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				filenameFilter = new PathFilter()
+				{
+					@Override
+					protected boolean match(String string)
+					{
+						if (pattern == null)
+						{
+							return false;
+						}
+						return pattern.matcher(string).find();
+					}
+
+					public String getPattern()
+					{
+						// This is what we display in the "filtering for ..." label
+						return text;
+					};
+				};
+				// We need some way to tell the job that uses the filter that this is the one to apply versus creating
+				// one for the hover
+				filterViaSearch = true;
+				setFilter(selectedProject);
+			}
+			catch (PatternSyntaxException e)
+			{
+				// TODO Show some UI popup or something to say regexp is bad?
+				search.getTextControl().setForeground(search.getDisplay().getSystemColor(SWT.COLOR_RED));
+			}
+		}
+		else
+		{
+			super.search(text, isCaseSensitive, isRegularExpression);
+		}
 	}
 
 }

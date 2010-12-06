@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<!--
+# Copyright (c) 2006, 2009 Wind River Systems, Inc. and others.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+# Michael Scharf (Wind River) - initial API and implementation 
+# Martin Oberhuber (Wind River) - fixed copyright headers and beautified
+# Uwe Stieber (Wind River) - [282996] [terminal][api] Add "hidden" attribute to terminal connector extension point
+-->
+<fragment>
+   <extension
+         point="com.aptana.org.eclipse.tm.terminal.terminalConnectors">
+      <connector
+            class="org.eclipse.tm.internal.terminal.speedtest.SpeedTestConnector"
+            id="org.eclipse.tm.internal.terminal.speedtest.SpeedTestConnector"
+            name="Speed Test"/>
+   </extension>
+</fragment>

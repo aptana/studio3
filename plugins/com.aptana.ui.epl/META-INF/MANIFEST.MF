@@ -2,16 +2,25 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.ui.epl;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.expressions,
  org.eclipse.ui,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
 Export-Package: com.aptana.editor.common.contentassist,
  com.aptana.editor.common.scripting.snippets,
- com.aptana.ui.epl
+ com.aptana.editor.common.text.rules,
+ com.aptana.ui.epl,
+ com.aptana.ui.preferences,
+ com.aptana.ui.properties,
+ com.aptana.ui.util,
+ com.aptana.ui.wizards
 Eclipse-ExtensibleAPI: true
 Bundle-Activator: com.aptana.ui.epl.UIEplPlugin
+

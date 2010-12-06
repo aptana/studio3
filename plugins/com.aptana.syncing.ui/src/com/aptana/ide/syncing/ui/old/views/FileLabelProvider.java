@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2007 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain Eclipse Public Licensed code and certain additional terms
+ * with certain other free and open source software ("FOSS") code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -81,14 +81,14 @@ public class FileLabelProvider extends LabelProvider
 			IFileStore f = (IFileStore) element;
 			retVal = f.getName();
 		}
-		//if (element == FileTreeContentProvider.LOADING)
-		//{
-		//	return Messages.FileLabelProvider_Loading_msg;
-		//}
-		//if (retVal == null)
-		//{
-		//	retVal = Messages.FileExplorerView_UnknownElement;
-		//}
+		// if (element == FileTreeContentProvider.LOADING)
+		// {
+		// return Messages.FileLabelProvider_Loading_msg;
+		// }
+		// if (retVal == null)
+		// {
+		// retVal = Messages.FileExplorerView_UnknownElement;
+		// }
 		return retVal;
 	}
 
@@ -99,61 +99,61 @@ public class FileLabelProvider extends LabelProvider
 	{
 		Image image = null;
 
-//		if (element instanceof ProtocolManager)
-//		{
-//			ProtocolManager pm = (ProtocolManager) element;
-//			image = pm.getImage();
-//		}
-//		else if (element instanceof IVirtualFileManager)
-//		{
-//			IVirtualFileManager fm = (IVirtualFileManager) element;
-//			image = fm.getImage();
-//		}
-//		else if (element instanceof IVirtualFile)
-//		{
-//			IVirtualFile f = (IVirtualFile) element;
-//			image = f.getImage();
-//			if (image == null)
-//			{
-//				IEditorDescriptor desc = EclipseUIUtils.getWorkbenchEditorRegistry().getDefaultEditor(f.getName());
-//				if (desc == null || desc.getImageDescriptor() == null)
-//				{
-//					IWorkbench workbench = PlatformUI.getWorkbench();
-//					if (workbench != null)
-//					{
-//						ISharedImages sharedImages = workbench.getSharedImages();
-//						if (f.isDirectory())
-//						{
-//							image = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
-//						}
-//						else
-//						{
-//							image = ImageUtils.getIcon(f.getExtension());
-//							if (image == null)
-//							{
-//								image = sharedImages.getImage(ISharedImages.IMG_OBJ_FILE);
-//							}
-//						}
-//					}
-//				}
-//				else
-//				{
-//					if (images.containsKey(desc))
-//					{
-//						image = (Image) images.get(desc);
-//					}
-//					else
-//					{
-//						image = desc.getImageDescriptor().createImage();
-//						images.put(desc, image);
-//					}
-//				}
-//			}
-//		}
-		//if (element == FileTreeContentProvider.LOADING)
-		//{
+		// if (element instanceof ProtocolManager)
+		// {
+		// ProtocolManager pm = (ProtocolManager) element;
+		// image = pm.getImage();
+		// }
+		// else if (element instanceof IVirtualFileManager)
+		// {
+		// IVirtualFileManager fm = (IVirtualFileManager) element;
+		// image = fm.getImage();
+		// }
+		// else if (element instanceof IVirtualFile)
+		// {
+		// IVirtualFile f = (IVirtualFile) element;
+		// image = f.getImage();
+		// if (image == null)
+		// {
+		// IEditorDescriptor desc = EclipseUIUtils.getWorkbenchEditorRegistry().getDefaultEditor(f.getName());
+		// if (desc == null || desc.getImageDescriptor() == null)
+		// {
+		// IWorkbench workbench = PlatformUI.getWorkbench();
+		// if (workbench != null)
+		// {
+		// ISharedImages sharedImages = workbench.getSharedImages();
+		// if (f.isDirectory())
+		// {
+		// image = sharedImages.getImage(ISharedImages.IMG_OBJ_FOLDER);
+		// }
+		// else
+		// {
+		// image = ImageUtils.getIcon(f.getExtension());
+		// if (image == null)
+		// {
+		// image = sharedImages.getImage(ISharedImages.IMG_OBJ_FILE);
+		// }
+		// }
+		// }
+		// }
+		// else
+		// {
+		// if (images.containsKey(desc))
+		// {
+		// image = (Image) images.get(desc);
+		// }
+		// else
+		// {
+		// image = desc.getImageDescriptor().createImage();
+		// images.put(desc, image);
+		// }
+		// }
+		// }
+		// }
+		// if (element == FileTreeContentProvider.LOADING)
+		// {
 		//	return FilePlugin.getImage("icons/hourglass.png"); //$NON-NLS-1$
-		//}
+		// }
 		return image;
 	}
 }

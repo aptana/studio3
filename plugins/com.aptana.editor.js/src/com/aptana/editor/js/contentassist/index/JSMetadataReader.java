@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -36,21 +36,20 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
+import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.ExceptionElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
@@ -60,22 +59,25 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
-import com.aptana.sax.Schema;
-import com.aptana.sax.SchemaBuilder;
-import com.aptana.sax.SchemaInitializationException;
-import com.aptana.sax.ValidatingReader;
 
 /**
  * ScriptDocReader
  */
-public class JSMetadataReader extends ValidatingReader
+public class JSMetadataReader extends MetadataReader
 {
-	private Schema _metadataSchema;
-	private StringBuffer _textBuffer = new StringBuffer();
+	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
+	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
+	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
+
+	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
+	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
+	private static final Pattern TYPE_PATTERN = Pattern
+		.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
 	// state flags
-	private boolean _bufferText;
 	private boolean _parsingCtors;
+	private TypeElement _currentClass;
 	private TypeElement _currentType;
 	private FunctionElement _currentFunction;
 	private ParameterElement _currentParameter;
@@ -83,7 +85,7 @@ public class JSMetadataReader extends ValidatingReader
 	private UserAgentElement _currentUserAgent;
 	private PropertyElement _currentProperty;
 	private ExceptionElement _currentException;
-	
+
 	private Map<String, TypeElement> _typesByName = new HashMap<String, TypeElement>();
 
 	/**
@@ -91,21 +93,6 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public JSMetadataReader()
 	{
-	}
-
-	/**
-	 * Process character data
-	 * 
-	 * @param buffer
-	 * @param offset
-	 * @param length
-	 */
-	public void characters(char[] buffer, int offset, int length)
-	{
-		if (this._bufferText)
-		{
-			this._textBuffer.append(new String(buffer, offset, length));
-		}
 	}
 
 	/**
@@ -119,10 +106,10 @@ public class JSMetadataReader extends ValidatingReader
 	public void enterAlias(String ns, String name, String qname, Attributes attributes)
 	{
 		AliasElement alias = new AliasElement();
-		
+
 		alias.setName(attributes.getValue("name")); //$NON-NLS-1$
 		alias.setType(attributes.getValue("type")); //$NON-NLS-1$
-		
+
 		// add somewhere?
 	}
 
@@ -144,7 +131,7 @@ public class JSMetadataReader extends ValidatingReader
 
 		// set version
 		String version = attributes.getValue("version"); //$NON-NLS-1$
-		
+
 		if (version != null)
 		{
 			userAgent.setVersion(version);
@@ -152,7 +139,7 @@ public class JSMetadataReader extends ValidatingReader
 
 		// set OS
 		String os = attributes.getValue("os"); //$NON-NLS-1$
-		
+
 		if (os != null)
 		{
 			userAgent.setOS(os);
@@ -160,7 +147,7 @@ public class JSMetadataReader extends ValidatingReader
 
 		// set OS version
 		String osVersion = attributes.getValue("osVersion"); //$NON-NLS-1$
-		
+
 		if (osVersion != null)
 		{
 			userAgent.setOSVersion(osVersion);
@@ -179,28 +166,81 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterClass(String ns, String name, String qname, Attributes attributes)
 	{
-		// create a new class documentation object
-		TypeElement type = this.getType(attributes.getValue("type")); //$NON-NLS-1$
+		String typeName = attributes.getValue("type"); //$NON-NLS-1$
 
-		// set optional superclass
-		String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
-
-		if (superclass != null && superclass.length() > 0)
+		if (this.isValidTypeIdentifier(typeName))
 		{
-			String[] types = superclass.split("\\s+"); //$NON-NLS-1$
+			String[] parts = DOT_PATTERN.split(typeName);
+			String accumulatedTypeName = parts[0];
+			TypeElement type = this.getType(accumulatedTypeName);
+			TypeElement clas = this.getType(getTypeClass(accumulatedTypeName));
 
-			for (String superType : types)
+			for (int i = 1; i < parts.length; i++)
 			{
-				if (superType != null && superType.length() > 0)
+				// grab name part
+				String propertyName = parts[i];
+
+				// update accumulated type name
+				accumulatedTypeName += "." + propertyName; //$NON-NLS-1$
+
+				// try to grab the property off of the current type
+				PropertyElement property = type.getProperty(propertyName);
+
+				// create property, if we didn't have one
+				if (property == null)
 				{
-					type.addParentType(superType);
+					property = new PropertyElement();
+
+					property.setName(propertyName);
+					property.setIsClassProperty(true);
+					property.addType(accumulatedTypeName);
+
+					type.addProperty(property);
+					// clas.addProperty(property);
+				}
+
+				// make sure to save last type we visited
+				this._typesByName.put(type.getName(), type);
+				this._typesByName.put(clas.getName(), clas);
+
+				// create new types
+				type = this.getType(accumulatedTypeName);
+				clas = this.getType(getTypeClass(accumulatedTypeName));
+			}
+
+			// set optional superclass
+			String superclass = attributes.getValue("superclass"); //$NON-NLS-1$
+
+			if (superclass != null && superclass.length() > 0)
+			{
+				String[] types = WHITESPACE_PATTERN.split(superclass);
+
+				for (String superType : types)
+				{
+					if (this.isValidTypeIdentifier(superType))
+					{
+						type.addParentType(superType);
+						clas.addParentType(getTypeClass(superType)); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					else
+					{
+						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Supertype_Name, superType, typeName);
+
+						Activator.logError(message, null);
+					}
 				}
 			}
-		}
 
-		// set current class
-		this._currentType = type;
-		// this._functions.add(this._currentClass);
+			// set current class
+			this._currentType = type;
+			this._currentClass = clas;
+		}
+		else
+		{
+			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName);
+
+			Activator.logError(message, null);
+		}
 	}
 
 	/**
@@ -226,11 +266,20 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterException(String ns, String name, String qname, Attributes attributes)
 	{
-		ExceptionElement exception = new ExceptionElement();
-		
-		exception.setType(attributes.getValue("type")); //$NON-NLS-1$
-		
-		this._currentException = exception;
+		String exceptionName = attributes.getValue("type"); //$NON-NLS-1$
+
+		if (this.isValidIdentifier(exceptionName))
+		{
+			ExceptionElement exception = new ExceptionElement();
+
+			exception.setType(exceptionName);
+
+			this._currentException = exception;
+		}
+		else
+		{
+			Activator.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName, null);
+		}
 	}
 
 	/**
@@ -243,39 +292,47 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterMethod(String ns, String name, String qname, Attributes attributes)
 	{
-		FunctionElement function = new FunctionElement();
-
-		//function.setExtends(this._currentType.getExtends());
-		function.setIsConstructor(this._parsingCtors); // for this xml format isCtor is always one or the other, user code may vary
-		function.setIsMethod(!this._parsingCtors);
-
-		// determine and set method name
 		String mname = attributes.getValue("name"); //$NON-NLS-1$
-		function.setName((mname == null) ? this._currentType.getName() : mname); //$NON-NLS-1$
 
-		// set scope
-		String scope = attributes.getValue("scope"); //$NON-NLS-1$
-		
-		if (scope != null && scope.equals("instance")) //$NON-NLS-1$
+		if (mname == null && this._currentType != null)
 		{
-			function.setIsInstance(true);
-		}
-		else if (scope.equals("invocation")) //$NON-NLS-1$
-		{
-			function.setIsInvocationOnly(true);
+			mname = this._currentType.getName();
 		}
 
-		// set visibility
-		String visibility = attributes.getValue("visibility"); //$NON-NLS-1$
-		
-		if (visibility != null && visibility.equals("internal")) //$NON-NLS-1$
+		if (this.isValidIdentifier(mname))
 		{
-			function.setIsInternal(true);
+			FunctionElement function = new FunctionElement();
+
+			// function.setExtends(this._currentType.getExtends());
+			function.setIsConstructor(this._parsingCtors); // for this xml format isCtor is always one or the other,
+															// user code may vary
+			function.setIsMethod(!this._parsingCtors);
+
+			// determine and set method name
+			function.setName(mname);
+
+			// set scope
+			String scope = attributes.getValue("scope"); //$NON-NLS-1$
+
+			if (scope == null || scope.length() == 0 || scope.equals("instance")) //$NON-NLS-1$
+			{
+				function.setIsInstanceProperty(true);
+			}
+			else if (scope.equals("static")) //$NON-NLS-1$
+			{
+				function.setIsClassProperty(true);
+			}
+
+			// set visibility
+			String visibility = attributes.getValue("visibility"); //$NON-NLS-1$
+
+			if (visibility != null && visibility.equals("internal")) //$NON-NLS-1$
+			{
+				function.setIsInternal(true);
+			}
+
+			this._currentFunction = function;
 		}
-
-		//methodDoc.getMemberOf().addType(_currentClass.getName());
-
-		this._currentFunction = function;
 	}
 
 	/**
@@ -312,21 +369,37 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterParameter(String ns, String name, String qname, Attributes attributes)
 	{
-		// create a new parameter documentation object
-		ParameterElement parameter = new ParameterElement();
+		String parameterName = attributes.getValue("name"); //$NON-NLS-1$
 
-		// grab and set properties
-		parameter.setName(attributes.getValue("name")); //$NON-NLS-1$
-		
-		for (String type : attributes.getValue("type").split("\\s*[,|]\\s*")) //$NON-NLS-1$ //$NON-NLS-2$
+		if (this.isValidIdentifier(parameterName))
 		{
-			parameter.addType(type);
-		}
-		
-		parameter.setUsage(attributes.getValue("usage")); //$NON-NLS-1$
+			// create a new parameter documentation object
+			ParameterElement parameter = new ParameterElement();
 
-		// store parameter
-		this._currentParameter = parameter;
+			// grab and set properties
+			parameter.setName(parameterName);
+			
+			String types = attributes.getValue("type"); //$NON-NLS-1$
+
+			for (String type : PARAMETER_TYPE_DELIMITER_PATTERN.split(types))
+			{
+				if (this.isValidTypeIdentifier(type))
+				{
+					parameter.addType(type);
+				}
+				else
+				{
+					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, type, parameterName);
+
+					Activator.logError(message, null);
+				}
+			}
+
+			parameter.setUsage(attributes.getValue("usage")); //$NON-NLS-1$
+
+			// store parameter
+			this._currentParameter = parameter;
+		}
 	}
 
 	/**
@@ -339,44 +412,52 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterProperty(String ns, String name, String qname, Attributes attributes)
 	{
-		// create a new property documentation object
-		PropertyElement property = new PropertyElement();
+		String propertyName = attributes.getValue("name"); //$NON-NLS-1$
 
-		// grab and set property values
-		property.setName(attributes.getValue("name")); //$NON-NLS-1$
+		if (this.isValidIdentifier(propertyName))
+		{
+			// create a new property documentation object
+			PropertyElement property = new PropertyElement();
 
-		// set scope
-		String scope = attributes.getValue("scope"); //$NON-NLS-1$
-		
-		if (scope.equals("instance")) //$NON-NLS-1$
-		{
-			property.setIsInstance(true);
-		}
-		else if (scope.equals("invocation")) //$NON-NLS-1$
-		{
-			property.setIsInvocationOnly(true);
-		}
+			// grab and set property values
+			property.setName(propertyName);
 
-		// set types
-		String type = attributes.getValue("type"); //$NON-NLS-1$
-		String[] types = type.split("\\s*\\|\\s*"); //$NON-NLS-1$
-		
-		for (String propertyType : types)
-		{
-			if (propertyType != null && propertyType.length() > 0)
+			// set scope
+			String scope = attributes.getValue("scope"); //$NON-NLS-1$
+
+			if (scope == null || scope.length() == 0 || scope.equals("instance")) //$NON-NLS-1$
 			{
-				ReturnTypeElement returnType = new ReturnTypeElement();
-				
-				returnType.setType(propertyType);
-				
-				property.addType(returnType);
+				property.setIsInstanceProperty(true);
 			}
-		}
-		
-		//propertyDoc.getMemberOf().addType(_currentClass.getName());
+			else if (scope.equals("static")) //$NON-NLS-1$
+			{
+				property.setIsClassProperty(true);
+			}
+			else
+			{
+				// TODO: error or warning?
+			}
 
-		// set current property
-		this._currentProperty = property;
+			// set types
+			String types = attributes.getValue("type"); //$NON-NLS-1$
+
+			for (String propertyType : PROPERTY_TYPE_DELIMITER_PATTERN.split(types))
+			{
+				if (this.isValidTypeIdentifier(propertyType))
+				{
+					property.addType(propertyType);
+				}
+				else
+				{
+					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName);
+
+					Activator.logError(message, null);
+				}
+			}
+
+			// set current property
+			this._currentProperty = property;
+		}
 	}
 
 	/**
@@ -405,14 +486,23 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void enterReturnType(String ns, String name, String qname, Attributes attributes)
 	{
-		ReturnTypeElement returnType = new ReturnTypeElement();
-		
-		// grab and set property values
-		returnType.setType(attributes.getValue("type")); //$NON-NLS-1$
+		String type = attributes.getValue("type"); //$NON-NLS-1$
 
-		this._currentReturnType = returnType;
+		if (this.isValidTypeIdentifier(type))
+		{
+			ReturnTypeElement returnType = new ReturnTypeElement();
+
+			// grab and set property values
+			returnType.setType(type);
+
+			this._currentReturnType = returnType;
+		}
+		else
+		{
+			Activator.logError(Messages.JSMetadataReader_Invalid_Return_Type + type, null);
+		}
 	}
-	
+
 	/**
 	 * start processing a specification element
 	 * 
@@ -424,21 +514,29 @@ public class JSMetadataReader extends ValidatingReader
 	public void enterSpecification(String ns, String name, String qname, Attributes attributes)
 	{
 		SinceElement since = new SinceElement();
-		
+
 		// set name
 		since.setName(attributes.getValue("name")); //$NON-NLS-1$
-		
+
 		// set version
 		String version = attributes.getValue("version"); //$NON-NLS-1$
-		
+
 		if (version != null)
 		{
 			since.setVersion(version);
 		}
-		
+
 		if (this._currentFunction != null)
 		{
 			this._currentFunction.addSince(since);
+		}
+		else if (this._currentProperty != null)
+		{
+			this._currentProperty.addSince(since);
+		}
+		else if (this._currentType != null)
+		{
+			this._currentType.addSince(since);
 		}
 	}
 
@@ -463,21 +561,24 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitBrowser(String ns, String name, String qname)
 	{
-		if (this._currentProperty != null)
+		if (this._currentUserAgent != null)
 		{
-			this._currentProperty.addUserAgent(this._currentUserAgent);
-		}
-		else if (this._currentFunction != null)
-		{
-			this._currentFunction.addUserAgent(this._currentUserAgent);
-		}
-		else if (this._currentType != null)
-		{
-			this._currentType.addUserAgent(this._currentUserAgent);
-		}
+			if (this._currentProperty != null)
+			{
+				this._currentProperty.addUserAgent(this._currentUserAgent);
+			}
+			else if (this._currentFunction != null)
+			{
+				this._currentFunction.addUserAgent(this._currentUserAgent);
+			}
+			else if (this._currentType != null)
+			{
+				this._currentType.addUserAgent(this._currentUserAgent);
+			}
 
-		// clear current class
-		this._currentUserAgent = null;
+			// clear current class
+			this._currentUserAgent = null;
+		}
 	}
 
 	/**
@@ -489,9 +590,19 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitClass(String ns, String name, String qname)
 	{
-		this._typesByName.put(this._currentType.getName(), this._currentType);
-		
-		this._currentType = null;
+		if (this._currentType != null)
+		{
+			this._typesByName.put(this._currentType.getName(), this._currentType);
+
+			this._currentType = null;
+		}
+
+		if (this._currentClass != null)
+		{
+			this._typesByName.put(this._currentClass.getName(), this._currentClass);
+
+			this._currentClass = null;
+		}
 	}
 
 	/**
@@ -526,17 +637,17 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitDescription(String ns, String name, String qname)
 	{
-		String description = this.getTextBuffer();
-		
+		String description = this.normalizeText(this.getText());
+
 		if (this._currentParameter != null)
 		{
 			this._currentParameter.setDescription(description);
 		}
-//		else if (this._currentException != false)
-//		{
-//			// ignore
-//			this._currentException = (this._currentException == false ) ? false : true;
-//		}
+		// else if (this._currentException != false)
+		// {
+		// // ignore
+		// this._currentException = (this._currentException == false ) ? false : true;
+		// }
 		else if (this._currentProperty != null)
 		{
 			this._currentProperty.setDescription(description);
@@ -556,22 +667,20 @@ public class JSMetadataReader extends ValidatingReader
 		{
 			this._currentType.setDescription(description);
 		}
-//		else if (this._currentProject != null)
-//		{
-//			// add description to the current method
-//			this._currentProject.setDescription(description);
-//		}
+		// else if (this._currentProject != null)
+		// {
+		// // add description to the current method
+		// this._currentProject.setDescription(description);
+		// }
 		else if (this._currentUserAgent != null)
 		{
 			// add description to the current method
 			this._currentUserAgent.setDescription(description);
-		}		
+		}
 		else
 		{
 			// throw error
 		}
-		
-		this.stopTextBuffer();
 	}
 
 	/**
@@ -583,7 +692,18 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitExample(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		String example = this.getText();
+
+		if (this._currentProperty != null)
+		{
+			this._currentProperty.addExample(example);
+		}
+		else if (this._currentFunction != null)
+		{
+			this._currentFunction.addExample(example);
+		}
+
+		// TODO: The schema allows these on classes as well
 	}
 
 	/**
@@ -595,20 +715,23 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitException(String ns, String name, String qname)
 	{
-		if (this._currentProperty != null)
+		if (this._currentException != null)
 		{
-			// this doesn't make sense to me, but it is defined in the schema
+			if (this._currentProperty != null)
+			{
+				// this doesn't make sense to me, but it is defined in the schema
+			}
+			else if (this._currentFunction != null)
+			{
+				this._currentFunction.addException(this._currentException);
+			}
+			else
+			{
+				// throw error
+			}
+
+			this._currentException = null;
 		}
-		else if (this._currentFunction != null)
-		{
-			this._currentFunction.addException(this._currentException);
-		}
-		else
-		{
-			// throw error
-		}
-		
-		this._currentException = null;
 	}
 
 	/**
@@ -631,8 +754,29 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitMethod(String ns, String name, String qname)
 	{
-		this._currentType.addProperty(this._currentFunction);
-		this._currentFunction = null;
+		if (this._currentFunction != null)
+		{
+			if (this._currentFunction.isClassProperty())
+			{
+				if (this._currentClass != null)
+				{
+					this._currentClass.addProperty(this._currentFunction);
+				}
+			}
+			else if (this._currentFunction.isInstanceProperty())
+			{
+				if (this._currentType != null)
+				{
+					this._currentType.addProperty(this._currentFunction);
+				}
+			}
+			else
+			{
+				// TODO: warning or error about unknown method role
+			}
+
+			this._currentFunction = null;
+		}
 	}
 
 	/**
@@ -644,11 +788,17 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitParameter(String ns, String name, String qname)
 	{
-		// add parameter to parameter list
-		this._currentFunction.addParameter(this._currentParameter);
+		if (this._currentParameter != null)
+		{
+			if (this._currentFunction != null)
+			{
+				// add parameter to parameter list
+				this._currentFunction.addParameter(this._currentParameter);
+			}
 
-		// clear current parameter
-		this._currentParameter = null;
+			// clear current parameter
+			this._currentParameter = null;
+		}
 	}
 
 	/**
@@ -660,12 +810,29 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitProperty(String ns, String name, String qname)
 	{
-		if (this._currentType != null)
+		if (this._currentProperty != null)
 		{
-			this._currentType.addProperty(this._currentProperty);
+			if (this._currentProperty.isClassProperty())
+			{
+				if (this._currentClass != null)
+				{
+					this._currentClass.addProperty(this._currentProperty);
+				}
+			}
+			else if (this._currentProperty.isInstanceProperty())
+			{
+				if (this._currentType != null)
+				{
+					this._currentType.addProperty(this._currentProperty);
+				}
+			}
+			else
+			{
+				// TODO: warning or error about unknown property role
+			}
+
+			this._currentProperty = null;
 		}
-		
-		this._currentProperty = null;
 	}
 
 	/**
@@ -677,7 +844,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitRemarks(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		this.getText();
 	}
 
 	/**
@@ -689,7 +856,7 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitReturnDescription(String ns, String name, String qname)
 	{
-		this.stopTextBuffer();
+		this.getText();
 	}
 
 	/**
@@ -701,9 +868,15 @@ public class JSMetadataReader extends ValidatingReader
 	 */
 	public void exitReturnType(String ns, String name, String qname)
 	{
-		this._currentFunction.addReturnType(this._currentReturnType);
-		
-		this._currentReturnType = null;
+		if (this._currentReturnType != null)
+		{
+			if (this._currentFunction != null)
+			{
+				this._currentFunction.addReturnType(this._currentReturnType);
+			}
+
+			this._currentReturnType = null;
+		}
 	}
 
 	/**
@@ -717,16 +890,23 @@ public class JSMetadataReader extends ValidatingReader
 	{
 	}
 
-	/**
-	 * getTextBuffer
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataReader#getSchemaStream()
 	 */
-	public String getTextBuffer()
+	@Override
+	protected InputStream getSchemaStream()
 	{
-		return this._textBuffer.toString();
+		try
+		{
+			return FileLocator.openStream(Activator.getDefault().getBundle(), Path.fromPortableString(JS_METADATA_SCHEMA), false);
+		}
+		catch (IOException e)
+		{
+			return this.getClass().getResourceAsStream(JS_METADATA_SCHEMA);
+		}
 	}
-	
+
 	/**
 	 * getType
 	 * 
@@ -736,19 +916,24 @@ public class JSMetadataReader extends ValidatingReader
 	private TypeElement getType(String typeName)
 	{
 		TypeElement result = this._typesByName.get(typeName);
-		
+
 		if (result == null)
 		{
 			result = new TypeElement();
-			
+
 			result.setName(typeName);
-			
+
 			// NOTE: type will be added in exitClass
 		}
-		
+
 		return result;
 	}
-	
+
+	private String getTypeClass(String accumulatedTypeName)
+	{
+		return JSTypeConstants.GENERIC_CLASS_OPEN + accumulatedTypeName + JSTypeConstants.GENERIC_CLOSE;
+	}
+
 	/**
 	 * getTypes
 	 * 
@@ -758,137 +943,47 @@ public class JSMetadataReader extends ValidatingReader
 	{
 		Collection<TypeElement> values = this._typesByName.values();
 		TypeElement[] types = new TypeElement[values.size()];
-		
+
 		return values.toArray(types);
 	}
-	
-	/**
-	 * @throws IOException
-	 * @throws SchemaInitializationException
-	 */
-	private void loadMetadataSchema()
-	{
-		if (this._metadataSchema == null)
-		{
-			// get schema for our documentation XML format
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(
-					"/metadata/JSMetadataSchema.xml"), null); //$NON-NLS-1$
-			InputStream schemaStream = null;
-
-			try
-			{
-				schemaStream = url.openStream();
-
-				// create the schema
-				this._schema = this._metadataSchema = SchemaBuilder.fromXML(schemaStream, this);
-			}
-			catch (IOException e)
-			{
-				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
-			}
-			catch (SchemaInitializationException e)
-			{
-				Activator.logError(Messages.JSMetadataReader_Error_Loading_JS_Metadata, e);
-			}
-			finally
-			{
-				// close the input stream
-				if (schemaStream != null)
-				{
-					try
-					{
-						schemaStream.close();
-					}
-					catch (IOException e)
-					{
-					}
-				}
-			}
-		}
-	}
 
 	/**
-	 * Load the JavaScript built-in objects documentation using a stream.
+	 * isValidIdentifier
 	 * 
-	 * @param stream
-	 *            The input stream for the source XML
-	 * @throws ScriptDocException
-	 */
-	public void loadXML(InputStream stream) throws ScriptDocException
-	{
-		this.loadMetadataSchema();
-
-		if (this._metadataSchema != null)
-		{
-			// create a new SAX factory class
-			SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setNamespaceAware(true);
-
-			// clear properties
-			this.stopTextBuffer();
-			SAXParser saxParser = null;
-
-			// parse the XML file
-			try
-			{
-				saxParser = factory.newSAXParser();
-				saxParser.parse(stream, this);
-			}
-			catch (ParserConfigurationException e)
-			{
-				String msg = Messages.JSMetadataReader_SAX_Error;
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-			catch (SAXException e)
-			{
-				Exception ex = e.getException();
-				String msg = Messages.JSMetadataReader_Parse_Error;
-
-				if (ex != null)
-				{
-					msg += ex.getMessage();
-				}
-				else
-				{
-					msg += e.getMessage();
-				}
-
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-			catch (IOException e)
-			{
-				String msg = Messages.JSMetadataReader_Parse_IO_Error;
-				ScriptDocException de = new ScriptDocException(msg, e);
-
-				throw de;
-			}
-		}
-	}
-
-	/**
-	 * start buffering text
-	 * 
-	 * @param ns
 	 * @param name
-	 * @param qname
-	 * @param attributes
+	 * @return
 	 */
-	public void startTextBuffer(String ns, String name, String qname, Attributes attributes)
+	protected boolean isValidIdentifier(String name)
 	{
-		this._bufferText = true;
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = IDENTIFIER_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
 	}
 
 	/**
-	 * stop buffering text
+	 * isValidTypeIdentifier
+	 * 
+	 * @param name
+	 * @return
 	 */
-	protected void stopTextBuffer()
+	protected boolean isValidTypeIdentifier(String name)
 	{
-		// clear buffer and reset text buffering state
-		this._textBuffer.setLength(0);
-		this._bufferText = false;
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = TYPE_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
 	}
 }

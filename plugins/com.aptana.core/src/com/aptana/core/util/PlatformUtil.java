@@ -187,7 +187,7 @@ public final class PlatformUtil
 			Process process2 = null;
 			try
 			{
-				process = Runtime.getRuntime().exec("/usr/bin/perl", new String[] { "VERSIONER_PERL_PREFER_32_BIT=yes" }); //$NON-NLS-1$
+				process = Runtime.getRuntime().exec("/usr/bin/perl", new String[] { "VERSIONER_PERL_PREFER_32_BIT=yes" }); //$NON-NLS-1$ //$NON-NLS-2$
 				InputStream in = process.getInputStream();
 				OutputStream out = process.getOutputStream();
 				String command = "use Mac::Processes; while ( ($psn, $psi) = each(%Process) ) { print GetProcessPID($psi->processNumber).\" \".$psi->processAppSpec.\"\\n\"; }"; //$NON-NLS-1$
@@ -383,11 +383,6 @@ public final class PlatformUtil
 				String docsDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kDocumentsFolderType);
 				if (docsDirectory != null) {
 					path = docsDirectory + path.substring(DOCUMENTS_DIRECTORY.length());
-				}
-			} else if (path.startsWith(HOME_DIRECTORY)) {
-				String homeDirectory = CoreMacOSX.FileManager_findFolder(true, CoreMacOSX.kCurrentUserFolderType);
-				if (homeDirectory != null) {
-					path = homeDirectory + path.substring(HOME_DIRECTORY.length());
 				}
 			}
 		}

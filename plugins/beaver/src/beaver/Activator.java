@@ -1,3 +1,11 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * This file is part of Beaver Parser Generator.                       *
+ * Copyright (C) 2003,2004 Alexander Demenchuk <alder@softanvil.com>.  *
+ * All rights reserved.                                                *
+ * See the file "LICENSE" for the terms and conditions for copying,    *
+ * distribution and modification of Beaver.                            *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 package beaver;
 
 import org.eclipse.core.runtime.Plugin;
@@ -9,7 +17,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "beaver";
+	public static final String PLUGIN_ID = "beaver"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;

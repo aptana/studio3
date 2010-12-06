@@ -36,14 +36,40 @@
          point="com.aptana.index.core.fileIndexingParticipants">
       <fileIndexingParticipant
             class="com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.css">
+         </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
    <extension
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.css.parsing.CSSParser"
+            content-type="com.aptana.contenttype.css"
             language="text/css">
       </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="com.aptana.editor.css.text.hyperlink.HTMLIDHyperlinkDetector"
+            id="com.aptana.editor.css.hyperlinkDetector"
+            name="%hyperlinkDetector.cssclass.name"
+            targetId="com.aptana.editor.ui.hyperlinkTarget">
+      </hyperlinkDetector>
+   </extension>
+   <extension
+         point="com.aptana.editor.common.validator">
+      <language
+            name="%validator.language.css.name"
+            type="text/css">
+      </language>
+      <validator
+            class="com.aptana.editor.css.validator.CSSValidator"
+            language="text/css"
+            name="%validator.css.name">
+      </validator>
    </extension>
 
 </plugin>

@@ -1,4 +1,3 @@
-package com.aptana.core.epl;
 /*******************************************************************************
  * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
@@ -10,7 +9,7 @@ package com.aptana.core.epl;
  *     IBM Corporation - initial API and implementation
  *     Aptana, Inc - non-UI adoption
  *******************************************************************************/
-
+package com.aptana.core.epl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -243,7 +242,7 @@ public final class XMLMemento implements IMemento {
         size = list.size();
         IMemento[] results = new IMemento[size];
         for (int x = 0; x < size; x++) {
-            results[x] = new XMLMemento(factory, (Element) list.get(x));
+            results[x] = new XMLMemento(factory, list.get(x));
         }
         return results;
     }

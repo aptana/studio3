@@ -1,11 +1,14 @@
+/**
+ * Copyright (c) 2005-2010 Aptana, Inc.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
+ * this entire header must remain intact.
+ */
 package com.aptana.index.core;
 
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.ISaveContext;
-import org.eclipse.core.resources.ISaveParticipant;
-import org.eclipse.core.resources.ISavedState;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -52,35 +55,6 @@ public class IndexActivator extends Plugin
 		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
 	}
 
-	private ResourceIndexer resourceChangeListener;
-
-	ISaveParticipant saveParticipant = new ISaveParticipant()
-	{
-
-		public void doneSaving(ISaveContext context)
-		{
-
-		}
-
-		public void prepareToSave(ISaveContext context) throws CoreException
-		{
-
-		}
-
-		public void rollback(ISaveContext context)
-		{
-
-		}
-
-		public void saving(ISaveContext context) throws CoreException
-		{
-			if (context.getKind() == ISaveContext.FULL_SAVE)
-			{
-				context.needDelta();
-			}
-		}
-	};
-
 	/**
 	 * The constructor
 	 */
@@ -96,25 +70,6 @@ public class IndexActivator extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		IndexManager.getInstance();
-		resourceChangeListener = new ResourceIndexer();
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		workspace.addResourceChangeListener(resourceChangeListener, IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
-
-		// Register save participant to process any deltas that occured since last save
-		ISavedState savedState = ResourcesPlugin.getWorkspace().addSaveParticipant(this, saveParticipant);
-		if (savedState != null)
-		{
-			try
-			{
-				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(savedState);
-				savedState.processResourceChangeEvents(resourceChangeListener);
-			}
-			finally
-			{
-				resourceChangeListener.processIResourceChangeEventPOST_BUILD.set(null);
-			}
-		}
 	}
 
 	/*
@@ -123,9 +78,6 @@ public class IndexActivator extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		// Clean up
-		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
-
 		plugin = null;
 		super.stop(context);
 	}

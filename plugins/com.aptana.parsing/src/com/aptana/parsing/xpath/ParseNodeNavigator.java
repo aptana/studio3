@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -142,7 +142,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 
 				protected IParseNode getNextNode(IParseNode node)
 				{
-					int index = node.getChildIndex();
+					int index = node.getIndex();
 
 					return node.getParent().getChild(index + 1);
 				}
@@ -226,7 +226,14 @@ public class ParseNodeNavigator extends DefaultNavigator
 	 */
 	public String getElementStringValue(Object element)
 	{
-		return null;
+		String result = null;
+
+		if (element instanceof IParseNode)
+		{
+			result = ((IParseNode) element).getText();
+		}
+
+		return result;
 	}
 
 	/**
@@ -253,7 +260,7 @@ public class ParseNodeNavigator extends DefaultNavigator
 	{
 		if (isAttribute(contextNode))
 		{
-			throw new UnsupportedAxisException("Need to add an iterator that supports attributes");
+			throw new UnsupportedAxisException("Need to add an iterator that supports attributes"); //$NON-NLS-1$
 		}
 		else
 		{
@@ -275,13 +282,11 @@ public class ParseNodeNavigator extends DefaultNavigator
 					}
 				}
 
-				@Override
 				public boolean hasNext()
 				{
 					return next != null;
 				}
 
-				@Override
 				public Object next()
 				{
 					Object result = next;
@@ -291,7 +296,6 @@ public class ParseNodeNavigator extends DefaultNavigator
 					return result;
 				}
 
-				@Override
 				public void remove()
 				{
 					// do nothing

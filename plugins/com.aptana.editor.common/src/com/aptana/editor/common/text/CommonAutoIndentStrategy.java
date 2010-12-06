@@ -69,6 +69,11 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		return fViewerConfiguration;
 	}
+	
+	protected ISourceViewer getSourceViewer()
+	{
+		return fSourceViewer;
+	}
 
 	/**
 	 * Returns the first offset greater than <code>offset</code> and smaller than <code>end</code> whose character is
@@ -155,19 +160,26 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 			buf.append(indent);
 
 			String line = d.get(info.getOffset(), info.getLength());
-			line = line.trim();
-			if (c1 == '*' && !line.endsWith("*/")) //$NON-NLS-1$
+			String trimmedLine = line.trim();
+			String upToOffset = line.substring(0, c.offset - info.getOffset());
+			// What we want is to add a star if user hit return inside a comment block
+			if (c1 == '*' && upToOffset.lastIndexOf("*/") <= upToOffset.lastIndexOf("/*")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
-				buf.append("* "); //$NON-NLS-1$
+				buf.append("*"); //$NON-NLS-1$
+				if (d.getChar(c.offset) != '/')
+				{
+					buf.append(" "); //$NON-NLS-1$
+				}
 			}
-			else if (line.startsWith("/*") && !line.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
+			// FIXME Don't do this if the newline comes before the /*!
+			else if (trimmedLine.startsWith("/*") && !trimmedLine.endsWith("*/") && line.indexOf("/*") < (c.offset - info.getOffset())) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			{
 				buf.append(" * "); //$NON-NLS-1$
 				try
 				{
 					IRegion nextLineInfo = d.getLineInformationOfOffset(c.offset + 1);
-					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength());
-					if (nextLine.endsWith("*/")) //$NON-NLS-1$
+					String nextLine = d.get(nextLineInfo.getOffset(), nextLineInfo.getLength()).trim();
+					if (nextLine.startsWith("*") || nextLine.endsWith("*/")) //$NON-NLS-1$ //$NON-NLS-2$
 					{
 						return buf.toString();
 					}
@@ -176,8 +188,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				{
 				}
 				String toEnd = " */"; //$NON-NLS-1$
-				if (line.startsWith("/**")) //$NON-NLS-1$
-					toEnd = " **/"; //$NON-NLS-1$
+				if (trimmedLine.startsWith("/**")) //$NON-NLS-1$
+				{
+					toEnd = " */"; //$NON-NLS-1$
+				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
 		}

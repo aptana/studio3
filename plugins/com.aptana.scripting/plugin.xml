@@ -42,6 +42,18 @@
       <file
             name="ruble/template.rb">
       </file>
+      <file
+            name="ruble/content_assist.rb">
+      </file>
+      <file
+            name="ruble/env.rb">
+      </file>
+      <file
+            name="ruble/smart_typing_pairs.rb">
+      </file>
+      <file
+            name="ruble/project_template.rb">
+      </file>
    </extension>
    <extension
          point="com.aptana.scripting.contextContributors">
@@ -60,7 +72,7 @@
          point="org.eclipse.ui.contexts">
       <context
             id="com.aptana.scripting.context"
-            name="Aptana Scriptable Context"
+            name="%context.scripting.name"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>

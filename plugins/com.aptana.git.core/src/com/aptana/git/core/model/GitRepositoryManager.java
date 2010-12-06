@@ -1,7 +1,40 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +51,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.team.core.IIgnoreInfo;
 import org.eclipse.team.core.RepositoryProvider;
+import org.eclipse.team.core.Team;
 import org.eclipse.team.core.TeamException;
 
 import com.aptana.git.core.GitPlugin;
@@ -29,7 +64,7 @@ public class GitRepositoryManager implements IGitRepositoryManager
 	private static final String GIT_DIR = GitRepository.GIT_DIR;
 
 	private Set<IGitRepositoriesListener> listeners = new HashSet<IGitRepositoriesListener>();
-	private Map<String, SoftReference<GitRepository>> cachedRepos = new HashMap<String, SoftReference<GitRepository>>(3);
+	private Map<String, GitRepository> cachedRepos = new HashMap<String, GitRepository>(3);
 
 	public void addListener(IGitRepositoriesListener listener)
 	{
@@ -47,20 +82,25 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public void cleanup()
 	{
-		for (SoftReference<GitRepository> reference : cachedRepos.values())
+		synchronized (listeners)
 		{
-			if (reference == null || reference.get() == null)
-				continue;
-			GitRepository cachedRepo = reference.get();
-			cachedRepo.dispose();
+			listeners.clear();
 		}
-		cachedRepos.clear();
+
+		synchronized (cachedRepos)
+		{
+			for (GitRepository reference : cachedRepos.values())
+			{
+				if (reference == null)
+					continue;
+				reference.dispose();
+			}
+			cachedRepos.clear();
+		}
 	}
 
-	@Override
 	public void create(IPath path)
 	{
 		if (path == null)
@@ -79,29 +119,47 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		{
 			file.mkdirs();
 		}
-		GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
+		if (result != null && !result.isEmpty() && result.keySet().iterator().next() == 0)
+		{
+			GitRepository repo = getUnattachedExisting(path.toFile().toURI());
+			if (repo != null)
+			{
+				// Create a .gitignore that contains the contents of the Prefs > Team > Ignored Resources!
+				IIgnoreInfo[] infos = Team.getAllIgnores();
+				for (IIgnoreInfo info : infos)
+				{
+					if (info == null || !info.getEnabled() || info.getPattern().equals(".git")) //$NON-NLS-1$
+					{
+						continue;
+					}
+					repo.ignore(info.getPattern());
+				}
+			}
+		}
 	}
 
-	@Override
 	public void removeRepository(IProject p)
 	{
 		GitRepository repo = getUnattachedExisting(p.getLocationURI());
 		if (repo == null)
 			return;
 
-		cachedRepos.remove(p.getLocationURI().getPath());
 		boolean dispose = true;
-
-		// Only dispose if there's no other projects attached to same repo!
-		for (SoftReference<GitRepository> ref : cachedRepos.values())
+		synchronized (cachedRepos)
 		{
-			if (ref == null || ref.get() == null)
-				continue;
-			GitRepository other = ref.get();
-			if (other.equals(repo))
+			cachedRepos.remove(p.getLocationURI().getPath());
+
+			// Only dispose if there's no other projects attached to same repo!
+			for (GitRepository ref : cachedRepos.values())
 			{
-				dispose = false;
-				break;
+				if (ref == null)
+					continue;
+				if (ref.equals(repo))
+				{
+					dispose = false;
+					break;
+				}
 			}
 		}
 
@@ -117,7 +175,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public GitRepository getAttached(IProject project)
 	{
 		if (project == null)
@@ -130,40 +187,43 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		return getUnattachedExisting(project.getLocationURI());
 	}
 
-	@Override
-	public synchronized GitRepository getUnattachedExisting(URI path)
+	public GitRepository getUnattachedExisting(URI path)
 	{
 		if (GitExecutable.instance() == null || GitExecutable.instance().path() == null || path == null)
 			return null;
 
-		SoftReference<GitRepository> ref = cachedRepos.get(path.getPath());
-		if (ref == null || ref.get() == null)
+		synchronized (cachedRepos)
 		{
+			GitRepository ref = cachedRepos.get(path.getPath());
+			if (ref != null)
+			{
+				return ref;
+			}
+
 			URI gitDirURL = gitDirForURL(path);
 			if (gitDirURL == null)
 				return null;
+
 			// Check to see if any cached repo has the same git dir
-			for (SoftReference<GitRepository> reference : cachedRepos.values())
+			for (GitRepository reference : cachedRepos.values())
 			{
-				if (reference == null || reference.get() == null)
+				if (reference == null)
 					continue;
-				GitRepository cachedRepo = reference.get();
-				if (cachedRepo.getFileURL().getPath().equals(gitDirURL.getPath()))
+				if (reference.getFileURL().getPath().equals(gitDirURL.getPath()))
 				{
 					// Same git dir, so cache under our new path as well
 					cachedRepos.put(path.getPath(), reference);
-					return cachedRepo;
+					return reference;
 				}
 			}
+
 			// no cache for this repo or any repo sharing same git dir
-			ref = new SoftReference<GitRepository>(new GitRepository(gitDirURL));
+			ref = new GitRepository(gitDirURL);
 			cachedRepos.put(path.getPath(), ref);
+			return ref;
 		}
-		// TODO What if the underlying .git dir was wiped while we still had the object cached?
-		return ref.get();
 	}
 
-	@Override
 	public GitRepository attachExisting(IProject project, IProgressMonitor m) throws CoreException
 	{
 		if (m == null)
@@ -194,7 +254,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 			listener.repositoryAdded(e);
 	}
 
-	@Override
 	public URI gitDirForURL(URI repositoryURL)
 	{
 		if (GitExecutable.instance() == null)
@@ -208,8 +267,12 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		if (!repositoryPath.toFile().exists())
 			return null;
 
-		if (isBareRepository(repositoryPath))
-			return repositoryURL;
+		// handle the most common case of .git under the url first, since the processes are slow
+		File gitDir = repositoryPath.append(GIT_DIR).toFile();
+		if (gitDir.isDirectory())
+		{
+			return gitDir.toURI();
+		}
 
 		// Use rev-parse to find the .git dir for the repository being opened
 		Map<Integer, String> result = GitExecutable.instance()
@@ -230,13 +293,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		return null;
 	}
 
-	private boolean isBareRepository(IPath path)
-	{
-		String output = GitExecutable.instance().outputForCommand(path, "rev-parse", "--is-bare-repository"); //$NON-NLS-1$ //$NON-NLS-2$
-		return "true".equals(output); //$NON-NLS-1$
-	}
-
-	@Override
 	public void addListenerToEachRepository(IGitRepositoryListener listener)
 	{
 		if (listener == null)
@@ -251,7 +307,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public void removeListenerFromEachRepository(IGitRepositoryListener listener)
 	{
 		if (listener == null)
@@ -266,7 +321,6 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 	}
 
-	@Override
 	public GitRepository createOrAttach(IProject project, IProgressMonitor monitor) throws CoreException
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 100);

@@ -34,22 +34,23 @@
  */
 package com.aptana.ide.syncing.ui.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.syncing.ui.actions.UploadAction;
 
-public class UploadHandler extends AbstractHandler {
+public class UploadHandler extends BaseSyncHandler
+{
 
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        UploadAction action = new UploadAction();
-        action.setActivePart(null, HandlerUtil.getActivePart(event));
-        action.setSelection(HandlerUtil.getCurrentSelection(event));
-        action.run(null);
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
+		UploadAction action = new UploadAction();
+		action.setActivePart(null, HandlerUtil.getActivePart(event));
+		action.setSelection(new StructuredSelection(getSelectedResources()), isSelectionFromSource());
+		action.run(null);
 
-        return null;
-    }
-
+		return null;
+	}
 }

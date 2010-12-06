@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -71,7 +71,6 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
 import com.aptana.ide.syncing.core.old.SyncFolder;
@@ -179,8 +178,7 @@ public class SmartSyncViewer
 	 * Sets the direction in which syncing should occur.
 	 * 
 	 * @param direction
-	 *            the direction for the syncing (UPLOAD, DOWNLOAD, BOTH,
-	 *            FORCE_UPLOAD, or FORCE_DOWNLOAD)
+	 *            the direction for the syncing (UPLOAD, DOWNLOAD, BOTH, FORCE_UPLOAD, or FORCE_DOWNLOAD)
 	 */
 	public void setSyncDirection(int direction)
 	{
@@ -346,8 +344,7 @@ public class SmartSyncViewer
 	 * Refreshes the viewer and expand it to a specified level.
 	 * 
 	 * @param level
-	 *            none-negative level or ALL_LEVELS to expand all levels of the
-	 *            tree
+	 *            none-negative level or ALL_LEVELS to expand all levels of the tree
 	 */
 	public void refreshAndExpandTo(int level)
 	{
@@ -379,8 +376,7 @@ public class SmartSyncViewer
 	}
 
 	/**
-	 * Updates the given element's presentation when one or more of its
-	 * properties changes.
+	 * Updates the given element's presentation when one or more of its properties changes.
 	 * 
 	 * @param element
 	 *            the element
@@ -463,19 +459,24 @@ public class SmartSyncViewer
 								|| file.getSyncState() == SyncState.ServerItemIsNewer)
 						{
 							final VirtualFileSyncPair pair = file.getPair();
-							File local = new File(EFSUtils.getAbsolutePath(pair.getSourceFile()));
+							File local = null;
+							try
+							{
+								local = pair.getSourceFile().toLocalFile(EFS.CACHE, null);
+							} catch (CoreException ex) {
+								ex.printStackTrace();
+							}
+							
 							FileCompareEditorInput input = new FileCompareEditorInput(new CompareConfiguration())
 							{
 
 								protected void prepareFiles()
 								{
-									//IFileStore file = pair.getDestinationFile();
-									File temp = null; //$NON-NLS-1$ //$NON-NLS-2$
+									File temp = null;
 									try
 									{
 										temp = pair.getDestinationFile().toLocalFile(EFS.CACHE, null);
 									} catch (CoreException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
 									setRightResource(temp);
@@ -518,11 +519,10 @@ public class SmartSyncViewer
 			}
 
 		});
-		viewer.setCellEditors(new CellEditor[]
-			{ null, new CheckboxCellEditor(), null, null });
-		viewer.setColumnProperties(new String[]
-			{ Messages.SmartSyncDialog_ColumnName, Messages.SmartSyncDialog_ColumnSkip,
-					Messages.SmartSyncDialog_ColumnLocal, Messages.SmartSyncDialog_ColumnRemote });
+		viewer.setCellEditors(new CellEditor[] { null, new CheckboxCellEditor(), null, null });
+		viewer.setColumnProperties(new String[] { Messages.SmartSyncDialog_ColumnName,
+				Messages.SmartSyncDialog_ColumnSkip, Messages.SmartSyncDialog_ColumnLocal,
+				Messages.SmartSyncDialog_ColumnRemote });
 
 		return viewer;
 	}

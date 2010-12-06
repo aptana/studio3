@@ -1,5 +1,42 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.peer;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -21,13 +58,18 @@ import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.jface.text.link.LinkedModeUI;
 import org.eclipse.jface.text.link.LinkedPosition;
 import org.eclipse.jface.text.link.LinkedPositionGroup;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.link.EditorLinkedModeUI;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.model.BundleManager;
+import com.aptana.scripting.model.SmartTypingPairsElement;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 /**
  * A class that can be installed on a ITextViewer and will auto-insert the closing peer character for typical paired
@@ -41,23 +83,25 @@ import com.aptana.scope.ScopeSelector;
 public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListener
 {
 
+	private static final char[] NO_PAIRS = new char[0];
+
 	private ITextViewer textViewer;
 	private final String CATEGORY = toString();
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
-	private char[] pairs;
+	private char[] pairs = NO_PAIRS;
 
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
-	PeerCharacterCloser(ITextViewer textViewer, char[] pairs)
+	PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
-		this.pairs = pairs;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer, char[] pairs)
+	public static PeerCharacterCloser install(ITextViewer textViewer)
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer, pairs);
+		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
 		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
 		return pairMatcher;
 	}
@@ -68,8 +112,10 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	public void verifyKey(VerifyEvent event)
 	{
 		// early pruning to slow down normal typing as little as possible
-		if (!event.doit || !isAutoInsertEnabled() || !isAutoInsertCharacter(event.character))
+		if (!event.doit || !isAutoInsertEnabled() || isModifierKey(event.keyCode))
 		{
+			// TODO prune more aggressively on keys that fall outside the superset of all pairs to help increase
+			// performance!
 			return;
 		}
 
@@ -82,7 +128,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		{
 
 			String scope = getScopeAtOffset(document, offset);
-			if (fgCommentSelector.matches(scope))
+			this.pairs = getPairs(scope);
+			if (this.pairs == null || this.pairs.length <= 0 || !isAutoInsertCharacter(event.character))
 			{
 				return;
 			}
@@ -181,6 +228,49 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 	}
 
+	private boolean isModifierKey(int keyCode)
+	{
+		// TODO Ignore if it's not in the superset of character pairs!
+		switch (keyCode)
+		{
+			case SWT.SHIFT:
+			case SWT.BS:
+			case SWT.CR:
+			case SWT.DEL:
+			case SWT.ESC:
+			case SWT.LF:
+			case SWT.TAB:
+			case SWT.CTRL:
+			case SWT.COMMAND:
+			case SWT.ALT:
+				return true;
+		}
+		return false;
+	}
+
+	protected char[] getPairs(String scope)
+	{
+		ScopeFilter filter = new ScopeFilter(scope);
+		List<SmartTypingPairsElement> pairs = BundleManager.getInstance().getPairs(filter);
+		if (pairs == null || pairs.isEmpty())
+		{
+			return NO_PAIRS;
+		}
+		Map<IScopeSelector, SmartTypingPairsElement> map = new HashMap<IScopeSelector, SmartTypingPairsElement>();
+		for (SmartTypingPairsElement pe : pairs)
+		{
+			IScopeSelector ss = pe.getScopeSelector();
+			if (ss == null)
+			{
+				continue;
+			}
+			map.put(ss, pe);
+		}
+		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
+		SmartTypingPairsElement yay = map.get(bestMatch);
+		return yay == null ? NO_PAIRS: yay.getPairs();
+	}
+
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
 	{
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
@@ -200,7 +290,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				char c = before.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					if (!ignoreScope(document, i))
 					{
 						stackLevel++;
 						stackLevel = stackLevel % 2;
@@ -208,14 +298,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				}
 				else if (c == openingChar)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					if (!ignoreScope(document, i))
 					{
 						stackLevel++;
 					}
 				}
 				else if (c == closingCharacter)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, i)))
+					if (!ignoreScope(document, i))
 					{
 						stackLevel--;
 					}
@@ -230,7 +320,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				char c = after.charAt(i);
 				if (c == openingChar && openingChar == closingCharacter)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					if (!ignoreScope(document, offset + i))
 					{
 						stackLevel++;
 						stackLevel = stackLevel % 2;
@@ -238,14 +328,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				}
 				else if (c == openingChar)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					if (!ignoreScope(document, offset + i))
 					{
 						stackLevel++;
 					}
 				}
 				else if (c == closingCharacter)
 				{
-					if (!fgCommentSelector.matches(getScopeAtOffset(document, offset + i)))
+					if (!ignoreScope(document, offset + i))
 					{
 						stackLevel--;
 						if (stackLevel < 0)
@@ -262,6 +352,25 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
+	/**
+	 * Checks the scope in the document at the offset. Determine if it's a scope that should be ignored for peer
+	 * characters.
+	 * 
+	 * @param document
+	 * @param offset
+	 * @return
+	 * @throws BadLocationException
+	 */
+	private boolean ignoreScope(IDocument document, int offset) throws BadLocationException
+	{
+		return ignoreScope(getScopeAtOffset(document, offset));
+	}
+
+	private boolean ignoreScope(String scope)
+	{
+		return fgCommentSelector.matches(scope) || fgStringSelector.matches(scope);
+	}
+
 	private boolean isUnclosedPair(VerifyEvent event, IDocument document, int offset) throws BadLocationException
 	{
 		final char closingCharacter = getPeerCharacter(event.character);
@@ -271,7 +380,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		char c = event.character;
 		int beginning = 0;
 		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
-		// partition if we can
+		// partition if we can. 
+		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to single string/comment partition?
 		if (document instanceof IDocumentExtension3)
 		{
 			try
@@ -291,8 +401,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
-			if (fgCommentSelector.matches(getScopeAtOffset(document, beginning + index)))
-				continue;
+//			if (ignoreScope(document, beginning + index))
+//				continue;
 			open = !open;
 			if (open)
 			{
@@ -386,7 +496,6 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		// TODO Set up a pref to turn this on or off
 		return true;
 	}
-
 
 	/**
 	 * Simple class to hold linked mode and two positions.

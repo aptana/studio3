@@ -1,0 +1,12 @@
+/**
+ * Apply a function to each element in an array.
+ * 
+ * @alias MyType.foreach
+ * @param {Array} array
+ * 		The source array
+ * @param {Function(Object,Number)->Object} func
+ * 		The function to apply to each of the items in the source array. The
+ * 		function has two parameters. The first parameter is the current item in
+ * 		the array that is potentially being filtered. The second parameter is
+ * 		the index of the item potentially being filtered.
+ */

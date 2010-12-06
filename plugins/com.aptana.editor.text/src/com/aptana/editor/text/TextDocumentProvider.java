@@ -39,7 +39,7 @@ import com.aptana.editor.common.CommonDocumentProvider;
 public class TextDocumentProvider extends CommonDocumentProvider
 {
 
-	protected String getDefaultContentType()
+	protected String getDefaultContentType(String filename)
 	{
 		return "text"; //$NON-NLS-1$
 	}

@@ -106,7 +106,10 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 		}
 		child = memento.getChild(ELEMENT_PATH);
 		if (child != null) {
-			path = Path.fromPortableString(child.getTextData());
+			String text = child.getTextData();
+			if (text != null) {
+				path = Path.fromPortableString(text);
+			}
 		}
 		child = memento.getChild(ELEMENT_LOGIN);
 		if (child != null) {
@@ -114,7 +117,10 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 		}
 		child = memento.getChild(ELEMENT_PRIVATE_KEY_FILE);
 		if (child != null) {
-			privateKeyFile = Path.fromPortableString(child.getTextData());
+			String text = child.getTextData();
+			if (text != null) {
+				privateKeyFile = Path.fromPortableString(text);
+			}
 		}
 		child = memento.getChild(ELEMENT_TRANSFER_TYPE);
 		if (child != null) {
@@ -348,7 +354,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IConnectionFileManager.class == adapter) {

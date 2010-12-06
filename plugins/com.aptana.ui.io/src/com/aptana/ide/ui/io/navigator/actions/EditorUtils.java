@@ -36,9 +36,11 @@ package com.aptana.ide.ui.io.navigator.actions;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +57,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.UIUtils;
 
@@ -65,11 +68,15 @@ public class EditorUtils {
 
     public static class RemoteFileStoreEditorInput extends FileStoreEditorInput {
 
-        private IFileStore fRemoteFileStore;
+    	protected IFileStore fLocalFileStore;
+        protected IFileStore fRemoteFileStore;
+        protected IFileInfo fRemoteFileInfo;
 
-        public RemoteFileStoreEditorInput(IFileStore localFileStore, IFileStore remoteFileStore) {
+        public RemoteFileStoreEditorInput(IFileStore localFileStore, IFileStore remoteFileStore, IFileInfo remoteFileInfo) {
             super(localFileStore);
+            fLocalFileStore = localFileStore;
             fRemoteFileStore = remoteFileStore;
+            fRemoteFileInfo = remoteFileInfo;
         }
 
         @Override
@@ -89,6 +96,11 @@ public class EditorUtils {
             return null;
         }
 
+		public IFileStore getRemoteFileStore()
+		{
+			return fRemoteFileStore;
+		}
+
         @Override
         public int hashCode() {
             return fRemoteFileStore.hashCode();
@@ -101,6 +113,22 @@ public class EditorUtils {
             }
             return false;
         }
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public Object getAdapter(Class adapter)
+		{
+			if (IFileStore.class == adapter) {
+				return fRemoteFileStore;
+			} else if (IFileInfo.class == adapter) {
+				return fRemoteFileInfo;
+			} else if (URI.class == adapter) {
+				if (fRemoteFileStore instanceof IExtendedFileStore) {
+					return ((IExtendedFileStore) fRemoteFileStore).toCanonicalURI();
+				}
+			}
+			return super.getAdapter(adapter);
+		}
     }
 
     /**
@@ -116,6 +144,7 @@ public class EditorUtils {
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     final IFileStore localFileStore = toLocalFileStore(fileStore, monitor);
+                    final IFileInfo remoteFileInfo = fileStore.fetchInfo(EFS.NONE, monitor);
 
                     if (localFileStore != null) {
                         UIJob openEditor = new UIJob("Opening editor") { //$NON-NLS-1$
@@ -126,15 +155,14 @@ public class EditorUtils {
                                     IEditorPart editorPart = null;
                                     if (page != null) {
                                         IEditorInput editorInput = new RemoteFileStoreEditorInput(
-                                                localFileStore, fileStore);
+                                                localFileStore, fileStore, remoteFileInfo);
                                         boolean opened = (page.findEditor(editorInput) != null);
 
                                         editorPart = page.openEditor(editorInput, IDE
                                                 .getEditorDescriptor(localFileStore.getName())
                                                 .getId());
                                         if (!opened && editorPart != null) {
-                                            attachSaveListener(fileStore, localFileStore,
-                                                    editorPart);
+                                            attachSaveListener(editorPart);
                                         }
                                     }
                                 } catch (Exception e) {
@@ -162,16 +190,14 @@ public class EditorUtils {
      * Watches the local file for changes and saves it back to the original
      * remote file when the editor is saved.
      * 
-     * @param originalFile
-     *            the file store for the original remote file
-     * @param localCacheFile
-     *            the file store for the local cache file
      * @param editorPart
      *            the editor part the file is opened on
      */
-    public static void attachSaveListener(final IFileStore originalFile,
-            final IFileStore localCacheFile, final IEditorPart editorPart) {
-        if (originalFile == localCacheFile) {
+    public static void attachSaveListener(final IEditorPart editorPart) {
+    	IEditorInput editorInput = editorPart.getEditorInput();
+    	final RemoteFileStoreEditorInput remoteFileStoreEditorInput = editorInput instanceof RemoteFileStoreEditorInput ? (RemoteFileStoreEditorInput) editorInput : null;
+        if (remoteFileStoreEditorInput == null
+        		|| remoteFileStoreEditorInput.fRemoteFileStore == remoteFileStoreEditorInput.fLocalFileStore) {
             // the original is a local file; no need to re-save it
             return;
         }
@@ -188,8 +214,21 @@ public class EditorUtils {
                     Job job = new Job(Messages.EditorUtils_MSG_RemotelySaving + ed.getPartName()) {
 
                         protected IStatus run(IProgressMonitor monitor) {
+                        	IFileStore originalFile = remoteFileStoreEditorInput.fRemoteFileStore;
+                        	IFileStore localCacheFile = remoteFileStoreEditorInput.fLocalFileStore;
+                        	IFileInfo originalFileInfo = remoteFileStoreEditorInput.fRemoteFileInfo;
                             try {
+                            	IFileInfo currentFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
+                            	if (currentFileInfo.getLastModified() != originalFileInfo.getLastModified()
+                            			|| currentFileInfo.getLength() != originalFileInfo.getLength()) {
+                            		if (!UIUtils.showPromptDialog(Messages.EditorUtils_OverwritePrompt_Title,
+                            				MessageFormat.format(Messages.EditorUtils_OverwritePrompt_Message, originalFile.getName()))) {
+                            			return Status.CANCEL_STATUS;
+                            		}
+                            	}
                                 localCacheFile.copy(originalFile, EFS.OVERWRITE, monitor);
+                                // update cached remote file info
+                                remoteFileStoreEditorInput.fRemoteFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
                             } catch (CoreException e) {
                                 UIUtils.showErrorMessage(MessageFormat.format(
                                         Messages.EditorUtils_ERR_SavingRemoteFile, originalFile
@@ -222,7 +261,12 @@ public class EditorUtils {
             return fileStore;
         }
         try {
-            file = File.createTempFile(fileStore.getFileSystem().getScheme(), fileStore.getName());
+        	String prefix = fileStore.getFileSystem().getScheme();
+        	while (prefix.length() < 3)
+        	{
+        		prefix += "_"; //$NON-NLS-1$
+        	}
+            file = File.createTempFile(prefix, fileStore.getName());
         } catch (IOException e) {
             return fileStore;
         }

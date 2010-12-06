@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.File;
@@ -6,25 +40,37 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.Activator;
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 import com.aptana.scripting.model.filters.AndFilter;
 import com.aptana.scripting.model.filters.IModelFilter;
@@ -32,43 +78,117 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
-	static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
-	static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
-	static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
-	static final BundleElement[] NO_BUNDLES = new BundleElement[0];
-	static final CommandElement[] NO_COMMANDS = new CommandElement[0];
-	static final MenuElement[] NO_MENUS = new MenuElement[0];
-	static final SnippetElement[] NO_SNIPPETS = new SnippetElement[0];
+	private class BundleLoadJob extends Job
+	{
+		private File bundleDirectory;
 
+		BundleLoadJob(File bundleDirectory)
+		{
+			super("Loading bundle: " + bundleDirectory.getAbsolutePath()); //$NON-NLS-1$
+
+			this.bundleDirectory = bundleDirectory;
+
+			setPriority(Job.SHORT);
+		}
+
+		public IStatus run(IProgressMonitor monitor)
+		{
+			List<File> bundleScripts = getBundleScripts(bundleDirectory);
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size());
+
+			if (bundleScripts.size() > 0)
+			{
+				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+				for (File script : bundleScripts)
+				{
+					sub.subTask(script.getAbsolutePath());
+					loadScript(script, true, bundleLoadPaths);
+					sub.worked(1);
+				}
+			}
+
+			sub.done();
+
+			return Status.OK_STATUS;
+		}
+	}
+
+	/**
+	 * This is a rule which reports a conflict when two rules wrap the same object. It is used to enforce a max job
+	 * count for parallel bundle loads.
+	 */
+	private class SerialPerObjectRule implements ISchedulingRule
+	{
+		private Object fObject = null;
+
+		public SerialPerObjectRule(Object lock)
+		{
+			fObject = lock;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.ISchedulingRule#contains(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean contains(ISchedulingRule rule)
+		{
+			return rule == this;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * org.eclipse.core.runtime.jobs.ISchedulingRule#isConflicting(org.eclipse.core.runtime.jobs.ISchedulingRule)
+		 */
+		public boolean isConflicting(ISchedulingRule rule)
+		{
+			if (rule instanceof SerialPerObjectRule)
+			{
+				SerialPerObjectRule vup = (SerialPerObjectRule) rule;
+
+				return fObject == vup.fObject;
+			}
+
+			return false;
+		}
+	}
+
+	// split patterns
+	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	private static final Pattern STAR_PATTERN = Pattern.compile("\\*"); //$NON-NLS-1$
+
+	// special sub-directories within a bundle directory
+	private static final String SNIPPETS_DIRECTORY_NAME = "snippets"; //$NON-NLS-1$
+	private static final String COMMANDS_DIRECTORY_NAME = "commands"; //$NON-NLS-1$
+	private static final String TEMPLATES_DIRECTORY_NAME = "templates"; //$NON-NLS-1$
+
+	// constant to indicated we have no file instances
 	private static final File[] NO_FILES = new File[0];
-	private static final String[] NO_STRINGS = new String[0];
 
+	// system property used to indicate the desired directory for user rubles
+	private static final String APTANA_RUBLE_USER_LOCATION = "aptana.ruble.user.location"; //$NON-NLS-1$
+
+	// project directory name where project bundles are located
 	private static final String BUILTIN_BUNDLES = "bundles"; //$NON-NLS-1$
+
+	// special file name used to define a bundle
 	private static final String BUNDLE_FILE = "bundle.rb"; //$NON-NLS-1$
+
 	private static final String RUBY_FILE_EXTENSION = ".rb"; //$NON-NLS-1$
+
+	// locations for user rubles
 	private static final String USER_HOME_PROPERTY = "user.home"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_GENERAL = "Aptana Rubles"; //$NON-NLS-1$
 	private static final String USER_BUNDLE_DIRECTORY_MACOSX = "/Documents/Aptana Rubles"; //$NON-NLS-1$
 
+	// singleton instance
 	private static BundleManager INSTANCE;
 
-	private String applicationBundlesPath;
-	private String userBundlesPath;
-
-	private Map<File, List<BundleElement>> _bundlesByPath;
-	private Map<String, BundleEntry> _entriesByName;
-
-	private Object bundlePathsLock = new Object();
-	private Object entryNamesLock = new Object();
-	
-	private List<BundleChangeListener> _bundleListeners;
-	private List<ElementChangeListener> _elementListeners;
-	private List<LoadCycleListener> _loadCycleListeners;
-
 	/**
-	 * getInstance
+	 * Return the singleton instance of BundleManager
 	 * 
-	 * @return
+	 * @return The singleton instance of BundleManager
 	 */
 	public static BundleManager getInstance()
 	{
@@ -76,11 +196,17 @@ public class BundleManager
 	}
 
 	/**
-	 * getInstance - used for unit testing
+	 * Return the singleton instance of BundleManager. Optional arguments allow for the explicit definition of the
+	 * directories used for application bundles and user bundles. However, this should only be used by unit tests. In
+	 * other words, don't use this unless you know what you're doing
 	 * 
 	 * @param applicationBundlesPath
+	 *            The path to use when looking for application bundles. Note this may be null in which case the standard
+	 *            default location will be used
 	 * @param userBundlesPath
-	 * @return
+	 *            The path to use when looking for user bundles. Note this may be null in which case the standard
+	 *            default location will be used
+	 * @return The singleton instance of BundleManager
 	 */
 	public static BundleManager getInstance(String applicationBundlesPath, String userBundlesPath)
 	{
@@ -90,24 +216,65 @@ public class BundleManager
 			INSTANCE = new BundleManager();
 
 			// setup default application bundles path
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+			URL url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
 
 			if (url != null)
 			{
 				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
 			}
 
-			String OS = Platform.getOS();
-			String userHome = System.getProperty(USER_HOME_PROPERTY);
+			// get possible user override
+			boolean validUserBundlePath = false;
+			String userBundlePathOverride = System.getProperty(APTANA_RUBLE_USER_LOCATION);
 
-			// setup default user bundles path
-			if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+			if (userBundlePathOverride != null)
 			{
-				INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				File f = new File(userBundlePathOverride);
+
+				if (f.exists())
+				{
+					if (f.isDirectory())
+					{
+						if (f.canRead() && f.canWrite())
+						{
+							validUserBundlePath = true;
+						}
+						else
+						{
+							ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+						}
+					}
+					else
+					{
+						ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+					}
+				}
+				else
+				{
+					// try to create the path
+					validUserBundlePath = f.mkdirs();
+				}
+
+				if (validUserBundlePath)
+				{
+					INSTANCE.userBundlesPath = f.getAbsolutePath();
+				}
 			}
-			else
+
+			if (validUserBundlePath == false)
 			{
-				INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				String OS = Platform.getOS();
+				String userHome = System.getProperty(USER_HOME_PROPERTY);
+
+				// setup default user bundles path
+				if (OS.equals(Platform.OS_MACOSX) || OS.equals(Platform.OS_LINUX))
+				{
+					INSTANCE.userBundlesPath = userHome + USER_BUNDLE_DIRECTORY_MACOSX;
+				}
+				else
+				{
+					INSTANCE.userBundlesPath = userHome + File.separator + USER_BUNDLE_DIRECTORY_GENERAL;
+				}
 			}
 		}
 
@@ -127,14 +294,64 @@ public class BundleManager
 	}
 
 	/**
-	 * BundleManager
+	 * Determine if the specified path is one of the special directories in a bundle: commands, snippets, templates,
+	 * etc.
+	 * 
+	 * @param path
+	 *            The path to test. This may be null, in which case this predicate will return false
+	 * @return A boolean indicating if the specified directory is "special"
 	 */
-	private BundleManager()
+	static boolean isSpecialDirectory(File path)
 	{
+		boolean result = false;
+
+		if (path != null)
+		{
+			String pathString = path.getName();
+
+			result = COMMANDS_DIRECTORY_NAME.equals(pathString) //
+				|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
+				|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
+		}
+
+		return result;
 	}
 
 	/**
-	 * addBundle
+	 * counter to cycle through for use in enforcing max parallel bundle loads. We compare versus the number of
+	 * available processors reported by Java's Runtime.
+	 */
+	private int counter = 0;
+
+	private String applicationBundlesPath;
+	private String userBundlesPath;
+
+	private Map<File, List<BundleElement>> _bundlesByPath;
+	private Map<String, BundleEntry> _entriesByName;
+
+	private List<BundleVisibilityListener> _bundleVisibilityListeners;
+	private List<ElementVisibilityListener> _elementVisibilityListeners;
+	private List<LoadCycleListener> _loadCycleListeners;
+
+	/**
+	 * Create a new instance of BundleManager and initialize its internal structure. Note that this constructor is
+	 * private so it can only be instantiated within a static method in this class
+	 */
+	private BundleManager()
+	{
+		// NOTE: It is very likely that we have at least one bundle, so pre-create these maps. This gets rid of a number
+		// of null checks and allows us to lock on the field directly instead of using separate locks
+		this._bundlesByPath = new HashMap<File, List<BundleElement>>();
+		this._entriesByName = new HashMap<String, BundleEntry>();
+
+		// NOTE: similar logic for these guys too
+		this._bundleVisibilityListeners = new ArrayList<BundleVisibilityListener>();
+		this._elementVisibilityListeners = new ArrayList<ElementVisibilityListener>();
+		this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+	}
+
+	/**
+	 * Add a new BundleElement to the scripting environment. Note this is called from the JRuby framework
 	 * 
 	 * @param bundle
 	 */
@@ -144,14 +361,9 @@ public class BundleManager
 		{
 			File bundleFile = bundle.getBundleDirectory();
 
-			synchronized (bundlePathsLock)
+			// store bundle by path
+			synchronized (this._bundlesByPath)
 			{
-				// store bundle by path
-				if (this._bundlesByPath == null)
-				{
-					this._bundlesByPath = new HashMap<File, List<BundleElement>>();
-				}
-
 				if (this._bundlesByPath.containsKey(bundleFile) == false)
 				{
 					List<BundleElement> bundles = new ArrayList<BundleElement>();
@@ -171,13 +383,8 @@ public class BundleManager
 			// store bundle by name
 			String name = bundle.getDisplayName();
 
-			synchronized (entryNamesLock)
+			synchronized (this._entriesByName)
 			{
-				if (this._entriesByName == null)
-				{
-					this._entriesByName = new HashMap<String, BundleEntry>();
-				}
-
 				if (this._entriesByName.containsKey(name) == false)
 				{
 					BundleEntry entry = new BundleEntry(name);
@@ -197,56 +404,65 @@ public class BundleManager
 	}
 
 	/**
-	 * addBundleChangeListener
+	 * Add a new listener to fire when any bundle changes visibility.
 	 * 
 	 * @param listener
+	 *            The listener to fire upon bundle visibility changes. A listener is added only once. Null values are
+	 *            ignored
 	 */
-	public void addBundleChangeListener(BundleChangeListener listener)
+	public void addBundleVisibilityListener(BundleVisibilityListener listener)
 	{
 		if (listener != null)
 		{
-			if (this._bundleListeners == null)
+			synchronized (this._bundleVisibilityListeners)
 			{
-				this._bundleListeners = new ArrayList<BundleChangeListener>();
+				if (this._bundleVisibilityListeners.contains(listener) == false)
+				{
+					this._bundleVisibilityListeners.add(listener);
+				}
 			}
-
-			this._bundleListeners.add(listener);
 		}
 	}
 
 	/**
-	 * addElementChangeListener
+	 * Add a new listener to fire when any bundle element changes visibility.
 	 * 
 	 * @param listener
+	 *            The listener to fire upon element visibility changes. A listener is added only once. Null values are
+	 *            ignored
 	 */
-	public void addElementChangeListener(ElementChangeListener listener)
+	public void addElementVisibilityListener(ElementVisibilityListener listener)
 	{
 		if (listener != null)
 		{
-			if (this._elementListeners == null)
+			synchronized (this._elementVisibilityListeners)
 			{
-				this._elementListeners = new ArrayList<ElementChangeListener>();
+				if (this._elementVisibilityListeners.contains(listener) == false)
+				{
+					this._elementVisibilityListeners.add(listener);
+				}
 			}
-
-			this._elementListeners.add(listener);
 		}
 	}
 
 	/**
-	 * addLoadCycleListener
+	 * Add a new listener to fire when any script is loaded, unloaded, or reloaded.
 	 * 
 	 * @param listener
+	 *            The listener to fire when scripts are processed. A listener is added only once. Null values are
+	 *            ignored
 	 */
 	public void addLoadCycleListener(LoadCycleListener listener)
 	{
 		if (listener != null)
 		{
-			if (this._loadCycleListeners == null)
+			synchronized (this._loadCycleListeners)
 			{
-				this._loadCycleListeners = new ArrayList<LoadCycleListener>();
+				if (this._loadCycleListeners.contains(listener) == false)
+				{
+					this._loadCycleListeners.add(listener);
+				}
 			}
-
-			this._loadCycleListeners.add(listener);
 		}
 	}
 
@@ -258,7 +474,7 @@ public class BundleManager
 	 * @param matchedPattern
 	 * @return
 	 */
-	private boolean betterMatch(ScopeSelector matchedScope, String scope, String matchedPattern)
+	private boolean betterMatch(IScopeSelector matchedScope, String scope, String matchedPattern)
 	{
 		if (matchedScope.matches(scope) == false)
 		{
@@ -276,139 +492,89 @@ public class BundleManager
 	}
 
 	/**
-	 * fireBundleAddedEvent
+	 * Fire a bundle-became-hidden visibility event to all listeners
 	 * 
 	 * @param bundle
-	 */
-	void fireBundleAddedEvent(BundleElement bundle)
-	{
-		if (this._bundleListeners != null && bundle != null)
-		{
-			for (BundleChangeListener listener : this._bundleListeners)
-			{
-				listener.added(bundle);
-			}
-		}
-	}
-
-	/**
-	 * fireBundleBecameHiddenEvent
-	 * 
-	 * @param bundle
+	 *            The bundle entry affected by this visibility event. Null values are ignored and do not cause the event
+	 *            to fire.
 	 */
 	void fireBundleBecameHiddenEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.becameHidden(entry);
+				listener.bundlesBecameHidden(entry);
 			}
 		}
 	}
 
 	/**
-	 * fireBundleBecameVisibleEvent
+	 * Fire a bundle-became-visible visibility event to all listeners
 	 * 
 	 * @param bundle
+	 *            The bundle entry affected by this visibility event. Null values are ignored and do not cause the event
+	 *            to fire.
 	 */
 	void fireBundleBecameVisibleEvent(BundleEntry entry)
 	{
-		if (this._bundleListeners != null && entry != null)
+		if (entry != null)
 		{
-			for (BundleChangeListener listener : this._bundleListeners)
+			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				listener.becameVisible(entry);
+				listener.bundlesBecameVisible(entry);
 			}
 		}
 	}
 
 	/**
-	 * fireBundleDeletedEvent
-	 * 
-	 * @param bundle
-	 */
-	void fireBundleDeletedEvent(BundleElement bundle)
-	{
-		if (this._bundleListeners != null && bundle != null)
-		{
-			for (BundleChangeListener listener : this._bundleListeners)
-			{
-				listener.deleted(bundle);
-			}
-		}
-	}
-
-	/**
-	 * fireElementAddedEvent
+	 * Fire an element-became-hidden visibility event to all listeners
 	 * 
 	 * @param element
+	 *            The element affected by this visibility event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
-	void fireElementAddedEvent(AbstractElement element)
+	void fireElementBecameHiddenEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementAdded(element);
+				listener.elementBecameHidden(element);
 			}
 		}
 	}
 
 	/**
-	 * fireElementDeletedEvent
+	 * Fire an element-became-visible visibility event to all listeners
 	 * 
 	 * @param element
+	 *            The element affected by this visibility event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
-	void fireElementDeletedEvent(AbstractElement element)
+	void fireElementBecameVisibleEvent(AbstractElement element)
 	{
-		if (this._elementListeners != null && element != null)
+		if (element != null)
 		{
-			for (ElementChangeListener listener : this._elementListeners)
+			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				listener.elementDeleted(element);
+				listener.elementBecameVisible(element);
 			}
 		}
 	}
 
 	/**
-	 * fireElementModifiedEvent
-	 * 
-	 * @param element
-	 */
-	void fireElementModifiedEvent(AbstractElement element)
-	{
-		if (this._elementListeners != null && element != null)
-		{
-			boolean sendEvent = true;
-
-			if (element instanceof AbstractBundleElement)
-			{
-				sendEvent = (((AbstractBundleElement) element).getOwningBundle() != null);
-			}
-
-			if (sendEvent)
-			{
-				for (ElementChangeListener listener : this._elementListeners)
-				{
-					listener.elementDeleted(element);
-					listener.elementAdded(element);
-					// listener.elementModified(element);
-				}
-			}
-		}
-	}
-
-	/**
-	 * fireScriptLoadedEvent
+	 * Fire a script-loaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptLoadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
 				listener.scriptLoaded(script);
 			}
@@ -416,15 +582,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireScriptReloadedEvent
+	 * Fire a script-reloaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptReloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
 				listener.scriptReloaded(script);
 			}
@@ -432,15 +600,17 @@ public class BundleManager
 	}
 
 	/**
-	 * fireScriptUnloadedEvent
+	 * Fire a script-unloaded load cycle event to all listeners
 	 * 
 	 * @param path
+	 *            The path affected by this load cycle event. Null values are ignored and do not cause the event to
+	 *            fire.
 	 */
 	void fireScriptUnloadedEvent(File script)
 	{
-		if (this._loadCycleListeners != null && script != null)
+		if (script != null)
 		{
-			for (LoadCycleListener listener : this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
 				listener.scriptReloaded(script);
 			}
@@ -448,47 +618,47 @@ public class BundleManager
 	}
 
 	/**
-	 * getApplicationBundles
+	 * Return a list of all bundle elements categorized as application bundles
 	 * 
-	 * @return
+	 * @return A list of bundles. This list will always be defined
 	 */
 	public List<BundleElement> getApplicationBundles()
 	{
-		List<BundleElement> bundles = new ArrayList<BundleElement>();
+		String applicationBundlesPath = this.getApplicationBundlesPath();
+		List<BundleElement> result = new ArrayList<BundleElement>();
 
-		synchronized (bundlePathsLock)
+		// make local copy of active keys (files)
+		Set<File> keys;
+
+		synchronized (this._bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
+			keys = new HashSet<File>(this._bundlesByPath.keySet());
+		}
+
+		// filter set
+		Set<File> applicationKeys = new HashSet<File>();
+
+		for (File key : keys)
+		{
+			String path = key.getAbsolutePath();
+
+			if (path.startsWith(applicationBundlesPath))
 			{
-				String applicationBundlesPath = this.getApplicationBundlesPath();
-
-				for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
-				{
-					String path = entry.getKey().getAbsolutePath();
-
-					if (path.startsWith(applicationBundlesPath))
-					{
-						List<BundleElement> matchingBundles = entry.getValue();
-
-						if (matchingBundles != null)
-						{
-							int size = matchingBundles.size();
-
-							if (size > 0)
-							{
-								bundles.add(matchingBundles.get(size - 1));
-							}
-						}
-					}
-				}
+				applicationKeys.add(key);
 			}
 		}
 
-		return bundles;
+		// build result list
+		for (File key : applicationKeys)
+		{
+			result.add(this.getBundleFromPath(key));
+		}
+
+		return result;
 	}
 
 	/**
-	 * getBuiltinsLoadPath
+	 * Return the path that contains application bundles
 	 * 
 	 * @return
 	 */
@@ -498,49 +668,65 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleCommands
+	 * Return a list of commands in the specified bundle name. Note that bundle precedence is taken into account, so
+	 * only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
-	public CommandElement[] getBundleCommands(String name)
+	public List<CommandElement> getBundleCommands(String name)
 	{
-		CommandElement[] result = NO_COMMANDS;
+		BundleEntry entry = this.getBundleEntry(name);
+		List<CommandElement> result;
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getCommands();
-			}
+			result = entry.getCommands();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
 	}
 
 	/**
-	 * getBundleDirectory
+	 * Return a list of content assist elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
 	 * 
-	 * @param script
-	 * @return
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
-	public File getBundleDirectory(File script)
+	public List<ContentAssistElement> getBundleContentAssists(String name)
 	{
-		String scriptPath = script.getAbsolutePath();
-		
-		return scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+		BundleEntry entry = this.getBundleEntry(name);
+		List<ContentAssistElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getContentAssists();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
 	}
-	
+
 	/**
-	 * getBundles
+	 * Return a list of directories within the specified directory. Each directory returned in the list becomes a
+	 * candidate bundle determined by other methods.
 	 * 
 	 * @param bundlesDirectory
-	 * @return
+	 *            The directory to query for child directories. It is verified that the specified file is a directory
+	 *            and is readable. Null values are ignored
+	 * @return The list of directories within the specified directory
 	 */
-	protected File[] getBundleDirectories(File bundlesDirectory)
+	protected List<File> getBundleDirectories(File bundlesDirectory)
 	{
 		File[] result = NO_FILES;
 
@@ -555,55 +741,103 @@ public class BundleManager
 			});
 		}
 
+		return Arrays.asList(result);
+	}
+
+	/**
+	 * Return the bundle directory that contains the specified script. If the script is the bundle.rb file, then its
+	 * parent is returned; otherwise, it is assumed that the script is within a special directory. In that case the
+	 * grandparent directory of the file is returned
+	 * 
+	 * @param script
+	 *            The descendant script used to locate the bundle directory. Null values are ignored
+	 * @return The bundle directory or null if the specified script was null
+	 */
+	public File getBundleDirectory(File script)
+	{
+		File result = null;
+
+		if (script != null)
+		{
+			String scriptPath = script.getAbsolutePath();
+
+			result = scriptPath.endsWith(BUNDLE_FILE) ? script.getParentFile() : script.getParentFile().getParentFile();
+		}
+
 		return result;
 	}
 
 	/**
-	 * getBundle
+	 * Return the underlying bundle entry which contains all bundle elements of the specified name
 	 * 
 	 * @param name
-	 * @return
+	 *            The bundle name used to locate the bundle entry
+	 * @return The bundle entry or null if no bundle exists for the specified name
 	 */
 	public BundleEntry getBundleEntry(String name)
 	{
-		BundleEntry result = null;
+		BundleEntry result;
 
-		synchronized (entryNamesLock)
+		synchronized (this._entriesByName)
 		{
-			if (this._entriesByName != null)
-			{
-				result = this._entriesByName.get(name);
-			}
+			result = this._entriesByName.get(name);
 		}
 
 		return result;
 	}
 
 	/**
-	 * getBundleFromPath
+	 * Return a list of environment elements in the specified bundle name. Note that bundle precedence is taken into
+	 * account, so only visible elements are returned in this list
 	 * 
-	 * @param path
-	 * @return
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<EnvironmentElement> getBundleEnvs(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<EnvironmentElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getEnvs();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * Find the bundle element contained within the specified directory
+	 * 
+	 * @param bundleDirectory
+	 *            A bundle directory. Null values are ignored
+	 * @return The bundle element that is defined within the specified directory or null if none is defined
 	 */
 	public BundleElement getBundleFromPath(File bundleDirectory)
 	{
+		List<BundleElement> bundles = null;
 		BundleElement result = null;
 
-		synchronized (bundlePathsLock)
+		synchronized (this._bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
+			if (this._bundlesByPath.containsKey(bundleDirectory))
 			{
-				List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
+				bundles = new ArrayList<BundleElement>(this._bundlesByPath.get(bundleDirectory));
+			}
+		}
 
-				if (bundles != null)
-				{
-					int size = bundles.size();
+		if (bundles != null)
+		{
+			int size = bundles.size();
 
-					if (size > 0)
-					{
-						result = bundles.get(size - 1);
-					}
-				}
+			if (size > 0)
+			{
+				result = bundles.get(size - 1);
 			}
 		}
 
@@ -611,10 +845,11 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleFromPath
+	 * Find the bundle element contained within the specified directory
 	 * 
 	 * @param path
-	 * @return
+	 *            A bundle directory. Null values are ignored
+	 * @return The bundle element that is defined within the specified directory or null if none is defined
 	 */
 	public BundleElement getBundleFromPath(String path)
 	{
@@ -629,120 +864,142 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleLoadPaths
+	 * Return a list of paths to be used by ruby when locating imported scripts
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            The bundle directory from which load paths will be calculated
+	 * @return A list of ruby load paths
 	 */
 	protected List<String> getBundleLoadPaths(File bundleDirectory)
 	{
 		List<String> result = null;
-		
+
 		if (bundleDirectory != null)
 		{
 			File bundleFile = new File(bundleDirectory, BUNDLE_FILE);
 			String bundleName = BundleUtils.getBundleName(bundleFile);
-			
+
 			if (bundleName != null)
 			{
 				String defaultName = BundleUtils.getDefaultBundleName(bundleFile.getAbsolutePath());
-				
+
 				if (bundleName.equals(defaultName) == false)
 				{
 					result = this.getBundleLoadPaths(bundleName);
 				}
 			}
-			
+
 			if (result == null)
 			{
-				result = new LinkedList<String>();
-				
+				result = new ArrayList<String>();
+
 				result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 			}
-			
+
 			result.add(0, BundleUtils.getBundleLibDirectory(bundleDirectory));
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	 * getBundleLoadPaths
+	 * Return a list of load paths for the specified bundle name. Note that bundle precedence is taken into account, so
+	 * only visible load paths are returned in this list
 	 * 
-	 * @param bundleDirectory
-	 * @return
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
 	protected List<String> getBundleLoadPaths(String name)
 	{
+		BundleEntry entry = this.getBundleEntry(name);
 		List<String> result = new ArrayList<String>();
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-				
-				result.addAll(entry.getLoadPaths());
-			}
+			result.addAll(entry.getLoadPaths());
 		}
-		
+
 		result.addAll(ScriptingEngine.getInstance().getContributedLoadPaths());
 
 		return result;
 	}
 
 	/**
-	 * getBundleCommands
+	 * Return a list of menu elements in the specified bundle name. Note that bundle precedence is taken into account,
+	 * so only visible elements are returned in this list
 	 * 
 	 * @param name
-	 * @return
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
 	 */
-	public MenuElement[] getBundleMenus(String name)
+	public List<MenuElement> getBundleMenus(String name)
 	{
-		MenuElement[] result = NO_MENUS;
+		BundleEntry entry = this.getBundleEntry(name);
+		List<MenuElement> result;
 
-		synchronized (entryNamesLock)
+		if (entry != null)
 		{
-			if (this._entriesByName != null && this._entriesByName.containsKey(name))
-			{
-				// grab all bundles of the given name
-				BundleEntry entry = this._entriesByName.get(name);
-
-				result = entry.getMenus();
-			}
+			result = entry.getMenus();
+		}
+		else
+		{
+			result = Collections.emptyList();
 		}
 
 		return result;
 	}
 
 	/**
-	 * getBundleNames
+	 * Return a list of names for all active bundles
 	 * 
-	 * @return
+	 * @return A list of bundle names
 	 */
-	public String[] getBundleNames()
+	public List<String> getBundleNames()
 	{
-		String[] result = NO_STRINGS;
+		List<String> names;
 
-		synchronized (entryNamesLock)
+		synchronized (this._entriesByName)
 		{
-			if (this._entriesByName != null && this._entriesByName.size() > 0)
-			{
-				result = this._entriesByName.keySet().toArray(new String[this._entriesByName.size()]);
-			}
+			names = new ArrayList<String>(this._entriesByName.keySet());
 		}
 
-		Arrays.sort(result);
+		return names;
+	}
+
+	/**
+	 * Return a list of smart typing pairs elements in the specified bundle name. Note that bundle precedence is taken
+	 * into account, so only visible elements are returned in this list
+	 * 
+	 * @param name
+	 *            The name of the bundle to query
+	 * @return A list of elements matching the specified criteria
+	 */
+	public List<SmartTypingPairsElement> getBundlePairs(String name)
+	{
+		BundleEntry entry = this.getBundleEntry(name);
+		List<SmartTypingPairsElement> result;
+
+		if (entry != null)
+		{
+			result = entry.getPairs();
+		}
+		else
+		{
+			result = Collections.emptyList();
+		}
 
 		return result;
 	}
 
 	/**
-	 * getBundlePrecedence
+	 * Determine the bundle precedence of the specified path. Note this method assumes that if a path is not an
+	 * application bundle nor a user bundle, then it is a project bundle. This may not be exactly true. A more thorough
+	 * check against the current workspace will be required to verify that case.
 	 * 
 	 * @param path
-	 * @return
+	 *            The path to use to determine bundle precedence
+	 * @return The BundlePrecedence type
 	 */
 	public BundlePrecedence getBundlePrecedence(File path)
 	{
@@ -750,10 +1007,13 @@ public class BundleManager
 	}
 
 	/**
-	 * getBundleScope
+	 * Determine the bundle precedence of the specified path. Note this method assumes that if a path is not an
+	 * application bundle nor a user bundle, then it is a project bundle. This may not be exactly true. A more thorough
+	 * check against the current workspace will be required to verify that case.
 	 * 
 	 * @param path
-	 * @return
+	 *            The path to use to determine bundle precedence
+	 * @return The BundlePrecedence type
 	 */
 	public BundlePrecedence getBundlePrecedence(String path)
 	{
@@ -773,14 +1033,16 @@ public class BundleManager
 
 		return result;
 	}
-	
+
 	/**
-	 * getBundleScripts
+	 * Return a list of all scripts that need to be processed in a specified bundle directory. Note that the items are
+	 * returned in the following order: bundle.rb, commands, snippets, and then project templates.
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            The bundle directory used to search for scripts
+	 * @return A list of all active scripts in the specified bundle directory
 	 */
-	protected File[] getBundleScripts(File bundleDirectory)
+	protected List<File> getBundleScripts(File bundleDirectory)
 	{
 		List<File> result = new ArrayList<File>();
 
@@ -797,72 +1059,102 @@ public class BundleManager
 			// check for scripts inside "commands" directory
 			File commandsDirectory = new File(bundleDirectory, COMMANDS_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(commandsDirectory)));
+			result.addAll(this.getScriptsFromDirectory(commandsDirectory));
 
 			// check for scripts inside "snippets" directory
 			File snippetsDirectory = new File(bundleDirectory, SNIPPETS_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(snippetsDirectory)));
-			
+			result.addAll(this.getScriptsFromDirectory(snippetsDirectory));
+
 			// look for templates inside "templates" directory
 			File templatesDirectory = new File(bundleDirectory, TEMPLATES_DIRECTORY_NAME);
 
-			result.addAll(Arrays.asList(this.getScriptsFromDirectory(templatesDirectory)));
+			result.addAll(this.getScriptsFromDirectory(templatesDirectory));
 		}
 
-		return result.toArray(new File[result.size()]);
+		return result;
 	}
 
 	/**
-	 * getCommands
+	 * getBundleVisibilityListeners
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	protected List<BundleVisibilityListener> getBundleVisibilityListeners()
+	{
+		List<BundleVisibilityListener> listeners;
+
+		synchronized (this._bundleVisibilityListeners)
+		{
+			listeners = new ArrayList<BundleVisibilityListener>(this._bundleVisibilityListeners);
+		}
+
+		return listeners;
+	}
+
+	/**
+	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list. Note that this method is called from the scripting framework
+	 * 
+	 * @return A list of elements that are visible
+	 */
+	public List<CommandElement> getCommands()
+	{
+		return this.getCommands(null);
+	}
+	
+	/**
+	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<CommandElement> getCommands(IModelFilter filter)
 	{
 		List<CommandElement> result = new ArrayList<CommandElement>();
 
 		for (String name : this.getBundleNames())
 		{
-			result.addAll(Arrays.asList(this.getBundleCommands(name)));
-		}
-
-		return result.toArray(new CommandElement[result.size()]);
-	}
-
-	/**
-	 * getCommands
-	 * 
-	 * @param filter
-	 * @return
-	 */
-	public CommandElement[] getCommands(IModelFilter filter)
-	{
-		// If the user specified a filter,
-		// AND it with the IsExecutableCommandFilter
-		// to filter the commands that are executable on
-		// current platform
-		if (filter != null)
-		{
-			filter = new AndFilter(filter, new IsExecutableCommandFilter());
-		}
-		List<CommandElement> result = new ArrayList<CommandElement>();
-
-		if (filter != null)
-		{
-			for (String name : this.getBundleNames())
+			for (CommandElement command : this.getBundleCommands(name))
 			{
-				for (CommandElement command : this.getBundleCommands(name))
+				if (filter == null || filter.include(command))
 				{
-					if (filter.include(command))
-					{
-						result.add(command);
-					}
+					result.add(command);
 				}
 			}
 		}
 
-		return result.toArray(new CommandElement[result.size()]);
+		return result;
+	}
+
+	/**
+	 * Return a list of all active content assist elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<ContentAssistElement> getContentAssists(IModelFilter filter)
+	{
+		List<ContentAssistElement> result = new ArrayList<ContentAssistElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			for (ContentAssistElement assist : this.getBundleContentAssists(name))
+			{
+				if (filter == null || filter.include(assist))
+				{
+					result.add(assist);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -892,6 +1184,69 @@ public class BundleManager
 		}
 
 		return result;
+	}
+
+	/**
+	 * getElementVisibilityListeners
+	 * 
+	 * @return
+	 */
+	protected List<ElementVisibilityListener> getElementVisibilityListeners()
+	{
+		List<ElementVisibilityListener> listeners;
+
+		synchronized (this._elementVisibilityListeners)
+		{
+			listeners = new ArrayList<ElementVisibilityListener>(this._elementVisibilityListeners);
+		}
+
+		return listeners;
+	}
+
+	/**
+	 * Return a list of all active environment elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<EnvironmentElement> getEnvs(IModelFilter filter)
+	{
+		List<EnvironmentElement> result = new ArrayList<EnvironmentElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			for (EnvironmentElement command : this.getBundleEnvs(name))
+			{
+				if (filter == null || filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Get a list of all active and executable commands. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list. This method is convenience method and is equivalent to constructing
+	 * an AndFilter with an IsExecutableCommandFilter and the specified filter
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active command. Only commands which pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of commands that are visible, executable, and that pass the specified filter
+	 */
+	public List<CommandElement> getExecutableCommands(IModelFilter filter)
+	{
+		IModelFilter executableFilter = new IsExecutableCommandFilter();
+
+		filter = (filter == null) ? executableFilter : new AndFilter(filter, executableFilter);
+
+		return this.getCommands(filter);
 	}
 
 	/**
@@ -982,30 +1337,137 @@ public class BundleManager
 	}
 
 	/**
-	 * getMenus
+	 * getLoadCycleListeners
 	 * 
-	 * @param filter
 	 * @return
 	 */
-	public MenuElement[] getMenus(IModelFilter filter)
+	protected List<LoadCycleListener> getLoadCycleListeners()
+	{
+		List<LoadCycleListener> listeners;
+
+		synchronized (this._loadCycleListeners)
+		{
+			listeners = new ArrayList<LoadCycleListener>(this._loadCycleListeners);
+		}
+
+		return listeners;
+	}
+
+	/**
+	 * Return a list of all active top-level menu elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<MenuElement> getMenus(IModelFilter filter)
 	{
 		List<MenuElement> result = new ArrayList<MenuElement>();
 
-		if (filter != null)
+		for (String name : this.getBundleNames())
 		{
-			for (String name : this.getBundleNames())
+			for (MenuElement menu : this.getBundleMenus(name))
 			{
-				for (MenuElement menu : this.getBundleMenus(name))
+				if (filter == null || filter.include(menu))
 				{
-					if (filter.include(menu))
-					{
-						result.add(menu);
-					}
+					result.add(menu);
 				}
 			}
 		}
 
-		return result.toArray(new MenuElement[result.size()]);
+		return result;
+	}
+
+	/**
+	 * Return a list of all active smart typing pairs elements. Note that bundle precedence is taken into account, so
+	 * only visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<SmartTypingPairsElement> getPairs(IModelFilter filter)
+	{
+		List<SmartTypingPairsElement> result = new ArrayList<SmartTypingPairsElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			for (SmartTypingPairsElement command : this.getBundlePairs(name))
+			{
+				if (filter == null || filter.include(command))
+				{
+					result.add(command);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of all active project template elements. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active element. Only elements that pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of elements that are visible and that pass the specified filter
+	 */
+	public List<ProjectTemplateElement> getProjectTemplates(IModelFilter filter)
+	{
+		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
+
+		for (String name : this.getBundleNames())
+		{
+			BundleEntry bundleEntry = this.getBundleEntry(name);
+
+			for (ProjectTemplateElement template : bundleEntry.getProjectTemplates())
+			{
+				if (filter == null || filter.include(template))
+				{
+					result.add(template);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of ruby files contained within a specified directory. The resulting list is sorted by file name.
+	 * Note that the search for scripts is non-recursive and only includes children of the specified directory.
+	 * 
+	 * @param directory
+	 *            The directory used to search for ruby files. Null values are ignored.
+	 * @return The list of scripts in the specified directory
+	 */
+	protected List<File> getScriptsFromDirectory(File directory)
+	{
+		File[] result = NO_FILES;
+
+		if (directory != null && directory.exists() && directory.canRead())
+		{
+			result = directory.listFiles(new FileFilter()
+			{
+				public boolean accept(File pathname)
+				{
+					return pathname.isFile() && pathname.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION);
+				}
+			});
+
+			Arrays.sort(result, new Comparator<File>()
+			{
+				public int compare(File o1, File o2)
+				{
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+		}
+
+		return Arrays.asList(result);
 	}
 
 	/**
@@ -1029,10 +1491,10 @@ public class BundleManager
 				String pattern = entry.getKey();
 
 				// Escape periods in pattern (for regexp)
-				pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = DOT_PATTERN.matcher(pattern).replaceAll("\\\\."); //$NON-NLS-1$
 
 				// Replace * wildcard pattern with .+? regexp
-				pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
+				pattern = STAR_PATTERN.matcher(pattern).replaceAll(".+?"); //$NON-NLS-1$
 
 				if (fileName.matches(pattern))
 				{
@@ -1047,8 +1509,10 @@ public class BundleManager
 						// return value
 						// TODO: Check for simple case where one is a subset scope of the other, use the more specific
 						// one and move on
-						int existingLength = result.split("\\.").length; // split on periods to see the specificity of scope name //$NON-NLS-1$
-						int newLength = entry.getValue().split("\\.").length; //$NON-NLS-1$
+
+						// split on periods to see the specificity of scope name
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1; //$NON-NLS-1$
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1; //$NON-NLS-1$
 
 						if (newLength > existingLength)
 						{
@@ -1074,39 +1538,7 @@ public class BundleManager
 	}
 
 	/**
-	 * getScriptsFromDirectory
-	 * 
-	 * @param directory
-	 * @return
-	 */
-	protected File[] getScriptsFromDirectory(File directory)
-	{
-		File[] result = NO_FILES;
-
-		if (directory.exists() && directory.canRead())
-		{
-			result = directory.listFiles(new FileFilter()
-			{
-				public boolean accept(File pathname)
-				{
-					return pathname.isFile() && pathname.getName().toLowerCase().endsWith(RUBY_FILE_EXTENSION);
-				}
-			});
-
-			Arrays.sort(result, new Comparator<File>()
-			{
-				public int compare(File o1, File o2)
-				{
-					return o1.getName().compareTo(o2.getName());
-				}
-			});
-		}
-
-		return result;
-	}
-
-	/**
-	 * getUserBundlePath
+	 * Return the path that contains user bundles
 	 * 
 	 * @return
 	 */
@@ -1116,30 +1548,30 @@ public class BundleManager
 	}
 
 	/**
-	 * hasBndleAtPath
+	 * A predicate that returns if the specified bundle directory contains a bundle that has been processed
 	 * 
 	 * @param bundleDirectory
-	 * @return
+	 *            A directory that may contain a processed bundle
+	 * @return Returns true if the specified directory has a bundle element associated with it
 	 */
 	public boolean hasBundleAtPath(File bundleDirectory)
 	{
 		boolean result = false;
 
-		synchronized (bundlePathsLock)
+		synchronized (this._bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
-			{
-				result = this._bundlesByPath.containsKey(bundleDirectory);
-			}
+			result = this._bundlesByPath.containsKey(bundleDirectory);
 		}
-		
+
 		return result;
 	}
 
 	/**
-	 * isValidBundleDirectory
+	 * Determine if the specified directory minimally defines a bundle. In order to return true, the specified directory
+	 * must exist, must be a directory, it must be readable, and it must contain a bundle.rb file
 	 * 
 	 * @param bundleDirectory
+	 *            The directory to test
 	 * @return
 	 */
 	protected boolean isValidBundleDirectory(File bundleDirectory)
@@ -1163,40 +1595,36 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
-								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-							new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
-						new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
-					new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
-		if (result == false  && message != null && message.length() > 0)
+		if (result == false && message != null && message.length() > 0)
 		{
 			ScriptLogger.logError(message);
 		}
 
 		return result;
-	}
+	};
 
 	/**
-	 * loadApplicationBundles
+	 * Load all application bundles
 	 */
-	public void loadApplicationBundles()
+	protected void loadApplicationBundles()
 	{
 		String applicationBundles = this.getApplicationBundlesPath();
 
@@ -1212,47 +1640,62 @@ public class BundleManager
 	}
 
 	/**
-	 * loadBundle
+	 * Load the bundle in the specified directory
 	 * 
 	 * @param bundleDirectory
+	 *            The directory containing a bundle and its children
 	 */
 	public void loadBundle(File bundleDirectory)
 	{
-		File[] bundleScripts = this.getBundleScripts(bundleDirectory);
+		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
-		if (bundleScripts.length > 0)
+		if (EclipseUtil.isTesting() == false)
 		{
-			List<String> bundleLoadPaths = this.getBundleLoadPaths(bundleDirectory);
+			job.setRule(new SerialPerObjectRule(counter++));
 
-			for (File script : bundleScripts)
+			if (counter >= Runtime.getRuntime().availableProcessors())
 			{
-				this.loadScript(script, true, bundleLoadPaths);
+				counter = 0;
 			}
+
+			job.schedule();
+		}
+		else
+		{
+			job.run(new NullProgressMonitor());
 		}
 	}
 
 	/**
-	 * loadBundles
+	 * Load all application, user, and project bundles
 	 */
 	public void loadBundles()
 	{
 		// clear out any existing bundles since we're rebuilding from scratch
 		this.reset();
-		
+
 		this.loadApplicationBundles();
 		this.loadUserBundles();
 		this.loadProjectBundles();
 	}
 
 	/**
-	 * loadProjectBundles
+	 * Load all project bundles
 	 */
-	public void loadProjectBundles()
+	protected void loadProjectBundles()
 	{
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			File projectDirectory = project.getLocation().toFile();
-			File bundlesDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + BUILTIN_BUNDLES);
+			IPath location = project.getLocation();
+
+			if (location == null)
+			{
+				// Log that it was null somehow to track down when this occurs?
+				continue;
+			}
+
+			File projectDirectory = location.toFile();
+			File bundlesDirectory = new File(projectDirectory.getAbsolutePath(), BUILTIN_BUNDLES);
 
 			for (File bundle : this.getBundleDirectories(bundlesDirectory))
 			{
@@ -1262,9 +1705,11 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script. This is a convenience method for loadScript(File, boolean) and is equivalent to
+	 * invoking loadScript(script, true).
 	 * 
 	 * @param script
+	 *            The script to load
 	 */
 	public void loadScript(File script)
 	{
@@ -1272,10 +1717,14 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script. This is a convenience method for loadScript(File, boolean, List<String>) and is
+	 * equivalent to invoking loadScript(script, fireEvent, bundleLoadPaths) where bundleLoadPaths is calculated
+	 * getBundleDirectory and getBundleLoadPaths
 	 * 
 	 * @param script
+	 *            The script to load
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 */
 	public void loadScript(File script, boolean fireEvent)
 	{
@@ -1293,11 +1742,14 @@ public class BundleManager
 	}
 
 	/**
-	 * loadScript
+	 * Process the specified script, possibly firing a script-load load cycle event
 	 * 
 	 * @param script
+	 *            The script to load
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 * @param loadPaths
+	 *            A list of paths for ruby to use to locate libraries when executing the script
 	 */
 	public void loadScript(File script, boolean fireEvent, List<String> loadPaths)
 	{
@@ -1313,8 +1765,7 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script
-					.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;
@@ -1332,9 +1783,9 @@ public class BundleManager
 	}
 
 	/**
-	 * loadUserBundles
+	 * Load all user bundles
 	 */
-	public void loadUserBundles()
+	protected void loadUserBundles()
 	{
 		String userBundles = this.getUserBundlesPath();
 
@@ -1350,35 +1801,41 @@ public class BundleManager
 	}
 
 	/**
-	 * reloadBundle
+	 * Reload the specified bundle. This is equivalent to calling unloadBundle(bundleDirectory) followed by
+	 * loadBundle(bundleDirectory)
 	 * 
 	 * @param bundle
+	 *            The bundle element to reload. Null values are ignored
 	 */
 	public void reloadBundle(BundleElement bundle)
 	{
-		File bundleDirectory = bundle.getBundleDirectory();
-		
-		this.unloadBundle(bundleDirectory);
-		this.loadBundle(bundleDirectory);
+		if (bundle != null)
+		{
+			File bundleDirectory = bundle.getBundleDirectory();
+
+			this.unloadBundle(bundleDirectory);
+			this.loadBundle(bundleDirectory);
+		}
 	}
-	
+
 	/**
-	 * reloadScript
+	 * Reload the specified script. A script-reloaded load cycle event will be fired.
 	 * 
 	 * @param script
+	 *            The script to re-process. Null values are ignored
 	 */
 	public void reloadScript(File script)
 	{
 		if (script != null)
 		{
 			this.unloadScript(script, false);
-			
+
 			// determine bundle root directory
 			File bundleDirectory = this.getBundleDirectory(script);
 
 			// get bundle load paths
 			List<String> loadPaths = this.getBundleLoadPaths(bundleDirectory);
-			
+
 			// execute script
 			ScriptingEngine.getInstance().runScript(script.getAbsolutePath(), loadPaths, RunType.THREAD, true);
 
@@ -1394,9 +1851,10 @@ public class BundleManager
 	}
 
 	/**
-	 * removeBundle
+	 * Remove the specified bundle from the scripting environment
 	 * 
 	 * @param bundle
+	 *            The bundle to remove. Null values are ignored
 	 */
 	private void removeBundle(BundleElement bundle)
 	{
@@ -1405,9 +1863,9 @@ public class BundleManager
 			File bundleFile = bundle.getBundleDirectory();
 			String name = bundle.getDisplayName();
 
-			synchronized (bundlePathsLock)
+			synchronized (this._bundlesByPath)
 			{
-				if (this._bundlesByPath != null && this._bundlesByPath.containsKey(bundleFile))
+				if (this._bundlesByPath.containsKey(bundleFile))
 				{
 					List<BundleElement> bundles = this._bundlesByPath.get(bundleFile);
 
@@ -1420,9 +1878,9 @@ public class BundleManager
 				}
 			}
 
-			synchronized (entryNamesLock)
+			synchronized (this._entriesByName)
 			{
-				if (this._entriesByName != null && this._entriesByName.containsKey(name))
+				if (this._entriesByName.containsKey(name))
 				{
 					BundleEntry entry = this._entriesByName.get(name);
 
@@ -1440,78 +1898,78 @@ public class BundleManager
 	}
 
 	/**
-	 * removeBundleChangeListener
+	 * Remove a listener from the bundle visibility event list
 	 * 
 	 * @param listener
+	 *            The listener to remove. Null values are ignored
 	 */
-	public void removeBundleChangeListener(BundleChangeListener listener)
+	public void removeBundleVisibilityListener(BundleVisibilityListener listener)
 	{
-		if (this._bundleListeners != null)
+		synchronized (this._bundleVisibilityListeners)
 		{
-			this._bundleListeners.remove(listener);
-		}
-	}
-	
-	/**
-	 * removeElementChangeListener
-	 * 
-	 * @param listener
-	 */
-	public void removeElementChangeListener(ElementChangeListener listener)
-	{
-		if (this._elementListeners != null)
-		{
-			this._elementListeners.remove(listener);
+			this._bundleVisibilityListeners.remove(listener);
 		}
 	}
 
 	/**
-	 * removeLoadCycleListener
+	 * Remove a listener from the element visibility event list
 	 * 
 	 * @param listener
+	 *            The listener to remove. Null values are ignored
+	 */
+	public void removeElementVisibilityListener(ElementVisibilityListener listener)
+	{
+		synchronized (this._elementVisibilityListeners)
+		{
+			this._elementVisibilityListeners.remove(listener);
+		}
+	}
+
+	/**
+	 * Remove a listener from the script load cycle event list
+	 * 
+	 * @param listener
+	 *            The listener to remove. Null values are ignored
 	 */
 	public void removeLoadCycleListener(LoadCycleListener listener)
 	{
-		if (this._loadCycleListeners != null)
+		synchronized (this._loadCycleListeners)
 		{
 			this._loadCycleListeners.remove(listener);
 		}
 	}
 
 	/**
-	 * reset
+	 * Clear internal state in the bundle manager. This used for unit testing, so don't use this unless you know what
+	 * you're doing
 	 */
 	public void reset()
 	{
 		// TODO: should unload all commands, menus, and snippets so events fire, but
 		// this is used for test only right now.
-		synchronized (bundlePathsLock)
+		synchronized (this._bundlesByPath)
 		{
-			if (this._bundlesByPath != null)
-			{
-				this._bundlesByPath.clear();
-			}
+			this._bundlesByPath.clear();
 		}
 
-		synchronized (entryNamesLock)
+		synchronized (this._entriesByName)
 		{
-			if (this._entriesByName != null)
-			{
-				this._entriesByName.clear();
-			}
+			this._entriesByName.clear();
 		}
 	}
 
 	/**
-	 * unloadBundle
+	 * Unload all scripts that have been processed in the specified bundle directory. This effectively unloads
+	 * everything all scripts associated with a bundle and the bundle.rb script as well
 	 * 
 	 * @param bundleDirectory
+	 *            The directory (and its descendants) to unload
 	 */
 	public void unloadBundle(File bundleDirectory)
 	{
-		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
+		List<AbstractElement> elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
 		Set<File> scripts = new HashSet<File>();
-		
+
 		if (elements != null)
 		{
 			for (AbstractElement element : elements)
@@ -1519,17 +1977,19 @@ public class BundleManager
 				scripts.add(new File(element.getPath()));
 			}
 		}
-		
+
 		for (File script : scripts)
 		{
 			this.unloadScript(script);
 		}
 	}
-	
+
 	/**
-	 * unloadScript
+	 * Unload the specified script. This is a convenience method for unloadScript(File, boolean) and is equivalent to
+	 * invoking unloadScript(script, true).
 	 * 
 	 * @param script
+	 *            The script to unload
 	 */
 	public void unloadScript(File script)
 	{
@@ -1537,17 +1997,19 @@ public class BundleManager
 	}
 
 	/**
-	 * unloadScript
+	 * Unload the specified script.
 	 * 
 	 * @param script
+	 *            The script to unload. Null values are ignored and will not fire load cycle events.
 	 * @param fireEvent
+	 *            A flag indicating if load cycle events should be fired
 	 */
 	public void unloadScript(File script, boolean fireEvent)
 	{
 		if (script != null)
 		{
 			String scriptPath = script.getAbsolutePath();
-			AbstractElement[] elements = AbstractElement.getElementsByPath(scriptPath);
+			List<AbstractElement> elements = AbstractElement.getElementsByPath(scriptPath);
 
 			// remove bundle members in pass 1
 			for (AbstractElement element : elements)
@@ -1559,7 +2021,7 @@ public class BundleManager
 
 					if (bundle != null)
 					{
-						bundle.removeElement(bundleElement);
+						bundle.removeChild(bundleElement);
 					}
 					else
 					{

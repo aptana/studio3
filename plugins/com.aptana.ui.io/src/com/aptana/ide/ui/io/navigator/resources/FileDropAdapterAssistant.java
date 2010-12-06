@@ -74,11 +74,20 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
     @Override
     public IStatus handleDrop(CommonDropAdapter aDropAdapter, DropTargetEvent aDropTargetEvent,
             Object aTarget) {
+    	IStatus status = null;
+    	try {
+    		status = super.handleDrop(aDropAdapter, aDropTargetEvent, aTarget);
+    	} catch (Exception e) {
+    		// ignores the exception to allow our customized handler to take over
+    	}
+		if (status == Status.OK_STATUS || (status instanceof MultiStatus && ((MultiStatus) status).isOK())) {
+			return status;
+		}
+
         if (aDropAdapter.getCurrentTarget() == null || aDropTargetEvent.data == null) {
             return Status.CANCEL_STATUS;
         }
 
-        IStatus status = null;
         IAdaptable[] sources = null;
         TransferData currentTransfer = aDropAdapter.getCurrentTransfer();
         if (LocalSelectionTransfer.getTransfer().isSupportedType(currentTransfer)) {
@@ -250,7 +259,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
         return new IAdaptable[0];
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private static IAdaptable[] getSelectedSourceFiles(IStructuredSelection selection) {
         List<IAdaptable> selectedFiles = new ArrayList<IAdaptable>();
 

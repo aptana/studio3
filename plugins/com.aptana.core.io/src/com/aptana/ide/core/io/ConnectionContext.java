@@ -49,6 +49,7 @@ public class ConnectionContext extends HashMap<String, Object> {
 	public static final String DETECT_TIMEZONE = "detect_timezone"; //$NON-NLS-1$
 	public static final String SERVER_TIMEZONE = "server_timezone"; //$NON-NLS-1$
 	public static final String COMMAND_LOG = "command_log"; //$NON-NLS-1$
+	public static final String USE_TEMPORARY_ON_UPLOAD = "use_temporary_on_upload"; //$NON-NLS-1$
 	
 	public boolean getBoolean(String key) {
 		Object value = get(key);

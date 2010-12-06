@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.editor.dtd.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.editor.dtd
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit
+Export-Package: com.aptana.editor.dtd

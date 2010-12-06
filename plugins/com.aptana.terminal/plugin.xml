@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="processConfigurations" name="Process Configurations" schema="schema/processConfigurations.exsd"/>
+   <extension-point id="terminalHyperlinkDetectors" name="Terminal Hyperlink Detectors" schema="schema/terminalHyperlinkDetectors.exsd"/>
 
    <extension
          point="org.eclipse.ui.views">
@@ -97,7 +98,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.aptana.common"
+            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.terminal.preferences.TerminalPreferencePage"
             id="com.aptana.terminal.page"
             name="%page.name">
@@ -148,19 +149,32 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="aptana">
+               id="com.aptana.ui.globalActionSet">
             <command
                   commandId="com.aptana.terminal.commands.showTerminal"
                   icon="icons/terminal.png"
                   style="push">
                <visibleWhen>
                   <reference
-                        definitionId="com.aptana.editor.common.contributions.inGlobalActionSet">
+                        definitionId="com.aptana.ui.contributions.inGlobalActionSet">
                   </reference>
                </visibleWhen>
             </command>
          </toolbar>
       </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.terminal.internal.hyperlink.URLHyperlinkDetector">
+      </detector>
+   </extension>
+
+   <extension
+         point="com.aptana.scripting.frameworkFiles">
+      <file
+            name="ruble/terminal.rb">
+      </file>
    </extension>
 
 </plugin>

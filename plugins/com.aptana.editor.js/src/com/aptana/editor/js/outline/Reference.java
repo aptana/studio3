@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.outline;
 
 import java.text.MessageFormat;
@@ -65,12 +99,12 @@ class Reference
 		IParseNode currentNode = node;
 		IParseNode parent;
 
-		switch (currentNode.getType())
+		switch (currentNode.getNodeType())
 		{
 			case JSNodeTypes.IDENTIFIER:
 			case JSNodeTypes.THIS:
 				parent = currentNode.getParent();
-				if (parent.getType() == JSNodeTypes.GET_PROPERTY)
+				if (parent.getNodeType() == JSNodeTypes.GET_PROPERTY)
 				{
 					if (parent.getChild(1) == currentNode)
 					{
@@ -92,13 +126,13 @@ class Reference
 
 				// NOTE: The following block is for 'dojo.lang.extend', 'MochiKit.Base.update',
 				// and 'Object.extend' support
-				if (parent != null && parent.getType() == JSNodeTypes.NAME_VALUE_PAIR)
+				if (parent != null && parent.getNodeType() == JSNodeTypes.NAME_VALUE_PAIR)
 				{
 					IParseNode grandparent = parent.getParent();
-					if (grandparent != null && grandparent.getType() == JSNodeTypes.OBJECT_LITERAL)
+					if (grandparent != null && grandparent.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
 					{
 						IParseNode greatgrandparent = grandparent.getParent();
-						if (greatgrandparent != null && greatgrandparent.getType() == JSNodeTypes.ARGUMENTS)
+						if (greatgrandparent != null && greatgrandparent.getNodeType() == JSNodeTypes.ARGUMENTS)
 						{
 							parts.add(greatgrandparent.getChild(0) + "."); //$NON-NLS-1$
 						}
@@ -110,7 +144,7 @@ class Reference
 
 		while (currentNode != null)
 		{
-			switch (currentNode.getType())
+			switch (currentNode.getNodeType())
 			{
 				case JSNodeTypes.FUNCTION:
 					String functionName = currentNode.getText();
@@ -130,8 +164,8 @@ class Reference
 							grandParentNode = parentNode.getParent();
 						}
 
-						if (parentNode != null && grandParentNode != null && parentNode.getType() == JSNodeTypes.GROUP
-								&& grandParentNode.getType() == JSNodeTypes.INVOKE)
+						if (parentNode != null && grandParentNode != null && parentNode.getNodeType() == JSNodeTypes.GROUP
+								&& grandParentNode.getNodeType() == JSNodeTypes.INVOKE)
 						{
 							currentNode = grandParentNode;
 						}
@@ -148,7 +182,7 @@ class Reference
 								index = 0;
 								if (currentParent != null)
 								{
-									index = currentParent.getIndex(p);
+									index = p.getIndex();
 								}
 								path = MessageFormat.format("[{0}]{1}{2}", index, p.getText(), path); //$NON-NLS-1$
 
@@ -164,7 +198,7 @@ class Reference
 					break;
 				case JSNodeTypes.DECLARATION:
 					IParseNode assignedValue = currentNode.getChild(1);
-					if (assignedValue.getType() == JSNodeTypes.OBJECT_LITERAL)
+					if (assignedValue.getNodeType() == JSNodeTypes.OBJECT_LITERAL)
 					{
 						parts.add(currentNode.getChild(0).getText());
 					}

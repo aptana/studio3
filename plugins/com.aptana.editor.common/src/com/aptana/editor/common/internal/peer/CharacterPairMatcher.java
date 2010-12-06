@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Christian Plesner Hansen (plesner@quenta.org) - initial API and implementation
+ *     Chris Williams (Aptana)
+ *******************************************************************************/
 package com.aptana.editor.common.internal.peer;
 
 import java.util.HashSet;
@@ -15,6 +26,8 @@ import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ICharacterPairMatcher;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.text.rules.CompositePartitionScanner;
+import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
 /**
@@ -28,7 +41,8 @@ import com.aptana.scope.ScopeSelector;
  */
 public class CharacterPairMatcher implements ICharacterPairMatcher
 {
-	private static final ScopeSelector fgCommentSelector = new ScopeSelector(Messages.getString("CharacterPairMatcher.0")); //$NON-NLS-1$
+	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
+
 	private int fAnchor = -1;
 	private final CharPairs fPairs;
 	private final String fPartitioning;
@@ -118,6 +132,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			// Now try to right of caret
 			charOffset = caretOffset;
 			caretOffset += 1;
+			if (charOffset >= doc.getLength())
+			{
+				return null;
+			}
 			prevChar = doc.getChar(charOffset);
 			if (!fPairs.contains(prevChar))
 			{
@@ -125,8 +143,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 		}
 
+		String currentScope = getScopeAtOffset(doc, charOffset);
+		// FIXME if we're inside a string or comment, we should limit our search to just this particular partition!
 		// Drop out if the char is inside a comment
-		if (fgCommentSelector.matches(getScopeAtOffset(doc, charOffset)))
+		if (fgCommentSelector.matches(currentScope))
 		{
 			return null;
 		}
@@ -135,17 +155,29 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		final String partition = TextUtilities.getContentType(doc, fPartitioning, charOffset, false);
 		if (fPairs.isAmbiguous(prevChar))
 		{
-			// Need to look at partition transition to tell if we're at end or beginning!
-			String partitionAhead = TextUtilities.getContentType(doc, fPartitioning, charOffset + 1, false);
-			String partitionBehind = TextUtilities.getContentType(doc, fPartitioning, charOffset - 1, false);
-			if (partition.equals(partitionBehind) && !partition.equals(partitionAhead))
+			// If this is common start tag, look forward, if common end tag look backwards!
+			if (partition.equals(CompositePartitionScanner.START_SWITCH_TAG))
 			{
-				// End because we're transitioning out of a partition on this character
+				isForward = true;
+			}
+			else if (partition.equals(CompositePartitionScanner.END_SWITCH_TAG))
+			{
 				isForward = false;
 			}
-			else if (isUnclosedPair(prevChar, doc, charOffset))
+			else
 			{
-				isForward = false;
+				// Need to look at partition transition to tell if we're at end or beginning!
+				String partitionAhead = TextUtilities.getContentType(doc, fPartitioning, charOffset + 1, false);
+				String partitionBehind = TextUtilities.getContentType(doc, fPartitioning, charOffset - 1, false);
+				if (partition.equals(partitionBehind) && !partition.equals(partitionAhead))
+				{
+					// End because we're transitioning out of a partition on this character
+					isForward = false;
+				}
+				else if (isUnclosedPair(prevChar, doc, charOffset))
+				{
+					isForward = false;
+				}
 			}
 		}
 		fAnchor = isForward ? ICharacterPairMatcher.LEFT : ICharacterPairMatcher.RIGHT;
@@ -153,8 +185,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		final int adjustedOffset = isForward ? charOffset : caretOffset;
 
 		final DocumentPartitionAccessor partDoc = new DocumentPartitionAccessor(doc, fPartitioning, partition);
-		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward, isForward ? doc
-				.getLength() : -1, searchStartPosition);
+		int endOffset = findMatchingPeer(partDoc, prevChar, fPairs.getMatching(prevChar), isForward,
+				isForward ? doc.getLength() : -1, searchStartPosition);
 		if (endOffset == -1)
 			return null;
 		final int adjustedEndOffset = isForward ? endOffset + 1 : endOffset;
@@ -230,8 +262,8 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 			}
 			else if (c == start && doc.inPartition(pos))
 			{
-				pos = findMatchingPeer(doc, start, end, searchForward, boundary, doc
-						.getNextPosition(pos, searchForward));
+				pos = findMatchingPeer(doc, start, end, searchForward, boundary,
+						doc.getNextPosition(pos, searchForward));
 				if (pos == -1)
 					return -1;
 			}
@@ -310,7 +342,13 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		public boolean inPartition(int pos)
 		{
 			final ITypedRegion partition = getPartition(pos);
-			return partition != null && partition.getType().equals(fPartition);
+			return samePartitions(partition);
+		}
+
+		private boolean samePartitions(ITypedRegion partition)
+		{
+			return partition != null
+					&& (partition.getType().equals(fPartition) || areSwitchPartitions(fPartition, partition.getType()));
 		}
 
 		/**
@@ -326,10 +364,10 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 		public int getNextPosition(int pos, boolean searchForward)
 		{
 			final ITypedRegion partition = getPartition(pos);
-			if (partition == null)
+			if (partition == null || samePartitions(partition))
+			{
 				return simpleIncrement(pos, searchForward);
-			if (fPartition.equals(partition.getType()))
-				return simpleIncrement(pos, searchForward);
+			}
 			if (searchForward)
 			{
 				int end = partition.getOffset() + partition.getLength();
@@ -343,6 +381,14 @@ public class CharacterPairMatcher implements ICharacterPairMatcher
 					return offset - 1;
 			}
 			return simpleIncrement(pos, searchForward);
+		}
+
+		private boolean areSwitchPartitions(String partition1, String partition2)
+		{
+			return (partition1.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition1
+					.equals(CompositePartitionScanner.END_SWITCH_TAG))
+					&& (partition2.equals(CompositePartitionScanner.START_SWITCH_TAG) || partition2
+							.equals(CompositePartitionScanner.END_SWITCH_TAG));
 		}
 
 		private int simpleIncrement(int pos, boolean searchForward)

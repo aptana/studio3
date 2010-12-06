@@ -48,6 +48,9 @@ import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.swt.custom.StyleRange;
 
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.theme.ThemePlugin;
+
 public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPresentationRepairer
 {
 
@@ -55,6 +58,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	protected IDocument fDocument;
 	/** The default text attribute if non is returned as data by the current token */
 	protected IToken fDefaultTextAttribute;
+	private String fFullScope;
 
 	/**
 	 * Constructor for NonRuleBasedDamagerRepairer.
@@ -89,7 +93,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 
 		IRegion info = fDocument.getLineInformationOfOffset(offset);
 		if (offset <= info.getOffset() + info.getLength())
+		{
 			return info.getOffset() + info.getLength();
+		}
 
 		int line = fDocument.getLineOfOffset(offset);
 		try
@@ -124,8 +130,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 					end = info.getOffset() + info.getLength();
 				}
 				else
+				{
 					end = endOfLineOf(end);
-
+				}
 				end = Math.min(partition.getOffset() + partition.getLength(), end);
 				return new Region(start, end - start);
 
@@ -143,7 +150,47 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	 */
 	public void createPresentation(TextPresentation presentation, ITypedRegion region)
 	{
-		addRange(presentation, region.getOffset(), region.getLength(), (TextAttribute) fDefaultTextAttribute.getData());
+		addRange(presentation, region.getOffset(), region.getLength(), getTextAttribute(region));
+	}
+
+	protected TextAttribute getTextAttribute(ITypedRegion region)
+	{
+		Object data = fDefaultTextAttribute.getData();
+		if (data instanceof String)
+		{
+			// Cache the full scope so we can just re-use it. It shouldn't ever change... Previous caching of text
+			// attribute ended up breaking when theme changed
+			if (fFullScope == null)
+			{
+				try
+				{
+					String last = (String) data;
+					int offset = region.getOffset();
+					String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+							.getScopeAtOffset(fDocument, offset);
+					if (last.length() == 0)
+					{
+						last = scope;
+					}
+					else if (!scope.endsWith(last))
+					{
+						scope += " " + last; //$NON-NLS-1$
+					}
+					fFullScope = scope;
+				}
+				catch (BadLocationException e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
+			IToken token = ThemePlugin.getDefault().getThemeManager().getToken(fFullScope);
+			data = token.getData();
+		}
+		if (data instanceof TextAttribute)
+		{
+			return (TextAttribute) data;
+		}
+		return null;
 	}
 
 	/**
@@ -161,7 +208,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager, IPrese
 	protected void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
 	{
 		if (attr != null)
+		{
 			presentation.addStyleRange(new StyleRange(offset, length, attr.getForeground(), attr.getBackground(), attr
 					.getStyle()));
+		}
 	}
 }

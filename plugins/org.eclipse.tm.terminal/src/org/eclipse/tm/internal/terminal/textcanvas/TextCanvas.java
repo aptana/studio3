@@ -11,12 +11,17 @@
  * Uwe Stieber (Wind River) - [281328] The very first few characters might be missing in the terminal control if opened and connected programmatically
  * Martin Oberhuber (Wind River) - [294327] After logging in, the remote prompt is hidden
  * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
+ * Uwe Stieber (Wind River) - [205486] Fix ScrollLock always moving to line 1
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.FocusEvent;
@@ -25,6 +30,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -84,6 +90,9 @@ public class TextCanvas extends GridCanvas {
 		fCellCanvasModel.addCellCanvasModelListener(new ITextCanvasModelListener(){
 			public void rangeChanged(int col, int line, int width, int height) {
 				repaintRange(col,line,width,height);
+				for (int i = line; i < line + height; i++) {
+					searchLineForHyperlinks(i);
+				}
 			}
 			public void dimensionsChanged(int cols, int rows) {
 				calculateGrid();
@@ -91,10 +100,8 @@ public class TextCanvas extends GridCanvas {
 			public void terminalDataChanged() {
 				if(isDisposed())
 					return;
+				// scroll to end (unless scroll lock is active)
 				scrollToEnd();
-				// make sure the scroll area is correct:
-				scrollY(getVerticalBar());
-				scrollX(getHorizontalBar());
 			}
 		});
 		// let the cursor blink if the text canvas gets the focus...
@@ -127,9 +134,18 @@ public class TextCanvas extends GridCanvas {
 					updateHasSelection(e);
 					if(fHasSelection)
 						setSelection(screenPointToCell(e.x, e.y));
-					else
+					else {
 						fCellCanvasModel.setSelection(-1,-1,-1,-1);
+						detectHyperlinkClicks();
+					}
 					fDraggingStart=null;
+				}
+			}
+			
+			protected void detectHyperlinkClicks() {
+				IHyperlink under = findHyperlink(fDraggingStart);
+				if (under != null) {
+					under.open();
 				}
 			}
 		});
@@ -139,6 +155,15 @@ public class TextCanvas extends GridCanvas {
 				if (fDraggingStart != null) {
 					updateHasSelection(e);
 					setSelection(screenPointToCell(e.x, e.y));
+				}
+				
+				// Change cursor to hand if over a hyperlink
+				IHyperlink link = findHyperlink(screenPointToCell(e.x, e.y));
+				if (link != null) {
+					Cursor c = getDisplay().getSystemCursor(SWT.CURSOR_HAND);
+					setCursor(c);
+				} else {
+					setCursor(null);
 				}
 			}
 		});
@@ -167,11 +192,25 @@ public class TextCanvas extends GridCanvas {
 				fCellCanvasModel.setSelection(p.y, fDraggingStart.y, p.x, fDraggingStart.x);
 			} else {
 				fCellCanvasModel.setSelection(fDraggingStart.y, p.y, fDraggingStart.x, p.x);
-
 			}
+			setClipboardContent(DND.SELECTION_CLIPBOARD);
 		}
 	}
-
+	
+	private void setClipboardContent(int clipboardType) throws SWTError {
+		if (!(Platform.WS_GTK.equals(Platform.getWS()) || Platform.WS_MOTIF.equals(Platform.getWS()))) {
+			return;
+		}
+		String text = fCellCanvasModel.getSelectedText();
+		if (text != null) {
+			Object[] data = new Object[]{ text };
+			Transfer[] types = new Transfer[]{ TextTransfer.getInstance() };
+			Clipboard clipboard = new Clipboard(getDisplay());
+			clipboard.setContents(data, types, clipboardType);
+			clipboard.dispose();
+		}
+	}
+	
 	int compare(Point p1, Point p2) {
 		if (p1.equals(p2))
 			return 0;
@@ -247,12 +286,8 @@ public class TextCanvas extends GridCanvas {
 		setVirtualExtend(getCols()*getCellWidth(),getRows()*getCellHeight());
 		setRedraw(false);
 		try {
-			// scroll to end
+			// scroll to end (unless scroll lock is active)
 			scrollToEnd();
-			// make sure the scroll area is correct:
-			scrollY(getVerticalBar());
-			scrollX(getHorizontalBar());
-	
 			getParent().layout();
 		} finally {
 			setRedraw(true);
@@ -268,6 +303,9 @@ public class TextCanvas extends GridCanvas {
 			if(v.y!=-y) {
 				setVirtualOrigin(v.x,y);
 			}
+			// make sure the scroll area is correct:
+			scrollY(getVerticalBar());
+			scrollX(getHorizontalBar());
 		}
 	}
 	/**
@@ -383,6 +421,12 @@ public class TextCanvas extends GridCanvas {
 		}
 
 	}
+	
+	protected void searchLineForHyperlinks(int line) {
+	}
 
+	protected IHyperlink findHyperlink(Point cellCoords) {
+		return null;
+	}
 }
 

@@ -18,9 +18,8 @@
    </license>
 
    <requires>
-      <import plugin="org.junit" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit"/>
       <import plugin="com.aptana.editor.common" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.ruby" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.core" version="3.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
@@ -31,7 +30,6 @@
       <import plugin="com.aptana.git.core" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.git.ui" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.erb" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.findbar" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.text" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.ui.epl" version="1.0.0" match="greaterOrEqual"/>
@@ -53,7 +51,6 @@
       <import plugin="org.eclipse.equinox.preferences"/>
       <import plugin="org.eclipse.core.filesystem" version="1.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.security" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="plistreader" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.jruby" version="1.4.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.index.core" version="2.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.ui" version="3.0.0" match="greaterOrEqual"/>
@@ -80,18 +77,20 @@
       <import plugin="org.eclipse.search" version="3.2.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.terminal" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.org.eclipse.tm.terminal" version="3.0.100" match="greaterOrEqual"/>
+      <import plugin="com.aptana.syncing.core"/>
+      <import plugin="com.aptana.syncing.ui"/>
+      <import plugin="com.aptana.theme"/>
+      <import plugin="com.aptana.browser"/>
+      <import plugin="com.aptana.plist"/>
+      <import plugin="com.aptana.editor.markdown"/>
+      <import plugin="com.aptana.editor.dtd"/>
+      <import plugin="com.aptana.filesystem.s3"/>
+      <import plugin="com.aptana.editor.yaml"/>
+      <import plugin="com.aptana.editor.idl"/>
    </requires>
 
    <plugin
          id="com.aptana.editor.common.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.ruby.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -168,14 +167,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.erb.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.core.io.tests"
          download-size="0"
          install-size="0"
@@ -225,6 +216,120 @@
          download-size="0"
          install-size="0"
          version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.core.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.syncing.ui.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.parsing.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.theme.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.plist.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.markdown.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.test.performance"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.derby"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.editor.epl.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tm.terminal.test"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.tests.harness"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="com.aptana.filesystem.s3.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.dtd.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.yaml.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.idl.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
          unpack="false"/>
 
 </feature>

@@ -21,6 +21,7 @@ import beaver.spec.parser.GrammarParser.Terminals;
  * on 6/7/10 11:59 AM from the specification file
  * <tt>GrammarScanner.flex</tt>
  */
+@SuppressWarnings("unused")
 public class GrammarScanner extends Scanner {
 
   /** This character denotes the end of file */

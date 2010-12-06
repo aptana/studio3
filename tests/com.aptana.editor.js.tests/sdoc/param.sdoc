@@ -1,0 +1,11 @@
+/**
+ * This is a description of the MyInstanceMethod instance method
+ *
+ * @alias MyClass.prototype.MyInstanceMethod
+ * @param {String} firstParam
+ *		This first parameter is a string
+ * @param {String|Number} secondParameter
+ *		This second parameter is a string or a number
+ * @param {Number} [thirdParameter]
+ *		This parameter is a number and is optional
+ */

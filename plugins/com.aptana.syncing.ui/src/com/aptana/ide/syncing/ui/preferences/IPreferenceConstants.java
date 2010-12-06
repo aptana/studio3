@@ -159,21 +159,32 @@ public interface IPreferenceConstants {
 	/**
 	 * COMPARE_IN_BACKGROUND
 	 */
-	static final String COMPARE_IN_BACKGROUND = "COMPARE_IN_BACKGROUND";
+	static final String COMPARE_IN_BACKGROUND = "COMPARE_IN_BACKGROUND"; //$NON-NLS-1$
 
 	/**
 	 * USE_CRC
 	 */
-	static final String USE_CRC = "USE_CRC";
+	static final String USE_CRC = "USE_CRC"; //$NON-NLS-1$
 
 	/**
 	 * INITIAL_POOL_SIZE
 	 */
-	static final String INITIAL_POOL_SIZE = "INITIAL_POOL_SIZE";
+	static final String INITIAL_POOL_SIZE = "INITIAL_POOL_SIZE"; //$NON-NLS-1$
 
 	/**
 	 * MAX_POOL_SIZE
 	 */
-	static final String MAX_POOL_SIZE = "MAX_POOL_SIZE";
-    	    	
+	static final String MAX_POOL_SIZE = "MAX_POOL_SIZE"; //$NON-NLS-1$
+
+	/**
+	 * Pref key for uploading the editor on save
+	 */
+	public static final String AUTO_SYNC = "AutoSyncChangesWithRemote"; //$NON-NLS-1$
+
+	public enum SyncDirection
+	{
+		UPLOAD, DOWNLOAD, BOTH
+	};
+
+	public static final String AUTO_SYNC_DIRECTION = "AutoSyncDirection"; //$NON-NLS-1$
 }

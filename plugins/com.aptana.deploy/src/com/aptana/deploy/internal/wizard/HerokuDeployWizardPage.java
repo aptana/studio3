@@ -1,6 +1,41 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -18,6 +53,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -37,7 +73,6 @@ public class HerokuDeployWizardPage extends WizardPage
 		super(NAME, Messages.HerokuDeployWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
 	}
 
-	@Override
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
@@ -55,14 +90,12 @@ public class HerokuDeployWizardPage extends WizardPage
 		label.setText(Messages.HerokuDeployWizardPage_ApplicationNameLabel);
 
 		appName = new Text(appSettings, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData(250, SWT.DEFAULT);
-		appName.setLayoutData(gd);
+		appName.setLayoutData(new GridData(250, SWT.DEFAULT));
 		// Set default name to project name
 		appName.setText(getProjectName());
 		appName.addModifyListener(new ModifyListener()
 		{
 
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				getContainer().updateButtons();
@@ -71,7 +104,8 @@ public class HerokuDeployWizardPage extends WizardPage
 
 		publishButton = new Button(composite, SWT.CHECK);
 		publishButton.setText(Messages.HerokuDeployWizardPage_PublishApplicationLabel);
-		publishButton.setSelection(true);
+		publishButton.setSelection(Platform.getPreferencesService().getBoolean(Activator.getPluginIdentifier(),
+				IPreferenceConstants.HEROKU_AUTO_PUBLISH, true, null));
 
 		if (doesntHaveGitRepo())
 		{
@@ -80,12 +114,13 @@ public class HerokuDeployWizardPage extends WizardPage
 			Font dialogFont = JFaceResources.getDialogFont();
 			FontData[] data = dialogFont.getFontData();
 			for (FontData dataElement : data)
+			{
 				dataElement.setStyle(dataElement.getStyle() | SWT.ITALIC);
+			}
 			Font italic = new Font(dialogFont.getDevice(), data);
 			note.setFont(italic);
 
-			gd = new GridData(400, SWT.DEFAULT);
-			note.setLayoutData(gd);
+			note.setLayoutData(new GridData(400, SWT.DEFAULT));
 			note.setText(Messages.HerokuDeployWizardPage_NoGitRepoNote);
 		}
 
@@ -111,18 +146,13 @@ public class HerokuDeployWizardPage extends WizardPage
 		}
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager()
 				.getUnattachedExisting(project.getLocationURI());
-		if (repo != null)
-		{
-			return false;
-		}
-		return true;
+		return repo == null;
 	}
 
 	protected IProject getProject()
 	{
 		DeployWizard wizard = (DeployWizard) getWizard();
-		IProject project = wizard.getProject();
-		return project;
+		return wizard.getProject();
 	}
 
 	@Override

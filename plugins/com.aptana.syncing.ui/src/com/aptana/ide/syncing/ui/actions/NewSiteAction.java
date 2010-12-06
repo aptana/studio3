@@ -76,11 +76,15 @@ public class NewSiteAction implements IObjectActionDelegate, IViewActionDelegate
     }
 
     public void selectionChanged(IAction action, ISelection selection) {
-        fSelection = selection;
+        setSelection(selection);
     }
 
-	@Override
 	public void init(IViewPart view) {
 		fActivePart = view;
 	}
+
+    public void setSelection(ISelection selection)
+    {
+    	fSelection = selection;
+    }
 }

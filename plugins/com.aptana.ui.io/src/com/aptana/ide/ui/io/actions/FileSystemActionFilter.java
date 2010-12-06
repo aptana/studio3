@@ -67,6 +67,9 @@ public class FileSystemActionFilter implements IActionFilter {
 			if ( "isSymlink".equals(name)) { //$NON-NLS-1$
 				return  FileSystemUtils.isSymlink(target) == toBoolean(value);
 			}			
+			if ( "isPrivate".equals(name)) { //$NON-NLS-1$
+				return FileSystemUtils.isPrivate(target) == toBoolean(value);
+			}
 		}
 		return false;
 	}
@@ -80,12 +83,12 @@ public class FileSystemActionFilter implements IActionFilter {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == IActionFilter.class) {
 				return new FileSystemActionFilter();
@@ -96,7 +99,6 @@ public class FileSystemActionFilter implements IActionFilter {
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList() {
 			return new Class[] { IActionFilter.class };
 		}

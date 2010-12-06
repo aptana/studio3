@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.io.IOException;
@@ -7,10 +41,10 @@ import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -20,32 +54,28 @@ import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveListener;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
-import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
-import com.aptana.editor.common.internal.theme.ThemeManager;
-import com.aptana.editor.common.internal.theme.fontloader.EditorFontOverride;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
 import com.aptana.index.core.IndexActivator;
 import com.aptana.usage.EventLogger;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class CommonEditorPlugin extends AbstractUIPlugin
 {
 
@@ -66,46 +96,61 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	// The shared instance
 	private static CommonEditorPlugin plugin;
 
-	private ColorManager fColorManager;
 	private Map<ContextTypeRegistry, ContributionTemplateStore> fTemplateStoreMap;
-	private InvasiveThemeHijacker themeHijacker;
 	private FilenameDifferentiator differentiator;
 
 	private final IPartListener fPartListener = new IPartListener()
 	{
 
-		@Override
 		public void partActivated(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partBroughtToTop(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partClosed(IWorkbenchPart part)
 		{
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				EventLogger.getInstance().logEvent("editor.closed", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+				final String id = editorPart.getEditorSite().getId();
+				Job job = new Job("Recording editor close") //$NON-NLS-1$
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						EventLogger.getInstance().logEvent("editor.closed", id); //$NON-NLS-1$
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.setPriority(Job.SHORT);
 			}
 		}
 
-		@Override
 		public void partDeactivated(IWorkbenchPart part)
 		{
 		}
 
-		@Override
 		public void partOpened(IWorkbenchPart part)
 		{
 			if (part instanceof IEditorPart)
 			{
 				IEditorPart editorPart = (IEditorPart) part;
-				EventLogger.getInstance().logEvent("editor.opened", editorPart.getEditorSite().getId()); //$NON-NLS-1$
+				final String id = editorPart.getEditorSite().getId();
+				Job job = new Job("Recording editor open") //$NON-NLS-1$
+				{
+					@Override
+					protected IStatus run(IProgressMonitor monitor)
+					{
+						EventLogger.getInstance().logEvent("editor.opened", id); //$NON-NLS-1$
+						return Status.OK_STATUS;
+					}
+				};
+				job.setSystem(true);
+				job.setPriority(Job.SHORT);
 			}
 		}
 	};
@@ -113,25 +158,23 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	private final IPerspectiveListener fPerspectiveListener = new IPerspectiveListener()
 	{
 
-		@Override
 		public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective)
 		{
-			setCommandState(((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null);
+			setCommandState(findView(page, OUTLINE_VIEW_ID) != null);
 		}
 
-		@Override
 		public void perspectiveChanged(IWorkbenchPage page, IPerspectiveDescriptor perspective, String changeId)
 		{
 			if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_HIDE))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) == null)
+				if (findView(page, OUTLINE_VIEW_ID) == null)
 				{
 					setCommandState(false);
 				}
 			}
 			else if (changeId.equals(IWorkbenchPage.CHANGE_VIEW_SHOW))
 			{
-				if (((WorkbenchPage) page).getActivePerspective().findView(OUTLINE_VIEW_ID) != null)
+				if (findView(page, OUTLINE_VIEW_ID) != null)
 				{
 					setCommandState(true);
 				}
@@ -148,6 +191,20 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 				commandState.setValue(state);
 				service.refreshElements(COMMAND_ID, null);
 			}
+		}
+
+		protected IViewReference findView(IWorkbenchPage page, String viewId)
+		{
+			IViewReference refs[] = page.getViewReferences();
+			for (int i = 0; i < refs.length; i++)
+			{
+				IViewReference ref = refs[i];
+				if (viewId.equals(ref.getId()))
+				{
+					return ref;
+				}
+			}
+			return null;
 		}
 	};
 
@@ -182,6 +239,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
+	private DocumentScopeManager fDocumentScopeManager;
 
 	/**
 	 * The constructor
@@ -201,11 +259,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 		// Activate indexing
 		IndexActivator.getDefault();
-		
-		new EditorFontOverride().schedule();
-		themeHijacker = new InvasiveThemeHijacker();
-		themeHijacker.schedule();
-		
+
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
 
@@ -220,21 +274,20 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		try
 		{
-			if (fColorManager != null)
-				fColorManager.dispose();
-
-			IEclipsePreferences prefs = new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-			prefs.removePreferenceChangeListener(themeHijacker);
 			differentiator.dispose();
 
 			removePartListener();
+			
+			if (fDocumentScopeManager != null)
+			{
+				fDocumentScopeManager.dispose();
+			}
 		}
 		finally
 		{
-			themeHijacker = null;
-			fColorManager = null;
+			fDocumentScopeManager = null;
 			differentiator = null;
-			plugin = null;
+			plugin = null;			
 			super.stop(context);
 		}
 	}
@@ -247,26 +300,6 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	public static CommonEditorPlugin getDefault()
 	{
 		return plugin;
-	}
-
-	/**
-	 * getColorManager
-	 * 
-	 * @return
-	 */
-	public ColorManager getColorManager()
-	{
-		if (this.fColorManager == null)
-		{
-			this.fColorManager = new ColorManager();
-		}
-
-		return this.fColorManager;
-	}
-
-	public IThemeManager getThemeManager()
-	{
-		return ThemeManager.instance();
 	}
 
 	public static void logError(Exception e)
@@ -297,7 +330,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 	{
 		getDefault().getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, null));
 	}
-	
+
 	public static void logInfo(String message)
 	{
 		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, null));
@@ -362,9 +395,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return store;
 	}
 
-	public IDocumentScopeManager getDocumentScopeManager()
+	public synchronized IDocumentScopeManager getDocumentScopeManager()
 	{
-		return DocumentScopeManager.getInstance();
+		if (fDocumentScopeManager == null)
+		{
+			fDocumentScopeManager = new DocumentScopeManager();
+		}
+		return fDocumentScopeManager;
 	}
 
 	public IContentTypeTranslator getContentTypeTranslator()
@@ -374,35 +411,59 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 
 	private void addPartListener()
 	{
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		IPartService partService;
-		for (IWorkbenchWindow window : windows)
+		IWorkbench workbench = null;
+		try
 		{
-			partService = window.getPartService();
-			if (partService != null)
-			{
-				partService.addPartListener(fPartListener);
-			}
-			window.addPerspectiveListener(fPerspectiveListener);
+			workbench = PlatformUI.getWorkbench();
 		}
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			IPartService partService;
+			for (IWorkbenchWindow window : windows)
+			{
+				partService = window.getPartService();
+				if (partService != null)
+				{
+					partService.addPartListener(fPartListener);
+				}
+				window.addPerspectiveListener(fPerspectiveListener);
+			}
 
-		// Listen on any future windows
-		PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+			// Listen on any future windows
+			PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+		}
 	}
 
 	private void removePartListener()
 	{
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		IPartService partService;
-		for (IWorkbenchWindow window : windows)
+		IWorkbench workbench = null;
+		try
 		{
-			partService = window.getPartService();
-			if (partService != null)
-			{
-				partService.removePartListener(fPartListener);
-			}
-			window.removePerspectiveListener(fPerspectiveListener);
+			workbench = PlatformUI.getWorkbench();
 		}
-		PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			IPartService partService;
+			for (IWorkbenchWindow window : windows)
+			{
+				partService = window.getPartService();
+				if (partService != null)
+				{
+					partService.removePartListener(fPartListener);
+				}
+				window.removePerspectiveListener(fPerspectiveListener);
+			}
+			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
+		}
 	}
 }

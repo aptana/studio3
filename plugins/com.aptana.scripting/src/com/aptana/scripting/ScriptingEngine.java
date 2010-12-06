@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting;
 
 import java.io.File;
@@ -48,7 +82,7 @@ public class ScriptingEngine
 	 */
 	private ScriptingEngine()
 	{
-		this._runType = Activator.getDefaultRunType();
+		this._runType = ScriptingActivator.getDefaultRunType();
 	}
 
 	/**
@@ -57,7 +91,7 @@ public class ScriptingEngine
 	 * @param scope
 	 * @return
 	 */
-	public ScriptingContainer createScriptingContainer(LocalContextScope scope)
+	private ScriptingContainer createScriptingContainer(LocalContextScope scope)
 	{
 		// ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.PERSISTENT);
 		ScriptingContainer result = new ScriptingContainer(scope, LocalVariableBehavior.TRANSIENT);
@@ -82,13 +116,20 @@ public class ScriptingEngine
 			}
 
 			result.setHomeDirectory(jrubyHome.getAbsolutePath());
+
+			// TODO Generate two containers? A global one for loading bundles, a threadsafe one for executing commands/snippets/etc?
+			// Pre-load 'ruble' framework files!
+			List<String> loadPaths = result.getLoadPaths();
+			loadPaths.addAll(0, getContributedLoadPaths());
+			result.setLoadPaths(loadPaths);
+			result.runScriptlet("require 'ruble'"); //$NON-NLS-1$
 		}
 		catch (IOException e)
 		{
-			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home, new Object[] { e
-					.getMessage() });
+			String message = MessageFormat.format(Messages.ScriptingEngine_Error_Setting_JRuby_Home,
+					new Object[] { e.getMessage() });
 
-			Activator.logError(message, e);
+			ScriptingActivator.logError(message, e);
 			ScriptLogger.logError(message);
 		}
 
@@ -100,7 +141,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public List<String> getContributedLoadPaths()
+	public synchronized List<String> getContributedLoadPaths()
 	{
 		if (this._loadPaths == null)
 		{
@@ -109,7 +150,7 @@ public class ScriptingEngine
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, LOADPATH_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, LOADPATH_ID);
 
 				if (extensionPoint != null)
 				{
@@ -141,7 +182,7 @@ public class ScriptingEngine
 											Messages.ScriptingEngine_Unable_To_Convert_Load_Path, new Object[] {
 													declaringPluginID, url });
 
-									Activator.logError(message, null);
+									ScriptingActivator.logError(message, null);
 								}
 							}
 						}
@@ -156,11 +197,12 @@ public class ScriptingEngine
 	}
 
 	/**
-	 * getFrameworkFiles
+	 * getFrameworkFiles 
+	 * Used by "ruble.rb" DO NOT REMOVE!
 	 * 
 	 * @return
 	 */
-	public List<String> getFrameworkFiles()
+	public synchronized List<String> getFrameworkFiles()
 	{
 		if (this._frameworkFiles == null)
 		{
@@ -169,7 +211,7 @@ public class ScriptingEngine
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, FRAMEWORK_FILE_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, FRAMEWORK_FILE_ID);
 
 				if (extensionPoint != null)
 				{
@@ -201,7 +243,7 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public static ScriptingEngine getInstance()
+	public static synchronized ScriptingEngine getInstance()
 	{
 		if (instance == null)
 		{
@@ -216,11 +258,11 @@ public class ScriptingEngine
 	 * 
 	 * @return
 	 */
-	public ScriptingContainer getScriptingContainer()
+	public synchronized ScriptingContainer getScriptingContainer()
 	{
 		if (this._scriptingContainer == null)
 		{
-			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.THREADSAFE);
+			this._scriptingContainer = this.createScriptingContainer(LocalContextScope.SINGLETON);
 		}
 
 		return this._scriptingContainer;
@@ -248,7 +290,7 @@ public class ScriptingEngine
 	{
 		return this.runScript(fullPath, loadPaths, this._runType, async);
 	}
-	
+
 	/**
 	 * runScript
 	 * 

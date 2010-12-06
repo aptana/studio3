@@ -37,6 +37,7 @@ package com.aptana.ide.ui.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.WeakHashMap;
 
 import javax.swing.Icon;
@@ -47,17 +48,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.program.Program;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor;
 
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -72,6 +72,8 @@ public final class ImageUtils {
 
 	private static javax.swing.JFileChooser jFileChooser;
 	private static final WeakHashMap<Object, String> iconToKeyMap = new WeakHashMap<Object, String>();
+
+	private static boolean shouldReset;
 
 	/**
 	 * 
@@ -116,8 +118,16 @@ public final class ImageUtils {
                 }
 			}
 			String imageKey = "os.fileType_" + fileType; //$NON-NLS-1$
-	
+
 			ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
+			if (shouldReset) {
+				Collection<String> imageKeys = iconToKeyMap.values();
+				for (String key : imageKeys) {
+					imageRegistry.remove(key);
+				}
+				iconToKeyMap.clear();
+				shouldReset = false;
+			}
 			ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(imageKey);
 			if (imageDescriptor != null) {
 				return imageDescriptor;
@@ -156,7 +166,12 @@ public final class ImageUtils {
 		}
 		return imageDescriptor;
 	}
-	
+
+	public static void themeChanged()
+	{
+		shouldReset = true;
+	}
+
 	private static ImageDescriptor getExtensionImageDescriptor(String extension) {
 		ImageRegistry imageRegistry = JFaceResources.getImageRegistry();
 		String imageKey = "extension_" + extension; //$NON-NLS-1$
@@ -175,8 +190,9 @@ public final class ImageUtils {
 	}
 	
 	private static ImageData awtImageIconToSWTImageData(javax.swing.Icon icon, Color backgroundColor) {
-		java.awt.Color bgColor = swtColorToAWTColor(backgroundColor != null ?
-				backgroundColor : Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		java.awt.Color bgColor = swtColorToAWTColor(backgroundColor != null ? backgroundColor : ThemePlugin
+				.getDefault().getColorManager()
+				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground()));
 
 		java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(icon.getIconWidth(), icon.getIconHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
 		java.awt.Graphics2D imageGraphics = bi.createGraphics();

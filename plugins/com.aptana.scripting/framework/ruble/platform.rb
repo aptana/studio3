@@ -26,6 +26,10 @@ module Ruble
     Ruble.platforms.include? :windows
   end
   
+  def Ruble.is_mac?
+    Ruble.platforms.include? :mac
+  end  
+
   def Ruble.os_name
     java.lang.System.getProperty("os.name")
   end  

@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.ui.views;
 
 import java.io.File;
@@ -6,9 +40,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -35,12 +69,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.ColorManager;
-import com.aptana.editor.common.theme.IThemeManager;
-import com.aptana.editor.common.theme.Theme;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
+import com.aptana.theme.ColorManager;
+import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 public class BundleView extends ViewPart
 {
@@ -73,7 +107,7 @@ public class BundleView extends ViewPart
 	 */
 	private void applyTheme()
 	{
-		CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+		ThemePlugin plugin = ThemePlugin.getDefault();
 		ColorManager colorManager = plugin.getColorManager();
 		IThemeManager themeManager = plugin.getThemeManager();
 		Theme currentTheme = themeManager.getCurrentTheme();
@@ -126,7 +160,7 @@ public class BundleView extends ViewPart
 		// remove theme change listener
 		if (this._themeChangeListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
 					this._themeChangeListener);
 		}
 
@@ -168,7 +202,7 @@ public class BundleView extends ViewPart
 	 */
 	private void hookContextMenu()
 	{
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener()
@@ -206,7 +240,7 @@ public class BundleView extends ViewPart
 					}
 					catch (IllegalStateException e)
 					{
-						CommonEditorPlugin.logError(e);
+						ThemePlugin.logError(e);
 					}
 
 					if (workbench != null)
@@ -276,7 +310,7 @@ public class BundleView extends ViewPart
 			}
 		};
 
-		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID)
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)
 				.addPreferenceChangeListener(this._themeChangeListener);
 	}
 
@@ -300,11 +334,11 @@ public class BundleView extends ViewPart
 					GC gc = event.gc;
 					Color oldBackground = gc.getBackground();
 
-					CommonEditorPlugin plugin = CommonEditorPlugin.getDefault();
+					ThemePlugin plugin = ThemePlugin.getDefault();
 					ColorManager colorManager = plugin.getColorManager();
 					IThemeManager themeManager = plugin.getThemeManager();
 
-					gc.setBackground(colorManager.getColor(themeManager.getCurrentTheme().getSelection()));
+					gc.setBackground(colorManager.getColor(themeManager.getCurrentTheme().getSelectionAgainstBG()));
 					gc.fillRectangle(0, event.y, clientWidth, event.height);
 					gc.setBackground(oldBackground);
 

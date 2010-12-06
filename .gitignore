@@ -7,6 +7,7 @@ CVS/
 *.ncb
 *.suo
 *.user
+*.sass-cache
 
 build/
 *.pbxuser
@@ -14,5 +15,5 @@ build/
 *.perspectivev3
 *.mode1v3
 *.mode2v3
-
-!/plugins/com.aptana.terminal/cygwin/bin/
+native/**/Debug/
+native/**/Release/

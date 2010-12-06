@@ -35,11 +35,18 @@
 
 package com.aptana.ide.ui.io.navigator;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
+import org.eclipse.ui.progress.IElementCollector;
 import org.eclipse.ui.progress.PendingUpdateAdapter;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 import com.aptana.ide.ui.io.CoreIOImages;
 
@@ -49,11 +56,14 @@ import com.aptana.ide.ui.io.CoreIOImages;
  */
 public class DeferredTreeContentManager extends org.eclipse.ui.progress.DeferredTreeContentManager {
 
+	private AbstractTreeViewer treeViewer;
+	
 	/**
 	 * @param viewer
 	 */
 	public DeferredTreeContentManager(AbstractTreeViewer viewer) {
 		super(viewer);
+		this.treeViewer = viewer;
 	}
 
 	/**
@@ -69,17 +79,43 @@ public class DeferredTreeContentManager extends org.eclipse.ui.progress.Deferred
 	 */
 	@Override
 	protected PendingUpdateAdapter createPendingUpdateAdapter() {
-		return new PendingUpdateAdapter() {
+		return new CustomPendingUpdateAdapter();
+	}
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.ui.progress.PendingUpdateAdapter#getImageDescriptor(java.lang.Object)
-			 */
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.progress.DeferredTreeContentManager#createElementCollector(java.lang.Object, org.eclipse.ui.progress.PendingUpdateAdapter)
+	 */
+	@Override
+	protected IElementCollector createElementCollector(Object parent, PendingUpdateAdapter placeholder) {
+		if (placeholder instanceof CustomPendingUpdateAdapter) {
+			((CustomPendingUpdateAdapter) placeholder).parent = parent;
+		}
+		return super.createElementCollector(parent, placeholder);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.progress.DeferredTreeContentManager#runClearPlaceholderJob(org.eclipse.ui.progress.PendingUpdateAdapter)
+	 */
+	@Override
+	protected void runClearPlaceholderJob(final PendingUpdateAdapter placeholder) {
+		super.runClearPlaceholderJob(placeholder);
+		if (!PlatformUI.isWorkbenchRunning() || !(placeholder instanceof CustomPendingUpdateAdapter)) {
+			return;
+		}
+		WorkbenchJob parentUpdateJob = new WorkbenchJob("Rerent Update") { //$NON-NLS-1$
 			@Override
-			public ImageDescriptor getImageDescriptor(Object object) {
-				return CoreIOImages.getImageDescriptor(CoreIOImages.IMG_OBJS_PENDING);
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				Control control = treeViewer.getControl();
+				if (control.isDisposed()) {
+					return Status.CANCEL_STATUS;
+				}
+				treeViewer.update(((CustomPendingUpdateAdapter) placeholder).parent, null);
+				return Status.OK_STATUS;
 			}
 			
 		};
+		parentUpdateJob.setSystem(true);
+		parentUpdateJob.schedule();
 	}
 
 	/* (non-Javadoc)
@@ -91,4 +127,28 @@ public class DeferredTreeContentManager extends org.eclipse.ui.progress.Deferred
 		return super.getFetchJobName(parent, adapter);
 	}
 
+	private class CustomPendingUpdateAdapter extends PendingUpdateAdapter {
+
+		protected Object parent;
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.progress.PendingUpdateAdapter#getImageDescriptor(java.lang.Object)
+		 */
+		@Override
+		public ImageDescriptor getImageDescriptor(Object object) {
+			return CoreIOImages.getImageDescriptor(CoreIOImages.IMG_OBJS_PENDING);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.progress.PendingUpdateAdapter#getParent(java.lang.Object)
+		 */
+		@Override
+		public Object getParent(Object o) {
+			if (o == this) {
+				return parent;
+			}
+			return super.getParent(o);
+		}
+
+	}
 }

@@ -1,0 +1,189 @@
+// java -jar beaver.js -T -w JSON.beaver
+%package "com.aptana.editor.json.parsing";
+
+%class "JSONParser";
+
+%import "java.util.ArrayList";
+
+%import "com.aptana.editor.json.parsing.ast.*";
+%import "com.aptana.parsing.IParseState";
+%import "com.aptana.parsing.IParser";
+%import "com.aptana.parsing.ast.IParseNode";
+%import "com.aptana.parsing.ast.IParseRootNode";
+
+%implements "IParser";
+
+%embed {:
+    // suppress parser error reporting and let the custom error recovery mechanism handle it
+    private static class JSONEvents extends Events
+    {
+        public void scannerError(Scanner.Exception e)
+        {
+        }
+
+        public void syntaxError(Symbol token)
+        {
+        }
+
+        public void unexpectedTokenRemoved(Symbol token)
+        {
+        }
+
+        public void missingTokenInserted(Symbol token)
+        {
+        }
+
+        public void misspelledTokenReplaced(Symbol token)
+        {
+        }
+
+        public void errorPhraseRemoved(Symbol error)
+        {
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.aptana.parsing.IParser#parse(com.aptana.parsing.IParseState)
+     */
+    public synchronized IParseRootNode parse(IParseState parseState) throws java.lang.Exception
+    {
+        JSONScanner scanner = new JSONScanner();
+
+        // grab source
+        char[] characters = parseState.getSource();
+
+        // make sure we have some source
+        String source = (characters != null) ? new String(characters) : "";
+
+        // send source to the scanner
+        scanner.setSource(source);
+
+        // parse
+        IParseRootNode result = (IParseRootNode) parse(scanner);
+
+        // save reference to result
+        parseState.setParseResult(result);
+
+        return result;
+    }
+:};
+
+%init {:
+        report = new JSONEvents();
+:};
+
+%terminals PROPERTY, STRING_DOUBLE, STRING_SINGLE;
+%terminals LCURLY, RCURLY, LBRACKET, RBRACKET;
+%terminals COMMA, COLON;
+%terminals NUMBER, TRUE, FALSE, NULL;
+
+%typeof Entry, Value, String = "JSONNode";
+%typeof PROPERTY, STRING_SINGLE, STRING_DOUBLE, NUMBER = "String";
+
+%goal JSON;
+
+JSON
+    =   Value.v
+        {:
+            return new JSONParseRootNode(new Symbol[] { v });
+        :}
+    |
+        {:
+            return new JSONParseRootNode();
+        :}
+    ;
+
+Value
+    =   String
+    |   NUMBER.n
+    	{:
+    		return new JSONNumberNode(n);
+    	:}
+    |   Object
+    |   Array
+    |   TRUE
+    	{:
+    		return new JSONTrueNode();
+    	:}
+    |   FALSE
+    	{:
+    		return new JSONFalseNode();
+    	:}
+    |   NULL
+    	{:
+    		return new JSONNullNode();
+    	:}
+    ;
+
+String
+    =   STRING_DOUBLE.s
+    	{:
+    		return new JSONStringNode(s.substring(1, s.length() - 1));
+    	:}
+    |   STRING_SINGLE.s
+    	{:
+    		return new JSONStringNode(s.substring(1, s.length() - 1));
+    	:}
+    ;
+
+Object
+    =   LCURLY RCURLY
+        {:
+            return new JSONObjectNode();
+        :}
+    |   LCURLY Entries.e RCURLY
+        {:
+            JSONObjectNode object = new JSONObjectNode();
+
+            for (IParseNode node : e)
+            {
+                object.addChild(node);
+            }
+
+            return object;
+        :}
+    ;
+
+Entries
+    =   Entries COMMA Entry
+    |   Entry
+    ;
+
+Entry
+    =   PROPERTY.p COLON.c Value.v
+        {:
+            JSONEntryNode entry = new JSONEntryNode(c);
+            JSONStringNode property = new JSONStringNode(p.substring(1, p.length() - 1));
+
+            property.setLocation(_symbol_p.getStart(), _symbol_p.getEnd());
+
+            entry.addChild(property);
+            entry.addChild(v);
+
+            return entry;
+        :}
+    ;
+
+Array
+    =   LBRACKET RBRACKET
+        {:
+            return new JSONArrayNode();
+        :}
+    |   LBRACKET Values.v RBRACKET
+        {:
+            JSONArrayNode array = new JSONArrayNode();
+
+            for (IParseNode node : v)
+            {
+                array.addChild(node);
+            }
+
+            return array;
+        :}
+    ;
+
+Values
+    =   Values COMMA Value
+    |   Value
+    ;

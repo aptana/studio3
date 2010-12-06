@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -62,7 +62,7 @@ import com.aptana.core.resources.IUniformResourceChangeListener;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"restriction", "unchecked", "rawtypes"})
 public final class MarkerManager {
 
 	private static final MarkerInfo[] NO_MARKER_INFO = new MarkerInfo[0];
@@ -311,15 +311,6 @@ public final class MarkerManager {
 	 */
 	public void removeResourceChangeListener( IUniformResourceChangeListener listener ) {
 		listeners.remove(listener);
-	}
-	
-	/**
-	 * Notifies manager that external resource is changed.
-	 * @param resource - resource that is changed.
-	 */
-	public void externalResourceChanged(IUniformResource resource)
-	{
-	    handleResourceChanged();
 	}
 
 	private void handleResourceChanged() {

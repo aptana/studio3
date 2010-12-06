@@ -3,7 +3,7 @@ require "ruble/command"
 module Ruble
 
   class Template < Command
-    def initialize(name)
+    def initialize(name, path)
       super
     end    
     
@@ -19,14 +19,16 @@ module Ruble
       def define_template(name, &block)
         log_info("loading template #{name}")
 
-        command = Template.new(name)
+        path = $0
+        path = block.binding.eval("__FILE__") if block
+        command = Template.new(name, path)
         block.call(command) if block_given?
 
         # add command to bundle
         bundle = BundleManager.bundle_from_path(command.path)
         
         if !bundle.nil?
-          bundle.add_command(command)
+          bundle.add_child(command)
         else
           log_warning("No bundle found for template #{name}: #{command.path}")
         end
@@ -36,7 +38,7 @@ module Ruble
     private
 
     def create_java_object
-      com.aptana.scripting.model.TemplateElement.new($fullpath)
+      com.aptana.scripting.model.TemplateElement.new(path)
     end
   end
 

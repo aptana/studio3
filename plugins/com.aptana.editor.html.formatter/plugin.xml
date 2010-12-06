@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.formatter.epl.formatterFactory">
+      <engineContribution
+            contentType="com.aptana.contenttype.html">
+         <formatterFactory
+               class="com.aptana.editor.html.formatter.HTMLFormatterFactory"
+               description="%html_code_formatter_description"
+               id="com.aptana.editor.html.formatterFactory"
+               name="%html_code_formatter"
+               priority="10">
+         </formatterFactory>
+      </engineContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.html.formatter.preferences.HTMLFormatterPreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>

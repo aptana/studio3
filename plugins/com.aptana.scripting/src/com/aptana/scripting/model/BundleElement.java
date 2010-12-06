@@ -1,15 +1,49 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.ScopeSelector;
 
@@ -22,23 +56,25 @@ public class BundleElement extends AbstractElement
 	private String _licenseUrl;
 	private String _repository;
 
+	private List<AbstractBundleElement> _children;
 	private File _bundleDirectory;
 	private BundlePrecedence _bundlePrecedence;
-	private List<MenuElement> _menus;
-	private List<CommandElement> _commands;
 	private boolean _visible;
 
-	private Object menuLock = new Object();
-	private Object commandLock = new Object();
-
 	private Map<String, String> _fileTypeRegistry;
-	private List<String> fileTypes;
+	private List<String> _fileTypes;
+	private Object fileTypeRegistryLock = new Object();
+	private Object fileTypesLock = new Object();
 
 	private Map<ScopeSelector, RubyRegexp> _foldingStartMarkers;
 	private Map<ScopeSelector, RubyRegexp> _foldingStopMarkers;
-	
+	private Object foldingStartMarkersLock = new Object();
+	private Object foldingStopMarkersLock = new Object();
+
 	private Map<ScopeSelector, RubyRegexp> _increaseIndentMarkers;
 	private Map<ScopeSelector, RubyRegexp> _decreaseIndentMarkers;
+	private Object increaseIndentMarkersLock = new Object();
+	private Object decreaseIndentMarkersLock = new Object();
 
 	/**
 	 * Bundle
@@ -54,10 +90,8 @@ public class BundleElement extends AbstractElement
 			// calculate bundle's root directory
 			File pathFile = new File(path);
 			File parentDirectory = (pathFile.isFile()) ? pathFile.getParentFile() : pathFile;
-			String parentName = parentDirectory.getName();
 
-			if (BundleManager.COMMANDS_DIRECTORY_NAME.equals(parentName)
-					|| BundleManager.SNIPPETS_DIRECTORY_NAME.equals(parentName))
+			if (BundleManager.isSpecialDirectory(parentDirectory))
 			{
 				parentDirectory = parentDirectory.getParentFile();
 			}
@@ -65,61 +99,46 @@ public class BundleElement extends AbstractElement
 			this._bundleDirectory = parentDirectory.getAbsoluteFile();
 		}
 
+		// it will be extremely rare to have no children, so go ahead and pre-allocate the child list. This will also
+		// allow us to lock on the list instead of maintaining a separate lock object
+		this._children = new ArrayList<AbstractBundleElement>();
+
 		// calculate the bundle scope
 		this._bundlePrecedence = BundleManager.getInstance().getBundlePrecedence(path);
 	}
 
 	/**
-	 * addCommand
+	 * addChild
 	 * 
-	 * @param command
+	 * @param element
 	 */
-	public void addCommand(CommandElement command)
+	public void addChild(AbstractBundleElement element)
 	{
-		if (command != null)
+		if (element != null)
 		{
-			synchronized (commandLock)
-			{
-				if (this._commands == null)
-				{
-					this._commands = new ArrayList<CommandElement>();
-				}
+			BundleEntry.VisibilityContext context = null;
 
-				// NOTE: Should we prevent the same element from being added twice?
-				this._commands.add(command);
+			synchronized (this._children)
+			{
+				if (this._children.contains(element) == false)
+				{
+					context = this.getVisibilityContext(element.getClass());
+
+					this._children.add(element);
+
+					if (context != null)
+					{
+						context.updateContext();
+					}
+				}
 			}
 
-			command.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(command);
-		}
-	}
-
-	/**
-	 * addMenu
-	 * 
-	 * @param snippet
-	 */
-	public void addMenu(MenuElement menu)
-	{
-		if (menu != null)
-		{
-			synchronized (menuLock)
+			if (context != null)
 			{
-				if (this._menus == null)
-				{
-					this._menus = new ArrayList<MenuElement>();
-				}
-
-				// NOTE: Should we prevent the same element from being added twice?
-				this._menus.add(menu);
+				context.fireVisibilityEvents();
 			}
 
-			menu.setOwningBundle(this);
-
-			// fire add event
-			BundleManager.getInstance().fireElementAddedEvent(menu);
+			element.setOwningBundle(this);
 		}
 	}
 
@@ -130,11 +149,15 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateFileType(String fileType)
 	{
-		if (fileTypes == null)
+		synchronized (fileTypesLock)
 		{
-			fileTypes = new ArrayList<String>();
+			if (this._fileTypes == null)
+			{
+				this._fileTypes = new ArrayList<String>();
+			}
+
+			this._fileTypes.add(fileType);
 		}
-		fileTypes.add(fileType);
 	}
 
 	/**
@@ -145,15 +168,18 @@ public class BundleElement extends AbstractElement
 	 */
 	public void associateScope(String filePattern, String scope)
 	{
-		if (filePattern != null && filePattern.length() > 0 && scope != null && scope.length() > 0)
+		if (!StringUtil.isEmpty(filePattern) && !StringUtil.isEmpty(scope))
 		{
-			// Store the filetype -> scope mapping for later lookup when we need to set up the scope in the editor
-			if (this._fileTypeRegistry == null)
+			synchronized (fileTypeRegistryLock)
 			{
-				this._fileTypeRegistry = new HashMap<String, String>();
+				// Store the file type -> scope mapping for later lookup when we need to set up the scope in the editor
+				if (this._fileTypeRegistry == null)
+				{
+					this._fileTypeRegistry = new HashMap<String, String>();
+				}
+
+				this._fileTypeRegistry.put(filePattern, scope);
 			}
-			
-			this._fileTypeRegistry.put(filePattern, scope);
 		}
 	}
 
@@ -200,6 +226,73 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getChildren
+	 * 
+	 * @return
+	 */
+	public List<AbstractBundleElement> getChildren()
+	{
+		List<AbstractBundleElement> result;
+
+		synchronized (this._children)
+		{
+			result = new ArrayList<AbstractBundleElement>(this._children);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will not be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByExactType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		for (AbstractBundleElement child : this.getChildren())
+		{
+			// NOTE: this will return true for children of type childType, but not for descendant types of
+			// childType.
+			if (childType == child.getClass())
+			{
+				result.add(childType.cast(child));
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will be
+	 * included in the resulting list
+	 * 
+	 * @param <T>
+	 * @param childType
+	 * @return
+	 */
+	public <T extends AbstractBundleElement> List<T> getChildrenByType(Class<T> childType)
+	{
+		List<T> result = new ArrayList<T>();
+
+		for (AbstractBundleElement child : this.getChildren())
+		{
+			// NOTE: isAssignableFrom is like instanceof where it will return true for instances of childType and
+			// its descendant types
+			if (childType.isAssignableFrom(child.getClass()))
+			{
+				result.add(childType.cast(child));
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getCommandByName
 	 * 
 	 * @return
@@ -208,17 +301,14 @@ public class BundleElement extends AbstractElement
 	{
 		CommandElement result = null;
 
-		synchronized (commandLock)
+		if (StringUtil.isEmpty(name) == false)
 		{
-			if (name != null && name.length() > 0 && this._commands != null && this._commands.size() > 0)
+			for (CommandElement command : this.getCommands())
 			{
-				for (CommandElement command : this._commands)
+				if (name.equals(command.getDisplayName()))
 				{
-					if (name.equals(command.getDisplayName()))
-					{
-						result = command;
-						break;
-					}
+					result = command;
+					break;
 				}
 			}
 		}
@@ -231,19 +321,19 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public CommandElement[] getCommands()
+	public List<CommandElement> getCommands()
 	{
-		CommandElement[] result = BundleManager.NO_COMMANDS;
+		return this.getChildrenByType(CommandElement.class);
+	}
 
-		synchronized (commandLock)
-		{
-			if (this._commands != null && this._commands.size() > 0)
-			{
-				result = this._commands.toArray(new CommandElement[this._commands.size()]);
-			}
-		}
-
-		return result;
+	/**
+	 * getContentAssists
+	 * 
+	 * @return
+	 */
+	public List<ContentAssistElement> getContentAssists()
+	{
+		return this.getChildrenByType(ContentAssistElement.class);
 	}
 
 	/**
@@ -254,6 +344,30 @@ public class BundleElement extends AbstractElement
 	public String getCopyright()
 	{
 		return this._copyright;
+	}
+
+	/**
+	 * getDecreaseIndentMarkers
+	 * 
+	 * @return
+	 */
+	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
+	{
+		Map<ScopeSelector, RubyRegexp> result;
+
+		synchronized (decreaseIndentMarkersLock)
+		{
+			if (this._decreaseIndentMarkers == null)
+			{
+				result = Collections.emptyMap();
+			}
+			else
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._decreaseIndentMarkers);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -285,7 +399,7 @@ public class BundleElement extends AbstractElement
 	{
 		String result = super.getDisplayName();
 
-		if (result == null || result.length() == 0)
+		if (StringUtil.isEmpty(result))
 		{
 			result = this.getDefaultName();
 		}
@@ -302,13 +416,61 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getEnvs
+	 * 
+	 * @return
+	 */
+	public List<EnvironmentElement> getEnvs()
+	{
+		return this.getChildrenByType(EnvironmentElement.class);
+	}
+
+	/**
 	 * getFileTypeRegistry
 	 * 
 	 * @return
 	 */
 	public Map<String, String> getFileTypeRegistry()
 	{
-		return this._fileTypeRegistry;
+		Map<String, String> result;
+
+		synchronized (fileTypeRegistryLock)
+		{
+			if (this._fileTypeRegistry != null)
+			{
+				result = new HashMap<String, String>(this._fileTypeRegistry);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getFileTypes
+	 * 
+	 * @return
+	 */
+	List<String> getFileTypes()
+	{
+		List<String> result;
+
+		synchronized (fileTypesLock)
+		{
+			if (this._fileTypes != null)
+			{
+				result = new ArrayList<String>(this._fileTypes);
+			}
+			else
+			{
+				result = Collections.emptyList();
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -318,12 +480,21 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStartMarkers()
 	{
-		if (this._foldingStartMarkers == null)
+		Map<ScopeSelector, RubyRegexp> result;
+
+		synchronized (foldingStartMarkersLock)
 		{
-			return Collections.emptyMap();
+			if (this._foldingStartMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._foldingStartMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
-		
-		return Collections.unmodifiableMap(this._foldingStartMarkers);
+
+		return result;
 	}
 
 	/**
@@ -333,14 +504,23 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getFoldingStopMarkers()
 	{
-		if (this._foldingStopMarkers == null)
+		Map<ScopeSelector, RubyRegexp> result;
+
+		synchronized (foldingStopMarkersLock)
 		{
-			return Collections.emptyMap();
+			if (this._foldingStopMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._foldingStopMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
-		
-		return Collections.unmodifiableMap(this._foldingStopMarkers);
+
+		return result;
 	}
-	
+
 	/**
 	 * getFoldingStartMarkers
 	 * 
@@ -348,27 +528,21 @@ public class BundleElement extends AbstractElement
 	 */
 	public Map<ScopeSelector, RubyRegexp> getIncreaseIndentMarkers()
 	{
-		if (this._increaseIndentMarkers == null)
-		{
-			return Collections.emptyMap();
-		}
-		
-		return Collections.unmodifiableMap(this._increaseIndentMarkers);
-	}
+		Map<ScopeSelector, RubyRegexp> result;
 
-	/**
-	 * getDecreaseIndentMarkers
-	 * 
-	 * @return
-	 */
-	public Map<ScopeSelector, RubyRegexp> getDecreaseIndentMarkers()
-	{
-		if (this._decreaseIndentMarkers == null)
+		synchronized (increaseIndentMarkersLock)
 		{
-			return Collections.emptyMap();
+			if (this._increaseIndentMarkers != null)
+			{
+				result = new HashMap<ScopeSelector, RubyRegexp>(this._increaseIndentMarkers);
+			}
+			else
+			{
+				result = Collections.emptyMap();
+			}
 		}
-		
-		return Collections.unmodifiableMap(this._decreaseIndentMarkers);
+
+		return result;
 	}
 
 	/**
@@ -398,8 +572,8 @@ public class BundleElement extends AbstractElement
 	 */
 	public List<String> getLoadPaths()
 	{
-		List<String> result = new LinkedList<String>();
-		
+		List<String> result = new ArrayList<String>();
+
 		result.add(BundleUtils.getBundleLibDirectory(this.getBundleDirectory()));
 
 		return result;
@@ -410,19 +584,29 @@ public class BundleElement extends AbstractElement
 	 * 
 	 * @return
 	 */
-	public MenuElement[] getMenus()
+	public List<MenuElement> getMenus()
 	{
-		MenuElement[] result = BundleManager.NO_MENUS;
+		return this.getChildrenByType(MenuElement.class);
+	}
 
-		synchronized (menuLock)
-		{
-			if (this._menus != null && this._menus.size() > 0)
-			{
-				result = this._menus.toArray(new MenuElement[this._menus.size()]);
-			}
-		}
+	/**
+	 * getPairs
+	 * 
+	 * @return
+	 */
+	public List<SmartTypingPairsElement> getPairs()
+	{
+		return this.getChildrenByType(SmartTypingPairsElement.class);
+	}
 
-		return result;
+	/**
+	 * getProjectTemplates
+	 * 
+	 * @return
+	 */
+	public List<ProjectTemplateElement> getProjectTemplates()
+	{
+		return this.getChildrenByType(ProjectTemplateElement.class);
 	}
 
 	/**
@@ -436,40 +620,35 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
-	 * hasCommands
+	 * getVisibilityContext
 	 * 
 	 * @return
 	 */
-	public boolean hasCommands()
+	private BundleEntry.VisibilityContext getVisibilityContext(Class<? extends AbstractBundleElement> elementClass)
 	{
-		boolean result = false;
+		BundleEntry entry = BundleManager.getInstance().getBundleEntry(this.getDisplayName());
+		BundleEntry.VisibilityContext context = null;
 
-		synchronized (commandLock)
+		if (entry != null)
 		{
-			if (this._commands != null)
-			{
-				result = this._commands.size() > 0;
-			}
+			context = entry.getVisibilityContext(elementClass);
 		}
 
-		return result;
+		return context;
 	}
-	
+
 	/**
-	 * hasMenus
+	 * hasChildren
 	 * 
 	 * @return
 	 */
-	public boolean hasMenus()
+	public boolean hasChildren()
 	{
 		boolean result = false;
 
-		synchronized (menuLock)
+		synchronized (this._children)
 		{
-			if (this._menus != null)
-			{
-				result = this._menus.size() > 0;
-			}
+			result = this._children.size() > 0;
 		}
 
 		return result;
@@ -492,7 +671,7 @@ public class BundleElement extends AbstractElement
 	 */
 	public boolean isEmpty()
 	{
-		return this.hasMetadata() == false && this.hasCommands() == false && this.hasMenus() == false;
+		return this.hasMetadata() == false && this.hasChildren() == false;
 	}
 
 	/**
@@ -506,8 +685,7 @@ public class BundleElement extends AbstractElement
 		// calculated display name we generate in this class
 		String displayName = super.getDisplayName();
 
-		return displayName != null && displayName.length() > 0
-				&& StringUtil.areNotEqual(displayName, this.getDefaultName());
+		return !StringUtil.isEmpty(displayName) && StringUtil.areNotEqual(displayName, this.getDefaultName());
 	}
 
 	/**
@@ -535,94 +713,60 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 
 		// output commands
-		synchronized (commandLock)
+		for (CommandElement command : this.getCommands())
 		{
-			if (this._commands != null)
-			{
-				for (CommandElement command : this._commands)
-				{
-					command.toSource(printer);
-				}
-			}
+			command.toSource(printer);
 		}
 
 		// output menus
-		synchronized (menuLock)
+		for (MenuElement menu : this.getMenus())
 		{
-			if (this._menus != null)
-			{
-				for (MenuElement menu : this._menus)
-				{
-					menu.toSource(printer);
-				}
-			}
+			menu.toSource(printer);
 		}
 	}
 
 	/**
-	 * removeCommand
-	 * 
-	 * @param command
-	 */
-	public void removeCommand(CommandElement command)
-	{
-		boolean removed = false;
-
-		synchronized (commandLock)
-		{
-			if (this._commands != null && (removed = this._commands.remove(command)))
-			{
-				AbstractElement.unregisterElement(command);
-			}
-		}
-
-		if (removed)
-		{
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(command);
-		}
-	}
-
-	/**
-	 * removeElement
+	 * removeChild
 	 * 
 	 * @param element
 	 */
-	public void removeElement(AbstractBundleElement element)
-	{
-		if (element instanceof CommandElement)
-		{
-			this.removeCommand((CommandElement) element);
-		}
-		else if (element instanceof MenuElement)
-		{
-			this.removeMenu((MenuElement) element);
-		}
-	}
-
-	/**
-	 * removeMenu
-	 * 
-	 * @param command
-	 */
-	public void removeMenu(MenuElement menu)
+	public void removeChild(AbstractBundleElement element)
 	{
 		boolean removed = false;
+		BundleEntry.VisibilityContext context = null;
 
-		synchronized (menuLock)
+		// disassociate element with this bundle
+		element.setOwningBundle(null);
+
+		synchronized (this._children)
 		{
-			if (this._menus != null && (removed = this._menus.remove(menu)))
-			{
-				AbstractElement.unregisterElement(menu);
+			context = this.getVisibilityContext(element.getClass());
 
-				menu.removeChildren();
+			if (removed = this._children.remove(element) && context != null)
+			{
+				context.updateContext();
 			}
 		}
 
 		if (removed)
 		{
-			// fire delete event
-			BundleManager.getInstance().fireElementDeletedEvent(menu);
+			// NOTE: We currently have only one element type that has children, so we special case it here. However, if
+			// more elements fall into this category, then we should introduce a removeChildren method in the element
+			// hierarchy and then call that on all element types
+
+			// special case for menus so they can remove their children to fire events for each
+			if (element instanceof MenuElement)
+			{
+				((MenuElement) element).removeChildren();
+			}
+
+			// make sure elements are no longer tracked in AbstractElement
+			AbstractElement.unregisterElement(element);
+
+			if (context != null)
+			{
+				context.fireVisibilityEvents();
+			}
 		}
 	}
 
@@ -665,26 +809,32 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
-			// store starting regular expression
-			if (this._foldingStartMarkers == null)
+			synchronized (foldingStartMarkersLock)
 			{
-				this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-			}
-			
-			this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
-			
-			// store ending regular expression
-			if (this._foldingStopMarkers == null)
-			{
-				this._foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				// store starting regular expression
+				if (this._foldingStartMarkers == null)
+				{
+					this._foldingStartMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._foldingStartMarkers.put(new ScopeSelector(scope), startRegexp);
 			}
 
-			this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+			synchronized (foldingStopMarkersLock)
+			{
+				// store ending regular expression
+				if (this._foldingStopMarkers == null)
+				{
+					this._foldingStopMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._foldingStopMarkers.put(new ScopeSelector(scope), endRegexp);
+			}
 		}
 	}
-	
+
 	/**
 	 * setIndentMarkers
 	 * 
@@ -694,23 +844,29 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (scope != null && scope.length() > 0 && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
 		{
-			// store increasing regular expression
-			if (this._increaseIndentMarkers == null)
+			synchronized (increaseIndentMarkersLock)
 			{
-				this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
-			}
-			
-			this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
-			
-			// store decreasing regular expression
-			if (this._decreaseIndentMarkers == null)
-			{
-				this._decreaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				// store increasing regular expression
+				if (this._increaseIndentMarkers == null)
+				{
+					this._increaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._increaseIndentMarkers.put(new ScopeSelector(scope), startRegexp);
 			}
 
-			this._decreaseIndentMarkers.put(new ScopeSelector(scope), endRegexp);
+			synchronized (decreaseIndentMarkersLock)
+			{
+				// store decreasing regular expression
+				if (this._decreaseIndentMarkers == null)
+				{
+					this._decreaseIndentMarkers = new HashMap<ScopeSelector, RubyRegexp>();
+				}
+
+				this._decreaseIndentMarkers.put(new ScopeSelector(scope), endRegexp);
+			}
 		}
 	}
 
@@ -752,15 +908,5 @@ public class BundleElement extends AbstractElement
 	public void setVisible(boolean flag)
 	{
 		this._visible = flag;
-	}
-
-
-	/**
-	 * getFileTypes
-	 * @return
-	 */
-	List<String> getFileTypes()
-	{
-		return fileTypes;
 	}
 }

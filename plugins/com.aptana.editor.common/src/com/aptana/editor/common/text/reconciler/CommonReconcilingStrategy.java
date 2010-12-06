@@ -67,7 +67,6 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
 		fEditor = editor;
-
 	}
 
 	public AbstractThemeableEditor getEditor()
@@ -75,34 +74,29 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		return fEditor;
 	}
 
-	@Override
 	public void reconcile(IRegion partition)
 	{
 		// TODO Only recalculate the folding diff in the dirty region?
 		reconcile(false);
 	}
 
-	@Override
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
-		// TODO Only recalculate the folding diff in the dirty region?
+		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an "incremental reconciler" to get just dirty region
 		reconcile(false);
 	}
 
-	@Override
 	public void setDocument(IDocument document)
 	{
-		folder = new RubyRegexpFolder(document);
+		folder = new RubyRegexpFolder(fEditor, document);
 		fEditor.getFileService().setDocument(document);
 	}
 
-	@Override
 	public void initialReconcile()
 	{
 		reconcile(true);
 	}
 
-	@Override
 	public void setProgressMonitor(IProgressMonitor monitor)
 	{
 		fMonitor = monitor;
@@ -132,7 +126,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 		fPositions.clear();
 		try
 		{
-			fPositions = folder.emitFoldingRegions(fPositions, monitor);
+			fPositions = folder.emitFoldingRegions(monitor);
 		}
 		catch (BadLocationException e)
 		{

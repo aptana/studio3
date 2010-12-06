@@ -1,3 +1,38 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
+
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
@@ -22,10 +57,14 @@
 #define MAXCOMLEN 255
 #endif
 
+#define MAXARGS 16
+
 #define ESC '\033'
 #define DLE	'\020'
 
 #define MAX_ESC_SEQUENCE_LENGTH	16
+
+static const char* DELIM = "\n";
 
 static void send_process_list(char* ptyname);
 
@@ -44,10 +83,23 @@ main (int argc, char** argv)
 	int pty;
 	char ptyname[MAXCOMLEN+1];
 	struct winsize size = { 0, 0 };
+	char *args[MAXARGS];
+	char* arg;
+	int index = 0;
 
-	if( argc > 1 ) {
+	if( argc < 3 ) {
+		return EXIT_FAILURE;
+	}
+	memset(args, 0, sizeof(args));
+	for( arg = strtok(argv[2], DELIM); arg != NULL; arg = strtok(NULL, DELIM), ++index ) {
+		if( index >= MAXARGS ) {
+			return EXIT_FAILURE;
+		}
+		args[index] = arg;
+	}
+	if( argc > 3 ) {
 		unsigned int width, height;
-		if( sscanf(argv[1], "%ux%u", &width, &height) == 2 ) {
+		if( sscanf(argv[3], "%ux%u", &width, &height) == 2 ) {
 			size.ws_col = width;
 			size.ws_row = height;
 		}
@@ -65,7 +117,7 @@ main (int argc, char** argv)
 			exit (EXIT_FAILURE); 
 			
 		case 0: /* This is the child process */ 
-			execl("/bin/bash", "-bash", "-li", NULL); 
+			execv(argv[1], args); 
 			
 			perror("exec()"); /* Since exec* never return */ 
 			exit (EXIT_FAILURE); 

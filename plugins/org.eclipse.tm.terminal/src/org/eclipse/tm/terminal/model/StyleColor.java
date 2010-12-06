@@ -18,6 +18,7 @@ import java.util.Map;
  * Flyweight
  * Threadsafe.
  */
+@SuppressWarnings({"unchecked","rawtypes"})
 public class StyleColor {
 	private final static Map fgStyleColors=new HashMap();
 	final String fName;

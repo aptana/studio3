@@ -288,7 +288,11 @@ public abstract class Parser
 			{
 				try
 				{
-					return scanner.nextToken();
+					Symbol s = scanner.nextToken();
+					
+//					System.out.println(s.value);
+					
+					return s;
 				}
 				catch (Scanner.Exception e)
 				{
@@ -352,7 +356,7 @@ public abstract class Parser
 			return true;
 		}
 
-		private void initStack() throws IOException
+		private void initStack()
 		{
 			if (states == null || states.length < Parser.this.states.length)
 			{

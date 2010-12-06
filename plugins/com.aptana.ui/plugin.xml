@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="propertyDialogs" name="propertyDialogs" schema="schema/propertyDialogs.exsd"/>
-   <extension-point id="imageAssociations" name="imageAssociations" schema="schema/imageAssociations.exsd"/>
+   <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
+   <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -30,6 +30,16 @@
                id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
+               id="com.aptana.ui.io.remoteview"
+               minimized="false"
+               relationship="stack"
+               relative="com.aptana.explorer.view"
+               visible="false">
+         </view>
+         <viewShortcut
+               id="com.aptana.ui.io.remoteview">
+         </viewShortcut>
+         <view
                id="org.eclipse.ui.views.ContentOutline"
                ratio="0.75"
                relationship="bottom"
@@ -47,6 +57,9 @@
          </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
          </viewShortcut>
          <view
                id="org.eclipse.pde.runtime.LogView"
@@ -72,63 +85,161 @@
          <newWizardShortcut
                id="org.eclipse.ui.wizards.new.folder">
          </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard">
+         </newWizardShortcut>
          <actionSet
                id="org.eclipse.ui.NavigateActionSet">
          </actionSet>
          <actionSet
                id="org.eclipse.ui.edit.text.actionSet.presentation">
          </actionSet>
-         <newWizardShortcut
-               id="com.aptana.ui.wizards.NewWebProject">
-         </newWizardShortcut>
          <actionSet
-               id="com.aptana.editor.common.globalActionSet">
+               id="com.aptana.ui.globalActionSet">
          </actionSet>
          <actionSet
                id="com.aptana.terminal.actionSet">
          </actionSet>
+         <showInPart
+               id="org.eclipse.ui.navigator.ProjectExplorer">
+         </showInPart>
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            category="com.aptana.ui.wizards.category"
-            class="com.aptana.ui.internal.wizards.NewProjectWizard"
-            finalPerspective="com.aptana.ui.WebPerspective"
-            icon="icons/new_web_project.gif"
-            id="com.aptana.ui.wizards.NewWebProject"
-            name="%wizard.webproject.name"
-            preferredPerspectives="com.aptana.ui.WebPerspective"
-            project="true">
-         <description>
-            %wizard.webproject.description
-         </description>
-      </wizard>
+         point="org.eclipse.ui.commands">
       <category
-            id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
+            id="com.aptana.ui.category"
+            name="%CommandsCategory.name">
       </category>
-      <primaryWizard
-            id="com.aptana.ui.wizards.NewWebProject">
-      </primaryWizard>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ViewReleaseNotesCommandHandler"
+            description="%ViewReleaseNotes.description"
+            id="com.aptana.ui.command.viewreleasenotes"
+            name="%ViewReleaseNotes.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.SendFeedbackCommandHandler"
+            description="%SendFeedbackCommand.description"
+            id="com.aptana.ui.command.sendfeedback"
+            name="%SendFeedbackCommand.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ReportBugCommandHandler"
+            description="%ReportBugCommand.description"
+            id="com.aptana.ui.command.reportbug"
+            name="%ReportBugCommand.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ViewLogCommandHandler"
+            description="%ViewLogCommand.description"
+            id="com.aptana.ui.command.viewlog"
+            name="%ViewLogCommand.Label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.internal.commands.ClearLogCommandHandler"
+            description="%ClearLogCommand.description"
+            id="com.aptana.ui.command.clearlog"
+            name="%ClearLogCommand.Label">
+      </command>
+      <command
+            defaultHandler="com.aptana.ui.internal.commands.OpenInFinderHandler"
+            id="com.aptana.ui.command.ShowInFileManager"
+            name="%ShowInFileManager.label">
+      </command>
    </extension>
    <extension
-         id="webnature"
-         name="%extension.webnature.name"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="com.aptana.ui.projects.WebProjectNature">
-         </run>
-      </runtime>
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?after=additions">
+         <menu
+               id="aptanahelp"
+               label="%Menu.Help.Aptana.label">
+            <command
+                  commandId="com.aptana.ui.command.sendfeedback"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.aptana.ui.command.reportbug"
+                  style="push">
+            </command>
+            <separator
+                  name="slot1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="com.aptana.ui.command.viewlog"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.aptana.ui.command.clearlog"
+                  style="push">
+            </command>
+            <separator
+                  name="slot2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="com.aptana.ui.command.viewreleasenotes"
+                  style="push">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
+         <menu
+               id="projectExplorerShowIn"
+               label="%ShowIn.label">
+            <dynamic
+                  class="com.aptana.ui.commands.OpenFileManagerContributionItem"
+                  id="com.aptana.ui.open.file.manager">
+            </dynamic>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate>
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </iterate>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
    </extension>
    <extension
-         point="org.eclipse.ui.ide.projectNatureImages">
-      <image
-            icon="icons/webnature.gif"
-            id="com.aptana.ui.webnature.image"
-            natureId="com.aptana.ui.webnature">
-      </image>
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.aptana.ui.preferences.AptanaPreferencePage"
+            id="com.aptana.ui.AptanaPreferencePage"
+            name="%page.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.aptana.ui.globalActionSet"
+            label="%actionSet.global.label"
+            visible="false">
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="com.aptana.ui.contributions.inGlobalActionSet">
+         <with
+               variable="activeContexts">
+            <iterate
+                  operator="or">
+               <equals
+                     value="com.aptana.ui.globalActionSet">
+               </equals>
+            </iterate>
+         </with>
+      </definition>
    </extension>
 
 </plugin>

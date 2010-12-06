@@ -38,16 +38,13 @@ package com.aptana.editor.css;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
 import org.eclipse.jface.text.rules.Token;
-import org.eclipse.jface.text.rules.WordRule;
 import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -55,9 +52,11 @@ import com.aptana.editor.common.IPartitioningConfiguration;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
+import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.text.rules.EmptyCommentRule;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
-import com.aptana.editor.common.theme.IThemeManager;
+import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
 
 /**
  * @author Max Stepanov
@@ -74,64 +73,6 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { ICSSConstants.CONTENT_TYPE_CSS } };
 
-	/**
-	 * Detector for empty comments.
-	 */
-	static class EmptyCommentDetector implements IWordDetector
-	{
-		/**
-		 * isWordStart
-		 */
-		public boolean isWordStart(char c)
-		{
-			return (c == '/');
-		}
-
-		/**
-		 * isWordPart
-		 */
-		public boolean isWordPart(char c)
-		{
-			return (c == '*' || c == '/');
-		}
-	}
-
-	/**
-	 * WordPredicateRule
-	 */
-	static class WordPredicateRule extends WordRule implements IPredicateRule
-	{
-		private IToken fSuccessToken;
-
-		/**
-		 * WordPredicateRule
-		 * 
-		 * @param successToken
-		 */
-		public WordPredicateRule(IToken successToken)
-		{
-			super(new EmptyCommentDetector());
-			fSuccessToken = successToken;
-			addWord("/**/", fSuccessToken); //$NON-NLS-1$
-		}
-
-		/**
-		 * evaluate
-		 */
-		public IToken evaluate(ICharacterScanner scanner, boolean resume)
-		{
-			return super.evaluate(scanner);
-		}
-
-		/**
-		 * getSuccessToken
-		 */
-		public IToken getSuccessToken()
-		{
-			return fSuccessToken;
-		}
-	}
-
 	private IToken stringToken = new Token(STRING);
 
 	private IPredicateRule[] partitioningRules;
@@ -145,9 +86,10 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	{
 		IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 		c.addTranslation(new QualifiedContentType(ICSSConstants.CONTENT_TYPE_CSS), new QualifiedContentType(
-				"source.css")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType("comment.block.css")); //$NON-NLS-1$
-		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType("string.quoted.single.css")); //$NON-NLS-1$
+				ICSSConstants.CSS_SCOPE));
+		c.addTranslation(new QualifiedContentType(MULTILINE_COMMENT), new QualifiedContentType(
+				ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
+		c.addTranslation(new QualifiedContentType(STRING), new QualifiedContentType(ICSSConstants.CSS_STRING_SCOPE));
 	}
 
 	public static CSSSourceConfiguration getDefault()
@@ -166,7 +108,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 
 		partitioningRules = new IPredicateRule[] { new SingleLineRule("\"", "\"", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
 				new SingleLineRule("\'", "\'", stringToken, '\\'), //$NON-NLS-1$ //$NON-NLS-2$
-				new WordPredicateRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
+				new EmptyCommentRule(comment), new MultiLineRule("/*", "*/", comment, (char) 0, true) //$NON-NLS-1$ //$NON-NLS-2$
 		};
 	}
 
@@ -223,49 +165,43 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 	 */
 	public void setupPresentationReconciler(PresentationReconciler reconciler, ISourceViewer sourceViewer)
 	{
-		DefaultDamagerRepairer dr = new DefaultDamagerRepairer(Activator.getDefault().getCodeScanner());
+		DefaultDamagerRepairer dr = new ThemeingDamagerRepairer(new CSSCodeScanner());
 		reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
 		reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
 
-		dr = new DefaultDamagerRepairer(getWordScanner());
+		dr = new ThemeingDamagerRepairer(getCommentScanner());
 		reconciler.setDamager(dr, MULTILINE_COMMENT);
 		reconciler.setRepairer(dr, MULTILINE_COMMENT);
 
-		dr = new DefaultDamagerRepairer(getStringScanner());
+		dr = new ThemeingDamagerRepairer(getStringScanner());
 		reconciler.setDamager(dr, STRING);
 		reconciler.setRepairer(dr, STRING);
 	}
 
-	protected ITokenScanner getWordScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		if (multilineCommentScanner == null)
 		{
-			multilineCommentScanner = new RuleBasedScanner();
-			multilineCommentScanner.setDefaultReturnToken(getToken("comment.block.css")); //$NON-NLS-1$
+			multilineCommentScanner = new CommentScanner(getToken(ICSSConstants.CSS_COMMENT_BLOCK_SCOPE));
 		}
 		return multilineCommentScanner;
 	}
 
-	protected ITokenScanner getStringScanner()
+	private ITokenScanner getStringScanner()
 	{
 		if (stringScanner == null)
 		{
 			stringScanner = new RuleBasedScanner();
-			stringScanner.setDefaultReturnToken(getToken("string.quoted.single.css")); //$NON-NLS-1$
+			stringScanner.setDefaultReturnToken(getToken(ICSSConstants.CSS_STRING_SCOPE));
 		}
 		return stringScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
-		return getThemeManager().getToken(name);
-	}
-
-	protected IThemeManager getThemeManager()
-	{
-		return CommonEditorPlugin.getDefault().getThemeManager();
+		return new Token(name);
 	}
 }

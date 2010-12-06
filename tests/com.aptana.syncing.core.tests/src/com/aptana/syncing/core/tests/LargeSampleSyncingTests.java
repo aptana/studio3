@@ -63,6 +63,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 /**
  * @author Ingo Muschenetz
  */
+@SuppressWarnings({"nls", "deprecation"})
 public abstract class LargeSampleSyncingTests extends TestCase
 {
 	protected IFileStore clientDirectory;
@@ -186,7 +187,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		String CLIENT_CONTROL = "client_control";
 		String SERVER_LOCAL = "server_local";
 		String SERVER_TEST = "server_test";
-		int timeTolerance = 150000;
+		int timeTolerance = 1000; //150000;
 
 		IFileStore clientTestDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_TEST + sysTime));
 		IFileStore clientControlDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_CONTROL + sysTime));
@@ -213,18 +214,15 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		
 		Synchronizer syncManager = new Synchronizer(true, timeTolerance, includeCloakedFiles);
 		syncManager.setLogger(new ILogger() {
-			
-			@Override
+
 			public void logWarning(String message, Throwable th) {
 				System.out.println(message);
 			}
-			
-			@Override
+
 			public void logInfo(String message, Throwable th) {
 				System.out.println(message);
 			}
-			
-			@Override
+
 			public void logError(String message, Throwable th) {
 				System.out.println(message);
 			}
@@ -262,7 +260,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		HashMap<String, IFileStore> map = new HashMap<String, IFileStore>();
 		for (int i = 0; i < ccd.length; i++) {
 			IFileStore fsTest = ccd[i];
-			String fileRelPath = EFSUtils.getRelativePath(root2, fsTest);
+			String fileRelPath = EFSUtils.getRelativePath(root2, fsTest, null);
 			map.put(fileRelPath, fsTest);
 		}
 		
@@ -276,8 +274,8 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	}
 
 	protected void testFilesEqual(IFileStore root1, IFileStore root2, IFileStore file1, IFileStore file2) throws CoreException {
-		String file1RelPath = EFSUtils.getRelativePath(root1, file1);
-		String file2RelPath = EFSUtils.getRelativePath(root2, file2);
+		String file1RelPath = EFSUtils.getRelativePath(root1, file1, null);
+		String file2RelPath = EFSUtils.getRelativePath(root2, file2, null);
 		assertEquals(StringUtil.format("File {0} and {1} not equal", new String[] {file1RelPath, file2RelPath}), file1RelPath, file2RelPath);
 		IFileInfo f1 = file1.fetchInfo(IExtendedFileStore.DETAILED, null);
 		IFileInfo f2 = file2.fetchInfo(IExtendedFileStore.DETAILED, null);
@@ -288,7 +286,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	}
 
 	protected void testFilesExists(HashMap<String, IFileStore> destMap, IFileStore sourceRoot, IFileStore sourceFile, int timeTolerance) throws CoreException {
-		String relPath = EFSUtils.getRelativePath(sourceRoot, sourceFile);
+		String relPath = EFSUtils.getRelativePath(sourceRoot, sourceFile, null);
 		IFileStore destFile = destMap.get(relPath);
 		//System.out.println("Comparing " + relPath);
 

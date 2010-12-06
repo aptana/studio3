@@ -36,7 +36,6 @@
 package com.aptana.ide.ui.io.navigator;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +46,6 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -58,13 +56,16 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
+import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.ui.io.CoreIOImages;
+import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.ImageUtils;
 import com.aptana.ui.ImageAssociations;
@@ -125,6 +126,19 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			}
 		} else if (object instanceof IConnectionPointCategory) {
             return ((IConnectionPointCategory) object).getConnectionPoints();
+		} else if (object instanceof LocalRoot) {
+			try {
+				return fetchFileSystemChildren(((LocalRoot) object).getRoot(), new NullProgressMonitor());
+			} catch (CoreException e) {
+				IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+				UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
+			}
+		} else if (object instanceof IConnectionPointManager) {
+			List<Object> list = new ArrayList<Object>();
+			for (IConnectionPointCategory category : ((IConnectionPointManager) object).getConnectionPointCategories()) {
+				list.add(category);
+			}
+			return list.toArray();
 		}
 		return EMPTY;
 	}
@@ -193,12 +207,6 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		} else if (object instanceof IFileStore) {
 			return ((IFileStore) object).getName();
 		} else if (object instanceof IConnectionPoint) {
-			if (object instanceof IBaseRemoteConnectionPoint) {
-				IPath path = ((IBaseRemoteConnectionPoint) object).getPath();
-				if (path.segmentCount() > 0) {
-					return MessageFormat.format("{0} ({1})", new Object[] { ((IConnectionPoint) object).getName(), path.toPortableString() }); //$NON-NLS-1$
-				}
-			}
 			return ((IConnectionPoint) object).getName();
 		} else if (object instanceof IConnectionPointCategory) {
 			return ((IConnectionPointCategory) object).getName();
@@ -247,6 +255,14 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
                 } catch (CoreException e1) {
                 }
             }
+			else if (object instanceof FileSystemObject && e.getCause() instanceof PermissionDeniedException)
+			{
+				IFileInfo fileInfo = FileSystemUtils.getFileInfo(object);
+				if (fileInfo != null && fileInfo instanceof IExtendedFileInfo) {
+					((IExtendedFileInfo) fileInfo).setPermissions(0);
+				}
+				return;
+			}
 			IOUIPlugin.logError(Messages.FileSystemWorkbenchAdapter_FailedToFetchDeferredChildren, e);
 			UIUtils.showErrorMessage(Messages.FileSystemWorkbenchAdapter_FailedToFetchChildren, e);
 		} finally {
@@ -280,12 +296,12 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		return list.toArray(new FileSystemObject[list.size()]);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
-		@SuppressWarnings("unchecked")
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (IWorkbenchAdapter.class == adapterType) {
 				return getInstance();
@@ -303,7 +319,6 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 		/* (non-Javadoc)
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
-		@SuppressWarnings("unchecked")
 		public Class[] getAdapterList() {
 			return new Class[] { IWorkbenchAdapter.class, IDeferredWorkbenchAdapter.class };
 		}

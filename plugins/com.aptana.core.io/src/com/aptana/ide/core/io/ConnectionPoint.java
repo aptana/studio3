@@ -57,13 +57,13 @@ import com.aptana.ide.core.io.vfs.VirtualConnectionManager;
  */
 public abstract class ConnectionPoint extends PlatformObject implements IConnectionPoint, IExecutableExtension {
 
-	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
+	private static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
 	private String id;
 	private String type;
 	private boolean dirty;
 	
-	protected String name;
+	private String name;
 	
 	/**
 	 * 
@@ -113,7 +113,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * @param id the id to set
 	 */
-	protected final void setId(String id) {
+	public final void setId(String id) {
 		this.id = id;
 		VirtualConnectionManager.getInstance().register(this);
 	}
@@ -128,7 +128,7 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
 	/**
 	 * @param type the type to set
 	 */
-	protected final void setType(String type) {
+	private final void setType(String type) {
 		this.type = type;
 	}	
 	
@@ -209,8 +209,8 @@ public abstract class ConnectionPoint extends PlatformObject implements IConnect
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
      */
-    @SuppressWarnings("unchecked")
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public Object getAdapter(Class adapter) {
         if (IFileStore.class == adapter) {
             try {

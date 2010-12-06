@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.editor.markdown.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.editor.markdown;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit,
+ org.eclipse.jface.text,
+ com.aptana.editor.common;bundle-version="1.0.0"
+Export-Package: com.aptana.editor.markdown.tests

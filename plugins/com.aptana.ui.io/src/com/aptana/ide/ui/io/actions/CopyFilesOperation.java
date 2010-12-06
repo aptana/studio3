@@ -170,6 +170,47 @@ public class CopyFilesOperation {
                 Messages.CopyFilesOperation_Status_OK, null);
     }
 
+	/**
+	 * Copies an array of files from the source to the destination.
+	 * 
+	 * @param sources
+	 *            the array of IAdaptable objects
+	 * @param sourceRoot
+	 *            the file store representing the root of source connection
+	 * @param destinationRoot
+	 *            the file store representing the root of target connection
+	 * @param listener
+	 *            an optional job listener
+	 */
+	public void copyFiles(IAdaptable[] sources, IFileStore sourceRoot, IFileStore destinationRoot,
+			IJobChangeListener listener)
+	{
+		IFileStore[] fileStores = new IFileStore[sources.length];
+		for (int i = 0; i < fileStores.length; ++i)
+		{
+			fileStores[i] = Utils.getFileStore(sources[i]);
+		}
+		copyFiles(fileStores, sourceRoot, destinationRoot, listener);
+	}
+
+	/**
+	 * Copies an array of files from the source to the destination.
+	 * 
+	 * @param sources
+	 *            the array of filenames
+	 * @param sourceRoot
+	 *            the file store representing the root of source connection
+	 * @param destinationRoot
+	 *            the file store representing the root of target connection
+	 * @param listener
+	 *            an optional job listener
+	 */
+	public void copyFiles(String[] filenames, IFileStore sourceRoot, IFileStore destinationRoot,
+			IJobChangeListener listener)
+	{
+		copyFiles(getFileStores(filenames), sourceRoot, destinationRoot, listener);
+	}
+
     /**
      * Copies an array of files from the source to the destination.
      * 
@@ -378,6 +419,35 @@ public class CopyFilesOperation {
         job.schedule();
     }
 
+	private void copyFiles(final IFileStore[] sources, final IFileStore sourceRoot, final IFileStore destinationRoot,
+			IJobChangeListener listener)
+	{
+		Job job = new Job(Messages.CopyFilesOperation_CopyJob_Title)
+		{
+
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				return copyFiles(sources, sourceRoot, destinationRoot, monitor);
+			}
+
+			public boolean belongsTo(Object family)
+			{
+				if (Messages.CopyFilesOperation_CopyJob_Title.equals(family))
+				{
+					return true;
+				}
+				return super.belongsTo(family);
+			}
+		};
+		if (listener != null)
+		{
+			job.addJobChangeListener(listener);
+		}
+		job.setUser(true);
+		job.schedule();
+	}
+
 	/**
 	 * Returns a new name for a copy of the file.
 	 * 
@@ -476,6 +546,9 @@ public class CopyFilesOperation {
      *         otherwise
      */
     private static String validateDestination(IAdaptable destination, IFileStore[] sourceStores) {
+    	if (destination instanceof IResource && !((IResource) destination).isAccessible()) {
+    		return Messages.CopyFilesOperation_DestinationNotAccessible;
+    	}
         IFileStore destinationStore = getFolderStore(destination);
         IFileStore sourceParentStore;
         for (IFileStore sourceStore : sourceStores) {

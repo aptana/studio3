@@ -1,3 +1,37 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.IOException;
@@ -11,18 +45,22 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jruby.Ruby;
+import org.jruby.RubyArray;
 import org.jruby.RubyClass;
-import org.jruby.RubyHash;
-import org.jruby.RubyIO;
-import org.jruby.RubySystemExit;
 import org.jruby.RubyGlobal.InputGlobalVariable;
 import org.jruby.RubyGlobal.OutputGlobalVariable;
+import org.jruby.RubyHash;
+import org.jruby.RubyIO;
+import org.jruby.RubyProc;
+import org.jruby.RubySystemExit;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.scripting.ScriptUtils;
+import com.aptana.scripting.model.filters.IModelFilter;
+import com.aptana.scripting.model.filters.ScopeFilter;
 
 public class CommandBlockRunner extends AbstractCommandRunner
 {
@@ -65,9 +103,9 @@ public class CommandBlockRunner extends AbstractCommandRunner
 	{
 		Ruby runtime = this.getRuntime();
 
-		// register any bundle libraries that were loaded by this script 
+		// register any bundle libraries that were loaded by this script
 		this.registerLibraries(runtime, this.getCommand().getPath());
-		
+
 		// unapply load paths
 		this.unapplyLoadPaths(runtime);
 
@@ -96,6 +134,15 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			this._originalEnvironment = (RubyHash) hash.dup();
 
 			hash.putAll(this.getContributedEnvironment());
+
+			// Grab all the matching env objects contributed via bundles that have scope matching!
+			IModelFilter filter = new ScopeFilter((String) hash.get("TM_CURRENT_SCOPE")); //$NON-NLS-1$
+			List<EnvironmentElement> envs = BundleManager.getInstance().getEnvs(filter);
+			for (EnvironmentElement e : envs)
+			{
+				RubyProc invoke = e.getInvokeBlock();
+				invoke.call(runtime.getCurrentContext(), new IRubyObject[] { hash });
+			}
 		}
 	}
 
@@ -193,8 +240,8 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		// create context
 		Ruby runtime = this.getRuntime();
 		ThreadContext threadContext = runtime.getCurrentContext();
-		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE,
-				CONTEXT_RUBY_CLASS, JavaEmbedUtils.javaToRuby(runtime, context));
+		IRubyObject rubyContext = ScriptUtils.instantiateClass(runtime, ScriptUtils.RUBLE_MODULE, CONTEXT_RUBY_CLASS,
+				JavaEmbedUtils.javaToRuby(runtime, context));
 		String resultText = null;
 
 		// assume that we've executed successfully
@@ -203,8 +250,8 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		try
 		{
 			// invoke the block
-			IRubyObject result = this.getCommand().getInvokeBlock().call(threadContext,
-					new IRubyObject[] { rubyContext });
+			IRubyObject result = this.getCommand().getInvokeBlock()
+					.call(threadContext, new IRubyObject[] { rubyContext });
 
 			// TODO: not sure if we need to perform the closing here or not. This will be
 			// resolved once we rework CommandExecutionUtils to support async calls. That's
@@ -216,7 +263,15 @@ public class CommandBlockRunner extends AbstractCommandRunner
 			// process return result, if any
 			if (result != null && result.isNil() == false)
 			{
-				resultText = result.asString().asJavaString();
+				// to_s for array and hash doesn't do what we want/many people expect.
+				// Inspect spits out values in a way that can then be eval'd back as ruby code.
+				if ((result instanceof RubyArray) || (result instanceof RubyHash))
+				{
+					result = result.inspect();
+				}
+				// Fix for RR3-677 - Incorrect transformation for non-latin characters after #rrinclude HTML
+				// We take the raw bytes returned and force to a UTF-8 String, vs ASCII default.
+				resultText = new String(result.asString().getByteList().bytes(), "UTF-8"); //$NON-NLS-1$
 			}
 		}
 		catch (RaiseException e)
@@ -236,7 +291,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 				else
 				{
 					executionFailed(command, e);
-				}				
+				}
 			}
 			else
 			{
@@ -346,7 +401,7 @@ public class CommandBlockRunner extends AbstractCommandRunner
 		if (ostream != null)
 		{
 			RubyIO io = new RubyIO(runtime, ostream);
-			
+
 			io.getOpenFile().getMainStream().setSync(true);
 			setConsole(io);
 		}

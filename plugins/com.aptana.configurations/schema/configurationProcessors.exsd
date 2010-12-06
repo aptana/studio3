@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.configurations" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.configurations" id="configurationProcessors" name="Configuration Processors"/>
+      </appinfo>
+      <documentation>
+         A configuration processor provides a common way to check the status, retrieve information or install components/plugins into the host environment.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="processor" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="delegate" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="processor">
+      <annotation>
+         <documentation>
+            A configuration processor extenstion point.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of this configuration processor.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of this configuration processor.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An AbstractConfigurationProcessor implemantation.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="com.aptana.configurations.processor.AbstractConfigurationProcessor:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="category" type="string">
+            <annotation>
+               <documentation>
+                  A comma separated list of categories that this configuration processors belongs to. For example: rails-install, git, plugins etc...
+Although optional, it is very recommended to set a category, as a user of this processor might need a hint for the nature of this processor.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="delegate">
+      <annotation>
+         <documentation>
+            A delegated processor extension point. This processor is designed to be invoked from another processor. The target processor that will invoke it is defined in the targetID.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="targetID" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The processor ID (the delegator) that will call this processor.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.configurations.configurationProcessors/processor/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  An IConfigurationProcessorDelegate implementation
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.configurations.processor.IConfigurationProcessorDelegate"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

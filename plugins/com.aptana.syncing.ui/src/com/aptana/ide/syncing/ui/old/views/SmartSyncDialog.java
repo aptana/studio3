@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -34,45 +34,59 @@
  */
 package com.aptana.ide.syncing.ui.old.views;
 
+import java.io.File;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.ToolTip;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
@@ -80,11 +94,23 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.ILogger;
+import com.aptana.core.util.FileUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
@@ -101,19 +127,35 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
+import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.UIUtils;
+import com.aptana.ui.widgets.SearchComposite;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)
  * @author Michael Xia (mxia@aptana.com)
  */
-public class SmartSyncDialog extends Window implements SelectionListener, ModifyListener, DirectionToolBar.Client,
-		OptionsToolBar.Client, SyncJob.Client
+@SuppressWarnings("deprecation")
+public class SmartSyncDialog extends TitleAreaDialog implements SelectionListener, ModifyListener,
+		DirectionToolBar.Client, OptionsToolBar.Client, SyncJob.Client, SearchComposite.Client
 {
 
-	private static final String ICON = "icons/full/obj16/direction_both.gif"; //$NON-NLS-1$
+	private static final String ICON = "icons/full/elcl16/arrow_up_down.png"; //$NON-NLS-1$
+	private static final String ICON_UPDATE = "icons/full/obj16/sync.png"; //$NON-NLS-1$
+	private static final String ICON_SKIP = "icons/full/obj16/skip.png"; //$NON-NLS-1$
+	private static final String ICON_DELETE = "icons/full/obj16/delete.png"; //$NON-NLS-1$
+	private static final String IMAGE_LOCAL_SITE = "icons/full/wizban/local_site.png"; //$NON-NLS-1$
+	private static final String IMAGE_REMOTE_SITE = "icons/full/wizban/remote_site.png"; //$NON-NLS-1$
+	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
+
+	/**
+	 * Key to store the dialog settings for the initial directory to open when exporting themes (saves last directory).
+	 */
+	private static final String LOG_EXPORT_DIRECTORY = "logExportDirectory"; //$NON-NLS-1$
+
 	private static final String CLOSE_WHEN_DONE = "com.aptana.ide.syncing.views.CLOSE_WHEN_DONE"; //$NON-NLS-1$
 	private static final String COMPARE_IN_BACKGROUND = IPreferenceConstants.COMPARE_IN_BACKGROUND;
 	private static final String USE_CRC = IPreferenceConstants.USE_CRC;
@@ -123,7 +165,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	private static final String DELETED_LABEL = Messages.SmartSyncDialog_NumFilesToDelete;
 	private static final String SYNC_LABEL = Messages.SmartSyncDialog_Comparing;
 
-	private Composite displayArea;
+	private Composite dialogArea;
 	private Label updatedLabel;
 	private Label skippedLabel;
 	private Label deletedLabel;
@@ -170,6 +212,18 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	private Job buildSmartSync;
 
 	private IFileStore[] filesToBeSynced;
+	private Image titleImage;
+	private Button left_arrow;
+	private Button right_arrow;
+	private Label sync_label;
+	private GridData filterLayoutData;
+	private CLabel filterLabel;
+	private Composite filterComp;
+	private ViewerFilter viewerFilter;
+	private String searchText;
+	private Button saveLog;
+	private Pattern searchPattern;
+	private SearchComposite searchComposite;
 
 	/**
 	 * Creates a new sync dialog.
@@ -209,21 +263,21 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			this.syncer.setServerFileRoot(dest);
 		}
 		this.syncer.setLogger(new ILogger()
-		{			
+		{
 			public void logWarning(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
 			}
-						
+
 			public void logInfo(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
 			}
-						
+
 			public void logError(String message, Throwable th)
 			{
 				SyncingConsole.println(message);
-			}			
+			}
 		});
 	}
 
@@ -243,8 +297,8 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			throws CoreException
 	{
 		this(parent, conf.getSourceFileManager(), conf.getDestinationFileManager(), conf.getSourceFileManager()
-				.getRoot(), conf.getDestinationFileManager().getRoot(), conf.getSourceFileManager()
-				.getName(), conf.getDestinationFileManager().getName());
+				.getRoot(), conf.getDestinationFileManager().getRoot(), conf.getSourceFileManager().getName(), conf
+				.getDestinationFileManager().getName());
 		this.syncer.setClientFileManager(conf.getSourceFileManager());
 		this.syncer.setServerFileManager(conf.getDestinationFileManager());
 		sourceConnectionPoint = conf.getSourceFileManager();
@@ -260,7 +314,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			this.filesToBeSynced = filesToBeSynced;
 			if (filesToBeSynced.length == 1)
 			{
-				String path = EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[0]);
+				String path = EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[0], null);
 				if (path == null || path.trim().length() == 0)
 				{
 					// the selection is from the project level, so we are doing
@@ -318,7 +372,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 
 		};
 		disconnectJob.setPriority(Job.INTERACTIVE);
-		disconnectJob.setSystem(true);
+		disconnectJob.setSystem(false);
 		disconnectJob.schedule();
 		close();
 	}
@@ -342,9 +396,10 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-		Label label = new Label(main, SWT.NONE);
-		label.setText(Messages.SmartSyncDialog_DirectionMode);
-		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+		optionsBar = new OptionsToolBar(main, this);
+		optionsBar.setPresentationType(getPresentationTypePref());
+		optionsBar.setShowDatesSelected(getShowModificationTimePref());
+		optionsBar.setEnabled(false);
 
 		directionBar = new DirectionToolBar(main, this, end1, end2);
 		directionBar.setSelection(getDirectionPref());
@@ -386,29 +441,90 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				headerFont.dispose();
 			}
 		});
-		descriptionLabel.setFont(headerFont);
-		descriptionLabel.setText(Messages.SmartSyncDialog_PreviewDescription);
-		descriptionLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		Composite endpoints = new Composite(description, SWT.NONE);
-		layout = new GridLayout(2, false);
+		layout = new GridLayout(3, true);
 		layout.marginHeight = 0;
 		layout.marginWidth = 10;
 		layout.verticalSpacing = 0;
 		endpoints.setLayout(layout);
 		endpoints.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-		Label symbol = new Label(endpoints, SWT.VERTICAL);
-		symbol.setImage(SyncingUIPlugin.getImage(ICON));
-		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, false, true);
-		gridData.verticalSpan = 2;
-		symbol.setLayoutData(gridData);
+		Label local_site = new Label(endpoints, SWT.VERTICAL);
+		local_site.setImage(SyncingUIPlugin.getImage(IMAGE_LOCAL_SITE));
+		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		local_site.setLayoutData(gridData);
+
+		Composite directions = new Composite(endpoints, SWT.NONE);
+		layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginTop = 0;
+		directions.setLayout(layout);
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		directions.setLayoutData(gridData);
+
+		left_arrow = new Button(directions, SWT.TOGGLE);
+		left_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_left.png")); //$NON-NLS-1$
+		gridData = new GridData(SWT.RIGHT, SWT.CENTER, false, true);
+		left_arrow.setLayoutData(gridData);
+		left_arrow.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (!left_arrow.getSelection())
+				{
+					directionBar.setSelection(DirectionToolBar.UPLOAD);
+				}
+				else if (right_arrow.getSelection())
+				{
+					directionBar.setSelection(DirectionToolBar.BOTH);
+				}
+				else
+				{
+					directionBar.setSelection(DirectionToolBar.DOWNLOAD);
+				}
+				updateSyncArrows(directionBar.getSelection());
+				load(false);
+			}
+		});
+
+		right_arrow = new Button(directions, SWT.TOGGLE);
+		right_arrow.setImage(SyncingUIPlugin.getImage("icons/full/wizban/sync_arrow_right.png")); //$NON-NLS-1$
+		gridData = new GridData(SWT.LEFT, SWT.CENTER, false, true);
+		right_arrow.setLayoutData(gridData);
+		right_arrow.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				if (!right_arrow.getSelection())
+				{
+					directionBar.setSelection(DirectionToolBar.DOWNLOAD);
+				}
+				else if (left_arrow.getSelection())
+				{
+					directionBar.setSelection(DirectionToolBar.BOTH);
+				}
+				else
+				{
+					directionBar.setSelection(DirectionToolBar.UPLOAD);
+				}
+				updateSyncArrows(directionBar.getSelection());
+				load(false);
+			}
+		});
+
+		Label remote_site = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
+		remote_site.setImage(SyncingUIPlugin.getImage(IMAGE_REMOTE_SITE));
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		remote_site.setLayoutData(gridData);
 
 		if (this.filesToBeSynced == null || this.filesToBeSynced.length <= 1)
 		{
-			Label end1Label = new Label(endpoints, SWT.NONE);
-			end1Label.setText("Source: '" + end1 + "' (" + source.toString() + ")");
-			end1Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+			Label end1Label = new Label(endpoints, SWT.CENTER);
+			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
+			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.FILL, true, false));
 		}
 		else
 		{
@@ -420,9 +536,9 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			end1Comp.setLayout(layout);
 			end1Comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-			Label end1Label = new Label(end1Comp, SWT.NONE);
-			end1Label.setText("Source: '" + end1 + "' (" + source.toString() + ")");
-			end1Label.setLayoutData(new GridData(SWT.FILL, SWT.HORIZONTAL, false, false));
+			Label end1Label = new Label(end1Comp, SWT.CENTER);
+			end1Label.setText(FileUtil.compressPath(source.toString(), 30));
+			end1Label.setLayoutData(new GridData(SWT.CENTER, SWT.HORIZONTAL, false, false));
 
 			final Label end1Extra = new Label(end1Comp, SWT.NONE);
 			end1Extra.setText("(multiple files/folders)"); //$NON-NLS-1$
@@ -433,109 +549,144 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			new LabelToolTip(end1Extra);
 		}
 
-		Label end2Label = new Label(endpoints, SWT.NONE);
-		end2Label.setText("Destination: '" + end2 + "' (" + dest.toString() + ")");
+		sync_label = new Label(endpoints, SWT.VERTICAL | SWT.CENTER);
+		gridData = new GridData(SWT.CENTER, SWT.CENTER, false, true);
+		gridData.widthHint = 150;
+		sync_label.setLayoutData(gridData);
+		sync_label.setText(""); //$NON-NLS-1$
+
+		Label end2Label = new Label(endpoints, SWT.CENTER);
+		end2Label.setText(FileUtil.compressPath(dest.toString(), 30));
 		end2Label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		// Commented out until we let the user switch endpoints
-		//		end2Combo = new Combo(endpoints, SWT.READ_ONLY);
-//		final List<IVirtualFileManager> vfms = new LinkedList<IVirtualFileManager>();
-//		int selectedIndex = 0;
-//		// Get sync pairs that contain a VFM that contains the source file i.e. file1
-//		VirtualFileManagerSyncPair[] confs = SyncManager.getContainingSyncPairs(source, true);
-//		int index = -1;
-//		for (VirtualFileManagerSyncPair conf : confs)
-//		{
-//			try
-//			{
-//				if (conf.getSourceFileManager().getRoot().isParentOf(source))
-//				{
-//					// Only consider the sync pair whose source VFM contains the source file i.e. file1
-//					IVirtualFileManager destinationFileManager = conf.getDestinationFileManager();
-//					end2Combo.add(destinationFileManager.getNickName());
-//					vfms.add(destinationFileManager);
-//					index++;
-//					if (destinationFileManager.getRoot().isParentOf(dest))
-//					{
-//						// Remember the index of originally passed in VFM
-//						selectedIndex = index;
-//					}
-//				}
-//			}
-//			catch (CoreException e1)
-//			{
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//		}
-//		end2Combo.select(selectedIndex);
-//		end2Combo.setLayoutData(new GridData(SWT.FILL, SWT.HORIZONTAL, true, false));
-//		end2Combo.addSelectionListener(new SelectionListener()
-//		{
-//			public void widgetDefaultSelected(SelectionEvent e)
-//			{
-//				widgetSelected(e);
-//			}
-//
-//			public void widgetSelected(SelectionEvent e)
-//			{
-//				int selectionIndex = end2Combo.getSelectionIndex();
-//				if (selectionIndex != -1)
-//				{
-//					// Reset the destination VFM and target file i.e. file2
-//					IVirtualFileManager virtualFileManager = vfms.get(selectionIndex);
-//					try
-//					{
-//						source = virtualFileManager.getRoot();
-//					}
-//					catch (CoreException e1)
-//					{
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
-//					load(true);
-//				}
-//			}
-//		});
+		Label shadow_sep_h = new Label(endpoints, SWT.SEPARATOR | SWT.SHADOW_IN | SWT.HORIZONTAL);
+		gridData = new GridData(SWT.FILL, SWT.CENTER, false, true);
+		gridData.horizontalSpan = 3;
+		gridData.verticalIndent = 15;
+		shadow_sep_h.setLayoutData(gridData);
 
-		Composite status = new Composite(top, SWT.NONE);
-		layout = new GridLayout();
-		layout.marginRight = 25;
+		Composite status = new Composite(description, SWT.NONE);
+		layout = new GridLayout(7, false);
+		layout.marginWidth = 40;
+		layout.marginTop = 12;
 		status.setLayout(layout);
-		status.setLayoutData(new GridData(SWT.END, SWT.FILL, false, true));
+		status.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+		Label updatedSymbol = new Label(status, SWT.VERTICAL);
+		updatedSymbol.setImage(SyncingUIPlugin.getImage(ICON_UPDATE));
 		updatedLabel = new Label(status, SWT.LEFT);
 		updatedLabel.setText(UPDATED_LABEL);
+		Label skippedSymbol = new Label(status, SWT.VERTICAL);
+		skippedSymbol.setImage(SyncingUIPlugin.getImage(ICON_SKIP));
 		skippedLabel = new Label(status, SWT.LEFT);
 		skippedLabel.setText(SKIPPED_LABEL);
+		Label deletedSymbol = new Label(status, SWT.VERTICAL);
+		deletedSymbol.setImage(SyncingUIPlugin.getImage(ICON_DELETE));
 		deletedLabel = new Label(status, SWT.LEFT);
 		deletedLabel.setText(DELETED_LABEL);
 
+		searchComposite = createSearchComposite(status);
+		filterComp = createFilterComposite(status);
+
 		return top;
+	}
+
+	private SearchComposite createSearchComposite(Composite myComposite)
+	{
+		SearchComposite search = new SearchComposite(myComposite, this);
+		search.setSearchOnEnter(true);
+		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		search.setInitialText(Messages.SmartSyncDialog_searchText);
+		return search;
+	}
+
+	private Composite createFilterComposite(final Composite myComposite)
+	{
+
+		Composite filter = new Composite(myComposite, SWT.NONE);
+		GridLayout gridLayout = new GridLayout(2, false);
+		gridLayout.marginWidth = 2;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginBottom = 2;
+		filter.setLayout(gridLayout);
+
+		filterLayoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		filterLayoutData.exclude = true;
+		filter.setLayoutData(filterLayoutData);
+
+		filterLabel = new CLabel(filter, SWT.LEFT);
+		filterLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		ToolBar toolBar = new ToolBar(filter, SWT.FLAT);
+		toolBar.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+
+		ToolItem toolItem = new ToolItem(toolBar, SWT.PUSH);
+		toolItem.setImage(SyncingUIPlugin.getImage(CLOSE_ICON));
+		toolItem.addSelectionListener(new SelectionListener()
+		{
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				removeFilter();
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+			}
+		});
+
+		return filter;
+	}
+
+	protected void hideFilterLable()
+	{
+		filterLayoutData.exclude = true;
+		filterComp.setVisible(false);
+		filterComp.getParent().layout();
+	}
+
+	protected void showFilterLabel(Image image, String text)
+	{
+		filterLabel.setImage(image);
+		filterLabel.setText(text);
+		filterLayoutData.exclude = false;
+		filterComp.setVisible(true);
+		filterComp.getParent().layout();
+	}
+
+	protected void removeFilter()
+	{
+		hideFilterLable();
 	}
 
 	private Composite createDeleteOptions(Composite parent)
 	{
 		Composite deletes = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
+		layout.marginHeight = 8;
+		layout.marginWidth = 8;
 		deletes.setLayout(layout);
 		deletes.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		deleteLocalFiles = new Button(deletes, SWT.CHECK);
-		deleteLocalFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end1 + "'");
-		deleteLocalFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + end1 + "'");
+		deleteLocalFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end1 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		deleteLocalFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + end1 + "'"); //$NON-NLS-1$
 		deleteLocalFiles.setSelection(getDeleteLocalPreference());
 		deleteLocalFiles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		deleteLocalFiles.addSelectionListener(this);
 
 		deleteRemoteFiles = new Button(deletes, SWT.CHECK);
-		deleteRemoteFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end2 + "'");
-		deleteRemoteFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + "'" + end2 + "'");
+		deleteRemoteFiles.setText(Messages.SmartSyncDialog_DeleteExtra + "'" + end2 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+		deleteRemoteFiles.setToolTipText(Messages.SmartSyncDialog_DeleteExtraTooltip + "'" + end2 + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		deleteRemoteFiles.setSelection(getDeleteRemotePreference());
 		deleteRemoteFiles.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		deleteRemoteFiles.addSelectionListener(this);
+
+		closeWhenDone = new Button(deletes, SWT.CHECK);
+		closeWhenDone.setText(Messages.SmartSyncDialog_CloseWhenDone);
+		closeWhenDone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		closeWhenDone.setSelection(getSyncingPreferenceStore().getBoolean(CLOSE_WHEN_DONE));
+		closeWhenDone.addSelectionListener(this);
 
 		return deletes;
 	}
@@ -560,7 +711,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		final Composite advanced = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 0;
-		layout.marginWidth = 0;
+		layout.marginWidth = 8;
 		advanced.setLayout(layout);
 		advanced.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
@@ -621,7 +772,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 					((GridData) advancedOptions.getLayoutData()).exclude = false;
 				}
 
-				displayArea.layout(true, true);
+				dialogArea.layout(true, true);
 			}
 
 		};
@@ -666,91 +817,18 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		main.setLayout(layout);
 		main.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createViewOptions(main);
 		swappable = createTable(main);
 		createFooter(main);
 
 		return main;
 	}
 
-//	private Composite createCommentSection(Composite parent)
-//	{
-//		Composite commentArea = new Composite(parent, SWT.NONE);
-//		commentArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-//
-//		GridLayout layout = new GridLayout(2, false);
-//		layout.marginHeight = 0;
-//		layout.marginWidth = 0;
-//		commentArea.setLayout(layout);
-//
-//		Label commentLabel = new Label(commentArea, SWT.BEGINNING);
-//		commentLabel.setText(Messages.SmartSyncDialog_CommentLabel);
-//		GridData commentLabelGridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-//		commentLabel.setLayoutData(commentLabelGridData);
-//
-//		Link helpLink = new Link(commentArea, SWT.END);
-//		helpLink.setText(Messages.SmartSyncDialog_WhatIsThisLink);
-//		GridData helpLinkGridData = new GridData(SWT.END, SWT.CENTER, true, false);
-//		helpLink.setLayoutData(helpLinkGridData);
-//		helpLink.addSelectionListener(new SelectionAdapter()
-//		{
-//			@Override
-//			public void widgetSelected(SelectionEvent e)
-//			{
-//				UIUtil
-//						.openBrowserURL("http://www.aptana.com/docs/index.php/My_Cloud_-_Team#What_is_the_Cloud_Team_Comment_feature.3F"); //$NON-NLS-1$
-//			}
-//		});
-//
-//		comment = new Text(commentArea, SWT.MULTI | SWT.BORDER);
-//		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-//		gridData.horizontalSpan = 2;
-//		gridData.heightHint = 50;
-//		comment.setLayoutData(gridData);
-//
-//		boolean isCloudSync = isCloudSync();
-//		comment.setEnabled(isCloudSync);
-//		if (isCloudSync)
-//		{
-//			comment.setText(Messages.SmartSyncDialog_HintComment);
-//			comment.selectAll();
-//		}
-//		comment.addModifyListener(new ModifyListener()
-//		{
-//
-//			public void modifyText(ModifyEvent e)
-//			{
-//				commentStr = comment.getText();
-//			}
-//
-//		});
-//		comment.addFocusListener(new FocusListener()
-//		{
-//
-//			public void focusGained(FocusEvent e)
-//			{
-//				if (firstEdit)
-//				{
-//					firstEdit = false;
-//					comment.setText(""); //$NON-NLS-1$
-//				}
-//			}
-//
-//			public void focusLost(FocusEvent e)
-//			{
-//			}
-//
-//		});
-//
-//		return commentArea;
-//	}
-
 	private Composite createErrorSection(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout());
 		main.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, true);
 		gridData.exclude = true;
 		main.setLayoutData(gridData);
@@ -808,7 +886,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				}
 			}
 		}
-		updatedLabel.setText(UPDATED_LABEL + updated);
+		updatedLabel.setText(StringUtil.format(UPDATED_LABEL, updated));
 		if (deleted == 0)
 		{
 			deletedLabel.setFont(updatedLabel.getFont());
@@ -835,28 +913,36 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			deletedLabel.setFont(boldFont);
 			deletedLabel.setForeground(deletedLabel.getDisplay().getSystemColor(SWT.COLOR_RED));
 		}
-		deletedLabel.setText(DELETED_LABEL + deleted);
-		skippedLabel.setText(SKIPPED_LABEL + skipped);
+		deletedLabel.setText(StringUtil.format(DELETED_LABEL, deleted));
+		skippedLabel.setText(StringUtil.format(SKIPPED_LABEL, skipped));
 		this.skipped = skipped;
 		skippedLabel.getParent().layout(true, true);
 		startSync.setEnabled(deleted + updated > 0);
 	}
 
-	private Composite createViewOptions(Composite parent)
+	private void updateSyncArrows(int selection)
 	{
-		Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		main.setLayout(layout);
-		main.setLayoutData(new GridData(SWT.END, SWT.FILL, true, false));
 
-		optionsBar = new OptionsToolBar(main, this);
-		optionsBar.setPresentationType(getPresentationTypePref());
-		optionsBar.setShowDatesSelected(getShowModificationTimePref());
-		optionsBar.setEnabled(false);
-
-		return main;
+		switch (selection)
+		{
+			case DirectionToolBar.BOTH:
+				left_arrow.setSelection(true);
+				right_arrow.setSelection(true);
+				sync_label.setText(Messages.SmartSyncDialog_BothDirection);
+				break;
+			case DirectionToolBar.UPLOAD:
+			case DirectionToolBar.FORCE_UPLOAD:
+				left_arrow.setSelection(false);
+				right_arrow.setSelection(true);
+				sync_label.setText(Messages.SmartSyncDialog_Upload);
+				break;
+			case DirectionToolBar.FORCE_DOWNLOAD:
+			case DirectionToolBar.DOWNLOAD:
+				left_arrow.setSelection(true);
+				right_arrow.setSelection(false);
+				sync_label.setText(Messages.SmartSyncDialog_Download);
+				break;
+		}
 	}
 
 	private Composite createTable(Composite parent)
@@ -869,7 +955,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gridData.heightHint = 400;
 		main.setLayoutData(gridData);
-		main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 		syncViewer = new SmartSyncViewer(main, end1, end2);
 		syncViewer.setPresentationType(getPresentationTypePref());
@@ -919,19 +1005,37 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			}
 
 		});
-		syncViewer.addFilter(new ViewerFilter()
-		{
 
+		viewerFilter = new ViewerFilter()
+		{
 			public boolean select(Viewer viewer, Object parentElement, Object element)
 			{
+
 				if (element instanceof SyncFile || element instanceof SyncFolder)
 				{
-					return true;
+					ISyncResource resource = (ISyncResource) element;
+					if (searchText == null)
+					{
+						return true;
+					}
+
+					String path = resource.getPath().toString();
+					Matcher m = searchPattern.matcher(path);
+
+					if (m.find())
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
 				}
 				return false;
 			}
+		};
 
-		});
+		syncViewer.addFilter(viewerFilter);
 
 		errorComp = createErrorSection(main);
 		loadingComp = createLoadingSection(main);
@@ -945,7 +1049,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(new GridLayout(2, false));
 		main.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// main.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		GridData gridData = new GridData(SWT.CENTER, SWT.CENTER, true, false);
 		gridData.exclude = true;
 		main.setLayoutData(gridData);
@@ -975,9 +1079,9 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	{
 		Composite loadingComp = new Composite(parent, SWT.NONE);
 		loadingComp.setLayout(new GridLayout());
-		loadingComp.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false));
+		loadingComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		loadingComp.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		loadingComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		// loadingComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
 		loadingLabel = new Label(loadingComp, SWT.NONE);
 		loadingLabel.setText(SYNC_LABEL + "..."); //$NON-NLS-1$
@@ -988,83 +1092,51 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		return loadingComp;
 	}
 
-	private Composite createActionsBar(Composite parent)
+	protected void createButtonsForButtonBar(Composite parent)
 	{
-		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(new GridLayout(3, false));
-		main.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-
-		closeWhenDone = new Button(main, SWT.CHECK);
-		closeWhenDone.setText(Messages.SmartSyncDialog_CloseWhenDone);
-		closeWhenDone.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		closeWhenDone.setSelection(getSyncingPreferenceStore().getBoolean(CLOSE_WHEN_DONE));
-		closeWhenDone.addSelectionListener(this);
-
-		cancel = new Button(main, SWT.PUSH);
-		cancel.setText(Messages.SmartSyncDialog_Cancel);
-		cancel.setLayoutData(new GridData(SWT.FILL, SWT.END, false, false));
-		cancel.addSelectionListener(this);
-
-		startSync = new Button(main, SWT.PUSH);
-		startSync.setText(Messages.SmartSyncDialog_StartSync);
+		// create OK and Cancel buttons by default
+		startSync = createButton(parent, IDialogConstants.PROCEED_ID, Messages.SmartSyncDialog_StartSync, true);
 		GridData gridData = new GridData(SWT.FILL, SWT.END, false, false);
 		GC gc = new GC(startSync);
 		// calculates the ideal width
-		gridData.widthHint = Math.max(gc.stringExtent(Messages.SmartSyncDialog_StartSync).x, gc
-				.stringExtent(Messages.SmartSyncDialog_RunInBackground).x) + 50;
+		gridData.widthHint = Math.max(gc.stringExtent(Messages.SmartSyncDialog_StartSync).x,
+				gc.stringExtent(Messages.SmartSyncDialog_RunInBackground).x) + 50;
 		gc.dispose();
 		startSync.setLayoutData(gridData);
 		startSync.addSelectionListener(this);
 
-		return main;
+		saveLog = createButton(parent, IDialogConstants.DETAILS_ID, "Save Log...", false); //$NON-NLS-1$
+		saveLog.addSelectionListener(this);
+		saveLog.setEnabled(false);
+
+		cancel = createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+		cancel.addSelectionListener(this);
 	}
 
 	private void setEnabled(boolean enabled)
 	{
-		//end2Combo.setEnabled(enabled);
 		directionBar.setEnabled(enabled);
 		optionsBar.setEnabled(enabled);
 		boolean syncEnabled = enabled && syncViewer.getCurrentResources().length > 0;
-		startSync.setEnabled(syncEnabled);
+		if (!startSync.isDisposed())
+		{
+			startSync.setEnabled(syncEnabled);
+		}
 
 		if (enabled)
 		{
 			updateFileButtonsState();
+			updateSyncArrows(directionBar.getSelection());
 		}
 	}
 
 	/**
 	 * @see org.eclipse.jface.window.Window#open()
 	 */
+	@Override
 	public int open()
 	{
-		
-//		if (sourceConnectionPoint instanceof IProjectProvider)
-//		{
-//			IProjectProvider projectProvider = (IProjectProvider) sourceConnectionPoint;
-//			IProject project = projectProvider.getProject();
-//			if (project != null)
-//			{
-//				try
-//				{
-//					if (Boolean.TRUE.equals((Boolean) project.getSessionProperty(Synchronizer.SYNC_IN_PROGRESS)))
-//					{
-//						MessageDialog messageDialog = new MessageDialog(UIUtils.getActiveShell(),
-//								Messages.SmartSyncDialog_SyncInProgressTitle, null,
-//								Messages.SmartSyncDialog_SyncInProgress, MessageDialog.QUESTION, new String[] {
-//										IDialogConstants.CANCEL_LABEL, Messages.SmartSyncDialog_ContinueLabel, }, 0);
-//						if (messageDialog.open() == 0)
-//						{
-//							return CANCEL;
-//						}
-//					}
-//				}
-//				catch (CoreException e)
-//				{
-//				}
-//			}
-//		}
-		
+		setBlockOnOpen(false);
 		if (!compareInBackground)
 		{
 			super.open();
@@ -1083,7 +1155,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			loadingComp.setVisible(true);
 			loadingComp.getParent().layout(true, true);
 		}
-		// displayArea.layout(true, true);
+
 		final boolean forceUp = compareInBackground ? false
 				: (directionBar.getSelection() == DirectionToolBar.FORCE_UPLOAD);
 		final boolean forceDown = compareInBackground ? false
@@ -1094,15 +1166,14 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			// cancels the existing one
 			buildSmartSync.cancel();
 		}
-		buildSmartSync = new Job("Generating Sync") //$NON-NLS-1$
+		buildSmartSync = new Job("Generating Synchronize Status") //$NON-NLS-1$
 		{
-
 			protected IStatus run(final IProgressMonitor monitor)
 			{
 				syncer.setEventHandler(new SyncEventHandlerAdapterWithProgressMonitor(monitor)
 				{
 
-					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems)
+					public boolean syncEvent(final VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 					{
 						if (item != null)
 						{
@@ -1128,7 +1199,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 								});
 							}
 						}
-						return super.syncEvent(item, index, totalItems);
+						return super.syncEvent(item, index, totalItems, monitor);
 					}
 
 				});
@@ -1139,9 +1210,9 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 					if (forceUp)
 					{
 						IFileStore[] clientFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(
-								source, true, false, null) : SyncUtils.getUploadFiles(sourceConnectionPoint,
-								destConnectionPoint, filesToBeSynced, monitor));
-						items = syncer.createSyncItems(clientFiles, new IFileStore[0]);
+								source, true, false, null) : EFSUtils
+								.getAllFiles(filesToBeSynced, true, false, monitor));
+						items = syncer.createSyncItems(clientFiles, new IFileStore[0], monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
 						{
@@ -1151,7 +1222,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 						VirtualFileSyncPair pair;
 						for (IFileStore file : serverFiles)
 						{
-							pair = pairs.get(EFSUtils.getRelativePath(destConnectionPoint.getRoot(), file));
+							pair = pairs.get(EFSUtils.getRelativePath(destConnectionPoint.getRoot(), file, null));
 							if (pair != null)
 							{
 								pair.setDestinationFile(file);
@@ -1164,7 +1235,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 						IFileStore[] serverFiles = (IFileStore[]) ((filesToBeSynced == null) ? EFSUtils.getFiles(dest,
 								true, false, null) : SyncUtils.getDownloadFiles(sourceConnectionPoint,
 								destConnectionPoint, filesToBeSynced, true, monitor));
-						items = syncer.createSyncItems(new IFileStore[0], serverFiles);
+						items = syncer.createSyncItems(new IFileStore[0], serverFiles, monitor);
 						Map<String, VirtualFileSyncPair> pairs = new HashMap<String, VirtualFileSyncPair>();
 						for (VirtualFileSyncPair item : items)
 						{
@@ -1186,17 +1257,22 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 					{
 						if (filesToBeSynced == null)
 						{
-							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest, monitor);
+							items = syncer.getSyncItems(sourceConnectionPoint, destConnectionPoint, source, dest,
+									monitor);
 						}
 						else
 						{
-							IFileStore[] clientFiles = SyncUtils.getUploadFiles(sourceConnectionPoint,
+							IFileStore[] clientFiles = EFSUtils.getAllFiles(filesToBeSynced, true, false, monitor);
+							IFileStore[] serverFiles = SyncUtils.getUploadFiles(sourceConnectionPoint,
 									destConnectionPoint, filesToBeSynced, monitor);
-							IFileStore[] serverFiles = SyncUtils.getDownloadFiles(sourceConnectionPoint,
-									destConnectionPoint, filesToBeSynced, true, monitor);
-							items = syncer.createSyncItems(clientFiles, serverFiles);
+
+							items = syncer.createSyncItems(clientFiles, serverFiles, monitor);
 						}
 					}
+				}
+				catch (OperationCanceledException e)
+				{
+					return Status.CANCEL_STATUS;
 				}
 				catch (Exception e1)
 				{
@@ -1252,8 +1328,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 									data.exclude = false;
 									synced.setVisible(true);
 									cancel.setText(Messages.SmartSyncDialog_Close);
-									setEnabled(false);
-									//end2Combo.setEnabled(true);
+									setEnabled(true);
 									syncer.disconnect();
 								}
 								else
@@ -1322,34 +1397,69 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 
 		};
 		buildSmartSync.setPriority(Job.LONG);
-		buildSmartSync.setSystem(true);
+		buildSmartSync.setSystem(false);
 		buildSmartSync.schedule();
 	}
 
-	/**
-	 * @see org.eclipse.jface.window.Window#createContents(org.eclipse.swt.widgets.Composite)
-	 */
-	protected Control createContents(Composite parent)
+	protected void dispose()
 	{
-		displayArea = new Composite(parent, SWT.NONE);
+		if (titleImage != null)
+		{
+			setTitleImage(null);
+			titleImage.dispose();
+			titleImage = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
+	@Override
+	protected Control createDialogArea(Composite parent)
+	{
+		dialogArea = (Composite) super.createDialogArea(parent);
+
+		titleImage = SyncingUIPlugin.getImageDescriptor("/icons/full/wizban/sync.png").createImage(); //$NON-NLS-1$
+		dialogArea.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
+				dispose();
+			}
+		});
+
+		setTitleImage(titleImage);
+		getShell().setText("Synchronize"); //$NON-NLS-1$
+
+		setTitle("Synchronize files between two endpoints"); //$NON-NLS-1$
+
+		Composite displayArea = new Composite(dialogArea, SWT.NONE);
 		displayArea.setLayout(new GridLayout());
 		displayArea.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		createHeader(displayArea);
 		createMainSection(displayArea);
-		//createCommentSection(displayArea);
 		createAdvancedSection(displayArea);
-		createActionsBar(displayArea);
 
 		syncViewer.setSyncDirection(directionBar.getSelection());
+
+		return dialogArea;
+	}
+
+	@Override
+	protected Control createContents(Composite parent)
+	{
+
+		Control composite = super.createContents(parent);
+
 		setEnabled(false);
 		updateDeleteStates();
 		if (getShell() != null && getParentShell() != null)
 		{
 			SWTUtils.center(getShell(), getParentShell());
 		}
-
-		return displayArea;
+		return composite;
 	}
 
 	/**
@@ -1421,6 +1531,32 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				close();
 			}
 		}
+		else if (source == saveLog)
+		{
+			FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
+			IDialogSettings editorSettings = SyncingUIPlugin.getDefault().getDialogSettings();
+			String value = editorSettings.get(LOG_EXPORT_DIRECTORY);
+			if (value != null)
+			{
+				fileDialog.setFilterPath(value);
+			}
+
+			DateFormat fileFormat = new SimpleDateFormat("yyyyMMddHHmmss"); //$NON-NLS-1$
+			Date d = new Date();
+			fileDialog.setFileName("Aptana Synchronize Log " + fileFormat.format(d) + ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
+			String path = fileDialog.open();
+			if (path == null)
+			{
+				return;
+			}
+
+			File logFile = new File(path);
+			editorSettings.put(LOG_EXPORT_DIRECTORY, logFile.getParent());
+
+			SyncExporter exporter = new SyncExporter();
+			ISyncResource[] resources = syncViewer.getCurrentResources();
+			exporter.export(logFile, resources);
+		}
 	}
 
 	/**
@@ -1436,6 +1572,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	public void selectionChanged(int direction, boolean reload)
 	{
 		updateFileButtonsState();
+		updateSyncArrows(directionBar.getSelection());
 		syncViewer.setSyncDirection(directionBar.getSelection());
 		saveDirectionPref(direction);
 		if (reload)
@@ -1479,7 +1616,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				{
 					resource.setTransferState(ISyncResource.SYNCING);
 
-					if (displayArea != null && !displayArea.isDisposed())
+					if (dialogArea != null && !dialogArea.isDisposed())
 					{
 						syncViewer.showProgress(item);
 					}
@@ -1502,7 +1639,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				{
 					resource.setTransferredBytes(bytes);
 
-					if (displayArea != null && !displayArea.isDisposed())
+					if (dialogArea != null && !dialogArea.isDisposed())
 					{
 						syncViewer.update(resource, null);
 					}
@@ -1525,7 +1662,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 				{
 					resource.setTransferState(ISyncResource.SYNCED);
 
-					if (displayArea != null && !displayArea.isDisposed())
+					if (dialogArea != null && !dialogArea.isDisposed())
 					{
 						syncViewer.update(resource, null);
 						syncViewer.reveal(resource);
@@ -1575,14 +1712,8 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 		// disables the options when sync has started
 		directionBar.setEnabled(false);
 		optionsBar.setEnabled(false);
-		//end2Combo.setEnabled(false);
-
-		// saves the permission preferences
-		// FilePlugin.getDefault().getPreferenceStore().setValue(
-		// com.aptana.ide.core.ui.io.file.IPreferenceConstants.FILE_PERMISSION, filePermission.getPermissions());
-		// FilePlugin.getDefault().getPreferenceStore().setValue(
-		// com.aptana.ide.core.ui.io.file.IPreferenceConstants.DIRECTORY_PERMISSION,
-		// dirPermission.getPermissions());
+		right_arrow.setEnabled(false);
+		left_arrow.setEnabled(false);
 
 		List<VirtualFileSyncPair> pairs = new ArrayList<VirtualFileSyncPair>();
 		ISyncResource[] resources = syncViewer.getCurrentResources();
@@ -1620,7 +1751,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			// cancels the previous job if exists
 			syncJob.cancel();
 		}
-		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this);
+		syncJob = new SyncJob(syncer, pairs, direction, deleteRemote, deleteLocal, this, MessageFormat.format(Messages.SmartSyncDialog_Endpoints, end1, end2));
 		syncJob.schedule();
 	}
 
@@ -1628,7 +1759,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 	{
 		if (handler != null)
 		{
-			handler.syncDone(null);
+			handler.syncDone(null, null);
 		}
 		if (source != null && dest != null)
 		{
@@ -1677,6 +1808,10 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 						synced.setVisible(true);
 						setEnabled(false);
 						swappable.layout(true, true);
+						right_arrow.setEnabled(true);
+						left_arrow.setEnabled(true);
+
+						saveLog.setEnabled(true);
 					}
 				}
 				else
@@ -1684,9 +1819,54 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 					// disconnect directly
 					syncer.disconnect();
 				}
+				refresh(monitor);
+
 				return Status.OK_STATUS;
 			}
 
+			/**
+			 * Performs post-sync refresh.
+			 */
+			private void refresh(IProgressMonitor monitor)
+			{
+				IConnectionPoint clientConnection = syncer.getClientFileManager();
+				if (clientConnection instanceof WorkspaceConnectionPoint)
+				{
+					IResource resource = ((WorkspaceConnectionPoint) clientConnection).getResource();
+					try
+					{
+						IViewPart viewPart = UIUtils.findView(IPageLayout.ID_PROJECT_EXPLORER);
+						if (viewPart instanceof CommonNavigator)
+						{
+							CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
+							viewer.refresh(resource);
+						}
+					}
+					catch (PartInitException e)
+					{
+						// Unable to refresh the project explorer view
+					}
+				}
+
+				IConnectionPoint serverConnection = syncer.getServerFileManager();
+				ConnectionPointType type = CoreIOPlugin.getConnectionPointManager().getType(serverConnection);
+				if (type != null && type.getCategory().isRemote())
+				{
+					try
+					{
+						IViewPart viewPart = UIUtils.findView(RemoteNavigatorView.ID);
+						if (viewPart instanceof RemoteNavigatorView)
+						{
+							RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
+							view.refresh(serverConnection);
+						}
+					}
+					catch (PartInitException e)
+					{
+						// Unable to refresh the remote view
+					}
+				}
+			}
 		};
 		updateEndJob.setSystem(true);
 		updateEndJob.schedule();
@@ -1894,7 +2074,7 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			StringBuilder buf = new StringBuilder();
 			for (int i = 0; i < filesToBeSynced.length; ++i)
 			{
-				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i]));
+				buf.append(EFSUtils.getRelativePath(sourceConnectionPoint, filesToBeSynced[i], null));
 				buf.append("\n"); //$NON-NLS-1$
 			}
 			Text text;
@@ -1917,6 +2097,13 @@ public class SmartSyncDialog extends Window implements SelectionListener, Modify
 			return contentArea;
 		}
 
+	}
+
+	public void search(String text, boolean isCaseSensitive, boolean isRegularExpression)
+	{
+		searchText = text;
+		searchPattern = searchComposite.createSearchPattern();
+		syncViewer.refresh();
 	}
 
 }

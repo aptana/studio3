@@ -1,6 +1,40 @@
+/**
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
+ * dual-licensed under both the Aptana Public License and the GNU General
+ * Public license. You may elect to use one or the other of these licenses.
+ * 
+ * This program is distributed in the hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
+ * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
+ * the GPL or APL you select, is prohibited.
+ *
+ * 1. For the GPL license (GPL), you can redistribute and/or modify this
+ * program under the terms of the GNU General Public License,
+ * Version 3, as published by the Free Software Foundation.  You should
+ * have received a copy of the GNU General Public License, Version 3 along
+ * with this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * Aptana provides a special exception to allow redistribution of this file
+ * with certain other free and open source software ("FOSS") code and certain additional terms
+ * pursuant to Section 7 of the GPL. You may view the exception and these
+ * terms on the web at http://www.aptana.com/legal/gpl/.
+ * 
+ * 2. For the Aptana Public License (APL), this program and the
+ * accompanying materials are made available under the terms of the APL
+ * v1.0 which accompanies this distribution, and is available at
+ * http://www.aptana.com/legal/apl/.
+ * 
+ * You may view the GPL, Aptana's exception and additional terms, and the
+ * APL in the file titled license.html at the root of the corresponding
+ * plugin containing this source file.
+ * 
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.ui.views;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -54,7 +88,7 @@ class BundleEntryNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		List<Object> result = new LinkedList<Object>();
+		List<Object> result = new ArrayList<Object>();
 
 		// add bundle element that contribute to this bundle
 		for (BundleElement bundle : this._entry.getBundles())
@@ -63,14 +97,14 @@ class BundleEntryNode extends BaseNode
 		}
 
 		// divide commands into commands and snippets
-		List<CommandElement> commands = new LinkedList<CommandElement>();
-		List<SnippetElement> snippets = new LinkedList<SnippetElement>();
+		List<CommandElement> commands = new ArrayList<CommandElement>();
+		List<CommandElement> snippets = new ArrayList<CommandElement>();
 
 		for (CommandElement element : this._entry.getCommands())
 		{
 			if (element instanceof SnippetElement)
 			{
-				snippets.add((SnippetElement) element);
+				snippets.add(element);
 			}
 			else
 			{
@@ -81,19 +115,19 @@ class BundleEntryNode extends BaseNode
 		// add visible commands
 		if (commands.size() > 0)
 		{
-			result.add(new CommandsNode(commands.toArray(new CommandElement[commands.size()])));
+			result.add(new CommandsNode(commands));
 		}
 
 		// add visible snippets
 		if (snippets.size() > 0)
 		{
-			result.add(new SnippetsNode(snippets.toArray(new CommandElement[snippets.size()])));
+			result.add(new SnippetsNode(snippets));
 		}
 
 		// add visible menus
-		MenuElement[] menus = this._entry.getMenus();
+		List<MenuElement> menus = this._entry.getMenus();
 
-		if (menus != null && menus.length > 0)
+		if (menus != null && menus.size() > 0)
 		{
 			result.add(new MenusNode(menus));
 		}
@@ -125,8 +159,8 @@ class BundleEntryNode extends BaseNode
 	 */
 	public IPropertyDescriptor[] getPropertyDescriptors()
 	{
-		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name");
-		PropertyDescriptor contributorCountProperty = new PropertyDescriptor(Property.CONTRIBUTOR_COUNT, "Contributors");
+		PropertyDescriptor nameProperty = new PropertyDescriptor(Property.NAME, "Name"); //$NON-NLS-1$
+		PropertyDescriptor contributorCountProperty = new PropertyDescriptor(Property.CONTRIBUTOR_COUNT, "Contributors"); //$NON-NLS-1$
 
 		return new IPropertyDescriptor[] { nameProperty, contributorCountProperty };
 	}
@@ -148,9 +182,9 @@ class BundleEntryNode extends BaseNode
 					break;
 					
 				case CONTRIBUTOR_COUNT:
-					BundleElement[] bundles = this._entry.getBundles();
+					List<BundleElement> bundles = this._entry.getBundles();
 					
-					result = (bundles != null) ? bundles.length : 0;
+					result = (bundles != null) ? bundles.size() : 0;
 					break;
 			}
 		}
@@ -169,7 +203,7 @@ class BundleEntryNode extends BaseNode
 
 		for (BundleElement bundle : this._entry.getBundles())
 		{
-			if (bundle.hasCommands() || bundle.hasMenus())
+			if (bundle.hasChildren())
 			{
 				result = true;
 				break;
@@ -191,7 +225,7 @@ class BundleEntryNode extends BaseNode
 				_entry.reload();
 			}
 		};
-		reloadAction.setText("Reload");
+		reloadAction.setText(Messages.BundleEntryNode_TXT_Reload);
 		//reloadAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_));
 	}
 }

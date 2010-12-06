@@ -41,8 +41,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.tm.internal.terminal.textcanvas.StyleMap;
 import org.eclipse.tm.terminal.model.StyleColor;
 
-import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.editor.common.theme.Theme;
+import com.aptana.theme.Theme;
+import com.aptana.theme.ThemePlugin;
 
 /**
  * @author Max Stepanov
@@ -53,37 +53,37 @@ import com.aptana.editor.common.theme.Theme;
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.textcanvas.StyleMap#getColor(java.util.Map, org.eclipse.tm.terminal.model.StyleColor)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	protected Color getColor(Map map, StyleColor color) {
-		if (color.getName().equalsIgnoreCase(StyleMap.BLACK)) {
-			return getForegroundColor();
-		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE)) {
-			return getBackgroundColor();
-		}
-		if (color.getName().equalsIgnoreCase(StyleMap.WHITE_FOREGROUND)) {
-			// FIXME turn to "ansi.white"
-		}
-
 		// Just grab colors straight from theme!
-		String ansiName = "ansi." + color.getName().toLowerCase(); //$NON-NLS-1$
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
+		String colorName = color.getName().toLowerCase();
+		String ansiName = "ansi." + colorName; //$NON-NLS-1$
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 		if (theme.hasEntry(ansiName)) {
 			return theme.getForeground(ansiName);
 		}
+		if (StyleMap.WHITE_FOREGROUND.equals(colorName)) {
+			ansiName = "ansi.white"; //$NON-NLS-1$
+			if (theme.hasEntry(ansiName)) {
+				return theme.getForeground(ansiName);
+			}
+		}
+		boolean isForeground = map == fColorMapForeground;
+		if (StyleMap.BLACK.equals(colorName)) {
+			return ThemePlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		}
+		if (StyleMap.WHITE.equals(colorName)) {
+			return ThemePlugin.getDefault().getColorManager().getColor(isForeground ? theme.getForeground() : theme.getBackground());
+		}
+
 		// fall back to defaults...
 		return super.getColor(map, color);
 	}
 
 	protected Color getBackgroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getBackground());
-	}
-
-	protected Color getForegroundColor() {
-		Theme theme = CommonEditorPlugin.getDefault().getThemeManager().getCurrentTheme();
-		return CommonEditorPlugin.getDefault().getColorManager().getColor(theme.getForeground());
+		Theme theme = ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+		return ThemePlugin.getDefault().getColorManager().getColor(theme.getBackground());
 	}
 
 

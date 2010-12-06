@@ -70,7 +70,29 @@ public interface IPreferenceConstants
 	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
 
 	/**
-	 * Pref key for enabling "invasive" themes (extend to JDT and other views that are not explicitly ours).
+	 * The preference key for the comma-separated list of task tag names.
 	 */
-	public static final String INVASIVE_THEMES = "enable_invasive_themes"; //$NON-NLS-1$
+	public static final String TASK_TAG_NAMES = CommonEditorPlugin.PLUGIN_ID + ".taskTagNames"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the comma-separated list of task tag priorities. Order is important and lines up with
+	 * {@value #TASK_TAG_NAMES}
+	 */
+	public static final String TASK_TAG_PRIORITIES = CommonEditorPlugin.PLUGIN_ID + ".taskTagPriorities"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for determining if task tags should be treated in a case-sensitive manner when detecting them.
+	 */
+	public static final String TASK_TAGS_CASE_SENSITIVE = CommonEditorPlugin.PLUGIN_ID + ".taskTagsCaseSensitive"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the comma-separated list of selected validators for a language
+	 */
+	public static final String SELECTED_VALIDATORS = CommonEditorPlugin.PLUGIN_ID + ".selectedValidators"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the list of regular expressions where the validation warnings and errors would be ignored
+	 * if matched
+	 */
+	public static final String FILTER_EXPRESSIONS = CommonEditorPlugin.PLUGIN_ID + ".filterExpressions"; //$NON-NLS-1$
 }

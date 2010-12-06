@@ -36,6 +36,7 @@
 package com.aptana.terminal.connector;
 
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.debug.core.IStreamListener;
 import org.eclipse.debug.core.model.IStreamMonitor;
@@ -51,17 +52,17 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 	private IOutputFilter outputFilter;
 
 	/**
+	 * @throws UnsupportedEncodingException 
 	 * 
 	 */
-	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) {
-		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true);
+	public LocalTerminalOutputListener(ITerminalControl control, IOutputFilter outputFilter) throws UnsupportedEncodingException {
+		printStream = new PrintStream(control.getRemoteToTerminalOutputStream(), true, LocalTerminalConnector.ENCODING);
 		this.outputFilter = outputFilter;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.core.IStreamListener#streamAppended(java.lang.String, org.eclipse.debug.core.model.IStreamMonitor)
 	 */
-	@Override
 	public void streamAppended(String text, IStreamMonitor monitor) {
 		if (outputFilter != null) {
 			printStream.print(outputFilter.filterOutput(text.toCharArray()));

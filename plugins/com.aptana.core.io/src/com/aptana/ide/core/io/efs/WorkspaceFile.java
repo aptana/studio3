@@ -86,9 +86,8 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	/**
 	 * 
 	 */
-	public WorkspaceFile(IResource resource) {
+	private WorkspaceFile(IResource resource) {
 		this(resource, resource.getFullPath());
-		
 	}
 
 	/**
@@ -109,7 +108,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IResource.class == adapter) {
@@ -185,6 +184,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public IFileStore getParent() {
+		if (path.equals(Path.ROOT)) {
+			return null;
+		}
 		return new WorkspaceFile(path.removeLastSegments(1));
 	}
 
@@ -342,7 +344,8 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore();
+		// passing "true" because the file store doesn't need to be physically exist when doing putInfo()
+		ensureLocalFileStore(true);
 		if (localFileStore != null) {
 			localFileStore.putInfo(info, options, monitor);
 		} else {
@@ -358,7 +361,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		if (localFileStore != null) {
 			return localFileStore.toLocalFile(options, monitor);
 		}
-		return null;
+		return new LocalFile(workspaceRoot.getFile(path).getLocation().toFile()).toLocalFile(options, monitor);
 	}
 
 	/* (non-Javadoc)
@@ -393,9 +396,6 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 			for (String name : path.segments()) {
 				if (res instanceof IContainer) {
 					IContainer container = (IContainer) res;
-					if (!container.isSynchronized(IResource.DEPTH_ONE)) {
-						container.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
-					}
 					res = container.findMember(name);
 				} else {
 					res = null;

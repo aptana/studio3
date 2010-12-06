@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -70,9 +70,8 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	/**
 	 * @see com.aptana.ide.core.resources.IUniformResourceChangeEvent#findMarkerDeltas(java.lang.String, boolean)
 	 */
-	@SuppressWarnings("unchecked")
 	public IMarkerDelta[] findMarkerDeltas(String type, boolean includeSubtypes) {
-		ArrayList matching = new ArrayList();
+		ArrayList<IMarkerDelta> matching = new ArrayList<IMarkerDelta>();
 		IMarkerDelta[] deltas = getMarkerDeltas();
 		for( int i = 0; i < deltas.length; ++i ) {
 			IMarkerDelta markerDelta = deltas[i];
@@ -85,7 +84,7 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 		{
 			return NO_MARKER_DELTAS;
 		}
-		return (IMarkerDelta[]) matching.toArray(new IMarkerDelta[matching.size()]);
+		return matching.toArray(new IMarkerDelta[matching.size()]);
 	}
 
 	/**
