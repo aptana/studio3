@@ -245,7 +245,7 @@
 		<antcall target="-pre-test" />
 
 		<!-- Run the tests. -->
-		<antcall target="run-ui-test">
+		<antcall target="run-perf-test">
 			<param name="test.plugin" value="com.aptana.red.core.tests.all" />
 			<param name="test.classname" value="com.aptana.red.core.tests.all.PerformanceTests" />
 		</antcall>
@@ -266,7 +266,7 @@
 			<property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
 			<property name="plugin-name" value="${test.plugin}" />
 			<property name="classname" value="${test.classname}" />
-			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
+			<property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
 
@@ -285,4 +285,20 @@
 			<property name="extraVMargs" value="-Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties" />
 		</ant>
 	</target>
+	
+	<target name="run-perf-test">
+    <ant target="ui-test" antfile="${library-file}" dir="${baseLocation}">
+      <reference refid="emma.lib" />
+      <property name="extra.java-test.classpath" value="emma.lib" />
+      <property name="timeout" value="${test.timeout}" />
+      <property name="os" value="${baseos}" />
+      <property name="ws" value="${basews}" />
+      <property name="arch" value="${basearch}" />
+      <property name="eclipse-home" value="${baseLocation}" />
+      <property name="data-dir" value="${baseLocation}/junit-workspace -clean" />
+      <property name="plugin-name" value="${test.plugin}" />
+      <property name="classname" value="${test.classname}" />
+      <property name="extraVMargs" value="-ea -Demma.coverage.out.file=${coverageDirectory}/coverage.emma -Dosgi.dev=${basedir}/lib/emma.jar -Djunit.properties=${basedir}/build.properties -Declipse.perf.dbloc= -Declipse.perf.config=build=R3.0.0beta;host=${computer.hostname};jvm=1.6.0_03-b05 -Declipse.perf.assertAgainst=build=R3.0.0beta -Dsetup.override.eclipseArgs=vm=/usr/bin/java" />
+    </ant>
+  </target>
 </project>
