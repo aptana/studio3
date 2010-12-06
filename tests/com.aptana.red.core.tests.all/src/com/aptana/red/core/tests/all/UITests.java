@@ -51,8 +51,10 @@ public class UITests
 		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite()); // FIXME I think the way we do passwords causes us to have to run in UI!
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.idl.AllTests.suite());
+		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.markdown.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
@@ -61,7 +63,7 @@ public class UITests
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
-		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // No syncing UI tests yet
+		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // FIXME Uncomment
 		suite.addTest(com.aptana.theme.tests.AllTests.suite());
 		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
 		// $JUnit-END$

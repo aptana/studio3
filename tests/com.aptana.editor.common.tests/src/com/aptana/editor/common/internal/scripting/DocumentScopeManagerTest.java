@@ -94,19 +94,19 @@ public class DocumentScopeManagerTest extends TestCase
 		try
 		{
 			IWorkbenchPage page = UIUtils.getActivePage();
-			file = File.createTempFile("testing", ".rb");
+			file = File.createTempFile("testing", ".js");
 			FileWriter writer = new FileWriter(file);
-			writer.write("require 'something'\n\ndef method_name\n  @var = 1\nend\n");
+			writer.write("if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
 			writer.close();
 
 			IEditorPart part = IDE.openEditorOnFileStore(page, EFS.getLocalFileSystem().fromLocalFile(file));
 			editor = (ITextEditor) part;
 			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 
-			assertEquals("source.ruby.rails keyword.control.def.ruby", CommonEditorPlugin.getDefault()
-					.getDocumentScopeManager().getScopeAtOffset(viewer, 22));
-			assertEquals("source.ruby.rails variable.other.readwrite.instance.ruby", CommonEditorPlugin.getDefault()
-					.getDocumentScopeManager().getScopeAtOffset(viewer, 41));
+			assertEquals("source.js keyword.control.js", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer, 1));
+			assertEquals("source.js support.class.js", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer, 7));
 		}
 		finally
 		{
@@ -136,17 +136,21 @@ public class DocumentScopeManagerTest extends TestCase
 		try
 		{
 			IWorkbenchPage page = UIUtils.getActivePage();
-			file = File.createTempFile("testing", ".rb");
+			file = File.createTempFile("testing", ".js");
 			FileWriter writer = new FileWriter(file);
-			writer.write("require 'something'\n\ndef method_name\n  @var = 1\nend\n");
+			writer.write("if(Object.isUndefined(Effect))\nthrow(\"dragdrop.js requires including script.aculo.us' effects.js library\");");
 			writer.close();
 
 			IEditorPart part = IDE.openEditorOnFileStore(page, EFS.getLocalFileSystem().fromLocalFile(file));
 			editor = (ITextEditor) part;
 			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
 
-			assertEquals("source.ruby.rails string.quoted.single.ruby", CommonEditorPlugin.getDefault()
-					.getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 12));
+			assertEquals("source.js",
+					CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 1));
+			assertEquals("source.js",
+					CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 7));
+			assertEquals("source.js string.quoted.double.js", CommonEditorPlugin.getDefault()
+					.getDocumentScopeManager().getScopeAtOffset(viewer.getDocument(), 50));
 		}
 		finally
 		{
