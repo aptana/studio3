@@ -213,9 +213,11 @@ public class HTMLParser implements IParser
 				elementsToClose.add((HTMLElementNode) node);
 			}
 		}
+		int end = fCurrentSymbol.getStart() - 1;
 		for (HTMLElementNode element : elementsToClose)
 		{
-			element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			element.setLocation(element.getStartingOffset(), end);
+			element.setEndNode(end, end);
 		}
 	}
 
@@ -297,6 +299,8 @@ public class HTMLParser implements IParser
 		}
 
 		HTMLElementNode element;
+		int currentStart = fCurrentSymbol.getStart();
+		int currentEnd = fCurrentSymbol.getEnd();
 		int size = elementsToClose.size();
 		for (int i = 0; i < size; ++i)
 		{
@@ -304,13 +308,13 @@ public class HTMLParser implements IParser
 			// adjusts the ending offset of the element to include the entire block
 			if (i < size - 1)
 			{
-				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+				element.setLocation(element.getStartingOffset(), currentStart - 1);
+				element.setEndNode(currentStart - 1, currentStart - 1);
 			}
 			else
 			{
-				// only the last element has the end tag
-				element.setLocation(element.getStartingOffset(), fCurrentSymbol.getEnd());
-				element.setEndNode(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
+				element.setLocation(element.getStartingOffset(), currentEnd);
+				element.setEndNode(currentStart, currentEnd);
 			}
 			closeElement();
 		}

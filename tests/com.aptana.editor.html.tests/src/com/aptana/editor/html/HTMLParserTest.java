@@ -167,7 +167,7 @@ public class HTMLParserTest extends TestCase
 		assertEquals(1, children.length);
 		assertEquals(12, children[0].getEndingOffset());
 		endTag = ((HTMLElementNode) children[0]).getEndNode();
-		assertNull(endTag);
+		assertEquals(new Range(12, 12), endTag.getNameRange());
 	}
 
 	public void testUnclosedRootTag() throws Exception
@@ -179,13 +179,13 @@ public class HTMLParserTest extends TestCase
 		assertEquals(1, children.length);
 		assertEquals(12, children[0].getEndingOffset());
 		INameNode endTag = ((HTMLElementNode) children[0]).getEndNode();
-		assertNull(endTag);
+		assertEquals(new Range(12, 12), endTag.getNameRange());
 
 		children = children[0].getChildren();
 		assertEquals(1, children.length);
 		assertEquals(12, children[0].getEndingOffset());
 		endTag = ((HTMLElementNode) children[0]).getEndNode();
-		assertNull(endTag);
+		assertEquals(new Range(12, 12), endTag.getNameRange());
 	}
 
 	public void testSpecialNodeEnd() throws Exception
