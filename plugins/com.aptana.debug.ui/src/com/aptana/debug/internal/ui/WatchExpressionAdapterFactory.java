@@ -42,6 +42,7 @@ import org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter;
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("rawtypes")
 public class WatchExpressionAdapterFactory implements IAdapterFactory
 {
 

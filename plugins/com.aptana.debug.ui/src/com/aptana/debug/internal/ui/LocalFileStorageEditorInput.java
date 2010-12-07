@@ -92,6 +92,7 @@ public class LocalFileStorageEditorInput extends StorageEditorInput implements I
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		if (ILocationProvider.class == adapter)

@@ -56,7 +56,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.IUpdate;
 
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.ui.DebugUiPlugin;
 
 /**

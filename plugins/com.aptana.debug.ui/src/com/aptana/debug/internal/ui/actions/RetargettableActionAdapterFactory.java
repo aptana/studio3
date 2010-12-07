@@ -41,6 +41,7 @@ import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("rawtypes")
 public class RetargettableActionAdapterFactory implements IAdapterFactory
 {
 	/**

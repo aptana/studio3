@@ -36,6 +36,7 @@
 package com.aptana.debug.internal.ui;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
@@ -69,6 +70,28 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 					}
 				});
 			}
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static class Factory implements IAdapterFactory {
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
+		 */
+		public Object getAdapter(Object adaptableObject, Class adapterType) {
+			if ( adapterType == IEditorOpenAdapter.class ) {
+				return new EditorOpenAdapter();
+			}
+			return null;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
+		 */
+		public Class[] getAdapterList() {
+			return new Class[] { IEditorOpenAdapter.class };
+		}
+
 	}
 
 }

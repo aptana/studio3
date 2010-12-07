@@ -45,7 +45,6 @@ import org.eclipse.ui.dialogs.PropertyDialogAction;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov

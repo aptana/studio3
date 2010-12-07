@@ -42,21 +42,18 @@ import com.aptana.debug.core.model.IJSVariable;
 /**
  * @author Max Stepanov
  */
-public class ActionFilterAdapterFactory implements IAdapterFactory
-{
+@SuppressWarnings("rawtypes")
+public class ActionFilterAdapterFactory implements IAdapterFactory {
+
 	/**
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
-	public Object getAdapter(Object adaptableObject, Class adapterType)
-	{
-		if (adapterType.isInstance(adaptableObject))
-		{
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
+		if (adapterType.isInstance(adaptableObject)) {
 			return adaptableObject;
 		}
-		if (adapterType == IActionFilter.class)
-		{
-			if (adaptableObject instanceof IJSVariable)
-			{
+		if (adapterType == IActionFilter.class) {
+			if (adaptableObject instanceof IJSVariable) {
 				return new JSVariableActionFilter();
 			}
 		}
@@ -66,8 +63,7 @@ public class ActionFilterAdapterFactory implements IAdapterFactory
 	/**
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
-	public Class[] getAdapterList()
-	{
+	public Class[] getAdapterList() {
 		return new Class[] { IActionFilter.class };
 	}
 }

@@ -77,14 +77,14 @@ public class DetailFormatterDialog extends StatusDialog
 
 	private DetailFormatter formatter;
 	private String type;
-	private List definedTypes;
+	private List<String> definedTypes;
 	private boolean editTypeName;
 
 	/**
 	 * DetailFormatterDialog
 	 *
 	 */
-	public DetailFormatterDialog(Shell parent, DetailFormatter detailFormatter, List definedTypes, boolean editDialog)
+	public DetailFormatterDialog(Shell parent, DetailFormatter detailFormatter, List<String> definedTypes, boolean editDialog)
 	{
 		this(parent, detailFormatter, definedTypes, true, editDialog);
 	}
@@ -93,7 +93,7 @@ public class DetailFormatterDialog extends StatusDialog
 	 * DetailFormatterDialog
 	 * 
 	 */
-	public DetailFormatterDialog(Shell parent, DetailFormatter formatter, List definedTypes,
+	public DetailFormatterDialog(Shell parent, DetailFormatter formatter, List<String> definedTypes,
 			boolean editTypeName, boolean editDialog)
 	{
 		super(parent);

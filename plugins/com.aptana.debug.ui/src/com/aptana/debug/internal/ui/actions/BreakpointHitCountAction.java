@@ -103,6 +103,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@SuppressWarnings("rawtypes")
 	public void run(IAction action)
 	{
 		if (selection != null && !selection.isEmpty())

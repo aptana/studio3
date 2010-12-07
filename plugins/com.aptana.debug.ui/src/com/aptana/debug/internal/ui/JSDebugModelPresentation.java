@@ -63,9 +63,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.model.IJSDebugTarget;
 import com.aptana.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.debug.core.model.IJSImplicitBreakpoint;
@@ -78,7 +78,6 @@ import com.aptana.debug.core.model.ISourceLink;
 import com.aptana.debug.core.model.JSInspectExpression;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.core.PathUtils;
 
 /**
  * @author Max Stepanov
@@ -197,7 +196,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		if (frame instanceof IJSStackFrame)
 		{
 			fileName = ((IJSStackFrame) frame).getSourceFileName();
-			IFile file = PathUtils.findWorkspaceFile(fileName);
+			IFile file = ResourceUtil.findWorkspaceFile(fileName);
 			if (file != null)
 			{
 				fileName = file.getFullPath().lastSegment();
@@ -240,7 +239,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				{
 					IJSImplicitBreakpoint implicitBreakpoint = (IJSImplicitBreakpoint) breakpoint;
 					fileName = implicitBreakpoint.getFileName();
-					IFile file = PathUtils.findWorkspaceFile(fileName);
+					IFile file = ResourceUtil.findWorkspaceFile(fileName);
 					if (file != null)
 					{
 						fileName = file.getFullPath().toString();
@@ -278,14 +277,14 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 					IMarker marker = breakpoint.getMarker();
 					if (marker instanceof IUniformResourceMarker)
 					{
-						fileName = PathUtils.getPath(((IUniformResourceMarker) marker).getUniformResource());
+						fileName = ResourceUtil.getPath(((IUniformResourceMarker) marker).getUniformResource());
 					}
 					else if (marker.getResource() instanceof IWorkspaceRoot)
 					{
 						URI uri = URI.create((String) marker.getAttribute(IDebugConstants.BREAKPOINT_LOCATION));
 						if ("file".equals(uri.getScheme())) { //$NON-NLS-1$
-							fileName = PathUtils.getPath(uri);
-							IFile file = PathUtils.findWorkspaceFile(fileName);
+							fileName = ResourceUtil.getPath(uri);
+							IFile file = ResourceUtil.findWorkspaceFile(fileName);
 							if (file != null)
 							{
 								fileName = file.getFullPath().toString();
@@ -350,7 +349,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		IMarker marker = breakpoint.getMarker();
 		if (marker instanceof IUniformResourceMarker)
 		{
-			label.append(PathUtils.getPath(((IUniformResourceMarker) marker).getUniformResource()));
+			label.append(ResourceUtil.getPath(((IUniformResourceMarker) marker).getUniformResource()));
 		}
 		else
 		{
@@ -384,6 +383,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	 * @return Image
 	 * @throws CoreException
 	 */
+	@SuppressWarnings("restriction")
 	private Image getBreakpointImage(IBreakpoint breakpoint) throws CoreException
 	{
 		if (breakpoint instanceof IJSExceptionBreakpoint)

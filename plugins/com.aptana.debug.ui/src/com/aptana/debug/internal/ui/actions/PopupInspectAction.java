@@ -34,33 +34,21 @@
  */
 package com.aptana.debug.internal.ui.actions;
 
-import java.lang.reflect.Constructor;
-
-import org.eclipse.debug.core.model.IExpression;
 import org.eclipse.debug.core.model.IWatchExpressionResult;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.debug.ui.InspectPopupDialog;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.information.IInformationProvider;
-import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.debug.core.model.JSInspectExpression;
 import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.editors.unified.IUnifiedEditor;
 
 /**
  * @author Max Stepanov
@@ -70,11 +58,10 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	/**
 	 * ACTION_DEFININIITION_ID
 	 */
-	public static final String ACTION_DEFININIITION_ID = "com.aptana.debug.ui.commands.Inspect"; //$NON-NLS-1$
+	private static final String ACTION_DEFININIITION_ID = "com.aptana.debug.ui.commands.Inspect"; //$NON-NLS-1$
 
 	private ITextViewer viewer;
 	private JSInspectExpression expression;
-	private InformationPresenter fInformationPresenter;
 
 	/**
 	 * see org.eclipse.jface.text.information.IInformationProvider#getInformation(org.eclipse.jface.text.ITextViewer,
@@ -105,115 +92,12 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	 */
 	protected void showPopup(final IWatchExpressionResult result)
 	{
-		try
-		{
-			Class.forName("org.eclipse.debug.ui.InspectPopupDialog"); //$NON-NLS-1$
-			showPopup32(result);
-		}
-		catch (ClassNotFoundException e)
-		{
-			showPopup31(result);
-		}
-	}
-
-	private void showPopup32(IWatchExpressionResult result)
-	{
 		expression = new JSInspectExpression(result);
-		Window displayPopup = null;
-
-		/*
-		 * Compatibility replacement for: new org.eclipse.debug.ui.InspectPopupDialog(getShell(),
-		 * getPopupAnchor(viewer), ACTION_DEFININIITION_ID, expression);
-		 */
-		try
-		{
-			Class clazz = Class.forName("org.eclipse.debug.ui.InspectPopupDialog"); //$NON-NLS-1$
-			Constructor constructor = clazz.getConstructor(new Class[] { Shell.class, Point.class, String.class,
-					IExpression.class });
-			displayPopup = (Window) constructor.newInstance(new Object[] { getShell(), getPopupAnchor(viewer),
-					ACTION_DEFININIITION_ID, expression });
-		}
-		catch (Exception e)
-		{
-			DebugUiPlugin.log(e);
-		}
+		Window displayPopup = new InspectPopupDialog(getShell(), getPopupAnchor(viewer), ACTION_DEFININIITION_ID, expression);
 		if (displayPopup != null)
 		{
 			displayPopup.open();
 		}
-	}
-
-	private void showPopup31(final IWatchExpressionResult result)
-	{
-		final InformationPresenter infoPresenter = new InformationPresenter(new IInformationControlCreator()
-		{
-			public IInformationControl createInformationControl(Shell parent)
-			{
-				IWorkbenchPage page = DebugUiPlugin.getActivePage();
-				expression = new JSInspectExpression(result);
-
-				IInformationControl control = null;
-				/*
-				 * Compatibility replacement for: new
-				 * org.eclipse.debug.internal.ui.views.expression.ExpressionInformationControl(page, expression,
-				 * ACTION_DEFININIITION_ID);
-				 */
-				try
-				{
-					Class clazz = Class
-							.forName("org.eclipse.debug.internal.ui.views.expression.ExpressionInformationControl"); //$NON-NLS-1$
-					Constructor constructor = clazz.getConstructor(new Class[] { IWorkbenchPage.class,
-							IExpression.class, String.class });
-					control = (IInformationControl) constructor.newInstance(new Object[] { page, expression,
-							ACTION_DEFININIITION_ID });
-				}
-				catch (Exception e)
-				{
-					DebugUiPlugin.log(e);
-				}
-				if (control != null)
-				{
-					control.addDisposeListener(new DisposeListener()
-					{
-						public void widgetDisposed(DisposeEvent e)
-						{
-							getInformationPresenter().uninstall();
-						}
-					});
-				}
-				return control;
-			}
-		});
-
-		setInformationPresenter(infoPresenter);
-
-		DebugUiPlugin.getStandardDisplay().asyncExec(new Runnable()
-		{
-			public void run()
-			{
-				if (viewer != null)
-				{
-					Point p = viewer.getSelectedRange();
-					IDocument doc = viewer.getDocument();
-					try
-					{
-						String contentType = TextUtilities.getContentType(doc, infoPresenter.getDocumentPartitioning(),
-								p.x, true);
-						infoPresenter.setInformationProvider(PopupInspectAction.this, contentType);
-						infoPresenter.install(viewer);
-						infoPresenter.showInformation();
-					}
-					catch (BadLocationException e)
-					{
-						return;
-					}
-					finally
-					{
-						viewer = null;
-					}
-				}
-			}
-		});
 	}
 
 	/**
@@ -225,10 +109,8 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 		viewer = (ITextViewer) part.getAdapter(ITextViewer.class);
 		if (viewer == null)
 		{
-			if (part instanceof IUnifiedEditor)
-			{
-				viewer = ((IUnifiedEditor) part).getViewer();
-			}
+			System.err.println("TODO: com.aptana.debug.internal.ui.actions.PopupInspectAction.displayResult()");
+			DebugUiPlugin.log("TODO: com.aptana.debug.internal.ui.actions.PopupInspectAction.displayResult()");
 		}
 		if (viewer == null)
 		{
@@ -244,16 +126,6 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	{
 		// TODO
 		return DebugUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
-	}
-
-	private InformationPresenter getInformationPresenter()
-	{
-		return fInformationPresenter;
-	}
-
-	private void setInformationPresenter(InformationPresenter informationPresenter)
-	{
-		fInformationPresenter = informationPresenter;
 	}
 
 	/**

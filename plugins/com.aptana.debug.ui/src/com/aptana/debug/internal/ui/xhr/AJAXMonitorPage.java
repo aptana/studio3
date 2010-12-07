@@ -62,8 +62,6 @@ import org.eclipse.ui.part.Page;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.xhr.IXHRTransfer;
-import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.core.ui.PreferenceUtils;
 
 /**
  * @author Max Stepanov
@@ -111,19 +109,6 @@ public class AJAXMonitorPage extends Page
 				}
 			}
 		});
-		//registring background and foreground preferences
-		PreferenceUtils.registerBackgroundColorPreference(tableViewer.getTable(), "com.aptana.ide.core.ui.background.color.ajaxmonitor"); //$NON-NLS-1$
-		PreferenceUtils.registerForegroundColorPreference(tableViewer.getTable(), "com.aptana.ide.core.ui.foreground.color.ajaxmonitor"); //$NON-NLS-1$
-		for (int a=0;a<requestData.length;a++){
-			PreferenceUtils.registerBackgroundColorPreference(requestData[a].getControl(), "com.aptana.ide.core.ui.background.color.ajaxmonitor.request"); //$NON-NLS-1$
-			PreferenceUtils.registerForegroundColorPreference(requestData[a].getControl(), "com.aptana.ide.core.ui.foreground.color.ajaxmonitor.request"); //$NON-NLS-1$
-		}
-		for (int a=0;a<responseData.length;a++){
-			PreferenceUtils.registerBackgroundColorPreference(responseData[a].getControl(), "com.aptana.ide.core.ui.background.color.ajaxmonitor.response"); //$NON-NLS-1$
-			PreferenceUtils.registerForegroundColorPreference(responseData[a].getControl(), "com.aptana.ide.core.ui.foreground.color.ajaxmonitor.response"); //$NON-NLS-1$
-		}
-		PreferenceUtils.registerBackgroundColorPreference(hSashForm, "com.aptana.ide.core.ui.background.color.ajaxmonitor.border"); //$NON-NLS-1$
-		PreferenceUtils.registerForegroundColorPreference(hSashForm, "com.aptana.ide.core.ui.foreground.color.ajaxmonitor.border"); //$NON-NLS-1$				
 		mainControl = hSashForm;
 	}
 
@@ -137,7 +122,6 @@ public class AJAXMonitorPage extends Page
 		TableLayout tableLayout = new TableLayout();
 		table.setLayout(tableLayout);
 
-		// CHECKSTYLE:OFF
 		TableColumn column = new TableColumn(table, SWT.LEFT);
 		column.setResizable(false);
 		tableLayout.addColumnData(new ColumnPixelData(20));
@@ -157,11 +141,9 @@ public class AJAXMonitorPage extends Page
 		column = new TableColumn(table, SWT.LEFT);
 		column.setText(Messages.AJAXMonitorPage_Received);
 		tableLayout.addColumnData(new ColumnWeightData(10));
-		// CHECKSTYLE:ON
 
 		tableViewer.setContentProvider(new XHRContentProvider());
 		tableViewer.setLabelProvider(new XHRLabelProvider());
-		PreferenceUtils.persist(DebugUiPlugin.getDefault().getPreferenceStore(), tableViewer.getTable(), "ajaxMonitorPage.requestsPart"); //$NON-NLS-1$
 	}
 
 	private void createDetailsPart(Composite parent, String name, Viewer[] viewers)
@@ -215,7 +197,6 @@ public class AJAXMonitorPage extends Page
 		textViewer.setEditable(false);
 		textViewer.setDocument(new Document());
 		viewers[1] = textViewer;
-		PreferenceUtils.persist(DebugUiPlugin.getDefault().getPreferenceStore(), viewer.getTable(), "ajaxMonitorPage.detailsPart"); //$NON-NLS-1$
 		tab.setSelection(item);
 	}
 

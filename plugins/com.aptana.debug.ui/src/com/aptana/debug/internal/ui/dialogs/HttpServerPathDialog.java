@@ -59,9 +59,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.internal.ide.dialogs.ResourceComparator;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.views.navigator.ResourceSorter;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.internal.ui.StatusInfo;
@@ -70,6 +70,7 @@ import com.aptana.debug.internal.ui.StatusInfo;
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("restriction")
 public class HttpServerPathDialog extends StatusDialog {
 
 	private static final Pattern SERVER_PATH_PATTERN = Pattern.compile("(/[a-zA-Z0-9_!~*'().;?:@&=+$,%#-]+)*/?"); //$NON-NLS-1$
@@ -128,7 +129,7 @@ public class HttpServerPathDialog extends StatusDialog {
 						new WorkbenchLabelProvider(),
 						new WorkbenchContentProvider());
 				dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-				dialog.setSorter(new ResourceSorter(ResourceSorter.NAME));
+				dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
 				dialog.addFilter( new ViewerFilter() {
 					public boolean select(Viewer viewer, Object parentElement, Object element) {
 						return element instanceof IContainer;

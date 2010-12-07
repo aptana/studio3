@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
@@ -62,7 +61,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -71,19 +69,20 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
 import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.core.util.FirebugUtils;
 import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.core.FileUtils;
-import com.aptana.ide.core.MutexJobRule;
-import com.aptana.ide.core.ui.WorkbenchHelper;
+import com.aptana.ui.PopupSchedulingRule;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * @author Max Stepanov
  *
  */
+@SuppressWarnings("restriction")
 public class Startup implements IStartup {
 	
 	/**
@@ -101,20 +100,20 @@ public class Startup implements IStartup {
             		}
             	
         	};
-        	job.setRule(MutexJobRule.getInstance());
+        	job.setRule(PopupSchedulingRule.INSTANCE);
         	job.setSystem(true);
         	job.schedule();
 	}
 	
 	private void registerAsFirebugEditor() {
-		IPath launcher = FileUtils.getApplicationLauncher();
+		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if ( launcher != null ) {
 			FirebugUtils.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	private void checkDefaultLaunchConfiguration() {
-		Stack defaultConfigurations = new Stack();
+		Stack<ILaunchConfiguration> defaultConfigurations = new Stack<ILaunchConfiguration>();
 		ILaunchConfiguration configuration;
 		LaunchConfigurationManager manager = DebugUIPlugin.getDefault().getLaunchConfigurationManager();
 		ILaunchConfiguration[] history = manager.getLaunchHistory(IDebugUIConstants.ID_DEBUG_LAUNCH_GROUP).getHistory();
@@ -135,7 +134,7 @@ public class Startup implements IStartup {
 		}
 	
 		for(int i = 0; i < history.length; ++i) {
-			for(Iterator j = defaultConfigurations.iterator(); j.hasNext(); ) {
+			for(Iterator<ILaunchConfiguration> j = defaultConfigurations.iterator(); j.hasNext(); ) {
 				if( history[i].equals(j.next()) ) {
 					j.remove();
 					break;
@@ -222,6 +221,7 @@ public class Startup implements IStartup {
 			public void terminate() throws DebugException {
 			}
 
+			@SuppressWarnings("rawtypes")
 			public Object getAdapter(Class adapter) {
 				return null;
 			}	
@@ -316,7 +316,7 @@ public class Startup implements IStartup {
 					break;
 				case IDialogConstants.INTERNAL_ID+1:
 					if ( download ) {
-						WorkbenchHelper.launchBrowser("http://www.getfirefox.com"); //$NON-NLS-1$
+						WorkbenchBrowserUtil.launchExternalBrowser("http://www.getfirefox.com"); //$NON-NLS-1$
 					}
 					path[0] = StringUtil.EMPTY;
 					break;

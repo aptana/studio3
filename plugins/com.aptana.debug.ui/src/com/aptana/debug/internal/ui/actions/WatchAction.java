@@ -101,6 +101,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 	/**
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
+	@SuppressWarnings("rawtypes")
 	public void run(IAction action)
 	{
 		if (fSelection == null)
@@ -109,8 +110,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 		}
 		if (fSelection instanceof IStructuredSelection)
 		{
-			Iterator iter = ((IStructuredSelection) fSelection).iterator();
-			while (iter.hasNext())
+			for (Iterator iter = ((IStructuredSelection) fSelection).iterator(); iter.hasNext(); )
 			{
 				IVariable variable = (IVariable) iter.next();
 				try
@@ -137,6 +137,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
+	@SuppressWarnings("rawtypes")
 	public void selectionChanged(IAction action, ISelection selection)
 	{
 		fSelection = null;
@@ -152,8 +153,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 			IStructuredSelection sSelection = (IStructuredSelection) selection;
 			size = sSelection.size();
 			IExpressionManager manager = DebugPlugin.getDefault().getExpressionManager();
-			Iterator iterator = sSelection.iterator();
-			while (iterator.hasNext())
+			for (Iterator iterator = sSelection.iterator(); iterator.hasNext(); )
 			{
 				IVariable variable = (IVariable) iterator.next();
 				if (manager.hasWatchExpressionDelegate(variable.getModelIdentifier()))

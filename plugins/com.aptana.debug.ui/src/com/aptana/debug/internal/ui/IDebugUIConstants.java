@@ -46,7 +46,7 @@ public interface IDebugUIConstants
 	/**
 	 * PLUGIN_ID
 	 */
-	String PLUGIN_ID = DebugUiPlugin.ID;
+	String PLUGIN_ID = DebugUiPlugin.PLUGIN_ID;
 
 	/**
 	 * PREF_INSTALL_DEBUGGER

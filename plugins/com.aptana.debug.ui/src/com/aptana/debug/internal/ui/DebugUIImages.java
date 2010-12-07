@@ -51,6 +51,7 @@ import com.aptana.debug.ui.DebugUiPlugin;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("restriction")
 public final class DebugUIImages
 {
 	private static String ICONS_PATH = "$nl$/icons/full/"; //$NON-NLS-1$

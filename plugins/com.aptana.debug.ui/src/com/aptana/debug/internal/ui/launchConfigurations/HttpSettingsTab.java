@@ -50,7 +50,6 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.ui.DebugUiPlugin;
 

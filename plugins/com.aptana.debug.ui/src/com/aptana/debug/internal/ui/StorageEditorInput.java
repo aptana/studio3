@@ -63,6 +63,7 @@ public abstract class StorageEditorInput extends PlatformObject implements IStor
 	/**
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
+	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class adapter)
 	{
 		Object object = getStorage().getAdapter(adapter);

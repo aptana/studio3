@@ -63,7 +63,6 @@ import com.aptana.debug.internal.ui.JSDebugModelPresentation;
 import com.aptana.debug.internal.ui.actions.OpenScriptSourceAction;
 import com.aptana.debug.internal.ui.scripts.ScriptsContentProvider;
 import com.aptana.debug.internal.ui.scripts.ScriptsViewer;
-import com.aptana.ide.core.ui.PreferenceUtils;
 
 /**
  * @author Max Stepanov
@@ -87,8 +86,6 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 		DebugPlugin.getDefault().addDebugEventListener(this);
 		// listen to selection in debug view
 		getSite().getPage().addPostSelectionListener(IDebugUIConstants.ID_DEBUG_VIEW, getSelectionListener());
-		PreferenceUtils.registerBackgroundColorPreference(treeViewer.getControl(), "com.aptana.ide.core.ui.background.color.scriptsView"); //$NON-NLS-1$
-		PreferenceUtils.registerForegroundColorPreference(treeViewer.getControl(), "com.aptana.ide.core.ui.foreground.color.scriptsView"); //$NON-NLS-1$
 		return treeViewer;
 	}
 

@@ -49,7 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.core.ui.WorkbenchHelper;
+import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * @author Max Stepanov
@@ -90,12 +90,12 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler
 					0);
 			switch(md.open()) {
 				case 0:
-					WorkbenchHelper.launchBrowser("http://www.aptana.com/pro/pdm.php", "org.eclipse.ui.browser.ie"); //$NON-NLS-1$ //$NON-NLS-2$
+					WorkbenchBrowserUtil.launchExternalBrowser("http://www.aptana.com/pro/pdm.php", "org.eclipse.ui.browser.ie"); //$NON-NLS-1$ //$NON-NLS-2$
 					/* continue */
 				case 1:
 					return new Boolean(true);
 				case 3:
-					WorkbenchHelper.launchBrowser("http://www.aptana.com/docs/index.php/Installing_the_IE_debugger"); //$NON-NLS-1$
+					WorkbenchBrowserUtil.launchExternalBrowser("http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger"); //$NON-NLS-1$
 					return new Boolean(true);					
 				default:
 					break;
@@ -135,9 +135,10 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler
 					default:
 						break;
 				}
-				WorkbenchHelper.launchBrowser( ((String)source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-						? "http://www.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
-						: "http://www.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"); //$NON-NLS-1$
+				String urlString = ((String)source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
+						? "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
+						: "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
+				WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 			}
 		}
 		IPreferenceStore store = DebugUiPlugin.getDefault().getPreferenceStore();
@@ -174,9 +175,10 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler
 				default:
 					break;
 			}
-			WorkbenchHelper.launchBrowser( ((String)source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-					? "http://www.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
-					: "http://www.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"); //$NON-NLS-1$
+			String urlString = ((String)source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
+					? "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
+					: "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
+			WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 		}
 	}
 }

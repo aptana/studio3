@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.debug.ui; singleton:=true
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.debug.ui.DebugUiPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="[3.2.0,4.0.0)",
+ org.eclipse.core.resources,
  org.eclipse.core.expressions,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
@@ -20,10 +20,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.core,
  com.aptana.ui,
- com.aptana.ide.editors,
- com.aptana.debug.core,
- com.aptana.ide.server,
- com.aptana.ide.server.ui
+ com.aptana.debug.core
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.debug.internal.ui,
@@ -36,3 +33,4 @@ Export-Package: com.aptana.debug.internal.ui,
    org.eclipse.swt.widgets,
    org.eclipse.core.runtime,
    org.eclipse.ui"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

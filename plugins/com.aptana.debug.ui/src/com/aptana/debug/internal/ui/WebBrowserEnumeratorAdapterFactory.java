@@ -46,6 +46,7 @@ import org.eclipse.ui.internal.browser.IBrowserDescriptor;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings({ "rawtypes", "restriction" })
 public class WebBrowserEnumeratorAdapterFactory implements IAdapterFactory
 {
 	/**

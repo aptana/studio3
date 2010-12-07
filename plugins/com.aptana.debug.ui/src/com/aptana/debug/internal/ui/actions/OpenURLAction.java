@@ -42,7 +42,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 import com.aptana.debug.core.model.JSDebugModel;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
-import com.aptana.ide.core.ui.dialogs.InputURLDialog;
+import com.aptana.ui.dialogs.InputURLDialog;
 
 /**
  * @author Max Stepanov

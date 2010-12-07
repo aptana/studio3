@@ -64,12 +64,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.views.navigator.ResourceSorter;
+import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.internal.ui.ActiveResourcePathGetterAdapter;
 import com.aptana.debug.ui.DebugUiPlugin;
@@ -341,7 +340,7 @@ public class LaunchServerSettingsTab extends AbstractLaunchConfigurationTab
 		ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), new WorkbenchLabelProvider(),
 				new WorkbenchContentProvider());
 		dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-		dialog.setSorter(new ResourceSorter(ResourceSorter.NAME));
+		dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
 		dialog.setMessage(Messages.LaunchBrowserSettingsTab_ChooseFile);
 		dialog.open();
 		Object result = dialog.getFirstResult();

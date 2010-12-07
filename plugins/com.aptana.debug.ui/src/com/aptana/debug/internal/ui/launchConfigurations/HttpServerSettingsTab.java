@@ -35,7 +35,6 @@
 package com.aptana.debug.internal.ui.launchConfigurations;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -45,6 +44,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -78,11 +78,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
 import com.aptana.debug.core.JSDebugOptionsManager;
-import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.internal.ui.dialogs.HttpServerPathDialog;
 import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.ide.core.ui.PixelConverter;
-import com.aptana.ide.core.ui.PreferenceUtils;
 
 /**
  * @author Max Stepanov
@@ -289,7 +286,6 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab
 		fRemoveButton.setEnabled(false);
 
 		setControl(composite);
-		PreferenceUtils.persist(DebugUiPlugin.getDefault().getPreferenceStore(), table, "httpServerSettings"); //$NON-NLS-1$
 	}
 
 	private void addPath() {
@@ -359,9 +355,8 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab
 	private void refreshViewer()
 	{
 		ArrayList<PathElement> checkedElements = new ArrayList<PathElement>();
-		for (Iterator i = elements.iterator(); i.hasNext();)
+		for (PathElement pathElement : elements)
 		{
-			PathElement pathElement = (PathElement) i.next();
 			if ( pathElement.enabled )
 			{
 				checkedElements.add(pathElement);
@@ -418,9 +413,8 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab
 	{
 		String[] values = new String[elements.size() * 3];
 		int index = 0;
-		for (Iterator i = elements.iterator(); i.hasNext(); )
+		for (PathElement element : elements)
 		{
-			PathElement element = (PathElement) i.next();
 			values[index++] = element.serverPath;
 			values[index++] = element.localPath;
 			values[index++] = element.enabled ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
