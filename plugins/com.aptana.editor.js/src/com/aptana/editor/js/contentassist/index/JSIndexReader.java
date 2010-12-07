@@ -63,6 +63,9 @@ import com.aptana.index.core.SearchPattern;
 public class JSIndexReader
 {
 	private static Map<String, UserAgentElement> userAgentsByKey = new HashMap<String, UserAgentElement>();
+	private static final Pattern COMMA_PATTERN = Pattern.compile(","); //$NON-NLS-1$
+	private static final Pattern DELIMITER_PATTERN = Pattern.compile(JSIndexConstants.DELIMITER);
+	private static final Pattern SUB_DELIMETER_PATTERN = Pattern.compile(JSIndexConstants.SUB_DELIMITER);
 
 	/**
 	 * createFunctionFromKey
@@ -80,7 +83,7 @@ public class JSIndexReader
 		if (fields.isEmpty() == false)
 		{
 			String key = function.getWord();
-			String[] columns = key.split(JSIndexConstants.DELIMITER);
+			String[] columns = DELIMITER_PATTERN.split(key);
 			int column = 0;
 			
 			// owning type
@@ -156,7 +159,7 @@ public class JSIndexReader
 				// user agents
 				if (fields.contains(ContentSelector.USER_AGENTS))
 				{
-					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+					for (String userAgentKey : SUB_DELIMETER_PATTERN.split(columns[column]))
 					{
 						// get user agent and add to element
 						f.addUserAgent(this.getUserAgent(userAgentKey));
@@ -194,7 +197,7 @@ public class JSIndexReader
 		if (fields.isEmpty() == false)
 		{
 			String key = property.getWord();
-			String[] columns = key.split(JSIndexConstants.DELIMITER);
+			String[] columns = DELIMITER_PATTERN.split(key);
 			int column = 0;
 			
 			// owning type
@@ -250,7 +253,7 @@ public class JSIndexReader
 				if (fields.contains(ContentSelector.USER_AGENTS))
 				{
 					// user agents
-					for (String userAgentKey : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+					for (String userAgentKey : SUB_DELIMETER_PATTERN.split(columns[column]))
 					{
 						// get user agent and add to element
 						p.addUserAgent(this.getUserAgent(userAgentKey));
@@ -283,7 +286,7 @@ public class JSIndexReader
 		UserAgentElement result = new UserAgentElement();
 
 		String key = userAgent.getWord();
-		String[] columns = key.split(JSIndexConstants.DELIMITER);
+		String[] columns = DELIMITER_PATTERN.split(key);
 		int column = 0;
 
 		column++; // skip key
@@ -353,7 +356,7 @@ public class JSIndexReader
 			if (queryResult != null && queryResult.size() > 0)
 			{
 				String word = queryResult.get(0).getWord();
-				String[] examples = word.split(JSIndexConstants.DELIMITER);
+				String[] examples = DELIMITER_PATTERN.split(word);
 
 				for (int i = 1; i < examples.length; i++)
 				{
@@ -515,12 +518,12 @@ public class JSIndexReader
 			if (parameters != null && parameters.size() > 0)
 			{
 				String parametersValue = parameters.get(0).getWord();
-				String[] parameterValues = parametersValue.split(JSIndexConstants.DELIMITER);
+				String[] parameterValues = DELIMITER_PATTERN.split(parametersValue);
 
 				for (int i = 1; i < parameterValues.length; i++)
 				{
 					String parameterValue = parameterValues[i];
-					String[] columns = parameterValue.split(","); //$NON-NLS-1$
+					String[] columns = COMMA_PATTERN.split(parameterValue);
 					ParameterElement parameter = new ParameterElement();
 
 					parameter.setName(columns[0]);
@@ -653,12 +656,12 @@ public class JSIndexReader
 			if (returnTypes != null && returnTypes.size() > 0)
 			{
 				String word = returnTypes.get(0).getWord();
-				String[] returnTypesValues = word.split(JSIndexConstants.DELIMITER);
+				String[] returnTypesValues = DELIMITER_PATTERN.split(word);
 
 				for (int i = 1; i < returnTypesValues.length; i++)
 				{
 					String returnTypeValue = returnTypesValues[i];
-					String[] columns = returnTypeValue.split(","); //$NON-NLS-1$
+					String[] columns = COMMA_PATTERN.split(returnTypeValue);
 					ReturnTypeElement returnType = new ReturnTypeElement();
 
 					returnType.setType(columns[0]);
@@ -693,12 +696,12 @@ public class JSIndexReader
 			if (queryResult != null && queryResult.size() > 0)
 			{
 				String word = queryResult.get(0).getWord();
-				String[] sinceListItems = word.split(JSIndexConstants.DELIMITER);
+				String[] sinceListItems = DELIMITER_PATTERN.split(word);
 
 				for (int i = 1; i < sinceListItems.length; i++)
 				{
 					String sinceListItem = sinceListItems[i];
-					String[] parts = sinceListItem.split(JSIndexConstants.SUB_DELIMITER);
+					String[] parts = SUB_DELIMETER_PATTERN.split(sinceListItem);
 					SinceElement since = new SinceElement();
 
 					since.setName(parts[0]);
@@ -737,7 +740,7 @@ public class JSIndexReader
 				if (types != null && types.size() > 0)
 				{
 					QueryResult type = types.get(0);
-					String[] columns = type.getWord().split(JSIndexConstants.DELIMITER);
+					String[] columns = DELIMITER_PATTERN.split(type.getWord());
 					String retrievedName = columns[0];
 					int column = 0;
 
@@ -756,7 +759,7 @@ public class JSIndexReader
 						// super types
 						if (fields.contains(ContentSelector.PARENT_TYPES))
 						{
-							for (String parentType : columns[column].split(JSIndexConstants.SUB_DELIMITER))
+							for (String parentType : SUB_DELIMETER_PATTERN.split(columns[column]))
 							{
 								result.addParentType(parentType);
 							}
