@@ -63,9 +63,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.preview.server.SimpleWebServerConfiguration;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.IPropertyDialogProvider;
+import com.aptana.webserver.core.SimpleWebServerConfiguration;
 
 /**
  * @author Max Stepanov

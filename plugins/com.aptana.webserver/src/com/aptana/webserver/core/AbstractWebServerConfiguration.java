@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.server;
+package com.aptana.webserver.core;
 
 import java.net.URL;
 

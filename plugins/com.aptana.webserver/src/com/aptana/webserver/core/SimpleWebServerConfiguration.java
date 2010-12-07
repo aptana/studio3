@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.server;
+package com.aptana.webserver.core;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -48,7 +48,6 @@ import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov

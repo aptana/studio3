@@ -88,9 +88,9 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.server.AbstractWebServerConfiguration;
-import com.aptana.preview.server.ServerConfigurationManager;
-import com.aptana.preview.server.SimpleWebServerConfiguration;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.SimpleWebServerConfiguration;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {

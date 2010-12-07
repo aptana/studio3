@@ -2,7 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="previewHandlers" name="%extension-point.previewHandlers.name" schema="schema/previewHandlers.exsd"/>
-   <extension-point id="webServerTypes" name="%extension-point.webServerTypes.name" schema="schema/webServerTypes.exsd"/>
    <extension-point id="editors" name="%extension-point.previewableEditors.name" schema="schema/editors.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
@@ -83,14 +82,6 @@
       </handler>
    </extension>
    <extension
-         point="com.aptana.preview.webServerTypes">
-      <type
-            class="com.aptana.preview.server.SimpleWebServerConfiguration"
-            id="com.aptana.preview.server.simple"
-            name="%type.webserver.name">
-      </type>
-   </extension>
-   <extension
          point="com.aptana.ui.imageAssociations">
       <image
             icon="icons/obj16/server.png"
@@ -102,7 +93,7 @@
       <dialog
             class="com.aptana.preview.ui.internal.SimpleWebServerPropertyDialog$Provider"
             id="com.aptana.preview.dialogs.simpleServer"
-            objectClass="com.aptana.preview.server.SimpleWebServerConfiguration">
+            objectClass="com.aptana.webserver.core.SimpleWebServerConfiguration">
       </dialog>
    </extension>
 

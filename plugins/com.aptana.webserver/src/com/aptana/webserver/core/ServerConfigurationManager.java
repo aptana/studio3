@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.server;
+package com.aptana.webserver.core;
 
 import java.io.File;
 import java.io.FileReader;
@@ -52,7 +52,6 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
-import com.aptana.preview.Activator;
 
 /**
  * @author Max Stepanov
