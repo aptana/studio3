@@ -62,6 +62,7 @@ import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
+import com.aptana.parsing.lexer.IRange;
 
 public class HTMLParser implements IParser
 {
@@ -71,8 +72,9 @@ public class HTMLParser implements IParser
 	@SuppressWarnings("nls")
 	private static final String[] CSS_VALID_TYPE_ATTR = new String[] { "text/css" };
 	@SuppressWarnings("nls")
-	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript", "application/ecmascript", "application/x-javascript",
-		"application/x-ecmascript", "text/javascript", "text/ecmascript", "text/jscript" };
+	private static final String[] JS_VALID_TYPE_ATTR = new String[] { "application/javascript",
+			"application/ecmascript", "application/x-javascript", "application/x-ecmascript", "text/javascript",
+			"text/ecmascript", "text/jscript" };
 	@SuppressWarnings("nls")
 	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
 
@@ -107,18 +109,18 @@ public class HTMLParser implements IParser
 		int startingOffset = parseState.getStartingOffset();
 
 		IParseRootNode root = new ParseRootNode( //
-			IHTMLParserConstants.LANGUAGE, //
-			new HTMLNode[0], //
-			startingOffset, //
-			startingOffset + source.length() //
+				IHTMLParserConstants.LANGUAGE, //
+				new HTMLNode[0], //
+				startingOffset, //
+				startingOffset + source.length() //
 		);
 
 		try
 		{
 			fCurrentElement = root;
-			
+
 			this.parseAll();
-			
+
 			parseState.setParseResult(root);
 		}
 		finally
@@ -184,7 +186,8 @@ public class HTMLParser implements IParser
 
 	protected HTMLElementNode processCurrentTag()
 	{
-		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
+		HTMLElementNode element = new HTMLElementNode(fCurrentSymbol, fCurrentSymbol.getStart(),
+				fCurrentSymbol.getEnd());
 		parseAttribute(element, fCurrentSymbol);
 		return element;
 	}
@@ -194,7 +197,10 @@ public class HTMLParser implements IParser
 		advance();
 		while (fCurrentSymbol.getId() != HTMLTokens.EOF)
 		{
-			processSymbol(fCurrentSymbol);
+			if (!isSkipped(fCurrentSymbol.getStart(), fCurrentSymbol.getEnd()))
+			{
+				processSymbol(fCurrentSymbol);
+			}
 			advance();
 		}
 
@@ -226,6 +232,22 @@ public class HTMLParser implements IParser
 		fCurrentSymbol = fScanner.nextToken();
 	}
 
+	private boolean isSkipped(int start, int end)
+	{
+		IRange[] ranges = fParseState.getSkippedRanges();
+		if (ranges != null)
+		{
+			for (IRange range : ranges)
+			{
+				if (start >= range.getStartingOffset() && end <= range.getEndingOffset())
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private IParseNode[] getParseResult(String language, int start, int end)
 	{
 		try
@@ -243,7 +265,8 @@ public class HTMLParser implements IParser
 
 	private void processComment()
 	{
-		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(), fCurrentSymbol.getEnd());
+		HTMLCommentNode comment = new HTMLCommentNode(fCurrentSymbol.value.toString(), fCurrentSymbol.getStart(),
+				fCurrentSymbol.getEnd());
 		if (fCurrentElement != null)
 		{
 			fCurrentElement.addChild(comment);
@@ -261,7 +284,8 @@ public class HTMLParser implements IParser
 	{
 		String tagName = HTMLUtils.stripTagEndings(fCurrentSymbol.value.toString());
 		List<HTMLElementNode> elementsToClose = new ArrayList<HTMLElementNode>();
-		if (fCurrentElement instanceof HTMLElementNode && ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
+		if (fCurrentElement instanceof HTMLElementNode
+				&& ((HTMLElementNode) fCurrentElement).getName().equalsIgnoreCase(tagName))
 		{
 			elementsToClose.add((HTMLElementNode) fCurrentElement);
 		}
@@ -365,7 +389,8 @@ public class HTMLParser implements IParser
 
 			if (data == TokenType.ATTR_NAME)
 			{
-				name = tag.substring(fTagScanner.getTokenOffset(), fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
+				name = tag.substring(fTagScanner.getTokenOffset(),
+						fTagScanner.getTokenOffset() + fTagScanner.getTokenLength());
 			}
 			else if (data == TokenType.ATTR_VALUE)
 			{
@@ -411,10 +436,12 @@ public class HTMLParser implements IParser
 		int closeTagType = fParseState.getCloseTagType(tagName);
 		// tag with optional end could not be nested, so if we see another instance of the same start tag, close the
 		// previous one
-		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null && tagName.equals(fCurrentElement.getNameNode().getName()))
+		if (closeTagType == HTMLTagInfo.END_OPTIONAL && fCurrentElement != null
+				&& tagName.equals(fCurrentElement.getNameNode().getName()))
 		{
 			// adjusts the ending offset of current element to include the entire block up to the start of the new tag
-			((HTMLNode) fCurrentElement).setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
+			((HTMLNode) fCurrentElement)
+					.setLocation(fCurrentElement.getStartingOffset(), fCurrentSymbol.getStart() - 1);
 			closeElement();
 		}
 
