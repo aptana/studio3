@@ -48,7 +48,8 @@ public class UITests
 	{
 		TestSuite suite = new TestSuite(UITests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite()); // FIXME I think the way we do passwords causes us to have to run in UI!
+		suite.addTest(com.aptana.filesystem.s3.tests.AllTests.suite()); // FIXME I think the way we do passwords causes
+																		// us to have to run in UI!
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
@@ -63,14 +64,14 @@ public class UITests
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 		suite.addTest(com.aptana.git.ui.AllTests.suite());
 		// suite.addTest(com.aptana.scripting.ui.tests.AllTests.suite()); // TODO Add Tests for scripting.ui
-		// suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite()); // FIXME Uncomment
+		suite.addTest(com.aptana.syncing.ui.tests.AllTests.suite());
 		suite.addTest(com.aptana.theme.tests.AllTests.suite());
 		suite.addTest(org.eclipse.tm.terminal.test.AllTests.suite());
 		// $JUnit-END$
-		
+
 		// Now add special test cases which require to be run after all plugins are loaded (dependency inversion in
 		// test)
-		
+
 		// require HTML editor to have outline contents to test common editor commands
 		suite.addTestSuite(ExpandCollapseAllHandlerTest.class);
 		suite.addTestSuite(ExpandLevelHandlerTest.class);
