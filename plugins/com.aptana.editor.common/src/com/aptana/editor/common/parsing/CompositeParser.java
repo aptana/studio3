@@ -74,7 +74,6 @@ public class CompositeParser implements IParser
 		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
 		// then processes the source as normal
 		IParseRootNode result = primaryParse(parseState);
-
 		if (fEmbeddedlanguageRoot != null)
 		{
 			// merges the tree for the embedded language into the result
@@ -82,14 +81,18 @@ public class CompositeParser implements IParser
 			getAllNodes(result, list);
 
 			IParseNode[] embeddedNodes = fEmbeddedlanguageRoot.getChildren();
-			IParseNode parent;
-			for (IParseNode node : embeddedNodes)
+			if (embeddedNodes.length == 0)
 			{
-				parent = findNode(node, list);
+				embeddedNodes = new IParseNode[] { fEmbeddedlanguageRoot };
+			}
+			IParseNode parent;
+			for (IParseNode embeddedNode : embeddedNodes)
+			{
+				parent = findNode(embeddedNode, list);
 				if (parent == null)
 				{
 					// the node is at the end of the source
-					result.addChild(node);
+					result.addChild(embeddedNode);
 				}
 				else
 				{
@@ -97,24 +100,31 @@ public class CompositeParser implements IParser
 					List<IParseNode> newList = new ArrayList<IParseNode>();
 					IParseNode[] children = parent.getChildren();
 					boolean found = false;
-					int start = node.getStartingOffset();
-					int end = node.getEndingOffset();
-					for (IParseNode child : children)
+					int embeddedStart = embeddedNode.getStartingOffset();
+					int embeddedEnd = embeddedNode.getEndingOffset();
+					for (IParseNode primaryNodeChild : children)
 					{
-						if (!found && child.getStartingOffset() > start)
+						if (!found && primaryNodeChild.getStartingOffset() > embeddedStart)
 						{
 							found = true;
-							newList.add(node);
+							newList.add(embeddedNode);
 						}
-						if (child.getStartingOffset() <= start || child.getEndingOffset() > end)
+						if (primaryNodeChild.getStartingOffset() > embeddedEnd)
 						{
-							newList.add(child);
+							newList.add(primaryNodeChild);
 						}
+						else if (primaryNodeChild.getStartingOffset() < embeddedStart
+								&& (primaryNodeChild.getEndingOffset() < embeddedStart || primaryNodeChild
+										.getEndingOffset() > embeddedEnd))
+						{
+							newList.add(primaryNodeChild);
+						}
+
 					}
 					if (!found)
 					{
 						// the node locates at the end of the parent node
-						newList.add(node);
+						newList.add(embeddedNode);
 					}
 					((ParseNode) parent).setChildren(newList.toArray(new IParseNode[newList.size()]));
 				}

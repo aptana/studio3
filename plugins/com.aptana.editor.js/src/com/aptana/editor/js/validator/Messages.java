@@ -32,28 +32,24 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.red.core.tests.all;
+package com.aptana.editor.js.validator;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.eclipse.osgi.util.NLS;
 
-public class CoreTests
+public class Messages extends NLS
 {
 
-	public static Test suite()
+	private static final String BUNDLE_NAME = "com.aptana.editor.js.validator.messages"; //$NON-NLS-1$
+
+	public static String JSLintValidator_ERR_FailToGetJSLint;
+
+	static
 	{
-		TestSuite suite = new TestSuite(CoreTests.class.getName());
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
-		suite.addTest(com.aptana.plist.tests.AllTests.suite());
-		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite());
-		// $JUnit-END$
-		return suite;
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages()
+	{
 	}
 }

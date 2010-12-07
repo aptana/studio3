@@ -756,8 +756,8 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		Policy.checkCanceled(monitor);
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Downloading_Files, fileList.length); 
+		Policy.checkCanceled(subMonitor);
 
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
@@ -947,8 +947,8 @@ public class Synchronizer implements ILoggable
 		// reset stats
 		this.reset();
 
-		Policy.checkCanceled(monitor);
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Synchronizing, fileList.length);
+		Policy.checkCanceled(subMonitor);
 
 		// process all items in our list
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
@@ -1277,8 +1277,8 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		Policy.checkCanceled(monitor);
 		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Uploading_Files, fileList.length); 
+		Policy.checkCanceled(subMonitor);
 		
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{

@@ -1024,7 +1024,11 @@ public class CompletionProposalPopup implements IContentAssistListener
 					}
 				}
 			}
-
+			// no default or suggested and only one proposal, just make it default
+			if (defaultIndex == -1 && suggestedIndex == -1 && proposals.length == 1)
+			{
+				defaultIndex = 0;
+			}
 			forceResize(longestString, longestLoc, newLen);
 			modifySelection(defaultIndex, suggestedIndex);
 		}

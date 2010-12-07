@@ -32,28 +32,55 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.red.core.tests.all;
+package com.aptana.editor.js.validator;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-public class CoreTests
+class ErrorItem
 {
 
-	public static Test suite()
+	private final int severity;
+	private final String message;
+	private final String sourceURI;
+	private final int line;
+	private final String lineText;
+	private final int lineOffset;
+
+	public ErrorItem(int severity, String message, String sourceURI, int line, String lineText, int lineOffset)
 	{
-		TestSuite suite = new TestSuite(CoreTests.class.getName());
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
-		suite.addTest(com.aptana.plist.tests.AllTests.suite());
-		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite());
-		// $JUnit-END$
-		return suite;
+		this.severity = severity;
+		this.message = message;
+		this.sourceURI = sourceURI;
+		this.line = line;
+		this.lineText = lineText;
+		this.lineOffset = lineOffset;
+	}
+
+	public int getSeverity()
+	{
+		return severity;
+	}
+
+	public String getMessage()
+	{
+		return message;
+	}
+
+	public String getSourceURI()
+	{
+		return sourceURI;
+	}
+
+	public int getLine()
+	{
+		return line;
+	}
+
+	public String getLineText()
+	{
+		return lineText;
+	}
+
+	public int getLineOffset()
+	{
+		return lineOffset;
 	}
 }

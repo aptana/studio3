@@ -32,28 +32,57 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.red.core.tests.all;
+package com.aptana.libraries;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.eclipse.core.runtime.Plugin;
+import org.osgi.framework.BundleContext;
 
-public class CoreTests
+/**
+ * The activator class controls the plug-in life cycle
+ */
+public class LibrariesPlugin extends Plugin
 {
 
-	public static Test suite()
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.libraries"; //$NON-NLS-1$
+
+	// The shared instance
+	private static LibrariesPlugin plugin;
+
+	/**
+	 * The constructor
+	 */
+	public LibrariesPlugin()
 	{
-		TestSuite suite = new TestSuite(CoreTests.class.getName());
-		// $JUnit-BEGIN$
-		suite.addTest(com.aptana.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.core.io.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.ftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.filesystem.secureftp.tests.AllTests.suite());
-		suite.addTest(com.aptana.git.core.tests.AllTests.suite());
-		suite.addTest(com.aptana.parsing.tests.AllTests.suite());
-		suite.addTest(com.aptana.plist.tests.AllTests.suite());
-		suite.addTest(com.aptana.scripting.tests.AllTests.suite());
-		suite.addTest(com.aptana.syncing.core.tests.AllTests.suite());
-		// $JUnit-END$
-		return suite;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception
+	{
+		super.start(context);
+		plugin = this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception
+	{
+		plugin = null;
+		super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static LibrariesPlugin getDefault()
+	{
+		return plugin;
 	}
 }

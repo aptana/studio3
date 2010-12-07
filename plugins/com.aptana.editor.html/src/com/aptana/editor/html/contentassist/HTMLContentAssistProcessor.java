@@ -653,17 +653,48 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	private void addEntityProposals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
 			int offset)
 	{
-		List<EntityElement> entities = this._queryHelper.getEntities();
-
-		if (entities != null)
+		boolean doIt = false;
+		this.setEntityRange(lexemeProvider, offset);
+		if (this._replaceRange == null)
 		{
-			this.setEntityRange(lexemeProvider, offset);
-			Image[] userAgentIcons = this.getAllUserAgentIcons();
-
-			for (EntityElement entity : entities)
+			doIt = true;
+		}
+		else
+		{
+			String text = null;
+			try
 			{
-				this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(), userAgentIcons,
-						offset);
+				text = this._document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+			}
+			catch (BadLocationException e)
+			{
+				// ignore
+			}
+			if (text != null && text.length() == 0)
+			{
+				text = this._currentLexeme.getText();
+				this._replaceRange = this._currentLexeme;
+			}
+			if (text != null && text.startsWith("&")) //$NON-NLS-1$
+			{
+				doIt = true;
+			}
+		}
+
+		if (doIt)
+		{
+			List<EntityElement> entities = this._queryHelper.getEntities();
+
+			if (entities != null)
+			{
+				this.setEntityRange(lexemeProvider, offset);
+				Image[] userAgentIcons = this.getAllUserAgentIcons();
+
+				for (EntityElement entity : entities)
+				{
+					this.addProposal(proposals, entity.getName(), ELEMENT_ICON, entity.getDescription(),
+							userAgentIcons, offset);
+				}
 			}
 		}
 	}

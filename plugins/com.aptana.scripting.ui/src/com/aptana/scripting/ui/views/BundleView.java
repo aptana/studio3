@@ -50,9 +50,14 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ContentViewer;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -128,6 +133,44 @@ public class BundleView extends ViewPart
 		this._treeViewer.setContentProvider(this._contentProvider);
 		this._treeViewer.setLabelProvider(_labelProvider);
 		this._treeViewer.setInput(BundleManager.getInstance());
+		this._treeViewer.setSorter(new ViewerSorter()
+		{
+			/*
+			 * (non-Javadoc)
+			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+			 * java.lang.Object, java.lang.Object)
+			 */
+			@Override
+			public int compare(Viewer viewer, Object e1, Object e2)
+			{
+				String name1 = null;
+				String name2 = null;
+
+				if (viewer != null && viewer instanceof ContentViewer)
+				{
+					IBaseLabelProvider provider = ((ContentViewer) viewer).getLabelProvider();
+
+					if (provider instanceof ILabelProvider)
+					{
+						ILabelProvider labelProvider = (ILabelProvider) provider;
+
+						name1 = labelProvider.getText(e1);
+						name2 = labelProvider.getText(e2);
+					}
+				}
+
+				if (name1 == null)
+				{
+					name1 = e1.toString();
+				}
+				if (name2 == null)
+				{
+					name2 = e2.toString();
+				}
+
+				return name1.compareTo(name2);
+			}
+		});
 
 		// add selection provider
 		this.getSite().setSelectionProvider(this._treeViewer);
@@ -160,8 +203,7 @@ public class BundleView extends ViewPart
 		// remove theme change listener
 		if (this._themeChangeListener != null)
 		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
-					this._themeChangeListener);
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(this._themeChangeListener);
 		}
 
 		super.dispose();
@@ -180,12 +222,12 @@ public class BundleView extends ViewPart
 		{
 			TreeSelection treeSelection = (TreeSelection) selection;
 			Object item = treeSelection.getFirstElement();
-			
+
 			if (item instanceof BaseNode)
 			{
 				BaseNode node = (BaseNode) item;
 				Action[] actions = node.getActions();
-				
+
 				if (actions != null)
 				{
 					for (Action action : actions)
@@ -310,8 +352,7 @@ public class BundleView extends ViewPart
 			}
 		};
 
-		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID)
-				.addPreferenceChangeListener(this._themeChangeListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(this._themeChangeListener);
 	}
 
 	/**
