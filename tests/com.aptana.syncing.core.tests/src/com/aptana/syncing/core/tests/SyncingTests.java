@@ -530,7 +530,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertSyncPairLength(2, items);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ServerItemOnly, items[0].getSyncState());
 	}
 	
