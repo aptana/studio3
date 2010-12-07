@@ -42,7 +42,7 @@
       <sourceLocator
             class="com.aptana.debug.internal.core.sourcelookup.JSSourceLookupDirector"
             id="com.aptana.debug.core.sourceLookupDirector"
-            name="%sourceLocator.name.js"/>
+            name="%sourceLocator.name"/>
    </extension>
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
@@ -56,7 +56,7 @@
             delegate="com.aptana.debug.core.JSLaunchConfigurationDelegate"
             id="com.aptana.debug.core.jsLaunchConfigurationType"
             modes="run,debug"
-            name="%launchConfigurationType.name.js"
+            name="%launchConfigurationType.webbrowser.name"
             public="true"
             sourceLocatorId="com.aptana.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
@@ -65,7 +65,7 @@
             delegate="com.aptana.debug.core.JSRemoteLaunchConfigurationDelegate"
             id="com.aptana.debug.core.jsRemoteLaunchConfigurationType"
             modes="run,debug"
-            name="%launchConfigurationType.name.remotejs"
+            name="%launchConfigurationType.remote.name"
             public="true"
             sourceLocatorId="com.aptana.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">

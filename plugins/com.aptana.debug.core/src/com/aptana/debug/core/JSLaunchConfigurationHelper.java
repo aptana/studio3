@@ -39,7 +39,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.Enumeration;
 
 import org.eclipse.core.resources.IProject;
@@ -65,9 +64,6 @@ import com.aptana.debug.internal.core.LocalResourceMapper;
 import com.aptana.debug.internal.core.browsers.Firefox;
 import com.aptana.debug.internal.core.browsers.InternetExplorer;
 import com.aptana.debug.internal.core.model.HttpServerProcess;
-import com.aptana.ide.server.ServerCore;
-import com.aptana.ide.server.core.IHttpServerProviderAdapter;
-import com.aptana.ide.server.core.IServer;
 
 /**
  * @author Max Stepanov
@@ -101,6 +97,7 @@ public final class JSLaunchConfigurationHelper {
 	 * 
 	 * @param configuration
 	 */
+	@SuppressWarnings("rawtypes")
 	public static void setBrowserDefaults(ILaunchConfigurationWorkingCopy configuration, String nature) {
 		String browser = StringUtil.EMPTY;
 		if (nature == null) {
@@ -328,11 +325,11 @@ public final class JSLaunchConfigurationHelper {
 		try {
 			if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL
 					|| serverType == ILaunchConfigurationConstants.SERVER_MANAGED) {
-				String externalBaseUrl;
+				String externalBaseUrl = null;
 				if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 					externalBaseUrl = configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
-				} else {
+				} else {/*
 					String serverId = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID,
 							(String) null);
 					String host = null;
@@ -348,8 +345,9 @@ public final class JSLaunchConfigurationHelper {
 								Messages.JSLaunchConfigurationHelper_Host_Not_Specified, null));
 					}
 					externalBaseUrl = MessageFormat.format("http://{0}/", host); //$NON-NLS-1$
+					*/
 				}
-				if (externalBaseUrl.length() == 0) {
+				if (StringUtil.isEmpty(externalBaseUrl)) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.JSLaunchConfigurationHelper_Empty_Server_URL, null));
 				}
@@ -360,7 +358,7 @@ public final class JSLaunchConfigurationHelper {
 
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL) {
 				if (startActionType != ILaunchConfigurationConstants.START_ACTION_START_URL && resource != null) {
-					IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(
+					/*IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(
 							new JSLaunchConfigurationDelegate(), IHttpServerProviderAdapter.class);
 					if (httpServerProvider != null) {
 						IServer server = httpServerProvider.getServer(resource);
@@ -373,6 +371,7 @@ public final class JSLaunchConfigurationHelper {
 							}
 						}
 					}
+					*/
 				}
 			}
 			if (baseURL != null) {

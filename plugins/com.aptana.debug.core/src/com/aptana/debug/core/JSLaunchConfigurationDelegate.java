@@ -36,7 +36,6 @@ package com.aptana.debug.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -63,8 +62,8 @@ import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
+import com.aptana.core.util.SocketUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.SocketUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.internal.core.BrowserUtil;
 import com.aptana.debug.internal.core.LocalResourceMapper;
@@ -74,9 +73,6 @@ import com.aptana.debug.internal.core.model.DebugConnection;
 import com.aptana.debug.internal.core.model.HttpServerProcess;
 import com.aptana.debug.internal.core.model.JSDebugProcess;
 import com.aptana.debug.internal.core.model.JSDebugTarget;
-import com.aptana.ide.server.ServerCore;
-import com.aptana.ide.server.core.IHttpServerProviderAdapter;
-import com.aptana.ide.server.core.IServer;
 
 /**
  * @author Max Stepanov
@@ -96,11 +92,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 	 *      java.lang.String, org.eclipse.debug.core.ILaunch,
 	 *      org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	// CHECKSTYLE:OFF
-	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
-			throws CoreException
-	// CHECKSTYLE:ON
-	{
+	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
 		IStatusHandler prompter = DebugPlugin.getDefault().getStatusHandler(promptStatus);
 
@@ -172,7 +164,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		LocalResourceMapper resourceMapper = null;
 		HttpServerProcess httpServer = null;
 		boolean launchHttpServer = false;
-		boolean launchServerDebugger = false;
+		//boolean launchServerDebugger = false;
 		URL baseURL = null;
 		try {
 			if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL) {
@@ -181,13 +173,12 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				} /* else => do not launch server for direct URLs */
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL
 					|| serverType == ILaunchConfigurationConstants.SERVER_MANAGED) {
-				String externalBaseUrl;
+				String externalBaseUrl = null;
 				if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 					externalBaseUrl = configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
-				} else {
-					String serverId = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID,
-							(String) null);
+				} else {/*
+					String serverId = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID, (String) null);
 					String host = null;
 					IServer server = ServerCore.getServerManager().findServer(serverId);
 					if (server != null) {
@@ -206,8 +197,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 								Messages.JSLaunchConfigurationDelegate_Host_Not_Specified, null));
 					}
 					externalBaseUrl = MessageFormat.format("http://{0}/", host); //$NON-NLS-1$
+					*/
 				}
-				if (externalBaseUrl.length() == 0) {
+				if (StringUtil.isEmpty(externalBaseUrl)) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.JSLaunchConfigurationDelegate_Empty_URL, null));
 				}
@@ -250,6 +242,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					if (resource != null) {
 						if (baseURL == null && launchHttpServer) {
 							monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingHTTPServer);
+							/*
 							IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(IHttpServerProviderAdapter.class);
 							IServer server = null;
 							if (httpServerProvider != null) {
@@ -268,11 +261,12 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 									}
 								}
 							}
+							*/
 
 							File root = resource.getProject().getLocation().toFile();
-							if (server != null) {
+							/*if (server != null) {
 								baseURL = new URL(MessageFormat.format("http://{0}/", server.getHost())); //$NON-NLS-1$
-							} else {
+							} else */{
 								httpServer = new HttpServerProcess(launch);
 								httpServer.setServerRoot(root);
 								baseURL = httpServer.getBaseURL();
@@ -390,31 +384,11 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				}
 
 				String debuggerLaunchUrl = BrowserUtil.DEBUGGER_LAUNCH_URL + Integer.toString(port);
-
-				/* TODO: temporary Jaxer solution - change before 1.1 release */
-				if ((launchServerDebugger || "true".equals(Platform.getDebugOption("com.aptana.debug.core/external_server_is_jaxer"))) //$NON-NLS-1$ //$NON-NLS-2$
-						&& "true".equals(Platform.getDebugOption("com.aptana.debug.core/jaxer_debugger"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					debuggerLaunchUrl = launchURL.toExternalForm();
-					if (launchURL.getQuery() == null) {
-						debuggerLaunchUrl += '?';
-					}
-					debuggerLaunchUrl += "__JAXER_DEBUGGER=" + Integer.toString(port); //$NON-NLS-1$
-				}
-
 				try {
 					if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 						args.add("/usr/bin/open"); //$NON-NLS-1$
-						if (System.getProperty("os.version", StringUtil.EMPTY).startsWith("10.3.")) { //$NON-NLS-1$ //$NON-NLS-2$
-							/*
-							 * Workaround for MaxOSX systems prior 10.4 where
-							 * open command doesn't have -b option
-							 */
-							args.add("-a"); //$NON-NLS-1$
-							args.add(browserExecutable);
-						} else {
-							args.add("-b"); //$NON-NLS-1$
-							args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
-						}
+						args.add("-b"); //$NON-NLS-1$
+						args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
 						args.add(debuggerLaunchUrl);
 
 					} else if (InternetExplorer.isBrowserExecutable(browserExecutable)) {
@@ -495,13 +469,8 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					String launchPage = launchURL.toExternalForm();
 					if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 						args.add("/usr/bin/open"); //$NON-NLS-1$
-						if (System.getProperty("os.version", StringUtil.EMPTY).startsWith("10.3.")) { //$NON-NLS-1$ //$NON-NLS-2$
-							args.add("-a"); //$NON-NLS-1$
-							args.add(browserExecutable);
-						} else {
-							args.add("-b"); //$NON-NLS-1$
-							args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
-						}
+						args.add("-b"); //$NON-NLS-1$
+						args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
 						args.add(launchPage);
 					} else {
 						args.add(browserExecutable);

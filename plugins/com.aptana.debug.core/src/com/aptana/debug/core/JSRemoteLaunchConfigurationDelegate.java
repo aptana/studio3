@@ -62,8 +62,6 @@ import com.aptana.debug.internal.core.model.DebugConnection;
 import com.aptana.debug.internal.core.model.HttpServerProcess;
 import com.aptana.debug.internal.core.model.JSDebugProcess;
 import com.aptana.debug.internal.core.model.JSDebugTarget;
-import com.aptana.ide.server.core.IHttpServerProviderAdapter;
-import com.aptana.ide.server.core.IServer;
 
 /**
  * @author Max Stepanov
@@ -139,16 +137,18 @@ public class JSRemoteLaunchConfigurationDelegate extends JSLaunchConfigurationDe
 					if (resource != null) {
 						if (baseURL == null && launchHttpServer) {
 							monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingHTTPServer);
+							/*
 							IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(IHttpServerProviderAdapter.class);
 							IServer server = null;
 							if (httpServerProvider != null) {
 								server = httpServerProvider.getServer(resource);
 							}
+							*/
 
 							File root = resource.getProject().getLocation().toFile();
-							if (server != null) {
+							/*if (server != null) {
 								baseURL = new URL(server.getHost());
-							} else {
+							} else */{
 								httpServer = new HttpServerProcess(launch);
 								httpServer.setServerRoot(root);
 								baseURL = httpServer.getBaseURL();
