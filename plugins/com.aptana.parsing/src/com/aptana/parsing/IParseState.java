@@ -35,6 +35,7 @@
 package com.aptana.parsing;
 
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
 
 public interface IParseState
 {
@@ -77,6 +78,13 @@ public interface IParseState
 	 * @return
 	 */
 	public int getStartingOffset();
+
+	/**
+	 * Returns the list of ranges in the source to skip.
+	 * 
+	 * @return the list of ranges in an array
+	 */
+	public IRange[] getSkippedRanges();
 
 	/**
 	 * setEditState
