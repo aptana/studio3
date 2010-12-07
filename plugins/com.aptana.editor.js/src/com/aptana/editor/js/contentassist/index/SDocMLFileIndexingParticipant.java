@@ -98,7 +98,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 		}
 		try
 		{
-			sub.subTask(file.getName());
+			sub.subTask(index.getRelativeDocumentPath(file.toURI()).toString());
 
 			try
 			{
