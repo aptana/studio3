@@ -39,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -456,7 +457,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ClientItemOnly, items[0].getSyncState());
 	}
 
@@ -473,7 +474,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ClientItemOnly, items[0].getSyncState());
 	}
 
@@ -492,7 +493,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
 	}
 
@@ -512,7 +513,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
 		// we now delete remote directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
 	}
 
@@ -529,10 +530,10 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(2, items);
 		assertEquals(SyncState.ServerItemOnly, items[0].getSyncState());
 	}
-
+	
 	/**
 	 * testServerDirectoryOnly
 	 * 
@@ -546,7 +547,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ServerItemOnly, items[0].getSyncState());
 	}
 
@@ -565,7 +566,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ServerItemIsNewer, items[0].getSyncState());
 	}
 
@@ -585,7 +586,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
 		// we now delete directories from sync
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ServerItemIsNewer, items[0].getSyncState());
 	}
 
@@ -604,7 +605,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -624,7 +625,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -643,7 +644,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 1000);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -662,7 +663,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 1000);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -681,7 +682,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 999);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ServerItemIsNewer, items[0].getSyncState());
 	}
 
@@ -700,7 +701,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 999);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
 	}
 
@@ -720,7 +721,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 1000);
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -740,7 +741,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 1000);
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -760,7 +761,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 999);
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ServerItemIsNewer, items[0].getSyncState());
 	}
 
@@ -780,7 +781,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems(false, 999);
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ClientItemIsNewer, items[0].getSyncState());
 	}
 
@@ -800,7 +801,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(true, 0);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.CRCMismatch, items[0].getSyncState());
 	}
 
@@ -820,7 +821,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems(true, 0);
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -840,7 +841,7 @@ public abstract class SyncingTests extends TestCase
 		VirtualFileSyncPair[] items = this.getSyncItems(true, 0);
 
 		// we now delete directories
-		assertEquals(0, items.length);
+		assertSyncPairLength(0, items);
 		// assertEquals(SyncState.ItemsMatch, items[0].getSyncState());
 	}
 
@@ -859,7 +860,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.IncompatibleFileTypes, items[0].getSyncState());
 	}
 
@@ -878,7 +879,7 @@ public abstract class SyncingTests extends TestCase
 
 		VirtualFileSyncPair[] items = this.getSyncItems();
 
-		assertEquals(1, items.length);
+		assertSyncPairLength(1, items);
 		assertEquals(SyncState.IncompatibleFileTypes, items[0].getSyncState());
 	}
 
@@ -2029,4 +2030,16 @@ public abstract class SyncingTests extends TestCase
 		assertEquals(0, syncManager.getServerFileDeletedCount());
 		assertEquals(1, syncManager.getServerFileTransferedCount());
 	}
+	
+	protected void assertSyncPairLength(int length, VirtualFileSyncPair[] items) {
+		if(items.length != length) {
+			String itemText = "";
+			for (int i = 0; i < items.length; i++)
+			{
+				itemText += items[i].toString() + "\n";
+			}
+			fail(MessageFormat.format("Expected length of {0}, was {1}.\nList is: {2}", length, items.length, itemText));
+		}
+	}
+
 }
