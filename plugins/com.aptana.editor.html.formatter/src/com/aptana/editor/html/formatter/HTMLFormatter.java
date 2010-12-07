@@ -44,8 +44,6 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -141,15 +139,15 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		String input = source.substring(offset, offset + length);
 		IParser parser = checkoutParser();
 		String mainContentType = getMainContentType();
-		if (!(parser instanceof HTMLParser))
-		{
-			// Check it back in and request a specific HTML parser.
-			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
-			// HTNLParser (like PHPParser).
-			checkinParser(parser, mainContentType);
-			mainContentType = IHTMLParserConstants.LANGUAGE;
-			parser = checkoutParser(mainContentType);
-		}
+//		if (!(parser instanceof HTMLParser))
+//		{
+//			// Check it back in and request a specific HTML parser.
+//			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
+//			// HTNLParser (like PHPParser).
+//			checkinParser(parser, mainContentType);
+//			mainContentType = IHTMLParserConstants.LANGUAGE;
+//			parser = checkoutParser(mainContentType);
+//		}
 		try
 		{
 			IParseState parseState = new HTMLParseState();
