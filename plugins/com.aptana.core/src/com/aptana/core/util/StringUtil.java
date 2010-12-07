@@ -407,7 +407,7 @@ public abstract class StringUtil
 	{
 		return text == null || text.trim().length() == 0;
 	}
-	
+
 	public static String getValue(String text)
 	{
 		return (text != null) ? text : EMPTY;
