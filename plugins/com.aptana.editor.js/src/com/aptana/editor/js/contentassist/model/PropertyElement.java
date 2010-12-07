@@ -37,6 +37,9 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
@@ -120,6 +123,44 @@ public class PropertyElement extends BaseElement
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+		
+		this.setOwningType(object.get("owningType").toString());
+		this.setIsClassProperty(Boolean.TRUE == object.get("isClassProperty"));
+		this.setIsInstanceProperty(Boolean.TRUE == object.get("isInstanceProperty"));
+		this.setIsInternal(Boolean.TRUE == object.get("isInternal"));
+		
+		Object types = object.get("types");
+		if (types != null && types.getClass().isArray())
+		{
+			for (Object type : (Object[]) types)
+			{
+				ReturnTypeElement rt = new ReturnTypeElement();
+				
+				rt.fromJSON((Map) type);
+				
+				this.addType(rt);
+			}
+		}
+		
+		Object examples = object.get("examples");
+		if (examples != null && examples.getClass().isArray())
+		{
+			for (Object example : (Object[]) examples)
+			{
+				this.addExample(example.toString());
+			}
+		}
+	}
+
 	/**
 	 * getExamples
 	 * 
@@ -144,7 +185,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public String getOwningType()
 	{
-		return this._owningType;
+		return StringUtil.getValue(this._owningType);
 	}
 
 	/**
@@ -258,6 +299,23 @@ public class PropertyElement extends BaseElement
 	public void setOwningType(String type)
 	{
 		this._owningType = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add("owningType", this.getOwningType());
+		out.add("isClassProperty", this.isClassProperty());
+		out.add("isInstanceProperty", this.isInstanceProperty());
+		out.add("isInternal", this.isInternal());
+		out.add("types", this.getTypes());
+		out.add("examples", this.getExamples());
 	}
 
 	/**

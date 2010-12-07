@@ -37,8 +37,14 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-public class ParameterElement
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class ParameterElement implements Convertible
 {
 	private String _name;
 	private List<String> _types;
@@ -65,8 +71,29 @@ public class ParameterElement
 			{
 				this._types = new ArrayList<String>();
 			}
-			
+
 			this._types.add(type);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(object.get("name").toString());
+		this.setUsage(object.get("usage").toString());
+		this.setDescription(object.get("description").toString());
+		
+		Object types = object.get("types");
+		if (types != null && types.getClass().isArray())
+		{
+			for (Object type : (Object[]) types)
+			{
+				this.addType(type.toString());
+			}
 		}
 	}
 
@@ -75,7 +102,7 @@ public class ParameterElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getValue(this._description);
 	}
 
 	/**
@@ -83,7 +110,7 @@ public class ParameterElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -94,12 +121,12 @@ public class ParameterElement
 	public List<String> getTypes()
 	{
 		List<String> result = this._types;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
 
@@ -110,7 +137,7 @@ public class ParameterElement
 	 */
 	public String getUsage()
 	{
-		return this._usage;
+		return StringUtil.getValue(this._usage);
 	}
 
 	/**
@@ -138,7 +165,19 @@ public class ParameterElement
 	{
 		this._usage = usage;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add("name", this.getName());
+		out.add("usage", this.getUsage());
+		out.add("description", this.getDescription());
+		out.add("types", this.getTypes());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()

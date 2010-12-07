@@ -34,7 +34,14 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
-public class ExceptionElement
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class ExceptionElement implements Convertible
 {
 	private String _type;
 	private String _description;
@@ -46,12 +53,23 @@ public class ExceptionElement
 	{
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setType(object.get("type").toString());
+		this.setDescription(object.get("description").toString());
+	}
+
 	/**
 	 * getDescription
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getValue(this._description);
 	}
 
 	/**
@@ -59,7 +77,7 @@ public class ExceptionElement
 	 */
 	public String getType()
 	{
-		return this._type;
+		return StringUtil.getValue(this._type);
 	}
 
 	/**
@@ -78,5 +96,15 @@ public class ExceptionElement
 	public void setType(String type)
 	{
 		this._type = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add("type", this.getType());
+		out.add("description", this.getDescription());
 	}
 }

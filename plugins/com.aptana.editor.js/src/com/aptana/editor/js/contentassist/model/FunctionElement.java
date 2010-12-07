@@ -37,6 +37,9 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
@@ -157,6 +160,68 @@ public class FunctionElement extends PropertyElement
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.PropertyElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+		
+		this.setIsConstructor(Boolean.TRUE == object.get("isConstructor"));
+		this.setIsMethod(Boolean.TRUE == object.get("isMethod"));
+		
+		Object parameters = object.get("parameters");
+		if (parameters != null && parameters.getClass().isArray())
+		{
+			for (Object parameter : (Object[]) parameters)
+			{
+				ParameterElement p = new ParameterElement();
+				
+				p.fromJSON((Map) parameter);
+				
+				this.addParameter(p);
+			}
+		}
+		
+		Object returnTypes = object.get("returnTypes");
+		if (returnTypes != null && returnTypes.getClass().isArray())
+		{
+			for (Object returnType : (Object[]) returnTypes)
+			{
+				ReturnTypeElement rt = new ReturnTypeElement();
+				
+				rt.fromJSON((Map) returnType);
+				
+				this.addReturnType(rt);
+			}
+		}
+		
+		Object exceptions = object.get("exceptions");
+		if (exceptions != null && exceptions.getClass().isArray())
+		{
+			for (Object exception : (Object[]) exceptions)
+			{
+				ExceptionElement e = new ExceptionElement();
+				
+				e.fromJSON((Map) exception);
+				
+				this.addException(e);
+			}
+		}
+		
+		Object references = object.get("references");
+		if (references != null && references.getClass().isArray())
+		{
+			for (Object reference : (Object[]) references)
+			{
+				this.addReference(reference.toString());
+			}
+		}
+	}
+
 	/**
 	 * getExceptions
 	 * 
@@ -243,23 +308,6 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
-	 * getReturnTypes
-	 * 
-	 * @return
-	 */
-	public List<ReturnTypeElement> getReturnTypes()
-	{
-		List<ReturnTypeElement> result = this._returnTypes;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
-	}
-
-	/**
 	 * getReturnTypeNames
 	 * 
 	 * @return
@@ -278,6 +326,23 @@ public class FunctionElement extends PropertyElement
 			}
 		}
 		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getReturnTypes
+	 * 
+	 * @return
+	 */
+	public List<ReturnTypeElement> getReturnTypes()
+	{
+		List<ReturnTypeElement> result = this._returnTypes;
+
+		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
@@ -376,6 +441,23 @@ public class FunctionElement extends PropertyElement
 	public void setIsMethod(boolean value)
 	{
 		this._isMethod = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.PropertyElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+		
+		out.add("isConstructor", this.isConstructor());
+		out.add("isMethod", this.isMethod());
+		out.add("parameters", this.getParameters());
+		out.add("returnTypes", this.getReturnTypes());
+		out.add("exceptions", this.getExceptions());
+		out.add("references", this.getReferences());
 	}
 
 	/**

@@ -34,7 +34,14 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
-public class SinceElement
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class SinceElement implements Convertible
 {
 	private String _name;
 	private String _version;
@@ -46,6 +53,17 @@ public class SinceElement
 	{
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(object.get("name").toString());
+		this.setVersion(object.get("version").toString());
+	}
+
 	/**
 	 * getName
 	 * 
@@ -53,7 +71,7 @@ public class SinceElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -63,7 +81,7 @@ public class SinceElement
 	 */
 	public String getVersion()
 	{
-		return this._version;
+		return StringUtil.getValue(this._version);
 	}
 
 	/**
@@ -84,5 +102,15 @@ public class SinceElement
 	public void setVersion(String version)
 	{
 		this._version = version;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add("name", this.getName());
+		out.add("version", this.getVersion());
 	}
 }

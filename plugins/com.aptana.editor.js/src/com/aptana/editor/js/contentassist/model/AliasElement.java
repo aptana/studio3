@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import com.aptana.core.util.StringUtil;
+
 public class AliasElement
 {
 	private String _name;
@@ -53,7 +55,7 @@ public class AliasElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -63,7 +65,7 @@ public class AliasElement
 	 */
 	public String getType()
 	{
-		return this._type;
+		return StringUtil.getValue(this._type);
 	}
 
 	/**

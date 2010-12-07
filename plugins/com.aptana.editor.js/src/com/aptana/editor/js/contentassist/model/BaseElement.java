@@ -37,22 +37,28 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-public class BaseElement
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class BaseElement implements Convertible
 {
 	private String _name;
 	private String _description;
 	private List<UserAgentElement> _userAgents;
 	private List<SinceElement> _sinceList;
 	private List<String> _documents;
-	
+
 	/**
 	 * BaseElement
 	 */
 	public BaseElement()
 	{
 	}
-	
+
 	/**
 	 * addDocument
 	 * 
@@ -66,11 +72,11 @@ public class BaseElement
 			{
 				this._documents = new ArrayList<String>();
 			}
-			
+
 			this._documents.add(document);
 		}
 	}
-	
+
 	/**
 	 * addSince
 	 * 
@@ -84,11 +90,11 @@ public class BaseElement
 			{
 				this._sinceList = new ArrayList<SinceElement>();
 			}
-			
+
 			this._sinceList.add(since);
 		}
 	}
-	
+
 	/**
 	 * addUserAgent
 	 * 
@@ -102,11 +108,50 @@ public class BaseElement
 			{
 				this._userAgents = new ArrayList<UserAgentElement>();
 			}
-			
+
 			this._userAgents.add(userAgent);
 		}
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(object.get("name").toString());
+		this.setDescription(object.get("description").toString());
+		
+		Object sinceList = object.get("since");
+		
+		if (sinceList != null && sinceList.getClass().isArray())
+		{
+			for (Object since : (Object[]) sinceList)
+			{
+				SinceElement s = new SinceElement();
+				
+				s.fromJSON((Map) since);
+				
+				this.addSince(s);
+			}
+		}
+		
+		Object userAgents = object.get("userAgents");
+		
+		if (userAgents != null && userAgents.getClass().isArray())
+		{
+			for (Object userAgent : (Object[]) userAgents)
+			{
+				UserAgentElement ua = new UserAgentElement();
+				
+				ua.fromJSON((Map) userAgent);
+				
+				this.addUserAgent(ua);
+			}
+		}
+	}
+
 	/**
 	 * getDescription
 	 * 
@@ -114,9 +159,9 @@ public class BaseElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getValue(this._description);
 	}
-	
+
 	/**
 	 * getDocuments
 	 * 
@@ -125,15 +170,15 @@ public class BaseElement
 	public List<String> getDocuments()
 	{
 		List<String> result = this._documents;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getName
 	 * 
@@ -141,9 +186,9 @@ public class BaseElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
-	
+
 	/**
 	 * getSinceList
 	 * 
@@ -152,32 +197,15 @@ public class BaseElement
 	public List<SinceElement> getSinceList()
 	{
 		List<SinceElement> result = this._sinceList;
-		
+
 		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
-	/**
-	 * getUserAgents
-	 * 
-	 * @return
-	 */
-	public List<UserAgentElement> getUserAgents()
-	{
-		List<UserAgentElement> result = this._userAgents;
-		
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-		
-		return result;
-	}
-	
+
 	/**
 	 * getUserAgentNames
 	 * 
@@ -186,11 +214,11 @@ public class BaseElement
 	public List<String> getUserAgentNames()
 	{
 		List<String> result;
-		
+
 		if (this._userAgents != null)
 		{
 			result = new ArrayList<String>(this._userAgents.size());
-			
+
 			for (UserAgentElement userAgent : this._userAgents)
 			{
 				result.add(userAgent.getPlatform());
@@ -200,10 +228,27 @@ public class BaseElement
 		{
 			result = Collections.emptyList();
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * getUserAgents
+	 * 
+	 * @return
+	 */
+	public List<UserAgentElement> getUserAgents()
+	{
+		List<UserAgentElement> result = this._userAgents;
+
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
 	/**
 	 * setDescription
 	 * 
@@ -216,7 +261,7 @@ public class BaseElement
 			this._description = description;
 		}
 	}
-	
+
 	/**
 	 * setName
 	 * 
@@ -228,5 +273,17 @@ public class BaseElement
 		{
 			this._name = name;
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add("name", this.getName());
+		out.add("description", this.getDescription());
+		out.add("since", this.getSinceList());
+		out.add("userAgents", this.getUserAgents());
 	}
 }

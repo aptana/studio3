@@ -34,9 +34,14 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
 import com.aptana.core.util.StringUtil;
 
-public class UserAgentElement
+public class UserAgentElement implements Convertible
 {
 	private String _platform;
 	private String _version;
@@ -69,14 +74,28 @@ public class UserAgentElement
 			UserAgentElement that = (UserAgentElement) obj;
 
 			result = //
-				this.getDescription().equals(that.getDescription()) //
-					&& this.getOS().equals(that.getOS()) //
-					&& this.getOSVersion().equals(that.getOSVersion()) //
-					&& this.getPlatform().equals(that.getPlatform()) //
-					&& this.getVersion().equals(that.getVersion()); //
+			this.getDescription().equals(that.getDescription()) //
+				&& this.getOS().equals(that.getOS()) //
+				&& this.getOSVersion().equals(that.getOSVersion()) //
+				&& this.getPlatform().equals(that.getPlatform()) //
+				&& this.getVersion().equals(that.getVersion()); //
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setPlatform(object.get("platform").toString());
+		this.setVersion(object.get("version").toString());
+		this.setOS(object.get("os").toString());
+		this.setOSVersion(object.get("osVersion").toString());
+		this.setDescription(object.get("description").toString());
 	}
 
 	/**
@@ -86,7 +105,7 @@ public class UserAgentElement
 	 */
 	public String getDescription()
 	{
-		return (this._description != null) ? this._description : StringUtil.EMPTY;
+		return StringUtil.getValue(this._description);
 	}
 
 	/**
@@ -106,7 +125,7 @@ public class UserAgentElement
 	 */
 	public String getOS()
 	{
-		return (this._os != null) ? this._os : StringUtil.EMPTY;
+		return StringUtil.getValue(this._os);
 	}
 
 	/**
@@ -116,7 +135,7 @@ public class UserAgentElement
 	 */
 	public String getOSVersion()
 	{
-		return (this._osVersion != null) ? this._osVersion : StringUtil.EMPTY;
+		return StringUtil.getValue(this._osVersion);
 	}
 
 	/**
@@ -126,7 +145,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return (this._platform != null) ? this._platform : StringUtil.EMPTY;
+		return StringUtil.getValue(this._platform);
 	}
 
 	/**
@@ -136,7 +155,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return (this._version != null) ? this._version : StringUtil.EMPTY;
+		return StringUtil.getValue(this._version);
 	}
 
 	/*
@@ -149,7 +168,7 @@ public class UserAgentElement
 		int h = 0;
 
 		String[] items = new String[] { //
-			this.getDescription(), //
+		this.getDescription(), //
 			this.getOS(), //
 			this.getOSVersion(), //
 			this.getPlatform(), //
@@ -215,5 +234,18 @@ public class UserAgentElement
 	public void setVersion(String version)
 	{
 		this._version = version;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add("platform", this.getPlatform());
+		out.add("version", this.getVersion());
+		out.add("os", this.getOS());
+		out.add("osVersion", this.getOSVersion());
+		out.add("description", this.getDescription());
 	}
 }
