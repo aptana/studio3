@@ -9,8 +9,10 @@ Bundle-ClassPath: .,
  uuid.jar,
  css-validator.jar,
  velocity.jar,
- Tidy.jar
-Export-Package: com.eaio.uuid,
+ Tidy.jar,
+ js.jar
+Export-Package: com.aptana.libraries,
+ com.eaio.uuid,
  org.apache.commons.lang,
  org.apache.derby.authentication,
  org.apache.derby.catalog,
@@ -108,6 +110,8 @@ Export-Package: com.eaio.uuid,
  org.apache.derby.shared.common.sanity,
  org.apache.derby.tools,
  org.apache.derby.vti,
+ org.mozilla.javascript,
+ org.mozilla.javascript.optimizer,
  org.w3c.css.css,
  org.w3c.css.error,
  org.w3c.css.index,
@@ -140,3 +144,6 @@ Export-Package: com.eaio.uuid,
  org.xml.sax
 Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.aptana.libraries.LibrariesPlugin

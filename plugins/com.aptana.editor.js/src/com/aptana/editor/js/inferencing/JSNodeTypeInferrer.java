@@ -358,12 +358,34 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
-			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
-			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
+			IParseNode lhs = node.getLeftHandSide();
+			IParseNode rhs = node.getRightHandSide();
+			
+			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
+			while (lhs.getNodeType() == JSNodeTypes.ADD)
+			{
+				rhs = lhs.getLastChild();
+				lhs = lhs.getFirstChild();
 
-			if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+				if (rhs instanceof JSStringNode)
+				{
+					break;
+				}
+			}
+			
+			if (lhs instanceof JSStringNode || rhs instanceof JSStringNode)
 			{
 				type = JSTypeConstants.STRING_TYPE;
+			}
+			else
+			{
+				List<String> lhsTypes = this.getTypes(lhs);
+				List<String> rhsTypes = this.getTypes(rhs);
+	
+				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+				{
+					type = JSTypeConstants.STRING_TYPE;
+				}
 			}
 		}
 
