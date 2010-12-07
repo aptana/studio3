@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  beaver,
  com.aptana.theme,
- com.aptana.libraries
+ com.aptana.libraries,
+ org.mortbay.jetty.util;bundle-version="6.1.23"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
