@@ -406,7 +406,7 @@ public class JSIndexReader
 						column++;
 
 						// description
-						if (fields.contains(ContentSelector.DESCRIPTION))
+						if (column < columns.length && fields.contains(ContentSelector.DESCRIPTION))
 						{
 							result.setDescription(columns[column]);
 						}
