@@ -45,6 +45,7 @@ public class ExceptionElement implements Convertible
 {
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+
 	private String _type;
 	private String _description;
 
