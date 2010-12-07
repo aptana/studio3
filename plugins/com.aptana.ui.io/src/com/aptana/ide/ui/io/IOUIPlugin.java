@@ -66,7 +66,7 @@ import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle

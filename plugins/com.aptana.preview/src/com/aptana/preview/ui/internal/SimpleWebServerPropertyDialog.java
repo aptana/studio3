@@ -182,7 +182,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 			if (url != null) {
 				baseUrlText.setText(url.toExternalForm());
 			}
-			IPath path = source.getDocumentRoot();
+			IPath path = source.getDocumentRootPath();
 			if (path != null) {
 				documentRootText.setText(path.toOSString());
 			}
@@ -226,7 +226,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 			} catch (MalformedURLException e) {
 			}
 			IPath path = Path.fromOSString(documentRootText.getText());
-			source.setDocumentRoot(path);
+			source.setDocumentRootPath(path);
 		}
 		super.okPressed();
 	}

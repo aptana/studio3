@@ -69,7 +69,7 @@ import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.ImageUtils;
 import com.aptana.ui.ImageAssociations;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov

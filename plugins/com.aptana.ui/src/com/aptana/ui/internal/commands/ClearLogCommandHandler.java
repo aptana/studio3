@@ -80,7 +80,7 @@ public class ClearLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 		return null;
 	}

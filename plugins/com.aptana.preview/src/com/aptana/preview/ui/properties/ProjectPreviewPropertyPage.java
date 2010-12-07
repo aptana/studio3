@@ -64,7 +64,7 @@ import com.aptana.preview.Activator;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.ServerConfigurationManager;
 import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;

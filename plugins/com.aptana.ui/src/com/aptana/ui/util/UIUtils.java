@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ui;
+package com.aptana.ui.util;
 
 import java.net.URI;
 
@@ -57,6 +57,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
+
+import com.aptana.ui.Messages;
+import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov

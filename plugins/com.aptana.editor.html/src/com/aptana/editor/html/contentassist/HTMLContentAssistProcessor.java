@@ -51,7 +51,6 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
@@ -89,8 +88,8 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.ServerConfigurationManager;
-import com.aptana.webserver.core.SimpleWebServerConfiguration;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -385,12 +384,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
-						.getServerConfiguration(getProject());
+				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance()
-							.getServerConfigurations())
+					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)
@@ -400,17 +397,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						}
 					}
 				}
-				if (serverConfiguration != null && serverConfiguration instanceof SimpleWebServerConfiguration)
+				if (serverConfiguration != null && serverConfiguration instanceof EFSWebServerConfiguration)
 				{
-					SimpleWebServerConfiguration swsc = (SimpleWebServerConfiguration) serverConfiguration;
-					IPath path = swsc.getDocumentRoot();
-					if (path.isAbsolute())
+					URI documentRoot = ((EFSWebServerConfiguration) serverConfiguration).getDocumentRoot();
+					if (documentRoot != null)
 					{
-						baseStore = EFS.getStore(path.toFile().toURI());
-					}
-					else
-					{
-						baseStore = baseStore.getFileStore(path);
+						baseStore = EFS.getStore(documentRoot);
 					}
 				}
 				else
