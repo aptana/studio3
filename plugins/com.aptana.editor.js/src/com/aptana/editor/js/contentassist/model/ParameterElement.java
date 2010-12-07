@@ -46,6 +46,11 @@ import com.aptana.core.util.StringUtil;
 
 public class ParameterElement implements Convertible
 {
+	private static final String TYPES_PROPERTY = "types"; //$NON-NLS-1$
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String USAGE_PROPERTY = "usage"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+
 	private String _name;
 	private List<String> _types;
 	private String _usage;
@@ -83,11 +88,13 @@ public class ParameterElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get("name").toString());
-		this.setUsage(object.get("usage").toString());
-		this.setDescription(object.get("description").toString());
-		
-		Object types = object.get("types");
+		this.setName(object.get(NAME_PROPERTY).toString());
+		this.setUsage(object.get(USAGE_PROPERTY).toString());
+		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+
+		// types
+		Object types = object.get(TYPES_PROPERTY);
+
 		if (types != null && types.getClass().isArray())
 		{
 			for (Object type : (Object[]) types)
@@ -172,10 +179,10 @@ public class ParameterElement implements Convertible
 	 */
 	public void toJSON(Output out)
 	{
-		out.add("name", this.getName());
-		out.add("usage", this.getUsage());
-		out.add("description", this.getDescription());
-		out.add("types", this.getTypes());
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(USAGE_PROPERTY, this.getUsage());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+		out.add(TYPES_PROPERTY, this.getTypes());
 	}
 
 	/*

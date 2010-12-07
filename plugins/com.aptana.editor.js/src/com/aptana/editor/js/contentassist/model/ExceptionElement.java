@@ -43,6 +43,8 @@ import com.aptana.core.util.StringUtil;
 
 public class ExceptionElement implements Convertible
 {
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 	private String _type;
 	private String _description;
 
@@ -60,8 +62,8 @@ public class ExceptionElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setType(object.get("type").toString());
-		this.setDescription(object.get("description").toString());
+		this.setType(object.get(TYPE_PROPERTY).toString());
+		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
 	}
 
 	/**
@@ -104,7 +106,7 @@ public class ExceptionElement implements Convertible
 	 */
 	public void toJSON(Output out)
 	{
-		out.add("type", this.getType());
-		out.add("description", this.getDescription());
+		out.add(TYPE_PROPERTY, this.getType());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 }

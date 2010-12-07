@@ -46,6 +46,11 @@ import com.aptana.core.util.StringUtil;
 
 public class BaseElement implements Convertible
 {
+	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+
 	private String _name;
 	private String _description;
 	private List<UserAgentElement> _userAgents;
@@ -120,34 +125,42 @@ public class BaseElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get("name").toString());
-		this.setDescription(object.get("description").toString());
-		
-		Object sinceList = object.get("since");
-		
+		this.setName(object.get(NAME_PROPERTY).toString());
+		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+
+		// since list
+		Object sinceList = object.get(SINCE_PROPERTY);
+
 		if (sinceList != null && sinceList.getClass().isArray())
 		{
 			for (Object since : (Object[]) sinceList)
 			{
-				SinceElement s = new SinceElement();
-				
-				s.fromJSON((Map) since);
-				
-				this.addSince(s);
+				if (since instanceof Map)
+				{
+					SinceElement s = new SinceElement();
+
+					s.fromJSON((Map) since);
+
+					this.addSince(s);
+				}
 			}
 		}
-		
-		Object userAgents = object.get("userAgents");
-		
+
+		// user agents
+		Object userAgents = object.get(USER_AGENTS_PROPERTY);
+
 		if (userAgents != null && userAgents.getClass().isArray())
 		{
 			for (Object userAgent : (Object[]) userAgents)
 			{
-				UserAgentElement ua = new UserAgentElement();
-				
-				ua.fromJSON((Map) userAgent);
-				
-				this.addUserAgent(ua);
+				if (userAgent instanceof Map)
+				{
+					UserAgentElement ua = new UserAgentElement();
+
+					ua.fromJSON((Map) userAgent);
+
+					this.addUserAgent(ua);
+				}
 			}
 		}
 	}
@@ -281,9 +294,9 @@ public class BaseElement implements Convertible
 	 */
 	public void toJSON(Output out)
 	{
-		out.add("name", this.getName());
-		out.add("description", this.getDescription());
-		out.add("since", this.getSinceList());
-		out.add("userAgents", this.getUserAgents());
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+		out.add(SINCE_PROPERTY, this.getSinceList());
+		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }

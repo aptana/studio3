@@ -43,6 +43,12 @@ import com.aptana.core.util.StringUtil;
 
 public class UserAgentElement implements Convertible
 {
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String OS_VERSION_PROPERTY = "osVersion"; //$NON-NLS-1$
+	private static final String OS_PROPERTY = "os"; //$NON-NLS-1$
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String PLATFORM_PROPERTY = "platform"; //$NON-NLS-1$
+
 	private String _platform;
 	private String _version;
 	private String _os;
@@ -91,11 +97,11 @@ public class UserAgentElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setPlatform(object.get("platform").toString());
-		this.setVersion(object.get("version").toString());
-		this.setOS(object.get("os").toString());
-		this.setOSVersion(object.get("osVersion").toString());
-		this.setDescription(object.get("description").toString());
+		this.setPlatform(object.get(PLATFORM_PROPERTY).toString());
+		this.setVersion(object.get(VERSION_PROPERTY).toString());
+		this.setOS(object.get(OS_PROPERTY).toString());
+		this.setOSVersion(object.get(OS_VERSION_PROPERTY).toString());
+		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
 	}
 
 	/**
@@ -242,10 +248,10 @@ public class UserAgentElement implements Convertible
 	 */
 	public void toJSON(Output out)
 	{
-		out.add("platform", this.getPlatform());
-		out.add("version", this.getVersion());
-		out.add("os", this.getOS());
-		out.add("osVersion", this.getOSVersion());
-		out.add("description", this.getDescription());
+		out.add(PLATFORM_PROPERTY, this.getPlatform());
+		out.add(VERSION_PROPERTY, this.getVersion());
+		out.add(OS_PROPERTY, this.getOS());
+		out.add(OS_VERSION_PROPERTY, this.getOSVersion());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 }

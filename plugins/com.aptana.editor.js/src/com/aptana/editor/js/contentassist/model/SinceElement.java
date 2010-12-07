@@ -43,6 +43,9 @@ import com.aptana.core.util.StringUtil;
 
 public class SinceElement implements Convertible
 {
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+
 	private String _name;
 	private String _version;
 
@@ -60,8 +63,8 @@ public class SinceElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get("name").toString());
-		this.setVersion(object.get("version").toString());
+		this.setName(object.get(NAME_PROPERTY).toString());
+		this.setVersion(object.get(VERSION_PROPERTY).toString());
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class SinceElement implements Convertible
 	 */
 	public void toJSON(Output out)
 	{
-		out.add("name", this.getName());
-		out.add("version", this.getVersion());
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(VERSION_PROPERTY, this.getVersion());
 	}
 }

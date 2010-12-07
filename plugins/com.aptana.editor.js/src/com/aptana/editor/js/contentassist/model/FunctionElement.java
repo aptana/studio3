@@ -47,6 +47,13 @@ import com.aptana.editor.js.JSTypeConstants;
 
 public class FunctionElement extends PropertyElement
 {
+	private static final String REFERENCES_PROPERTY = "references"; //$NON-NLS-1$
+	private static final String EXCEPTIONS_PROPERTY = "exceptions"; //$NON-NLS-1$
+	private static final String RETURN_TYPES_PROPERTY = "returnTypes"; //$NON-NLS-1$
+	private static final String PARAMETERS_PROPERTY = "parameters"; //$NON-NLS-1$
+	private static final String IS_METHOD_PROPERTY = "isMethod"; //$NON-NLS-1$
+	private static final String IS_CONSTRUCTOR_PROPERTY = "isConstructor"; //$NON-NLS-1$
+	
 	private List<ParameterElement> _parameters;
 	private List<String> _references;
 	private List<ExceptionElement> _exceptions;
@@ -170,10 +177,10 @@ public class FunctionElement extends PropertyElement
 	{
 		super.fromJSON(object);
 		
-		this.setIsConstructor(Boolean.TRUE == object.get("isConstructor"));
-		this.setIsMethod(Boolean.TRUE == object.get("isMethod"));
+		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
+		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
 		
-		Object parameters = object.get("parameters");
+		Object parameters = object.get(PARAMETERS_PROPERTY);
 		if (parameters != null && parameters.getClass().isArray())
 		{
 			for (Object parameter : (Object[]) parameters)
@@ -186,7 +193,7 @@ public class FunctionElement extends PropertyElement
 			}
 		}
 		
-		Object returnTypes = object.get("returnTypes");
+		Object returnTypes = object.get(RETURN_TYPES_PROPERTY);
 		if (returnTypes != null && returnTypes.getClass().isArray())
 		{
 			for (Object returnType : (Object[]) returnTypes)
@@ -199,7 +206,7 @@ public class FunctionElement extends PropertyElement
 			}
 		}
 		
-		Object exceptions = object.get("exceptions");
+		Object exceptions = object.get(EXCEPTIONS_PROPERTY);
 		if (exceptions != null && exceptions.getClass().isArray())
 		{
 			for (Object exception : (Object[]) exceptions)
@@ -212,7 +219,7 @@ public class FunctionElement extends PropertyElement
 			}
 		}
 		
-		Object references = object.get("references");
+		Object references = object.get(REFERENCES_PROPERTY);
 		if (references != null && references.getClass().isArray())
 		{
 			for (Object reference : (Object[]) references)
@@ -452,12 +459,12 @@ public class FunctionElement extends PropertyElement
 	{
 		super.toJSON(out);
 		
-		out.add("isConstructor", this.isConstructor());
-		out.add("isMethod", this.isMethod());
-		out.add("parameters", this.getParameters());
-		out.add("returnTypes", this.getReturnTypes());
-		out.add("exceptions", this.getExceptions());
-		out.add("references", this.getReferences());
+		out.add(IS_CONSTRUCTOR_PROPERTY, this.isConstructor());
+		out.add(IS_METHOD_PROPERTY, this.isMethod());
+		out.add(PARAMETERS_PROPERTY, this.getParameters());
+		out.add(RETURN_TYPES_PROPERTY, this.getReturnTypes());
+		out.add(EXCEPTIONS_PROPERTY, this.getExceptions());
+		out.add(REFERENCES_PROPERTY, this.getReferences());
 	}
 
 	/**
