@@ -181,7 +181,7 @@ public class ValidationManager implements IValidationManager
 	public boolean isIgnored(String message, String language)
 	{
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getFilterExpressionsPrefKey(fCurrentLanguage));
+				.getString(getFilterExpressionsPrefKey(language));
 		if (!StringUtil.isEmpty(list))
 		{
 			String[] expressions = list.split("####"); //$NON-NLS-1$
