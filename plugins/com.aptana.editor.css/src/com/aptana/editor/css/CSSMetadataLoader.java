@@ -70,7 +70,7 @@ public class CSSMetadataLoader extends Job
 	 */
 	public CSSMetadataLoader()
 	{
-		super("Loading CSS metadata...");
+		super(Messages.CSSMetadataLoader_Loading_Metadata);
 
 		setPriority(Job.LONG);
 	}
@@ -102,7 +102,7 @@ public class CSSMetadataLoader extends Job
 				}
 				catch (Throwable t)
 				{
-					CSSPlugin.logError("Error loading CSS metadata: " + resource, t);
+					CSSPlugin.logError(Messages.CSSMetadataLoader_Error_Loading_Metadata + resource, t);
 				}
 				finally
 				{
@@ -136,7 +136,7 @@ public class CSSMetadataLoader extends Job
 
 		CSSMetadataReader reader = new CSSMetadataReader();
 
-		this.loadMetadata(monitor, reader, "/metadata/css_metadata.xml");
+		this.loadMetadata(monitor, reader, "/metadata/css_metadata.xml"); //$NON-NLS-1$
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
 		Index index = CSSIndexQueryHelper.getIndex();
