@@ -63,7 +63,7 @@ public interface ICSSMetadataElement
 	 * 
 	 * @return
 	 */
-	public String[] getUserAgentNames();
+	public List<String> getUserAgentNames();
 
 	/**
 	 * getExample

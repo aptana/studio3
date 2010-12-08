@@ -34,14 +34,24 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class ValueElement
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class ValueElement implements Convertible
 {
+	private static final String USER_AGENTS_PROPERTY = "userAgents";
+	private static final String DESCRIPTION_PROPERTY = "description";
+	private static final String NAME_PROPERTY = "name";
+
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 
 	/**
 	 * ValueElement
@@ -60,6 +70,35 @@ public class ValueElement
 		this._userAgents.add(userAgent);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(object.get(NAME_PROPERTY).toString());
+		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+
+		// user agents
+		Object userAgents = object.get(USER_AGENTS_PROPERTY);
+
+		if (userAgents != null && userAgents.getClass().isArray())
+		{
+			for (Object userAgent : (Object[]) userAgents)
+			{
+				if (userAgent instanceof Map)
+				{
+					UserAgentElement ua = new UserAgentElement();
+
+					ua.fromJSON((Map) userAgent);
+
+					this.addUserAgent(ua);
+				}
+			}
+		}
+	}
+
 	/**
 	 * getDescription
 	 * 
@@ -67,7 +106,7 @@ public class ValueElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getValue(this._description);
 	}
 
 	/**
@@ -77,7 +116,7 @@ public class ValueElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -108,5 +147,16 @@ public class ValueElement
 	public void setName(String name)
 	{
 		this._name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }

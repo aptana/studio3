@@ -34,8 +34,18 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-public class SpecificationElement
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class SpecificationElement implements Convertible
 {
+	private static final String VERSION_PROPERTY = "version";
+	private static final String NAME_PROPERTY = "name";
+
 	private String _name;
 	private String _version;
 
@@ -46,6 +56,17 @@ public class SpecificationElement
 	{
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(object.get(NAME_PROPERTY).toString());
+		this.setVersion(object.get(VERSION_PROPERTY).toString());
+	}
+
 	/**
 	 * getName
 	 * 
@@ -53,7 +74,7 @@ public class SpecificationElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -63,7 +84,7 @@ public class SpecificationElement
 	 */
 	public String getVersion()
 	{
-		return this._version;
+		return StringUtil.getValue(this._version);
 	}
 
 	/**
@@ -73,6 +94,7 @@ public class SpecificationElement
 	 */
 	public void setName(String name)
 	{
+		this._name = name;
 	}
 
 	/**
@@ -83,5 +105,15 @@ public class SpecificationElement
 	public void setVersion(String version)
 	{
 		this._version = version;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(VERSION_PROPERTY, this.getVersion());
 	}
 }

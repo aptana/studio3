@@ -34,13 +34,13 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoElementElement extends AbstractCSSMetadataElement
 {
 	private boolean _allowPseudoClassSyntax;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
 
 	/**
 	 * PseudoElementElement

@@ -34,13 +34,13 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PseudoClassElement extends AbstractCSSMetadataElement
 {
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<ValueElement> _values = new LinkedList<ValueElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<ValueElement> _values = new ArrayList<ValueElement>();
 
 	/**
 	 * PseudoClassElement
@@ -61,16 +61,6 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	}
 
 	/**
-	 * getSpecifications
-	 * 
-	 * @return
-	 */
-	public List<SpecificationElement> getSpecifications()
-	{
-		return this._specifications;
-	}
-
-	/**
 	 * addValue
 	 * 
 	 * @param value
@@ -78,6 +68,16 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	public void addValue(ValueElement value)
 	{
 		this._values.add(value);
+	}
+
+	/**
+	 * getSpecifications
+	 * 
+	 * @return
+	 */
+	public List<SpecificationElement> getSpecifications()
+	{
+		return this._specifications;
 	}
 
 	/**
