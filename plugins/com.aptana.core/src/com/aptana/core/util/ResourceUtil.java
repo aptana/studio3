@@ -40,6 +40,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -58,6 +59,9 @@ public class ResourceUtil
 {
 	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
 	private static final String SCHEME_FILE = "file"; //$NON-NLS-1$
+
+	private static final String APTANA_NATURE_PREFIX = "com.aptana."; //$NON-NLS-1$
+	private static final String RAILS_NATURE_PREFIX = "org.radrails.rails."; //$NON-NLS-1$
 
 	private ResourceUtil()
 	{
@@ -206,8 +210,8 @@ public class ResourceUtil
 	}
 
 	/**
-	 * Add a builder to the given project. Return boolean indicating if it was added (if already exists on project we'll
-	 * return a false. if there's an error, we'll throw a CoreException).
+	 * Add a builder to the given project. Return boolean indicating if it was added (if already exists on the project
+	 * we'll return a false. if there's an error, we'll throw a CoreException).
 	 * 
 	 * @param project
 	 * @param id
@@ -259,6 +263,80 @@ public class ResourceUtil
 		return addBuilder;
 	}
 
+	/**
+	 * Remove a builder from the given project. Return boolean indicating if it was removed (if doesn't exist on the
+	 * project we'll return a false. if there's an error, we'll throw a CoreException).
+	 * 
+	 * @param project
+	 * @param id
+	 * @throws CoreException
+	 */
+	public static boolean removeBuilder(IProject project, String id) throws CoreException
+	{
+		IProjectDescription desc = project.getDescription();
+		if (removeBuilder(desc, id))
+		{
+			project.setDescription(desc, null);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Remove a builder from the given project description. Does NOT save/set on project. Return boolean indicating if
+	 * it was removed (if already removed from description we'll return a false).
+	 * 
+	 * @param description
+	 * @param builderId
+	 * @throws CoreException
+	 */
+	public static boolean removeBuilder(IProjectDescription description, String builderId)
+	{
+		ICommand[] commands = description.getBuildSpec();
+		boolean removeBuilder = false;
+
+		ArrayList<ICommand> builders = new ArrayList<ICommand>();
+		for (int i = 0; i < commands.length; i++)
+		{
+			ICommand iCommand = commands[i];
+			if (!iCommand.getBuilderName().equals(builderId))
+			{
+				builders.add(iCommand);
+			}
+			else
+			{
+				removeBuilder = true;
+			}
+		}
+		description.setBuildSpec(builders.toArray(new ICommand[0]));
+		return removeBuilder;
+	}
+
+	/**
+	 * Add a nature to the given project. Return boolean indicating if it was added (if already exists on the project
+	 * we'll return a false. if there's an error, we'll throw a CoreException).
+	 * 
+	 * @param project
+	 * @param id
+	 * @throws CoreException
+	 */
+	public static boolean addNature(IProject project, String id) throws CoreException
+	{
+		IProjectDescription desc = project.getDescription();
+		if (addNature(desc, id))
+		{
+			project.setDescription(desc, null);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Adds a nature to the project. Returns true if added, false if the nature already existed on the project
+	 * @param description
+	 * @param natureId
+	 * @return
+	 */
 	public static boolean addNature(IProjectDescription description, String natureId)
 	{
 		String[] natures = description.getNatureIds();
@@ -283,4 +361,110 @@ public class ResourceUtil
 
 		return addNature;
 	}
+
+	/**
+	 * Remove a nature from the given project. Return boolean indicating if it was removed (if doesn't exist on the
+	 * project we'll return a false. if there's an error, we'll throw a CoreException).
+	 * 
+	 * @param project
+	 * @param id
+	 * @throws CoreException
+	 */
+	public static boolean removeNature(IProject project, String id) throws CoreException
+	{
+		IProjectDescription desc = project.getDescription();
+		if (removeNature(desc, id))
+		{
+			project.setDescription(desc, null);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Remove nature from the project. Returns true if removed, false if the nature did not exist on the project
+	 * @param description
+	 * @param natureId
+	 * @return
+	 */
+	public static boolean removeNature(IProjectDescription description, String natureId)
+	{
+		String[] natures = description.getNatureIds();
+		boolean removeNature = false;
+
+		ArrayList<String> newNatures = new ArrayList<String>(); 
+		for (int i = 0; i < natures.length; ++i)
+		{
+			if (!natures[i].equals(natureId))
+			{
+				newNatures.add(natures[i]);
+			}
+			else
+			{
+				removeNature = true;
+			}
+		}
+
+		description.setNatureIds(newNatures.toArray(new String[0]));
+		return removeNature;
+	}
+	
+	/**
+	 * Determines if the nature is one belonging to Aptana
+	 * 
+	 * @param natureId
+	 *            The natureID in question
+	 * @return
+	 */
+	public static boolean isAptanaNature(String natureId)
+	{
+		return natureId != null
+				&& (natureId.startsWith(APTANA_NATURE_PREFIX) || natureId.startsWith(RAILS_NATURE_PREFIX));
+	}
+
+	/**
+	 * Reurns a list of all the natures that belong to Aptana.
+	 * 
+	 * @param description
+	 * @return
+	 */
+	public static String[] getAptanaNatures(IProjectDescription description)
+	{
+		String[] natures = description.getNatureIds();
+		ArrayList<String> newNatures = new ArrayList<String>();
+
+		// Add Aptana natures to list
+		for (int i = 0; i < natures.length; ++i)
+		{
+			if (isAptanaNature(natures[i]))
+			{
+				newNatures.add(natures[i]);
+			}
+		}
+
+		return newNatures.toArray(new String[0]);
+	}
+
+	/**
+	 * Removes the passed-in builder if there are zero Aptana natures left on the project.
+	 * 
+	 * @param description
+	 * @param builderId
+	 * @return
+	 * @throws CoreException 
+	 */
+	public static boolean removeBuilderIfOrphaned(IProject project, String builderId) throws CoreException
+	{
+		String[] natures = getAptanaNatures(project.getDescription());
+		if (natures.length == 0)
+		{
+			return removeBuilder(project, builderId);
+		}
+		else
+		{
+			return false;
+		}
+
+	}
+
 }
