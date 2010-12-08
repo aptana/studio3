@@ -34,7 +34,6 @@
  */
 package com.aptana.editor.css.contentassist.index;
 
-import java.io.InputStream;
 import java.net.URI;
 
 import org.mortbay.util.ajax.JSON;
@@ -46,14 +45,11 @@ import com.aptana.index.core.Index;
 
 public class CSSIndexWriter
 {
-	private CSSMetadataReader _reader;
-	
 	/**
 	 * CSSIndexWriter
 	 */
 	public CSSIndexWriter()
 	{
-		this._reader = new CSSMetadataReader();
 	}
 	
 	/**
@@ -63,19 +59,7 @@ public class CSSIndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(CSSIndexConstants.METADATA);
-	}
-	
-	/**
-	 * loadXML
-	 * 
-	 * @param stream
-	 * @throws Exception 
-	 * @throws ScriptDocException
-	 */
-	public void loadXML(InputStream stream) throws Exception
-	{
-		this._reader.loadXML(stream);
+		return URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION);
 	}
 
 	/**
@@ -84,7 +68,7 @@ public class CSSIndexWriter
 	 * @param index
 	 * @param element
 	 */
-	protected void writeElement(Index index, ElementElement element)
+	public void writeElement(Index index, ElementElement element)
 	{
 		String key = StringUtil.join( //
 			CSSIndexConstants.DELIMITER, //
@@ -101,7 +85,7 @@ public class CSSIndexWriter
 	 * @param index
 	 * @param property
 	 */
-	protected void writeProperty(Index index, PropertyElement property)
+	public void writeProperty(Index index, PropertyElement property)
 	{
 		String key = StringUtil.join( //
 			CSSIndexConstants.DELIMITER, //
@@ -111,21 +95,4 @@ public class CSSIndexWriter
 		index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
 	}
 
-	/**
-	 * writeToIndex
-	 * 
-	 * @param index
-	 */
-	public void writeToIndex(Index index)
-	{
-		for (ElementElement element : this._reader.getElements())
-		{
-			this.writeElement(index, element);
-		}
-		
-		for (PropertyElement property : this._reader.getProperties())
-		{
-			this.writeProperty(index, property);
-		}
-	}
 }
