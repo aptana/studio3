@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,6 +87,8 @@ import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
 @SuppressWarnings("restriction")
@@ -218,6 +221,18 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 					// We have to use it since not all of the Natures that are defined in the system
 					// are valid and some are forced into the project in a non-standard way.
 					fProject.setDescription(description, IResource.AVOID_NATURE_CONFIG, monitor);
+
+					for (Iterator<String> iterator = natureIds.iterator(); iterator.hasNext();)
+					{
+						String natureId = iterator.next();
+						if (isAptanaNature(natureId))
+						{
+							ResourceUtil.addBuilder(fProject, UnifiedBuilder.ID);
+							
+							// Exit, as we only need to add once, independent of # of Aptana natures.
+							break;
+						}												
+					}
 				}
 				catch (CoreException e)
 				{

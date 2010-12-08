@@ -305,4 +305,17 @@ public class VirtualFileSyncPair
 			}
 		}
 	}
+	
+	/**
+	 * Returns a nicely formatted version of the file pair
+	 */
+	public String toString()
+	{
+		String text = "";
+		text += (this._sourceFile != null) ? this._sourceFile.toString() : "null";
+		text += " <-> ";
+		text += (this._destinationFile != null) ? this._destinationFile.toString() : "null";
+
+		return text;
+	}
 }
