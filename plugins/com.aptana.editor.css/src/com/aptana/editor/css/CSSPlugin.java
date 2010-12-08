@@ -37,6 +37,7 @@ package com.aptana.editor.css;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -46,17 +47,17 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class CSSPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.css"; //$NON-NLS-1$
-	private static Activator plugin;
+	private static CSSPlugin plugin;
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static CSSPlugin getDefault()
 	{
 		return plugin;
 	}
@@ -123,7 +124,7 @@ public class Activator extends AbstractUIPlugin
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public CSSPlugin()
 	{
 	}
 
@@ -135,6 +136,9 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+		
+		Job job = new CSSMetadataLoader();
+		job.schedule();
 	}
 
 	/*
