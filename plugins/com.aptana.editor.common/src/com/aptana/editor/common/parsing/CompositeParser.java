@@ -39,8 +39,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beaver.Scanner.Exception;
 import beaver.Symbol;
+import beaver.Scanner.Exception;
 
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
@@ -67,6 +67,7 @@ public class CompositeParser implements IParser
 
 	public IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fScanner.getTokenScanner().reset();
 		String source = new String(parseState.getSource());
 		fScanner.setSource(source);
 		fCurrentSymbol = null;
