@@ -34,25 +34,14 @@
  */
 package com.aptana.editor.css.preferences;
 
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-
-import com.aptana.editor.css.CSSPlugin;
-
-public class PreferenceInitializer extends AbstractPreferenceInitializer
+/**
+ * @author klindsey
+ *
+ */
+public interface IPreferenceConstants
 {
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	/**
+	 * The value is a double used to indicate the current format being used by the CSS index categories.
 	 */
-	@Override
-	public void initializeDefaultPreferences()
-	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(CSSPlugin.PLUGIN_ID);
-
-		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
-		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
-	}
-
+	String CSS_INDEX_VERSION = "CSS_INDEX_VERSION";
 }
