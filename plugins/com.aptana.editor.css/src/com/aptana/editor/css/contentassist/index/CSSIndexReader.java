@@ -35,16 +35,16 @@
 package com.aptana.editor.css.contentassist.index;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.mortbay.util.ajax.JSON;
+
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
-import com.aptana.editor.css.contentassist.model.UserAgentElement;
-import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -59,6 +59,37 @@ public class CSSIndexReader
 	}
 
 	/**
+	 * createElementFromKey
+	 * 
+	 * @param index
+	 * @param key
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("rawtypes")
+	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
+	{
+		ElementElement e = new ElementElement();
+
+		String key = element.getWord();
+		String[] columns = key.split(CSSIndexConstants.DELIMITER);
+
+		Object m = JSON.parse(columns[1]);
+
+		if (m instanceof Map)
+		{
+			e.fromJSON((Map) m);
+		}
+
+		for (String document : element.getDocuments())
+		{
+			e.addDocument(document);
+		}
+
+		return e;
+	}
+
+	/**
 	 * createPropertyFromKey
 	 * 
 	 * @param index
@@ -66,37 +97,27 @@ public class CSSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	private PropertyElement createPropertyFromKey(Index index, String key) throws IOException
+	@SuppressWarnings("rawtypes")
+	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
 	{
+		PropertyElement p = new PropertyElement();
+
+		String key = property.getWord();
 		String columns[] = key.split(CSSIndexConstants.DELIMITER);
-		int column = 0;
-		PropertyElement property = new PropertyElement();
 
-		property.setName(columns[column++]);
-		property.setAllowMultipleValues(Boolean.valueOf(columns[column++]));
-		property.setType(columns[column++]);
-		// TODO: specifications
+		Object m = JSON.parse(columns[1]);
 
-		for (String userAgentKey : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
+		if (m instanceof Map)
 		{
-			// get user agent and add to element
-			property.addUserAgent(this.getUserAgent(index, userAgentKey));
+			p.fromJSON((Map) m);
 		}
 
-		property.setDescription(columns[column++]);
-		property.setExample(columns[column++]);
-		property.setHint(columns[column++]);
-		property.setRemark(columns[column++]);
-
-		if (column < columns.length)
+		for (String document : property.getDocuments())
 		{
-			for (String valueKey : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
-			{
-				property.addValue(this.getValue(index, valueKey));
-			}
+			p.addDocument(document);
 		}
 
-		return property;
+		return p;
 	}
 
 	/**
@@ -108,39 +129,22 @@ public class CSSIndexReader
 	 */
 	public List<ElementElement> getElements(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.ELEMENT }, "*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH);
-		List<ElementElement> result = new LinkedList<ElementElement>();
+		List<ElementElement> result = new ArrayList<ElementElement>();
 
-		if (items != null)
+		if (index != null)
 		{
-			for (QueryResult queryResult : items)
+			List<QueryResult> items = index.query( //
+				new String[] { CSSIndexConstants.ELEMENT }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+			if (items != null)
 			{
-				String key = queryResult.getWord();
-				String[] columns = key.split(CSSIndexConstants.DELIMITER);
-				ElementElement element = new ElementElement();
-				int column = 0;
-
-				element.setName(columns[column++]);
-				element.setDisplayName(columns[column++]);
-
-				for (String userAgentKey : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
+				for (QueryResult element : items)
 				{
-					// get user agent and add to element
-					element.addUserAgent(this.getUserAgent(index, userAgentKey));
+					result.add(this.createElementFromKey(index, element));
 				}
-
-				element.setDescription(columns[column++]);
-				element.setExample(columns[column++]);
-
-				for (String property : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
-				{
-					element.addProperty(property);
-				}
-
-				element.setRemark(columns[column++]);
-
-				result.add(element);
 			}
 		}
 
@@ -156,18 +160,22 @@ public class CSSIndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.PROPERTY }, "*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH);
-		List<PropertyElement> result = new LinkedList<PropertyElement>();
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (items != null)
+		if (index != null)
 		{
-			for (QueryResult queryResult : items)
-			{
-				String key = queryResult.getWord();
-				PropertyElement property = this.createPropertyFromKey(index, key);
+			List<QueryResult> properties = index.query( //
+				new String[] { CSSIndexConstants.PROPERTY }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
 
-				result.add(property);
+			if (properties != null)
+			{
+				for (QueryResult property : properties)
+				{
+					result.add(this.createPropertyFromKey(index, property));
+				}
 			}
 		}
 
@@ -184,22 +192,24 @@ public class CSSIndexReader
 	 */
 	public List<PropertyElement> getProperties(Index index, String... names) throws IOException
 	{
-		List<PropertyElement> result = new LinkedList<PropertyElement>();
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		for (String name : names)
+		if (index != null)
 		{
-			String searchKey = name + CSSIndexConstants.DELIMITER;
-			List<QueryResult> items = index.query(new String[] { CSSIndexConstants.PROPERTY }, searchKey,
-					SearchPattern.PREFIX_MATCH);
-
-			if (items != null)
+			for (String name : names)
 			{
-				for (QueryResult item : items)
-				{
-					String key = item.getWord();
-					PropertyElement property = this.createPropertyFromKey(index, key);
+				List<QueryResult> properties = index.query( //
+					new String[] { CSSIndexConstants.PROPERTY }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
 
-					result.add(property);
+				if (properties != null)
+				{
+					for (QueryResult property : properties)
+					{
+						result.add(this.createPropertyFromKey(index, property));
+					}
 				}
 			}
 		}
@@ -207,87 +217,6 @@ public class CSSIndexReader
 		return result;
 	}
 
-	/**
-	 * getUserAgent
-	 * 
-	 * @param userAgentKey
-	 * @return
-	 * @throws IOException
-	 */
-	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
-	{
-		UserAgentElement result = CSSIndexWriter.userAgentsByKey.get(userAgentKey);
-		
-		if (result == null)
-		{
-			String searchKey = userAgentKey + CSSIndexConstants.DELIMITER;
-			List<QueryResult> items = index.query(new String[] { CSSIndexConstants.USER_AGENT }, searchKey,
-					SearchPattern.PREFIX_MATCH);
-	
-			if (items != null && items.size() > 0)
-			{
-				String key = items.get(0).getWord();
-				String[] columns = key.split(CSSIndexConstants.DELIMITER);
-				int column = 1; // skip index
-	
-				result = new UserAgentElement();
-				result.setDescription(columns[column++]);
-				result.setOS(columns[column++]);
-				result.setPlatform(columns[column++]);
-	
-				// NOTE: split does not return a final empty element if the string being split
-				// ends with the delimiter.
-				if (column < columns.length)
-				{
-					result.setVersion(columns[column++]);
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * getValue
-	 * 
-	 * @param index
-	 * @param valueKey
-	 * @return
-	 * @throws IOException
-	 */
-	private ValueElement getValue(Index index, String valueKey) throws IOException
-	{
-		String searchKey = valueKey + CSSIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { CSSIndexConstants.VALUE }, searchKey, SearchPattern.PREFIX_MATCH);
-		ValueElement result = null;
-
-		if (items != null && items.size() > 0)
-		{
-			String key = items.get(0).getWord();
-			String[] columns = key.split(CSSIndexConstants.DELIMITER);
-			int column = 1; // skip index
-
-			result = new ValueElement();
-			result.setName(columns[column++]);
-
-			result.setDescription(columns[column++]);
-
-			// NOTE: split does not return an empty element if the string being
-			// split ends with the delimiter pattern. So, we have to make sure
-			// we actually have a column for user agents before using it.
-			if (column < columns.length)
-			{
-				for (String userAgentKey : columns[column++].split(CSSIndexConstants.SUB_DELIMITER))
-				{
-					// get user agent and add to element
-					result.addUserAgent(this.getUserAgent(index, userAgentKey));
-				}
-			}
-		}
-
-		return result;
-	}
-	
 	/**
 	 * getValues
 	 * 
