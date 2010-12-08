@@ -23,7 +23,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class DeleteBranchHandler extends AbstractGitHandler
 {

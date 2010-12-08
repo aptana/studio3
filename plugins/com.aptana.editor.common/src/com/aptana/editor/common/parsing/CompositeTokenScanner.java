@@ -90,7 +90,7 @@ public class CompositeTokenScanner implements ITokenScanner
 				if (hasExitToken(data.toString()))
 				{
 					// exits out to the top level
-					reset();
+					resetIndex();
 				}
 			}
 		}
@@ -147,8 +147,13 @@ public class CompositeTokenScanner implements ITokenScanner
 		return false;
 	}
 
-	private void reset()
+	private void resetIndex()
 	{
 		fCurrentIndex = DEFAULT_INDEX;
+	}
+
+	protected void reset()
+	{
+		resetIndex();
 	}
 }

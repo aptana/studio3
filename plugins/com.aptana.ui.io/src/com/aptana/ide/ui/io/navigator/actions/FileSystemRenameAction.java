@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.Utils;
 

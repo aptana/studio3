@@ -294,7 +294,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (file != null)
 			{
-				sub.subTask(file.getName());
+				sub.subTask(getIndexingMessage(index, file));
 
 				removeTasks(file, sub.newChild(10));
 

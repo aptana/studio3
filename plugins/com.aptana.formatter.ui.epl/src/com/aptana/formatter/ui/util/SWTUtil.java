@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Utility class to simplify access to some SWT resources.

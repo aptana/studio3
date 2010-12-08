@@ -44,7 +44,7 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new ParallelTestSuite(AllTests.class.getName());
+		TestSuite suite = new ParallelTestSuite(AllTests.class.getName(), 2);
 		// $JUnit-BEGIN$
 		suite.addTestSuite(LocalSyncingTests.class);
 		suite.addTestSuite(LocalSyncingTestsWithSpaces.class);

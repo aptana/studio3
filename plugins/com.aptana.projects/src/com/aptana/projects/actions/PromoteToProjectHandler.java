@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.projects.internal.wizards.PromoteToProjectWizard;
-import com.aptana.ui.SWTUtils;
+import com.aptana.ui.util.SWTUtils;
 
 public class PromoteToProjectHandler extends AbstractHandler
 {

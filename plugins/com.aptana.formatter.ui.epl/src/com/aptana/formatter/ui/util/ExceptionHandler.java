@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.formatter.ui.epl.Activator;
 import com.aptana.formatter.ui.epl.UIEplMessages;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The default exception handler shows an error dialog when one of its handle methods is called. If the passed exception

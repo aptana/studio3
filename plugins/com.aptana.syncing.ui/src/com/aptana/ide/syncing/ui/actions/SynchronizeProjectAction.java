@@ -47,7 +47,7 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class SynchronizeProjectAction extends BaseSyncAction
 {

@@ -39,11 +39,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import beaver.Scanner.Exception;
 import beaver.Symbol;
+import beaver.Scanner.Exception;
 
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.IParser;
+import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ParserPoolFactory;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -66,25 +67,37 @@ public class CompositeParser implements IParser
 
 	public IParseRootNode parse(IParseState parseState) throws java.lang.Exception
 	{
+		fScanner.getTokenScanner().reset();
 		String source = new String(parseState.getSource());
 		fScanner.setSource(source);
 		fCurrentSymbol = null;
 
 		// first processes the embedded language
 		fEmbeddedlanguageRoot = processEmbeddedlanguage(parseState);
-		// then processes the source as normal
-		IParseRootNode result = primaryParse(parseState);
+
+		// then processes the source as normal, but skips the nodes returned from embedded language parsing
+		IParseNode[] embeddedNodes = null;
 		if (fEmbeddedlanguageRoot != null)
 		{
-			// merges the tree for the embedded language into the result
-			List<IParseNode> list = new LinkedList<IParseNode>();
-			getAllNodes(result, list);
-
-			IParseNode[] embeddedNodes = fEmbeddedlanguageRoot.getChildren();
+			embeddedNodes = fEmbeddedlanguageRoot.getChildren();
 			if (embeddedNodes.length == 0)
 			{
 				embeddedNodes = new IParseNode[] { fEmbeddedlanguageRoot };
 			}
+			((ParseState) parseState).setSkippedRanges(embeddedNodes);
+		}
+		IParseRootNode result = primaryParse(parseState);
+		if (embeddedNodes != null)
+		{
+			((ParseState) parseState).setSkippedRanges(null);
+		}
+
+		// merges the tree for the embedded language into the result
+		if (fEmbeddedlanguageRoot != null)
+		{
+			List<IParseNode> list = new LinkedList<IParseNode>();
+			getAllNodes(result, list);
+
 			IParseNode parent;
 			for (IParseNode embeddedNode : embeddedNodes)
 			{

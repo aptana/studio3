@@ -86,33 +86,20 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
 
-	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.SINCE, //
-		ContentSelector.TYPES, //
-		ContentSelector.USER_AGENTS //
+	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of( //
+		ContentSelector.NAME, //
+		ContentSelector.DESCRIPTION //
 		);
-	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
+	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of( //
+		ContentSelector.NAME, //
+		ContentSelector.DESCRIPTION, //
+		ContentSelector.DOCUMENTS //
+		);
+	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of( //
+		ContentSelector.NAME, //
 		ContentSelector.DESCRIPTION, //
 		ContentSelector.DOCUMENTS, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.TYPES //
-		);
-	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.DOCUMENTS, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.PARENT_TYPES, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.SINCE, //
-		ContentSelector.TYPES, //
-		ContentSelector.USER_AGENTS //
+		ContentSelector.PARENT_TYPES //
 		);
 
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);

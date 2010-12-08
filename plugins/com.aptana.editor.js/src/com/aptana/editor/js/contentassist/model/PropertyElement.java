@@ -37,6 +37,9 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
@@ -44,6 +47,13 @@ import com.aptana.editor.js.JSTypeConstants;
 
 public class PropertyElement extends BaseElement
 {
+	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
+	private static final String TYPES_PROPERTY = "types"; //$NON-NLS-1$
+	private static final String IS_INTERNAL_PROPERTY = "isInternal"; //$NON-NLS-1$
+	private static final String IS_INSTANCE_PROPERTY = "isInstanceProperty"; //$NON-NLS-1$
+	private static final String IS_CLASS_PROPERTY = "isClassProperty"; //$NON-NLS-1$
+	private static final String OWNING_TYPE_PROPERTY = "owningType"; //$NON-NLS-1$
+
 	private String _owningType;
 	private boolean _isInstanceProperty;
 	private boolean _isClassProperty;
@@ -120,6 +130,48 @@ public class PropertyElement extends BaseElement
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setOwningType(object.get(OWNING_TYPE_PROPERTY).toString());
+		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY));
+		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY));
+		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY));
+
+		// types
+		Object types = object.get(TYPES_PROPERTY);
+
+		if (types != null && types.getClass().isArray())
+		{
+			for (Object type : (Object[]) types)
+			{
+				ReturnTypeElement rt = new ReturnTypeElement();
+
+				rt.fromJSON((Map) type);
+
+				this.addType(rt);
+			}
+		}
+
+		// examples
+		Object examples = object.get(EXAMPLES_PROPERTY);
+
+		if (examples != null && examples.getClass().isArray())
+		{
+			for (Object example : (Object[]) examples)
+			{
+				this.addExample(example.toString());
+			}
+		}
+	}
+
 	/**
 	 * getExamples
 	 * 
@@ -144,7 +196,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public String getOwningType()
 	{
-		return this._owningType;
+		return StringUtil.getValue(this._owningType);
 	}
 
 	/**
@@ -258,6 +310,23 @@ public class PropertyElement extends BaseElement
 	public void setOwningType(String type)
 	{
 		this._owningType = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(OWNING_TYPE_PROPERTY, this.getOwningType());
+		out.add(IS_CLASS_PROPERTY, this.isClassProperty());
+		out.add(IS_INSTANCE_PROPERTY, this.isInstanceProperty());
+		out.add(IS_INTERNAL_PROPERTY, this.isInternal());
+		out.add(TYPES_PROPERTY, this.getTypes());
+		out.add(EXAMPLES_PROPERTY, this.getExamples());
 	}
 
 	/**
