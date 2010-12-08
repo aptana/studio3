@@ -547,4 +547,25 @@
          version="0.0.0"
          unpack="false"/>
 
+   <plugin
+         id="com.aptana.debug.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.debug.core.ie"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"/>
+
+   <plugin
+         id="com.aptana.debug.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
