@@ -34,15 +34,15 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventElement
 {
 	private String _name;
 	private String _type;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 	private String _description;
 	private String _remark;
 

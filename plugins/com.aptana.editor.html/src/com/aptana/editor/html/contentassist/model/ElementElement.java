@@ -34,22 +34,24 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.aptana.core.util.StringUtil;
 
 public class ElementElement
 {
 	private String _displayName;
 	private String _name;
 	private String _relatedClass;
-	private List<String> _attributes = new LinkedList<String>();
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private List<String> _attributes = new ArrayList<String>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 	private String _deprecated;
 	private String _description;
-	private List<String> _events = new LinkedList<String>();
+	private List<String> _events = new ArrayList<String>();
 	private String _example;
-	private List<String> _references = new LinkedList<String>();
+	private List<String> _references = new ArrayList<String>();
 	private String _remark;
 
 	/**
@@ -127,7 +129,7 @@ public class ElementElement
 	 */
 	public String getDeprecated()
 	{
-		return this._deprecated;
+		return StringUtil.getValue(this._deprecated);
 	}
 
 	/**
@@ -137,7 +139,7 @@ public class ElementElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getValue(this._description);
 	}
 
 	/**
@@ -147,7 +149,7 @@ public class ElementElement
 	 */
 	public String getDisplayName()
 	{
-		return this._displayName;
+		return StringUtil.getValue(this._displayName);
 	}
 
 	/**
@@ -167,7 +169,7 @@ public class ElementElement
 	 */
 	public String getExample()
 	{
-		return this._example;
+		return StringUtil.getValue(this._example);
 	}
 
 	/**
@@ -177,7 +179,7 @@ public class ElementElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getValue(this._name);
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class ElementElement
 	 */
 	public String getRelatedClass()
 	{
-		return this._relatedClass;
+		return StringUtil.getValue(this._relatedClass);
 	}
 
 	/**
@@ -207,7 +209,7 @@ public class ElementElement
 	 */
 	public String getRemark()
 	{
-		return this._remark;
+		return StringUtil.getValue(this._remark);
 	}
 
 	/**
@@ -233,13 +235,13 @@ public class ElementElement
 	 * 
 	 * @return
 	 */
-	public String[] getUserAgentNames()
+	public List<String> getUserAgentNames()
 	{
-		String[] result = new String[this._userAgents.size()];
+		List<String> result = new ArrayList<String>();
 		
-		for (int i = 0; i < result.length; i++)
+		for (UserAgentElement userAgent : this.getUserAgents())
 		{
-			result[i] = this._userAgents.get(i).getPlatform();
+			result.add(userAgent.getPlatform());
 		}
 		
 		return result;

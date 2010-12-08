@@ -222,7 +222,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 			}
 
-			String[] userAgents = element.getUserAgentNames();
+			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 			for (String attribute : element.getAttributes())
@@ -853,7 +853,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	private CommonCompletionProposal createCloseTagProposal(ElementElement element, int offset)
 	{
-		String[] userAgents = element.getUserAgentNames();
+		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 		String replaceString = element.getName();
 

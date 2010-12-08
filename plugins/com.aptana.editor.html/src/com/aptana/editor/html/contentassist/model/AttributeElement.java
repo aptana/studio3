@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AttributeElement
@@ -42,14 +42,14 @@ public class AttributeElement
 	private String _name;
 	private String _type;
 	private String _element;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 	private String _deprecated;
 	private String _description;
 	private String _hint;
-	private List<String> _references = new LinkedList<String>();
+	private List<String> _references = new ArrayList<String>();
 	private String _remark;
-	private List<ValueElement> _values = new LinkedList<ValueElement>();
+	private List<ValueElement> _values = new ArrayList<ValueElement>();
 
 	/**
 	 * AttributeElement
