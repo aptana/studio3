@@ -129,9 +129,9 @@ import com.aptana.ide.syncing.ui.old.SyncingConsole;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
-import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
 /**

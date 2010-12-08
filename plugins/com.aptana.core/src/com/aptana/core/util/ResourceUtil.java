@@ -42,17 +42,24 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.resources.IUniformResource;
 
 public class ResourceUtil
 {
@@ -283,4 +290,60 @@ public class ResourceUtil
 
 		return addNature;
 	}
+	
+	/**
+	 * getPath
+	 *
+	 * @param element
+	 * @return path
+	 */
+	public static String getPath( Object element ) {
+		if ( element instanceof IUniformResource ) {
+			IUniformResource resource = (IUniformResource) element;
+			IPath path = (IPath) resource.getAdapter(IPath.class);
+			if (path == null) {
+				IStorage storage = (IStorage) resource.getAdapter(IStorage.class);
+				if (storage != null) {
+					path = (IPath) storage.getAdapter(IPath.class);
+				}
+			}
+			if ( path != null ) {
+				return path.toOSString();	
+			} else {
+				return resource.getURI().toString();
+			}			
+		}
+		if ( element instanceof String ) {
+			try {
+				element = new URI((String) element);
+			} catch (URISyntaxException e) {
+			}	
+		}
+		if ( element instanceof URI ) {
+			URI uri = (URI) element;
+			if ( "file".equals(uri.getScheme()) ) //$NON-NLS-1$
+			{
+				return uri.getSchemeSpecificPart();
+			}
+			return uri.toString();
+		}
+		return null;
+	}
+	
+	/**
+	 * findWorkspaceFile
+	 *
+	 * @param filePath
+	 * @return IFile
+	 */
+	public static IFile findWorkspaceFile(String filePath) {
+		IPath path = new Path(filePath);
+		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+		if ( resource instanceof IFile )
+		{
+			return (IFile) resource;
+		}
+		return null;
+	}
+
 }

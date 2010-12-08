@@ -53,8 +53,8 @@ import org.osgi.framework.Bundle;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
-import com.aptana.ui.SWTUtils;
 import com.aptana.ui.epl.UIEplPlugin;
+import com.aptana.ui.util.SWTUtils;
 
 public class UserAgentManager
 {

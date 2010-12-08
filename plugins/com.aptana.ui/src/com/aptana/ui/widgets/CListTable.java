@@ -58,8 +58,8 @@ import org.eclipse.swt.widgets.Label;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.util.SWTUtils;
 
 /**
  * @author Ingo Muschenetz

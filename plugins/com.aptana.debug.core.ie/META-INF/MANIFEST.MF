@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %fragmentName
+Bundle-SymbolicName: com.aptana.debug.core.ie;singleton:=true
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.debug.core;bundle-version="[3.0.0,4.0.0)"
+Bundle-Localization: fragment
+Eclipse-PlatformFilter: (osgi.os=win32)

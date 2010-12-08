@@ -44,7 +44,7 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

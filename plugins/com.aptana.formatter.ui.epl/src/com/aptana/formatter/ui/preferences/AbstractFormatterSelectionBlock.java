@@ -72,8 +72,8 @@ import com.aptana.formatter.ui.IFormatterModifyDialog;
 import com.aptana.formatter.ui.IFormatterModifyDialogOwner;
 import com.aptana.formatter.ui.util.ExceptionHandler;
 import com.aptana.formatter.ui.util.IStatusChangeListener;
-import com.aptana.ui.SWTUtils;
 import com.aptana.ui.UIPlugin;
+import com.aptana.ui.util.SWTUtils;
 
 /**
  * Abstract formatter option block that displays multiple languages and let the user select a profile and a language to

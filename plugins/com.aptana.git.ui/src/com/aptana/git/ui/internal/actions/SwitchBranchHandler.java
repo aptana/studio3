@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class SwitchBranchHandler extends AbstractGitHandler
 {
