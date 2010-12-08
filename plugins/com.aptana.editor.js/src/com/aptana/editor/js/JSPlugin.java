@@ -46,55 +46,27 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class JSPlugin extends AbstractUIPlugin
 {
-
-	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.editor.js"; //$NON-NLS-1$
-
-	// The shared instance
-	private static Activator plugin;
-
-	/**
-	 * The constructor
-	 */
-	public Activator()
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception
-	{
-		super.start(context);
-		plugin = this;
-
-		Job job = new MetadataLoader();
-		job.schedule();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception
-	{
-		plugin = null;
-		super.stop(context);
-	}
+	private static JSPlugin plugin;
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static JSPlugin getDefault()
 	{
 		return plugin;
 	}
 
+	/**
+	 * getImage
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public static Image getImage(String path)
 	{
 		ImageRegistry registry = plugin.getImageRegistry();
@@ -112,6 +84,12 @@ public class Activator extends AbstractUIPlugin
 		return image;
 	}
 
+	/**
+	 * getImageDescriptor
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public static ImageDescriptor getImageDescriptor(String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
@@ -158,5 +136,35 @@ public class Activator extends AbstractUIPlugin
 		if (getDefault() == null || !getDefault().isDebugging())
 			return;
 		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
+	}
+
+	/**
+	 * The constructor
+	 */
+	public JSPlugin()
+	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception
+	{
+		super.start(context);
+		plugin = this;
+
+		Job job = new JSMetadataLoader();
+		job.schedule();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception
+	{
+		plugin = null;
+		super.stop(context);
 	}
 }
