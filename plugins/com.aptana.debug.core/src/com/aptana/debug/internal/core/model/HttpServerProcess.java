@@ -56,11 +56,6 @@ import org.eclipse.debug.core.model.IStreamsProxy;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.internal.core.CompositeResourceResolver;
-import com.aptana.ide.server.http.HttpServer;
-import com.aptana.ide.server.http.HttpServerException;
-import com.aptana.ide.server.http.RequestLineParser;
-import com.aptana.ide.server.resolvers.IHttpResourceResolver;
-import com.aptana.ide.server.resources.IHttpResource;
 
 /**
  * @author Max Stepanov
@@ -70,7 +65,7 @@ public class HttpServerProcess extends PlatformObject implements IProcess, IDebu
 	private ILaunchListener launchListener;
 	private IDebugTarget debugTarget;
 	private String label;
-	private HttpServer server;
+	private Object server;
 	private URL baseUrl;
 	private CompositeResourceResolver resourceResolver;
 
@@ -119,11 +114,11 @@ public class HttpServerProcess extends PlatformObject implements IProcess, IDebu
 		};
 		DebugPlugin.getDefault().getLaunchManager().addLaunchListener(this.launchListener);
 
+		/*
 		String serverAddress = HttpServer.getServerAddress();
 		int[] portRange = HttpServer.getPortRange();
 
 		server = new HttpServer(new IHttpResourceResolver() {
-			/* IHttpResourceResolver proxy */
 			public IHttpResource getResource(RequestLineParser requestLine) throws HttpServerException {
 				return resourceResolver.getResource(requestLine);
 			}
@@ -140,6 +135,7 @@ public class HttpServerProcess extends PlatformObject implements IProcess, IDebu
 			JSDebugPlugin.log(e);
 		}
 		this.label = MessageFormat.format(Messages.HttpServerProcess_LocalHTTPServer_0, baseUrl.toExternalForm());
+		*/
 
 		launch.addProcess(this);
 		fireCreationEvent();
@@ -245,6 +241,7 @@ public class HttpServerProcess extends PlatformObject implements IProcess, IDebu
 		if (server == null) {
 			return;
 		}
+		/*
 		try {
 			server.stop();
 		} catch (IOException e) {
@@ -252,6 +249,7 @@ public class HttpServerProcess extends PlatformObject implements IProcess, IDebu
 		} finally {
 			server = null;
 		}
+		*/
 	}
 
 	/**

@@ -39,17 +39,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.aptana.ide.server.http.HttpServerException;
-import com.aptana.ide.server.http.RequestLineParser;
-import com.aptana.ide.server.resolvers.IHttpResourceResolver;
-import com.aptana.ide.server.resources.FileHttpResource;
-import com.aptana.ide.server.resources.IHttpResource;
-
 /**
  * @author Max Stepanov
  * 
  */
-public class CompositeResourceResolver implements IHttpResourceResolver {
+public class CompositeResourceResolver /*implements IHttpResourceResolver*/ {
 
 	/**
 	 * Entry
@@ -70,9 +64,9 @@ public class CompositeResourceResolver implements IHttpResourceResolver {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.aptana.ide.server.resolvers.IHttpResourceResolver#getResource(com
-	 * .aptana.ide.server.http.RequestLineParser)
+	 * com.aptana.ide.server.resolvers.IHttpResourceResolver#getResource(com.aptana.ide.server.http.RequestLineParser)
 	 */
+	/*
 	public IHttpResource getResource(RequestLineParser requestLine) throws HttpServerException {
 		String request = requestLine.getUri();
 		for (Iterator i = paths.iterator(); i.hasNext();) {
@@ -91,6 +85,7 @@ public class CompositeResourceResolver implements IHttpResourceResolver {
 		}
 		return null;
 	}
+	*/
 
 	public void addPath(String path, File dir) {
 		if (path.length() == 0 || path.charAt(0) != '/') {

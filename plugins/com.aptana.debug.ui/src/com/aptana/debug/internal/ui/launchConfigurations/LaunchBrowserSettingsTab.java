@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -65,11 +64,12 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
+import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
@@ -77,7 +77,6 @@ import org.eclipse.ui.views.navigator.ResourceComparator;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.internal.ui.ActiveResourcePathGetterAdapter;
 import com.aptana.debug.ui.DebugUiPlugin;
@@ -85,6 +84,7 @@ import com.aptana.debug.ui.DebugUiPlugin;
 /**
  * Launch settings tab
  */
+@SuppressWarnings("restriction")
 public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 {
 	private Listener dirtyListener;
@@ -362,8 +362,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 		serversBar.setLayout(sbLayout);
 		serversBar.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		selectedServer = new ToolItem(serversBar, SWT.PUSH);
-		Image arrow = EclipseUtils.getArrowImage();
-		selectedServer.setImage(arrow);
+		selectedServer.setImage(WorkbenchImages.getImage(IWorkbenchGraphicConstants.IMG_LCL_RENDERED_VIEW_MENU));
 		serverMenu = new Menu(serverComposite);
 		selectedServer.addSelectionListener(new SelectionAdapter()
 		{
@@ -378,6 +377,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 			}
 
 		});
+		/*
 		IServer[] servers = ServerCore.getServerManager().getServers();
 		for (int i = 0; i < servers.length; i++)
 		{
@@ -409,6 +409,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 				});
 			}
 		}
+		*/
 	}
 
 	private void hookListeners(boolean hook)
@@ -523,6 +524,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 						StringUtil.EMPTY);
 				if (serverID.length() > 0)
 				{
+					/*
 					IServer[] servers = ServerCore.getServerManager().getServers();
 					for (int i = 0; i < servers.length; i++)
 					{
@@ -544,6 +546,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 							}
 						}
 					}
+					*/
 				}
 			}
 		}
@@ -609,10 +612,12 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, value);
 
 		Object data = serverText.getData();
+		/*
 		if (data instanceof IServer)
 		{
 			configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID, ((IServer) data).getId());
 		}
+		*/
 
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, fAddProjectName
 				.getSelection());
@@ -682,11 +687,13 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab
 		if (useServer.getSelection())
 		{
 			Object data = serverText.getData();
+			/*
 			if (data == null || !(data instanceof IServer))
 			{
 				setErrorMessage(Messages.LaunchBrowserSettingsTab_Server_Must_Be_Selected);
 				return false;
 			}
+			*/
 		}
 
 		return true;
