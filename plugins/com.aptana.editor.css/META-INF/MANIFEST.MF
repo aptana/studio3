@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  com.aptana.scripting,
  com.aptana.libraries,
- com.aptana.ui
+ com.aptana.ui,
+ org.mortbay.jetty.util
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
