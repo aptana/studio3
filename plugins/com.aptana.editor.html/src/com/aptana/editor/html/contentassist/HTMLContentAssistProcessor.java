@@ -71,7 +71,7 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.OpenTagCloser;
@@ -114,9 +114,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
+	static final Image ELEMENT_ICON = HTMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 	private static final Map<String, String> DOCTYPES;
 
@@ -475,7 +475,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e);
+			HTMLPlugin.logError(e);
 		}
 
 		return proposals;

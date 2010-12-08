@@ -35,7 +35,7 @@
 package com.aptana.editor.common.internal.commands;
 
 import com.aptana.editor.common.tests.SingleEditorTestCase;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 
 public class ExpandCollapseAllHandlerTest extends SingleEditorTestCase
 {
@@ -47,7 +47,7 @@ public class ExpandCollapseAllHandlerTest extends SingleEditorTestCase
 	@Override
 	protected void setUp() throws Exception
 	{
-		Activator.getDefault();
+		HTMLPlugin.getDefault();
 		super.setUp();
 	}
 

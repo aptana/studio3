@@ -56,7 +56,7 @@ import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
@@ -316,7 +316,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			Activator
+			HTMLPlugin
 					.logError(
 							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
 									file.getName()), e);

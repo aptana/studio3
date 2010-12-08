@@ -46,17 +46,17 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class HTMLPlugin extends AbstractUIPlugin
 {
 	public static final String PLUGIN_ID = "com.aptana.editor.html"; //$NON-NLS-1$
-	private static Activator plugin;
+	private static HTMLPlugin plugin;
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault()
+	public static HTMLPlugin getDefault()
 	{
 		return plugin;
 	}
@@ -121,7 +121,7 @@ public class Activator extends AbstractUIPlugin
 	/**
 	 * The constructor
 	 */
-	public Activator()
+	public HTMLPlugin()
 	{
 	}
 
