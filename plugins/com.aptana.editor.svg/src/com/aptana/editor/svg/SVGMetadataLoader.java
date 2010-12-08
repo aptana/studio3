@@ -64,14 +64,14 @@ import com.aptana.index.core.IndexManager;
 /**
  * MetadataLoader
  */
-public class MetadataLoader extends Job
+public class SVGMetadataLoader extends Job
 {
 	private static final String SVG_DTD = "DTD/svg11-flat.dtd"; //$NON-NLS-1$
 
 	/**
 	 * MetadataLoader
 	 */
-	public MetadataLoader()
+	public SVGMetadataLoader()
 	{
 		super(Messages.MetadataLoader_Loading_SVG_Metadata);
 
