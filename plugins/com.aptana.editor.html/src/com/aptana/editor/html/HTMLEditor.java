@@ -57,7 +57,6 @@ import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
-import com.aptana.editor.js.JSPlugin;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
@@ -123,7 +122,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
-		return JSPlugin.getDefault().getPreferenceStore();
+		return HTMLPlugin.getDefault().getPreferenceStore();
 	}
 
 	@Override
@@ -197,7 +196,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 			}
 			catch (BadLocationException e)
 			{
-				JSPlugin.logError(e.getMessage(), e);
+				HTMLPlugin.logError(e.getMessage(), e);
 			}
 			for (Map.Entry<Annotation, Position> entry : occurrences.entrySet())
 			{
