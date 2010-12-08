@@ -56,6 +56,8 @@ public interface CSSIndexConstants
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
 	static final String USER_AGENT = PREFIX + "user_agent"; //$NON-NLS-1$
 	static final String VALUE = PREFIX + "value"; //$NON-NLS-1$
+	static final String PSUEDO_CLASS = PREFIX + "pseudo_class"; //$NON-NLS-1$
+	static final String PSUEDO_ELEMENT = PREFIX + "pseudo_element"; //$NON-NLS-1$
 
 	static final String CLASS = PREFIX + "class"; //$NON-NLS-1$
 	static final String IDENTIFIER = PREFIX + "identifier"; //$NON-NLS-1$
