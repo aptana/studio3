@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
 import com.aptana.editor.html.contentassist.index.HTMLMetadataReader;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
@@ -204,7 +204,7 @@ public class HTMLIndexQueryHelper
 
 			for (String resource : resources)
 			{
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+				URL url = FileLocator.find(HTMLPlugin.getDefault().getBundle(), new Path(resource), null);
 
 				if (url != null)
 				{
@@ -218,7 +218,7 @@ public class HTMLIndexQueryHelper
 					}
 					catch (Throwable t)
 					{
-						Activator.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata + ": " + resource, t); //$NON-NLS-1$
+						HTMLPlugin.logError(Messages.HTMLIndexQueryHelper_Error_Loading_Metadata + ": " + resource, t); //$NON-NLS-1$
 					}
 					finally
 					{

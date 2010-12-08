@@ -34,13 +34,22 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
 
 public class ElementElement extends AbstractCSSMetadataElement
 {
+	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
+	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
+
 	private String _displayName;
-	private List<String> _properties = new LinkedList<String>();
+	private List<String> _properties = new ArrayList<String>();
 	private String _remark;
 
 	/**
@@ -61,6 +70,29 @@ public class ElementElement extends AbstractCSSMetadataElement
 		this._properties.add(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setDisplayName(object.get(DISPLAY_NAME_PROPERTY).toString());
+		this.setRemark(object.get(REMARK_PROPERTY).toString());
+
+		Object properties = object.get(PROPERTIES_PROPERTY);
+		if (properties != null && properties.getClass().isArray())
+		{
+			for (Object property : (Object[]) properties)
+			{
+				this.addProperty(property.toString());
+			}
+		}
+	}
+
 	/**
 	 * getFullName
 	 * 
@@ -68,7 +100,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getDisplayName()
 	{
-		return this._displayName;
+		return StringUtil.getValue(this._displayName);
 	}
 
 	/**
@@ -88,7 +120,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return this._remark;
+		return StringUtil.getValue(this._remark);
 	}
 
 	/**
@@ -109,5 +141,20 @@ public class ElementElement extends AbstractCSSMetadataElement
 	public void setRemark(String remark)
 	{
 		this._remark = remark;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(DISPLAY_NAME_PROPERTY, this.getDisplayName());
+		out.add(REMARK_PROPERTY, this.getRemark());
+		out.add(PROPERTIES_PROPERTY, this.getProperties());
 	}
 }

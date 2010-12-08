@@ -63,7 +63,7 @@ import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class CSSValidator implements IValidator
@@ -214,7 +214,7 @@ public class CSSValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			Activator.logError(Messages.CSSValidator_ERR_FailToLoadProfile, e);
+			CSSPlugin.logError(Messages.CSSValidator_ERR_FailToLoadProfile, e);
 		}
 		finally
 		{
@@ -335,7 +335,7 @@ public class CSSValidator implements IValidator
 		}
 		catch (MalformedURLException e)
 		{
-			Activator.logError(MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path), e);
+			CSSPlugin.logError(MessageFormat.format(Messages.CSSValidator_ERR_InvalidPath, path), e);
 		}
 
 		StyleSheet stylesheet = parser.getStyleSheet();

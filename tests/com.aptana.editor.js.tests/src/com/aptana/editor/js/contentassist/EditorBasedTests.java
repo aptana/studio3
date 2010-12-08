@@ -55,7 +55,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 
 public class EditorBasedTests extends TestCase
 {
@@ -92,7 +92,7 @@ public class EditorBasedTests extends TestCase
 		
 		try
 		{
-			editor = (ITextEditor) page.openEditor(editorInput, Activator.PLUGIN_ID);
+			editor = (ITextEditor) page.openEditor(editorInput, JSPlugin.PLUGIN_ID);
 		}
 		catch (PartInitException e)
 		{
@@ -134,7 +134,7 @@ public class EditorBasedTests extends TestCase
 
 		try
 		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
+			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), path, null);
 			URL fileURL = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(fileURL);
 

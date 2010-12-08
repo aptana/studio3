@@ -137,7 +137,7 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
 /**

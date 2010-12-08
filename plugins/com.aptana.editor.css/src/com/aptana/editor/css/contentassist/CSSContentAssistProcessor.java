@@ -59,7 +59,7 @@ import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
@@ -82,8 +82,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
 	};
 
-	private static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image PROPERTY_ICON = Activator.getImage("/icons/property.png"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = CSSPlugin.getImage("/icons/property.png"); //$NON-NLS-1$
 
 	private IContextInformationValidator _validator;
 	private CSSIndexQueryHelper _queryHelper;
@@ -117,7 +117,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (ElementElement element : elements)
 			{
 				String description = CSSModelFormatter.getDescription(element);
-				String[] userAgents = element.getUserAgentNames();
+				List<String> userAgents = element.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				proposals.add(createProposal(element.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
@@ -153,7 +153,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					for (ValueElement value : values)
 					{
 						// String description = CSSModelFormatter.getDescription(value);
-						String[] userAgents = pseudoClass.getUserAgentNames();
+						List<String> userAgents = pseudoClass.getUserAgentNames();
 						Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 						proposals.add(createProposal(value.getName(), ELEMENT_ICON, value.getDescription(),
@@ -179,7 +179,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (PseudoClassElement pseudoClass : classes)
 			{
 				String description = CSSModelFormatter.getDescription(pseudoClass);
-				String[] userAgents = pseudoClass.getUserAgentNames();
+				List<String> userAgents = pseudoClass.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				proposals.add(createProposal(pseudoClass.getName(), ELEMENT_ICON, description, userAgentIcons, offset));
@@ -196,7 +196,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 					continue;
 				}
 				String description = CSSModelFormatter.getDescription(pseudoElement);
-				String[] userAgents = pseudoElement.getUserAgentNames();
+				List<String> userAgents = pseudoElement.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				proposals
@@ -219,7 +219,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (PseudoElementElement pseudoElement : elements)
 			{
 				String description = CSSModelFormatter.getDescription(pseudoElement);
-				String[] userAgents = pseudoElement.getUserAgentNames();
+				List<String> userAgents = pseudoElement.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				proposals
@@ -284,7 +284,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			for (PropertyElement property : properties)
 			{
 				String description = CSSModelFormatter.getDescription(property);
-				String[] userAgents = property.getUserAgentNames();
+				List<String> userAgents = property.getUserAgentNames();
 				Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 				proposals.add(createProposal(property.getName(), property.getName() + postfix, PROPERTY_ICON,
@@ -502,7 +502,7 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 							UserAgentManager.getInstance().getActiveUserAgentIDs());
 					for (String color : colors)
 					{
-						ImageRegistry reg = Activator.getDefault().getImageRegistry();
+						ImageRegistry reg = CSSPlugin.getDefault().getImageRegistry();
 						Image img = reg.get(color);
 						if (img == null)
 						{

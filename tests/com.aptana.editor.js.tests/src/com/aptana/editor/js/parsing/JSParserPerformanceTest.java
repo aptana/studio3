@@ -43,7 +43,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 
@@ -73,7 +73,7 @@ public class JSParserPerformanceTest extends PerformanceTestCase
 	 */
 	private String getSource(String resourceName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
 	}

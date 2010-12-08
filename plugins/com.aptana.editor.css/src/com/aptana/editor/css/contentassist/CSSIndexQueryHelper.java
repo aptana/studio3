@@ -35,36 +35,42 @@
 package com.aptana.editor.css.contentassist;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
-import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 
 public class CSSIndexQueryHelper
 {
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	public static Index getIndex()
+	{
+		return IndexManager.getInstance().getIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
 	private CSSIndexReader _reader;
-	private CSSMetadataReader _metadata;
 
 	/**
 	 * CSSIndexQueryHelper
 	 */
 	public CSSIndexQueryHelper()
 	{
+		this._reader = new CSSIndexReader();
 	}
 
 	/**
@@ -74,48 +80,7 @@ public class CSSIndexQueryHelper
 	 */
 	public Map<String, String> getClasses(Index index)
 	{
-		return this.getReader().getValues(index, CSSIndexConstants.CLASS);
-	}
-
-	/**
-	 * getElements
-	 * 
-	 * @return
-	 */
-	public List<ElementElement> getElements()
-	{
-		return this.getMetadata().getElements();
-	}
-	
-	/**
-	 * getPseudoElements
-	 * 
-	 * @return
-	 */
-	public List<PseudoElementElement> getPseudoElements()
-	{
-		return this.getMetadata().getPseudoElements();
-	}
-	
-	/**
-	 * getPseudoClasses
-	 * 
-	 * @return
-	 */
-	public List<PseudoClassElement> getPseudoClasses()
-	{
-		return this.getMetadata().getPseudoClasses();
-	}
-
-	/**
-	 * getIDs
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Map<String, String> getIDs(Index index)
-	{
-		return this.getReader().getValues(index, CSSIndexConstants.IDENTIFIER);
+		return this._reader.getValues(index, CSSIndexConstants.CLASS);
 	}
 
 	/**
@@ -126,74 +91,51 @@ public class CSSIndexQueryHelper
 	 */
 	public Set<String> getColors(Index index)
 	{
-		if (index == null)
-			return Collections.emptySet();
-		Map<String, String> colorMap = this.getReader().getValues(index, CSSIndexConstants.COLOR);
-		if (colorMap == null)
-			return Collections.emptySet();
-		return colorMap.keySet();
-	}
+		Set<String> result = Collections.emptySet();
 
-	/**
-	 * getMetadata
-	 */
-	private CSSMetadataReader getMetadata()
-	{
-		if (this._metadata == null)
+		if (index != null)
 		{
-			this._metadata = new CSSMetadataReader();
-			String[] resources = this.getMetadataResources();
+			Map<String, String> colorMap = this._reader.getValues(index, CSSIndexConstants.COLOR);
 
-			for (String resource : resources)
+			if (colorMap != null)
 			{
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
-
-				if (url != null)
-				{
-					InputStream stream = null;
-
-					try
-					{
-						stream = url.openStream();
-
-						this._metadata.loadXML(stream);
-					}
-					catch (IOException e)
-					{
-						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, e);
-					}
-					catch (Throwable t)
-					{
-						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, t);
-					}
-					finally
-					{
-						if (stream != null)
-						{
-							try
-							{
-								stream.close();
-							}
-							catch (IOException e)
-							{
-							}
-						}
-					}
-				}
+				result = colorMap.keySet();
 			}
 		}
 
-		return this._metadata;
+		return result;
 	}
 
 	/**
-	 * getMetadataResources
+	 * getElements
 	 * 
 	 * @return
 	 */
-	protected String[] getMetadataResources()
+	public List<ElementElement> getElements()
 	{
-		return new String[] { "/metadata/css_metadata.xml" }; //$NON-NLS-1$
+		List<ElementElement> result = Collections.emptyList();
+
+		try
+		{
+			result = this._reader.getElements(getIndex());
+		}
+		catch (IOException e)
+		{
+			CSSPlugin.logError(e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getIDs
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Map<String, String> getIDs(Index index)
+	{
+		return this._reader.getValues(index, CSSIndexConstants.IDENTIFIER);
 	}
 
 	/**
@@ -203,7 +145,18 @@ public class CSSIndexQueryHelper
 	 */
 	public List<PropertyElement> getProperties()
 	{
-		return this.getMetadata().getProperties();
+		List<PropertyElement> result = Collections.emptyList();
+
+		try
+		{
+			result = this._reader.getProperties(getIndex());
+		}
+		catch (IOException e)
+		{
+			CSSPlugin.logError(e.getMessage(), e);
+		}
+
+		return result;
 	}
 
 	/**
@@ -215,34 +168,69 @@ public class CSSIndexQueryHelper
 	{
 		PropertyElement result = null;
 
-		if (name != null && name.length() > 0)
+		try
 		{
-			// TODO: optimize with name->property hash
-			for (PropertyElement property : this.getProperties())
+			List<PropertyElement> properties = this._reader.getProperties(getIndex(), name);
+
+			if (properties != null)
 			{
-				if (name.equals(property.getName()))
+				for (PropertyElement property : properties)
 				{
-					result = property;
-					break;
+					if (name.equals(property.getName()))
+					{
+						result = property;
+						break;
+					}
 				}
 			}
+		}
+		catch (IOException e)
+		{
+			CSSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
 	}
 
 	/**
-	 * getReader
+	 * getPseudoClasses
 	 * 
 	 * @return
 	 */
-	protected CSSIndexReader getReader()
+	public List<PseudoClassElement> getPseudoClasses()
 	{
-		if (this._reader == null)
+		List<PseudoClassElement> result = Collections.emptyList();
+
+		try
 		{
-			this._reader = new CSSIndexReader();
+			result = this._reader.getPseudoClasses(getIndex());
+		}
+		catch (IOException e)
+		{
+			CSSPlugin.logError(e.getMessage(), e);
 		}
 
-		return this._reader;
+		return result;
+	}
+
+	/**
+	 * getPseudoElements
+	 * 
+	 * @return
+	 */
+	public List<PseudoElementElement> getPseudoElements()
+	{
+		List<PseudoElementElement> result = Collections.emptyList();
+
+		try
+		{
+			result = this._reader.getPseudoElements(getIndex());
+		}
+		catch (IOException e)
+		{
+			CSSPlugin.logError(e.getMessage(), e);
+		}
+
+		return result;
 	}
 }

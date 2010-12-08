@@ -506,6 +506,20 @@
          unpack="false"/>
 
    <plugin
+         id="com.aptana.webserver.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.webserver.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="com.aptana.configurations"
          download-size="0"
          install-size="0"

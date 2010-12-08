@@ -34,13 +34,19 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 public class PseudoElementElement extends AbstractCSSMetadataElement
 {
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax"; //$NON-NLS-1$
+
 	private boolean _allowPseudoClassSyntax;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
 
 	/**
 	 * PseudoElementElement
@@ -60,6 +66,42 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 		this._specifications.add(specification);
 	}
 
+	public boolean allowPseudoClassSyntax()
+	{
+		return _allowPseudoClassSyntax;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setAllowPseudoClassSyntax(Boolean.TRUE == object.get(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY));
+
+		// specifications
+		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
+
+		if (specifications != null && specifications.getClass().isArray())
+		{
+			for (Object specification : (Object[]) specifications)
+			{
+				if (specification instanceof Map)
+				{
+					SpecificationElement s = new SpecificationElement();
+
+					s.fromJSON((Map) specification);
+
+					this.addSpecification(s);
+				}
+			}
+		}
+	}
+
 	/**
 	 * getSpecifications
 	 * 
@@ -75,8 +117,17 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 		this._allowPseudoClassSyntax = allow;
 	}
 
-	public boolean allowPseudoClassSyntax()
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
 	{
-		return _allowPseudoClassSyntax;
+		super.toJSON(out);
+
+		out.add(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY, this.allowPseudoClassSyntax());
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
 	}
 }

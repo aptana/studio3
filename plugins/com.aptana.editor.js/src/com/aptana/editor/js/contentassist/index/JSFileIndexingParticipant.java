@@ -52,7 +52,7 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -86,7 +86,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 	}
 
@@ -177,7 +177,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{

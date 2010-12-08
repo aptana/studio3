@@ -36,7 +36,7 @@ package com.aptana.editor.html.outline;
 
 import junit.framework.TestCase;
 
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.parsing.ast.IParseNode;
@@ -78,6 +78,6 @@ public class HTMLOutlineProviderTest extends TestCase
 		Object[] selectors = fContentProvider.getElements(result);
 		assertEquals(1, selectors.length);
 		assertEquals("html", fLabelProvider.getText(selectors[0]));
-		assertEquals(Activator.getImage("icons/element.png"), fLabelProvider.getImage(selectors[0]));
+		assertEquals(HTMLPlugin.getImage("icons/element.png"), fLabelProvider.getImage(selectors[0]));
 	}
 }

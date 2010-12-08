@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -52,7 +52,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (new DefaultScope()).getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences prefs = (new DefaultScope()).getNode(JSPlugin.PLUGIN_ID);
 		
 		prefs.putBoolean(IPreferenceConstants.COMMENT_INDENT_USE_STAR, DEFAULT_COMMENT_INDENT_USE_STAR);
 		prefs.putBoolean(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, DEFAULT_AUTO_INDENT_ON_RETURN);

@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -109,7 +109,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -133,7 +133,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -157,7 +157,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -270,7 +270,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -294,7 +294,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -319,7 +319,7 @@ public class JSIndexQueryHelper
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;

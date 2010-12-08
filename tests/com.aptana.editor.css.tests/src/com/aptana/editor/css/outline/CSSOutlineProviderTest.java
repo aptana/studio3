@@ -34,7 +34,7 @@
  */
 package com.aptana.editor.css.outline;
 
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.editor.css.parsing.CSSScanner;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
@@ -79,13 +79,13 @@ public class CSSOutlineProviderTest extends TestCase
 		assertEquals(2, selectors.length);
 		CSSRuleNode rule = (CSSRuleNode) result.getChild(0);
 		assertEquals(rule.getSelectors()[0], selectors[0]);
-		assertEquals(Activator.getImage("icons/selector.png"), fLabelProvider.getImage(selectors[0]));
+		assertEquals(CSSPlugin.getImage("icons/selector.png"), fLabelProvider.getImage(selectors[0]));
 		assertEquals(rule.getSelectors()[1], selectors[1]);
 
 		Object[] declarations = fContentProvider.getChildren(selectors[0]);
 		assertEquals(1, declarations.length);
 		assertEquals(rule.getDeclarations()[0], declarations[0]);
-		assertEquals(Activator.getImage("icons/declaration.png"), fLabelProvider.getImage(declarations[0]));
+		assertEquals(CSSPlugin.getImage("icons/declaration.png"), fLabelProvider.getImage(declarations[0]));
 
 		declarations = fContentProvider.getChildren(selectors[1]);
 		assertEquals(1, declarations.length);

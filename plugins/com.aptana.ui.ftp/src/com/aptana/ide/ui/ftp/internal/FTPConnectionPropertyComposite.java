@@ -89,7 +89,7 @@ import com.aptana.ide.ui.ftp.dialogs.Messages;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * 

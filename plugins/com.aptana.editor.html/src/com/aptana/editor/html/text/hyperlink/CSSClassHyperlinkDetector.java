@@ -49,8 +49,8 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 
 import com.aptana.editor.common.text.hyperlink.EditorSearchHyperlink;
 import com.aptana.editor.common.text.hyperlink.IndexQueryingHyperlinkDetector;
-import com.aptana.editor.css.Activator;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -116,7 +116,7 @@ public class CSSClassHyperlinkDetector extends IndexQueryingHyperlinkDetector
 		}
 		catch (Exception e)
 		{
-			Activator.logError(e.getMessage(), e);
+			HTMLPlugin.logError(e.getMessage(), e);
 		}
 		if (hyperlinks.isEmpty())
 		{

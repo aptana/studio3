@@ -51,7 +51,7 @@ import beaver.Symbol;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 
 public class SDocParserTests extends TestCase
@@ -91,7 +91,7 @@ public class SDocParserTests extends TestCase
 
 		try
 		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), path, null);
+			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), path, null);
 			URL fileURL = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(fileURL);
 
