@@ -74,8 +74,7 @@ public final class ServerConfigurationManager {
 	private static ServerConfigurationManager instance;
 	private Map<String, IConfigurationElement> configurationElements = new HashMap<String, IConfigurationElement>();
 	private List<ConfigurationType> types = new ArrayList<ConfigurationType>();
-	private List<AbstractWebServerConfiguration> serverConfigurations = Collections
-			.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
+	private List<AbstractWebServerConfiguration> serverConfigurations = Collections.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
 	private List<IMemento> unresolvedElements = new ArrayList<IMemento>();
 
 	public final class ConfigurationType {

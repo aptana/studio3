@@ -33,32 +33,32 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.webserver.core;
+package com.aptana.webserver.core.builtin;
 
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import java.net.URI;
+
+import com.aptana.core.util.SocketUtil;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.EFSWebServerConfiguration;
 
 /**
  * @author Max Stepanov
  *
  */
-public class SimpleWebServerConfiguration extends EFSWebServerConfiguration {
+public class LocalWebServer {
 
+	private final EFSWebServerConfiguration configuration;
+	
 	/**
-	 * @return the documentRoot
+	 * 
 	 */
-	public IPath getDocumentRootPath() {
-		if (documentRoot == null) {
-			return null;
-		}
-		return Path.fromPortableString(documentRoot.getSchemeSpecificPart());
+	public LocalWebServer(URI documentRoot) {
+		configuration = new EFSWebServerConfiguration();
+		configuration.setDocumentRoot(documentRoot);
+	}
+	
+	public AbstractWebServerConfiguration getConfiguration() {
+		return configuration;
 	}
 
-	/**
-	 * @param documentRoot the documentRoot to set
-	 */
-	public void setDocumentRootPath(IPath documentRoot) {
-		this.documentRoot = EFS.getLocalFileSystem().getStore(documentRoot).toURI();
-	}
 }
