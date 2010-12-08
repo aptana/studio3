@@ -64,12 +64,12 @@ import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class MetadataLoader extends Job
+public class JSMetadataLoader extends Job
 {
 	/**
 	 * MetadataLoader
 	 */
-	public MetadataLoader()
+	public JSMetadataLoader()
 	{
 		super(Messages.Loading_Metadata);
 
@@ -88,7 +88,7 @@ public class MetadataLoader extends Job
 
 		for (String resource : resources)
 		{
-			URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), new Path(resource), null);
 
 			if (url != null)
 			{
@@ -102,7 +102,7 @@ public class MetadataLoader extends Job
 				}
 				catch (Throwable t)
 				{
-					Activator.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t); //$NON-NLS-1$
+					JSPlugin.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t); //$NON-NLS-1$
 				}
 				finally
 				{
@@ -159,7 +159,7 @@ public class MetadataLoader extends Job
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 	}
 
@@ -196,7 +196,7 @@ public class MetadataLoader extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(Activator.PLUGIN_ID,
+		double expectedVersion = Platform.getPreferencesService().getDouble(JSPlugin.PLUGIN_ID,
 				IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
 
 		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
@@ -217,7 +217,7 @@ public class MetadataLoader extends Job
 	 */
 	private void updateVersionPreference()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(JSPlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, JSIndexConstants.INDEX_VERSION);
 
