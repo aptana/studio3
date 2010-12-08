@@ -20,7 +20,7 @@ import com.aptana.editor.common.ICommonConstants;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.commands.TextEditorUtils;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class DocumentScopeManagerTest extends TestCase
 {

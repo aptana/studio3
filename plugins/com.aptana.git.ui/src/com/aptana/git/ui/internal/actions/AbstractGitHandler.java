@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 abstract class AbstractGitHandler extends AbstractHandler
 {

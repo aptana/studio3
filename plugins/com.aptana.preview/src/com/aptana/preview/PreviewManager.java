@@ -84,7 +84,7 @@ import com.aptana.preview.internal.Editors;
 import com.aptana.preview.internal.PreviewEditorInput;
 import com.aptana.preview.internal.PreviewEditorPart;
 import com.aptana.preview.internal.PreviewHandlers;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov

@@ -71,7 +71,7 @@ import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ide.ui.secureftp.dialogs.Messages;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * 

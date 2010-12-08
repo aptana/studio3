@@ -43,8 +43,8 @@ import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.SourceConfig;
-import com.aptana.preview.server.AbstractWebServerConfiguration;
-import com.aptana.preview.server.ServerConfigurationManager;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.ServerConfigurationManager;
 
 /**
  * @author Max Stepanov
