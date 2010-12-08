@@ -44,9 +44,9 @@ import com.aptana.core.util.StringUtil;
 
 public class ElementElement extends AbstractCSSMetadataElement
 {
-	private static final String PROPERTIES_PROPERTY = "properties";
-	private static final String REMARK_PROPERTY = "remark";
-	private static final String DISPLAY_NAME_PROPERTY = "displayName";
+	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
+	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
 
 	private String _displayName;
 	private List<String> _properties = new ArrayList<String>();

@@ -44,13 +44,13 @@ import com.aptana.core.util.StringUtil;
 
 public class PropertyElement extends AbstractCSSMetadataElement
 {
-	private static final String SPECIFICATIONS_PROPERTY = "specifications";
-	private static final String VALUES_PROPERTY = "values";
-	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues";
-	private static final String HINT_PROPERTY = "hint";
-	private static final String REMARK_PROPERTY = "remark";
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
+	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues"; //$NON-NLS-1$
+	private static final String HINT_PROPERTY = "hint"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
 
-	private static final String TYPE_PROPERTY = "type";
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 	private boolean _allowMultipleValues;
 	private String _type;
 	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();

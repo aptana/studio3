@@ -42,8 +42,8 @@ import org.mortbay.util.ajax.JSON.Output;
 
 public class PseudoElementElement extends AbstractCSSMetadataElement
 {
-	private static final String SPECIFICATIONS_PROPERTY = "specifications";
-	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax";
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax"; //$NON-NLS-1$
 
 	private boolean _allowPseudoClassSyntax;
 	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();

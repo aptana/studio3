@@ -45,9 +45,9 @@ import com.aptana.core.util.StringUtil;
 
 public class ValueElement implements Convertible
 {
-	private static final String USER_AGENTS_PROPERTY = "userAgents";
-	private static final String DESCRIPTION_PROPERTY = "description";
-	private static final String NAME_PROPERTY = "name";
+	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
 	private String _description;

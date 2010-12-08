@@ -43,8 +43,8 @@ import com.aptana.core.util.StringUtil;
 
 public class SpecificationElement implements Convertible
 {
-	private static final String VERSION_PROPERTY = "version";
-	private static final String NAME_PROPERTY = "name";
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
 	private String _version;

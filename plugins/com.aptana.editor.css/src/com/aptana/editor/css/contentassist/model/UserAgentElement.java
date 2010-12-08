@@ -43,10 +43,10 @@ import com.aptana.core.util.StringUtil;
 
 public class UserAgentElement implements Convertible
 {
-	private static final String DESCRIPTION_PROPERTY = "description";
-	private static final String VERSION_PROPERTY = "version";
-	private static final String PLATFORM_PROPERTY = "platform";
-	private static final String OS_PROPERTY = "os";
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String PLATFORM_PROPERTY = "platform"; //$NON-NLS-1$
+	private static final String OS_PROPERTY = "os"; //$NON-NLS-1$
 
 	private String _description;
 	private String _os;

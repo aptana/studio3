@@ -46,10 +46,10 @@ import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement, Convertible
 {
-	private static final String USER_AGENTS_PROPERTY = "userAgents";
-	private static final String EXAMPLE_PROPERTY = "example";
-	private static final String DESCRIPTION_PROPERTY = "description";
-	private static final String NAME_PROPERTY = "name";
+	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String EXAMPLE_PROPERTY = "example"; //$NON-NLS-1$
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
 	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
