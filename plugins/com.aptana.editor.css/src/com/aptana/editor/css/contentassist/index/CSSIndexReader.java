@@ -45,6 +45,8 @@ import org.mortbay.util.ajax.JSON;
 
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -113,6 +115,58 @@ public class CSSIndexReader
 		}
 
 		for (String document : property.getDocuments())
+		{
+			p.addDocument(document);
+		}
+
+		return p;
+	}
+
+	/**
+	 * @param index
+	 * @param pseudoClass
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private PseudoClassElement createPseudoClassFromKey(Index index, QueryResult pseudoClass)
+	{
+		PseudoClassElement p = new PseudoClassElement();
+
+		String word = pseudoClass.getWord();
+		Object m = JSON.parse(word);
+
+		if (m instanceof Map)
+		{
+			p.fromJSON((Map) m);
+		}
+
+		for (String document : pseudoClass.getDocuments())
+		{
+			p.addDocument(document);
+		}
+
+		return p;
+	}
+
+	/**
+	 * @param index
+	 * @param pseudoElement
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private PseudoElementElement createPseudoElementFromKey(Index index, QueryResult pseudoElement)
+	{
+		PseudoElementElement p = new PseudoElementElement();
+
+		String word = pseudoElement.getWord();
+		Object m = JSON.parse(word);
+
+		if (m instanceof Map)
+		{
+			p.fromJSON((Map) m);
+		}
+
+		for (String document : pseudoElement.getDocuments())
 		{
 			p.addDocument(document);
 		}
@@ -210,6 +264,68 @@ public class CSSIndexReader
 					{
 						result.add(this.createPropertyFromKey(index, property));
 					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getPseudoClasses
+	 * 
+	 * @param index
+	 * @return
+	 * @throws IOException
+	 */
+	public List<PseudoClassElement> getPseudoClasses(Index index) throws IOException
+	{
+		List<PseudoClassElement> result = new ArrayList<PseudoClassElement>();
+
+		if (index != null)
+		{
+			List<QueryResult> pseudoClasses = index.query( //
+				new String[] { CSSIndexConstants.PSUEDO_CLASS }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+			if (pseudoClasses != null)
+			{
+				for (QueryResult pseudoClass : pseudoClasses)
+				{
+					result.add(this.createPseudoClassFromKey(index, pseudoClass));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getPseudoElements
+	 * 
+	 * @param index
+	 * @return
+	 * @throws IOException
+	 */
+	public List<PseudoElementElement> getPseudoElements(Index index) throws IOException
+	{
+		List<PseudoElementElement> result = new ArrayList<PseudoElementElement>();
+
+		if (index != null)
+		{
+			List<QueryResult> pseudoElements = index.query( //
+				new String[] { CSSIndexConstants.PSUEDO_ELEMENT }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+			if (pseudoElements != null)
+			{
+				for (QueryResult pseudoElement : pseudoElements)
+				{
+					result.add(this.createPseudoElementFromKey(index, pseudoElement));
 				}
 			}
 		}

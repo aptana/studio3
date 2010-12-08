@@ -41,6 +41,8 @@ import org.mortbay.util.ajax.JSON;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
 
 public class CSSIndexWriter
@@ -51,7 +53,7 @@ public class CSSIndexWriter
 	public CSSIndexWriter()
 	{
 	}
-	
+
 	/**
 	 * getDocumentPath
 	 * 
@@ -70,15 +72,18 @@ public class CSSIndexWriter
 	 */
 	public void writeElement(Index index, ElementElement element)
 	{
-		String key = StringUtil.join( //
-			CSSIndexConstants.DELIMITER, //
-			element.getName(), //
-			JSON.toString(element) //
-		);
-		
-		index.addEntry(CSSIndexConstants.ELEMENT, key, this.getDocumentPath());
+		if (index != null)
+		{
+			String key = StringUtil.join( //
+				CSSIndexConstants.DELIMITER, //
+				element.getName(), //
+				JSON.toString(element) //
+				);
+
+			index.addEntry(CSSIndexConstants.ELEMENT, key, this.getDocumentPath());
+		}
 	}
-	
+
 	/**
 	 * writeProperty
 	 * 
@@ -87,12 +92,46 @@ public class CSSIndexWriter
 	 */
 	public void writeProperty(Index index, PropertyElement property)
 	{
-		String key = StringUtil.join( //
-			CSSIndexConstants.DELIMITER, //
-			JSON.toString(property) //
-		);
-		
-		index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
+		if (index != null)
+		{
+			String key = StringUtil.join( //
+				CSSIndexConstants.DELIMITER, //
+				JSON.toString(property) //
+				);
+
+			index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
+		}
 	}
 
+	/**
+	 * writePseudoClassElement
+	 * 
+	 * @param index
+	 * @param pseudoClass
+	 */
+	public void writePseudoClass(Index index, PseudoClassElement pseudoClass)
+	{
+		if (index != null)
+		{
+			String key = JSON.toString(pseudoClass);
+			
+			index.addEntry(CSSIndexConstants.PSUEDO_CLASS, key, this.getDocumentPath());
+		}
+	}
+
+	/**
+	 * writePseudoElement
+	 * 
+	 * @param index
+	 * @param pseudoElement
+	 */
+	public void writePseudoElement(Index index, PseudoElementElement pseudoElement)
+	{
+		if (index != null)
+		{
+			String key = JSON.toString(pseudoElement);
+			
+			index.addEntry(CSSIndexConstants.PSUEDO_ELEMENT, key, this.getDocumentPath());
+		}
+	}
 }
