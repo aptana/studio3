@@ -50,7 +50,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.js.Activator;
 import com.aptana.editor.svg.contentassist.index.SVGIndexConstants;
 import com.aptana.editor.svg.preferences.IPreferenceConstants;
 import com.aptana.editor.xml.contentassist.index.IKeyProvider;
@@ -153,7 +152,7 @@ public class MetadataLoader extends Job
 	 */
 	private void updateVersionPreference()
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(SVGPlugin.PLUGIN_ID);
 
 		prefs.putDouble(IPreferenceConstants.SVG_INDEX_VERSION, SVGIndexConstants.INDEX_VERSION);
 
