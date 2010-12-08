@@ -42,6 +42,7 @@ import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -101,11 +102,15 @@ public abstract class SyncingTests extends TestCase
 		context.put(ConnectionContext.COMMAND_LOG, System.out);
 		CoreIOPlugin.setConnectionContext(clientManager, context);
 
-		clientDirectory = clientManager.getRoot().getFileStore(new Path("/client" + System.currentTimeMillis()));
+		Random r = new Random();
+		int i = r.nextInt();
+		long millis = System.currentTimeMillis();
+		
+		clientDirectory = clientManager.getRoot().getFileStore(new Path("/client_" + millis + "_" + i));
 		assertNotNull(clientDirectory);
 		clientDirectory.mkdir(EFS.NONE, null);
 
-		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server" + System.currentTimeMillis()));
+		serverDirectory = serverManager.getRoot().getFileStore(new Path("/server_" + millis + "_" + i));
 		assertNotNull(serverDirectory);
 		serverDirectory.mkdir(EFS.NONE, null);
 
