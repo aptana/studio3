@@ -36,6 +36,7 @@ package com.aptana.editor.css.contentassist;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +46,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexReader;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
@@ -54,9 +55,20 @@ import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexManager;
 
 public class CSSIndexQueryHelper
 {
+	/**
+	 * getIndex
+	 * 
+	 * @return
+	 */
+	public static Index getIndex()
+	{
+		return IndexManager.getInstance().getIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
+	}
+
 	private CSSIndexReader _reader;
 	private CSSMetadataReader _metadata;
 
@@ -78,6 +90,29 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
+	 * getColors - Returns the unique set of colors used within the project.
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public Set<String> getColors(Index index)
+	{
+		Set<String> result = Collections.emptySet();
+
+		if (index != null)
+		{
+			Map<String, String> colorMap = this.getReader().getValues(index, CSSIndexConstants.COLOR);
+
+			if (colorMap != null)
+			{
+				result = colorMap.keySet();
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getElements
 	 * 
 	 * @return
@@ -85,26 +120,6 @@ public class CSSIndexQueryHelper
 	public List<ElementElement> getElements()
 	{
 		return this.getMetadata().getElements();
-	}
-	
-	/**
-	 * getPseudoElements
-	 * 
-	 * @return
-	 */
-	public List<PseudoElementElement> getPseudoElements()
-	{
-		return this.getMetadata().getPseudoElements();
-	}
-	
-	/**
-	 * getPseudoClasses
-	 * 
-	 * @return
-	 */
-	public List<PseudoClassElement> getPseudoClasses()
-	{
-		return this.getMetadata().getPseudoClasses();
 	}
 
 	/**
@@ -119,22 +134,6 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
-	 * getColors - Returns the unique set of colors used within the project.
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Set<String> getColors(Index index)
-	{
-		if (index == null)
-			return Collections.emptySet();
-		Map<String, String> colorMap = this.getReader().getValues(index, CSSIndexConstants.COLOR);
-		if (colorMap == null)
-			return Collections.emptySet();
-		return colorMap.keySet();
-	}
-
-	/**
 	 * getMetadata
 	 */
 	private CSSMetadataReader getMetadata()
@@ -146,7 +145,7 @@ public class CSSIndexQueryHelper
 
 			for (String resource : resources)
 			{
-				URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+				URL url = FileLocator.find(CSSPlugin.getDefault().getBundle(), new Path(resource), null);
 
 				if (url != null)
 				{
@@ -160,11 +159,11 @@ public class CSSIndexQueryHelper
 					}
 					catch (IOException e)
 					{
-						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, e);
+						CSSPlugin.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, e);
 					}
 					catch (Throwable t)
 					{
-						Activator.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, t);
+						CSSPlugin.logError(Messages.CSSIndexQueryHelper_Error_Reading_Metadata, t);
 					}
 					finally
 					{
@@ -229,6 +228,26 @@ public class CSSIndexQueryHelper
 		}
 
 		return result;
+	}
+
+	/**
+	 * getPseudoClasses
+	 * 
+	 * @return
+	 */
+	public List<PseudoClassElement> getPseudoClasses()
+	{
+		return this.getMetadata().getPseudoClasses();
+	}
+
+	/**
+	 * getPseudoElements
+	 * 
+	 * @return
+	 */
+	public List<PseudoElementElement> getPseudoElements()
+	{
+		return this.getMetadata().getPseudoElements();
 	}
 
 	/**
