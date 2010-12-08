@@ -58,7 +58,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.ui.Messages;
 import com.aptana.ui.UIPlugin;
 
 /**

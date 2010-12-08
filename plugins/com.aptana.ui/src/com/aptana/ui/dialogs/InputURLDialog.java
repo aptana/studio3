@@ -145,7 +145,7 @@ public class InputURLDialog extends Dialog {
 				try {
 					new URI(newText).toURL();
 				} catch (Exception e) {
-					return "Invalid URL"; //$NON-NLS-1$
+					return Messages.InputURLDialog_InvalidURL;
 				}
 				return null;
 			}
@@ -188,8 +188,7 @@ public class InputURLDialog extends Dialog {
                 IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID,
                 IDialogConstants.CANCEL_LABEL, false);
-        //do this here because setting the text will set enablement on the ok
-        // button
+        //do this here because setting the text will set enablement on the ok button
         loadList();
         combo.setFocus();
         if (value != null) {

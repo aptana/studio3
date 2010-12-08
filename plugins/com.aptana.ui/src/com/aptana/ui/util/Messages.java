@@ -32,36 +32,25 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core;
+package com.aptana.ui.util;
 
-public interface CoreStrings
+import org.eclipse.osgi.util.NLS;
+
+public class Messages extends NLS
 {
 
-	public static final String ADD = Messages.CoreStrings_Add;
+	private static final String BUNDLE_NAME = "com.aptana.ui.messages"; //$NON-NLS-1$
 
-	public static final String REMOVE = Messages.CoreStrings_Remove;
+	public static String UIUtils_Error;
 
-	public static final String NEW = Messages.CoreStrings_New;
 
-	public static final String BROWSE = Messages.CoreStrings_Browse;
+	static
+	{
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-	public static final String EDIT = Messages.CoreStrings_Edit;
-
-	public static final String OPEN = Messages.CoreStrings_Open;
-
-	public static final String DELETE = Messages.CoreStrings_Delete;
-
-	public static final String RENAME = Messages.CoreStrings_Rename;
-
-	public static final String REFRESH = Messages.CoreStrings_Refresh;
-
-	public static final String PROPERTIES = Messages.CoreStrings_Properties;
-	
-	public static final String CONTINUE = Messages.CoreStrings_Continue;
-
-	public static final String CANCEL = Messages.CoreStrings_Cancel;
-
-	public static final String ERROR = Messages.CoreStrings_Error;
-
-	public static final String HELP = Messages.CoreStrings_Help;
+	private Messages()
+	{
+	}
 }
