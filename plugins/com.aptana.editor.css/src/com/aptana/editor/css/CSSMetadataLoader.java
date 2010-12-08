@@ -57,6 +57,8 @@ import com.aptana.editor.css.contentassist.index.CSSIndexWriter;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
+import com.aptana.editor.css.contentassist.model.PseudoClassElement;
+import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -147,6 +149,16 @@ public class CSSMetadataLoader extends Job
 		for (PropertyElement property : reader.getProperties())
 		{
 			indexer.writeProperty(index, property);
+		}
+		
+		for (PseudoClassElement pseudoClass : reader.getPseudoClasses())
+		{
+			indexer.writePseudoClass(index, pseudoClass);
+		}
+		
+		for (PseudoElementElement pseudoElement : reader.getPseudoElements())
+		{
+			indexer.writePseudoElement(index, pseudoElement);
 		}
 
 		try
