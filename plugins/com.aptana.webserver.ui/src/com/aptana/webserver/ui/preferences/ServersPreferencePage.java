@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.ui.preferences;
+package com.aptana.webserver.ui.preferences;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
@@ -66,13 +66,13 @@ import org.eclipse.ui.dialogs.ListDialog;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.preview.Activator;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
 import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.ServerConfigurationManager;
 import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
+import com.aptana.webserver.ui.Activator;
 
 /**
  * @author Max Stepanov

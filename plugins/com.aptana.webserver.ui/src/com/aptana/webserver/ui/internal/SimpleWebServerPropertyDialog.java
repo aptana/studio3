@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.ui.internal;
+package com.aptana.webserver.ui.internal;
 
 import java.io.File;
 import java.net.MalformedURLException;
