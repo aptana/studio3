@@ -56,7 +56,7 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -301,7 +301,7 @@ public abstract class InferencingTestsBase extends TestCase
 		IFileStore store = null;
 		try
 		{
-			URL url = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), path, null);
+			URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), path, null);
 			url = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(url);
 			store = EFS.getStore(fileURI);

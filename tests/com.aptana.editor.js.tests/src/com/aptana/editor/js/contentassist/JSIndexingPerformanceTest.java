@@ -49,7 +49,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.test.performance.PerformanceTestCase;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.parsing.JSParser;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -114,7 +114,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 	 */
 	private String getSource(String resourceName) throws IOException
 	{
-		InputStream stream = FileLocator.openStream(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+		InputStream stream = FileLocator.openStream(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName),
 				false);
 		return getSource(stream);
 	}
@@ -255,7 +255,7 @@ public class JSIndexingPerformanceTest extends PerformanceTestCase
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, src, 0, 0);
 		
-		URL url = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), new Path(resourceName),
+		URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), new Path(resourceName),
 				null);
 		url = FileLocator.toFileURL(url);
 		IFileStore store = EFS.getStore(url.toURI());

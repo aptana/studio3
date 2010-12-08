@@ -46,7 +46,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -165,7 +165,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 			}
 			catch (Throwable e)
 			{
-				Activator.logError(e.getMessage(), e);
+				JSPlugin.logError(e.getMessage(), e);
 			}
 		}
 		finally

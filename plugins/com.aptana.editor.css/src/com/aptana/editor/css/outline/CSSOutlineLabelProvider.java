@@ -37,15 +37,15 @@ package com.aptana.editor.css.outline;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
 
 public class CSSOutlineLabelProvider extends CommonOutlineLabelProvider
 {
 
-	private static final Image SELECTOR_ICON = Activator.getImage("icons/selector.png"); //$NON-NLS-1$
-	private static final Image DECLARATION_ICON = Activator.getImage("icons/declaration.png"); //$NON-NLS-1$
+	private static final Image SELECTOR_ICON = CSSPlugin.getImage("icons/selector.png"); //$NON-NLS-1$
+	private static final Image DECLARATION_ICON = CSSPlugin.getImage("icons/declaration.png"); //$NON-NLS-1$
 
 	@Override
 	public Image getImage(Object element)
