@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -50,14 +51,14 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues"; //$NON-NLS-1$
 	private static final String HINT_PROPERTY = "hint"; //$NON-NLS-1$
 	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
-
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+
 	private boolean _allowMultipleValues;
 	private String _type;
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<SpecificationElement> _specifications;
 	private String _hint;
 	private String _remark;
-	private List<ValueElement> _values = new ArrayList<ValueElement>();
+	private List<ValueElement> _values;
 
 	/**
 	 * PropertyElement
@@ -74,7 +75,15 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -84,7 +93,15 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public void addValue(ValueElement value)
 	{
-		this._values.add(value);
+		if (value != null)
+		{
+			if (this._values == null)
+			{
+				this._values = new ArrayList<ValueElement>();
+			}
+
+			this._values.add(value);
+		}
 	}
 
 	/**
@@ -143,7 +160,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -163,7 +180,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public List<ValueElement> getValues()
 	{
-		return this._values;
+		return CollectionsUtil.getListValue(this._values);
 	}
 
 	/**

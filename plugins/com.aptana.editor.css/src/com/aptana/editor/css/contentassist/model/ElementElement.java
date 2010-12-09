@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -50,7 +51,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
 
 	private String _displayName;
-	private List<String> _properties = new ArrayList<String>();
+	private List<String> _properties;
 	private String _remark;
 
 	/**
@@ -68,7 +69,15 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public void addProperty(String name)
 	{
-		this._properties.add(name);
+		if (name != null && name.isEmpty() == false)
+		{
+			if (this._properties == null)
+			{
+				this._properties = new ArrayList<String>();
+			}
+
+			this._properties.add(name);
+		}
 	}
 
 	/*
@@ -104,7 +113,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public List<String> getProperties()
 	{
-		return this._properties;
+		return CollectionsUtil.getListValue(this._properties);
 	}
 
 	/**

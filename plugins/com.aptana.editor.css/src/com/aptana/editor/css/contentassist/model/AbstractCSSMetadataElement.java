@@ -42,6 +42,7 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -53,7 +54,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<UserAgentElement> _userAgents;
 	private String _description;
 	private String _example;
 	private List<String> _documents;
@@ -91,7 +92,15 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
 	/*
@@ -124,14 +133,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public List<String> getDocuments()
 	{
-		List<String> result = this._documents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._documents);
 	}
 
 	/*
@@ -160,7 +162,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	{
 		List<String> result = new ArrayList<String>();
 
-		for (UserAgentElement ua : this._userAgents)
+		for (UserAgentElement ua : this.getUserAgents())
 		{
 			result.add(ua.getPlatform());
 		}
@@ -174,7 +176,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**

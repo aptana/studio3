@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.IndexUtil;
 
 public class PseudoClassElement extends AbstractCSSMetadataElement
@@ -47,8 +48,8 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
 
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
-	private List<ValueElement> _values = new ArrayList<ValueElement>();
+	private List<SpecificationElement> _specifications;
+	private List<ValueElement> _values;
 
 	/**
 	 * PseudoClassElement
@@ -65,7 +66,15 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+			
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -75,7 +84,15 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	 */
 	public void addValue(ValueElement value)
 	{
-		this._values.add(value);
+		if (value != null)
+		{
+			if (this._values == null)
+			{
+				this._values = new ArrayList<ValueElement>();
+			}
+
+			this._values.add(value);
+		}
 	}
 
 	/*
@@ -99,7 +116,7 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -109,7 +126,7 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	 */
 	public List<ValueElement> getValues()
 	{
-		return this._values;
+		return CollectionsUtil.getListValue(this._values);
 	}
 
 	/*

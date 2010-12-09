@@ -48,7 +48,7 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax"; //$NON-NLS-1$
 
 	private boolean _allowPseudoClassSyntax;
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<SpecificationElement> _specifications;
 
 	/**
 	 * PseudoElementElement
@@ -65,9 +65,22 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
+	/**
+	 * allowPseudoClassSyntax
+	 * 
+	 * @return
+	 */
 	public boolean allowPseudoClassSyntax()
 	{
 		return _allowPseudoClassSyntax;
@@ -98,6 +111,11 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 		return this._specifications;
 	}
 
+	/**
+	 * setAllowPseudoClassSyntax
+	 * 
+	 * @param allow
+	 */
 	public void setAllowPseudoClassSyntax(Boolean allow)
 	{
 		this._allowPseudoClassSyntax = allow;

@@ -52,37 +52,12 @@ public class UserAgentElement implements Convertible
 	private String _os;
 	private String _platform;
 	private String _version;
-	private int _hash;
 
 	/**
 	 * UserAgentElement
 	 */
 	public UserAgentElement()
 	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj)
-	{
-		boolean result = false;
-
-		if (this == obj)
-		{
-			result = true;
-		}
-		else if (obj instanceof UserAgentElement)
-		{
-			UserAgentElement that = (UserAgentElement) obj;
-
-			result = StringUtil.areEqual(this.getDescription(), that.getDescription()) && StringUtil.areEqual(this.getOS(), that.getOS())
-				&& StringUtil.areEqual(this.getPlatform(), that.getPlatform()) && StringUtil.areEqual(this.getVersion(), that.getVersion());
-		}
-
-		return result;
 	}
 
 	/*
@@ -136,38 +111,6 @@ public class UserAgentElement implements Convertible
 		return StringUtil.getStringValue(this._version);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		int h = this._hash;
-
-		if (h == 0)
-		{
-			String[] items = new String[] { //
-			this.getDescription(), //
-				this.getOS(), //
-				this.getPlatform(), //
-				this.getVersion() //
-			};
-
-			for (String item : items)
-			{
-				if (item != null)
-				{
-					h = 31 * h + item.hashCode();
-				}
-			}
-
-			this._hash = h;
-		}
-
-		return h;
-	}
-
 	/**
 	 * setDescription
 	 * 
@@ -176,7 +119,6 @@ public class UserAgentElement implements Convertible
 	public void setDescription(String description)
 	{
 		this._description = description;
-		this._hash = 0;
 	}
 
 	/**
@@ -187,7 +129,6 @@ public class UserAgentElement implements Convertible
 	public void setOS(String os)
 	{
 		this._os = os;
-		this._hash = 0;
 	}
 
 	/**
@@ -198,7 +139,6 @@ public class UserAgentElement implements Convertible
 	public void setPlatform(String platform)
 	{
 		this._platform = platform;
-		this._hash = 0;
 	}
 
 	/**
@@ -209,7 +149,6 @@ public class UserAgentElement implements Convertible
 	public void setVersion(String version)
 	{
 		this._version = version;
-		this._hash = 0;
 	}
 
 	/*
