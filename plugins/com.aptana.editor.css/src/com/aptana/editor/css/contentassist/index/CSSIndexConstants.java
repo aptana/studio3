@@ -48,7 +48,7 @@ public interface CSSIndexConstants
 	// general constants
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
-	static final String METADATA_INDEX_LOCATION = PREFIX + "metadata.css"; //$NON-NLS-1$
+	static final String METADATA_INDEX_LOCATION = PREFIX + "metadata:/css"; //$NON-NLS-1$
 	static final String CORE = "CSS Core"; //$NON-NLS-1$
 
 	// index categories
