@@ -106,7 +106,7 @@ public class ValueElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class ValueElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**

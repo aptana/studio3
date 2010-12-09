@@ -74,7 +74,7 @@ public class SinceElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class SinceElement implements Convertible
 	 */
 	public String getVersion()
 	{
-		return StringUtil.getValue(this._version);
+		return StringUtil.getStringValue(this._version);
 	}
 
 	/**

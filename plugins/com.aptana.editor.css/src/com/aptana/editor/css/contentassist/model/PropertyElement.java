@@ -155,7 +155,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getHint()
 	{
-		return StringUtil.getValue(this._hint);
+		return StringUtil.getStringValue(this._hint);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return StringUtil.getValue(this._remark);
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getType()
 	{
-		return StringUtil.getValue(this._type);
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/**

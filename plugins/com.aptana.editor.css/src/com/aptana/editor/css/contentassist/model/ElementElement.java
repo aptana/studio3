@@ -83,7 +83,9 @@ public class ElementElement extends AbstractCSSMetadataElement
 		this.setDisplayName(object.get(DISPLAY_NAME_PROPERTY).toString());
 		this.setRemark(object.get(REMARK_PROPERTY).toString());
 
+		// properties
 		Object properties = object.get(PROPERTIES_PROPERTY);
+		
 		if (properties != null && properties.getClass().isArray())
 		{
 			for (Object property : (Object[]) properties)
@@ -100,7 +102,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getDisplayName()
 	{
-		return StringUtil.getValue(this._displayName);
+		return StringUtil.getStringValue(this._displayName);
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return StringUtil.getValue(this._remark);
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**

@@ -72,7 +72,7 @@ public class ExceptionElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class ExceptionElement implements Convertible
 	 */
 	public String getType()
 	{
-		return StringUtil.getValue(this._type);
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/**

@@ -196,7 +196,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public String getOwningType()
 	{
-		return StringUtil.getValue(this._owningType);
+		return StringUtil.getStringValue(this._owningType);
 	}
 
 	/**

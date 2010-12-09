@@ -129,7 +129,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public String getExample()
 	{
-		return StringUtil.getValue(this._example);
+		return StringUtil.getStringValue(this._example);
 	}
 
 	/*
@@ -164,7 +164,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/*

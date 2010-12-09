@@ -103,7 +103,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getOS()
 	{
-		return StringUtil.getValue(this._os);
+		return StringUtil.getStringValue(this._os);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getPlatform()
 	{
-		return StringUtil.getValue(this._platform);
+		return StringUtil.getStringValue(this._platform);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getVersion()
 	{
-		return StringUtil.getValue(this._version);
+		return StringUtil.getStringValue(this._version);
 	}
 
 	/*

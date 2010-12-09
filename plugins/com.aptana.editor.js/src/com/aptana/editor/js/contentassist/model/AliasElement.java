@@ -55,7 +55,7 @@ public class AliasElement
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class AliasElement
 	 */
 	public String getType()
 	{
-		return StringUtil.getValue(this._type);
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/**

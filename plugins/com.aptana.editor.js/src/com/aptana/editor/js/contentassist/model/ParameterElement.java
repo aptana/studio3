@@ -109,7 +109,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -144,7 +144,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getUsage()
 	{
-		return StringUtil.getValue(this._usage);
+		return StringUtil.getStringValue(this._usage);
 	}
 
 	/**
