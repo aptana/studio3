@@ -43,7 +43,7 @@ import org.mortbay.util.ajax.JSON.Output;
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.index.core.IndexUtil;
 
-public class PseudoClassElement extends AbstractCSSMetadataElement
+public class PseudoClassElement extends BaseElement
 {
 	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$

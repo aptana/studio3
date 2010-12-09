@@ -45,7 +45,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
-public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement, Convertible
+public abstract class BaseElement implements ICSSMetadataElement, Convertible
 {
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
 	private static final String EXAMPLE_PROPERTY = "example"; //$NON-NLS-1$
@@ -61,7 +61,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	/**
 	 * AbstractCSSMetadataElement
 	 */
-	public AbstractCSSMetadataElement()
+	public BaseElement()
 	{
 		super();
 	}

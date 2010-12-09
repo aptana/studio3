@@ -44,7 +44,7 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
-public class ElementElement extends AbstractCSSMetadataElement
+public class ElementElement extends BaseElement
 {
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
 	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
