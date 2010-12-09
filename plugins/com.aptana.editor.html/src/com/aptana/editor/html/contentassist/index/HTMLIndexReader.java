@@ -37,15 +37,18 @@ package com.aptana.editor.html.contentassist.index;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
+import com.aptana.editor.html.contentassist.model.AttributeElement;
+import com.aptana.editor.html.contentassist.model.BaseElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
-import com.aptana.editor.html.contentassist.model.UserAgentElement;
+import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
@@ -53,50 +56,121 @@ import com.aptana.index.core.SearchPattern;
 public class HTMLIndexReader
 {
 	/**
-	 * createElement
+	 * createAttributeFromKey
 	 * 
 	 * @param key
+	 * @param attribute
 	 * @return
 	 * @throws IOException
 	 */
-	private ElementElement createElementFromKey(Index index, String key) throws IOException
+	private AttributeElement createAttributeFromKey(Index index, QueryResult attribute) throws IOException
 	{
-		String[] columns = key.split(HTMLIndexConstants.DELIMITER);
-		ElementElement element = new ElementElement();
-		int column = 0;
+		return (AttributeElement) this.populateElement(index, attribute, new AttributeElement());
+	}
 
-		element.setName(columns[column++]);
-		element.setDisplayName(columns[column++]);
-		element.setRelatedClass(columns[column++]);
+	/**
+	 * createElementFromKey
+	 * 
+	 * @param key
+	 * @param element
+	 * @return
+	 * @throws IOException
+	 */
+	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
+	{
+		return (ElementElement) this.populateElement(index, element, new ElementElement());
+	}
 
-		for (String attribute : columns[column++].split(HTMLIndexConstants.SUB_DELIMITER))
+	/**
+	 * createEntityFromKey
+	 * 
+	 * @param key
+	 * @param entity
+	 * @return
+	 * @throws IOException
+	 */
+	private EntityElement createEntityFromKey(Index index, QueryResult entity) throws IOException
+	{
+		return (EntityElement) this.populateElement(index, entity, new EntityElement());
+	}
+
+	/**
+	 * createEventFromKey
+	 * 
+	 * @param key
+	 * @param event
+	 * @return
+	 * @throws IOException
+	 */
+	private EventElement createEventFromKey(Index index, QueryResult event) throws IOException
+	{
+		return (EventElement) this.populateElement(index, event, new EventElement());
+	}
+
+	/**
+	 * getAttribute
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public List<AttributeElement> getAttributes(Index index, String... names) throws IOException
+	{
+		List<AttributeElement> result = new ArrayList<AttributeElement>();
+
+		if (index != null)
 		{
-			element.addAttribute(attribute);
+			for (String name : names)
+			{
+				List<QueryResult> attributes = index.query( //
+					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
+
+				if (attributes != null)
+				{
+					for (QueryResult attribute : attributes)
+					{
+						result.add(this.createAttributeFromKey(index, attribute));
+						break;
+					}
+				}
+			}
 		}
 
-		for (String userAgentKey : columns[column++].split(HTMLIndexConstants.SUB_DELIMITER))
+		return result;
+	}
+
+	/**
+	 * getAttributes
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public List<AttributeElement> getAttributes(Index index) throws IOException
+	{
+		List<AttributeElement> result = new ArrayList<AttributeElement>();
+
+		if (index != null)
 		{
-			element.addUserAgent(this.getUserAgent(index, userAgentKey));
+			List<QueryResult> attributes = index.query( //
+				new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
+
+			if (attributes != null)
+			{
+				for (QueryResult attribute : attributes)
+				{
+					result.add(this.createAttributeFromKey(index, attribute));
+				}
+			}
 		}
 
-		element.setDeprecated(columns[column++]);
-		element.setDescription(columns[column++]);
-
-		for (String event : columns[column++].split(HTMLIndexConstants.SUB_DELIMITER))
-		{
-			element.addEvent(event);
-		}
-
-		element.setExample(columns[column++]);
-
-		for (String reference : columns[column++].split(HTMLIndexConstants.SUB_DELIMITER))
-		{
-			element.addReference(reference);
-		}
-
-		element.setRemark(columns[column++]);
-
-		return element;
+		return result;
 	}
 
 	/**
@@ -107,22 +181,28 @@ public class HTMLIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public ElementElement getElement(Index index, String name) throws IOException
+	public List<ElementElement> getElements(Index index, String... names) throws IOException
 	{
-		String searchKey = name + CSSIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT }, searchKey,
-				SearchPattern.PREFIX_MATCH);
-		ElementElement result = null;
+		List<ElementElement> result = new ArrayList<ElementElement>();
 
-		if (items != null)
+		if (index != null)
 		{
-			for (QueryResult item : items)
+			for (String name : names)
 			{
-				String key = item.getWord();
+				List<QueryResult> elements = index.query( //
+					new String[] { HTMLIndexConstants.ELEMENT }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
 
-				result = this.createElementFromKey(index, key);
-
-				break;
+				if (elements != null)
+				{
+					for (QueryResult element : elements)
+					{
+						result.add(this.createElementFromKey(index, element));
+						break;
+					}
+				}
 			}
 		}
 
@@ -137,18 +217,22 @@ public class HTMLIndexReader
 	 */
 	public List<ElementElement> getElements(Index index) throws IOException
 	{
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.ELEMENT },
-				"*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
-		List<ElementElement> result = new LinkedList<ElementElement>();
+		List<ElementElement> result = new ArrayList<ElementElement>();
 
-		if (items != null)
+		if (index != null)
 		{
-			for (QueryResult item : items)
-			{
-				String key = item.getWord();
-				ElementElement element = this.createElementFromKey(index, key);
+			List<QueryResult> elements = index.query( //
+				new String[] { HTMLIndexConstants.ELEMENT }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
 
-				result.add(element);
+			if (elements != null)
+			{
+				for (QueryResult element : elements)
+				{
+					result.add(this.createElementFromKey(index, element));
+				}
 			}
 		}
 
@@ -156,33 +240,95 @@ public class HTMLIndexReader
 	}
 
 	/**
-	 * getUserAgent
+	 * getEntities
 	 * 
-	 * @param userAgentKey
 	 * @return
 	 * @throws IOException
 	 */
-	protected UserAgentElement getUserAgent(Index index, String userAgentKey) throws IOException
+	public List<EntityElement> getEntities(Index index) throws IOException
 	{
-		String searchKey = userAgentKey + HTMLIndexConstants.DELIMITER;
-		List<QueryResult> items = index.query(new String[] { HTMLIndexConstants.USER_AGENT }, searchKey,
-				SearchPattern.PREFIX_MATCH);
-		UserAgentElement result = null;
+		List<EntityElement> result = new ArrayList<EntityElement>();
 
-		if (items != null && items.size() > 0)
+		if (index != null)
 		{
-			String key = items.get(0).getWord();
-			String[] columns = key.split(HTMLIndexConstants.DELIMITER);
-			int column = 1; // skip index
+			List<QueryResult> entities = index.query( //
+				new String[] { HTMLIndexConstants.ENTITY }, //
+				"*", //$NON-NLS-1$
+				SearchPattern.PATTERN_MATCH //
+				);
 
-			result = new UserAgentElement();
-			result.setPlatform(columns[column++]);
-
-			// NOTE: split does not return a final empty element if the string being split
-			// ends with the delimiter.
-			if (column < columns.length)
+			if (entities != null)
 			{
-				result.setVersion(columns[column++]);
+				for (QueryResult entity : entities)
+				{
+					result.add(this.createEntityFromKey(index, entity));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEntity
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public EntityElement getEntity(Index index, String name) throws IOException
+	{
+		EntityElement result = null;
+
+		if (index != null)
+		{
+			List<QueryResult> entities = index.query( //
+				new String[] { HTMLIndexConstants.ENTITY }, //
+				name + CSSIndexConstants.DELIMITER, //
+				SearchPattern.PREFIX_MATCH //
+				);
+
+			if (entities != null)
+			{
+				for (QueryResult entity : entities)
+				{
+					result = this.createEntityFromKey(index, entity);
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEvent
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public EventElement getEvent(Index index, String name) throws IOException
+	{
+		EventElement result = null;
+
+		if (index != null)
+		{
+			List<QueryResult> events = index.query( //
+				new String[] { HTMLIndexConstants.EVENT }, //
+				name + CSSIndexConstants.DELIMITER, //
+				SearchPattern.PREFIX_MATCH //
+				);
+
+			if (events != null)
+			{
+				for (QueryResult event : events)
+				{
+					result = this.createEventFromKey(index, event);
+					break;
+				}
 			}
 		}
 
@@ -214,9 +360,11 @@ public class HTMLIndexReader
 					{
 						Set<String> paths = item.getDocuments();
 						String path = (paths != null && !paths.isEmpty()) ? paths.iterator().next() : ""; //$NON-NLS-1$
+
 						try
 						{
 							URI uri = index.getRelativeDocumentPath(new URI(path));
+
 							result.put(item.getWord(), uri.toString());
 						}
 						catch (URISyntaxException e)
@@ -233,5 +381,33 @@ public class HTMLIndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * populateElement
+	 * 
+	 * @param index
+	 * @param attribute
+	 * @param element
+	 */
+	@SuppressWarnings("rawtypes")
+	private BaseElement populateElement(Index index, QueryResult attribute, BaseElement element)
+	{
+		String key = attribute.getWord();
+		String[] columns = key.split(HTMLIndexConstants.DELIMITER);
+
+		Object m = columns[1];
+
+		if (m instanceof Map)
+		{
+			element.fromJSON((Map) m);
+		}
+
+		for (String document : attribute.getDocuments())
+		{
+			element.addDocument(document);
+		}
+
+		return element;
 	}
 }
