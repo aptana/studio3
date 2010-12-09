@@ -115,7 +115,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	protected String[] getMetadataFiles()
 	{
 		return new String[] { //
-			"/metadata/js_core.xml", //$NON-NLS-1$
+		"/metadata/js_core.xml", //$NON-NLS-1$
 			"/metadata/dom_0.xml", //$NON-NLS-1$
 			"/metadata/dom_2.xml", //$NON-NLS-1$
 			"/metadata/dom_3.xml", //$NON-NLS-1$
@@ -156,6 +156,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				IWorkspace ws = ResourcesPlugin.getWorkspace();
+
 				try
 				{
 					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
@@ -164,6 +165,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 				{
 					return e.getStatus();
 				}
+
 				return Status.OK_STATUS;
 			}
 		};
