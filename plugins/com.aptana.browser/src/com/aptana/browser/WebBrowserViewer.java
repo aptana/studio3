@@ -598,7 +598,11 @@ public class WebBrowserViewer extends Composite
 			{
 				try
 				{
-					Integer.parseInt(text);
+					int width = Integer.parseInt(text);
+					if (width <= 0)
+					{
+						throw (new NumberFormatException());
+					}
 				}
 				catch (NumberFormatException e)
 				{
@@ -617,7 +621,11 @@ public class WebBrowserViewer extends Composite
 				{
 					try
 					{
-						Integer.parseInt(text);
+						int height = Integer.parseInt(text);
+						if (height <= 0)
+						{
+							throw (new NumberFormatException());
+						}
 					}
 					catch (NumberFormatException e)
 					{
