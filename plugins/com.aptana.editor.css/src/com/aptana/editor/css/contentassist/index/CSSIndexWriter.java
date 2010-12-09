@@ -94,10 +94,7 @@ public class CSSIndexWriter
 	{
 		if (index != null)
 		{
-			String key = StringUtil.join( //
-				CSSIndexConstants.DELIMITER, //
-				JSON.toString(property) //
-				);
+			String key = JSON.toString(property);
 
 			index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
 		}
