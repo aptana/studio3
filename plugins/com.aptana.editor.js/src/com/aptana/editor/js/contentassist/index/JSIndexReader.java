@@ -71,19 +71,19 @@ public class JSIndexReader
 	protected FunctionElement createFunction(Index index, QueryResult function, EnumSet<ContentSelector> fields) throws IOException
 	{
 		FunctionElement f = new FunctionElement();
-		
+
 		if (fields.isEmpty() == false)
 		{
 			String key = function.getWord();
 			String[] columns = DELIMITER_PATTERN.split(key);
-			
+
 			Object m = JSON.parse(columns[2]);
-			
+
 			if (m instanceof Map)
 			{
 				f.fromJSON((Map) m);
 			}
-			
+
 			// documents
 			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
@@ -93,7 +93,7 @@ public class JSIndexReader
 				}
 			}
 		}
-		
+
 		return f;
 	}
 
@@ -115,14 +115,14 @@ public class JSIndexReader
 		{
 			String key = property.getWord();
 			String[] columns = DELIMITER_PATTERN.split(key);
-			
+
 			Object m = JSON.parse(columns[2]);
-			
+
 			if (m instanceof Map)
 			{
 				p.fromJSON((Map) m);
 			}
-			
+
 			// documents
 			if (fields.contains(ContentSelector.DOCUMENTS))
 			{
@@ -132,7 +132,7 @@ public class JSIndexReader
 				}
 			}
 		}
-		
+
 		return p;
 	}
 
@@ -214,8 +214,8 @@ public class JSIndexReader
 		if (index != null && owningType != null && owningType.length() > 0)
 		{
 			// read functions
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.PREFIX_MATCH
+				| SearchPattern.CASE_SENSITIVE);
 
 			if (functions != null)
 			{
@@ -466,7 +466,6 @@ public class JSIndexReader
 
 		return properties;
 	}
-
 
 	/**
 	 * getUserTypesPattern
