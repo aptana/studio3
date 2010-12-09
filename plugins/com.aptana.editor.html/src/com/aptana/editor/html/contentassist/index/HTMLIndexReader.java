@@ -67,7 +67,7 @@ public class HTMLIndexReader
 	 */
 	private AttributeElement createAttributeFromKey(Index index, QueryResult attribute) throws IOException
 	{
-		return (AttributeElement) this.populateElement(index, attribute, new AttributeElement());
+		return this.populateElement(index, attribute, new AttributeElement());
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class HTMLIndexReader
 	 */
 	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
 	{
-		return (ElementElement) this.populateElement(index, element, new ElementElement());
+		return this.populateElement(index, element, new ElementElement());
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class HTMLIndexReader
 	 */
 	private EntityElement createEntityFromKey(Index index, QueryResult entity) throws IOException
 	{
-		return (EntityElement) this.populateElement(index, entity, new EntityElement());
+		return this.populateElement(index, entity, new EntityElement());
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class HTMLIndexReader
 	 */
 	private EventElement createEventFromKey(Index index, QueryResult event) throws IOException
 	{
-		return (EventElement) this.populateElement(index, event, new EventElement());
+		return this.populateElement(index, event, new EventElement());
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class HTMLIndexReader
 	 * @param element
 	 */
 	@SuppressWarnings("rawtypes")
-	private BaseElement populateElement(Index index, QueryResult attribute, BaseElement element)
+	private <T extends BaseElement> T populateElement(Index index, QueryResult attribute, T element)
 	{
 		String key = attribute.getWord();
 		String[] columns = key.split(HTMLIndexConstants.DELIMITER);
