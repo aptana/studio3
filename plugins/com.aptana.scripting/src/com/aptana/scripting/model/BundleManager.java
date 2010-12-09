@@ -1094,6 +1094,17 @@ public class BundleManager
 
 	/**
 	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list. Note that this method is called from the scripting framework
+	 * 
+	 * @return A list of elements that are visible
+	 */
+	public List<CommandElement> getCommands()
+	{
+		return this.getCommands(null);
+	}
+	
+	/**
+	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
 	 * are returned in this list
 	 * 
 	 * @param filter

@@ -64,6 +64,7 @@ import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -163,7 +164,15 @@ public class ThemeManager implements IThemeManager
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
 		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
 		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
-		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		// TODO Move this stuff over to theme change listeners in the HTML/Ruby editor plugins?
+		prefs.putBoolean("htmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
+		prefs.putBoolean("htmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
+		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
+		prefs.put("htmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		prefs.putBoolean("rubyBlockPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
+		prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
+		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
+		prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
 		try
 		{
 			prefs.flush();
@@ -172,7 +181,7 @@ public class ThemeManager implements IThemeManager
 		{
 			ThemePlugin.logError(e);
 		}
-		
+
 		// Set the bg/fg/selection colors for compare editors
 		prefs = new InstanceScope().getNode("org.eclipse.compare"); //$NON-NLS-1$
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, false);
@@ -180,9 +189,11 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND, StringConverter.asString(theme.getSelectionAgainstBG()));
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND,
+				StringConverter.asString(theme.getSelectionAgainstBG()));
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme.getForeground()));
+		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+				StringConverter.asString(theme.getForeground()));
 
 		try
 		{

@@ -7,7 +7,9 @@ Bundle-Vendor: %providerName
 Fragment-Host: com.aptana.core;bundle-version="3.0.0"
 Require-Bundle: org.eclipse.core.runtime,
  org.junit,
- com.aptana.testing.mocks;bundle-version="1.0.0"
+ com.aptana.testing.mocks,
+ org.eclipse.ui.ide,
+ org.eclipse.jface
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -112,6 +112,9 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		c.addTranslation(new QualifiedContentType(JS_MULTILINE_COMMENT), new QualifiedContentType("comment.block.js")); //$NON-NLS-1$
 		c.addTranslation(new QualifiedContentType(JS_DOC), new QualifiedContentType("comment.block.documentation.js")); //$NON-NLS-1$
 	}
+	
+	private JSSourceConfiguration() {
+	}
 
 	public static JSSourceConfiguration getDefault()
 	{
@@ -264,7 +267,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		return docScanner;
 	}
 
-	protected ITokenScanner getCodeScanner()
+	private ITokenScanner getCodeScanner()
 	{
 		if (codeScanner == null)
 		{
@@ -273,7 +276,7 @@ public class JSSourceConfiguration implements IPartitioningConfiguration, ISourc
 		return codeScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

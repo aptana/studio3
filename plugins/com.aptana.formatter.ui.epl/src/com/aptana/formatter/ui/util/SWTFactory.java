@@ -29,7 +29,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 
 import com.aptana.formatter.ui.preferences.ScrolledPageContent;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Factory class to create SWT resources.

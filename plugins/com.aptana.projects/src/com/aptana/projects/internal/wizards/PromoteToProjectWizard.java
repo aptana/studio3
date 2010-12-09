@@ -104,7 +104,7 @@ public class PromoteToProjectWizard extends BasicNewResourceWizard implements IE
 	{
 		super.addPages();
 
-		mainPage = new WizardFolderImportPage(); //$NON-NLS-1$
+		mainPage = new WizardFolderImportPage();
 		mainPage.setDirectoryPath(initialDirectoryPath);
 		mainPage.setTitle(Messages.NewProjectWizard_ProjectPage_Title);
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);

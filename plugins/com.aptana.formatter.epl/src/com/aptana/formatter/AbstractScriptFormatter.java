@@ -41,14 +41,14 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 {
 
 	protected static final long ERROR_DISPLAY_TIMEOUT = 3000L;
-	private final Map<String, ? extends Object> preferences;
+	private final Map<String, String> preferences;
 	private boolean isSlave;
 	private String mainContentType;
 
 	/**
 	 * @param preferences
 	 */
-	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences, String mainContentType)
+	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType)
 	{
 		this.preferences = preferences;
 		this.mainContentType = mainContentType;

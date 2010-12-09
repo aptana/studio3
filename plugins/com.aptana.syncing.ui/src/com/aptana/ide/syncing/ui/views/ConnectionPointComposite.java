@@ -104,8 +104,8 @@ import com.aptana.ide.ui.io.navigator.actions.FileSystemRenameAction;
 import com.aptana.ide.ui.io.navigator.actions.OpenFileAction;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.SWTUtils;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

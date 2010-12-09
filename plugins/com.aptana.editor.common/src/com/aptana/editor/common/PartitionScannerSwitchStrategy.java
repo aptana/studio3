@@ -42,27 +42,24 @@ package com.aptana.editor.common;
 public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchStrategy {
 
 	private char[][] switchSequences;
-	private char[][][] escapeSequences;
-	
+	private SequenceBypassHandler sequenceBypassHandler;
+
 	/**
 	 * 
 	 */
-	public PartitionScannerSwitchStrategy(String[] switchSequences, String[][] escapeSequences) {
+	public PartitionScannerSwitchStrategy(String[] switchSequences) {
+		this(switchSequences, null);
+	}
+
+	/**
+	 * 
+	 */
+	public PartitionScannerSwitchStrategy(String[] switchSequences, SequenceBypassHandler sequenceBypassHandler) {
 		this.switchSequences = new char[switchSequences.length][];
 		for (int i = 0 ; i < switchSequences.length; ++i) {
 			this.switchSequences[i] = switchSequences[i].toCharArray();
 		}
-		this.escapeSequences = new char[escapeSequences.length][][];
-		for (int i = 0 ; i < escapeSequences.length; ++i) {
-			this.escapeSequences[i] = new char[][] { escapeSequences[i][0].toCharArray(), escapeSequences[i][1].toCharArray()};
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aptana.editor.common.IPartitionScannerSwitchStrategy#getEscapeSequences()
-	 */
-	public char[][][] getEscapeSequences() {
-		return escapeSequences;
+		this.sequenceBypassHandler = sequenceBypassHandler;
 	}
 
 	/* (non-Javadoc)
@@ -70,6 +67,10 @@ public class PartitionScannerSwitchStrategy implements IPartitionScannerSwitchSt
 	 */
 	public char[][] getSwitchSequences() {
 		return switchSequences;
+	}
+
+	public SequenceBypassHandler getSequenceBypassHandler() {
+		return sequenceBypassHandler;
 	}
 
 }

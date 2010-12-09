@@ -68,7 +68,7 @@ public interface IPreferenceConstants
 	 * Pref key for sorting the outline view alphabetically
 	 */
 	public static final String SORT_OUTLINE_ALPHABETIC = CommonEditorPlugin.PLUGIN_ID + ".sortOutlineAlphabetic"; //$NON-NLS-1$
-	
+
 	/**
 	 * The preference key for the comma-separated list of task tag names.
 	 */
@@ -95,4 +95,15 @@ public interface IPreferenceConstants
 	 */
 	public static final String EDITOR_MARK_OCCURRENCES_COLOR = CommonEditorPlugin.PLUGIN_ID + ".editorMarkOccurrencesColor"; //$NON-NLS-1$
 
+
+	/**
+	 * The preference key for the comma-separated list of selected validators for a language
+	 */
+	public static final String SELECTED_VALIDATORS = CommonEditorPlugin.PLUGIN_ID + ".selectedValidators"; //$NON-NLS-1$
+
+	/**
+	 * The preference key for the list of regular expressions where the validation warnings and errors would be ignored
+	 * if matched
+	 */
+	public static final String FILTER_EXPRESSIONS = CommonEditorPlugin.PLUGIN_ID + ".filterExpressions"; //$NON-NLS-1$
 }

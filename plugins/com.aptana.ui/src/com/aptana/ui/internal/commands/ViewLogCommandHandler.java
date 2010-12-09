@@ -79,7 +79,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 		}
 		catch (Exception e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 		return null;
 	}
@@ -116,7 +116,7 @@ public class ViewLogCommandHandler extends AbstractHandler
 			}
 			catch (PartInitException e)
 			{
-				UIPlugin.logError(e.getLocalizedMessage(), e);
+				UIPlugin.log(e);
 			}
 		}
 	}

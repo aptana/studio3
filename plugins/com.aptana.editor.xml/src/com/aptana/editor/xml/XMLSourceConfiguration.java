@@ -75,7 +75,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IXMLConstants.CONTENT_TYPE_XML } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
+	private final IPredicateRule[] partitioningRules = new IPredicateRule[] { //
 		new MultiLineRule("<?", "?>", new Token(PRE_PROCESSOR)), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<!--", "-->", new Token(COMMENT), (char) 0, true), //$NON-NLS-1$ //$NON-NLS-2$
 		new MultiLineRule("<![CDATA[", "]]>", new Token(CDATA)), //$NON-NLS-1$ //$NON-NLS-2$
@@ -91,6 +91,9 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static XMLSourceConfiguration instance;
 
+	private XMLSourceConfiguration() {
+	}
+	
 	public static XMLSourceConfiguration getDefault()
 	{
 		if (instance == null)
@@ -215,7 +218,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return cdataScanner;
 	}
 
-	protected ITokenScanner getXMLScanner()
+	private ITokenScanner getXMLScanner()
 	{
 		if (xmlScanner == null)
 		{
@@ -224,7 +227,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return xmlScanner;
 	}
 
-	protected ITokenScanner getXMLTagScanner()
+	private ITokenScanner getXMLTagScanner()
 	{
 		if (xmlTagScanner == null)
 		{
@@ -233,7 +236,7 @@ public class XMLSourceConfiguration implements IPartitioningConfiguration, ISour
 		return xmlTagScanner;
 	}
 
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

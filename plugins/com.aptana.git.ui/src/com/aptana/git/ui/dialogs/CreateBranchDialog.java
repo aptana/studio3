@@ -34,11 +34,14 @@
  */
 package com.aptana.git.ui.dialogs;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.fieldassist.AutoCompleteField;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -97,7 +100,7 @@ public class CreateBranchDialog extends InputDialog
 		Composite composite = (Composite) super.createDialogArea(parent);
 
 		// TODO Add a minimize/maximize button for the advanced section
-		Group group = new Group(composite, SWT.BORDER);
+		Group group = new Group(composite, SWT.DEFAULT);
 		group.setText(Messages.CreateBranchDialog_AdvancedOptions_label);
 		group.setLayout(new GridLayout(1, false));
 		group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
@@ -119,7 +122,17 @@ public class CreateBranchDialog extends InputDialog
 		});
 
 		String[] proposals = repo.allSimpleRefs().toArray(new String[0]);
+
 		new AutoCompleteField(startPointText, new TextContentAdapter(), proposals);
+		
+		//Have CTRL+SPACE also trigger content assist
+		SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(proposals);
+		proposalProvider.setFiltering(true);
+		ContentProposalAdapter adapter = new ContentProposalAdapter(startPointText, new TextContentAdapter(),
+				proposalProvider, KeyStroke.getInstance(SWT.CONTROL, ' '), null);
+		adapter.setPropagateKeys(true);
+		adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+		
 		ControlDecoration decoration = new ControlDecoration(startPointText, SWT.LEFT);
 		decoration.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(
 				FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());

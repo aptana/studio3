@@ -41,7 +41,7 @@ import org.eclipse.jface.dialogs.Dialog;
 
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov

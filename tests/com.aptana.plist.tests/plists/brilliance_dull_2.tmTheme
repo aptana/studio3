@@ -621,7 +621,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Keyword</string>
+			<string>Keyword</string>
 			<key>scope</key>
 			<string>keyword</string>
 			<key>settings</key>
@@ -632,7 +632,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Keyword.control</string>
+			<string>Keyword.control</string>
 			<key>scope</key>
 			<string>keyword.control</string>
 			<key>settings</key>
@@ -645,7 +645,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Special Function</string>
+			<string>Special Function</string>
 			<key>scope</key>
 			<string>keyword.other.special-method, meta.function-call entity.name.function -(meta.function-call meta.function), support.function - variable</string>
 			<key>settings</key>
@@ -656,7 +656,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Library function</string>
+			<string>Library function</string>
 			<key>scope</key>
 			<string>support.function - variable</string>
 			<key>settings</key>
@@ -667,7 +667,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Keyword.operator</string>
+			<string>Keyword.operator</string>
 			<key>scope</key>
 			<string>keyword.operator, declaration.function.operator, meta.preprocessor.c.include</string>
 			<key>settings</key>
@@ -693,7 +693,7 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Function argument</string>
+			<string>Function argument</string>
 			<key>scope</key>
 			<string>variable.parameter -variable.parameter.misc.css, meta.definition.method  meta.definition.param-list, meta.function.method.with-arguments variable.parameter.function</string>
 			<key>settings</key>

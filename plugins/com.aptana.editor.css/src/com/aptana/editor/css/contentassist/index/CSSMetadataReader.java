@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -521,7 +521,7 @@ public class CSSMetadataReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(Activator.getDefault().getBundle(),
+			return FileLocator.openStream(CSSPlugin.getDefault().getBundle(),
 					Path.fromPortableString(METADATA_SCHEMA_XML), false);
 		}
 		catch (IOException e)

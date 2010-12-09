@@ -67,7 +67,7 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
-	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.of(ContentSelector.NAME, ContentSelector.TYPES, ContentSelector.RETURN_TYPES);
+	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.allOf(ContentSelector.class);
 
 	private Index _index;
 	private JSScope _activeScope;

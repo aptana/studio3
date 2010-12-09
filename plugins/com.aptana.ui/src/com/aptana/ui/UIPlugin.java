@@ -90,9 +90,20 @@ public class UIPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void logError(String msg, Throwable e)
-	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, msg, e));
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
+	}
+
+	public static void log(String msg) {
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
+	}
+
+	public static void log(String msg, Throwable e) {
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
 	}
 
 	public static Image getImage(String string)

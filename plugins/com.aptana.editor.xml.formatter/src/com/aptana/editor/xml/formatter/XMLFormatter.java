@@ -75,7 +75,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * 
 	 * @param preferences
 	 */
-	protected XMLFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected XMLFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;

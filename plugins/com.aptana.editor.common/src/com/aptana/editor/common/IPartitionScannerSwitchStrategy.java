@@ -35,12 +35,18 @@
 
 package com.aptana.editor.common;
 
+import org.eclipse.jface.text.rules.ICharacterScanner;
+
 /**
  * @author Max Stepanov
  *
  */
 public interface IPartitionScannerSwitchStrategy {
 
+	public interface SequenceBypassHandler {
+		public boolean bypassSequence(ICharacterScanner characterScanner, char[] sequenceFound);
+	}
+	
 	public char[][] getSwitchSequences();
-	public char[][][] getEscapeSequences();
+	public SequenceBypassHandler getSequenceBypassHandler();
 }

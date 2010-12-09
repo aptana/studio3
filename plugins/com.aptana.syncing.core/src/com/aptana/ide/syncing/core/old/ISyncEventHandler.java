@@ -34,6 +34,8 @@
  */
 package com.aptana.ide.syncing.core.old;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * @author Kevin Lindsey
  */
@@ -41,9 +43,10 @@ public interface ISyncEventHandler extends IConnectionPointEventHandler
 {
 	/**
 	 * syncContinue
+	 * @param monitor
 	 * @return boolean
 	 */
-	boolean syncContinue();
+	boolean syncContinue(IProgressMonitor monitor);
 	
 	/**
 	 * syncEvent
@@ -51,18 +54,20 @@ public interface ISyncEventHandler extends IConnectionPointEventHandler
 	 * @param item
 	 * @param index
 	 * @param totalItems
+	 * @param monitor
 	 * @return boolean
 	 */
-	boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems);
+	boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor);
 
 	/**
 	 * syncErrorEvent
 	 * 
 	 * @param item
 	 * @param e
+	 * @param monitor
 	 * @return boolean
 	 */
-	boolean syncErrorEvent(VirtualFileSyncPair item, Exception e);
+	boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor);
 
 	/**
 	 * Indicates how many bytes have been transferred for a specific item.
@@ -71,14 +76,16 @@ public interface ISyncEventHandler extends IConnectionPointEventHandler
 	 *            the item being synced
 	 * @param bytes
 	 *            the number of bytes transferred
+	 * @param monitor
 	 */
-	void syncTransferring(VirtualFileSyncPair item, long bytes);
+	void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor);
 
 	/**
 	 * Sync done callback
 	 * 
 	 * @param item
+	 * @param monitor
 	 */
-	void syncDone(VirtualFileSyncPair item);
+	void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor);
 
 }

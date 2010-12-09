@@ -99,6 +99,6 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
-		return Activator.getDefault().getPreferenceStore();
+		return CSSPlugin.getDefault().getPreferenceStore();
 	}
 }

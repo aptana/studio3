@@ -46,16 +46,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 
-public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	/*
 	 * (non-Javadoc)
@@ -98,7 +98,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 		}
 		try
 		{
-			sub.subTask(file.getName());
+			sub.subTask(getIndexingMessage(index, file));
 
 			try
 			{
@@ -165,7 +165,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 			}
 			catch (Throwable e)
 			{
-				Activator.logError(e.getMessage(), e);
+				JSPlugin.logError(e.getMessage(), e);
 			}
 		}
 		finally

@@ -34,13 +34,19 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 public class PseudoClassElement extends AbstractCSSMetadataElement
 {
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<ValueElement> _values = new LinkedList<ValueElement>();
+	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<ValueElement> _values = new ArrayList<ValueElement>();
 
 	/**
 	 * PseudoClassElement
@@ -61,6 +67,63 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	}
 
 	/**
+	 * addValue
+	 * 
+	 * @param value
+	 */
+	public void addValue(ValueElement value)
+	{
+		this._values.add(value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		// specifications
+		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
+
+		if (specifications != null && specifications.getClass().isArray())
+		{
+			for (Object specification : (Object[]) specifications)
+			{
+				if (specification instanceof Map)
+				{
+					SpecificationElement s = new SpecificationElement();
+
+					s.fromJSON((Map) specification);
+
+					this.addSpecification(s);
+				}
+			}
+		}
+
+		// values
+		Object values = object.get(VALUES_PROPERTY);
+
+		if (values != null && values.getClass().isArray())
+		{
+			for (Object value : (Object[]) values)
+			{
+				if (value instanceof Map)
+				{
+					ValueElement v = new ValueElement();
+
+					v.fromJSON((Map) value);
+
+					this.addValue(v);
+				}
+			}
+		}
+	}
+
+	/**
 	 * getSpecifications
 	 * 
 	 * @return
@@ -71,16 +134,6 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	}
 
 	/**
-	 * addValue
-	 * 
-	 * @param value
-	 */
-	public void addValue(ValueElement value)
-	{
-		this._values.add(value);
-	}
-
-	/**
 	 * getValues
 	 * 
 	 * @return
@@ -88,5 +141,19 @@ public class PseudoClassElement extends AbstractCSSMetadataElement
 	public List<ValueElement> getValues()
 	{
 		return this._values;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
+		out.add(VALUES_PROPERTY, this.getValues());
 	}
 }

@@ -197,17 +197,17 @@ public abstract class LargeSampleSyncingTests extends TestCase
 
 		// clone version x of github-services to local directory (newer)
 		System.out.println("1) Writing github repo to " + EFSUtils.getAbsolutePath(clientTestDirectory) );
-		runGitClone("http://github.com/DmitryBaranovskiy/raphael.git", clientDirectory, clientTestDirectory.getName());
+		runGitClone("git://github.com/DmitryBaranovskiy/raphael.git", clientDirectory, clientTestDirectory.getName());
 		
 		System.out.println("2) Writing github repo to " + EFSUtils.getAbsolutePath(serverLocalDirectory));
-		runGitClone("http://github.com/DmitryBaranovskiy/raphael.git", serverDirectory, serverLocalDirectory.getName());
+		runGitClone("git://github.com/DmitryBaranovskiy/raphael.git", serverDirectory, serverLocalDirectory.getName());
 
 		// checkout specific tags
-		System.out.println("Checking out tag 1.4.0 on client_test");
-		runGitTag(clientTestDirectory, "1.4.0");
+		System.out.println("Checking out tag v1.4.0 on client_test");
+		runGitTag(clientTestDirectory, "v1.4.0");
 		
-		System.out.println("Checking out tag 1.3.0 on server_local");
-		runGitTag(serverLocalDirectory, "1.3.0");
+		System.out.println("Checking out tag v1.3.0 on server_local");
+		runGitTag(serverLocalDirectory, "v1.3.0");
 
 		System.out.println("3) Copying github repo to " + EFSUtils.getAbsolutePath(clientControlDirectory));
 		clientTestDirectory.copy(clientControlDirectory, EFS.OVERWRITE, null);

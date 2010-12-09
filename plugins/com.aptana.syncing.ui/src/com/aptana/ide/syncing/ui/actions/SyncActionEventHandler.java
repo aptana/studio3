@@ -43,7 +43,7 @@ import com.aptana.core.CoreStrings;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapterWithProgressMonitor;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 class SyncActionEventHandler extends SyncEventHandlerAdapterWithProgressMonitor
 {
@@ -71,20 +71,20 @@ class SyncActionEventHandler extends SyncEventHandlerAdapterWithProgressMonitor
 	}
 
 	@Override
-	public void syncDone(VirtualFileSyncPair item)
+	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{
-		super.syncDone(item);
+		super.syncDone(item, monitor);
 		fSyncDoneCount++;
 		checkDone();
 	}
 
 	@Override
-	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e)
+	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
 		showError(e.getLocalizedMessage(), e);
 		fSyncDoneCount++;
 		checkDone();
-		return fContinue && super.syncErrorEvent(item, e);
+		return fContinue && super.syncErrorEvent(item, e, monitor);
 	}
 
 	@Override

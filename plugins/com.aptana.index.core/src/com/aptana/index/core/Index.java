@@ -290,7 +290,6 @@ public class Index implements IReadWriteMonitor
 		return (pattern != null) ? pattern.matcher(word).find() : false;
 	}
 
-	public char separator = DEFAULT_SEPARATOR;
 	private MemoryIndex memoryIndex;
 	private DiskIndex diskIndex;
 	private IReadWriteMonitor monitor;
@@ -303,7 +302,7 @@ public class Index implements IReadWriteMonitor
 	 * @param reuseExistingFile
 	 * @throws IOException
 	 */
-	public Index(URI containerURI, boolean reuseExistingFile) throws IOException
+	protected Index(URI containerURI, boolean reuseExistingFile) throws IOException
 	{
 		this.containerURI = containerURI;
 
@@ -564,7 +563,7 @@ public class Index implements IReadWriteMonitor
 		}
 		catch (IOException e)
 		{
-			IndexActivator.logError("An error occurred while remove categories from the index", e);
+			IndexActivator.logError("An error occurred while remove categories from the index", e); //$NON-NLS-1$
 		}
 	}
 

@@ -60,7 +60,7 @@ public class SendFeedbackCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 	}
 
@@ -90,7 +90,7 @@ public class SendFeedbackCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 
 		return null;

@@ -38,17 +38,21 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.editor.common.preferences.IPreferenceConstants;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
-
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = new DefaultScope().getNode(Activator.PLUGIN_ID);
-		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		IEclipsePreferences prefs = new DefaultScope().getNode(CSSPlugin.PLUGIN_ID);
+
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
 	}
 
 }

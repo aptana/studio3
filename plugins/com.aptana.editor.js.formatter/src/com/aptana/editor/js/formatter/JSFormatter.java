@@ -46,6 +46,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -94,7 +95,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
 
-	private static Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
+	private static final Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
+	private static final Pattern COMMENTS_STRIPPING_PATTERN = Pattern.compile("\\s|\\*|//"); //$NON-NLS-1$
+
 	private String lineSeparator;
 
 	/**
@@ -102,7 +105,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * 
 	 * @param preferences
 	 */
-	protected JSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected JSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -220,8 +223,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	{
 		// first, strip out all the comments from the input and the output.
 		// save those comments for later comparison.
-		StringBuilder inputBuffer = new StringBuilder(input.length());
-		StringBuilder outputBuffer = new StringBuilder(output.length());
+		int inputLength = input.length();
+		int outputLength = output.length();
+		StringBuilder inputBuffer = new StringBuilder(inputLength);
+		StringBuilder outputBuffer = new StringBuilder(outputLength);
 		StringBuilder inputComments = new StringBuilder();
 		StringBuilder outputComments = new StringBuilder();
 		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
@@ -234,7 +239,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
 			inputOffset = inputCommentsMatcher.end() + 1;
 		}
-		inputBuffer.append(input.subSequence(inputOffset, input.length()));
+		if (inputOffset < inputLength)
+		{
+			inputBuffer.append(input.subSequence(inputOffset, inputLength));
+		}
 		while (outputCommentsMatcher.find())
 		{
 			outputComments.append(outputCommentsMatcher.group());
@@ -242,7 +250,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			outputOffset = outputCommentsMatcher.end() + 1;
 
 		}
-		outputBuffer.append(output.subSequence(outputOffset, output.length()));
+		if (outputOffset < outputLength)
+		{
+			outputBuffer.append(output.subSequence(outputOffset, outputLength));
+		}
 		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
 				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
 	}
@@ -254,7 +265,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 */
 	private String stripComment(String comment)
 	{
-		return comment.replaceAll("\\s|\\*|//", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		return COMMENTS_STRIPPING_PATTERN.matcher(comment).replaceAll(StringUtil.EMPTY);
 	}
 
 	/*

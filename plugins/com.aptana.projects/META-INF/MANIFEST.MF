@@ -11,11 +11,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  com.aptana.scripting,
  com.aptana.git.ui,
+ com.aptana.ui,
  com.aptana.ui.epl,
- com.aptana.ui.io
+ com.aptana.ui.io,
+ com.aptana.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.projects,
  com.aptana.projects.internal,
  com.aptana.projects.internal.wizards
-Import-Package: com.aptana.ui

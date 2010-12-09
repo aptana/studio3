@@ -37,6 +37,7 @@ package com.aptana.editor.html.outline;
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -97,6 +98,17 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				if (attribute != null && attribute.length() > 0)
 				{
 					return getExternalChildren(parentElement, attribute, ICSSParserConstants.LANGUAGE);
+				}
+			}
+			else
+			{
+				IParseNode[] styleNodes = item.getCSSStyleNodes();
+				if (styleNodes.length > 0)
+				{
+					List<IParseNode> children = new ArrayList<IParseNode>();
+					children.addAll(Arrays.asList(styleNodes));
+					children.addAll(Arrays.asList(item.getChildren()));
+					return filter(children.toArray(new IParseNode[children.size()]));
 				}
 			}
 		}
@@ -253,15 +265,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				}
 				catch (FileNotFoundException e)
 				{
-					Activator.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					HTMLPlugin.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
-					Activator.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					HTMLPlugin.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;
