@@ -76,7 +76,7 @@ public class CSSIndexReader
 		String key = element.getWord();
 		String[] columns = key.split(CSSIndexConstants.DELIMITER);
 
-		Object m = JSON.parse(columns[0]);
+		Object m = JSON.parse(columns[1]);
 
 		if (m instanceof Map)
 		{
