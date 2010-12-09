@@ -34,17 +34,29 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
 
 public class PropertyElement extends AbstractCSSMetadataElement
 {
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
+	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues"; //$NON-NLS-1$
+	private static final String HINT_PROPERTY = "hint"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
+
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 	private boolean _allowMultipleValues;
 	private String _type;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
 	private String _hint;
 	private String _remark;
-	private List<ValueElement> _values = new LinkedList<ValueElement>();
+	private List<ValueElement> _values = new ArrayList<ValueElement>();
 
 	/**
 	 * PropertyElement
@@ -84,6 +96,58 @@ public class PropertyElement extends AbstractCSSMetadataElement
 		return this._allowMultipleValues;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setType(object.get(TYPE_PROPERTY).toString());
+		this.setRemark(object.get(REMARK_PROPERTY).toString());
+		this.setHint(object.get(HINT_PROPERTY).toString());
+		this.setAllowMultipleValues(Boolean.TRUE == object.get(ALLOW_MULTIPLE_VALUES_PROPERTY));
+
+		// values
+		Object values = object.get(VALUES_PROPERTY);
+
+		if (values != null && values.getClass().isArray())
+		{
+			for (Object value : (Object[]) values)
+			{
+				if (value instanceof Map)
+				{
+					ValueElement v = new ValueElement();
+
+					v.fromJSON((Map) value);
+
+					this.addValue(v);
+				}
+			}
+		}
+
+		// specifications
+		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
+
+		if (specifications != null && specifications.getClass().isArray())
+		{
+			for (Object specification : (Object[]) specifications)
+			{
+				if (specification instanceof Map)
+				{
+					SpecificationElement s = new SpecificationElement();
+
+					s.fromJSON((Map) specification);
+
+					this.addSpecification(s);
+				}
+			}
+		}
+	}
+
 	/**
 	 * getHint
 	 * 
@@ -91,7 +155,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getHint()
 	{
-		return this._hint;
+		return StringUtil.getValue(this._hint);
 	}
 
 	/**
@@ -101,7 +165,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return this._remark;
+		return StringUtil.getValue(this._remark);
 	}
 
 	/**
@@ -121,7 +185,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getType()
 	{
-		return this._type;
+		return StringUtil.getValue(this._type);
 	}
 
 	/**
@@ -172,5 +236,23 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	public void setType(String type)
 	{
 		this._type = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(TYPE_PROPERTY, this.getType());
+		out.add(REMARK_PROPERTY, this.getRemark());
+		out.add(HINT_PROPERTY, this.getHint());
+		out.add(ALLOW_MULTIPLE_VALUES_PROPERTY, this.allowMultipleValues());
+		out.add(VALUES_PROPERTY, this.getValues());
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
 	}
 }

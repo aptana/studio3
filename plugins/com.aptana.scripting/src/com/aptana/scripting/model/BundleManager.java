@@ -85,7 +85,9 @@ public class BundleManager
 		BundleLoadJob(File bundleDirectory)
 		{
 			super("Loading bundle: " + bundleDirectory.getAbsolutePath()); //$NON-NLS-1$
+
 			this.bundleDirectory = bundleDirectory;
+
 			setPriority(Job.SHORT);
 		}
 
@@ -115,8 +117,6 @@ public class BundleManager
 	/**
 	 * This is a rule which reports a conflict when two rules wrap the same object. It is used to enforce a max job
 	 * count for parallel bundle loads.
-	 * 
-	 * @author cwilliams
 	 */
 	private class SerialPerObjectRule implements ISchedulingRule
 	{
@@ -502,12 +502,9 @@ public class BundleManager
 	{
 		if (entry != null)
 		{
-			synchronized (this._bundleVisibilityListeners)
+			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
-				{
-					listener.bundlesBecameHidden(entry);
-				}
+				listener.bundlesBecameHidden(entry);
 			}
 		}
 	}
@@ -523,12 +520,9 @@ public class BundleManager
 	{
 		if (entry != null)
 		{
-			synchronized (this._bundleVisibilityListeners)
+			for (BundleVisibilityListener listener : this.getBundleVisibilityListeners())
 			{
-				for (BundleVisibilityListener listener : this._bundleVisibilityListeners)
-				{
-					listener.bundlesBecameVisible(entry);
-				}
+				listener.bundlesBecameVisible(entry);
 			}
 		}
 	}
@@ -544,12 +538,9 @@ public class BundleManager
 	{
 		if (element != null)
 		{
-			synchronized (this._elementVisibilityListeners)
+			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
-				{
-					listener.elementBecameHidden(element);
-				}
+				listener.elementBecameHidden(element);
 			}
 		}
 	}
@@ -565,12 +556,9 @@ public class BundleManager
 	{
 		if (element != null)
 		{
-			synchronized (this._elementVisibilityListeners)
+			for (ElementVisibilityListener listener : this.getElementVisibilityListeners())
 			{
-				for (ElementVisibilityListener listener : this._elementVisibilityListeners)
-				{
-					listener.elementBecameVisible(element);
-				}
+				listener.elementBecameVisible(element);
 			}
 		}
 	}
@@ -586,12 +574,9 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				for (LoadCycleListener listener : this._loadCycleListeners)
-				{
-					listener.scriptLoaded(script);
-				}
+				listener.scriptLoaded(script);
 			}
 		}
 	}
@@ -607,12 +592,9 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				for (LoadCycleListener listener : this._loadCycleListeners)
-				{
-					listener.scriptReloaded(script);
-				}
+				listener.scriptReloaded(script);
 			}
 		}
 	}
@@ -628,12 +610,9 @@ public class BundleManager
 	{
 		if (script != null)
 		{
-			synchronized (this._loadCycleListeners)
+			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				for (LoadCycleListener listener : this._loadCycleListeners)
-				{
-					listener.scriptReloaded(script);
-				}
+				listener.scriptReloaded(script);
 			}
 		}
 	}
@@ -645,34 +624,37 @@ public class BundleManager
 	 */
 	public List<BundleElement> getApplicationBundles()
 	{
-		List<BundleElement> bundles = new ArrayList<BundleElement>();
+		String applicationBundlesPath = this.getApplicationBundlesPath();
+		List<BundleElement> result = new ArrayList<BundleElement>();
+
+		// make local copy of active keys (files)
+		Set<File> keys;
 
 		synchronized (this._bundlesByPath)
 		{
-			String applicationBundlesPath = this.getApplicationBundlesPath();
+			keys = new HashSet<File>(this._bundlesByPath.keySet());
+		}
 
-			for (Map.Entry<File, List<BundleElement>> entry : _bundlesByPath.entrySet())
+		// filter set
+		Set<File> applicationKeys = new HashSet<File>();
+
+		for (File key : keys)
+		{
+			String path = key.getAbsolutePath();
+
+			if (path.startsWith(applicationBundlesPath))
 			{
-				String path = entry.getKey().getAbsolutePath();
-
-				if (path.startsWith(applicationBundlesPath))
-				{
-					List<BundleElement> matchingBundles = entry.getValue();
-
-					if (matchingBundles != null)
-					{
-						int size = matchingBundles.size();
-
-						if (size > 0)
-						{
-							bundles.add(matchingBundles.get(size - 1));
-						}
-					}
-				}
+				applicationKeys.add(key);
 			}
 		}
 
-		return bundles;
+		// build result list
+		for (File key : applicationKeys)
+		{
+			result.add(this.getBundleFromPath(key));
+		}
+
+		return result;
 	}
 
 	/**
@@ -838,20 +820,24 @@ public class BundleManager
 	 */
 	public BundleElement getBundleFromPath(File bundleDirectory)
 	{
+		List<BundleElement> bundles = null;
 		BundleElement result = null;
 
 		synchronized (this._bundlesByPath)
 		{
-			List<BundleElement> bundles = this._bundlesByPath.get(bundleDirectory);
-
-			if (bundles != null)
+			if (this._bundlesByPath.containsKey(bundleDirectory))
 			{
-				int size = bundles.size();
+				bundles = new ArrayList<BundleElement>(this._bundlesByPath.get(bundleDirectory));
+			}
+		}
 
-				if (size > 0)
-				{
-					result = bundles.get(size - 1);
-				}
+		if (bundles != null)
+		{
+			int size = bundles.size();
+
+			if (size > 0)
+			{
+				result = bundles.get(size - 1);
 			}
 		}
 
@@ -1090,6 +1076,34 @@ public class BundleManager
 	}
 
 	/**
+	 * getBundleVisibilityListeners
+	 * 
+	 * @return
+	 */
+	protected List<BundleVisibilityListener> getBundleVisibilityListeners()
+	{
+		List<BundleVisibilityListener> listeners;
+
+		synchronized (this._bundleVisibilityListeners)
+		{
+			listeners = new ArrayList<BundleVisibilityListener>(this._bundleVisibilityListeners);
+		}
+
+		return listeners;
+	}
+
+	/**
+	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
+	 * are returned in this list. Note that this method is called from the scripting framework
+	 * 
+	 * @return A list of elements that are visible
+	 */
+	public List<CommandElement> getCommands()
+	{
+		return this.getCommands(null);
+	}
+	
+	/**
 	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
 	 * are returned in this list
 	 * 
@@ -1114,25 +1128,6 @@ public class BundleManager
 		}
 
 		return result;
-	}
-
-	/**
-	 * Get a list of all active and executable commands. Note that bundle precedence is taken into account, so only
-	 * visible elements are returned in this list. This method is convenience method and is equivalent to constructing
-	 * an AndFilter with an IsExecutableCommandFilter and the specified filter
-	 * 
-	 * @param filter
-	 *            A filter to apply to each active command. Only commands which pass the filter will be included in the
-	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
-	 * @return A list of commands that are visible, executable, and that pass the specified filter
-	 */
-	public List<CommandElement> getExecutableCommands(IModelFilter filter)
-	{
-		IModelFilter executableFilter = new IsExecutableCommandFilter();
-
-		filter = (filter == null) ? executableFilter : new AndFilter(filter, executableFilter);
-
-		return this.getCommands(filter);
 	}
 
 	/**
@@ -1192,6 +1187,23 @@ public class BundleManager
 	}
 
 	/**
+	 * getElementVisibilityListeners
+	 * 
+	 * @return
+	 */
+	protected List<ElementVisibilityListener> getElementVisibilityListeners()
+	{
+		List<ElementVisibilityListener> listeners;
+
+		synchronized (this._elementVisibilityListeners)
+		{
+			listeners = new ArrayList<ElementVisibilityListener>(this._elementVisibilityListeners);
+		}
+
+		return listeners;
+	}
+
+	/**
 	 * Return a list of all active environment elements. Note that bundle precedence is taken into account, so only
 	 * visible elements are returned in this list
 	 * 
@@ -1216,6 +1228,25 @@ public class BundleManager
 		}
 
 		return result;
+	}
+
+	/**
+	 * Get a list of all active and executable commands. Note that bundle precedence is taken into account, so only
+	 * visible elements are returned in this list. This method is convenience method and is equivalent to constructing
+	 * an AndFilter with an IsExecutableCommandFilter and the specified filter
+	 * 
+	 * @param filter
+	 *            A filter to apply to each active command. Only commands which pass the filter will be included in the
+	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
+	 * @return A list of commands that are visible, executable, and that pass the specified filter
+	 */
+	public List<CommandElement> getExecutableCommands(IModelFilter filter)
+	{
+		IModelFilter executableFilter = new IsExecutableCommandFilter();
+
+		filter = (filter == null) ? executableFilter : new AndFilter(filter, executableFilter);
+
+		return this.getCommands(filter);
 	}
 
 	/**
@@ -1303,6 +1334,23 @@ public class BundleManager
 		}
 
 		return result;
+	}
+
+	/**
+	 * getLoadCycleListeners
+	 * 
+	 * @return
+	 */
+	protected List<LoadCycleListener> getLoadCycleListeners()
+	{
+		List<LoadCycleListener> listeners;
+
+		synchronized (this._loadCycleListeners)
+		{
+			listeners = new ArrayList<LoadCycleListener>(this._loadCycleListeners);
+		}
+
+		return listeners;
 	}
 
 	/**
@@ -1919,7 +1967,7 @@ public class BundleManager
 	 */
 	public void unloadBundle(File bundleDirectory)
 	{
-		AbstractElement[] elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
+		List<AbstractElement> elements = AbstractElement.getElementsByDirectory(bundleDirectory.getAbsolutePath());
 		Set<File> scripts = new HashSet<File>();
 
 		if (elements != null)
@@ -1961,7 +2009,7 @@ public class BundleManager
 		if (script != null)
 		{
 			String scriptPath = script.getAbsolutePath();
-			AbstractElement[] elements = AbstractElement.getElementsByPath(scriptPath);
+			List<AbstractElement> elements = AbstractElement.getElementsByPath(scriptPath);
 
 			// remove bundle members in pass 1
 			for (AbstractElement element : elements)

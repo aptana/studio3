@@ -46,7 +46,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
@@ -104,7 +104,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 */
 	private InputStream loadResource(String resource)
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+		URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), new Path(resource), null);
 		InputStream stream = null;
 
 		if (url != null)

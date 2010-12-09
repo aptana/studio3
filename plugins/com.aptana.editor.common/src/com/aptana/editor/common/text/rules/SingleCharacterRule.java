@@ -42,7 +42,7 @@ import org.eclipse.jface.text.rules.Token;
 /**
  * Optimized rule to match a single character. Faster than a RegexpRule for one char.
  * 
- * @author cwilliams
+ * @author Chris Williams
  */
 public class SingleCharacterRule implements IPredicateRule
 {

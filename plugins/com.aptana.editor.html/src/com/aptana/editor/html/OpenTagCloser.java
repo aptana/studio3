@@ -144,7 +144,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 		catch (BadLocationException e)
 		{
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+			HTMLPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 	}
 
@@ -211,7 +211,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 		catch (BadLocationException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			HTMLPlugin.logError(e.getMessage(), e);
 		}
 		return null;
 	}

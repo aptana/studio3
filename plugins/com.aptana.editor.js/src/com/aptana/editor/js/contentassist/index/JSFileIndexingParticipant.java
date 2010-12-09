@@ -52,7 +52,7 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tasks.TaskTag;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.model.ContentSelector;
@@ -86,7 +86,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (JaxenException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (file != null)
 			{
-				sub.subTask(file.getName());
+				sub.subTask(getIndexingMessage(index, file));
 	
 				removeTasks(file, sub.newChild(10));
 	
@@ -177,7 +177,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			Activator.logError(e.getMessage(), e);
+			JSPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -259,6 +259,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 			// create new Window type for this file
 			TypeElement type = new TypeElement();
 			type.setName(JSTypeConstants.WINDOW_TYPE);
+			type.addParentType(JSTypeConstants.GLOBAL_TYPE);
 
 			JSSymbolTypeInferrer symbolInferrer = new JSSymbolTypeInferrer(globals, index, location);
 

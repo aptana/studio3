@@ -123,7 +123,7 @@ public class SVGPlugin extends AbstractUIPlugin
 		super.start(context);
 		plugin = this;
 
-		Job job = new MetadataLoader();
+		Job job = new SVGMetadataLoader();
 		job.schedule();
 	}
 

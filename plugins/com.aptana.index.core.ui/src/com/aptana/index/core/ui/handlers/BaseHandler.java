@@ -50,7 +50,7 @@ import org.eclipse.ui.ISources;
 
 import com.aptana.ide.core.io.efs.EFSUtils;
 
-public abstract class BaseHandler extends AbstractHandler
+abstract class BaseHandler extends AbstractHandler
 {
 	private List<IFileStore> _fileStores;
 
@@ -67,7 +67,7 @@ public abstract class BaseHandler extends AbstractHandler
 	 * 
 	 * @param fileStore
 	 */
-	protected void addFileStore(IFileStore fileStore)
+	private void addFileStore(IFileStore fileStore)
 	{
 		this._fileStores.add(fileStore);
 	}
@@ -75,7 +75,7 @@ public abstract class BaseHandler extends AbstractHandler
 	/**
 	 * clearFileStores
 	 */
-	protected void clearFileStores()
+	private void clearFileStores()
 	{
 		this._fileStores.clear();
 	}

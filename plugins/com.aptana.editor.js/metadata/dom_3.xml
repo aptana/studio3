@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <javascript>
-	<class type = "Document" superclass = "Node">
+	<class type="Document" superclass="Node">
         <description>Represents an HTML or XML document.</description>
 		<properties>
 			<property name="documentURI" type="DOMString" scope="instance" access="read-write">
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.7+"/>
-                    <browser platform = "Safari" version = "1.0+"/>
+                    <browser platform="Mozilla" version="1.7+"/>
+                    <browser platform="Safari" version="1.0+"/>
                 </browsers>
                 <description>The location of the document or null if undefined or if the Document was created using DOMImplementation.createDocument. No lexical checking is performed when setting this attribute; this could result in a null value returned when using Node.baseURI. Beware that when the Document supports the feature "HTML" [DOM Level 2 HTML], the href attribute of the HTML BASE element takes precedence over this attribute when computing Node.baseURI.</description>
             </property>
@@ -17,7 +17,7 @@
 					<specification name="W3C" version="HTML DOM Level 3"/>
                 </availability>
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
 				</browsers>
             </property>
 			<property name="xmlEncoding" type="DOMString" scope="instance" access="read">
@@ -27,7 +27,7 @@
 					<specification name="W3C" version="HTML DOM Level 3"/>
                 </availability>
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
 				</browsers>
             </property>
 			<property name="xmlStandalone" type="boolean" scope="instance" access="read-write">
@@ -45,7 +45,7 @@ Note: No verification is done on the value when setting this attribute. Applicat
 					<specification name="W3C" version="HTML DOM Level 3"/>
                 </availability>
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
 				</browsers>
             </property>
 			<property name="xmlVersion" type="DOMString" scope="instance" access="read-write">
@@ -61,7 +61,7 @@ Note: No verification is done on the value when setting this attribute. Applicat
 					<specification name="W3C" version="HTML DOM Level 3"/>
                 </availability>
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
 				</browsers>
             </property>
 			<property name="strictErrorChecking" type="boolean" scope="instance" access="read-write">
@@ -71,7 +71,7 @@ Note: No verification is done on the value when setting this attribute. Applicat
 					<specification name="W3C" version="HTML DOM Level 3"/>
                 </availability>
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
 				</browsers>
             </property>
 			<property name="domConfig" type="DOMConfiguration" scope="instance" access="read-write">
@@ -91,7 +91,7 @@ Note: No verification is done on the value when setting this attribute. Applicat
                     </parameter>
                 </parameters>
                 <return-types>
-                    <return-type type = "Node"/>
+                    <return-type type="Node"/>
                 </return-types>
                 <return-description>The adopted node that can be used in the current document. The new node's &lt;code&gt;parentNode&lt;/code&gt; is null, since it has not yet been inserted into the document tree. </return-description>
 				<availability>
@@ -285,15 +285,15 @@ To specify an attribute by local name and namespace URI, use the setIdAttributeN
 		<properties>
 			<property name="baseURI" type="DOMString" scope="instance" access="read-write">
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
-                    <browser platform = "Safari" version = "1.0+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
+                    <browser platform="Safari" version="1.0+"/>
                 </browsers>
                 <description>The absolute base URI of this node or null if the implementation wasn't able to obtain an absolute URI. This value is computed as described in Base URIs. However, when the Document supports the feature "HTML" [DOM Level 2 HTML], the base URI is computed using first the value of the href attribute of the HTML BASE element if any, and the value of the documentURI  attribute from the Document interface otherwise.</description>
             </property>
 			<property name="textContent" type="DOMString" scope="instance" access="read-write">
                 <browsers>
-                    <browser platform = "Mozilla" version = "1.8.1+"/>
-                    <browser platform = "Safari" version = "1.0+"/>
+                    <browser platform="Mozilla" version="1.8.1+"/>
+                    <browser platform="Safari" version="1.0+"/>
                 </browsers>
                 <description>This attribute returns the text content of this node and its descendants. When it is defined to be null, setting it has no effect. On setting, any possible children this node may have are removed and, if it the new string is not empty or null, replaced by a single Text node containing the string this attribute is set to.
 				

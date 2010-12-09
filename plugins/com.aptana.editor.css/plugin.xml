@@ -59,5 +59,17 @@
             targetId="com.aptana.editor.ui.hyperlinkTarget">
       </hyperlinkDetector>
    </extension>
+   <extension
+         point="com.aptana.editor.common.validator">
+      <language
+            name="%validator.language.css.name"
+            type="text/css">
+      </language>
+      <validator
+            class="com.aptana.editor.css.validator.CSSValidator"
+            language="text/css"
+            name="%validator.css.name">
+      </validator>
+   </extension>
 
 </plugin>

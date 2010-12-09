@@ -45,6 +45,8 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.keybindings.internal.KeybindingsManager;
+import com.aptana.scripting.listeners.ExecutionListenerRegistrant;
+import com.aptana.scripting.listeners.FileWatcherRegistrant;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.BundleMonitor;
 import com.aptana.scripting.model.RunType;
@@ -158,8 +160,10 @@ public class ScriptingActivator extends Plugin
 				fileTypeListener = new FileTypeAssociationListener();
 				manager.addBundleVisibilityListener(fileTypeListener);
 
-				// grabbing instance registers itself the bundle manager
+				// TODO: Make this an extension point so plugins can contribute these
+				// grabbing instances register listeners
 				FileWatcherRegistrant.getInstance();
+				ExecutionListenerRegistrant.getInstance();
 
 				// load all existing bundles automatically, if we're not running
 				// unit tests
@@ -212,6 +216,7 @@ public class ScriptingActivator extends Plugin
 			}
 
 			FileWatcherRegistrant.shutdown();
+			ExecutionListenerRegistrant.shutdown();
 
 			// FIXME Clean up the bundle manager singleton!
 		}

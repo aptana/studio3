@@ -93,13 +93,17 @@ public class MenuElement extends AbstractBundleElement
 	 */
 	public synchronized List<MenuElement> getChildren()
 	{
-		List<MenuElement> result = Collections.emptyList();
+		List<MenuElement> result;
 
 		synchronized (childrenLock)
 		{
 			if (this._children != null && this._children.size() > 0)
 			{
 				result = new ArrayList<MenuElement>(this._children);
+			}
+			else
+			{
+				result = Collections.emptyList();
 			}
 		}
 

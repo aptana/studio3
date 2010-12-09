@@ -37,6 +37,9 @@ package com.aptana.editor.js.contentassist.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
@@ -44,6 +47,13 @@ import com.aptana.editor.js.JSTypeConstants;
 
 public class FunctionElement extends PropertyElement
 {
+	private static final String REFERENCES_PROPERTY = "references"; //$NON-NLS-1$
+	private static final String EXCEPTIONS_PROPERTY = "exceptions"; //$NON-NLS-1$
+	private static final String RETURN_TYPES_PROPERTY = "returnTypes"; //$NON-NLS-1$
+	private static final String PARAMETERS_PROPERTY = "parameters"; //$NON-NLS-1$
+	private static final String IS_METHOD_PROPERTY = "isMethod"; //$NON-NLS-1$
+	private static final String IS_CONSTRUCTOR_PROPERTY = "isConstructor"; //$NON-NLS-1$
+	
 	private List<ParameterElement> _parameters;
 	private List<String> _references;
 	private List<ExceptionElement> _exceptions;
@@ -157,6 +167,68 @@ public class FunctionElement extends PropertyElement
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.PropertyElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+		
+		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
+		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
+		
+		Object parameters = object.get(PARAMETERS_PROPERTY);
+		if (parameters != null && parameters.getClass().isArray())
+		{
+			for (Object parameter : (Object[]) parameters)
+			{
+				ParameterElement p = new ParameterElement();
+				
+				p.fromJSON((Map) parameter);
+				
+				this.addParameter(p);
+			}
+		}
+		
+		Object returnTypes = object.get(RETURN_TYPES_PROPERTY);
+		if (returnTypes != null && returnTypes.getClass().isArray())
+		{
+			for (Object returnType : (Object[]) returnTypes)
+			{
+				ReturnTypeElement rt = new ReturnTypeElement();
+				
+				rt.fromJSON((Map) returnType);
+				
+				this.addReturnType(rt);
+			}
+		}
+		
+		Object exceptions = object.get(EXCEPTIONS_PROPERTY);
+		if (exceptions != null && exceptions.getClass().isArray())
+		{
+			for (Object exception : (Object[]) exceptions)
+			{
+				ExceptionElement e = new ExceptionElement();
+				
+				e.fromJSON((Map) exception);
+				
+				this.addException(e);
+			}
+		}
+		
+		Object references = object.get(REFERENCES_PROPERTY);
+		if (references != null && references.getClass().isArray())
+		{
+			for (Object reference : (Object[]) references)
+			{
+				this.addReference(reference.toString());
+			}
+		}
+	}
+
 	/**
 	 * getExceptions
 	 * 
@@ -243,23 +315,6 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
-	 * getReturnTypes
-	 * 
-	 * @return
-	 */
-	public List<ReturnTypeElement> getReturnTypes()
-	{
-		List<ReturnTypeElement> result = this._returnTypes;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
-	}
-
-	/**
 	 * getReturnTypeNames
 	 * 
 	 * @return
@@ -278,6 +333,23 @@ public class FunctionElement extends PropertyElement
 			}
 		}
 		else
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
+	}
+
+	/**
+	 * getReturnTypes
+	 * 
+	 * @return
+	 */
+	public List<ReturnTypeElement> getReturnTypes()
+	{
+		List<ReturnTypeElement> result = this._returnTypes;
+
+		if (result == null)
 		{
 			result = Collections.emptyList();
 		}
@@ -376,6 +448,23 @@ public class FunctionElement extends PropertyElement
 	public void setIsMethod(boolean value)
 	{
 		this._isMethod = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.PropertyElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+		
+		out.add(IS_CONSTRUCTOR_PROPERTY, this.isConstructor());
+		out.add(IS_METHOD_PROPERTY, this.isMethod());
+		out.add(PARAMETERS_PROPERTY, this.getParameters());
+		out.add(RETURN_TYPES_PROPERTY, this.getReturnTypes());
+		out.add(EXCEPTIONS_PROPERTY, this.getExceptions());
+		out.add(REFERENCES_PROPERTY, this.getReferences());
 	}
 
 	/**

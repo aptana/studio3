@@ -8,7 +8,7 @@
      cwilliams
      schitale                                                               
      ====================================================================== -->
-<project name="red-core" default="build">
+<project name="studio3" default="build">
 	<description>
             Builds the RED Core feature
     </description>

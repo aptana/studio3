@@ -56,7 +56,6 @@ public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner
 
 	private static final String[] JS_SWITCH_SEQUENCES = new String[] { "</script>" }; //$NON-NLS-1$
 	private static final String[] CSS_SWITCH_SEQUENCES = new String[] { "</style>" }; //$NON-NLS-1$
-	private static final String[][] EMPTY = new String[0][];
 
 	/**
 	 * SVGSubPartitionerScanner
@@ -70,8 +69,8 @@ public class SVGSubPartitionerScanner extends CompositeSubPartitionScanner
 				CSSSourceConfiguration.getDefault().createSubPartitionScanner() //
 			}, //
 			new IPartitionScannerSwitchStrategy[] { //
-				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES, EMPTY), //
-				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES, EMPTY) //
+				new PartitionScannerSwitchStrategy(JS_SWITCH_SEQUENCES), //
+				new PartitionScannerSwitchStrategy(CSS_SWITCH_SEQUENCES) //
 			} //
 		);
 	}

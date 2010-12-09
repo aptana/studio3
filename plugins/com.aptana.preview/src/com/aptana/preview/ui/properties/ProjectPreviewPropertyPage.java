@@ -62,12 +62,12 @@ import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.preview.Activator;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.server.AbstractWebServerConfiguration;
-import com.aptana.preview.server.ServerConfigurationManager;
-import com.aptana.preview.server.ServerConfigurationManager.ConfigurationType;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
 
 /**
  * @author Max Stepanov

@@ -35,18 +35,22 @@
 
 package com.aptana.editor.common;
 
+import com.aptana.editor.common.IPartitionScannerSwitchStrategy.SequenceBypassHandler;
+
 /**
  * @author Max Stepanov
  *
  */
 public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStrategy {
+	
+	private final char[][][] switchSequences;
+	private final SequenceBypassHandler[] sequenceBypassHandlers;
 
-	private static final char[][][] EMPTY = new char[][][] {};
-	
-	private char[][][] switchSequences;
-	private char[][][] escapeSequences;
-	
-	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, String[][] escapeSequencePairs) {
+	protected PartitionerSwitchStrategy(String[][] switchSequencePairs) {
+		this(switchSequencePairs, null, null);
+	}
+
+	protected PartitionerSwitchStrategy(String[][] switchSequencePairs, SequenceBypassHandler startBypassHandler, SequenceBypassHandler endBypassHandler) {
 		char[][] startSequences = new char[switchSequencePairs.length][];
 		char[][] endSequences = new char[switchSequencePairs.length][];
 		for (int i = 0; i < switchSequencePairs.length; ++i) {
@@ -55,13 +59,7 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 		}
 
 		switchSequences = new char[][][] { TextUtils.removeDuplicates(startSequences), TextUtils.removeDuplicates(endSequences) };
-		escapeSequences = new char[escapeSequencePairs.length][][];
-		for (int i = 0; i < escapeSequencePairs.length; ++i) {
-			escapeSequences[i] = new char[][] {
-					escapeSequencePairs[i][0].toCharArray(),
-					escapeSequencePairs[i][1] != null ? escapeSequencePairs[i][1].toCharArray() : null
-			};
-		}
+		sequenceBypassHandlers = new SequenceBypassHandler[] { startBypassHandler, endBypassHandler };
 	}
 
 	/* (non-Javadoc)
@@ -72,9 +70,9 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 			public char[][] getSwitchSequences() {
 				return switchSequences[0];
 			}
-			
-			public char[][][] getEscapeSequences() {
-				return EMPTY;
+
+			public SequenceBypassHandler getSequenceBypassHandler() {
+				return sequenceBypassHandlers[0];
 			}
 		};
 	}
@@ -87,9 +85,9 @@ public abstract class PartitionerSwitchStrategy implements IPartitionerSwitchStr
 			public char[][] getSwitchSequences() {
 				return switchSequences[1];
 			}
-			
-			public char[][][] getEscapeSequences() {
-				return escapeSequences;
+
+			public SequenceBypassHandler getSequenceBypassHandler() {
+				return sequenceBypassHandlers[1];
 			}
 		};
 	}

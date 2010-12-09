@@ -38,6 +38,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 
@@ -49,7 +50,7 @@ import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class SynchronizeFilesAction extends BaseSyncAction
 {
@@ -73,7 +74,7 @@ public class SynchronizeFilesAction extends BaseSyncAction
 					dialog.open();
 					dialog.setHandler(new SyncEventHandlerAdapter()
 					{
-						public void syncDone(VirtualFileSyncPair item)
+						public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 						{
 							Object file = source.getAdapter(IResource.class);
 							if (file != null && file instanceof IResource)

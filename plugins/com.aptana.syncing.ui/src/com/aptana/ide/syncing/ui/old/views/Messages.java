@@ -83,6 +83,8 @@ public class Messages extends NLS
 	public static String SmartSyncDialog_DirectionMode;
 	public static String SmartSyncDialog_Download;
 	public static String SmartSyncDialog_DownloadAll;
+	public static String SmartSyncDialog_Endpoints;
+
 	public static String SmartSyncDialog_ErrorMessage;
 	public static String SmartSyncDialog_ErrorSmartSync;
 	public static String SmartSyncDialog_ErrorSync;

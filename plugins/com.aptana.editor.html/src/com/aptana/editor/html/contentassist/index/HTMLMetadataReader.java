@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
@@ -538,7 +538,7 @@ public class HTMLMetadataReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(Activator.getDefault().getBundle(),
+			return FileLocator.openStream(HTMLPlugin.getDefault().getBundle(),
 					Path.fromPortableString(HTML_METADATA_SCHEMA), false);
 		}
 		catch (IOException e)

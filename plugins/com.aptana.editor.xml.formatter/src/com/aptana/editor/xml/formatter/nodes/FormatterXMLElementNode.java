@@ -48,14 +48,16 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 {
 	private String element;
+	private boolean children;
 
 	/**
 	 * @param document
 	 */
-	public FormatterXMLElementNode(IFormatterDocument document, String element)
+	public FormatterXMLElementNode(IFormatterDocument document, String element, boolean hasChildrenInAST)
 	{
 		super(document);
 		this.element = element;
+		this.children = hasChildrenInAST;
 	}
 
 	/*
@@ -84,7 +86,7 @@ public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingEndNewLine()
 	{
 		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return !set.contains(element);
+		return (!set.contains(element) || children);
 	}
 
 	/*
