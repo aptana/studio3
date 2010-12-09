@@ -91,9 +91,15 @@ public class JSLintValidator implements IValidator
 	{
 		Context context = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
-		context.setErrorReporter(reporter);
-		parseWithLint(context, source, path, manager);
-
+		try
+		{
+			context.setErrorReporter(reporter);
+			parseWithLint(context, source, path, manager);
+		}
+		finally
+		{
+			Context.exit();
+		}
 		return manager.getItems();
 	}
 

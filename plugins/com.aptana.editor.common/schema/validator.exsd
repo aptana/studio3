@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="validator"/>
+            <element ref="validator" minOccurs="1" maxOccurs="unbounded"/>
             <element ref="language" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">

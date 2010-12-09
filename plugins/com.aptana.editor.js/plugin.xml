@@ -73,6 +73,11 @@
             language="text/javascript"
             name="%validator.jslint.name">
       </validator>
+      <validator
+            class="com.aptana.editor.js.validator.MozillaJsValidator"
+            language="text/javascript"
+            name="%validator.mozilla.name">
+      </validator>
    </extension>
 
 </plugin>
