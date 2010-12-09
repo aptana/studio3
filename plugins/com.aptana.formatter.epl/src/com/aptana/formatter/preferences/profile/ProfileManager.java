@@ -227,7 +227,7 @@ public class ProfileManager implements IProfileManager
 		for (IContributedExtension extension : extensions)
 		{
 			IScriptFormatterFactory factory = (IScriptFormatterFactory) extension;
-			if (!factoriesClasses.contains(factory.getClass()))
+			if (factory.isContributingToUI() && !factoriesClasses.contains(factory.getClass()))
 			{
 				factoriesClasses.add(factory.getClass());
 				factories.add(factory);

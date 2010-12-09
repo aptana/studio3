@@ -34,6 +34,7 @@
  */
 package com.aptana.editor.css.outline;
 
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.parsing.CSSParser;
 import com.aptana.editor.css.parsing.CSSScanner;
@@ -78,18 +79,18 @@ public class CSSOutlineProviderTest extends TestCase
 		Object[] selectors = fContentProvider.getElements(result);
 		assertEquals(2, selectors.length);
 		CSSRuleNode rule = (CSSRuleNode) result.getChild(0);
-		assertEquals(rule.getSelectors()[0], selectors[0]);
+		assertEquals(rule.getSelectors()[0], getNode(selectors[0]));
 		assertEquals(CSSPlugin.getImage("icons/selector.png"), fLabelProvider.getImage(selectors[0]));
-		assertEquals(rule.getSelectors()[1], selectors[1]);
+		assertEquals(rule.getSelectors()[1], getNode(selectors[1]));
 
 		Object[] declarations = fContentProvider.getChildren(selectors[0]);
 		assertEquals(1, declarations.length);
-		assertEquals(rule.getDeclarations()[0], declarations[0]);
+		assertEquals(rule.getDeclarations()[0], getNode(declarations[0]));
 		assertEquals(CSSPlugin.getImage("icons/declaration.png"), fLabelProvider.getImage(declarations[0]));
 
 		declarations = fContentProvider.getChildren(selectors[1]);
 		assertEquals(1, declarations.length);
-		assertEquals(rule.getDeclarations()[0], declarations[0]);
+		assertEquals(rule.getDeclarations()[0], getNode(declarations[0]));
 	}
 
 	public void testElementAt() throws Exception
@@ -99,10 +100,23 @@ public class CSSOutlineProviderTest extends TestCase
 		IParseNode result = (IParseNode) fParser.parse(fScanner);
 
 		CSSRuleNode rule = (CSSRuleNode) result.getChild(0);
-		assertEquals(rule.getSelectors()[0], CSSOutlineContentProvider.getElementAt(result, 0));
-		assertEquals(rule.getSelectors()[0], CSSOutlineContentProvider.getElementAt(result, 10));
-		assertEquals(rule.getSelectors()[1], CSSOutlineContentProvider.getElementAt(result, 20));
-		assertEquals(rule.getDeclarations()[0], CSSOutlineContentProvider.getElementAt(result, 40));
-		assertEquals(rule.getSelectors()[1], CSSOutlineContentProvider.getElementAt(result, source.length() - 1));
+		assertEquals(rule.getSelectors()[0], getNode(CSSOutlineContentProvider.getElementAt(result, 0)));
+		assertEquals(rule.getSelectors()[0], getNode(CSSOutlineContentProvider.getElementAt(result, 10)));
+		assertEquals(rule.getSelectors()[1], getNode(CSSOutlineContentProvider.getElementAt(result, 20)));
+		assertEquals(rule.getDeclarations()[0], getNode(CSSOutlineContentProvider.getElementAt(result, 40)));
+		assertEquals(rule.getSelectors()[1], getNode(CSSOutlineContentProvider.getElementAt(result, source.length() - 1)));
+	}
+
+	private static IParseNode getNode(Object element)
+	{
+		if (element instanceof CommonOutlineItem)
+		{
+			return ((CommonOutlineItem) element).getReferenceNode();
+		}
+		if (element instanceof IParseNode)
+		{
+			return (IParseNode) element;
+		}
+		return null;
 	}
 }

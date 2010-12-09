@@ -35,10 +35,10 @@
 package com.aptana.editor.css.outline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.aptana.editor.common.outline.CommonOutlineContentProvider;
+import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.css.parsing.ast.CSSDeclarationNode;
 import com.aptana.editor.css.parsing.ast.CSSRuleNode;
 import com.aptana.editor.css.parsing.ast.CSSSelectorNode;
@@ -53,7 +53,7 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 		if (parentElement instanceof CSSSelectorNode)
 		{
 			CSSRuleNode rule = ((CSSSelectorNode) parentElement).getRule();
-			return rule.getDeclarations();
+			return filter(rule.getDeclarations());
 		}
 		return super.getChildren(parentElement);
 	}
@@ -86,7 +86,7 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 							{
 								if (offset <= selector.getEnd())
 								{
-									return selector;
+									return getItem(selector);
 								}
 							}
 						}
@@ -98,12 +98,12 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 							{
 								if (offset <= declaration.getEnd())
 								{
-									return declaration;
+									return getItem(declaration);
 								}
 							}
 						}
 						// by default returns the last selector
-						return selectors[selectors.length - 1];
+						return getItem(selectors[selectors.length - 1]);
 					}
 				}
 			}
@@ -114,17 +114,28 @@ public class CSSOutlineContentProvider extends CommonOutlineContentProvider
 	@Override
 	protected Object[] filter(IParseNode[] nodes)
 	{
-		// displays only the rules
-		List<CSSSelectorNode> selectors = new ArrayList<CSSSelectorNode>();
-		CSSRuleNode rule;
+		List<CommonOutlineItem> items = new ArrayList<CommonOutlineItem>();
 		for (IParseNode node : nodes)
 		{
 			if (node instanceof CSSRuleNode)
 			{
-				rule = (CSSRuleNode) node;
-				selectors.addAll(Arrays.asList(rule.getSelectors()));
+				// displays the selectors of each rule at the top level
+				CSSSelectorNode[] selectors = ((CSSRuleNode) node).getSelectors();
+				for (CSSSelectorNode selector : selectors)
+				{
+					items.add(getOutlineItem(selector));
+				}
+			}
+			else if (node instanceof CSSDeclarationNode)
+			{
+				items.add(getOutlineItem(node));
 			}
 		}
-		return selectors.toArray(new CSSSelectorNode[selectors.size()]);
+		return items.toArray(new CommonOutlineItem[items.size()]);
+	}
+
+	private static CommonOutlineItem getItem(IParseNode node)
+	{
+		return new CommonOutlineItem(node.getNameNode().getNameRange(), node);
 	}
 }

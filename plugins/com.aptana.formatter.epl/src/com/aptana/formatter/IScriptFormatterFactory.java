@@ -116,4 +116,11 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @return An IPartitioningConfiguration instance
 	 */
 	Object getPartitioningConfiguration();
+
+	/**
+	 * Indicated that this formatter factory will contribute an element in the formatter preference page.
+	 * 
+	 * @return True, if this formatter factory appears in the preferences; False, otherwise.
+	 */
+	boolean isContributingToUI();
 }

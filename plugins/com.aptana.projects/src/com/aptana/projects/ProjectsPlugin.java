@@ -34,21 +34,11 @@
  */
 package com.aptana.projects;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import com.aptana.core.build.UnifiedBuilder;
-import com.aptana.core.util.ResourceUtil;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -61,8 +51,6 @@ public class ProjectsPlugin extends AbstractUIPlugin
 
 	// The shared instance
 	private static ProjectsPlugin plugin;
-
-	private Job addBuilderJob;
 
 	/**
 	 * The constructor
@@ -79,52 +67,6 @@ public class ProjectsPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
-		addBuilderJob = new Job("Adding unified builder to our projects")
-		{
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				SubMonitor sub = SubMonitor.convert(monitor, projects.length);
-				for (IProject p : projects)
-				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-
-					try
-					{
-						if (!p.isAccessible())
-						{
-							continue;
-						}
-						sub.subTask(p.getName());
-
-						// FIXME These should be constants on the nature classes, but the dependencies would get
-						// inverted...
-						if (p.hasNature(WebProjectNature.ID) || p.hasNature("com.aptana.ruby.core.rubynature") //$NON-NLS-1$
-								|| p.hasNature("org.radrails.rails.core.railsnature") //$NON-NLS-1$
-								|| p.hasNature("com.aptana.editor.php.phpNature")) //$NON-NLS-1$
-						{
-							ResourceUtil.addBuilder(p, UnifiedBuilder.ID);
-						}
-						status.add(Status.OK_STATUS);
-					}
-					catch (CoreException e)
-					{
-						status.add(e.getStatus());
-					}
-					finally
-					{
-						sub.worked(1);
-					}
-				}
-				sub.done();
-				return status;
-			}
-		};
-		addBuilderJob.schedule();
 	}
 
 	/*
@@ -133,19 +75,8 @@ public class ProjectsPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		try
-		{
-			if (addBuilderJob != null)
-			{
-				addBuilderJob.cancel();
-				addBuilderJob = null;
-			}
-		}
-		finally
-		{
-			plugin = null;
-			super.stop(context);
-		}
+		plugin = null;
+		super.stop(context);
 	}
 
 	/**

@@ -32,39 +32,70 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.projects;
+package com.aptana.editor.js.validator;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
+import java.net.URI;
+import java.util.List;
 
-import com.aptana.core.build.UnifiedBuilder;
-import com.aptana.core.util.ResourceUtil;
+import org.eclipse.core.resources.IMarker;
+import org.mozilla.javascript.CompilerEnvirons;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.Parser;
 
-public class WebProjectNature implements IProjectNature
+import com.aptana.editor.common.validator.IValidationItem;
+import com.aptana.editor.common.validator.IValidationManager;
+import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.js.parsing.IJSParserConstants;
+
+public class MozillaJsValidator implements IValidator
 {
 
-	public static final String ID = ProjectsPlugin.PLUGIN_ID + ".webnature"; //$NON-NLS-1$
-
-	private IProject project;
-
-	public void configure() throws CoreException
+	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
-		ResourceUtil.addBuilder(getProject(), UnifiedBuilder.ID);
-	}
+		Context cx = Context.enter();
+		DefaultErrorReporter reporter = new DefaultErrorReporter();
+		try
+		{
+			cx.setErrorReporter(reporter);
 
-	public void deconfigure() throws CoreException
-	{
-		ResourceUtil.removeBuilderIfOrphaned(getProject(), UnifiedBuilder.ID);
-	}
+			CompilerEnvirons compilerEnv = new CompilerEnvirons();
+			compilerEnv.initFromContext(cx);
 
-	public IProject getProject()
-	{
-		return project;
-	}
+			Parser p = new Parser(compilerEnv, reporter);
+			try
+			{
+				p.parse(source, path.toString(), 1);
+			}
+			catch (EvaluatorException e)
+			{
+			}
+		}
+		finally
+		{
+			Context.exit();
+		}
 
-	public void setProject(IProject project)
-	{
-		this.project = project;
+		// converts the items from mozilla's error reporter to the ones stored in validation manager
+		List<ErrorItem> errors = reporter.getItems();
+		String message;
+		int severity;
+		for (ErrorItem error : errors)
+		{
+			message = error.getMessage();
+			if (!manager.isIgnored(message, IJSParserConstants.LANGUAGE))
+			{
+				severity = error.getSeverity();
+				if (severity == IMarker.SEVERITY_ERROR)
+				{
+					manager.addError(message, error.getLine(), error.getLineOffset(), 0, path);
+				}
+				else if (severity == IMarker.SEVERITY_WARNING)
+				{
+					manager.addWarning(message, error.getLine(), error.getLineOffset(), 0, path);
+				}
+			}
+		}
+		return manager.getItems();
 	}
 }

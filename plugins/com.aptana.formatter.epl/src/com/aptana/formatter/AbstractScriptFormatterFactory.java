@@ -133,4 +133,13 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	{
 		return null;
 	}
+
+	/**
+	 * By default, return true.<br>
+	 * Subclasses may override.
+	 */
+	public boolean isContributingToUI()
+	{
+		return true;
+	}
 }
