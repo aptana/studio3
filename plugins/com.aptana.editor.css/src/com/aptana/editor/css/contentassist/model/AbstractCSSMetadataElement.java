@@ -43,6 +43,7 @@ import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement, Convertible
 {
@@ -100,27 +101,11 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
-		this.setExample(object.get(EXAMPLE_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
+		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
 	}
 
 	/*

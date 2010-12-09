@@ -41,6 +41,7 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class PropertyElement extends AbstractCSSMetadataElement
 {
@@ -106,46 +107,13 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	{
 		super.fromJSON(object);
 
-		this.setType(object.get(TYPE_PROPERTY).toString());
-		this.setRemark(object.get(REMARK_PROPERTY).toString());
-		this.setHint(object.get(HINT_PROPERTY).toString());
+		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
+		this.setHint(StringUtil.getStringValue(object.get(HINT_PROPERTY)));
 		this.setAllowMultipleValues(Boolean.TRUE == object.get(ALLOW_MULTIPLE_VALUES_PROPERTY));
 
-		// values
-		Object values = object.get(VALUES_PROPERTY);
-
-		if (values != null && values.getClass().isArray())
-		{
-			for (Object value : (Object[]) values)
-			{
-				if (value instanceof Map)
-				{
-					ValueElement v = new ValueElement();
-
-					v.fromJSON((Map) value);
-
-					this.addValue(v);
-				}
-			}
-		}
-
-		// specifications
-		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
-
-		if (specifications != null && specifications.getClass().isArray())
-		{
-			for (Object specification : (Object[]) specifications)
-			{
-				if (specification instanceof Map)
-				{
-					SpecificationElement s = new SpecificationElement();
-
-					s.fromJSON((Map) specification);
-
-					this.addSpecification(s);
-				}
-			}
-		}
+		IndexUtil.addArrayItems(object.get(VALUES_PROPERTY), this._values, ValueElement.class);
+		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
 	}
 
 	/**

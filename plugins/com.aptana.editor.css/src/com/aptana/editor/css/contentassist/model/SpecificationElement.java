@@ -63,8 +63,8 @@ public class SpecificationElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setVersion(object.get(VERSION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setVersion(StringUtil.getStringValue(object.get(VERSION_PROPERTY)));
 	}
 
 	/**

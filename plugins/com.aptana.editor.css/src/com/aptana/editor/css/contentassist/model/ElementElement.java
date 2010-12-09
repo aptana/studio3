@@ -41,6 +41,7 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class ElementElement extends AbstractCSSMetadataElement
 {
@@ -80,19 +81,10 @@ public class ElementElement extends AbstractCSSMetadataElement
 	{
 		super.fromJSON(object);
 
-		this.setDisplayName(object.get(DISPLAY_NAME_PROPERTY).toString());
-		this.setRemark(object.get(REMARK_PROPERTY).toString());
+		this.setDisplayName(StringUtil.getStringValue(object.get(DISPLAY_NAME_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
-		// properties
-		Object properties = object.get(PROPERTIES_PROPERTY);
-		
-		if (properties != null && properties.getClass().isArray())
-		{
-			for (Object property : (Object[]) properties)
-			{
-				this.addProperty(property.toString());
-			}
-		}
+		IndexUtil.addStringItems(object.get(PROPERTIES_PROPERTY), this._properties);
 	}
 
 	/**

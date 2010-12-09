@@ -42,6 +42,7 @@ import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class ValueElement implements Convertible
 {
@@ -77,26 +78,10 @@ public class ValueElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
 	}
 
 	/**

@@ -40,6 +40,8 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.index.core.IndexUtil;
+
 public class PseudoElementElement extends AbstractCSSMetadataElement
 {
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
@@ -83,23 +85,7 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 
 		this.setAllowPseudoClassSyntax(Boolean.TRUE == object.get(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY));
 
-		// specifications
-		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
-
-		if (specifications != null && specifications.getClass().isArray())
-		{
-			for (Object specification : (Object[]) specifications)
-			{
-				if (specification instanceof Map)
-				{
-					SpecificationElement s = new SpecificationElement();
-
-					s.fromJSON((Map) specification);
-
-					this.addSpecification(s);
-				}
-			}
-		}
+		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
 	}
 
 	/**
