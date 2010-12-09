@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.mortbay.util.ajax.JSON;
+
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.BaseElement;
@@ -396,7 +398,7 @@ public class HTMLIndexReader
 		String key = attribute.getWord();
 		String[] columns = key.split(HTMLIndexConstants.DELIMITER);
 
-		Object m = columns[1];
+		Object m = JSON.parse(columns[1]);
 
 		if (m instanceof Map)
 		{
