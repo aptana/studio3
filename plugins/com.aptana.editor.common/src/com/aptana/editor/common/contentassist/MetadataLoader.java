@@ -246,7 +246,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 			null //
 			);
 
-		return expectedVersion == this.getIndexVersion();
+		return expectedVersion != this.getIndexVersion();
 	}
 
 	/**
