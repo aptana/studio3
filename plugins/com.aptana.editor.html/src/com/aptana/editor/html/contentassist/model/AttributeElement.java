@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -57,13 +58,13 @@ public class AttributeElement extends BaseElement
 
 	private String _type;
 	private String _element;
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<SpecificationElement> _specifications;
+	private List<UserAgentElement> _userAgents;
 	private String _deprecated;
 	private String _hint;
-	private List<String> _references = new ArrayList<String>();
+	private List<String> _references;
 	private String _remark;
-	private List<ValueElement> _values = new ArrayList<ValueElement>();
+	private List<ValueElement> _values;
 
 	/**
 	 * AttributeElement
@@ -80,7 +81,15 @@ public class AttributeElement extends BaseElement
 	 */
 	public void addReference(String reference)
 	{
-		this._references.add(reference);
+		if (reference != null && reference.isEmpty() == false)
+		{
+			if (this._references == null)
+			{
+				this._references = new ArrayList<String>();
+			}
+
+			this._references.add(reference);
+		}
 	}
 
 	/**
@@ -91,7 +100,15 @@ public class AttributeElement extends BaseElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -102,7 +119,15 @@ public class AttributeElement extends BaseElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
 	/**
@@ -113,7 +138,15 @@ public class AttributeElement extends BaseElement
 	 */
 	public void addValue(ValueElement value)
 	{
-		this._values.add(value);
+		if (value != null)
+		{
+			if (this._values == null)
+			{
+				this._values = new ArrayList<ValueElement>();
+			}
+
+			this._values.add(value);
+		}
 	}
 
 	/*
@@ -131,10 +164,10 @@ public class AttributeElement extends BaseElement
 		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 		this.setDeprecated(StringUtil.getStringValue(object.get(DEPRECATED_PROPERTY)));
 
-		IndexUtil.addArrayItems(object.get(VALUES_PROPERTY), this._values, ValueElement.class);
-		IndexUtil.addStringItems(object.get(REFERENCES_PROPERTY), this._references);
-		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
-		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
+		this._values = IndexUtil.createList(object.get(VALUES_PROPERTY), ValueElement.class);
+		this._references = IndexUtil.createList(object.get(REFERENCES_PROPERTY));
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -172,7 +205,7 @@ public class AttributeElement extends BaseElement
 	 */
 	public List<String> getReferences()
 	{
-		return this._references;
+		return CollectionsUtil.getListValue(this._references);
 	}
 
 	/**
@@ -192,7 +225,7 @@ public class AttributeElement extends BaseElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -212,7 +245,7 @@ public class AttributeElement extends BaseElement
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**
@@ -222,7 +255,7 @@ public class AttributeElement extends BaseElement
 	 */
 	public List<ValueElement> getValues()
 	{
-		return this._values;
+		return CollectionsUtil.getListValue(this._values);
 	}
 
 	/**

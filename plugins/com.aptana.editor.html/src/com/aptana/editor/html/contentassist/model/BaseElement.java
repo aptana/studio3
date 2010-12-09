@@ -35,13 +35,13 @@
 package com.aptana.editor.html.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -102,14 +102,7 @@ public abstract class BaseElement implements Convertible
 	 */
 	public List<String> getDocuments()
 	{
-		List<String> result = this._documents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._documents);
 	}
 
 	/**

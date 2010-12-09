@@ -54,7 +54,7 @@ public class FunctionElement extends PropertyElement
 	private static final String PARAMETERS_PROPERTY = "parameters"; //$NON-NLS-1$
 	private static final String IS_METHOD_PROPERTY = "isMethod"; //$NON-NLS-1$
 	private static final String IS_CONSTRUCTOR_PROPERTY = "isConstructor"; //$NON-NLS-1$
-	
+
 	private List<ParameterElement> _parameters;
 	private List<String> _references;
 	private List<ExceptionElement> _exceptions;
@@ -177,14 +177,14 @@ public class FunctionElement extends PropertyElement
 	public void fromJSON(Map object)
 	{
 		super.fromJSON(object);
-		
+
 		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
 		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
-		
-		IndexUtil.addArrayItems(object.get(PARAMETERS_PROPERTY), this._parameters, ParameterElement.class);
-		IndexUtil.addArrayItems(object.get(RETURN_TYPES_PROPERTY), this._returnTypes, ReturnTypeElement.class);
-		IndexUtil.addArrayItems(object.get(EXCEPTIONS_PROPERTY), this._exceptions, ExceptionElement.class);
-		IndexUtil.addStringItems(object.get(REFERENCES_PROPERTY), this._references);
+
+		this._parameters = IndexUtil.createList(object.get(PARAMETERS_PROPERTY), ParameterElement.class);
+		this._returnTypes = IndexUtil.createList(object.get(RETURN_TYPES_PROPERTY), ReturnTypeElement.class);
+		this._exceptions = IndexUtil.createList(object.get(EXCEPTIONS_PROPERTY), ExceptionElement.class);
+		this._references = IndexUtil.createList(object.get(REFERENCES_PROPERTY));
 	}
 
 	/**
@@ -416,7 +416,7 @@ public class FunctionElement extends PropertyElement
 	public void toJSON(Output out)
 	{
 		super.toJSON(out);
-		
+
 		out.add(IS_CONSTRUCTOR_PROPERTY, this.isConstructor());
 		out.add(IS_METHOD_PROPERTY, this.isMethod());
 		out.add(PARAMETERS_PROPERTY, this.getParameters());

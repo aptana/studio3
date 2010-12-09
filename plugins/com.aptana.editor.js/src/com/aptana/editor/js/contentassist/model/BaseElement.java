@@ -129,8 +129,8 @@ public class BaseElement implements Convertible
 		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		IndexUtil.addArrayItems(object.get(SINCE_PROPERTY), this._sinceList, SinceElement.class);
-		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
+		this._sinceList = IndexUtil.createList(object.get(SINCE_PROPERTY), SinceElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**

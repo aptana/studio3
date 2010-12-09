@@ -84,7 +84,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 		this.setDisplayName(StringUtil.getStringValue(object.get(DISPLAY_NAME_PROPERTY)));
 		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
-		IndexUtil.addStringItems(object.get(PROPERTIES_PROPERTY), this._properties);
+		this._properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY));
 	}
 
 	/**

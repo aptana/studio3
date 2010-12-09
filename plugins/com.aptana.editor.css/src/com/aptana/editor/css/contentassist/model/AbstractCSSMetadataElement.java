@@ -105,7 +105,7 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 
-		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/*

@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -51,8 +52,8 @@ public class EventElement extends BaseElement
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
 
 	private String _type;
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<SpecificationElement> _specifications;
+	private List<UserAgentElement> _userAgents;
 	private String _remark;
 
 	/**
@@ -70,7 +71,15 @@ public class EventElement extends BaseElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -79,7 +88,15 @@ public class EventElement extends BaseElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
 	/*
@@ -94,8 +111,8 @@ public class EventElement extends BaseElement
 		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
 		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
-		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
-		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -115,7 +132,7 @@ public class EventElement extends BaseElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -133,7 +150,7 @@ public class EventElement extends BaseElement
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**

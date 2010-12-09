@@ -146,8 +146,8 @@ public class PropertyElement extends BaseElement
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY));
 		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY));
 
-		IndexUtil.addArrayItems(object.get(TYPES_PROPERTY), this._types, ReturnTypeElement.class);
-		IndexUtil.addStringItems(object.get(EXAMPLES_PROPERTY), this._examples);
+		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
+		this._examples = IndexUtil.createList(object.get(EXAMPLES_PROPERTY));
 	}
 
 	/**

@@ -112,8 +112,8 @@ public class PropertyElement extends AbstractCSSMetadataElement
 		this.setHint(StringUtil.getStringValue(object.get(HINT_PROPERTY)));
 		this.setAllowMultipleValues(Boolean.TRUE == object.get(ALLOW_MULTIPLE_VALUES_PROPERTY));
 
-		IndexUtil.addArrayItems(object.get(VALUES_PROPERTY), this._values, ValueElement.class);
-		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
+		this._values = IndexUtil.createList(object.get(VALUES_PROPERTY), ValueElement.class);
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
 	}
 
 	/**

@@ -93,7 +93,7 @@ public class ParameterElement implements Convertible
 		this.setUsage(StringUtil.getStringValue(object.get(USAGE_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		IndexUtil.addStringItems(object.get(TYPES_PROPERTY), this._types);
+		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY));
 	}
 
 	/**

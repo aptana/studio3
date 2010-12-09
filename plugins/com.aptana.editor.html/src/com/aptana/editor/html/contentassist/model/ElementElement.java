@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -58,13 +59,13 @@ public class ElementElement extends BaseElement
 
 	private String _displayName;
 	private String _relatedClass;
-	private List<String> _attributes = new ArrayList<String>();
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<String> _attributes;
+	private List<SpecificationElement> _specifications;
+	private List<UserAgentElement> _userAgents;
 	private String _deprecated;
-	private List<String> _events = new ArrayList<String>();
+	private List<String> _events;
 	private String _example;
-	private List<String> _references = new ArrayList<String>();
+	private List<String> _references;
 	private String _remark;
 
 	/**
@@ -82,7 +83,15 @@ public class ElementElement extends BaseElement
 	 */
 	public void addAttribute(String attribute)
 	{
-		this._attributes.add(attribute);
+		if (attribute != null && attribute.isEmpty() == false)
+		{
+			if (this._attributes == null)
+			{
+				this._attributes = new ArrayList<String>();
+			}
+
+			this._attributes.add(attribute);
+		}
 	}
 
 	/**
@@ -93,7 +102,15 @@ public class ElementElement extends BaseElement
 	 */
 	public void addEvent(String event)
 	{
-		this._events.add(event);
+		if (event != null && event.isEmpty() == false)
+		{
+			if (this._events == null)
+			{
+				this._events = new ArrayList<String>();
+			}
+
+			this._events.add(event);
+		}
 	}
 
 	/**
@@ -102,7 +119,15 @@ public class ElementElement extends BaseElement
 	 */
 	public void addReference(String reference)
 	{
-		this._references.add(reference);
+		if (reference != null && reference.isEmpty() == false)
+		{
+			if (this._references == null)
+			{
+				this._references = new ArrayList<String>();
+			}
+
+			this._references.add(reference);
+		}
 	}
 
 	/**
@@ -113,7 +138,15 @@ public class ElementElement extends BaseElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -124,7 +157,15 @@ public class ElementElement extends BaseElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
 	/*
@@ -141,11 +182,11 @@ public class ElementElement extends BaseElement
 		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 		this.setRelatedClass(StringUtil.getStringValue(object.get(RELATED_CLASS_PROPERTY)));
 
-		IndexUtil.addStringItems(object.get(ATTRIBUTES_PROPERTY), this._attributes);
-		IndexUtil.addStringItems(object.get(EVENTS_PROPERTY), this._events);
-		IndexUtil.addStringItems(object.get(REFERENCES_PROPERTY), this._references);
-		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
-		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
+		this._attributes = IndexUtil.createList(object.get(ATTRIBUTES_PROPERTY));
+		this._events = IndexUtil.createList(object.get(EVENTS_PROPERTY));
+		this._references = IndexUtil.createList(object.get(REFERENCES_PROPERTY));
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -155,7 +196,7 @@ public class ElementElement extends BaseElement
 	 */
 	public List<String> getAttributes()
 	{
-		return this._attributes;
+		return CollectionsUtil.getListValue(this._attributes);
 	}
 
 	/**
@@ -185,7 +226,7 @@ public class ElementElement extends BaseElement
 	 */
 	public List<String> getEvents()
 	{
-		return this._events;
+		return CollectionsUtil.getListValue(this._events);
 	}
 
 	/**
@@ -205,7 +246,7 @@ public class ElementElement extends BaseElement
 	 */
 	public List<String> getReferences()
 	{
-		return this._references;
+		return CollectionsUtil.getListValue(this._references);
 	}
 
 	/**
@@ -235,7 +276,7 @@ public class ElementElement extends BaseElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -260,7 +301,7 @@ public class ElementElement extends BaseElement
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**
