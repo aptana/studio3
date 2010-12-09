@@ -34,8 +34,18 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-public class ValueElement
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class ValueElement implements Convertible
 {
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
+
 	private String _name;
 	private String _description;
 
@@ -46,6 +56,17 @@ public class ValueElement
 	{
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
+	}
+
 	/**
 	 * getDescription
 	 * 
@@ -53,7 +74,7 @@ public class ValueElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -63,7 +84,7 @@ public class ValueElement
 	 */
 	public String getName()
 	{
-		return this._name;
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -84,5 +105,15 @@ public class ValueElement
 	public void setName(String name)
 	{
 		this._name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(NAME_PROPERTY, this.getName());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 }

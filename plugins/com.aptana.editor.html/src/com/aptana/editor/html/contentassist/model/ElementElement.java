@@ -36,19 +36,32 @@ package com.aptana.editor.html.contentassist.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
-public class ElementElement
+public class ElementElement extends BaseElement
 {
+	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String REFERENCES_PROPERTY = "references"; //$NON-NLS-1$
+	private static final String EVENTS_PROPERTY = "events"; //$NON-NLS-1$
+	private static final String ATTRIBUTES_PROPERTY = "attributes"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
+	private static final String RELATED_CLASS_PROPERTY = "relatedClass"; //$NON-NLS-1$
+	private static final String EXAMPLE_PROPERTY = "example"; //$NON-NLS-1$
+	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
+	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
+
 	private String _displayName;
-	private String _name;
 	private String _relatedClass;
 	private List<String> _attributes = new ArrayList<String>();
 	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
 	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 	private String _deprecated;
-	private String _description;
 	private List<String> _events = new ArrayList<String>();
 	private String _example;
 	private List<String> _references = new ArrayList<String>();
@@ -71,7 +84,7 @@ public class ElementElement
 	{
 		this._attributes.add(attribute);
 	}
-	
+
 	/**
 	 * addEvent
 	 * 
@@ -104,12 +117,35 @@ public class ElementElement
 	}
 
 	/**
+	 * addUserAgent
+	 * 
 	 * @param userAgent
 	 *            the userAgents to add
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
 		this._userAgents.add(userAgent);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setDisplayName(StringUtil.getStringValue(object.get(DISPLAY_NAME_PROPERTY)));
+		this.setDeprecated(StringUtil.getStringValue(object.get(DEPRECATED_PROPERTY)));
+		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
+		this.setRelatedClass(StringUtil.getStringValue(object.get(RELATED_CLASS_PROPERTY)));
+
+		IndexUtil.addStringItems(object.get(ATTRIBUTES_PROPERTY), this._attributes);
+		IndexUtil.addStringItems(object.get(EVENTS_PROPERTY), this._events);
+		IndexUtil.addStringItems(object.get(REFERENCES_PROPERTY), this._references);
+		IndexUtil.addArrayItems(object.get(SPECIFICATIONS_PROPERTY), this._specifications, SpecificationElement.class);
+		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
 	}
 
 	/**
@@ -129,17 +165,7 @@ public class ElementElement
 	 */
 	public String getDeprecated()
 	{
-		return StringUtil.getValue(this._deprecated);
-	}
-
-	/**
-	 * getDescription
-	 * 
-	 * @return the description
-	 */
-	public String getDescription()
-	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._deprecated);
 	}
 
 	/**
@@ -149,7 +175,7 @@ public class ElementElement
 	 */
 	public String getDisplayName()
 	{
-		return StringUtil.getValue(this._displayName);
+		return StringUtil.getStringValue(this._displayName);
 	}
 
 	/**
@@ -161,7 +187,7 @@ public class ElementElement
 	{
 		return this._events;
 	}
-	
+
 	/**
 	 * getExample
 	 * 
@@ -169,17 +195,7 @@ public class ElementElement
 	 */
 	public String getExample()
 	{
-		return StringUtil.getValue(this._example);
-	}
-
-	/**
-	 * getName
-	 * 
-	 * @return the name
-	 */
-	public String getName()
-	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._example);
 	}
 
 	/**
@@ -199,7 +215,7 @@ public class ElementElement
 	 */
 	public String getRelatedClass()
 	{
-		return StringUtil.getValue(this._relatedClass);
+		return StringUtil.getStringValue(this._relatedClass);
 	}
 
 	/**
@@ -209,7 +225,7 @@ public class ElementElement
 	 */
 	public String getRemark()
 	{
-		return StringUtil.getValue(this._remark);
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**
@@ -223,14 +239,6 @@ public class ElementElement
 	}
 
 	/**
-	 * @return the userAgents
-	 */
-	public List<UserAgentElement> getUserAgents()
-	{
-		return this._userAgents;
-	}
-
-	/**
 	 * getUserAgentNames
 	 * 
 	 * @return
@@ -238,15 +246,23 @@ public class ElementElement
 	public List<String> getUserAgentNames()
 	{
 		List<String> result = new ArrayList<String>();
-		
+
 		for (UserAgentElement userAgent : this.getUserAgents())
 		{
 			result.add(userAgent.getPlatform());
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * @return the userAgents
+	 */
+	public List<UserAgentElement> getUserAgents()
+	{
+		return this._userAgents;
+	}
+
 	/**
 	 * setDeprecated
 	 * 
@@ -256,17 +272,6 @@ public class ElementElement
 	public void setDeprecated(String deprecated)
 	{
 		this._deprecated = deprecated;
-	}
-
-	/**
-	 * setDescription
-	 * 
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description)
-	{
-		this._description = description;
 	}
 
 	/**
@@ -292,17 +297,6 @@ public class ElementElement
 	}
 
 	/**
-	 * setName
-	 * 
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name)
-	{
-		this._name = name;
-	}
-
-	/**
 	 * setRelatedClass
 	 * 
 	 * @param relatedClass
@@ -322,5 +316,26 @@ public class ElementElement
 	public void setRemark(String remark)
 	{
 		this._remark = remark;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(DISPLAY_NAME_PROPERTY, this.getDisplayName());
+		out.add(DEPRECATED_PROPERTY, this.getDeprecated());
+		out.add(EXAMPLE_PROPERTY, this.getExample());
+		out.add(RELATED_CLASS_PROPERTY, this.getRelatedClass());
+		out.add(REMARK_PROPERTY, this.getRemark());
+
+		out.add(ATTRIBUTES_PROPERTY, this.getAttributes());
+		out.add(EVENTS_PROPERTY, this.getEvents());
+		out.add(REFERENCES_PROPERTY, this.getReferences());
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
+		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }
