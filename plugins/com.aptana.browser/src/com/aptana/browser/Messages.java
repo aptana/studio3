@@ -40,8 +40,25 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.browser.messages"; //$NON-NLS-1$
 
+	public static String WebBrowserViewer_CustomSize_Message;
+	public static String WebBrowserViewer_CustomSize_Title;
+	public static String WebBrowserViewer_ERR_InvalidHeight;
+	public static String WebBrowserViewer_ERR_InvalidWidth;
+	public static String WebBrowserViewer_LBL_Back;
+	public static String WebBrowserViewer_LBL_Custom;
+	public static String WebBrowserViewer_LBL_Forward;
 	public static String WebBrowserViewer_LBL_FullEditor;
+	public static String WebBrowserViewer_LBL_Go;
+	public static String WebBrowserViewer_LBL_Height;
+	public static String WebBrowserViewer_LBL_Refresh;
 	public static String WebBrowserViewer_LBL_SetSize;
+	public static String WebBrowserViewer_LBL_Stop;
+	public static String WebBrowserViewer_LBL_Width;
+	public static String WebBrowserViewer_TTP_Back;
+	public static String WebBrowserViewer_TTP_Forward;
+	public static String WebBrowserViewer_TTP_Go;
+	public static String WebBrowserViewer_TTP_Refresh;
+	public static String WebBrowserViewer_TTP_Stop;
 
 	static
 	{
