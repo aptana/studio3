@@ -43,6 +43,7 @@ import java.util.Set;
 
 import org.mortbay.util.ajax.JSON;
 
+import com.aptana.editor.css.contentassist.model.BaseElement;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -99,27 +100,9 @@ public class CSSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
 	{
-		PropertyElement p = new PropertyElement();
-
-		String key = property.getWord();
-		String columns[] = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[0]);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : property.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, property, new PropertyElement());
 	}
 
 	/**
@@ -127,25 +110,9 @@ public class CSSIndexReader
 	 * @param pseudoClass
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private PseudoClassElement createPseudoClassFromKey(Index index, QueryResult pseudoClass)
 	{
-		PseudoClassElement p = new PseudoClassElement();
-
-		String word = pseudoClass.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoClass.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, pseudoClass, new PseudoClassElement());
 	}
 
 	/**
@@ -153,25 +120,9 @@ public class CSSIndexReader
 	 * @param pseudoElement
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private PseudoElementElement createPseudoElementFromKey(Index index, QueryResult pseudoElement)
 	{
-		PseudoElementElement p = new PseudoElementElement();
-
-		String word = pseudoElement.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoElement.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, pseudoElement, new PseudoElementElement());
 	}
 
 	/**
@@ -370,5 +321,31 @@ public class CSSIndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * populateElement
+	 * 
+	 * @param index
+	 * @param item
+	 * @param element
+	 */
+	@SuppressWarnings("rawtypes")
+	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element)
+	{
+		String word = item.getWord();
+		Object m = JSON.parse(word);
+
+		if (m instanceof Map)
+		{
+			element.fromJSON((Map) m);
+		}
+
+		for (String document : item.getDocuments())
+		{
+			element.addDocument(document);
+		}
+
+		return element;
 	}
 }
