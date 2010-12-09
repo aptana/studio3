@@ -35,22 +35,11 @@
 package com.aptana.editor.css;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.framework.Bundle;
 
+import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.index.CSSIndexWriter;
@@ -63,80 +52,86 @@ import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class CSSMetadataLoader extends Job
+public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 {
 	/**
-	 * MetadataLoader
+	 * CSSMetadataLoader
 	 */
 	public CSSMetadataLoader()
 	{
 		super(Messages.CSSMetadataLoader_Loading_Metadata);
-
-		setPriority(Job.LONG);
 	}
 
-	/**
-	 * loadMetadata
-	 * 
-	 * @param monitor
-	 * @param reader
-	 * @param resources
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#createMetadataReader()
 	 */
-	private void loadMetadata(IProgressMonitor monitor, CSSMetadataReader reader, String... resources)
+	@Override
+	protected CSSMetadataReader createMetadataReader()
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-
-		for (String resource : resources)
-		{
-			URL url = FileLocator.find(CSSPlugin.getDefault().getBundle(), new Path(resource), null);
-
-			if (url != null)
-			{
-				InputStream stream = null;
-
-				try
-				{
-					stream = url.openStream();
-
-					reader.loadXML(stream);
-				}
-				catch (Throwable t)
-				{
-					CSSPlugin.logError(Messages.CSSMetadataLoader_Error_Loading_Metadata + resource, t);
-				}
-				finally
-				{
-					if (stream != null)
-					{
-						try
-						{
-							stream.close();
-						}
-						catch (IOException e)
-						{
-						}
-					}
-				}
-			}
-
-			subMonitor.worked(1);
-		}
-
-		subMonitor.done();
+		return new CSSMetadataReader();
 	}
 
-	/**
-	 * rebuildMetadataIndex
-	 * 
-	 * @param monitor
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getBundle()
 	 */
-	private void rebuildMetadataIndex(IProgressMonitor monitor)
+	@Override
+	protected Bundle getBundle()
 	{
+		return CSSPlugin.getDefault().getBundle();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersion()
+	 */
+	@Override
+	protected double getIndexVersion()
+	{
+		return CSSIndexConstants.INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersionKey()
+	 */
+	@Override
+	protected String getIndexVersionKey()
+	{
+		return IPreferenceConstants.CSS_INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getMetadataFiles()
+	 */
+	@Override
+	protected String[] getMetadataFiles()
+	{
+		return new String[] { "/metadata/css_metadata.xml" }; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getPluginId()
+	 */
+	@Override
+	protected String getPluginId()
+	{
+		return CSSPlugin.PLUGIN_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#writeIndex(com.aptana.editor.common.contentassist.
+	 * MetadataReader)
+	 */
+	@Override
+	protected void writeIndex(CSSMetadataReader reader)
+	{
+		// remove old index
 		IndexManager.getInstance().removeIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
-
-		CSSMetadataReader reader = new CSSMetadataReader();
-
-		this.loadMetadata(monitor, reader, "/metadata/css_metadata.xml"); //$NON-NLS-1$
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
 		Index index = CSSIndexQueryHelper.getIndex();
@@ -150,12 +145,12 @@ public class CSSMetadataLoader extends Job
 		{
 			indexer.writeProperty(index, property);
 		}
-		
+
 		for (PseudoClassElement pseudoClass : reader.getPseudoClasses())
 		{
 			indexer.writePseudoClass(index, pseudoClass);
 		}
-		
+
 		for (PseudoElementElement pseudoElement : reader.getPseudoElements())
 		{
 			indexer.writePseudoElement(index, pseudoElement);
@@ -168,46 +163,6 @@ public class CSSMetadataLoader extends Job
 		catch (IOException e)
 		{
 			CSSPlugin.logError(e.getMessage(), e);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor)
-	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(CSSPlugin.PLUGIN_ID, IPreferenceConstants.CSS_INDEX_VERSION, 0.0, null);
-
-		if (expectedVersion != CSSIndexConstants.INDEX_VERSION)
-		{
-			// rebuild indexes
-			this.rebuildMetadataIndex(monitor);
-			// this.rebuildProjectIndexes();
-
-			// update version preference to the latest version
-			this.updateVersionPreference();
-		}
-
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * updateVersionPreference
-	 */
-	private void updateVersionPreference()
-	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(CSSPlugin.PLUGIN_ID);
-
-		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, CSSIndexConstants.INDEX_VERSION);
-
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
 		}
 	}
 }

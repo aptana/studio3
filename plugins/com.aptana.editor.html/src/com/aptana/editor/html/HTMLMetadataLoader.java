@@ -35,22 +35,11 @@
 package com.aptana.editor.html;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.framework.Bundle;
 
+import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.index.HTMLIndexWriter;
@@ -64,84 +53,92 @@ import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
 /**
- * @author klindsey
+ * HTMLMetadataLoader
  */
-public class HTMLMetadataLoader extends Job
+public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 {
 	/**
 	 * HTMLMetadataLoader
 	 */
 	public HTMLMetadataLoader()
 	{
-		super("Loading HTML metadata...");
-
-		setPriority(Job.LONG);
+		super(Messages.HTMLMetadataLoader_Loading_Metadata);
 	}
 
-	/**
-	 * loadMetadata
-	 * 
-	 * @param monitor
-	 * @param reader
-	 * @param resources
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#createMetadataReader()
 	 */
-	private void loadMetadata(IProgressMonitor monitor, HTMLMetadataReader reader, String... resources)
+	@Override
+	protected HTMLMetadataReader createMetadataReader()
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-
-		for (String resource : resources)
-		{
-			URL url = FileLocator.find(HTMLPlugin.getDefault().getBundle(), new Path(resource), null);
-
-			if (url != null)
-			{
-				InputStream stream = null;
-
-				try
-				{
-					stream = url.openStream();
-
-					reader.loadXML(stream);
-				}
-				catch (Throwable t)
-				{
-					HTMLPlugin.logError("Error loading HTML metadata: " + resource, t);
-				}
-				finally
-				{
-					if (stream != null)
-					{
-						try
-						{
-							stream.close();
-						}
-						catch (IOException e)
-						{
-						}
-					}
-				}
-			}
-		}
-
-		subMonitor.done();
+		return new HTMLMetadataReader();
 	}
 
-	/**
-	 * rebuildMetadataIndex
-	 * 
-	 * @param monitor
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getBundle()
 	 */
-	private void rebuildMetadataIndex(IProgressMonitor monitor)
+	@Override
+	protected Bundle getBundle()
 	{
+		return HTMLPlugin.getDefault().getBundle();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersion()
+	 */
+	@Override
+	protected double getIndexVersion()
+	{
+		return HTMLIndexConstants.INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersionKey()
+	 */
+	@Override
+	protected String getIndexVersionKey()
+	{
+		return IPreferenceContants.HTML_INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getMetadataFiles()
+	 */
+	@Override
+	protected String[] getMetadataFiles()
+	{
+		return new String[] { "/metadata/html_metadata.xml" }; //$NON-NLS-1$
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getPluginId()
+	 */
+	@Override
+	protected String getPluginId()
+	{
+		return HTMLPlugin.PLUGIN_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#writeIndex(com.aptana.editor.common.contentassist.
+	 * MetadataReader)
+	 */
+	@Override
+	protected void writeIndex(HTMLMetadataReader reader)
+	{
+		// remove old index
 		IndexManager.getInstance().removeIndex(URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION));
 
-		HTMLMetadataReader reader = new HTMLMetadataReader();
-
-		this.loadMetadata(monitor, reader, "/metadata/html_metadata.xml");
-		
 		HTMLIndexWriter indexer = new HTMLIndexWriter();
 		Index index = HTMLIndexQueryHelper.getIndex();
-		
+
 		for (ElementElement element : reader.getElements())
 		{
 			indexer.writeElement(index, element);
@@ -156,50 +153,19 @@ public class HTMLMetadataLoader extends Job
 		{
 			indexer.writeEvent(index, event);
 		}
-		
+
 		for (EntityElement entity : reader.getEntities())
 		{
 			indexer.writeEntity(index, entity);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor)
-	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(HTMLPlugin.PLUGIN_ID, IPreferenceContants.HTML_INDEX_VERSION, 0.0, null);
-
-		if (expectedVersion != HTMLIndexConstants.INDEX_VERSION)
-		{
-			// rebuild indexes
-			this.rebuildMetadataIndex(monitor);
-			// this.rebuildProjectIndexes();
-
-			// update version preference to the latest version
-			this.updateVersionPreference();
-		}
-
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * updateVersionPreference
-	 */
-	private void updateVersionPreference()
-	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(HTMLPlugin.PLUGIN_ID);
-
-		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, HTMLIndexConstants.INDEX_VERSION);
 
 		try
 		{
-			prefs.flush();
+			index.save();
 		}
-		catch (BackingStoreException e)
+		catch (IOException e)
 		{
+			HTMLPlugin.logError(e.getMessage(), e);
 		}
 	}
 }

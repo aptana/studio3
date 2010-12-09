@@ -35,26 +35,19 @@
 package com.aptana.editor.js;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.framework.Bundle;
 
+import com.aptana.editor.common.contentassist.MetadataLoader;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
@@ -64,7 +57,7 @@ import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class JSMetadataLoader extends Job
+public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 {
 	/**
 	 * MetadataLoader
@@ -72,77 +65,122 @@ public class JSMetadataLoader extends Job
 	public JSMetadataLoader()
 	{
 		super(Messages.Loading_Metadata);
+	}
 
-		setPriority(Job.LONG);
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#createMetadataReader()
+	 */
+	@Override
+	protected JSMetadataReader createMetadataReader()
+	{
+		return new JSMetadataReader();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getBundle()
+	 */
+	@Override
+	protected Bundle getBundle()
+	{
+		return JSPlugin.getDefault().getBundle();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersion()
+	 */
+	@Override
+	protected double getIndexVersion()
+	{
+		return JSIndexConstants.INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getIndexVersionKey()
+	 */
+	@Override
+	protected String getIndexVersionKey()
+	{
+		return IPreferenceConstants.JS_INDEX_VERSION;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getMetadataFiles()
+	 */
+	@Override
+	protected String[] getMetadataFiles()
+	{
+		return new String[] { //
+			"/metadata/js_core.xml", //$NON-NLS-1$
+			"/metadata/dom_0.xml", //$NON-NLS-1$
+			"/metadata/dom_2.xml", //$NON-NLS-1$
+			"/metadata/dom_3.xml", //$NON-NLS-1$
+			"/metadata/dom_5.xml" //$NON-NLS-1$;
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#getPluginId()
+	 */
+	@Override
+	protected String getPluginId()
+	{
+		return JSPlugin.PLUGIN_ID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#postRebuild()
+	 */
+	@Override
+	protected void postRebuild()
+	{
+		super.postRebuild();
+
+		this.rebuildProjectIndexes();
 	}
 
 	/**
-	 * loadMetadata
-	 * 
-	 * @param monitor
-	 * @param resources
+	 * rebuildProjectIndexes
 	 */
-	private void loadMetadata(IProgressMonitor monitor, JSMetadataReader reader, String... resources)
+	private void rebuildProjectIndexes()
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
-
-		for (String resource : resources)
+		Job job = new Job(Messages.JSMetadataLoader_Rebuilding_Project_Indexes)
 		{
-			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), new Path(resource), null);
-
-			if (url != null)
+			@Override
+			protected IStatus run(IProgressMonitor monitor)
 			{
-				InputStream stream = null;
-
+				IWorkspace ws = ResourcesPlugin.getWorkspace();
 				try
 				{
-					stream = url.openStream();
-
-					reader.loadXML(stream);
+					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
 				}
-				catch (Throwable t)
+				catch (CoreException e)
 				{
-					JSPlugin.logError(Messages.Activator_Error_Loading_Metadata + ":" + resource, t); //$NON-NLS-1$
+					return e.getStatus();
 				}
-				finally
-				{
-					if (stream != null)
-					{
-						try
-						{
-							stream.close();
-						}
-						catch (IOException e)
-						{
-						}
-					}
-				}
+				return Status.OK_STATUS;
 			}
+		};
 
-			subMonitor.worked(1);
-		}
-
-		subMonitor.done();
+		job.schedule();
 	}
 
-	/**
-	 * rebuildMetadataIndex
-	 * 
-	 * @param monitor
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.MetadataLoader#writeIndex(com.aptana.editor.common.contentassist.
+	 * MetadataReader)
 	 */
-	private void rebuildMetadataIndex(IProgressMonitor monitor)
+	@Override
+	protected void writeIndex(JSMetadataReader reader)
 	{
-		// delete any existing metadata index
+		// remove old index
 		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
-
-		JSMetadataReader reader = new JSMetadataReader();
-
-		this.loadMetadata(monitor, reader, "/metadata/js_core.xml", //$NON-NLS-1$
-				"/metadata/dom_0.xml", //$NON-NLS-1$
-				"/metadata/dom_2.xml", //$NON-NLS-1$
-				"/metadata/dom_3.xml", //$NON-NLS-1$
-				"/metadata/dom_5.xml" //$NON-NLS-1$
-		);
 
 		JSIndexWriter indexer = new JSIndexWriter();
 		Index index = JSIndexQueryHelper.getIndex();
@@ -160,73 +198,6 @@ public class JSMetadataLoader extends Job
 		catch (IOException e)
 		{
 			JSPlugin.logError(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * rebuildProjectIndexes
-	 */
-	private void rebuildProjectIndexes()
-	{
-		Job job = new Job("Rebuilding indices")
-		{
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				IWorkspace ws = ResourcesPlugin.getWorkspace();
-				try
-				{
-					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-				}
-				catch (CoreException e)
-				{
-					return e.getStatus();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.schedule();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor)
-	{
-		double expectedVersion = Platform.getPreferencesService().getDouble(JSPlugin.PLUGIN_ID,
-				IPreferenceConstants.JS_INDEX_VERSION, 0.0, null);
-
-		if (expectedVersion != JSIndexConstants.INDEX_VERSION)
-		{
-			// rebuild indexes
-			this.rebuildMetadataIndex(monitor);
-			this.rebuildProjectIndexes();
-
-			// update version preference to latest version
-			this.updateVersionPreference();
-		}
-
-		return Status.OK_STATUS;
-	}
-
-	/**
-	 * updateVersionPreference
-	 */
-	private void updateVersionPreference()
-	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(JSPlugin.PLUGIN_ID);
-
-		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, JSIndexConstants.INDEX_VERSION);
-
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
 		}
 	}
 }
