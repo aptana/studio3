@@ -59,7 +59,7 @@ public class IndexUtil
 	@SuppressWarnings("rawtypes")
 	public static <T extends Convertible> void addArrayItems(Object object, List<T> list, Class<T> itemClass)
 	{
-		if (object != null && object.getClass().isArray())
+		if (list != null && object != null && object.getClass().isArray())
 		{
 			// Wrap loop because if newInstance fails once, it will fail for all iterations
 			try
@@ -95,7 +95,7 @@ public class IndexUtil
 	 */
 	public static void addStringItems(Object object, List<String> list)
 	{
-		if (object != null && object.getClass().isArray())
+		if (list != null && object != null && object.getClass().isArray())
 		{
 			for (Object value : (Object[]) object)
 			{
