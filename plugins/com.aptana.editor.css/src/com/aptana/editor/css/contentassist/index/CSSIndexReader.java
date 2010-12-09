@@ -69,27 +69,9 @@ public class CSSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
 	{
-		ElementElement e = new ElementElement();
-
-		String key = element.getWord();
-		String[] columns = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[1]);
-
-		if (m instanceof Map)
-		{
-			e.fromJSON((Map) m);
-		}
-
-		for (String document : element.getDocuments())
-		{
-			e.addDocument(document);
-		}
-
-		return e;
+		return this.populateElement(index, element, new ElementElement(), 1);
 	}
 
 	/**
@@ -102,7 +84,7 @@ public class CSSIndexReader
 	 */
 	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
 	{
-		return this.populateElement(index, property, new PropertyElement());
+		return this.populateElement(index, property, new PropertyElement(), 1);
 	}
 
 	/**
@@ -326,26 +308,58 @@ public class CSSIndexReader
 	/**
 	 * populateElement
 	 * 
+	 * @param <T>
 	 * @param index
 	 * @param item
 	 * @param element
+	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element)
 	{
-		String word = item.getWord();
-		Object m = JSON.parse(word);
+		return this.populateElement(element, item.getWord());
+	}
+	
+	/**
+	 * populateElement
+	 * 
+	 * @param <T>
+	 * @param index
+	 * @param item
+	 * @param element
+	 * @param columnIndex
+	 * @return
+	 */
+	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element, int columnIndex)
+	{
+		String key = item.getWord();
+		String[] columns = key.split(CSSIndexConstants.DELIMITER);
+
+		return this.populateElement(element, columns[columnIndex]);
+	}
+
+	/**
+	 * populateElement
+	 * 
+	 * @param <T>
+	 * @param element
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private <T extends BaseElement> T populateElement(T element, String value)
+	{
+		Object m = JSON.parse(value);
 
 		if (m instanceof Map)
 		{
 			element.fromJSON((Map) m);
 		}
 
-		for (String document : item.getDocuments())
+		for (String document : element.getDocuments())
 		{
 			element.addDocument(document);
 		}
-
+		
 		return element;
 	}
 }
