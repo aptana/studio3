@@ -43,6 +43,7 @@ import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class BaseElement implements Convertible
 {
@@ -125,44 +126,11 @@ public class BaseElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		// since list
-		Object sinceList = object.get(SINCE_PROPERTY);
-
-		if (sinceList != null && sinceList.getClass().isArray())
-		{
-			for (Object since : (Object[]) sinceList)
-			{
-				if (since instanceof Map)
-				{
-					SinceElement s = new SinceElement();
-
-					s.fromJSON((Map) since);
-
-					this.addSince(s);
-				}
-			}
-		}
-
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		IndexUtil.addArrayItems(object.get(SINCE_PROPERTY), this._sinceList, SinceElement.class);
+		IndexUtil.addArrayItems(object.get(USER_AGENTS_PROPERTY), this._userAgents, UserAgentElement.class);
 	}
 
 	/**

@@ -97,11 +97,11 @@ public class UserAgentElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setPlatform(object.get(PLATFORM_PROPERTY).toString());
-		this.setVersion(object.get(VERSION_PROPERTY).toString());
-		this.setOS(object.get(OS_PROPERTY).toString());
-		this.setOSVersion(object.get(OS_VERSION_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setPlatform(StringUtil.getStringValue(object.get(PLATFORM_PROPERTY)));
+		this.setVersion(StringUtil.getStringValue(object.get(VERSION_PROPERTY)));
+		this.setOS(StringUtil.getStringValue(object.get(OS_PROPERTY)));
+		this.setOSVersion(StringUtil.getStringValue(object.get(OS_VERSION_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 	}
 
 	/**

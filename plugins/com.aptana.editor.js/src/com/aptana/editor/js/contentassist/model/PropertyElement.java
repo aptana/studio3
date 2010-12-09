@@ -44,6 +44,7 @@ import org.mortbay.util.ajax.JSON.Output;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.index.core.IndexUtil;
 
 public class PropertyElement extends BaseElement
 {
@@ -140,36 +141,13 @@ public class PropertyElement extends BaseElement
 	{
 		super.fromJSON(object);
 
-		this.setOwningType(object.get(OWNING_TYPE_PROPERTY).toString());
+		this.setOwningType(StringUtil.getStringValue(object.get(OWNING_TYPE_PROPERTY)));
 		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY));
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY));
 		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY));
 
-		// types
-		Object types = object.get(TYPES_PROPERTY);
-
-		if (types != null && types.getClass().isArray())
-		{
-			for (Object type : (Object[]) types)
-			{
-				ReturnTypeElement rt = new ReturnTypeElement();
-
-				rt.fromJSON((Map) type);
-
-				this.addType(rt);
-			}
-		}
-
-		// examples
-		Object examples = object.get(EXAMPLES_PROPERTY);
-
-		if (examples != null && examples.getClass().isArray())
-		{
-			for (Object example : (Object[]) examples)
-			{
-				this.addExample(example.toString());
-			}
-		}
+		IndexUtil.addArrayItems(object.get(TYPES_PROPERTY), this._types, ReturnTypeElement.class);
+		IndexUtil.addStringItems(object.get(EXAMPLES_PROPERTY), this._examples);
 	}
 
 	/**

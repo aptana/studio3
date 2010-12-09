@@ -44,6 +44,7 @@ import org.mortbay.util.ajax.JSON.Output;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.index.core.IndexUtil;
 
 public class FunctionElement extends PropertyElement
 {
@@ -180,53 +181,10 @@ public class FunctionElement extends PropertyElement
 		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
 		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
 		
-		Object parameters = object.get(PARAMETERS_PROPERTY);
-		if (parameters != null && parameters.getClass().isArray())
-		{
-			for (Object parameter : (Object[]) parameters)
-			{
-				ParameterElement p = new ParameterElement();
-				
-				p.fromJSON((Map) parameter);
-				
-				this.addParameter(p);
-			}
-		}
-		
-		Object returnTypes = object.get(RETURN_TYPES_PROPERTY);
-		if (returnTypes != null && returnTypes.getClass().isArray())
-		{
-			for (Object returnType : (Object[]) returnTypes)
-			{
-				ReturnTypeElement rt = new ReturnTypeElement();
-				
-				rt.fromJSON((Map) returnType);
-				
-				this.addReturnType(rt);
-			}
-		}
-		
-		Object exceptions = object.get(EXCEPTIONS_PROPERTY);
-		if (exceptions != null && exceptions.getClass().isArray())
-		{
-			for (Object exception : (Object[]) exceptions)
-			{
-				ExceptionElement e = new ExceptionElement();
-				
-				e.fromJSON((Map) exception);
-				
-				this.addException(e);
-			}
-		}
-		
-		Object references = object.get(REFERENCES_PROPERTY);
-		if (references != null && references.getClass().isArray())
-		{
-			for (Object reference : (Object[]) references)
-			{
-				this.addReference(reference.toString());
-			}
-		}
+		IndexUtil.addArrayItems(object.get(PARAMETERS_PROPERTY), this._parameters, ParameterElement.class);
+		IndexUtil.addArrayItems(object.get(RETURN_TYPES_PROPERTY), this._returnTypes, ReturnTypeElement.class);
+		IndexUtil.addArrayItems(object.get(EXCEPTIONS_PROPERTY), this._exceptions, ExceptionElement.class);
+		IndexUtil.addStringItems(object.get(REFERENCES_PROPERTY), this._references);
 	}
 
 	/**
