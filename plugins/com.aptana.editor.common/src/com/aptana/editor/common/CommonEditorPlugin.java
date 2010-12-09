@@ -70,7 +70,7 @@ import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.index.core.IndexActivator;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.usage.EventLogger;
 
 /**
@@ -258,7 +258,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		plugin = this;
 
 		// Activate indexing
-		IndexActivator.getDefault();
+		IndexPlugin.getDefault();
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();

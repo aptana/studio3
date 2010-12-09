@@ -91,7 +91,7 @@ public class IndexManager
 				}
 				catch (IOException e1)
 				{
-					IndexActivator.logError("An error occurred while trying to access an index", e1); //$NON-NLS-1$
+					IndexPlugin.logError("An error occurred while trying to access an index", e1); //$NON-NLS-1$
 				}
 			}
 		}
