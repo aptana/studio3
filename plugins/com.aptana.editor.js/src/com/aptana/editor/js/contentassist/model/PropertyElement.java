@@ -35,12 +35,12 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -157,14 +157,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<String> getExamples()
 	{
-		List<String> result = this._examples;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._examples);
 	}
 
 	/**
@@ -184,20 +177,11 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<String> getTypeNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._types != null)
+		for (ReturnTypeElement type : this.getTypes())
 		{
-			result = new ArrayList<String>(this._types.size());
-
-			for (ReturnTypeElement type : this._types)
-			{
-				result.add(type.getType());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(type.getType());
 		}
 
 		return result;
@@ -210,14 +194,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<ReturnTypeElement> getTypes()
 	{
-		List<ReturnTypeElement> result = this._types;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._types);
 	}
 
 	/**

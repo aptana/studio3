@@ -35,12 +35,12 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
@@ -194,14 +194,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ExceptionElement> getExceptions()
 	{
-		List<ExceptionElement> result = this._exceptions;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._exceptions);
 	}
 
 	/**
@@ -228,14 +221,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ParameterElement> getParameters()
 	{
-		List<ParameterElement> result = this._parameters;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._parameters);
 	}
 
 	/**
@@ -262,14 +248,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReferences()
 	{
-		List<String> result = this._references;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._references);
 	}
 
 	/**
@@ -279,20 +258,11 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReturnTypeNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._returnTypes != null)
+		for (ReturnTypeElement type : this.getReturnTypes())
 		{
-			result = new ArrayList<String>(this._returnTypes.size());
-
-			for (ReturnTypeElement type : this._returnTypes)
-			{
-				result.add(type.getType());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(type.getType());
 		}
 
 		return result;
@@ -305,14 +275,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ReturnTypeElement> getReturnTypes()
 	{
-		List<ReturnTypeElement> result = this._returnTypes;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._returnTypes);
 	}
 
 	/**

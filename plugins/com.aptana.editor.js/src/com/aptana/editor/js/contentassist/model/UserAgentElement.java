@@ -64,34 +64,6 @@ public class UserAgentElement implements Convertible
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj)
-	{
-		boolean result = false;
-
-		if (this == obj)
-		{
-			result = true;
-		}
-		else
-		{
-			UserAgentElement that = (UserAgentElement) obj;
-
-			result = //
-			this.getDescription().equals(that.getDescription()) //
-				&& this.getOS().equals(that.getOS()) //
-				&& this.getOSVersion().equals(that.getOSVersion()) //
-				&& this.getPlatform().equals(that.getPlatform()) //
-				&& this.getVersion().equals(that.getVersion()); //
-		}
-
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
 	@SuppressWarnings("rawtypes")
@@ -112,16 +84,6 @@ public class UserAgentElement implements Convertible
 	public String getDescription()
 	{
 		return StringUtil.getStringValue(this._description);
-	}
-
-	/**
-	 * getKey
-	 * 
-	 * @return
-	 */
-	public String getKey()
-	{
-		return Integer.toString(this.hashCode());
 	}
 
 	/**
@@ -162,34 +124,6 @@ public class UserAgentElement implements Convertible
 	public String getVersion()
 	{
 		return StringUtil.getStringValue(this._version);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		int h = 0;
-
-		String[] items = new String[] { //
-		this.getDescription(), //
-			this.getOS(), //
-			this.getOSVersion(), //
-			this.getPlatform(), //
-			this.getVersion() //
-		};
-
-		for (String item : items)
-		{
-			if (item != null)
-			{
-				h = 31 * h + item.hashCode();
-			}
-		}
-
-		return h;
 	}
 
 	/**

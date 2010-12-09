@@ -35,13 +35,13 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
@@ -150,14 +150,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<String> getDocuments()
 	{
-		List<String> result = this._documents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._documents);
 	}
 
 	/**
@@ -177,14 +170,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<SinceElement> getSinceList()
 	{
-		List<SinceElement> result = this._sinceList;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._sinceList);
 	}
 
 	/**
@@ -194,20 +180,11 @@ public class BaseElement implements Convertible
 	 */
 	public List<String> getUserAgentNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._userAgents != null)
+		for (UserAgentElement userAgent : this.getUserAgents())
 		{
-			result = new ArrayList<String>(this._userAgents.size());
-
-			for (UserAgentElement userAgent : this._userAgents)
-			{
-				result.add(userAgent.getPlatform());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(userAgent.getPlatform());
 		}
 
 		return result;
@@ -220,14 +197,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		List<UserAgentElement> result = this._userAgents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**
@@ -237,10 +207,7 @@ public class BaseElement implements Convertible
 	 */
 	public void setDescription(String description)
 	{
-		if (description != null)
-		{
-			this._description = description;
-		}
+		this._description = description;
 	}
 
 	/**
@@ -250,10 +217,7 @@ public class BaseElement implements Convertible
 	 */
 	public void setName(String name)
 	{
-		if (name != null)
-		{
-			this._name = name;
-		}
+		this._name = name;
 	}
 
 	/*
