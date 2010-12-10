@@ -35,15 +35,16 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.index.core.IndexUtil;
 
 public class FunctionElement extends PropertyElement
 {
@@ -53,7 +54,7 @@ public class FunctionElement extends PropertyElement
 	private static final String PARAMETERS_PROPERTY = "parameters"; //$NON-NLS-1$
 	private static final String IS_METHOD_PROPERTY = "isMethod"; //$NON-NLS-1$
 	private static final String IS_CONSTRUCTOR_PROPERTY = "isConstructor"; //$NON-NLS-1$
-	
+
 	private List<ParameterElement> _parameters;
 	private List<String> _references;
 	private List<ExceptionElement> _exceptions;
@@ -176,57 +177,14 @@ public class FunctionElement extends PropertyElement
 	public void fromJSON(Map object)
 	{
 		super.fromJSON(object);
-		
+
 		this.setIsConstructor(Boolean.TRUE == object.get(IS_CONSTRUCTOR_PROPERTY));
 		this.setIsMethod(Boolean.TRUE == object.get(IS_METHOD_PROPERTY));
-		
-		Object parameters = object.get(PARAMETERS_PROPERTY);
-		if (parameters != null && parameters.getClass().isArray())
-		{
-			for (Object parameter : (Object[]) parameters)
-			{
-				ParameterElement p = new ParameterElement();
-				
-				p.fromJSON((Map) parameter);
-				
-				this.addParameter(p);
-			}
-		}
-		
-		Object returnTypes = object.get(RETURN_TYPES_PROPERTY);
-		if (returnTypes != null && returnTypes.getClass().isArray())
-		{
-			for (Object returnType : (Object[]) returnTypes)
-			{
-				ReturnTypeElement rt = new ReturnTypeElement();
-				
-				rt.fromJSON((Map) returnType);
-				
-				this.addReturnType(rt);
-			}
-		}
-		
-		Object exceptions = object.get(EXCEPTIONS_PROPERTY);
-		if (exceptions != null && exceptions.getClass().isArray())
-		{
-			for (Object exception : (Object[]) exceptions)
-			{
-				ExceptionElement e = new ExceptionElement();
-				
-				e.fromJSON((Map) exception);
-				
-				this.addException(e);
-			}
-		}
-		
-		Object references = object.get(REFERENCES_PROPERTY);
-		if (references != null && references.getClass().isArray())
-		{
-			for (Object reference : (Object[]) references)
-			{
-				this.addReference(reference.toString());
-			}
-		}
+
+		this._parameters = IndexUtil.createList(object.get(PARAMETERS_PROPERTY), ParameterElement.class);
+		this._returnTypes = IndexUtil.createList(object.get(RETURN_TYPES_PROPERTY), ReturnTypeElement.class);
+		this._exceptions = IndexUtil.createList(object.get(EXCEPTIONS_PROPERTY), ExceptionElement.class);
+		this._references = IndexUtil.createList(object.get(REFERENCES_PROPERTY));
 	}
 
 	/**
@@ -236,14 +194,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ExceptionElement> getExceptions()
 	{
-		List<ExceptionElement> result = this._exceptions;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._exceptions);
 	}
 
 	/**
@@ -270,14 +221,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ParameterElement> getParameters()
 	{
-		List<ParameterElement> result = this._parameters;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._parameters);
 	}
 
 	/**
@@ -304,14 +248,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReferences()
 	{
-		List<String> result = this._references;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._references);
 	}
 
 	/**
@@ -321,20 +258,11 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<String> getReturnTypeNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._returnTypes != null)
+		for (ReturnTypeElement type : this.getReturnTypes())
 		{
-			result = new ArrayList<String>(this._returnTypes.size());
-
-			for (ReturnTypeElement type : this._returnTypes)
-			{
-				result.add(type.getType());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(type.getType());
 		}
 
 		return result;
@@ -347,14 +275,7 @@ public class FunctionElement extends PropertyElement
 	 */
 	public List<ReturnTypeElement> getReturnTypes()
 	{
-		List<ReturnTypeElement> result = this._returnTypes;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._returnTypes);
 	}
 
 	/**
@@ -458,7 +379,7 @@ public class FunctionElement extends PropertyElement
 	public void toJSON(Output out)
 	{
 		super.toJSON(out);
-		
+
 		out.add(IS_CONSTRUCTOR_PROPERTY, this.isConstructor());
 		out.add(IS_METHOD_PROPERTY, this.isMethod());
 		out.add(PARAMETERS_PROPERTY, this.getParameters());

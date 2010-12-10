@@ -34,15 +34,35 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-public class EntityElement
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.StringUtil;
+
+public class EntityElement extends BaseElement
 {
-	private String _name;
+	private static final String DECIMAL_VALUE_PROPERTY = "decimalValue"; //$NON-NLS-1$
+	private static final String HEX_VALUE_PROPERTY = "hexValue"; //$NON-NLS-1$
+
 	private String _decimalValue;
 	private String _hexValue;
-	private String _description;
 
 	public EntityElement()
 	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setHexValue(StringUtil.getStringValue(object.get(HEX_VALUE_PROPERTY)));
+		this.setDecimalValue(StringUtil.getStringValue(object.get(DECIMAL_VALUE_PROPERTY)));
 	}
 
 	/**
@@ -52,17 +72,7 @@ public class EntityElement
 	 */
 	public String getDecimalValue()
 	{
-		return this._decimalValue;
-	}
-
-	/**
-	 * getDescription
-	 * 
-	 * @return the description
-	 */
-	public String getDescription()
-	{
-		return this._description;
+		return StringUtil.getStringValue(this._decimalValue);
 	}
 
 	/**
@@ -72,17 +82,7 @@ public class EntityElement
 	 */
 	public String getHexValue()
 	{
-		return this._hexValue;
-	}
-
-	/**
-	 * getName
-	 * 
-	 * @return the name
-	 */
-	public String getName()
-	{
-		return this._name;
+		return StringUtil.getStringValue(this._hexValue);
 	}
 
 	/**
@@ -97,16 +97,6 @@ public class EntityElement
 	}
 
 	/**
-	 * setDescription
-	 * 
-	 * @param description the description to set
-	 */
-	public void setDescription(String description)
-	{
-		this._description = description;
-	}
-
-	/**
 	 * setHexValue
 	 * 
 	 * @param hexValue
@@ -117,12 +107,15 @@ public class EntityElement
 		this._hexValue = value;
 	}
 
-	/**
-	 * @param name
-	 *            the name to set
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
 	 */
-	public void setName(String name)
+	public void toJSON(Output out)
 	{
-		this._name = name;
+		super.toJSON(out);
+
+		out.add(HEX_VALUE_PROPERTY, this.getHexValue());
+		out.add(DECIMAL_VALUE_PROPERTY, this.getDecimalValue());
 	}
 }

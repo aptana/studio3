@@ -40,23 +40,25 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
-public class PropertyElement extends AbstractCSSMetadataElement
+public class PropertyElement extends BaseElement
 {
 	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
 	private static final String VALUES_PROPERTY = "values"; //$NON-NLS-1$
 	private static final String ALLOW_MULTIPLE_VALUES_PROPERTY = "allowMultipleValues"; //$NON-NLS-1$
 	private static final String HINT_PROPERTY = "hint"; //$NON-NLS-1$
 	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
-
 	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+
 	private boolean _allowMultipleValues;
 	private String _type;
-	private List<SpecificationElement> _specifications = new ArrayList<SpecificationElement>();
+	private List<SpecificationElement> _specifications;
 	private String _hint;
 	private String _remark;
-	private List<ValueElement> _values = new ArrayList<ValueElement>();
+	private List<ValueElement> _values;
 
 	/**
 	 * PropertyElement
@@ -73,7 +75,15 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -83,7 +93,15 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public void addValue(ValueElement value)
 	{
-		this._values.add(value);
+		if (value != null)
+		{
+			if (this._values == null)
+			{
+				this._values = new ArrayList<ValueElement>();
+			}
+
+			this._values.add(value);
+		}
 	}
 
 	/**
@@ -106,46 +124,13 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	{
 		super.fromJSON(object);
 
-		this.setType(object.get(TYPE_PROPERTY).toString());
-		this.setRemark(object.get(REMARK_PROPERTY).toString());
-		this.setHint(object.get(HINT_PROPERTY).toString());
+		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
+		this.setHint(StringUtil.getStringValue(object.get(HINT_PROPERTY)));
 		this.setAllowMultipleValues(Boolean.TRUE == object.get(ALLOW_MULTIPLE_VALUES_PROPERTY));
 
-		// values
-		Object values = object.get(VALUES_PROPERTY);
-
-		if (values != null && values.getClass().isArray())
-		{
-			for (Object value : (Object[]) values)
-			{
-				if (value instanceof Map)
-				{
-					ValueElement v = new ValueElement();
-
-					v.fromJSON((Map) value);
-
-					this.addValue(v);
-				}
-			}
-		}
-
-		// specifications
-		Object specifications = object.get(SPECIFICATIONS_PROPERTY);
-
-		if (specifications != null && specifications.getClass().isArray())
-		{
-			for (Object specification : (Object[]) specifications)
-			{
-				if (specification instanceof Map)
-				{
-					SpecificationElement s = new SpecificationElement();
-
-					s.fromJSON((Map) specification);
-
-					this.addSpecification(s);
-				}
-			}
-		}
+		this._values = IndexUtil.createList(object.get(VALUES_PROPERTY), ValueElement.class);
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
 	}
 
 	/**
@@ -155,7 +140,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getHint()
 	{
-		return StringUtil.getValue(this._hint);
+		return StringUtil.getStringValue(this._hint);
 	}
 
 	/**
@@ -165,7 +150,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return StringUtil.getValue(this._remark);
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**
@@ -175,7 +160,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -185,7 +170,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public String getType()
 	{
-		return StringUtil.getValue(this._type);
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/**
@@ -195,7 +180,7 @@ public class PropertyElement extends AbstractCSSMetadataElement
 	 */
 	public List<ValueElement> getValues()
 	{
-		return this._values;
+		return CollectionsUtil.getListValue(this._values);
 	}
 
 	/**

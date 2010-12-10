@@ -18,18 +18,18 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class IndexActivator extends Plugin
+public class IndexPlugin extends Plugin
 {
 
 	public static final String PLUGIN_ID = "com.aptana.index.core"; //$NON-NLS-1$
-	private static IndexActivator plugin;
+	private static IndexPlugin plugin;
 
 	/**
 	 * Returns the shared instance
 	 * 
 	 * @return the shared instance
 	 */
-	public static IndexActivator getDefault()
+	public static IndexPlugin getDefault()
 	{
 		return plugin;
 	}
@@ -58,7 +58,7 @@ public class IndexActivator extends Plugin
 	/**
 	 * The constructor
 	 */
-	public IndexActivator()
+	public IndexPlugin()
 	{
 	}
 

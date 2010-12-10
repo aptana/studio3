@@ -149,7 +149,7 @@ public class Index implements IReadWriteMonitor
 
 		String fileName = Long.toString(crc.getValue()) + ".index"; //$NON-NLS-1$
 
-		return IndexActivator.getDefault().getStateLocation().append(fileName);
+		return IndexPlugin.getDefault().getStateLocation().append(fileName);
 	}
 
 	/**
@@ -563,7 +563,7 @@ public class Index implements IReadWriteMonitor
 		}
 		catch (IOException e)
 		{
-			IndexActivator.logError("An error occurred while remove categories from the index", e); //$NON-NLS-1$
+			IndexPlugin.logError("An error occurred while remove categories from the index", e); //$NON-NLS-1$
 		}
 	}
 

@@ -87,8 +87,8 @@ public class ReturnTypeElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setType(object.get(TYPE_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class ReturnTypeElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class ReturnTypeElement implements Convertible
 	 */
 	public String getType()
 	{
-		return StringUtil.getValue(this._type);
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/*

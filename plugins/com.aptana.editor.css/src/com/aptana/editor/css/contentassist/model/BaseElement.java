@@ -45,21 +45,35 @@ import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.index.core.IndexUtil;
 
-public class ValueElement implements Convertible
+public abstract class BaseElement implements ICSSMetadataElement, Convertible
 {
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String EXAMPLE_PROPERTY = "example"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
-	private String _description;
 	private List<UserAgentElement> _userAgents;
+	private String _description;
+	private String _example;
+	private List<String> _documents;
 
 	/**
-	 * ValueElement
+	 * addDocument
+	 * 
+	 * @param document
 	 */
-	public ValueElement()
+	public void addDocument(String document)
 	{
+		if (document != null && document.length() > 0)
+		{
+			if (this._documents == null)
+			{
+				this._documents = new ArrayList<String>();
+			}
+
+			this._documents.add(document);
+		}
 	}
 
 	/**
@@ -89,14 +103,14 @@ public class ValueElement implements Convertible
 	{
 		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
 		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
+		this.setExample(StringUtil.getStringValue(object.get(EXAMPLE_PROPERTY)));
 
 		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
-	/**
-	 * getDescription
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getDescription()
 	 */
 	public String getDescription()
 	{
@@ -104,19 +118,52 @@ public class ValueElement implements Convertible
 	}
 
 	/**
-	 * getName
+	 * getDocuments
 	 * 
 	 * @return
+	 */
+	public List<String> getDocuments()
+	{
+		return CollectionsUtil.getListValue(this._documents);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getExample()
+	 */
+	public String getExample()
+	{
+		return StringUtil.getStringValue(this._example);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getName()
 	 */
 	public String getName()
 	{
 		return StringUtil.getStringValue(this._name);
 	}
 
-	/**
-	 * getUserAgents
-	 * 
-	 * @return
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getUserAgentNames()
+	 */
+	public List<String> getUserAgentNames()
+	{
+		List<String> result = new ArrayList<String>();
+
+		for (UserAgentElement ua : this.getUserAgents())
+		{
+			result.add(ua.getPlatform());
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getUserAgents()
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
@@ -131,6 +178,16 @@ public class ValueElement implements Convertible
 	public void setDescription(String description)
 	{
 		this._description = description;
+	}
+
+	/**
+	 * setExample
+	 * 
+	 * @param example
+	 */
+	public void setExample(String example)
+	{
+		this._example = example;
 	}
 
 	/**
@@ -151,6 +208,7 @@ public class ValueElement implements Convertible
 	{
 		out.add(NAME_PROPERTY, this.getName());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
+		out.add(EXAMPLE_PROPERTY, this.getExample());
 		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }

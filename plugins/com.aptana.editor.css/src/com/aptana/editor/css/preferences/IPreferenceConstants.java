@@ -35,8 +35,7 @@
 package com.aptana.editor.css.preferences;
 
 /**
- * @author klindsey
- *
+ * IPreferenceConstants
  */
 public interface IPreferenceConstants
 {

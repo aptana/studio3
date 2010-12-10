@@ -43,6 +43,7 @@ import java.util.Set;
 
 import org.mortbay.util.ajax.JSON;
 
+import com.aptana.editor.css.contentassist.model.BaseElement;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
@@ -68,27 +69,9 @@ public class CSSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
 	{
-		ElementElement e = new ElementElement();
-
-		String key = element.getWord();
-		String[] columns = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[0]);
-
-		if (m instanceof Map)
-		{
-			e.fromJSON((Map) m);
-		}
-
-		for (String document : element.getDocuments())
-		{
-			e.addDocument(document);
-		}
-
-		return e;
+		return this.populateElement(index, element, new ElementElement(), 1);
 	}
 
 	/**
@@ -99,27 +82,9 @@ public class CSSIndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
 	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
 	{
-		PropertyElement p = new PropertyElement();
-
-		String key = property.getWord();
-		String columns[] = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[0]);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : property.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, property, new PropertyElement(), 1);
 	}
 
 	/**
@@ -127,25 +92,9 @@ public class CSSIndexReader
 	 * @param pseudoClass
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private PseudoClassElement createPseudoClassFromKey(Index index, QueryResult pseudoClass)
 	{
-		PseudoClassElement p = new PseudoClassElement();
-
-		String word = pseudoClass.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoClass.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, pseudoClass, new PseudoClassElement());
 	}
 
 	/**
@@ -153,25 +102,9 @@ public class CSSIndexReader
 	 * @param pseudoElement
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
 	private PseudoElementElement createPseudoElementFromKey(Index index, QueryResult pseudoElement)
 	{
-		PseudoElementElement p = new PseudoElementElement();
-
-		String word = pseudoElement.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoElement.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(index, pseudoElement, new PseudoElementElement());
 	}
 
 	/**
@@ -370,5 +303,63 @@ public class CSSIndexReader
 		}
 
 		return result;
+	}
+
+	/**
+	 * populateElement
+	 * 
+	 * @param <T>
+	 * @param index
+	 * @param item
+	 * @param element
+	 * @return
+	 */
+	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element)
+	{
+		return this.populateElement(element, item.getWord());
+	}
+	
+	/**
+	 * populateElement
+	 * 
+	 * @param <T>
+	 * @param index
+	 * @param item
+	 * @param element
+	 * @param columnIndex
+	 * @return
+	 */
+	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element, int columnIndex)
+	{
+		String key = item.getWord();
+		String[] columns = key.split(CSSIndexConstants.DELIMITER);
+
+		return this.populateElement(element, columns[columnIndex]);
+	}
+
+	/**
+	 * populateElement
+	 * 
+	 * @param <T>
+	 * @param element
+	 * @param value
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	private <T extends BaseElement> T populateElement(T element, String value)
+	{
+		Object m = JSON.parse(value);
+
+		if (m instanceof Map)
+		{
+			element.fromJSON((Map) m);
+		}
+
+		for (String document : element.getDocuments())
+		{
+			element.addDocument(document);
+		}
+		
+		return element;
 	}
 }

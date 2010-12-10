@@ -32,39 +32,37 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js;
+package com.aptana.editor.html;
 
 import java.io.IOException;
 import java.net.URI;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
 
 import com.aptana.editor.common.contentassist.MetadataLoader;
-import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.index.JSIndexConstants;
-import com.aptana.editor.js.contentassist.index.JSIndexWriter;
-import com.aptana.editor.js.contentassist.index.JSMetadataReader;
-import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.preferences.IPreferenceConstants;
+import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
+import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
+import com.aptana.editor.html.contentassist.index.HTMLIndexWriter;
+import com.aptana.editor.html.contentassist.index.HTMLMetadataReader;
+import com.aptana.editor.html.contentassist.model.AttributeElement;
+import com.aptana.editor.html.contentassist.model.ElementElement;
+import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
+import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
-public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
+/**
+ * HTMLMetadataLoader
+ */
+public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 {
 	/**
-	 * MetadataLoader
+	 * HTMLMetadataLoader
 	 */
-	public JSMetadataLoader()
+	public HTMLMetadataLoader()
 	{
-		super(Messages.Loading_Metadata);
+		super(Messages.HTMLMetadataLoader_Loading_Metadata);
 	}
 
 	/*
@@ -72,9 +70,9 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	 * @see com.aptana.editor.common.contentassist.MetadataLoader#createMetadataReader()
 	 */
 	@Override
-	protected JSMetadataReader createMetadataReader()
+	protected HTMLMetadataReader createMetadataReader()
 	{
-		return new JSMetadataReader();
+		return new HTMLMetadataReader();
 	}
 
 	/*
@@ -84,7 +82,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected Bundle getBundle()
 	{
-		return JSPlugin.getDefault().getBundle();
+		return HTMLPlugin.getDefault().getBundle();
 	}
 
 	/*
@@ -94,7 +92,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected double getIndexVersion()
 	{
-		return JSIndexConstants.INDEX_VERSION;
+		return HTMLIndexConstants.INDEX_VERSION;
 	}
 
 	/*
@@ -104,7 +102,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected String getIndexVersionKey()
 	{
-		return IPreferenceConstants.JS_INDEX_VERSION;
+		return IPreferenceContants.HTML_INDEX_VERSION;
 	}
 
 	/*
@@ -114,13 +112,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected String[] getMetadataFiles()
 	{
-		return new String[] { //
-		"/metadata/js_core.xml", //$NON-NLS-1$
-			"/metadata/dom_0.xml", //$NON-NLS-1$
-			"/metadata/dom_2.xml", //$NON-NLS-1$
-			"/metadata/dom_3.xml", //$NON-NLS-1$
-			"/metadata/dom_5.xml" //$NON-NLS-1$;
-		};
+		return new String[] { "/metadata/html_metadata.xml" }; //$NON-NLS-1$
 	}
 
 	/*
@@ -130,47 +122,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	@Override
 	protected String getPluginId()
 	{
-		return JSPlugin.PLUGIN_ID;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.contentassist.MetadataLoader#postRebuild()
-	 */
-	@Override
-	protected void postRebuild()
-	{
-		super.postRebuild();
-
-		this.rebuildProjectIndexes();
-	}
-
-	/**
-	 * rebuildProjectIndexes
-	 */
-	private void rebuildProjectIndexes()
-	{
-		Job job = new Job(Messages.JSMetadataLoader_Rebuilding_Project_Indexes)
-		{
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
-			{
-				IWorkspace ws = ResourcesPlugin.getWorkspace();
-
-				try
-				{
-					ws.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-				}
-				catch (CoreException e)
-				{
-					return e.getStatus();
-				}
-
-				return Status.OK_STATUS;
-			}
-		};
-
-		job.schedule();
+		return HTMLPlugin.PLUGIN_ID;
 	}
 
 	/*
@@ -179,18 +131,32 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 	 * MetadataReader)
 	 */
 	@Override
-	protected void writeIndex(JSMetadataReader reader)
+	protected void writeIndex(HTMLMetadataReader reader)
 	{
 		// remove old index
-		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
+		IndexManager.getInstance().removeIndex(URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION));
 
-		JSIndexWriter indexer = new JSIndexWriter();
-		Index index = JSIndexQueryHelper.getIndex();
+		HTMLIndexWriter indexer = new HTMLIndexWriter();
+		Index index = HTMLIndexQueryHelper.getIndex();
 
-		// write types
-		for (TypeElement type : reader.getTypes())
+		for (ElementElement element : reader.getElements())
 		{
-			indexer.writeType(index, type);
+			indexer.writeElement(index, element);
+		}
+
+		for (AttributeElement attribute : reader.getAttributes())
+		{
+			indexer.writeAttribute(index, attribute);
+		}
+
+		for (EventElement event : reader.getEvents())
+		{
+			indexer.writeEvent(index, event);
+		}
+
+		for (EntityElement entity : reader.getEntities())
+		{
+			indexer.writeEntity(index, entity);
 		}
 
 		try
@@ -199,7 +165,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		}
 		catch (IOException e)
 		{
-			JSPlugin.logError(e.getMessage(), e);
+			HTMLPlugin.logError(e.getMessage(), e);
 		}
 	}
 }

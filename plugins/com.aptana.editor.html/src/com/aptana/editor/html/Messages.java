@@ -32,14 +32,18 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.contentassist;
+package com.aptana.editor.html;
 
 import org.eclipse.osgi.util.NLS;
 
+/**
+ * @author klindsey
+ *
+ */
 public class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.html.contentassist.messages"; //$NON-NLS-1$
-	public static String HTMLIndexQueryHelper_Error_Loading_Metadata;
+	private static final String BUNDLE_NAME = "com.aptana.editor.html.messages"; //$NON-NLS-1$
+	public static String HTMLMetadataLoader_Loading_Metadata;
 	static
 	{
 		// initialize resource bundle

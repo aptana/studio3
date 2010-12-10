@@ -32,38 +32,29 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.contentassist.model;
+package com.aptana.editor.html.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
 
-public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement, Convertible
+/**
+ * BaseElement
+ */
+public abstract class BaseElement implements Convertible
 {
-	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
-	private static final String EXAMPLE_PROPERTY = "example"; //$NON-NLS-1$
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$
 
 	private String _name;
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
 	private String _description;
-	private String _example;
 	private List<String> _documents;
-
-	/**
-	 * AbstractCSSMetadataElement
-	 */
-	public AbstractCSSMetadataElement()
-	{
-		super();
-	}
 
 	/**
 	 * addDocument
@@ -83,16 +74,6 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 		}
 	}
 
-	/**
-	 * addUserAgent
-	 * 
-	 * @param userAgent
-	 */
-	public void addUserAgent(UserAgentElement userAgent)
-	{
-		this._userAgents.add(userAgent);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
@@ -100,36 +81,18 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
-		this.setExample(object.get(EXAMPLE_PROPERTY).toString());
-
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getDescription()
+	/**
+	 * getDescription
+	 * 
+	 * @return the description
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -139,63 +102,24 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	 */
 	public List<String> getDocuments()
 	{
-		List<String> result = this._documents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._documents);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getExample()
-	 */
-	public String getExample()
-	{
-		return StringUtil.getValue(this._example);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getName()
+	/**
+	 * getName
+	 * 
+	 * @return the name
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getUserAgentNames()
-	 */
-	public List<String> getUserAgentNames()
-	{
-		List<String> result = new ArrayList<String>();
-
-		for (UserAgentElement ua : this._userAgents)
-		{
-			result.add(ua.getPlatform());
-		}
-
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.css.contentassist.model.ICSSMetadataElement#getUserAgents()
-	 */
-	public List<UserAgentElement> getUserAgents()
-	{
-		return this._userAgents;
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
 	 * setDescription
 	 * 
 	 * @param description
+	 *            the description to set
 	 */
 	public void setDescription(String description)
 	{
@@ -203,19 +127,10 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	}
 
 	/**
-	 * setExample
-	 * 
-	 * @param example
-	 */
-	public void setExample(String example)
-	{
-		this._example = example;
-	}
-
-	/**
 	 * setName
 	 * 
 	 * @param name
+	 *            the name to set
 	 */
 	public void setName(String name)
 	{
@@ -230,7 +145,5 @@ public abstract class AbstractCSSMetadataElement implements ICSSMetadataElement,
 	{
 		out.add(NAME_PROPERTY, this.getName());
 		out.add(DESCRIPTION_PROPERTY, this.getDescription());
-		out.add(EXAMPLE_PROPERTY, this.getExample());
-		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }

@@ -34,16 +34,26 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class EventElement
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
+
+public class EventElement extends BaseElement
 {
-	private String _name;
+	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+
 	private String _type;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
-	private List<UserAgentElement> _userAgents = new LinkedList<UserAgentElement>();
-	private String _description;
+	private List<SpecificationElement> _specifications;
+	private List<UserAgentElement> _userAgents;
 	private String _remark;
 
 	/**
@@ -61,7 +71,15 @@ public class EventElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
 	}
 
 	/**
@@ -70,27 +88,31 @@ public class EventElement
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
-	/**
-	 * getDescription
-	 * 
-	 * @return the description
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
-	public String getDescription()
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
 	{
-		return this._description;
-	}
+		super.fromJSON(object);
 
-	/**
-	 * getName
-	 * 
-	 * @return the name
-	 */
-	public String getName()
-	{
-		return this._name;
+		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
+
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -100,7 +122,7 @@ public class EventElement
 	 */
 	public String getRemark()
 	{
-		return this._remark;
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**
@@ -110,7 +132,7 @@ public class EventElement
 	 */
 	public List<SpecificationElement> getSpecifications()
 	{
-		return this._specifications;
+		return CollectionsUtil.getListValue(this._specifications);
 	}
 
 	/**
@@ -120,7 +142,7 @@ public class EventElement
 	 */
 	public String getType()
 	{
-		return this._type;
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/**
@@ -128,29 +150,7 @@ public class EventElement
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
-	}
-
-	/**
-	 * setDescription
-	 * 
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description)
-	{
-		this._description = description;
-	}
-
-	/**
-	 * setName
-	 * 
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name)
-	{
-		this._name = name;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**
@@ -173,5 +173,20 @@ public class EventElement
 	public void setType(String type)
 	{
 		this._type = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		out.add(TYPE_PROPERTY, this.getType());
+		out.add(REMARK_PROPERTY, this.getRemark());
+
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
+		out.add(USER_AGENTS_PROPERTY, this.getUserAgents());
 	}
 }

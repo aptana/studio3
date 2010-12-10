@@ -32,61 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.contentassist.index;
-
-import org.eclipse.osgi.util.NLS;
+package com.aptana.editor.html.preferences;
 
 /**
- * Messages
- * @author Ingo Muschenetz
- *
+ * IPreferenceContants
  */
-public final class Messages extends NLS
+public interface IPreferenceContants
 {
-	private static final String BUNDLE_NAME = "com.aptana.parsing.metadata.reader.messages"; //$NON-NLS-1$
-
-	private Messages()
-	{
-	}
-
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-	
 	/**
-	 * MetadataObjectsReader_UnableToLocateDocumentationXML
+	 * The value is a double used to indicate the current format being used by the HTML index categories.
 	 */
-	public static String MetadataObjectsReader_UnableToLocateDocumentationXML;
-	
-	/**
-	 * MetadataObjectsReader_IOErrorOccurredProcessingDocumentationXML
-	 */
-	public static String MetadataObjectsReader_IOErrorOccurredProcessingDocumentationXML;
-	
-	/**
-	 * MetadataObjectsReader_IOErrorOccurredProcessingDocumentationBinary
-	 */
-	public static String MetadataObjectsReader_IOErrorOccurredProcessingDocumentationBinary;
-	
-	/**
-	 * MetadataReader_ErrorLoadingDocumentationXML
-	 */
-	public static String MetadataReader_ErrorLoadingDocumentationXML;
-	
-	/**
-	 * MetadataReader_IOErrorProcessingDocumentationXML
-	 */
-	public static String MetadataReader_IOErrorProcessingDocumentationXML;
-	
-	/**
-	 * MetadataReader_SAXParserConfiguredIncorrectly
-	 */
-	public static String MetadataReader_SAXParserConfiguredIncorrectly;
-	
-	/**
-	 * MetadataReader_ErrorParsingDocumentationXML
-	 */
-	public static String MetadataReader_ErrorParsingDocumentationXML;
+	String HTML_INDEX_VERSION = "HTML_INDEX_VERSION";
 }

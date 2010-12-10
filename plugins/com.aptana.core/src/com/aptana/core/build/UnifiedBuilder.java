@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.index.core.IndexActivator;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.RebuildIndexJob;
@@ -72,7 +72,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			return uri;
 		}
-		IndexActivator.logError(MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
+		IndexPlugin.logError(MessageFormat.format("Project's location URI is null. raw location: {0}, path: {1}", //$NON-NLS-1$
 				getProject().getRawLocationURI(), getProject().getFullPath()), null);
 		uri = getProject().getRawLocationURI();
 		return uri;
@@ -127,7 +127,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			}
 			catch (CoreException e)
 			{
-				IndexActivator.logError(e);
+				IndexPlugin.logError(e);
 			}
 		}
 		sub.done();

@@ -96,6 +96,7 @@ public class CSSIndexWriter
 		{
 			String key = StringUtil.join( //
 				CSSIndexConstants.DELIMITER, //
+				property.getName(), //
 				JSON.toString(property) //
 				);
 
