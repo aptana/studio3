@@ -45,6 +45,10 @@ import com.aptana.editor.xml.parsing.IXMLParserConstants;
 
 public class XMLEditor extends AbstractThemeableEditor
 {
+	
+	private static final char[] XML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
+		'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
+		
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.AbstractThemeableEditor#initializeEditor()
@@ -56,6 +60,17 @@ public class XMLEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
+	}
+	
+	/**
+	 * Return an array of character pairs used in our pair matching highlighter. Even number chars are the start, odd
+	 * are the end.
+	 * 
+	 * @return
+	 */
+	protected char[] getPairMatchingCharacters()
+	{
+		return XML_PAIR_MATCHING_CHARS;
 	}
 
 	/*
