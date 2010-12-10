@@ -16,24 +16,8 @@ module Ruble
       end
     end
 
-    def add_command(command)
-      @jobj.add_command command.java_object
-    end
-
-    def add_env(env)
-      @jobj.add_env env.java_object
-    end
-    
-    def add_smart_typing_pairs(p)
-      @jobj.add_smart_typing_pairs p.java_object
-    end
-
-    def add_menu(menu)
-      @jobj.add_menu menu.java_object
-    end
-
-    def add_snippet(snippet)
-      @jobj.add_snippet snippet.java_object
+    def add_child(child)
+      @jobj.add_child child.java_object
     end
 
     def apply_defaults(obj)
@@ -124,10 +108,6 @@ module Ruble
 
     def license_url=(license_url)
       @jobj.license_url = license_url.join("\n")
-    end
-
-    def project_template(type, name, location, description = nil)
-      @jobj.addProjectTemplate(type, name, location, description)
     end
 
     # A proxy class to make syntax pretty...

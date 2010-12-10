@@ -133,6 +133,9 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 		c.addTranslation(new QualifiedContentType(DOCTYPE), new QualifiedContentType("meta.tag.sgml.doctype.xml.svg")); //$NON-NLS-1$
 	}
 
+	private SVGSourceConfiguration() {
+	}
+	
 	/**
 	 * getDefault
 	 * 
@@ -176,7 +179,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getCommentScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		return new CommentScanner(getToken("comment.block.xml.svg")); //$NON-NLS-1$
 	}
@@ -248,7 +251,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}
@@ -267,7 +270,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getXMLScanner()
+	private ITokenScanner getXMLScanner()
 	{
 		return new XMLScanner();
 	}
@@ -277,7 +280,7 @@ public class SVGSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getXMLTagScanner()
+	private ITokenScanner getXMLTagScanner()
 	{
 		return new XMLTagScanner();
 	}

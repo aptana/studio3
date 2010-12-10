@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.SubMonitor;
  * 
  * @author cwilliams
  */
-class IndexFilesOfProjectJob extends IndexRequestJob
+public class IndexFilesOfProjectJob extends IndexRequestJob
 {
 
 	private final IProject project;
@@ -38,7 +38,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 
 	public IndexFilesOfProjectJob(IProject project, Set<IFile> files)
 	{
-		super(MessageFormat.format("Indexing files in project {0}", project.getName()), project.getLocationURI());
+		super(MessageFormat.format(Messages.IndexFilesOfProjectJob_Name, project.getName()), project.getLocationURI());
 		this.project = project;
 		this.files = files;
 	}
@@ -60,7 +60,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 		Index index = getIndex();
 		if (index == null)
 		{
-			IndexActivator.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null); //$NON-NLS-1$
+			IndexPlugin.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null); //$NON-NLS-1$
 			return Status.CANCEL_STATUS;
 		}
 		try
@@ -84,7 +84,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError("An error occurred while saving an index", e);
+				IndexPlugin.logError("An error occurred while saving an index", e); //$NON-NLS-1$
 			}
 			sub.done();
 		}
@@ -106,7 +106,7 @@ class IndexFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (CoreException e)
 			{
-				IndexActivator.logError(e);
+				IndexPlugin.logError(e);
 			}
 			finally
 			{

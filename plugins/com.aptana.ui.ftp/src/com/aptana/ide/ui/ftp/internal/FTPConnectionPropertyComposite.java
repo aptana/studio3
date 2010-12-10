@@ -89,7 +89,7 @@ import com.aptana.ide.ui.ftp.dialogs.Messages;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * 
@@ -228,7 +228,7 @@ public class FTPConnectionPropertyComposite extends Composite implements IOption
 		optionsExpandable = new ExpandableComposite(this, SWT.NONE, ExpandableComposite.TWISTIE
 				| ExpandableComposite.FOCUS_TITLE);
 		optionsExpandable.setText(Messages.FTPConnectionPointPropertyDialog_LBL_Options);
-		optionsExpandable.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).grab(true, true).create());
+		optionsExpandable.setLayoutData(GridDataFactory.fillDefaults().span(2, 1).grab(true, true).minSize(SWT.DEFAULT, SWT.DEFAULT).create());
 		Group optionsGroup = new Group(optionsExpandable, SWT.NONE);
 		optionsGroup.setLayout(GridLayoutFactory.fillDefaults().create());
 

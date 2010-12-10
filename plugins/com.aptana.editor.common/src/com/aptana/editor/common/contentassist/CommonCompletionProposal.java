@@ -294,15 +294,22 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public void apply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
 		IDocument document = viewer.getDocument();
-		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString());
-		int shift = (validPrefix) ? offset - this._replacementOffset : 0;
+		boolean validPrefix = isValidPrefix(getPrefix(document, offset), getDisplayString(), true);
+		boolean validPrefixCaseSensitive = isValidPrefix(getPrefix(document, offset), getDisplayString(), false);
 
+		// It seems plausible this logic could be simplified
+		int shift = 0;
+		if(validPrefix && validPrefixCaseSensitive)
+		{
+			shift = offset - this._replacementOffset;
+		}
+		
 		if (shift < this._replacementString.length())
 		{
 			int length = Math.max(0, this._replacementLength - shift);
 			String toReplace = this._replacementString.substring(shift);
 
-			if (!validPrefix)
+			if (!validPrefix || validPrefix && !validPrefixCaseSensitive)
 			{
 				offset = this._replacementOffset;
 			}
@@ -390,9 +397,27 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 */
 	protected boolean isValidPrefix(String prefix, String displayString)
 	{
+		return isValidPrefix(prefix, displayString, true);
+	}
+	
+	/**
+	 * Returns true if the proposal is still valid as the user types while the content assist popup is visible.
+	 * 
+	 * @param prefix
+	 * @param displayString
+	 * @param ignoreCase Do we ignore the case of the prefix during comparisons?
+	 */
+	protected boolean isValidPrefix(String prefix, String displayString, boolean ignoreCase)
+	{
 		if (prefix == null || displayString == null || prefix.length() > displayString.length())
 			return false;
 		String start = displayString.substring(0, prefix.length());
-		return start.equalsIgnoreCase(prefix);
+		if(ignoreCase) {
+			return start.equalsIgnoreCase(prefix);
+		}
+		else
+		{
+			return start.equals(prefix);
+		}
 	}
 }

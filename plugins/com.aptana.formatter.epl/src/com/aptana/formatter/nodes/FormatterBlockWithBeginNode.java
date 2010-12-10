@@ -37,8 +37,13 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			writeSpaces(visitor, context, getSpacesCountBefore());
 		}
+		int blankLines = context.getBlankLines();
+		if (blankLines > 0)
+		{
+			visitor.ensureLineStarted(context);
+		}
 		boolean addingNewLine = isAddingBeginNewLine();
-		if (addingNewLine && !visitor.endsWithNewLine())
+		if (addingNewLine && !visitor.isInBlankLine())
 		{
 			// Add a new line in case the end should be pre-pended with a new line and the previous node did not add
 			// a new-line.
@@ -73,6 +78,14 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 		{
 			context.decIndent();
 		}
+
+		context.setBlankLines(getBlankLinesAfter(context));
+
+	}
+
+	protected int getBlankLinesAfter(IFormatterContext context)
+	{
+		return -1;
 	}
 
 	/**

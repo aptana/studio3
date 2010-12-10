@@ -53,7 +53,7 @@ public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 	 */
 	public FormatterSpecialElementNode(IFormatterDocument document, String element)
 	{
-		super(document, element);
+		super(document, element, false);
 	}
 
 	/*
@@ -74,11 +74,13 @@ public class FormatterSpecialElementNode extends FormatterDefaultElementNode
 	@Override
 	public void accept(IFormatterContext context, IFormatterWriter visitor) throws Exception
 	{
-		// boolean prevValue = context.isInForeignNode();
+		// We reset the indent before we write the foreign content to avoid any compilation errors later with the
+		// foreign language. For example, indenting the source might kill the PHP formatter when a HEREDOC is getting
+		// indented.
+		int indent = context.getIndent();
+		context.resetIndent();
 		visitor.write(context, getStartOffset(), getEndOffset());
-		// context.setInForeignNode(true);
-		// super.accept(context, visitor);
-		// context.setInForeignNode(prevValue);
+		context.setIndent(indent);
 	}
 
 	/*

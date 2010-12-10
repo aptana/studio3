@@ -39,23 +39,23 @@ import java.util.Arrays;
 public class CSSMediaNode extends CSSNode
 {
 
-	private String[] fMedias;
+	private CSSTextNode[] fMedias;
 	private CSSNode[] fStatements;
 	private String fText;
 
-	public CSSMediaNode(String[] medias, int start, int end)
+	public CSSMediaNode(CSSTextNode[] medias, int start, int end)
 	{
 		this(medias, new CSSNode[0], start, end);
 	}
 
-	public CSSMediaNode(String[] medias, CSSNode[] statements, int start, int end)
+	public CSSMediaNode(CSSTextNode[] medias, CSSNode[] statements, int start, int end)
 	{
 		super(CSSNodeTypes.MEDIA, start, end);
 		fMedias = medias;
 		fStatements = statements;
 	}
 
-	public String[] getMedias()
+	public CSSTextNode[] getMedias()
 	{
 		return fMedias;
 	}
@@ -92,7 +92,7 @@ public class CSSMediaNode extends CSSNode
 		{
 			StringBuilder text = new StringBuilder();
 			text.append("@media"); //$NON-NLS-1$
-			for (String media : fMedias)
+			for (CSSTextNode media : fMedias)
 			{
 				text.append(" ").append(media); //$NON-NLS-1$
 			}

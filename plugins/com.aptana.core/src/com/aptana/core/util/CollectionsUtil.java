@@ -36,6 +36,7 @@ package com.aptana.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -77,5 +78,25 @@ public class CollectionsUtil
 		Set<T> union = new HashSet<T>(coll1);
 		union.addAll(new HashSet<T>(coll2));
 		return new ArrayList<T>(union);
+	}
+
+	/**
+	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
+	 * case. If the list is non-null, then this is an identity function.
+	 * 
+	 * @param <T>
+	 * @param list
+	 * @return
+	 */
+	public static <T> List<T> getListValue(List<T> list)
+	{
+		List<T> result = list;
+
+		if (result == null)
+		{
+			result = Collections.emptyList();
+		}
+
+		return result;
 	}
 }

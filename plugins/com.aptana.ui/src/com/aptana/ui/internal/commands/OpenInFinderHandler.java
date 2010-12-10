@@ -44,6 +44,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -97,6 +98,11 @@ public class OpenInFinderHandler extends AbstractHandler
 					{
 						open(resource.getLocationURI());
 					}
+					else if (selected instanceof IFileStore)
+					{
+						IFileStore fileStore = (IFileStore) selected;
+						open(fileStore.toURI());
+					}
 				}
 			}
 		}
@@ -127,9 +133,15 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openOnLinux(File file)
 	{
+		// Can only handle directories
+		if (file.isFile())
+		{
+			file = file.getParentFile();
+		}
+		
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, "\"" //$NON-NLS-1$ //$NON-NLS-2$
-				+ file.getAbsolutePath() + "\""); //$NON-NLS-1$
+		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$ //$NON-NLS-2$
+				file.getAbsolutePath()); //$NON-NLS-1$
 		if (result == null || result.isEmpty())
 		{
 			return false;
@@ -139,13 +151,14 @@ public class OpenInFinderHandler extends AbstractHandler
 
 	private boolean openInWindowsExplorer(File file)
 	{
-		// This works for Windows XP Pro! Can't run under ProcessBuilder or it does some quoting/mangling of args that breaks this!
+		// This works for Windows XP Pro! Can't run under ProcessBuilder or it does some quoting/mangling of args that
+		// breaks this!
 		String explorer = PlatformUtil.expandEnvironmentStrings("%SystemRoot%\\explorer.exe"); //$NON-NLS-1$
 		try
 		{
-			Process p = Runtime.getRuntime().exec("\"" + explorer + "\" /select,\"" + file.getAbsolutePath() + "\"");
+			Process p = Runtime.getRuntime().exec("\"" + explorer + "\" /select,\"" + file.getAbsolutePath() + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			return p.exitValue() == 0;
-		} 
+		}
 		catch (IOException e)
 		{
 			return false;

@@ -44,7 +44,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;

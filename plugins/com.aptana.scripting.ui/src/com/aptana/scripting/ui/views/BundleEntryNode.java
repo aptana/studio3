@@ -34,7 +34,7 @@
  */
 package com.aptana.scripting.ui.views;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -88,7 +88,7 @@ class BundleEntryNode extends BaseNode
 	 */
 	public Object[] getChildren()
 	{
-		List<Object> result = new LinkedList<Object>();
+		List<Object> result = new ArrayList<Object>();
 
 		// add bundle element that contribute to this bundle
 		for (BundleElement bundle : this._entry.getBundles())
@@ -97,14 +97,14 @@ class BundleEntryNode extends BaseNode
 		}
 
 		// divide commands into commands and snippets
-		List<CommandElement> commands = new LinkedList<CommandElement>();
-		List<SnippetElement> snippets = new LinkedList<SnippetElement>();
+		List<CommandElement> commands = new ArrayList<CommandElement>();
+		List<CommandElement> snippets = new ArrayList<CommandElement>();
 
 		for (CommandElement element : this._entry.getCommands())
 		{
 			if (element instanceof SnippetElement)
 			{
-				snippets.add((SnippetElement) element);
+				snippets.add(element);
 			}
 			else
 			{
@@ -115,19 +115,19 @@ class BundleEntryNode extends BaseNode
 		// add visible commands
 		if (commands.size() > 0)
 		{
-			result.add(new CommandsNode(commands.toArray(new CommandElement[commands.size()])));
+			result.add(new CommandsNode(commands));
 		}
 
 		// add visible snippets
 		if (snippets.size() > 0)
 		{
-			result.add(new SnippetsNode(snippets.toArray(new CommandElement[snippets.size()])));
+			result.add(new SnippetsNode(snippets));
 		}
 
 		// add visible menus
-		MenuElement[] menus = this._entry.getMenus();
+		List<MenuElement> menus = this._entry.getMenus();
 
-		if (menus != null && menus.length > 0)
+		if (menus != null && menus.size() > 0)
 		{
 			result.add(new MenusNode(menus));
 		}
@@ -182,9 +182,9 @@ class BundleEntryNode extends BaseNode
 					break;
 					
 				case CONTRIBUTOR_COUNT:
-					BundleElement[] bundles = this._entry.getBundles();
+					List<BundleElement> bundles = this._entry.getBundles();
 					
-					result = (bundles != null) ? bundles.length : 0;
+					result = (bundles != null) ? bundles.size() : 0;
 					break;
 			}
 		}
@@ -203,7 +203,7 @@ class BundleEntryNode extends BaseNode
 
 		for (BundleElement bundle : this._entry.getBundles())
 		{
-			if (bundle.hasCommands() || bundle.hasMenus())
+			if (bundle.hasChildren())
 			{
 				result = true;
 				break;

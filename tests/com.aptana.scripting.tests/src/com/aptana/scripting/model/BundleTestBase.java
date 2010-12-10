@@ -35,6 +35,7 @@
 package com.aptana.scripting.model;
 
 import java.io.File;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -77,10 +78,10 @@ public abstract class BundleTestBase extends TestCase
 	{
 		BundleEntry entry = this.getBundleEntry(bundleName, precedence);
 
-		BundleElement[] bundles = entry.getBundles();
-		assertEquals(1, bundles.length);
+		List<BundleElement> bundles = entry.getBundles();
+		assertEquals(1, bundles.size());
 
-		return bundles[0];
+		return bundles.get(0);
 	}
 
 	/**
@@ -117,7 +118,7 @@ public abstract class BundleTestBase extends TestCase
 		assertTrue(bundleFile.exists());
 
 		// load bundle
-		manager.loadBundle(bundleFile, false);
+		manager.loadBundle(bundleFile);
 	}
 
 	/**

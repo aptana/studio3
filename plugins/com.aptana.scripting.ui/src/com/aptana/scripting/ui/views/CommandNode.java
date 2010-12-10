@@ -40,6 +40,7 @@ import org.eclipse.ui.views.properties.PropertyDescriptor;
 
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.InputType;
+import com.aptana.scripting.model.TriggerType;
 import com.aptana.scripting.ui.ScriptingUIPlugin;
 
 class CommandNode extends BaseNode
@@ -159,7 +160,7 @@ class CommandNode extends BaseNode
 					break;
 
 				case TRIGGERS:
-					String[] triggers = this._command.getTriggers();
+					String[] triggers = this._command.getTriggerTypeValues(TriggerType.PREFIX);
 
 					if (triggers != null && triggers.length > 0)
 					{

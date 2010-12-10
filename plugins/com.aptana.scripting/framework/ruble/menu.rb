@@ -69,7 +69,12 @@ module Ruble
         
         # add command to bundle
         bundle = BundleManager.bundle_from_path(new_menu.path)
-        bundle.add_menu(new_menu) unless bundle.nil?
+        
+        if !bundle.nil?
+          bundle.add_child(new_menu)
+        else
+          log_warning("No bundle found for menu #{name}: #{new_menu.path}")
+        end
       end
     end
     

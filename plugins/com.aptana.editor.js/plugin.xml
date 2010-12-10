@@ -62,5 +62,22 @@
             language="text/javascript">
       </parser>
    </extension>
+   <extension
+         point="com.aptana.editor.common.validator">
+      <language
+            name="%validator.language.js.name"
+            type="text/javascript">
+      </language>
+      <validator
+            class="com.aptana.editor.js.validator.JSLintValidator"
+            language="text/javascript"
+            name="%validator.jslint.name">
+      </validator>
+      <validator
+            class="com.aptana.editor.js.validator.MozillaJsValidator"
+            language="text/javascript"
+            name="%validator.mozilla.name">
+      </validator>
+   </extension>
 
 </plugin>

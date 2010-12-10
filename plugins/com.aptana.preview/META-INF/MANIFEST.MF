@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core.io,
  com.aptana.ui,
  com.aptana.browser,
- com.aptana.filewatcher
+ com.aptana.filewatcher,
+ com.aptana.webserver.core;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.preview,
- com.aptana.preview.server
+Export-Package: com.aptana.preview

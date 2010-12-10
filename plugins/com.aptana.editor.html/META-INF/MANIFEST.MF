@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.html;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.editor.html.Activator
+Bundle-Activator: com.aptana.editor.html.HTMLPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -23,7 +23,9 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.parsing,
  beaver,
  com.aptana.theme,
- com.aptana.preview;visibility:=reexport
+ com.aptana.preview;visibility:=reexport,
+ org.mortbay.jetty.util;bundle-version="6.1.23",
+ org.w3c.tidy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

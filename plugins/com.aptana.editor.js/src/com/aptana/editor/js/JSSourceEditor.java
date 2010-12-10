@@ -89,6 +89,6 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
-		return Activator.getDefault().getPreferenceStore();
+		return JSPlugin.getDefault().getPreferenceStore();
 	}
 }

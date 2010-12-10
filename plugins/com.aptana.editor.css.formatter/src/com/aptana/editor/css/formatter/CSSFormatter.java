@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.formatter.IFormattingContext;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -76,7 +77,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * 
 	 * @param preferences
 	 */
-	protected CSSFormatter(String lineSeparator, Map<String, ? extends Object> preferences, String mainContentType)
+	protected CSSFormatter(String lineSeparator, Map<String, String> preferences, String mainContentType)
 	{
 		super(preferences, mainContentType);
 		this.lineSeparator = lineSeparator;
@@ -85,7 +86,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	/**
 	 * Detects the indentation level.
 	 */
-	public int detectIndentationLevel(IDocument document, int offset)
+	public int detectIndentationLevel(IDocument document, int offset, boolean isSelection,
+			IFormattingContext formattingContext)
 	{
 
 		int indent = 0;
@@ -134,9 +136,10 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
+	 * @see com.aptana.formatter.IScriptFormatter#format(java.lang.String, int, int, int, boolean)
 	 */
-	public TextEdit format(String source, int offset, int length, int indentationLevel) throws FormatterException
+	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
 	{
 		String input = new String(source.substring(offset, offset + length));
 		IParser parser = checkoutParser();
@@ -148,7 +151,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset);
+				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
 				if (output != null)
 				{
 					if (!input.equals(output))
@@ -227,8 +230,14 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
+			boolean isSelection) throws Exception
 	{
+		int spacesCount = -1;
+		if (isSelection)
+		{
+			spacesCount = countLeftWhitespaceChars(input);
+		}
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
@@ -239,7 +248,15 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		writer.setLinesPreserve(getInt(CSSFormatterConstants.PRESERVED_LINES));
 		root.accept(context, writer);
 		writer.flush(context);
-		return writer.getOutput();
+		String output = writer.getOutput();
+		if (isSelection)
+		{
+			if (isSelection)
+			{
+				output = leftTrim(output, spacesCount);
+			}
+		}
+		return output;
 	}
 
 	private FormatterDocument createFormatterDocument(String input, int offset)
@@ -250,6 +267,8 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS,
 				getString(CSSFormatterConstants.NEW_LINES_BEFORE_BLOCKS));
 		document.setInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS, getInt(CSSFormatterConstants.LINES_AFTER_ELEMENTS));
+		document.setInt(CSSFormatterConstants.LINES_AFTER_DECLARATION,
+				getInt(CSSFormatterConstants.LINES_AFTER_DECLARATION));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;

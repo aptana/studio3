@@ -34,6 +34,8 @@
  */
 package com.aptana.scripting.ui.views;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -78,13 +80,13 @@ class BundleViewContentProvider implements ITreeContentProvider
 		if (inputElement instanceof BundleManager)
 		{
 			BundleManager manager = (BundleManager) inputElement;
-			String[] names = manager.getBundleNames();
+			List<String> names = manager.getBundleNames();
 
-			elements = new BundleEntryNode[names.length];
+			elements = new BundleEntryNode[names.size()];
 
-			for (int i = 0; i < names.length; i++)
+			for (int i = 0; i < names.size(); i++)
 			{
-				elements[i] = new BundleEntryNode(manager.getBundleEntry(names[i]));
+				elements[i] = new BundleEntryNode(manager.getBundleEntry(names.get(i)));
 			}
 		}
 

@@ -49,7 +49,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
-import com.aptana.scripting.Activator;
+import com.aptana.scripting.ScriptingActivator;
 
 public class CommandContext
 {
@@ -85,7 +85,7 @@ public class CommandContext
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(Activator.PLUGIN_ID, CONTEXT_CONTRIBUTOR_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(ScriptingActivator.PLUGIN_ID, CONTEXT_CONTRIBUTOR_ID);
 
 				if (extensionPoint != null)
 				{
@@ -112,7 +112,7 @@ public class CommandContext
 										new Object[] { e.getMessage() }
 									);
 									
-									Activator.logError(message, e);
+									ScriptingActivator.logError(message, e);
 								}
 							}
 						}

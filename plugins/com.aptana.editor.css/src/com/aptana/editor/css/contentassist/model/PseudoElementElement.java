@@ -34,13 +34,21 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class PseudoElementElement extends AbstractCSSMetadataElement
+import org.mortbay.util.ajax.JSON.Output;
+
+import com.aptana.index.core.IndexUtil;
+
+public class PseudoElementElement extends BaseElement
 {
+	private static final String SPECIFICATIONS_PROPERTY = "specifications"; //$NON-NLS-1$
+	private static final String ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY = "allowPseudoClassSyntax"; //$NON-NLS-1$
+
 	private boolean _allowPseudoClassSyntax;
-	private List<SpecificationElement> _specifications = new LinkedList<SpecificationElement>();
+	private List<SpecificationElement> _specifications;
 
 	/**
 	 * PseudoElementElement
@@ -57,7 +65,40 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 	 */
 	public void addSpecification(SpecificationElement specification)
 	{
-		this._specifications.add(specification);
+		if (specification != null)
+		{
+			if (this._specifications == null)
+			{
+				this._specifications = new ArrayList<SpecificationElement>();
+			}
+
+			this._specifications.add(specification);
+		}
+	}
+
+	/**
+	 * allowPseudoClassSyntax
+	 * 
+	 * @return
+	 */
+	public boolean allowPseudoClassSyntax()
+	{
+		return _allowPseudoClassSyntax;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		this.setAllowPseudoClassSyntax(Boolean.TRUE == object.get(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY));
+
+		this._specifications = IndexUtil.createList(object.get(SPECIFICATIONS_PROPERTY), SpecificationElement.class);
 	}
 
 	/**
@@ -70,13 +111,27 @@ public class PseudoElementElement extends AbstractCSSMetadataElement
 		return this._specifications;
 	}
 
+	/**
+	 * setAllowPseudoClassSyntax
+	 * 
+	 * @param allow
+	 */
 	public void setAllowPseudoClassSyntax(Boolean allow)
 	{
 		this._allowPseudoClassSyntax = allow;
 	}
 
-	public boolean allowPseudoClassSyntax()
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.css.contentassist.model.AbstractCSSMetadataElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
 	{
-		return _allowPseudoClassSyntax;
+		super.toJSON(out);
+
+		out.add(ALLOW_PSEUDO_CLASS_SYNTAX_PROPERTY, this.allowPseudoClassSyntax());
+		out.add(SPECIFICATIONS_PROPERTY, this.getSpecifications());
 	}
 }

@@ -37,8 +37,8 @@ package com.aptana.preview;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.preview.server.AbstractWebServerConfiguration;
-import com.aptana.preview.server.ServerConfigurationManager;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.ServerConfigurationManager;
 
 public class ProjectPreviewUtil
 {

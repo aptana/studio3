@@ -41,14 +41,14 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 {
 
 	protected static final long ERROR_DISPLAY_TIMEOUT = 3000L;
-	private final Map<String, ? extends Object> preferences;
+	private final Map<String, String> preferences;
 	private boolean isSlave;
 	private String mainContentType;
 
 	/**
 	 * @param preferences
 	 */
-	protected AbstractScriptFormatter(Map<String, ? extends Object> preferences, String mainContentType)
+	protected AbstractScriptFormatter(Map<String, String> preferences, String mainContentType)
 	{
 		this.preferences = preferences;
 		this.mainContentType = mainContentType;
@@ -353,6 +353,10 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 */
 	public int detectIndentationLevel(IDocument document, int offset)
 	{
+		if (document.getLength() <= offset + 1)
+		{
+			return 0;
+		}
 		try
 		{
 			int lineNumber = document.getLineOfOffset(offset + 1);
@@ -435,5 +439,40 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	public boolean isSlave()
 	{
 		return this.isSlave;
+	}
+
+	/**
+	 * Left trim the String output.
+	 * 
+	 * @param str
+	 * @param keptChars
+	 *            The number of whitespace chars to keep.
+	 * @return The output without the white-spaces at its beginning.
+	 */
+	protected static String leftTrim(String str, int keptChars)
+	{
+		int whitespaceChars = countLeftWhitespaceChars(str);
+		if (whitespaceChars >= keptChars)
+		{
+			whitespaceChars -= keptChars;
+		}
+		return str.substring(whitespaceChars);
+	}
+
+	/**
+	 * Count the number of whitespace characters that appear in the start of the given string.
+	 * 
+	 * @param str
+	 * @return The number of prefix whitespace chars in the string.
+	 */
+	protected static int countLeftWhitespaceChars(String str)
+	{
+		int i = 0;
+		int length = str.length();
+		while (i < length && Character.isWhitespace(str.charAt(i)))
+		{
+			i++;
+		}
+		return i;
 	}
 }

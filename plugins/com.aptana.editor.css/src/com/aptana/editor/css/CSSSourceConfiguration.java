@@ -181,7 +181,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		reconciler.setRepairer(dr, STRING);
 	}
 
-	protected ITokenScanner getCommentScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		if (multilineCommentScanner == null)
 		{
@@ -190,7 +190,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		return multilineCommentScanner;
 	}
 
-	protected ITokenScanner getStringScanner()
+	private ITokenScanner getStringScanner()
 	{
 		if (stringScanner == null)
 		{
@@ -200,7 +200,7 @@ public class CSSSourceConfiguration implements IPartitioningConfiguration, ISour
 		return stringScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
 		return new Token(name);
 	}

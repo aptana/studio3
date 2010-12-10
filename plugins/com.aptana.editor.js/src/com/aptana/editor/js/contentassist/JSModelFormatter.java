@@ -44,7 +44,7 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URIUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -55,7 +55,7 @@ public class JSModelFormatter
 	private static final Map<String, Image> TYPE_IMAGE_MAP;
 
 	// used for mixed types
-	private static final Image PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
+	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
@@ -66,14 +66,14 @@ public class JSModelFormatter
 	static
 	{
 		TYPE_IMAGE_MAP = new HashMap<String, Image>();
-		TYPE_IMAGE_MAP.put(JSTypeConstants.ARRAY_TYPE, Activator.getImage("/icons/array-literal.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.BOOLEAN_TYPE, Activator.getImage("/icons/boolean.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.FUNCTION_TYPE, Activator.getImage("/icons/js_function.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.NULL_TYPE, Activator.getImage("/icons/null.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.NUMBER_TYPE, Activator.getImage("/icons/number.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.OBJECT_TYPE, Activator.getImage("/icons/object-literal.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.REG_EXP_TYPE, Activator.getImage("/icons/regex.png")); //$NON-NLS-1$
-		TYPE_IMAGE_MAP.put(JSTypeConstants.STRING_TYPE, Activator.getImage("/icons/string.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.ARRAY_TYPE, JSPlugin.getImage("/icons/array-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.BOOLEAN_TYPE, JSPlugin.getImage("/icons/boolean.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.FUNCTION_TYPE, JSPlugin.getImage("/icons/js_function.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NULL_TYPE, JSPlugin.getImage("/icons/null.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.NUMBER_TYPE, JSPlugin.getImage("/icons/number.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.OBJECT_TYPE, JSPlugin.getImage("/icons/object-literal.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.REG_EXP_TYPE, JSPlugin.getImage("/icons/regex.png")); //$NON-NLS-1$
+		TYPE_IMAGE_MAP.put(JSTypeConstants.STRING_TYPE, JSPlugin.getImage("/icons/string.png")); //$NON-NLS-1$
 	}
 
 	/**
@@ -221,7 +221,7 @@ public class JSModelFormatter
 		}
 		else
 		{
-			buffer.append(JSTypeConstants.UNDEFINED_TYPE);
+			buffer.append(JSTypeConstants.NO_TYPE);
 		}
 	}
 

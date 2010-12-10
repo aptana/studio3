@@ -70,7 +70,10 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 		{
 			return false;
 		}
-		return fReferenceNode.equals(((CommonOutlineItem) obj).fReferenceNode);
+		CommonOutlineItem item = (CommonOutlineItem) obj;
+		return fReferenceNode.equals(item.fReferenceNode)
+				&& fSourceRange.getStartingOffset() == item.fSourceRange.getStartingOffset()
+				&& fSourceRange.getEndingOffset() == item.fSourceRange.getEndingOffset();
 	}
 
 	public int getEndingOffset()
@@ -105,11 +108,19 @@ public class CommonOutlineItem implements ILanguageNode, IRange, Comparable<IRan
 
 	public int hashCode()
 	{
-		return fReferenceNode.hashCode();
+		int hash = fReferenceNode.hashCode();
+		hash = hash * 31 + fSourceRange.getStartingOffset();
+		hash = hash * 31 + fSourceRange.getEndingOffset();
+		return hash;
 	}
 
 	public boolean isEmpty()
 	{
 		return fSourceRange.isEmpty();
+	}
+
+	public void setRange(IRange range)
+	{
+		fSourceRange = range;
 	}
 }

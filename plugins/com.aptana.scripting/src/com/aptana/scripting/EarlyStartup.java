@@ -55,6 +55,6 @@ public class EarlyStartup implements IStartup
 	public void earlyStartup()
 	{
 		// Force plugin to start
-		Activator.getDefault();
+		ScriptingActivator.getDefault();
 	}
 }

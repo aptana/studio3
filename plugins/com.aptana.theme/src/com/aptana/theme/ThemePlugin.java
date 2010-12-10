@@ -42,7 +42,6 @@ import org.osgi.framework.BundleContext;
 import com.aptana.theme.internal.ControlThemerFactory;
 import com.aptana.theme.internal.InvasiveThemeHijacker;
 import com.aptana.theme.internal.ThemeManager;
-import com.aptana.theme.internal.fontloader.EditorFontOverride;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -79,8 +78,6 @@ public class ThemePlugin extends AbstractUIPlugin
 
 		themeHijacker = new InvasiveThemeHijacker();
 		themeHijacker.apply();
-
-		new EditorFontOverride().schedule();
 	}
 
 	/*

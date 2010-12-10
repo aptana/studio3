@@ -13,12 +13,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.search,
  com.aptana.core,
  com.aptana.ui.epl,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ org.eclipse.core.filesystem;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui,
  com.aptana.ui.actions,
  com.aptana.ui.commands,
+ com.aptana.ui.dialogs,
  com.aptana.ui.preferences,
+ com.aptana.ui.util,
  com.aptana.ui.widgets
 Eclipse-ExtensibleAPI: true

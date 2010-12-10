@@ -42,6 +42,7 @@ import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -51,12 +52,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.filewatcher.FileWatcher;
 
 /**
@@ -73,6 +77,9 @@ public class CorePlugin extends Plugin
 
 	private ResourceListener fProjectsListener;
 
+	private Job addBuilderJob;
+	private Job addFilewatcherJob;
+
 	/**
 	 * The constructor
 	 */
@@ -88,17 +95,64 @@ public class CorePlugin extends Plugin
 	{
 		super.start(context);
 		plugin = this;
-		Job job = new Job("Hooking filewatchers to projects") //$NON-NLS-1$
+		addFilewatcherJob = new Job(Messages.CorePlugin_Hooking_Filewatchers)
 		{
-
-			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
 				addProjectResourceListener();
 				return Status.OK_STATUS;
 			}
 		};
-		job.schedule();
+		addFilewatcherJob.schedule();
+		addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
+		{
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
+				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+				SubMonitor sub = SubMonitor.convert(monitor, projects.length);
+				for (IProject p : projects)
+				{
+					if (sub.isCanceled())
+					{
+						return Status.CANCEL_STATUS;
+					}
+
+					try
+					{
+						if (!p.isAccessible())
+						{
+							continue;
+						}
+						sub.subTask(p.getName());
+
+						String[] natureIds = p.getDescription().getNatureIds();
+						for (int i = 0; i < natureIds.length; i++)
+						{
+							String natureId = natureIds[i];
+							if (ResourceUtil.isAptanaNature(natureId))
+							{
+								IProjectNature nature = p.getNature(natureId);
+								nature.configure();
+							}
+						}
+						status.add(Status.OK_STATUS);
+					}
+					catch (CoreException e)
+					{
+						status.add(e.getStatus());
+					}
+					finally
+					{
+						sub.worked(1);
+					}
+				}
+				sub.done();
+				return status;
+			}
+		};
+		addBuilderJob.schedule();
+
 	}
 
 	/*
@@ -109,6 +163,16 @@ public class CorePlugin extends Plugin
 	{
 		try
 		{
+			if (addFilewatcherJob != null)
+			{
+				addFilewatcherJob.cancel();
+				addFilewatcherJob = null;
+			}
+			if (addBuilderJob != null)
+			{
+				addBuilderJob.cancel();
+				addBuilderJob = null;
+			}
 			removeProjectResourceListener();
 		}
 		finally

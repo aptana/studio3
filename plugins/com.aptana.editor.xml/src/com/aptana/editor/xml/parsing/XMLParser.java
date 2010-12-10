@@ -134,10 +134,10 @@ public class XMLParser implements IParser
 
 		// creates the root node
 		IParseRootNode root = new ParseRootNode( //
-			IXMLParserConstants.LANGUAGE, //
-			new XMLNode[0], //
-			startingOffset, //
-			startingOffset + source.length() //
+				IXMLParserConstants.LANGUAGE, //
+				new XMLNode[0], //
+				startingOffset, //
+				startingOffset + source.length() //
 		);
 
 		try
@@ -232,8 +232,8 @@ public class XMLParser implements IParser
 	{
 		if (fCurrentElement != null)
 		{
-			XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getStartingOffset(), fCurrentLexeme.getEndingOffset());
-
+			XMLCommentNode comment = new XMLCommentNode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
+					fCurrentLexeme.getEndingOffset());
 			fCurrentElement.addChild(comment);
 		}
 	}
@@ -245,9 +245,9 @@ public class XMLParser implements IParser
 	{
 		// adjusts the ending offset of current element to include the entire block
 		((XMLElementNode) fCurrentElement).setLocation( //
-			fCurrentElement.getStartingOffset(), //
-			fCurrentLexeme.getEndingOffset() //
-			);
+				fCurrentElement.getStartingOffset(), //
+				fCurrentLexeme.getEndingOffset() //
+				);
 
 		this.closeElement();
 	}
@@ -260,9 +260,9 @@ public class XMLParser implements IParser
 	protected void processStartTag()
 	{
 		XMLElementNode element = new XMLElementNode( //
-			fCurrentLexeme.getText(), //
-			fCurrentLexeme.getStartingOffset(), //
-			fCurrentLexeme.getEndingOffset() //
+				fCurrentLexeme.getText(), //
+				fCurrentLexeme.getStartingOffset(), //
+				fCurrentLexeme.getEndingOffset() //
 		);
 
 		this.parseAttributes(element);

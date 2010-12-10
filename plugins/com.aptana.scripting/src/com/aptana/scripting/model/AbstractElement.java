@@ -36,23 +36,23 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
 public abstract class AbstractElement implements Comparable<AbstractElement>
 {
-	private static final AbstractElement[] NO_ELEMENTS = new AbstractElement[0];
 	private static final Map<String, List<AbstractElement>> ELEMENTS_BY_PATH;
 
 	private String _path;
 	private String _displayName;
-	private Map<String, Object> _customProperties;
 
+	private Map<String, Object> _customProperties;
 	private Object propertyLock = new Object();
 
 	/**
@@ -62,34 +62,47 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	{
 		ELEMENTS_BY_PATH = new HashMap<String, List<AbstractElement>>();
 	}
-	
+
 	/**
 	 * getElementsByDirectory
 	 * 
 	 * @param path
 	 * @return
 	 */
-	public static AbstractElement[] getElementsByDirectory(String path)
+	public static List<AbstractElement> getElementsByDirectory(String path)
 	{
-		List<AbstractElement> result = new LinkedList<AbstractElement>();
-		
+		List<AbstractElement> result = new ArrayList<AbstractElement>();
+
+		// canonicalize path. This avoids false matches where one path segment name is a subset of another. For example,
+		// /a/b is a subset of /a/bc/ and would be erroneously treated as a match without the trailing file separator
 		if (path.endsWith(File.separator) == false)
 		{
 			path += File.separator;
 		}
-		
+
+		// make a copy of the current paths we're tracking
+		Set<String> keys;
+
 		synchronized (ELEMENTS_BY_PATH)
 		{
-			 for (String key : ELEMENTS_BY_PATH.keySet())
-			 {
-				 if (key.startsWith(path))
-				 {
-					 result.addAll(ELEMENTS_BY_PATH.get(key));
-				 }
-			 }
+			keys = ELEMENTS_BY_PATH.keySet();
 		}
-		
-		return result.toArray(new AbstractElement[result.size()]);
+
+		// add all elements that start with the specified path
+		for (String key : keys)
+		{
+			if (key.startsWith(path))
+			{
+				List<AbstractElement> elements = ELEMENTS_BY_PATH.get(key);
+
+				if (elements != null)
+				{
+					result.addAll(elements);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -98,9 +111,9 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * @param path
 	 * @return
 	 */
-	public static AbstractElement[] getElementsByPath(String path)
+	public static List<AbstractElement> getElementsByPath(String path)
 	{
-		AbstractElement[] result = NO_ELEMENTS;
+		List<AbstractElement> result;
 
 		synchronized (ELEMENTS_BY_PATH)
 		{
@@ -108,7 +121,11 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 
 			if (elements != null)
 			{
-				result = elements.toArray(new AbstractElement[elements.size()]);
+				result = new ArrayList<AbstractElement>(elements);
+			}
+			else
+			{
+				result = Collections.emptyList();
 			}
 		}
 
@@ -143,7 +160,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-	
+
 	/**
 	 * unregisterElement
 	 * 
@@ -171,7 +188,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 						}
 					}
 				}
-				
+
 				LibraryCrossReference.getInstance().unregisterPath(path);
 			}
 		}
@@ -204,13 +221,16 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * @param property
 	 * @return
 	 */
-	public synchronized Object get(String property)
+	public Object get(String property)
 	{
 		Object result = null;
 
-		if (this._customProperties != null)
+		synchronized (propertyLock)
 		{
-			result = this._customProperties.get(property);
+			if (this._customProperties != null)
+			{
+				result = this._customProperties.get(property);
+			}
 		}
 
 		return result;
@@ -244,6 +264,24 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	}
 
 	/**
+	 * hasProperty
+	 * 
+	 * @param property
+	 * @return
+	 */
+	public boolean hasProperty(String property)
+	{
+		boolean result;
+		
+		synchronized (propertyLock)
+		{
+			result = this._customProperties != null && this._customProperties.containsKey(property);
+		}
+		
+		return result;
+	}
+
+	/**
 	 * printBody
 	 * 
 	 * @param printer
@@ -256,7 +294,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * @param property
 	 * @param value
 	 */
-	public synchronized void put(String property, Object value)
+	public void put(String property, Object value)
 	{
 		if (property != null && property.length() > 0)
 		{
@@ -339,7 +377,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		// close element
 		printer.decreaseIndent().printlnWithIndent("}"); //$NON-NLS-1$
 	}
-	
+
 	@Override
 	public String toString()
 	{

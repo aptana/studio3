@@ -124,13 +124,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.erb"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.editor.html"
          download-size="0"
          install-size="0"
@@ -139,13 +132,6 @@
 
    <plugin
          id="com.aptana.editor.js"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.ruby"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -359,13 +345,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.jrubyparser"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.portablegit.win32"
          os="win32"
          download-size="0"
@@ -499,13 +478,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.aptana.editor.ruby.formatter.epl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.aptana.formatter.epl"
          download-size="0"
          install-size="0"
@@ -534,6 +506,20 @@
          unpack="false"/>
 
    <plugin
+         id="com.aptana.webserver.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.webserver.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="com.aptana.configurations"
          download-size="0"
          install-size="0"
@@ -556,6 +542,26 @@
 
    <plugin
          id="com.aptana.portal.ui.eclipse35"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.mozilla.rhino"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.w3c.css"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.w3c.tidy"
          download-size="0"
          install-size="0"
          version="0.0.0"

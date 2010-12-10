@@ -54,6 +54,13 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
 
+	public static String ValidationPreferencePage_ERR_EmptyExpression;
+	public static String ValidationPreferencePage_Filter_Description;
+	public static String ValidationPreferencePage_Ignore_Message;
+	public static String ValidationPreferencePage_Ignore_Title;
+	public static String ValidationPreferencePage_LBL_Filter;
+	public static String ValidationPreferencePage_LBL_Validators;
+
 	static
 	{
 		// initialize resource bundle

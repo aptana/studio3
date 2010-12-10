@@ -8,6 +8,9 @@
             class="com.aptana.theme.preferences.ThemePreferencePage"
             id="com.aptana.theme.preferencePage"
             name="%preferencePage.themes.name">
+         <keywordReference
+               id="com.aptana.theme.keywords">
+         </keywordReference>
       </page>
    </extension>
    <extension
@@ -20,32 +23,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.themes">
-      <colorDefinition
-            categoryId="org.eclipse.ui.workbenchMisc"
-            colorFactory="com.aptana.theme.internal.fontloader.FontLoader"
-            id="com.aptana.theme.internal.fontloader.FontLoader"
-            label="%colorDefinition.label">
-      </colorDefinition>
-      <theme
-            id="com.aptana.theme"
-            name="%customThemeName">
-         <fontOverride
-               id="org.eclipse.jface.textfont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-         <fontOverride
-               id="org.eclipse.ui.workbench.texteditor.blockSelectionModeFont"
-               value="Inconsolata-regular-14">
-            <fontValue
-                  os="win32"
-                  value="Inconsolata-regular-12">
-            </fontValue>
-         </fontOverride>
-      </theme>
       <fontDefinition
             categoryId="org.eclipse.ui.workbenchMisc"
             defaultsTo="org.eclipse.jface.textfont"
@@ -65,6 +42,13 @@
       <initializer
             class="com.aptana.theme.internal.preferences.ThemerPreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="com.aptana.theme.keywords"
+            label="%keyword.label">
+      </keyword>
    </extension>
 
 </plugin>

@@ -83,6 +83,8 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNodeTypeInferrer extends JSTreeWalker
 {
+	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.allOf(ContentSelector.class);
+	
 	private JSScope _scope;
 	private Index _index;
 	private URI _location;
@@ -358,12 +360,34 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
-			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
-			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
+			IParseNode lhs = node.getLeftHandSide();
+			IParseNode rhs = node.getRightHandSide();
+			
+			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
+			while (lhs.getNodeType() == JSNodeTypes.ADD)
+			{
+				rhs = lhs.getLastChild();
+				lhs = lhs.getFirstChild();
 
-			if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+				if (rhs instanceof JSStringNode)
+				{
+					break;
+				}
+			}
+			
+			if (lhs instanceof JSStringNode || rhs instanceof JSStringNode)
 			{
 				type = JSTypeConstants.STRING_TYPE;
+			}
+			else
+			{
+				List<String> lhsTypes = this.getTypes(lhs);
+				List<String> rhsTypes = this.getTypes(rhs);
+	
+				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+				{
+					type = JSTypeConstants.STRING_TYPE;
+				}
 			}
 		}
 
@@ -522,8 +546,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
-					ContentSelector.TYPES));
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, MEMBER_CONTENT);
 
 				if (property != null)
 				{
@@ -590,7 +613,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
-			property = this._queryHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+			property = this._queryHelper.getGlobal(this._index, name, MEMBER_CONTENT);
 		}
 
 		if (property != null)

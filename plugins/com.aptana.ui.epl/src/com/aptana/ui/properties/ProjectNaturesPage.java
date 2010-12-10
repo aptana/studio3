@@ -46,6 +46,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -79,19 +81,18 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.actions.CloseResourceAction;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
 @SuppressWarnings("restriction")
 public class ProjectNaturesPage extends PropertyPage implements IWorkbenchPropertyPage, ICheckStateListener,
 		SelectionListener
 {
-
-	private static final String APTANA_NATURE_PREFIX = "com.aptana."; //$NON-NLS-1$
-	private static final String RAILS_NATURE_PREFIX = "org.radrails.rails."; //$NON-NLS-1$
 	private static final Image APTANA_NATURE_IMAGE = UIEplPlugin.getImage("icons/aptana_nature.gif"); //$NON-NLS-1$;
 
 	private CheckboxTableViewer fTableViewer;
@@ -211,10 +212,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				{
 					IProjectDescription description = fProject.getDescription();
 					description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
-					// Use IResource.AVOID_NATURE_CONFIG to avoid any warning about the natures.
-					// We have to use it since not all of the Natures that are defined in the system
-					// are valid and some are forced into the project in a non-standard way.
-					fProject.setDescription(description, IResource.AVOID_NATURE_CONFIG, monitor);
+					fProject.setDescription(description, monitor);
 				}
 				catch (CoreException e)
 				{
@@ -433,7 +431,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 					natureId = descriptor.getNatureId();
 					if (natureId != null)
 					{
-						if (isAptanaNature(natureId))
+						if (ResourceUtil.isAptanaNature(natureId))
 						{
 							elements.add(natureId);
 							fNatureDescriptions.put(natureId, descriptor.getLabel());
@@ -469,11 +467,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			public int compare(String o1, String o2)
 			{
 				// set Aptana natures ahead of others
-				if (isAptanaNature(o1))
+				if (ResourceUtil.isAptanaNature(o1))
 				{
-					return isAptanaNature(o2) ? o1.compareTo(o2) : -1;
+					return ResourceUtil.isAptanaNature(o2) ? o1.compareTo(o2) : -1;
 				}
-				return isAptanaNature(o2) ? 1 : o1.compareTo(o2);
+				return ResourceUtil.isAptanaNature(o2) ? 1 : o1.compareTo(o2);
 			}
 		});
 	}
@@ -502,12 +500,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				|| !fInitialPrimaryNature.equals(fPrimaryNature);
 	}
 
-	private static boolean isAptanaNature(String natureId)
-	{
-		return natureId != null
-				&& (natureId.startsWith(APTANA_NATURE_PREFIX) || natureId.startsWith(RAILS_NATURE_PREFIX));
-	}
-
 	private class NaturesLabelProvider extends LabelProvider implements IFontProvider
 	{
 
@@ -529,7 +521,19 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		@Override
 		public Image getImage(Object element)
 		{
-			return isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;
+			String nature = element.toString();
+			try {
+				ImageRegistry reg = UIEplPlugin.getDefault().getImageRegistry();
+				if (reg.get(nature) == null)
+				{
+					ImageDescriptor d = IDEWorkbenchPlugin.getDefault().getProjectImageRegistry().getNatureImage(element.toString());
+					reg.put(nature, d);
+				}
+				return reg.get(nature);
+			}
+			catch(Exception e) {
+				return ResourceUtil.isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;				
+			}
 		}
 
 		public Font getFont(Object element)

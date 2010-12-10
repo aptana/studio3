@@ -51,7 +51,7 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Ingo Muschenetz

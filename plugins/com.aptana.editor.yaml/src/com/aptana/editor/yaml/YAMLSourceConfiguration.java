@@ -196,33 +196,33 @@ public class YAMLSourceConfiguration implements IPartitioningConfiguration, ISou
 		reconciler.setRepairer(dr, INTERPOLATED);
 	}
 
-	protected ITokenScanner getCommentScanner()
+	private ITokenScanner getCommentScanner()
 	{
 		return new CommentScanner(getToken(IYAMLConstants.YAML_COMMENT_SCOPE));
 	}
 
-	protected ITokenScanner getStringScanner()
+	private ITokenScanner getStringScanner()
 	{
 		RuleBasedScanner stringScanner = new RuleBasedScanner();
 		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_STRING_SINGLE_SCOPE));
 		return stringScanner;
 	}
 
-	protected ITokenScanner getDoubleStringScanner()
+	private ITokenScanner getDoubleStringScanner()
 	{
 		RuleBasedScanner stringScanner = new RuleBasedScanner();
 		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_STRING_DOUBLE_SCOPE));
 		return stringScanner;
 	}
 
-	protected ITokenScanner getInterpolatedScanner()
+	private ITokenScanner getInterpolatedScanner()
 	{
 		RuleBasedScanner stringScanner = new RuleBasedScanner();
 		stringScanner.setDefaultReturnToken(getToken(IYAMLConstants.YAML_INTERPOLATED_STRING_SCOPE));
 		return stringScanner;
 	}
 
-	protected IToken getToken(String name)
+	private IToken getToken(String name)
 	{
 		return new Token(name);
 	}

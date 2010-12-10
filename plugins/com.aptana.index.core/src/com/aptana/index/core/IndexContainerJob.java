@@ -32,12 +32,12 @@ public class IndexContainerJob extends IndexRequestJob
 
 	private ArrayList<String> fileURIs;
 
-	public IndexContainerJob(URI containerURI)
+	protected IndexContainerJob(URI containerURI)
 	{
 		super(containerURI);
 	}
 
-	public IndexContainerJob(String name, URI containerURI)
+	protected IndexContainerJob(String name, URI containerURI)
 	{
 		super(name, containerURI);
 	}
@@ -54,7 +54,7 @@ public class IndexContainerJob extends IndexRequestJob
 		Index index = getIndex();
 		if (index == null)
 		{
-			IndexActivator.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null);
+			IndexPlugin.logError(MessageFormat.format("Index is null for container: {0}", getContainerURI()), null); //$NON-NLS-1$
 			return Status.CANCEL_STATUS;
 		}
 		try
@@ -104,7 +104,7 @@ public class IndexContainerJob extends IndexRequestJob
 		}
 		catch (IOException e)
 		{
-			IndexActivator.logError(e.getMessage(), e);
+			IndexPlugin.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -114,7 +114,7 @@ public class IndexContainerJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError("An error occurred while saving an index", e);
+				IndexPlugin.logError("An error occurred while saving an index", e); //$NON-NLS-1$
 			}
 			sub.done();
 		}
@@ -148,7 +148,7 @@ public class IndexContainerJob extends IndexRequestJob
 				}
 				catch (CoreException e)
 				{
-					IndexActivator.logError(e);
+					IndexPlugin.logError(e);
 				}
 			}
 			else
@@ -161,7 +161,7 @@ public class IndexContainerJob extends IndexRequestJob
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 		finally
 		{

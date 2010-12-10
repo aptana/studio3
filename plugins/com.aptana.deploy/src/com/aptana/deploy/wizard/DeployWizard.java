@@ -464,7 +464,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			private void openSignup(final String javascript, IProgressMonitor monitor) throws Exception
 			{
 				final String BROWSER_ID = "heroku-signup"; //$NON-NLS-1$
-				final URL url = new URL("http://api.heroku.com/signup"); //$NON-NLS-1$
+				final URL url = new URL("https://api.heroku.com/signup/aptana3"); //$NON-NLS-1$
 
 				final int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
 						| IWorkbenchBrowserSupport.STATUS;

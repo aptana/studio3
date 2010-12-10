@@ -99,7 +99,7 @@ public class RangeTests extends TestCase
 				}
 				else
 				{
-					fail("No proposals");
+					fail("No proposals at offset " + offset);
 				}
 			}
 		}

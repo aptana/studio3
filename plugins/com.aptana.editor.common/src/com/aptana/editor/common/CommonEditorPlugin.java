@@ -70,7 +70,7 @@ import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
-import com.aptana.index.core.IndexActivator;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.usage.EventLogger;
 
 /**
@@ -239,6 +239,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			window.addPerspectiveListener(fPerspectiveListener);
 		}
 	};
+	private DocumentScopeManager fDocumentScopeManager;
 
 	/**
 	 * The constructor
@@ -257,7 +258,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		plugin = this;
 
 		// Activate indexing
-		IndexActivator.getDefault();
+		IndexPlugin.getDefault();
 
 		differentiator = new FilenameDifferentiator();
 		differentiator.schedule();
@@ -276,11 +277,17 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 			differentiator.dispose();
 
 			removePartListener();
+			
+			if (fDocumentScopeManager != null)
+			{
+				fDocumentScopeManager.dispose();
+			}
 		}
 		finally
 		{
+			fDocumentScopeManager = null;
 			differentiator = null;
-			plugin = null;
+			plugin = null;			
 			super.stop(context);
 		}
 	}
@@ -313,10 +320,10 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		if (getDefault() != null && getDefault().isDebugging())
 			getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
-
-	public static void logError(String string, Exception e)
+	
+	public static void logError(String string, Throwable t)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, e));
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, string, t));
 	}
 
 	public static void logWarning(String message)
@@ -388,9 +395,13 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return store;
 	}
 
-	public IDocumentScopeManager getDocumentScopeManager()
+	public synchronized IDocumentScopeManager getDocumentScopeManager()
 	{
-		return DocumentScopeManager.getInstance();
+		if (fDocumentScopeManager == null)
+		{
+			fDocumentScopeManager = new DocumentScopeManager();
+		}
+		return fDocumentScopeManager;
 	}
 
 	public IContentTypeTranslator getContentTypeTranslator()

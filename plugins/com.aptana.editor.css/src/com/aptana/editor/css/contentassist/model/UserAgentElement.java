@@ -34,15 +34,24 @@
  */
 package com.aptana.editor.css.contentassist.model;
 
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
 import com.aptana.core.util.StringUtil;
 
-public class UserAgentElement
+public class UserAgentElement implements Convertible
 {
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String PLATFORM_PROPERTY = "platform"; //$NON-NLS-1$
+	private static final String OS_PROPERTY = "os"; //$NON-NLS-1$
+
 	private String _description;
 	private String _os;
 	private String _platform;
 	private String _version;
-	private int _hash;
 
 	/**
 	 * UserAgentElement
@@ -53,29 +62,15 @@ public class UserAgentElement
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
-	@Override
-	public boolean equals(Object obj)
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
 	{
-		boolean result = false;
-		
-		if (this == obj)
-		{
-			result = true;
-		}
-		else if (obj instanceof UserAgentElement)
-		{
-			UserAgentElement that = (UserAgentElement) obj;
-			
-			result =
-				StringUtil.areEqual(this.getDescription(), that.getDescription())
-			&&	StringUtil.areEqual(this.getOS(), that.getOS())
-			&&	StringUtil.areEqual(this.getPlatform(), that.getPlatform())
-			&&	StringUtil.areEqual(this.getVersion(), that.getVersion());
-		}
-		
-		return result;
+		this.setOS(StringUtil.getStringValue(object.get(OS_PROPERTY)));
+		this.setPlatform(StringUtil.getStringValue(object.get(PLATFORM_PROPERTY)));
+		this.setVersion(StringUtil.getStringValue(object.get(VERSION_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 	}
 
 	/**
@@ -83,7 +78,7 @@ public class UserAgentElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -93,7 +88,7 @@ public class UserAgentElement
 	 */
 	public String getOS()
 	{
-		return this._os;
+		return StringUtil.getStringValue(this._os);
 	}
 
 	/**
@@ -103,7 +98,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return this._platform;
+		return StringUtil.getStringValue(this._platform);
 	}
 
 	/**
@@ -113,39 +108,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return this._version;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		int h = this._hash;
-		
-		if (h == 0)
-		{
-			String[] items = new String[] {
-				this._description,
-				this._os,
-				this._platform,
-				this._version
-			};
-			
-			for (String item : items)
-			{
-				if (item != null)
-				{
-					h = 31*h + item.hashCode();
-				}
-			}
-			
-			this._hash = h;
-		}
-		
-		return h;
+		return StringUtil.getStringValue(this._version);
 	}
 
 	/**
@@ -156,7 +119,6 @@ public class UserAgentElement
 	public void setDescription(String description)
 	{
 		this._description = description;
-		this._hash = 0;
 	}
 
 	/**
@@ -167,7 +129,6 @@ public class UserAgentElement
 	public void setOS(String os)
 	{
 		this._os = os;
-		this._hash = 0;
 	}
 
 	/**
@@ -178,7 +139,6 @@ public class UserAgentElement
 	public void setPlatform(String platform)
 	{
 		this._platform = platform;
-		this._hash = 0;
 	}
 
 	/**
@@ -189,6 +149,17 @@ public class UserAgentElement
 	public void setVersion(String version)
 	{
 		this._version = version;
-		this._hash = 0;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(OS_PROPERTY, this.getOS());
+		out.add(PLATFORM_PROPERTY, this.getPlatform());
+		out.add(VERSION_PROPERTY, this.getVersion());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 }

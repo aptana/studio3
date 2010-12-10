@@ -40,8 +40,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
 
-import com.aptana.scripting.model.BundleChangeListener;
-import com.aptana.scripting.model.BundleElement;
+import com.aptana.scripting.model.BundleVisibilityListener;
 import com.aptana.scripting.model.BundleEntry;
 
 /**
@@ -50,17 +49,11 @@ import com.aptana.scripting.model.BundleEntry;
  * 
  * @author cwilliams
  */
-class FileTypeAssociationListener implements BundleChangeListener
+class FileTypeAssociationListener implements BundleVisibilityListener
 {
-
 	private static final String GENERIC_CONTENT_TYPE_ID = "com.aptana.editor.text.content-type.generic"; //$NON-NLS-1$
 
-	public void deleted(BundleElement bundle)
-	{
-		// nothing
-	}
-
-	public void becameVisible(BundleEntry entry)
+	public void bundlesBecameVisible(BundleEntry entry)
 	{
 		// Activate the file type associations
 		for (String fileType : getFileTypes(entry))
@@ -82,7 +75,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 		type = Platform.getContentTypeManager().getContentType(GENERIC_CONTENT_TYPE_ID);
 		if (type == null)
 		{
-			Activator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
+			ScriptingActivator.logError("Unable to get reference to generic content type for dynamic filetype associations!", null); //$NON-NLS-1$
 			return;
 		}
 		try
@@ -99,11 +92,11 @@ class FileTypeAssociationListener implements BundleChangeListener
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 	}
 
-	public void becameHidden(BundleEntry entry)
+	public void bundlesBecameHidden(BundleEntry entry)
 	{
 		// remove the file type associations
 		for (String fileType : getFileTypes(entry))
@@ -127,18 +120,13 @@ class FileTypeAssociationListener implements BundleChangeListener
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 	}
 
 	protected List<String> getFileTypes(BundleEntry entry)
 	{
 		return entry.getFileTypes();
-	}
-
-	public void added(BundleElement bundle)
-	{
-		// nothing
 	}
 
 	public void cleanup()
@@ -157,7 +145,7 @@ class FileTypeAssociationListener implements BundleChangeListener
 				}
 				catch (CoreException e)
 				{
-					Activator.logError(e.getMessage(), e);
+					ScriptingActivator.logError(e.getMessage(), e);
 				}
 			}
 		}

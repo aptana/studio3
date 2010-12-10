@@ -34,7 +34,8 @@
  */
 package com.aptana.scripting.ui.views;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.swt.graphics.Image;
 
@@ -62,17 +63,17 @@ class MenusNode extends BaseNode
 	 * 
 	 * @param elements
 	 */
-	public MenusNode(MenuElement[] elements)
+	public MenusNode(List<MenuElement> elements)
 	{
 		if (elements != null)
 		{
-			Arrays.sort(elements);
+			Collections.sort(elements);
 
-			this._menus = new MenuNode[elements.length];
+			this._menus = new MenuNode[elements.size()];
 
-			for (int i = 0; i < elements.length; i++)
+			for (int i = 0; i < elements.size(); i++)
 			{
-				this._menus[i] = new MenuNode(elements[i]);
+				this._menus[i] = new MenuNode(elements.get(i));
 			}
 		}
 		else

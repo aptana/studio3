@@ -274,6 +274,10 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			@Override
 			protected boolean wordOK(String word, ICharacterScanner scanner)
 			{
+				if (word == null || word.length() == 0)
+				{
+					return false;
+				}
 				if (word.charAt(0) == '-')
 				{
 					return word.length() > 1;

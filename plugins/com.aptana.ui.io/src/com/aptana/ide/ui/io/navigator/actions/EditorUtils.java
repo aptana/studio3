@@ -59,7 +59,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

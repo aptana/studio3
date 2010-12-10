@@ -40,6 +40,7 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginNode;
 import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSBlockNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSDeclarationNode;
 import com.aptana.editor.css.formatter.nodes.FormatterCSSRootNode;
@@ -108,7 +109,49 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		{
 			pushFormatterFontFaceNode((CSSFontFaceNode) cssNode);
 		}
-		// TODO account for @media nodes
+		else if (cssNode.getNodeType() == CSSNodeTypes.MEDIA)
+		{
+			pushFormatterMediaNode((CSSMediaNode) cssNode);
+		}
+
+	}
+
+	/**
+	 * Accepts a CSSMediaNode and breaks down the node into different formatter nodes which should represent it while
+	 * rewriting the doc.<br>
+	 * The statements of the media node will also be recursively added as formatter nodes.
+	 * 
+	 * @param pageNode
+	 */
+	private void pushFormatterMediaNode(CSSMediaNode mediaNode)
+	{
+
+		CSSTextNode[] medias = mediaNode.getMedias();
+
+		int blockStartOffset = getBlockStartOffset(medias[medias.length - 1].getEndingOffset() + 1, document);
+
+		for (int i = 0; i < medias.length; i++)
+		{
+			CSSTextNode mediaSelectorNode = medias[i];
+			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
+			formatterSelectorNode.setBegin(createTextNode(document,
+					getBeginWithoutWhiteSpaces(mediaSelectorNode.getStartingOffset(), document),
+					getSelectorNodeEnd(mediaSelectorNode.getEndingOffset() + 1, document) + 1));
+			push(formatterSelectorNode);
+
+			checkedPop(formatterSelectorNode, -1);
+		}
+
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
+		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
+		formatterBlockNode
+				.setEnd(createTextNode(document, mediaNode.getEndingOffset(), mediaNode.getEndingOffset() + 1));
+		push(formatterBlockNode);
+
+		// Recursively add this node's children
+		addNodes(mediaNode.getStatements());
+
+		checkedPop(formatterBlockNode, -1);
 
 	}
 
@@ -126,28 +169,27 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		CSSDeclarationNode[] declarations = faceFontNode.getDeclarations();
 		int blockStartOffset = getBlockStartOffset(faceFontNode.getStartingOffset() + 9, document);
 
-		//create a FormatterCSSSelectorNode for @font-face
+		// create a FormatterCSSSelectorNode for @font-face
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
 		formatterSelectorNode.setBegin(createTextNode(document,
-				getSelectorNodeBegin(faceFontNode.getStartingOffset(), document),
+				getBeginWithoutWhiteSpaces(faceFontNode.getStartingOffset(), document),
 				getSelectorNodeEnd(faceFontNode.getStartingOffset() + 9, document) + 1));
 		push(formatterSelectorNode);
 		checkedPop(formatterSelectorNode, -1);
 
-		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, faceFontNode.getEndingOffset(),
 				faceFontNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
-		if (declarations != null && declarations.length != 0)
+		// Don't create text nodes when there are no declarations, or only white space
+		if (declarations != null && declarations.length != 0
+				&& getBeginWithoutWhiteSpaces(blockStartOffset + 1, document) < declarations[0].getStartingOffset())
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
 					declarations[0].getStartingOffset()));
-		}
-		else
-		{
-			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, faceFontNode.getEndingOffset()));
+
 		}
 
 		pushFormatterDeclarationNodes(faceFontNode.getEndingOffset(), declarations, formatterBlockNode);
@@ -173,7 +215,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, true);
 		formatterSelectorNode.setBegin(createTextNode(document,
-				getSelectorNodeBegin(pageNode.getStartingOffset(), document),
+				getBeginWithoutWhiteSpaces(pageNode.getStartingOffset(), document),
 				getSelectorNodeEnd(pageNode.getStartingOffset() + 5, document) + 1));
 		push(formatterSelectorNode);
 		checkedPop(formatterSelectorNode, -1);
@@ -181,25 +223,24 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterSelectorNode = new FormatterCSSSelectorNode(document, false);
 		// we do startingOffset - 1 to account for the ':'
 		formatterSelectorNode.setBegin(createTextNode(document,
-				getSelectorNodeBegin(selector.getStartingOffset() - 1, document),
+				getBeginWithoutWhiteSpaces(selector.getStartingOffset() - 1, document),
 				getSelectorNodeEnd(selector.getEndingOffset() + 1, document) + 1));
 
 		push(formatterSelectorNode);
 		checkedPop(formatterSelectorNode, -1);
 
-		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, false);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, pageNode.getEndingOffset(), pageNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
-		if (declarations != null && declarations.length != 0)
+		// Don't create text nodes when there are no declarations, or only white space
+		if (declarations != null && declarations.length != 0
+				&& getBeginWithoutWhiteSpaces(blockStartOffset + 1, document) < declarations[0].getStartingOffset())
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
 					declarations[0].getStartingOffset()));
-		}
-		else
-		{
-			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, pageNode.getEndingOffset()));
+
 		}
 
 		pushFormatterDeclarationNodes(pageNode.getEndingOffset(), declarations, formatterBlockNode);
@@ -225,19 +266,21 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 		pushFormatterSelectorNodes(selectors);
 
-		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document);
+		// Check to see whether the rule node is a declaration of a media node
+		boolean isDeclaration = (ruleNode.getParent() == null) || !(ruleNode.getParent() instanceof ParseRootNode);
+
+		FormatterBlockWithBeginEndNode formatterBlockNode = new FormatterCSSBlockNode(document, isDeclaration);
 		formatterBlockNode.setBegin(createTextNode(document, blockStartOffset, blockStartOffset + 1));
 		formatterBlockNode.setEnd(createTextNode(document, ruleNode.getEndingOffset(), ruleNode.getEndingOffset() + 1));
 		push(formatterBlockNode);
 
-		if (declarations != null && declarations.length != 0)
+		// Don't create text nodes when there are no declarations, or only white space
+		if (declarations != null && declarations.length != 0
+				&& getBeginWithoutWhiteSpaces(blockStartOffset + 1, document) < declarations[0].getStartingOffset())
 		{
 			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1,
 					declarations[0].getStartingOffset()));
-		}
-		else
-		{
-			formatterBlockNode.addChild(createTextNode(document, blockStartOffset + 1, ruleNode.getEndingOffset()));
+
 		}
 
 		pushFormatterDeclarationNodes(ruleNode.getEndingOffset(), declarations, formatterBlockNode);
@@ -263,14 +306,19 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			if (i + 1 < declarations.length)
 			{
-				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
-						declarations[i + 1].getStartingOffset()));
+				if (getBeginWithoutWhiteSpaces(declarations[i].getEndingOffset() + 1, document) < declarations[i + 1]
+						.getStartingOffset())
+				{
+					formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
+							declarations[i + 1].getStartingOffset()));
+				}
 			}
-			else
+			else if (getBeginWithoutWhiteSpaces(declarations[i].getEndingOffset() + 1, document) < parentEndOffset)
 			{
 				formatterBlockNode.addChild(createTextNode(document, declarations[i].getEndingOffset() + 1,
 						parentEndOffset));
 			}
+
 		}
 	}
 
@@ -281,7 +329,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			CSSSelectorNode selectorNode = selectors[i];
 			FormatterBlockWithBeginNode formatterSelectorNode = new FormatterCSSSelectorNode(document, i == 0);
 			formatterSelectorNode.setBegin(createTextNode(document,
-					getSelectorNodeBegin(selectorNode.getStartingOffset(), document),
+					getBeginWithoutWhiteSpaces(selectorNode.getStartingOffset(), document),
 					getSelectorNodeEnd(selectorNode.getEndingOffset() + 1, document) + 1));
 			push(formatterSelectorNode);
 
@@ -308,7 +356,7 @@ public class CSSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param document2
 	 * @return
 	 */
-	private int getSelectorNodeBegin(int offset, FormatterDocument document)
+	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
 	{
 		int length = document.getLength();
 		while (offset < length)

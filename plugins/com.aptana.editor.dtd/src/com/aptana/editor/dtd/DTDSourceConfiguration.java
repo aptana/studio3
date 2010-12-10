@@ -74,6 +74,9 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 
 	private static DTDSourceConfiguration instance;
 
+	private DTDSourceConfiguration() {
+	}
+	
 	/**
 	 * getDefault
 	 * 
@@ -133,7 +136,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * 
 	 * @return
 	 */
-	protected ITokenScanner getDTDScanner()
+	private ITokenScanner getDTDScanner()
 	{
 		if (dtdScanner == null)
 		{
@@ -158,7 +161,7 @@ public class DTDSourceConfiguration implements IPartitioningConfiguration, ISour
 	 * @param tokenName
 	 * @return
 	 */
-	protected IToken getToken(String tokenName)
+	private IToken getToken(String tokenName)
 	{
 		return new Token(tokenName);
 	}

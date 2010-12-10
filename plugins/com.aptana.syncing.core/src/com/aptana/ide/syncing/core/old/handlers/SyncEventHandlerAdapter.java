@@ -34,6 +34,8 @@
  */
 package com.aptana.ide.syncing.core.old.handlers;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
@@ -45,26 +47,26 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 {
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue()
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue(IProgressMonitor)
 	 */
-	public boolean syncContinue() {
+	public boolean syncContinue(IProgressMonitor monitor) {
 		// Does nothing by default, subclasses should override
 		return true;
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair, IProgressMonitor)
 	 */
-	public void syncDone(VirtualFileSyncPair item)
+	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{
 		// Does nothing by default, subclasses should override
 	}
 
 	/**
 	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
-	 *      java.lang.Exception)
+	 *      java.lang.Exception, IProgressMonitor)
 	 */
-	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e)
+	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
 		// Does nothing by default, subclasses should override
 		return true;
@@ -72,9 +74,9 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 
 	/**
 	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
-	 *      int, int)
+	 *      int, int, IProgressMonitor)
 	 */
-	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems)
+	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 	{
 		// Does nothing by default, subclasses should override
 		return true;
@@ -82,9 +84,9 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 
 	/**
 	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
-	 *      long)
+	 *      long, IProgressMonitor)
 	 */
-	public void syncTransferring(VirtualFileSyncPair item, long bytes)
+	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor)
 	{
 		// Does nothing by default, subclasses should override
 	}
