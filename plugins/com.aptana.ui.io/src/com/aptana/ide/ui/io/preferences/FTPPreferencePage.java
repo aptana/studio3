@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
+ * with certain Eclipse Public Licensed code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -34,36 +34,49 @@
  */
 package com.aptana.ide.ui.io.preferences;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 
-/**
- * NLS
- */
-public final class Messages extends NLS
+public class FTPPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
+	private Button fReopenButton;
 
-	public static String FTPPreferencePage_LBL_ReopenRemote;
-
-	public static String PermissionsGroup_All;
-	public static String PermissionsGroup_Execute;
-	public static String PermissionsGroup_Group;
-	public static String PermissionsGroup_Read;
-	public static String PermissionsGroup_Title;
-	public static String PermissionsGroup_User;
-	public static String PermissionsGroup_Write;
-	public static String PermissionPreferencePage_DirectoryGroupTitle;
-	public static String PermissionPreferencePage_FileGroupTitle;
-	public static String PermissionPreferencePage_Notes;
-
-	static
+	public void init(IWorkbench workbench)
 	{
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
-	private Messages()
+	@Override
+	protected Control createContents(Composite parent)
 	{
-		// Do not instantiate
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.swtDefaults().create());
+
+		fReopenButton = new Button(main, SWT.CHECK);
+		fReopenButton.setText(Messages.FTPPreferencePage_LBL_ReopenRemote);
+		fReopenButton.setSelection(FTPPreferenceUtil.getReopenRemoteOnStartup());
+
+		return main;
+	}
+
+	@Override
+	protected void performDefaults()
+	{
+		fReopenButton.setSelection(false);
+		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk()
+	{
+		FTPPreferenceUtil.setReopenRemoteOnStartup(fReopenButton.getSelection());
+
+		return super.performOk();
 	}
 }

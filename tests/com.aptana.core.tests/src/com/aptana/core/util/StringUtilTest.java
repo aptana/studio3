@@ -99,29 +99,55 @@ public class StringUtilTest extends TestCase
 		assertEquals("chris", tokens.get(0));
 		assertEquals(" williams", tokens.get(1));
 	}
-	
+
 	public void testAreNotEqualWithNulls()
 	{
 		assertFalse(StringUtil.areNotEqual(null, null));
 	}
-	
+
 	public void testAreNotEqualFirstIsNull()
 	{
 		assertTrue(StringUtil.areNotEqual(null, "test"));
 	}
-	
+
 	public void testAreNotEqualLastIsNull()
 	{
 		assertTrue(StringUtil.areNotEqual("test", null));
 	}
-	
+
 	public void testAreNotEqual()
 	{
 		assertFalse(StringUtil.areNotEqual("test", "test"));
 	}
-	
+
 	public void testAreNotEqual2()
 	{
 		assertTrue(StringUtil.areNotEqual("test", "tes"));
+	}
+
+	public void getStringValueWithNull()
+	{
+		assertSame(StringUtil.EMPTY, StringUtil.getStringValue(null));
+	}
+
+	public void getStringValueWithString()
+	{
+		String text = "abc";
+
+		assertSame(text, StringUtil.getStringValue(text));
+	}
+
+	public void getStringValueWithObject()
+	{
+		final String text = "hello";
+		Object item = new Object()
+		{
+			public String toString()
+			{
+				return text;
+			}
+		};
+
+		assertSame(text, StringUtil.getStringValue(item));
 	}
 }

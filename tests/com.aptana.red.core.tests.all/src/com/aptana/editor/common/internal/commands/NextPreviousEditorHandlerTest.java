@@ -75,7 +75,7 @@ public class NextPreviousEditorHandlerTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		Class.forName("com.aptana.editor.html.Activator");
+		Class.forName("com.aptana.editor.html.HTMLPlugin");
 		project = createProject();
 		files = new ArrayList<IFile>();
 		editors = new ArrayList<ITextEditor>();

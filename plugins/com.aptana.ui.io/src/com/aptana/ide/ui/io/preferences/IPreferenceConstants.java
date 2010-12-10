@@ -34,7 +34,10 @@
  */
 package com.aptana.ide.ui.io.preferences;
 
-public class IPreferenceConstants {
+public class IPreferenceConstants
+{
 
-    public static final String COPY_OVERWRITE = "COPY_OVERWRITE"; //$NON-NLS-1$
+	public static final String COPY_OVERWRITE = "COPY_OVERWRITE"; //$NON-NLS-1$
+
+	public static final String REOPEN_REMOTE_FILES_ON_STARUP = "REOPEN_REMOTE_FILES_ON_STARTUP"; //$NON-NLS-1$
 }
