@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.mozilla.rhino
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: org.mozilla.rhino.RhinoPlugin
+Bundle-Vendor: %providerName
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/js.jar,
+ .
+Export-Package: org.mozilla.javascript,
+ org.mozilla.javascript.optimizer,
+ org.mozilla.rhino
