@@ -59,14 +59,6 @@ public abstract class BaseElement implements ICSSMetadataElement, Convertible
 	private List<String> _documents;
 
 	/**
-	 * AbstractCSSMetadataElement
-	 */
-	public BaseElement()
-	{
-		super();
-	}
-
-	/**
 	 * addDocument
 	 * 
 	 * @param document
