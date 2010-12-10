@@ -136,7 +136,6 @@ public class HTMLIndexReader
 					for (QueryResult attribute : attributes)
 					{
 						result.add(this.createAttributeFromKey(index, attribute));
-						break;
 					}
 				}
 			}
@@ -202,7 +201,6 @@ public class HTMLIndexReader
 					for (QueryResult element : elements)
 					{
 						result.add(this.createElementFromKey(index, element));
-						break;
 					}
 				}
 			}
@@ -296,6 +294,8 @@ public class HTMLIndexReader
 				for (QueryResult entity : entities)
 				{
 					result = this.createEntityFromKey(index, entity);
+					
+					// there should only be one match
 					break;
 				}
 			}
@@ -329,6 +329,8 @@ public class HTMLIndexReader
 				for (QueryResult event : events)
 				{
 					result = this.createEventFromKey(index, event);
+					
+					// there should only be one match
 					break;
 				}
 			}
