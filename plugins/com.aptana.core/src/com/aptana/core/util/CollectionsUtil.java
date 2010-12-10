@@ -80,6 +80,14 @@ public class CollectionsUtil
 		return new ArrayList<T>(union);
 	}
 
+	/**
+	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
+	 * case. If the list is non-null, then this is an identity function.
+	 * 
+	 * @param <T>
+	 * @param list
+	 * @return
+	 */
 	public static <T> List<T> getListValue(List<T> list)
 	{
 		List<T> result = list;
