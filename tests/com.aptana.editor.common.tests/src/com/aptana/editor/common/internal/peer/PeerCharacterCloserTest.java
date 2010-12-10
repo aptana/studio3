@@ -169,7 +169,7 @@ public class PeerCharacterCloserTest extends TestCase
 
 			protected char[] getPairs(String scope)
 			{
-				return new char[] { '(', ')', '"', '"'};
+				return new char[] { '(', ')', '"', '"' };
 			}
 
 			@Override
@@ -222,7 +222,7 @@ public class PeerCharacterCloserTest extends TestCase
 			}
 		};
 		viewer.setDocument(document);
-		
+
 		viewer.setSelectedRange(5, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -273,17 +273,12 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("function x()\n" + "{\n" + "    if (false)\n" + "    {}\n" + "\n" + "    if (false)\n" + "    {\n"
 				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
 	}
-	
+
 	public void testStudio3_1213()
 	{
-		setDocument("bundle do |bundle|\n" +
-"  bundle.author = 'Ed Spencer'\n" +
-"  bundle.contact_email_rot_13 = 'null'\n" +
-"  bundle.description =  \"A bundle for ExtJS\"\n" +
-"\n" +
-"  bundle.menu \"ExtJS do |main_menu|\n" +
-"  end\n" +
-"end");
+		setDocument("bundle do |bundle|\n" + "  bundle.author = 'Ed Spencer'\n"
+				+ "  bundle.contact_email_rot_13 = 'null'\n" + "  bundle.description =  \"A bundle for ExtJS\"\n"
+				+ "\n" + "  bundle.menu \"ExtJS do |main_menu|\n" + "  end\n" + "end");
 		viewer.setSelectedRange(154, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -307,12 +302,33 @@ public class PeerCharacterCloserTest extends TestCase
 
 		assertTrue(event.doit); // Don't pair, insert single character!
 	}
-	
+
 	public void testignoresRubyHashesForHTMLTagPairs()
 	{
-		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n";
-		setDocument(src);
-		viewer.setSelectedRange(src.length(), 0);
+		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor and then sent a keypress to it...
+		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n ";
+		document = new Document(src)
+		{
+			public ITypedRegion[] computePartitioning(int offset, int length) throws BadLocationException
+			{
+				return new ITypedRegion[] { 
+						new TypedRegion(0, 3, "__common_start_switch_tag"),
+						new TypedRegion(3, 21, "__rb__dftl_partition_content_type"),
+						new TypedRegion(24, 8, "__rb_string_single"),
+						new TypedRegion(32, 12, "__rb__dftl_partition_content_type"),
+						new TypedRegion(44, 43, "__rb_string_single"),
+						new TypedRegion(87, 1, "__rb__dftl_partition_content_type"),
+						new TypedRegion(88, 2, "__common_end_switch_tag"),
+						new TypedRegion(90, 1, "__html__dftl_partition_content_type") };
+			}
+
+			public String getContentType(int offset) throws BadLocationException
+			{
+				return "__html__dftl_partition_content_type";
+			}
+		};
+		viewer.setDocument(document);
+		viewer.setSelectedRange(src.length() - 1, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
 
@@ -336,7 +352,8 @@ public class PeerCharacterCloserTest extends TestCase
 		VerifyEvent event = sendEvent('<');
 		// Make sure we pair this!
 		assertFalse("Should have paired the character!", event.doit);
-		assertEquals("<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n<>", document.get());
+		assertEquals("<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n<> ",
+				document.get());
 	}
 
 	protected IDocument setDocument(String src)
