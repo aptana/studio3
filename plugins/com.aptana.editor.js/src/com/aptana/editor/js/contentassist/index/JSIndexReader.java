@@ -37,103 +37,51 @@ package com.aptana.editor.js.contentassist.index;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.mortbay.util.ajax.JSON;
-
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class JSIndexReader
+public class JSIndexReader extends IndexReader
 {
-	private static final Pattern DELIMITER_PATTERN = Pattern.compile(JSIndexConstants.DELIMITER);
-	private static final Pattern SUB_DELIMETER_PATTERN = Pattern.compile(JSIndexConstants.SUB_DELIMITER);
-
 	/**
 	 * createFunction
 	 * 
-	 * @param index
 	 * @param function
-	 * @param fields
 	 * @return
-	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
-	protected FunctionElement createFunction(Index index, QueryResult function, EnumSet<ContentSelector> fields) throws IOException
+	protected FunctionElement createFunction(QueryResult function)
 	{
-		FunctionElement f = new FunctionElement();
-
-		if (fields.isEmpty() == false)
-		{
-			String key = function.getWord();
-			String[] columns = DELIMITER_PATTERN.split(key);
-
-			Object m = JSON.parse(columns[2]);
-
-			if (m instanceof Map)
-			{
-				f.fromJSON((Map) m);
-			}
-
-			// documents
-			if (fields.contains(ContentSelector.DOCUMENTS))
-			{
-				for (String document : function.getDocuments())
-				{
-					f.addDocument(document);
-				}
-			}
-		}
-
-		return f;
+		return this.populateElement(new FunctionElement(), function, 2);
 	}
 
 	/**
 	 * createProperty
 	 * 
-	 * @param index
-	 * @param key
-	 * @param fields
+	 * @param property
 	 * @return
-	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
-	protected PropertyElement createProperty(Index index, QueryResult property, EnumSet<ContentSelector> fields) throws IOException
+	protected PropertyElement createProperty(QueryResult property)
 	{
-		PropertyElement p = new PropertyElement();
+		return this.populateElement(new PropertyElement(), property, 2);
+	}
 
-		if (fields.isEmpty() == false)
-		{
-			String key = property.getWord();
-			String[] columns = DELIMITER_PATTERN.split(key);
-
-			Object m = JSON.parse(columns[2]);
-
-			if (m instanceof Map)
-			{
-				p.fromJSON((Map) m);
-			}
-
-			// documents
-			if (fields.contains(ContentSelector.DOCUMENTS))
-			{
-				for (String document : property.getDocuments())
-				{
-					p.addDocument(document);
-				}
-			}
-		}
-
-		return p;
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getDelimiter()
+	 */
+	@Override
+	protected String getDelimiter()
+	{
+		return JSIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -142,15 +90,14 @@ public class JSIndexReader
 	 * @param index
 	 * @param owningType
 	 * @param propertyName
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public FunctionElement getFunction(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
+	public FunctionElement getFunction(Index index, String owningType, String propertyName) throws IOException
 	{
 		FunctionElement result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(owningType) == false && StringUtil.isEmpty(propertyName) == false)
 		{
 			List<QueryResult> functions = index.query( //
 				new String[] { JSIndexConstants.FUNCTION }, //
@@ -160,7 +107,7 @@ public class JSIndexReader
 
 			if (functions != null && functions.size() > 0)
 			{
-				result = this.createFunction(index, functions.get(0), fields);
+				result = this.createFunction(functions.get(0));
 			}
 		}
 
@@ -172,25 +119,27 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param owningTypes
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
+	public List<FunctionElement> getFunctions(Index index, List<String> owningTypes) throws IOException
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
+		if (index != null && CollectionsUtil.isEmpty(owningTypes) == false)
 		{
 			// read functions
-			List<QueryResult> functions = index
-				.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningTypes), SearchPattern.REGEX_MATCH);
+			List<QueryResult> functions = index.query( //
+				new String[] { JSIndexConstants.FUNCTION }, //
+				this.getMemberPattern(owningTypes), //
+				SearchPattern.REGEX_MATCH //
+				);
 
 			if (functions != null)
 			{
 				for (QueryResult function : functions)
 				{
-					result.add(this.createFunction(index, function, fields));
+					result.add(this.createFunction(function));
 				}
 			}
 		}
@@ -203,25 +152,27 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param owningType
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<FunctionElement> getFunctions(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
+	public List<FunctionElement> getFunctions(Index index, String owningType) throws IOException
 	{
 		List<FunctionElement> result = new ArrayList<FunctionElement>();
 
-		if (index != null && owningType != null && owningType.length() > 0)
+		if (index != null && StringUtil.isEmpty(owningType) == false)
 		{
 			// read functions
-			List<QueryResult> functions = index.query(new String[] { JSIndexConstants.FUNCTION }, this.getMemberPattern(owningType), SearchPattern.PREFIX_MATCH
-				| SearchPattern.CASE_SENSITIVE);
+			List<QueryResult> functions = index.query( //
+				new String[] { JSIndexConstants.FUNCTION }, //
+				this.getMemberPattern(owningType), //
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			);
 
 			if (functions != null)
 			{
 				for (QueryResult function : functions)
 				{
-					result.add(this.createFunction(index, function, fields));
+					result.add(this.createFunction(function));
 				}
 			}
 		}
@@ -239,7 +190,7 @@ public class JSIndexReader
 	{
 		String typePattern = getUserTypesPattern(typeNames);
 
-		return MessageFormat.format("^{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typePattern }); //$NON-NLS-1$
+		return MessageFormat.format("^{1}{0}", new Object[] { this.getDelimiter(), typePattern }); //$NON-NLS-1$
 	}
 
 	/**
@@ -250,7 +201,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName)
 	{
-		return MessageFormat.format("{1}{0}", new Object[] { JSIndexConstants.DELIMITER, typeName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}", new Object[] { this.getDelimiter(), typeName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -262,7 +213,7 @@ public class JSIndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("{1}{0}{2}", new Object[] { JSIndexConstants.DELIMITER, typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}{2}", new Object[] { this.getDelimiter(), typeName, memberName }); //$NON-NLS-1$
 	}
 
 	/**
@@ -270,25 +221,27 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param owningTypes
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, List<String> owningTypes, EnumSet<ContentSelector> fields) throws IOException
+	public List<PropertyElement> getProperties(Index index, List<String> owningTypes) throws IOException
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && owningTypes != null && owningTypes.isEmpty() == false)
+		if (index != null && CollectionsUtil.isEmpty(owningTypes) == false)
 		{
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningTypes),
-				SearchPattern.REGEX_MATCH);
+			List<QueryResult> properties = index.query( //
+				new String[] { JSIndexConstants.PROPERTY }, //
+				this.getMemberPattern(owningTypes), //
+				SearchPattern.REGEX_MATCH //
+				);
 
 			if (properties != null)
 			{
 				for (QueryResult property : properties)
 				{
-					result.add(this.createProperty(index, property, fields));
+					result.add(this.createProperty(property));
 				}
 			}
 		}
@@ -301,25 +254,27 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param owningType
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getProperties(Index index, String owningType, EnumSet<ContentSelector> fields) throws IOException
+	public List<PropertyElement> getProperties(Index index, String owningType) throws IOException
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null && owningType != null && owningType.length() > 0)
+		if (index != null && StringUtil.isEmpty(owningType) == false)
 		{
 			// read properties
-			List<QueryResult> properties = index.query(new String[] { JSIndexConstants.PROPERTY }, this.getMemberPattern(owningType),
-				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE);
+			List<QueryResult> properties = index.query( //
+				new String[] { JSIndexConstants.PROPERTY }, //
+				this.getMemberPattern(owningType), //
+				SearchPattern.PREFIX_MATCH | SearchPattern.CASE_SENSITIVE //
+			);
 
 			if (properties != null)
 			{
 				for (QueryResult property : properties)
 				{
-					result.add(this.createProperty(index, property, fields));
+					result.add(this.createProperty(property));
 				}
 			}
 		}
@@ -333,15 +288,14 @@ public class JSIndexReader
 	 * @param index
 	 * @param owningType
 	 * @param propertyName
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public PropertyElement getProperty(Index index, String owningType, String propertyName, EnumSet<ContentSelector> fields) throws IOException
+	public PropertyElement getProperty(Index index, String owningType, String propertyName) throws IOException
 	{
 		PropertyElement result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(owningType) == false && StringUtil.isEmpty(propertyName) == false)
 		{
 			List<QueryResult> properties = index.query( //
 				new String[] { JSIndexConstants.PROPERTY }, //
@@ -351,11 +305,21 @@ public class JSIndexReader
 
 			if (properties != null && properties.size() > 0)
 			{
-				result = this.createProperty(index, properties.get(0), fields);
+				result = this.createProperty(properties.get(0));
 			}
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getSubDelimiter()
+	 */
+	@Override
+	protected String getSubDelimiter()
+	{
+		return JSIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -363,20 +327,21 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param typeName
+	 * @param includeMembers
 	 * @return
 	 */
-	public TypeElement getType(Index index, String typeName, EnumSet<ContentSelector> fields)
+	public TypeElement getType(Index index, String typeName, boolean includeMembers)
 	{
 		TypeElement result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(typeName) == false)
 		{
 			try
 			{
 				String pattern = typeName + JSIndexConstants.DELIMITER;
 				List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
 
-				if (types != null && types.size() > 0)
+				if (types != null && types.isEmpty() == false)
 				{
 					QueryResult type = types.get(0);
 					String[] columns = DELIMITER_PATTERN.split(type.getWord());
@@ -386,58 +351,44 @@ public class JSIndexReader
 					// create type
 					result = new TypeElement();
 
-					if (fields.isEmpty() == false)
+					// name
+					result.setName(columns[column]);
+					column++;
+
+					// super types
+					for (String parentType : this.getSubDelimiterPattern().split(columns[column]))
 					{
-						// name
-						if (fields.contains(ContentSelector.NAME))
-						{
-							result.setName(columns[column]);
-						}
-						column++;
+						result.addParentType(parentType);
+					}
+					column++;
 
-						// super types
-						if (fields.contains(ContentSelector.PARENT_TYPES))
-						{
-							for (String parentType : SUB_DELIMETER_PATTERN.split(columns[column]))
-							{
-								result.addParentType(parentType);
-							}
-						}
-						column++;
+					// description
+					if (column < columns.length)
+					{
+						result.setDescription(columns[column]);
+					}
+					column++;
 
-						// description
-						if (column < columns.length && fields.contains(ContentSelector.DESCRIPTION))
-						{
-							result.setDescription(columns[column]);
-						}
-						column++;
-
+					// members
+					if (includeMembers)
+					{
 						// properties
-						if (fields.contains(ContentSelector.PROPERTIES))
+						for (PropertyElement property : this.getProperties(index, retrievedName))
 						{
-							for (PropertyElement property : this.getProperties(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
-							{
-								result.addProperty(property);
-							}
+							result.addProperty(property);
 						}
 
 						// functions
-						if (fields.contains(ContentSelector.FUNCTIONS))
+						for (FunctionElement function : this.getFunctions(index, retrievedName))
 						{
-							for (FunctionElement function : this.getFunctions(index, retrievedName, EnumSet.allOf(ContentSelector.class)))
-							{
-								result.addProperty(function);
-							}
+							result.addProperty(function);
 						}
+					}
 
-						// documents
-						if (fields.contains(ContentSelector.DOCUMENTS))
-						{
-							for (String document : type.getDocuments())
-							{
-								result.addDocument(document);
-							}
-						}
+					// documents
+					for (String document : type.getDocuments())
+					{
+						result.addDocument(document);
 					}
 				}
 			}
@@ -454,21 +405,20 @@ public class JSIndexReader
 	 * 
 	 * @param index
 	 * @param typeName
-	 * @param fields
 	 * @return
 	 * @throws IOException
 	 */
-	public List<PropertyElement> getTypeProperties(Index index, String typeName, EnumSet<ContentSelector> fields) throws IOException
+	public List<PropertyElement> getTypeProperties(Index index, String typeName) throws IOException
 	{
-		List<PropertyElement> properties = this.getProperties(index, typeName, fields);
+		List<PropertyElement> properties = this.getProperties(index, typeName);
 
-		properties.addAll(this.getFunctions(index, typeName, fields));
+		properties.addAll(this.getFunctions(index, typeName));
 
 		return properties;
 	}
 
 	/**
-	 * getUserTypesPattern
+	 * Convert a list of types into a regular expression. Note that this method assumes that list is non-empty
 	 * 
 	 * @param owningTypes
 	 * @return
