@@ -1,0 +1,44 @@
+#set ( $page_type = "doc" )
+#parse("./header.vm")
+<div class="doc">
+<h2>Translation of the W3C CSS Validator</h2>
+
+<p>The CSS Validation service is currently available in $num_languages languages. The translations are mainly contributed by <a href="thanks.html">volunteers</a>.</p>
+
+<h3>Translate the CSS validator in a new language</h3>
+<p>If the CSS validator is not yet available in your native language and you would like to translate it:</p>
+<ol class="translations_instructions">
+  <li><a href="http://www.w3.org/QA/Tools/css-validator/translation_kit.zip">Download the translation kit</a>. Unpack the kit: It includes a number of HTML documents, a file with all the strings used for the validator messages, and a text files with instructions.</li>
+  <li><a href="http://www.w3.org/Consortium/Translation/#discussions">Get in touch with us</a> <strong>before</strong> you start translating: someone may already be on the job. Someone from the W3C staff or validator development team will get back to you with details about how to translate the validator.</li>
+  <li>Translate. Congratulations, you have made the CSS validator more accessible to a lot more Web developers and designers.</li>
+</ol>
+
+  <h3>Help complete the translation of the validator in your language</h3>
+
+<p>The table below lists all the text strings used to translate the CSS validator:</p>
+<ul class="translations_instructions">
+<li>Cells marked <span class='table_translation_missing'><a title="Cross Mark">✘</a></span> need a new or updated translation. Click on the relevant ✘ to submit a translation by mail.</li>
+<li>Cells marked <span class='table_translation_ok'>✔</span> are translated and up-to-date. Hover above  ✔ to read the current translation for each string.</li>
+</ul>
+<p>You can help fill the blanks and complete the translation in <strong>your</strong> language!</p>
+<table id="translation_summary">
+<thead><tr>
+<th scope='col' class="property_name" id="properties">Property</th>
+#foreach ( $language in $languages )
+    #set ( $name = $language.get("name") )
+	#if ($name != "en")
+	    #if ( $language.get("real") )
+	        #set ( $real =  $language.get("real") )
+	    #else
+	        #set ( $real = $language.get("name") )
+	    #end
+		#set ($completeness = $language.get("completeness") )
+		<th scope='col'>$real <br /> $completeness%</th>
+	#end
+#end
+</tr></thead>
+
+
+$translations_table
+</div>
+#parse("./footer.vm")

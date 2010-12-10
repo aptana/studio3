@@ -1,0 +1,44 @@
+important-style:  \ !important
+not-css1-style: /* BE CAREFUL ! This is not a CSS1 property ! */
+
+rules: \
+<!-- #rule -->
+
+rule: \
+<!-- #selectors -->{\
+<!-- #declaration -->\n\
+}\n
+
+selectors: \
+<!-- #selector -->
+
+selector: \
+<!-- #element-style -->\
+<!-- #id-style -->\
+<!-- #class-style -->\
+<!-- #pseudo-class-style -->\
+<!-- #pseudo-element-style --> \
+
+element-style:\
+<!-- #element -->
+
+id-style:\
+#<!-- #id -->
+
+class-style:\
+.<!-- #class -->
+
+pseudo-class-style:\
+:<!-- #pseudo-class -->
+
+pseudo-element-style:\
+:<!-- #pseudo-element -->
+
+declaration: \
+\n  <!-- #property-name -->: <!-- #property-value --><!-- #important-style -->; <!-- #not-css1-style -->
+
+document: \
+/* file : <!-- #file-title --> */\n\
+<!-- #rules -->
+
+

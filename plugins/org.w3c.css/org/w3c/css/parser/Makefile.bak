@@ -1,0 +1,73 @@
+SRCS = CssFouffa.java Errors.java\
+CssError.java CssValidatorListener.java Frame.java\
+CssErrorDeclaration.java CssXMLListener.java\
+CssErrorToken.java CssXMLParser.java CssSelectors.java\
+CssStyle.java CssPrinterStyle.java CssParseException.java
+
+OBJS = $(SRCS:.java=.class)
+
+PACKAGE = org.w3c.css.parser
+JAVAC = javac
+JAVADOC = javadoc
+JAVADOCFLAGS = -version -d docs -protected
+JAVACFLAGS = 
+MAKEDEPEND = jmakedepend
+
+.SUFFIXES: .class .java
+.java.class:; $(JAVAC) $(JAVACFLAGS) $<
+
+all: $(OBJS)
+
+javadoc:; $(JAVADOC) $(JAVADOCFLAGS) $(PACKAGE)
+
+clean:; -rm -f $(OBJS) *~ core
+
+depend:; $(MAKEDEPEND) $(SRCS)
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+CssErrorToken.class:: CssErrorToken.java\
+	/usr/local/java11/lib/classes.zip
+CssSelectors.class:: CssSelectors.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class
+Frame.class:: Frame.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warning.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class
+CssXMLParser.class:: CssXMLParser.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/w3c.zip
+CssError.class:: CssError.java
+CssValidatorListener.class:: CssValidatorListener.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class
+CssErrorDeclaration.class:: CssErrorDeclaration.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.values/CssExpression.class
+Errors.class:: Errors.java
+CssFouffa.class:: CssFouffa.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/CssGrammar.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/ParseError.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/ParseException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.values/CssExpression.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.values/CssValue.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/InvalidParamException.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Util.class
+CssStyle.class:: CssStyle.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warnings.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.util/Warning.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.css/StyleSheet.class
+CssParseException.class:: CssParseException.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/ParseException.class
+CssXMLListener.class:: CssXMLListener.java\
+	/usr/local/java11/lib/classes.zip\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.parser.analyzer/ParseError.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.values/CssExpression.class\
+	/u/www43/0/w3c/plehegar/Work/Java/w3c.zip
+CssPrinterStyle.class:: CssPrinterStyle.java\
+	/u/www43/0/w3c/plehegar/Work/Java/org.w3c.css.properties/CssProperty.class

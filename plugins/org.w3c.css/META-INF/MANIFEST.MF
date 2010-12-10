@@ -5,9 +5,6 @@ Bundle-SymbolicName: org.w3c.css
 Bundle-Version: 3.0.0.qualifier
 Bundle-Vendor: %providerName
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Bundle-ClassPath: css-validator.jar,
- lib/velocity.jar,
- .
 Export-Package: org.apache.commons.lang,
  org.w3c.css.css,
  org.w3c.css.error,

@@ -1,0 +1,143 @@
+#set ( $page_type = "UI" )
+#macro( moreOptionMacro $submit_message $tab_id)
+  <fieldset id="extra_opt_$tab_id" class="moreoptions">
+    <legend class="toggletext" title="$title_more_options">$more_options</legend>
+    <div class="options">
+    <table>
+    <tr>
+    <th id="header_profile_$tab_id">
+      <label for="profile_$tab_id">$profile :</label>
+    </th>
+    <td headers="header_profile_$tab_id">
+      <select id="profile_$tab_id" name="profile">
+        <option value="none">$no_special_profile</option>
+        <option value="css1">$css1</option>
+        <option value="css2">$css2</option>
+        <option selected="selected" value="css21">$css21</option>
+        <option value="css3">$css3</option>
+        <option value="svg">$SVG</option>
+        <option value="svgbasic">$svgbasic</option>
+        <option value="svgtiny">$svgtiny</option>  
+        <option value="mobile">$mobile</option>
+        <option value="atsc-tv">$ATSC_TV_profile</option>
+        <option value="tv">$TV_profile</option>
+      </select>
+    </td>
+    <th id="header_medium_$tab_id">
+      <label for="medium_$tab_id">$medium :</label>
+    </th>
+    <td headers="header_medium_$tab_id">
+      <select id="medium_$tab_id" name="usermedium">
+        <option selected="selected" value="all">$all</option>
+        <option value="aural">$aural</option>
+        <option value="braille">$braille</option>
+        <option value="embossed">$embossed</option>
+        <option value="handheld">$handheld</option>
+        <option value="print">$print</option>
+        <option value= "projection">$projection</option>
+        <option value="screen">$screen</option>
+        <option value="tty">$tty</option>
+        <option value="tv">$tv</option>
+        <option value="presentation">$presentation</option>
+      </select>
+    </td>
+    </tr>
+    <tr>
+    #if ($tab_id == "input")
+    <th id="header_type_$tab_id">
+      <label for="type_$tab_id">$type :</label>
+    </th>
+    <td headers="header_type_$tab_id">
+      <select id="type_$tab_id" name="type">
+        <option selected="selected" value="none">$no_special_type</option>
+        <option value="html">$html_doc</option>
+        <option value="css">$css_doc</option>
+      </select>
+    </td>
+    #end
+    <th id="header_warning_$tab_id">
+      <label for="warning_$tab_id">$warnings :</label>
+    </th>
+    <td
+    #if ($tab_id != "input")
+    colspan="3"
+    #end
+     headers="header_warning_$tab_id">
+      <select id="warning_$tab_id" name="warning"> 
+        <option value="2">$all</option>
+        <option selected="selected" value="1">$normal_report</option>
+        <option value="0">$most_important</option>
+        <option value="no">$no_warnings</option>
+      </select>
+    </td>
+    </tr>
+    </table>
+    </div><!-- item_contents -->
+  </fieldset><!-- invisible -->
+  
+  <p class="submit_button">
+  <input type="hidden" name="lang" value="$lang" />
+    <label title="$submit_message">
+      <input type="submit" value="$check" />
+    </label>
+  </p>
+#end
+#parse("./header.vm")
+
+  <div id="frontforms">
+      <ul id="tabset_tabs">
+        <li><a href="#validate-by-uri" class="active">$by_URI</a></li><li><a href="#validate-by-upload">$by_file_upload</a></li><li><a href="#validate-by-input">$by_direct_input</a></li>
+      </ul>
+      <div id="fields">
+
+      <fieldset id="validate-by-uri" class="tabset_content front">
+        <legend class="tabset_label">$validate_by_URI</legend>
+        <form method="get" action="validator">
+        <p class="instructions">
+          $enter_uri :
+        </p>
+        <p>
+           <label title="$page_address" for="uri">$address :
+             <input type="text" name="uri" id="uri" size="45" />
+           </label>
+        </p>
+      #set($tab_id = "uri")
+      #moreOptionMacro($submit_uri $tab_id)
+      </form>
+      </fieldset>
+
+      <fieldset id="validate-by-upload"  class="tabset_content front">
+        <legend class="tabset_label">$validate_by_file_upload</legend>
+      <form method="post" enctype="multipart/form-data" action="validator">
+        <p class="instructions">$choose_document :</p>
+        <p>
+          <label title="$choose_local_file" for="file">$local_CSS_file :
+          <input type="file" id="file" name="file" size="30" /></label></p>
+          #set($tab_id = "upload")
+          #moreOptionMacro($submit_file $tab_id)
+      </form>
+      </fieldset>
+
+      <fieldset id="validate-by-input"  class="tabset_content front">
+        <legend class="tabset_label">$validate_by_input</legend>
+        <form action="validator" enctype="multipart/form-data" method="post">
+        <p class="instructions">$enter_CSS :</p>
+        <p>
+          <textarea name="text" rows="12" cols="70"></textarea>
+        </p>      
+      #set($tab_id = "input")
+      #moreOptionMacro($submit_input $tab_id)
+      </form>
+      </fieldset>
+      </div><!-- fields -->
+  </div> <!-- frontforms -->
+  
+  <div class="intro" id="don_program"></div>  
+  <script type="text/javascript" src="http://www.w3.org/QA/Tools/don_prog.js"></script>
+  
+  
+  <div class="intro">
+  <p><strong>$note</strong>: $note_xhtml_valid.
+  </p>
+  </div>
+#parse("./footer.vm")

@@ -1,0 +1,57 @@
+  <ul class="navbar" id="menu">
+    <li><a href="about.html" title="$about_title">$about</a> <span class="hideme">|</span></li>
+    <li><a href="documentation.html" title="$doc_title">$doc</a> <span class="hideme">|</span></li>
+    <li><a href="DOWNLOAD.html" title="$dl_title">$dl</a> <span class="hideme">|</span></li>
+    <li><a href="Email.html" title="$feedback_title">$feedback</a> <span class="hideme">|</span></li>
+    <li><a href="thanks.html" title="$credits_title">$credits</a></li>
+  </ul>
+
+   <ul id="lang_choice">
+#foreach ( $language in $languages )
+    #set ( $name = $language.get("name") )
+    #if ( $language.get("real") )
+        #set ( $real =  $language.get("real") )
+    #else
+        #set ( $real = $language.get("name") )
+    #end
+
+        <li><a href="validator.html.$name"
+            lang="$name"
+            xml:lang="$name"
+            hreflang="$name"
+            rel="alternate">$real</a>
+        </li>
+#end
+   </ul>
+
+<div id="footer">
+   <p id="activity_logos">
+     <a href="http://www.w3.org/QA/" title="$W3C_quality_msg"><img src="http://www.w3.org/QA/2002/12/qa-small.png" alt="QA" /></a><a href="http://www.w3.org/Style/CSS/learning" title="$learn_more_msg"><img src="images/woolly-icon" alt="CSS" /></a>
+   </p>
+   <p id="support_logo">
+   <a href="http://www.w3.org/QA/Tools/Donate">
+   <img src="http://www.w3.org/QA/Tools/I_heart_validator" alt="I heart Validator logo" title=" Validators Donation Program" />
+   </a>
+   </p>
+
+    <p class="copyright">
+      <a rel="Copyright" href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> &copy; 1994-2009
+      <a href="http://www.w3.org/"><acronym title="World Wide Web Consortium">W3C</acronym></a>&reg;
+
+      (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>,
+      <a href="http://www.ercim.org/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>,
+      <a href="http://www.keio.ac.jp/">Keio</a>),
+      All Rights Reserved.
+      W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+      <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a>,
+      <a rel="Copyright" href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a>
+      and <a rel="Copyright" href="http://www.w3.org/Consortium/Legal/copyright-software">software licensing</a>
+
+      rules apply. Your interactions with this site are in accordance
+      with our <a href="http://www.w3.org/Consortium/Legal/privacy-statement#Public">public</a> and
+      <a href="http://www.w3.org/Consortium/Legal/privacy-statement#Members">Member</a> privacy
+      statements.
+    </p>
+</div>
+  </body>
+</html>

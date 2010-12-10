@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$lang" lang="$lang">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>$W3C_CSS_validation_service</title>
+    <link rev="made" href="mailto:www-validator-css@w3.org" />
+    <link rev="start" href="./" title="$home_title" />
+    <style type="text/css" media="all">
+      @import "style/base.css";
+	  #if ( $page_type == "doc" )
+      @import "style/docs.css";
+	  #end
+    </style>   
+  #if ( $page_type != "doc" )
+    <script type="text/javascript" src="scripts/mootools.js"></script>
+    <script type="text/javascript" src="scripts/w3c-validator.js"></script>
+  #end
+  </head>
+
+  <body>
+   <div id="banner">
+    <h1 id="title"><a href="http://www.w3.org/"><img alt="W3C" width="110" height="61" id="logo" src="./images/w3c.png" /></a>
+    <a href="./"><span>CSS Validation Service</span></a></h1>
+    <p id="tagline">
+      $check_CSS
+    </p>
+   </div>
