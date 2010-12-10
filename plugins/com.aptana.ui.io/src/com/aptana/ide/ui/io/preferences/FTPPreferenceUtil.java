@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
+ * with certain Eclipse Public Licensed code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -34,36 +34,31 @@
  */
 package com.aptana.ide.ui.io.preferences;
 
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
-/**
- * NLS
- */
-public final class Messages extends NLS
+import com.aptana.ide.ui.io.IOUIPlugin;
+
+public class FTPPreferenceUtil
 {
-
-	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
-
-	public static String FTPPreferencePage_LBL_ReopenRemote;
-
-	public static String PermissionsGroup_All;
-	public static String PermissionsGroup_Execute;
-	public static String PermissionsGroup_Group;
-	public static String PermissionsGroup_Read;
-	public static String PermissionsGroup_Title;
-	public static String PermissionsGroup_User;
-	public static String PermissionsGroup_Write;
-	public static String PermissionPreferencePage_DirectoryGroupTitle;
-	public static String PermissionPreferencePage_FileGroupTitle;
-	public static String PermissionPreferencePage_Notes;
-
-	static
+	public static boolean getReopenRemoteOnStartup()
 	{
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+		return Platform.getPreferencesService().getBoolean(IOUIPlugin.PLUGIN_ID,
+				IPreferenceConstants.REOPEN_REMOTE_FILES_ON_STARUP, false, null);
 	}
 
-	private Messages()
+	public static void setReopenRemoteOnStartup(boolean reopen)
 	{
-		// Do not instantiate
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(IOUIPlugin.PLUGIN_ID);
+		prefs.putBoolean(IPreferenceConstants.REOPEN_REMOTE_FILES_ON_STARUP, reopen);
+		try
+		{
+			prefs.flush();
+		}
+		catch (BackingStoreException e)
+		{
+		}
 	}
 }
