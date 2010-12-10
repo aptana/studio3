@@ -95,6 +95,11 @@ public interface IPreferenceConstants
 	 */
 	public static final String EDITOR_MARK_OCCURRENCES_COLOR = CommonEditorPlugin.PLUGIN_ID + ".editorMarkOccurrencesColor"; //$NON-NLS-1$
 
+	/**
+	 * EDITOR_PEER_CHARACTER_CLOSE
+	 */
+	public static final String EDITOR_PEER_CHARACTER_CLOSE = CommonEditorPlugin.PLUGIN_ID + ".editorPeerCharacterClose"; //$NON-NLS-1$
+
 
 	/**
 	 * The preference key for the comma-separated list of selected validators for a language

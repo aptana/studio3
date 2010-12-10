@@ -40,6 +40,10 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
 
+	public static String CommonEditorPreferencePage_Default_Editor_Preference_Link;
+
+	public static String CommonEditorPreferencePage_Editor_Preferences;
+
 	public static String TasksPreferencePage_CaseSensitiveLabel;
 	public static String TasksPreferencePage_Description;
 	public static String TasksPreferencePage_EditTagTitle;
@@ -54,73 +58,29 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
 
-	/**
-	 * EditorsPreferencePage_Advanced
-	 */
-	public static String EditorsPreferencePage_Advanced;
+	public static String EditorsPreferencePage_Close_Matching_Character_Pairs;
 
-	/**
-	 * EditorsPreferencePage_CodeAssist
-	 */
-	public static String EditorsPreferencePage_CodeAssist;
+	public static String EditorsPreferencePage_Colorize_Matching_Character_Pairs;
 
-	/**
-	 * EditorsPreferencePage_DelayBeforeShowing
-	 */
-	public static String EditorsPreferencePage_DelayBeforeShowing;
+	public static String EditorsPreferencePage_Content_Assist;
+
+	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
+
+	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
+
 	
 	/**
 	 * EditorsPreferencePage_EditLink
 	 */
 	public static String EditorsPreferencePage_EditLink;
-	public static String EditorsPreferencePage_EmailAddressForBugReports;
-
-	/**
-	 * EditorsPreferencePage_EnableCodeDragAndDrop
-	 */
-	public static String EditorsPreferencePage_EnableCodeDragAndDrop;
-
-	/**
-	 * EditorsPreferencePage_EnableCodePairMatching
-	 */
-	public static String EditorsPreferencePage_EnableCodePairMatching;
-
-	/**
-	 * EditorsPreferencePage_EnableSourceColorizing
-	 */
-	public static String EditorsPreferencePage_EnableSourceColorizing;
-
-	/**
-	 * EditorsPreferencePage_EnableUnicode
-	 */
-	public static String EditorsPreferencePage_EnableUnicode;
-
-	/**
-	 * EditorsPreferencePage_EnableWordWrap
-	 */
-	public static String EditorsPreferencePage_EnableWordWrap;
 
 	/**
 	 * EditorsPreferencePage_Formatting
 	 */
 	public static String EditorsPreferencePage_Formatting;
 	
-	/**
-	 * EditorsPreferencePage_General
-	 */
-	public static String EditorsPreferencePage_General;
 	public static String EditorsPreferencePage_HomeEndBehavior;
 
-	public static String EditorsPreferencePage_INF_ErrorParsingOSGIFrameworkVersion;
-	/**
-	 * EditorsPreferencePage_InsertSelectedProposal
-	 */
-	public static String EditorsPreferencePage_InsertSelectedProposal;
-
-	/**
-	 * EditorsPreferencePage_InsertSpaces
-	 */
-	public static String EditorsPreferencePage_InsertSpaces;
 	public static String EditorsPreferencePage_JumpsStartEnd;
 	
 	/**
@@ -129,40 +89,17 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_MarkOccurrences;
 
 	/**
-	 * EditorsPreferencePage_MaxColorizeColumns
-	 */
-	public static String EditorsPreferencePage_MaxColorizeColumns;
-
-	/**
-	 * EditorsPreferencePage_OptimizeProfileReparsing
-	 */
-	public static String EditorsPreferencePage_OptimizeProfileReparsing;
-
-	/**
 	 * EditorsPreferencePage_PreferenceDescription
 	 */
 	public static String EditorsPreferencePage_PreferenceDescription;
-
-	/**
-	 * EditorsPreferencePage_ShowLocations
-	 */
-	public static String EditorsPreferencePage_ShowLocations;
-
-	/**
-	 * EditorsPreferencePage_ShowSpacesAs
-	 */
-	public static String EditorsPreferencePage_ShowSpacesAs;
-
-	/**
-	 * EditorsPreferencePage_ShowTabsAs
-	 */
-	public static String EditorsPreferencePage_ShowTabsAs;
 	
 	/**
 	 * EditorsPreferencePage_TabInsertion
 	 */
 	public static String EditorsPreferencePage_TabInsertion;
 	public static String EditorsPreferencePage_ToggleBetween;
+
+	public static String EditorsPreferencePage_Typing;
 	
 	/**
 	 * EditorsPreferencePage_UseSpaces
@@ -173,30 +110,6 @@ public class Messages extends NLS
 	 * EditorsPreferencePage_UseTabs
 	 */
 	public static String EditorsPreferencePage_UseTabs;
-
-	/**
-	 * EditorsPreferencePage_WhitespaceMarkers
-	 */
-	public static String EditorsPreferencePage_WhitespaceMarkers;
-
-	/**
-	 * EditorsPreferencePage_EnableOccurrenceHighlight
-	 */
-	public static String EditorsPreferencePage_EnableOccurrenceHighlight;
-	public static String EditorsPreferencePage_LBL_Colorization;
-	public static String EditorsPreferencePage_LBL_Less;
-	public static String EditorsPreferencePage_LBL_More;
-	public static String EditorsPreferencePage_LBL_PianoKeyColorDifference;
-
-	/**
-	 * EditorsPreferencePage_OccurrenceBackgroundColor
-	 */
-	public static String EditorsPreferencePage_OccurrenceBackgroundColor;
-
-	/**
-	 * EditorsPreferencePage_SmartHomeKeyPositioning
-	 */
-	public static String EditorsPreferencePage_SmartHomeKeyPositioning;
 	
 	/**
 	 * EditorsPreferencePage_GeneralTextEditorPrefLink

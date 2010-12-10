@@ -530,11 +530,6 @@
             name="%page.editors.name"/>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="%page.name.0"/>
-      <page
-            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.TasksPreferencePage"
             id="com.aptana.editor.common.preferences.TasksPreferencePage"
             name="%page.tasks.name">

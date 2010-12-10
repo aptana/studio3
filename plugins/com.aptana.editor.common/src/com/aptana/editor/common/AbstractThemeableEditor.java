@@ -195,6 +195,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	private IPropertyChangeListener fThemeListener;
 
+	private PeerCharacterCloser fPeerCharacterCloser;
+
 	/**
 	 * AbstractThemeableEditor
 	 */
@@ -236,7 +238,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		PeerCharacterCloser.install(getSourceViewer());
+		fPeerCharacterCloser = PeerCharacterCloser.install(getSourceViewer());
+		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
 		fCursorChangeListened = true;
 
 		fSelectionChangedListener = new SelectionChangedListener();
@@ -523,6 +526,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				fFileService.dispose();
 				fFileService = null;
 			}
+			fPeerCharacterCloser = null;
 		}
 		finally
 		{
@@ -579,6 +583,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
+		if(event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE)) {
+			fPeerCharacterCloser.setAutoInsertEnabled((Boolean)event.getNewValue());
+		}
 	}
 
 	public synchronized FileService getFileService()

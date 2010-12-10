@@ -34,46 +34,121 @@
  */
 package com.aptana.editor.common.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
+import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.ui.epl.UIEplPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
  * The form for configuring the general top-level preferences for this plugin
  */
 
+@SuppressWarnings("restriction")
 public class EditorsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	private Button spaces;
 	private Button tabs;
-
 	private IPreferenceStore editorPreferenceStore;
+	private IPreferenceStore eplPreferenceStore;
+	private CheckboxTableViewer categoryViewer;
+
+	/**
+	 * CategoryContentProvider
+	 * 
+	 * @author Ingo Muschenetz
+	 */
+	private class CategoryContentProvider implements IStructuredContentProvider
+	{
+		/**
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		public Object[] getElements(Object inputElement)
+		{
+			return (Object[]) inputElement;
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
+		public void dispose()
+		{
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
+		{
+		}
+	}
+
+	/**
+	 * CategoryLabelProvider
+	 * 
+	 * @author Ingo Muschenetz
+	 */
+	private class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
+	{
+		/**
+		 * @param decorate
+		 */
+		public CategoryLabelProvider(boolean decorate)
+		{
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		 */
+		public Image getColumnImage(Object element, int columnIndex)
+		{
+			return ((UserAgentManager.UserAgent) element).enabledIcon;
+		}
+
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
+		public String getColumnText(Object element, int columnIndex)
+		{
+			return ((UserAgentManager.UserAgent) element).name;
+		}
+	}
 
 	private IPropertyChangeListener prefListener = new IPropertyChangeListener()
 	{
@@ -101,11 +176,11 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	/**
 	 * EditorsPreferencePage
 	 */
-	@SuppressWarnings("restriction")
 	public EditorsPreferencePage()
 	{
 		super(GRID);
 		editorPreferenceStore = EditorsPlugin.getDefault().getPreferenceStore();
+		eplPreferenceStore = UIEplPlugin.getDefault().getPreferenceStore();
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
 		setDescription(Messages.EditorsPreferencePage_PreferenceDescription);
 	}
@@ -117,18 +192,122 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	public void createFieldEditors()
 	{
 		Composite appearanceComposite = getFieldEditorParent();
-		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
-				Messages.EditorsPreferencePage_Formatting);
+		Composite group = AptanaPreferencePage.createGroup(appearanceComposite, Messages.EditorsPreferencePage_Typing);
 
 		addField(new BooleanFieldEditor(IPreferenceConstants.ENABLE_CHARACTER_PAIR_COLORING,
-				"Colorize matching character pairs", group));
+				Messages.EditorsPreferencePage_Colorize_Matching_Character_Pairs, group));
 
-		addField(new RadioGroupFieldEditor(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END,
-				Messages.EditorsPreferencePage_HomeEndBehavior, 1, new String[][] {
-						{ Messages.EditorsPreferencePage_ToggleBetween, "true" }, //$NON-NLS-1$
-						{ Messages.EditorsPreferencePage_JumpsStartEnd, "false" } }, //$NON-NLS-1$
-				appearanceComposite, true));
+		addField(new BooleanFieldEditor(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE,
+				Messages.EditorsPreferencePage_Close_Matching_Character_Pairs, group));
 
+		// In Studio 2.0, commenting out until requested, or it's determined we have enough available space
+		// addField(new RadioGroupFieldEditor(AbstractTextEditor.PREFERENCE_NAVIGATION_SMART_HOME_END,
+		// Messages.EditorsPreferencePage_HomeEndBehavior, 1, new String[][] {
+		//								{ Messages.EditorsPreferencePage_ToggleBetween, "true" }, //$NON-NLS-1$
+		//								{ Messages.EditorsPreferencePage_JumpsStartEnd, "false" } }, //$NON-NLS-1$
+		// appearanceComposite, true));
+
+		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.EditorsPreferencePage_Content_Assist);
+
+		addField(new RadioGroupFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, 3, new String[][] {
+						{ "On", Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) }, //$NON-NLS-1$
+						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
+								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
+						{ "Off", "-1" } }, //$NON-NLS-1$ //$NON-NLS-2$
+				caGroup, false));
+
+		createUserAgentCategoryArea(caGroup);
+		createUserAgentButtons(caGroup);
+
+		createTabInsertionEditors(appearanceComposite);
+	}
+
+	/**
+	 * @param parent
+	 */
+	private void createUserAgentCategoryArea(Composite parent)
+	{
+		Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.UserAgentPreferencePage_Select_User_Agents);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.widthHint = 400;
+		data.horizontalSpan = 2;
+		label.setLayoutData(data);
+
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		composite.setLayout(layout);
+		data = new GridData(GridData.FILL_BOTH);
+		data.widthHint = 200;
+		composite.setLayoutData(data);
+		Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.SINGLE);
+		table.setFont(parent.getFont());
+		table.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+			}
+		});
+		categoryViewer = new CheckboxTableViewer(table);
+		categoryViewer.getControl().setFont(parent.getFont());
+		categoryViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
+		categoryViewer.setContentProvider(new CategoryContentProvider());
+		CategoryLabelProvider categoryLabelProvider = new CategoryLabelProvider(true);
+		categoryViewer.setLabelProvider(categoryLabelProvider);
+		categoryViewer.setSorter(new ViewerSorter());
+
+		categoryViewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			public void selectionChanged(SelectionChangedEvent event)
+			{
+			}
+		});
+		categoryViewer.setInput(UserAgentManager.getInstance().getAllUserAgents());
+		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getActiveUserAgents());
+	}
+
+	private void createUserAgentButtons(Composite parent)
+	{
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout(4, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		composite.setLayout(layout);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		composite.setLayoutData(data);
+
+		Button enableAll = new Button(composite, SWT.PUSH);
+		enableAll.setFont(parent.getFont());
+		enableAll.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				categoryViewer.setCheckedElements(UserAgentManager.getInstance().getAllUserAgents());
+			}
+		});
+		enableAll.setText(Messages.UserAgentPreferencePage_Select_All);
+		setButtonLayoutData(enableAll);
+
+		Button disableAll = new Button(composite, SWT.PUSH);
+		disableAll.setFont(parent.getFont());
+		disableAll.addSelectionListener(new SelectionAdapter()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				categoryViewer.setCheckedElements(new Object[0]);
+			}
+		});
+		disableAll.setText(Messages.UserAgentPreferencePage_Select_None);
+		setButtonLayoutData(disableAll);
+	}
+
+	private void createTabInsertionEditors(Composite appearanceComposite)
+	{
 		Composite wsGroup = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_TabInsertion);
 		Composite wsComp = new Composite(wsGroup, SWT.NONE);
@@ -185,6 +364,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 			}
 
 		});
+
 		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
 		Link link = new Link(appearanceComposite, SWT.NONE);
 		link.setText(Messages.EditorsPreferencePage_GeneralTextEditorPrefLink);
@@ -225,7 +405,11 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 				.getDefaultBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		spaces.setSelection(useSpaces);
 		tabs.setSelection(!useSpaces);
+
+		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getDefaultActiveUserAgents());
+
 		super.performDefaults();
+
 	}
 
 	/**
@@ -235,6 +419,21 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	{
 		editorPreferenceStore.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
 				spaces.getSelection());
+
+		List<String> al = new ArrayList<String>();
+		Object[] elements = categoryViewer.getCheckedElements();
+
+		for (int i = 0; i < elements.length; i++)
+		{
+			UserAgentManager.UserAgent userAgent = (UserAgentManager.UserAgent) elements[i];
+
+			al.add(userAgent.ID);
+		}
+
+		eplPreferenceStore.setValue(com.aptana.editor.common.contentassist.IPreferenceConstants.USER_AGENT_PREFERENCE,
+				StringUtil.join(",", al.toArray(new String[al.size()])) //$NON-NLS-1$
+				);
+
 		return super.performOk();
 	}
 
