@@ -60,11 +60,6 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 				this));
 		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
-
-		// TODO: Fix issue with comments not wrapping correctly with newlines
-		// Something like: /*
-		// border: 1px solid red;
-		// */
-		// addTabPage("Comments", new CSSFormatterCommentsPage(this));
+		addTabPage("Comments", new CSSFormatterCommentsPage(this));
 	}
 }

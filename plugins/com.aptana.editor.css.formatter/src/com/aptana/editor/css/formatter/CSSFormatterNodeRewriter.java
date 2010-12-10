@@ -34,29 +34,54 @@
  */
 package com.aptana.editor.css.formatter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.aptana.editor.css.formatter.nodes.FormatterCSSCommentNode;
+import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterNodeRewriter;
-import com.aptana.formatter.nodes.IFormatterContainerNode;
 import com.aptana.formatter.nodes.IFormatterNode;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.IParseRootNode;
 
 public class CSSFormatterNodeRewriter extends FormatterNodeRewriter
 {
+	private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("(\\S.*)"); //$NON-NLS-1$
+	private static final String MULTI_LINE_COMMENT_PREFIX = "/*"; //$NON-NLS-1$
 
-	public CSSFormatterNodeRewriter(IParseRootNode parseResult)
+	public CSSFormatterNodeRewriter(IParseRootNode parseResult, FormatterDocument document)
 	{
-		for (IParseNode commentNode : parseResult.getCommentNodes())
-		{
-			addComment(commentNode.getStartingOffset(), commentNode.getEndingOffset(), commentNode);
-		}
+		insertComments(document, parseResult.getCommentNodes());
 	}
 
-	public void rewrite(IFormatterContainerNode root)
+	private void insertComments(FormatterDocument document, IParseNode[] comments)
 	{
-		super.rewrite(root);
-		attachComments(root);
+		for (IParseNode commentNode : comments)
+		{
+			// in case we have a multi-line block comment, we actually break the comment to its lines and
+			// create a comment node for each line.
+			int startingOffset = commentNode.getStartingOffset();
+			int endingOffset = commentNode.getEndingOffset() + 1;
+			String commentText = document.get(startingOffset, endingOffset);
+			if (commentText.startsWith(MULTI_LINE_COMMENT_PREFIX))
+			{
+				// Push each line as a comment. Mark the first line as a 'first'.
+				Matcher matcher = COMMENT_LINE_PATTERN.matcher(commentText);
+				boolean isFirstLine = true;
+				while (matcher.find())
+				{
+					int start = matcher.start();
+					int end = matcher.end();
+					addComment(startingOffset + start, startingOffset + end, new CSSCommentInfo(true, isFirstLine));
+					isFirstLine = false;
+				}
+			}
+			else
+			{
+				addComment(startingOffset, endingOffset, new CSSCommentInfo(false, false));
+			}
+		}
 	}
 
 	/*
@@ -68,7 +93,22 @@ public class CSSFormatterNodeRewriter extends FormatterNodeRewriter
 	protected IFormatterNode createCommentNode(IFormatterDocument document, int startOffset, int endOffset,
 			Object object)
 	{
-		return new FormatterCSSCommentNode(document, startOffset, endOffset);
+		CSSCommentInfo info = (CSSCommentInfo) object;
+
+		return new FormatterCSSCommentNode(document, startOffset, endOffset, info.isMultiLine, info.isFirstLine);
+	}
+
+	private class CSSCommentInfo
+	{
+		boolean isMultiLine;
+		boolean isFirstLine;
+
+		CSSCommentInfo(boolean isMultiLine, boolean isFirstLine)
+		{
+			this.isMultiLine = isMultiLine;
+			this.isFirstLine = isFirstLine;
+		}
+
 	}
 
 }
