@@ -81,6 +81,18 @@ public class CollectionsUtil
 	}
 
 	/**
+	 * This is a convenience method that returns true if the specified collection is null or empty
+	 * 
+	 * @param <T>
+	 * @param collection
+	 * @return
+	 */
+	public static <T> boolean isEmpty(Collection<T> collection)
+	{
+		return collection == null || collection.isEmpty();
+	}
+
+	/**
 	 * This is a convenience method that essentially checks for a null list and returns Collections.emptyList in that
 	 * case. If the list is non-null, then this is an identity function.
 	 * 
