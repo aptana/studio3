@@ -37,26 +37,24 @@ package com.aptana.editor.common.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -87,38 +85,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	private IPreferenceStore editorPreferenceStore;
 	private IPreferenceStore eplPreferenceStore;
 	private CheckboxTableViewer categoryViewer;
-
-	/**
-	 * CategoryContentProvider
-	 * 
-	 * @author Ingo Muschenetz
-	 */
-	private class CategoryContentProvider implements IStructuredContentProvider
-	{
-		/**
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
-		public Object[] getElements(Object inputElement)
-		{
-			return (Object[]) inputElement;
-		}
-
-		/**
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
-		public void dispose()
-		{
-		}
-
-		/**
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
-		{
-		}
-	}
-
+	private String GENERAL_TEXT_EDITOR_PREF_ID = "org.eclipse.ui.preferencePages.GeneralTextEditor"; //$NON-NLS-1$
+	
 	/**
 	 * CategoryLabelProvider
 	 * 
@@ -155,13 +123,13 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 		public void propertyChange(PropertyChangeEvent event)
 		{
-			if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH)
+			if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(event.getProperty())
 					&& spaces != null && !spaces.isDisposed())
 			{
 				spaces.setText(StringUtil.format(Messages.EditorsPreferencePage_UseSpaces, event.getNewValue()));
 			}
 
-			if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS)
+			if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS.equals(event.getProperty())
 					&& spaces != null && !spaces.isDisposed() && tabs != null && !tabs.isDisposed())
 			{
 				Boolean val = (Boolean) event.getNewValue();
@@ -231,41 +199,23 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	{
 		Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.UserAgentPreferencePage_Select_User_Agents);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.widthHint = 400;
-		data.horizontalSpan = 2;
-		label.setLayoutData(data);
+		label.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
 
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-		data = new GridData(GridData.FILL_BOTH);
-		data.widthHint = 200;
-		composite.setLayoutData(data);
+		composite.setLayout(GridLayoutFactory.fillDefaults().create());
+		composite.setLayoutData(GridDataFactory.fillDefaults().hint(400, 120).grab(true, true).create());
+
 		Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.SINGLE);
 		table.setFont(parent.getFont());
-		table.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-			}
-		});
+
 		categoryViewer = new CheckboxTableViewer(table);
 		categoryViewer.getControl().setFont(parent.getFont());
 		categoryViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
-		categoryViewer.setContentProvider(new CategoryContentProvider());
+		categoryViewer.setContentProvider(new ArrayContentProvider());
 		CategoryLabelProvider categoryLabelProvider = new CategoryLabelProvider(true);
 		categoryViewer.setLabelProvider(categoryLabelProvider);
 		categoryViewer.setSorter(new ViewerSorter());
 
-		categoryViewer.addSelectionChangedListener(new ISelectionChangedListener()
-		{
-			public void selectionChanged(SelectionChangedEvent event)
-			{
-			}
-		});
 		categoryViewer.setInput(UserAgentManager.getInstance().getAllUserAgents());
 		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getActiveUserAgents());
 	}
@@ -273,13 +223,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	private void createUserAgentButtons(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(4, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
-		data.horizontalSpan = 2;
-		composite.setLayoutData(data);
+		composite.setLayout(GridLayoutFactory.fillDefaults().numColumns(4).create());
+		composite.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).grab(true, false).create());
 
 		Button enableAll = new Button(composite, SWT.PUSH);
 		enableAll.setFont(parent.getFont());
@@ -311,20 +256,14 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		Composite wsGroup = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_TabInsertion);
 		Composite wsComp = new Composite(wsGroup, SWT.NONE);
+		wsComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).create());
+		wsComp.setLayoutData(GridDataFactory.fillDefaults().create());
 
-		GridLayout wsLayout = new GridLayout(3, false);
-		wsLayout.marginWidth = 0;
-		wsLayout.marginHeight = 0;
-		wsComp.setLayout(wsLayout);
-		wsComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		tabs = new Button(wsComp, SWT.RADIO);
 		Composite spaceComp = new Composite(wsComp, SWT.NONE);
-		wsLayout = new GridLayout(2, false);
-		wsLayout.marginWidth = 0;
-		wsLayout.marginHeight = 0;
-		wsLayout.horizontalSpacing = 0;
-		spaceComp.setLayout(wsLayout);
-		spaceComp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		spaceComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).equalWidth(false).create());
+		spaceComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
 		spaces = new Button(spaceComp, SWT.RADIO);
 		final Link currentTabSize = new Link(spaceComp, SWT.NONE);
 		int size = editorPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
@@ -338,7 +277,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 			public void widgetSelected(SelectionEvent e)
 			{
 				((IWorkbenchPreferenceContainer) getContainer()).openPage(
-						"org.eclipse.ui.preferencePages.GeneralTextEditor", null); //$NON-NLS-1$
+						GENERAL_TEXT_EDITOR_PREF_ID, null);
 			}
 
 		});
@@ -374,7 +313,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 			public void widgetSelected(SelectionEvent e)
 			{
 				((IWorkbenchPreferenceContainer) getContainer()).openPage(
-						"org.eclipse.ui.preferencePages.GeneralTextEditor", null); //$NON-NLS-1$
+						GENERAL_TEXT_EDITOR_PREF_ID, null);
 			}
 
 		});
@@ -423,10 +362,9 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		List<String> al = new ArrayList<String>();
 		Object[] elements = categoryViewer.getCheckedElements();
 
-		for (int i = 0; i < elements.length; i++)
+		for (Object i : elements)
 		{
-			UserAgentManager.UserAgent userAgent = (UserAgentManager.UserAgent) elements[i];
-
+			UserAgentManager.UserAgent userAgent = (UserAgentManager.UserAgent)i;
 			al.add(userAgent.ID);
 		}
 

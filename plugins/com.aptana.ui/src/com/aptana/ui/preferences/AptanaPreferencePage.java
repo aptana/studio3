@@ -34,10 +34,10 @@
  */
 package com.aptana.ui.preferences;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
@@ -65,22 +65,12 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		Group group = new Group(appearanceComposite, SWT.NONE);
 		group.setFont(font);
 		group.setText(string);
-		GridLayout layout = new GridLayout();
-		layout.marginWidth = 5;
-		layout.marginHeight = 5;
-		layout.numColumns = 2;
-		group.setLayout(layout);
+		
+		group.setLayout(GridLayoutFactory.fillDefaults().margins(5, 5).numColumns(2).create());
+		group.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).grab(true, false).create());
 
 		Composite c = new Composite(group, SWT.NONE);
-		layout = new GridLayout();
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		layout.numColumns = 2;
-		c.setLayout(layout);
-
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		group.setLayoutData(gd);
+		c.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 
 		return c;
 	}

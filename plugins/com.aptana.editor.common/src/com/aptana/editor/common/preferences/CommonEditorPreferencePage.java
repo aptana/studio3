@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.common.preferences;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -41,7 +43,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
@@ -112,15 +113,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	{
 		Composite aOptions = new Composite(parent, SWT.NONE);
 
-		GridLayout layout = new GridLayout();
-		layout.marginHeight = 0;
-		layout.marginLeft = 0;
-		aOptions.setLayout(layout);
-
-		GridData data = new GridData(GridData.FILL_BOTH);
-		data.horizontalIndent = 18;
-		data.horizontalSpan = 2;
-		aOptions.setLayoutData(data);
+		aOptions.setLayout(GridLayoutFactory.fillDefaults().create());
+		aOptions.setLayoutData(GridDataFactory.fillDefaults().indent(18, 0).create());
 
 		createMarkOccurrenceOptions(aOptions);
 
@@ -152,31 +146,21 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		{
 			if (!(Boolean) event.getNewValue())
 			{
-				hideAdvancedOccurrenceSection();
+				toggleAdvancedOccurrenceSection(false);
 			}
 			else
 			{
-				showAdvancedOccurrenceSection();
+				toggleAdvancedOccurrenceSection(true);
 			}
 		}
 	}
 
-	private void hideAdvancedOccurrenceSection()
+	private void toggleAdvancedOccurrenceSection(boolean show)
 	{
-		advancedOptions.setVisible(false);
+		advancedOptions.setVisible(show);
 		if (advancedOptions.getLayoutData() != null)
 		{
-			((GridData) advancedOptions.getLayoutData()).exclude = true;
-		}
-		appearanceComposite.layout(true, true);
-	}
-
-	private void showAdvancedOccurrenceSection()
-	{
-		advancedOptions.setVisible(true);
-		if (advancedOptions.getLayoutData() != null)
-		{
-			((GridData) advancedOptions.getLayoutData()).exclude = false;
+			((GridData) advancedOptions.getLayoutData()).exclude = !show;
 		}
 		appearanceComposite.layout(true, true);
 	}
@@ -191,14 +175,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		if (advancedOptions != null)
 		{
-			if (getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES))
-			{
-				showAdvancedOccurrenceSection();
-			}
-			else
-			{
-				hideAdvancedOccurrenceSection();
-			}
+			boolean markOccurrences = getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
+			toggleAdvancedOccurrenceSection(markOccurrences);
 		}
 	}
 }
