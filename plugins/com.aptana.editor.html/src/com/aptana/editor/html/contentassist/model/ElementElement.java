@@ -83,7 +83,7 @@ public class ElementElement extends BaseElement
 	 */
 	public void addAttribute(String attribute)
 	{
-		if (attribute != null && attribute.isEmpty() == false)
+		if (StringUtil.isEmpty(attribute))
 		{
 			if (this._attributes == null)
 			{
@@ -102,7 +102,7 @@ public class ElementElement extends BaseElement
 	 */
 	public void addEvent(String event)
 	{
-		if (event != null && event.isEmpty() == false)
+		if (StringUtil.isEmpty(event))
 		{
 			if (this._events == null)
 			{
@@ -119,7 +119,7 @@ public class ElementElement extends BaseElement
 	 */
 	public void addReference(String reference)
 	{
-		if (reference != null && reference.isEmpty() == false)
+		if (StringUtil.isEmpty(reference))
 		{
 			if (this._references == null)
 			{
