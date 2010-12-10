@@ -338,13 +338,13 @@ public class JSIndexReader extends IndexReader
 		{
 			try
 			{
-				String pattern = typeName + JSIndexConstants.DELIMITER;
+				String pattern = typeName + this.getDelimiter();
 				List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, pattern, SearchPattern.PREFIX_MATCH);
 
 				if (types != null && types.isEmpty() == false)
 				{
 					QueryResult type = types.get(0);
-					String[] columns = DELIMITER_PATTERN.split(type.getWord());
+					String[] columns = this.getDelimiterPattern().split(type.getWord());
 					String retrievedName = columns[0];
 					int column = 0;
 
