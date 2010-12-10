@@ -35,9 +35,9 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 
@@ -112,14 +112,7 @@ public class TypeElement extends BaseElement
 	 */
 	public List<PropertyElement> getProperties()
 	{
-		List<PropertyElement> result = this._properties;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._properties);
 	}
 
 	/**
@@ -175,14 +168,7 @@ public class TypeElement extends BaseElement
 	 */
 	public List<String> getParentTypes()
 	{
-		List<String> result = this._parentTypes;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._parentTypes);
 	}
 
 	/**

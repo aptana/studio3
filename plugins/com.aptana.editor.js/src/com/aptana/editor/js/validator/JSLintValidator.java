@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.mozilla.javascript.CompilerEnvirons;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
@@ -56,32 +57,12 @@ import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.libraries.LibrariesPlugin;
 
 public class JSLintValidator implements IValidator
 {
 
 	private static final String JSLINT_FILENAME = "fulljslint.js"; //$NON-NLS-1$
 	private static Script jsLintScript;
-	static
-	{
-		URL url = LibrariesPlugin.getDefault().getBundle().getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$
-		if (url != null)
-		{
-			String source = null;
-			try
-			{
-				source = StreamUtil.readContent(url.openStream());
-			}
-			catch (IOException e)
-			{
-			}
-			if (source != null)
-			{
-				jsLintScript = getJSLintScript(source);
-			}
-		}
-	}
 
 	public JSLintValidator()
 	{
@@ -106,7 +87,7 @@ public class JSLintValidator implements IValidator
 	private void parseWithLint(Context context, String source, URI path, IValidationManager manager)
 	{
 		Scriptable scope = context.initStandardObjects();
-		jsLintScript.exec(context, scope);
+		getJSLintScript().exec(context, scope);
 
 		Object functionObj = scope.get("JSLINT", scope); //$NON-NLS-1$
 		if (functionObj instanceof Function)
@@ -162,6 +143,30 @@ public class JSLintValidator implements IValidator
 
 			}
 		}
+	}
+
+	private static synchronized Script getJSLintScript()
+	{
+		if (jsLintScript == null)
+		{
+			URL url = Platform.getBundle("org.mozilla.rhino").getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$ //$NON-NLS-2$
+			if (url != null)
+			{
+				String source = null;
+				try
+				{
+					source = StreamUtil.readContent(url.openStream());
+				}
+				catch (IOException e)
+				{
+				}
+				if (source != null)
+				{
+					jsLintScript = getJSLintScript(source);
+				}
+			}
+		}
+		return jsLintScript;
 	}
 
 	private static Script getJSLintScript(String source)

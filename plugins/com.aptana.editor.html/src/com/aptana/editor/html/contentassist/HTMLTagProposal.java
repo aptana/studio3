@@ -1,5 +1,7 @@
 package com.aptana.editor.html.contentassist;
 
+import java.util.List;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -41,7 +43,7 @@ class HTMLTagProposal extends CommonCompletionProposal
 				HTMLContentAssistProcessor.ELEMENT_ICON, element.getName(), null, element.getDescription());
 		setFileLocation(HTMLIndexConstants.CORE);
 
-		String[] userAgents = element.getUserAgentNames();
+		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 		setUserAgentImages(userAgentIcons);
 

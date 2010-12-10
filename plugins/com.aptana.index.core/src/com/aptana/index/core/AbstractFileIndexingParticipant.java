@@ -37,7 +37,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 					}
 					catch (CoreException e)
 					{
-						IndexActivator.logError(e);
+						IndexPlugin.logError(e);
 					}
 				}
 			}
@@ -100,7 +100,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 	}
 

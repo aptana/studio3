@@ -35,16 +35,18 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexDocument;
+import com.aptana.index.core.IndexUtil;
 
-public class BaseElement implements Convertible
+public class BaseElement implements Convertible, IndexDocument
 {
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
 	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$
@@ -125,44 +127,11 @@ public class BaseElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		// since list
-		Object sinceList = object.get(SINCE_PROPERTY);
-
-		if (sinceList != null && sinceList.getClass().isArray())
-		{
-			for (Object since : (Object[]) sinceList)
-			{
-				if (since instanceof Map)
-				{
-					SinceElement s = new SinceElement();
-
-					s.fromJSON((Map) since);
-
-					this.addSince(s);
-				}
-			}
-		}
-
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		this._sinceList = IndexUtil.createList(object.get(SINCE_PROPERTY), SinceElement.class);
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -172,7 +141,7 @@ public class BaseElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -182,14 +151,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<String> getDocuments()
 	{
-		List<String> result = this._documents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._documents);
 	}
 
 	/**
@@ -199,7 +161,7 @@ public class BaseElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -209,14 +171,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<SinceElement> getSinceList()
 	{
-		List<SinceElement> result = this._sinceList;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._sinceList);
 	}
 
 	/**
@@ -226,20 +181,11 @@ public class BaseElement implements Convertible
 	 */
 	public List<String> getUserAgentNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._userAgents != null)
+		for (UserAgentElement userAgent : this.getUserAgents())
 		{
-			result = new ArrayList<String>(this._userAgents.size());
-
-			for (UserAgentElement userAgent : this._userAgents)
-			{
-				result.add(userAgent.getPlatform());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(userAgent.getPlatform());
 		}
 
 		return result;
@@ -252,14 +198,7 @@ public class BaseElement implements Convertible
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		List<UserAgentElement> result = this._userAgents;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**
@@ -269,10 +208,7 @@ public class BaseElement implements Convertible
 	 */
 	public void setDescription(String description)
 	{
-		if (description != null)
-		{
-			this._description = description;
-		}
+		this._description = description;
 	}
 
 	/**
@@ -282,10 +218,7 @@ public class BaseElement implements Convertible
 	 */
 	public void setName(String name)
 	{
-		if (name != null)
-		{
-			this._name = name;
-		}
+		this._name = name;
 	}
 
 	/*

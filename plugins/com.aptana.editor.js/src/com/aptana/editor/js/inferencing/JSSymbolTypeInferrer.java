@@ -36,7 +36,6 @@ package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -50,7 +49,6 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -67,7 +65,6 @@ import com.aptana.parsing.ast.IParseNode;
 public class JSSymbolTypeInferrer
 {
 	private static final String NO_TYPE = ""; //$NON-NLS-1$
-	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.allOf(ContentSelector.class);
 
 	private Index _index;
 	private JSScope _activeScope;
@@ -178,13 +175,13 @@ public class JSSymbolTypeInferrer
 			while (queue.isEmpty() == false)
 			{
 				JSNode node = queue.poll();
-				
+
 				if (visitedSymbols.contains(node) == false)
 				{
 					visitedSymbols.add(node);
-					
+
 					DocumentationBlock docs = node.getDocumentation();
-	
+
 					if (docs != null)
 					{
 						JSTypeUtil.applyDocumentation(property, docs);
@@ -194,9 +191,9 @@ public class JSSymbolTypeInferrer
 					{
 						// grab name
 						String symbol = node.getText();
-	
+
 						JSPropertyCollection p = this.getSymbolProperty(this._activeScope.getObject(), symbol);
-	
+
 						if (p != null)
 						{
 							for (JSNode value : p.getValues())
@@ -208,7 +205,7 @@ public class JSSymbolTypeInferrer
 					else if (node instanceof JSAssignmentNode)
 					{
 						IParseNode rhs = node.getLastChild();
-	
+
 						if (rhs instanceof JSNode)
 						{
 							queue.offer((JSNode) rhs);
@@ -404,7 +401,7 @@ public class JSSymbolTypeInferrer
 		}
 
 		List<String> typesAndAncestors = new ArrayList<String>(ancestors);
-		List<PropertyElement> typeMembers = helper.getTypeMembers(this._index, typesAndAncestors, MEMBER_CONTENT);
+		List<PropertyElement> typeMembers = helper.getTypeMembers(this._index, typesAndAncestors);
 		Map<String, PropertyElement> propertyMap = new HashMap<String, PropertyElement>();
 
 		for (PropertyElement propertyElement : typeMembers)

@@ -168,25 +168,21 @@ public class CSSIndexQueryHelper
 	{
 		PropertyElement result = null;
 
-		try
+		if (name != null && name.length() > 0)
 		{
-			List<PropertyElement> properties = this._reader.getProperties(getIndex(), name);
-
-			if (properties != null)
+			try
 			{
-				for (PropertyElement property : properties)
+				List<PropertyElement> properties = this._reader.getProperties(getIndex(), name);
+
+				if (properties.isEmpty() == false)
 				{
-					if (name.equals(property.getName()))
-					{
-						result = property;
-						break;
-					}
+					result = properties.get(0);
 				}
 			}
-		}
-		catch (IOException e)
-		{
-			CSSPlugin.logError(e.getMessage(), e);
+			catch (IOException e)
+			{
+				CSSPlugin.logError(e.getMessage(), e);
+			}
 		}
 
 		return result;

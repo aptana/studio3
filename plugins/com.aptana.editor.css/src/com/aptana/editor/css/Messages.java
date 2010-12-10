@@ -43,7 +43,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.css.messages"; //$NON-NLS-1$
-	public static String CSSMetadataLoader_Error_Loading_Metadata;
 	public static String CSSMetadataLoader_Loading_Metadata;
 	static
 	{

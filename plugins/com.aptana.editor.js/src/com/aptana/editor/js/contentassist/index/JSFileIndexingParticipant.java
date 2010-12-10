@@ -37,7 +37,6 @@ package com.aptana.editor.js.contentassist.index;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +54,6 @@ import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
@@ -388,7 +386,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 					{
 						JSIndexQueryHelper queryHelper = new JSIndexQueryHelper();
 
-						result = queryHelper.getTypeMembers(index, typeNames, EnumSet.allOf(ContentSelector.class));
+						result = queryHelper.getTypeMembers(index, typeNames);
 					}
 				}
 			}

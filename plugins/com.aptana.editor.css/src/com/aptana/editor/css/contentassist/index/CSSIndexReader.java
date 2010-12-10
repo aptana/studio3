@@ -41,137 +41,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON;
-
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class CSSIndexReader
+public class CSSIndexReader extends IndexReader
 {
 	/**
-	 * CSSIndexReader
-	 */
-	public CSSIndexReader()
-	{
-	}
-
-	/**
-	 * createElementFromKey
+	 * createElement
 	 * 
-	 * @param index
-	 * @param key
+	 * @param element
 	 * @return
-	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
-	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
+	private ElementElement createElement(QueryResult element)
 	{
-		ElementElement e = new ElementElement();
-
-		String key = element.getWord();
-		String[] columns = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[0]);
-
-		if (m instanceof Map)
-		{
-			e.fromJSON((Map) m);
-		}
-
-		for (String document : element.getDocuments())
-		{
-			e.addDocument(document);
-		}
-
-		return e;
+		return this.populateElement(new ElementElement(), element, 1);
 	}
 
 	/**
-	 * createPropertyFromKey
+	 * createProperty
 	 * 
-	 * @param index
-	 * @param key
+	 * @param property
 	 * @return
-	 * @throws IOException
 	 */
-	@SuppressWarnings("rawtypes")
-	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
+	private PropertyElement createProperty(QueryResult property)
 	{
-		PropertyElement p = new PropertyElement();
-
-		String key = property.getWord();
-		String columns[] = key.split(CSSIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[0]);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : property.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(new PropertyElement(), property, 1);
 	}
 
 	/**
-	 * @param index
+	 * createPseudoClass
+	 * 
 	 * @param pseudoClass
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	private PseudoClassElement createPseudoClassFromKey(Index index, QueryResult pseudoClass)
+	private PseudoClassElement createPseudoClass(QueryResult pseudoClass)
 	{
-		PseudoClassElement p = new PseudoClassElement();
-
-		String word = pseudoClass.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoClass.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+		return this.populateElement(new PseudoClassElement(), pseudoClass);
 	}
 
 	/**
-	 * @param index
 	 * @param pseudoElement
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
-	private PseudoElementElement createPseudoElementFromKey(Index index, QueryResult pseudoElement)
+	private PseudoElementElement createPseudoElement(QueryResult pseudoElement)
 	{
-		PseudoElementElement p = new PseudoElementElement();
+		return this.populateElement(new PseudoElementElement(), pseudoElement);
+	}
 
-		String word = pseudoElement.getWord();
-		Object m = JSON.parse(word);
-
-		if (m instanceof Map)
-		{
-			p.fromJSON((Map) m);
-		}
-
-		for (String document : pseudoElement.getDocuments())
-		{
-			p.addDocument(document);
-		}
-
-		return p;
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getDelimiter()
+	 */
+	@Override
+	protected String getDelimiter()
+	{
+		return CSSIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -197,7 +128,7 @@ public class CSSIndexReader
 			{
 				for (QueryResult element : items)
 				{
-					result.add(this.createElementFromKey(index, element));
+					result.add(this.createElement(element));
 				}
 			}
 		}
@@ -228,7 +159,7 @@ public class CSSIndexReader
 			{
 				for (QueryResult property : properties)
 				{
-					result.add(this.createPropertyFromKey(index, property));
+					result.add(this.createProperty(property));
 				}
 			}
 		}
@@ -248,7 +179,7 @@ public class CSSIndexReader
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null)
+		if (index != null && names != null)
 		{
 			for (String name : names)
 			{
@@ -262,7 +193,7 @@ public class CSSIndexReader
 				{
 					for (QueryResult property : properties)
 					{
-						result.add(this.createPropertyFromKey(index, property));
+						result.add(this.createProperty(property));
 					}
 				}
 			}
@@ -294,7 +225,7 @@ public class CSSIndexReader
 			{
 				for (QueryResult pseudoClass : pseudoClasses)
 				{
-					result.add(this.createPseudoClassFromKey(index, pseudoClass));
+					result.add(this.createPseudoClass(pseudoClass));
 				}
 			}
 		}
@@ -325,12 +256,22 @@ public class CSSIndexReader
 			{
 				for (QueryResult pseudoElement : pseudoElements)
 				{
-					result.add(this.createPseudoElementFromKey(index, pseudoElement));
+					result.add(this.createPseudoElement(pseudoElement));
 				}
 			}
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getSubDelimiter()
+	 */
+	@Override
+	protected String getSubDelimiter()
+	{
+		return CSSIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -342,7 +283,7 @@ public class CSSIndexReader
 	{
 		Map<String, String> result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(category) == false)
 		{
 			String pattern = "*"; //$NON-NLS-1$
 

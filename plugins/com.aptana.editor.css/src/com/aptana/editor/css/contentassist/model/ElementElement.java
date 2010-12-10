@@ -40,16 +40,18 @@ import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
-public class ElementElement extends AbstractCSSMetadataElement
+public class ElementElement extends BaseElement
 {
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
 	private static final String REMARK_PROPERTY = "remark"; //$NON-NLS-1$
 	private static final String DISPLAY_NAME_PROPERTY = "displayName"; //$NON-NLS-1$
 
 	private String _displayName;
-	private List<String> _properties = new ArrayList<String>();
+	private List<String> _properties;
 	private String _remark;
 
 	/**
@@ -67,7 +69,15 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public void addProperty(String name)
 	{
-		this._properties.add(name);
+		if (name != null && name.length() > 0)
+		{
+			if (this._properties == null)
+			{
+				this._properties = new ArrayList<String>();
+			}
+
+			this._properties.add(name);
+		}
 	}
 
 	/*
@@ -80,17 +90,10 @@ public class ElementElement extends AbstractCSSMetadataElement
 	{
 		super.fromJSON(object);
 
-		this.setDisplayName(object.get(DISPLAY_NAME_PROPERTY).toString());
-		this.setRemark(object.get(REMARK_PROPERTY).toString());
+		this.setDisplayName(StringUtil.getStringValue(object.get(DISPLAY_NAME_PROPERTY)));
+		this.setRemark(StringUtil.getStringValue(object.get(REMARK_PROPERTY)));
 
-		Object properties = object.get(PROPERTIES_PROPERTY);
-		if (properties != null && properties.getClass().isArray())
-		{
-			for (Object property : (Object[]) properties)
-			{
-				this.addProperty(property.toString());
-			}
-		}
+		this._properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY));
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getDisplayName()
 	{
-		return StringUtil.getValue(this._displayName);
+		return StringUtil.getStringValue(this._displayName);
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public List<String> getProperties()
 	{
-		return this._properties;
+		return CollectionsUtil.getListValue(this._properties);
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class ElementElement extends AbstractCSSMetadataElement
 	 */
 	public String getRemark()
 	{
-		return StringUtil.getValue(this._remark);
+		return StringUtil.getStringValue(this._remark);
 	}
 
 	/**

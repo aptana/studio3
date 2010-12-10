@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-Vendor: %providerName
+Bundle-SymbolicName: org.w3c.tidy
+Bundle-Version: 1.0.0.qualifier
+Export-Package: org.w3c.dom,
+ org.w3c.tidy,
+ org.xml.sax
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

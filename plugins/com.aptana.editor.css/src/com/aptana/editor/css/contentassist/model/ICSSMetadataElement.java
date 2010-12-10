@@ -38,7 +38,6 @@ import java.util.List;
 
 public interface ICSSMetadataElement
 {
-
 	/**
 	 * getDescription;
 	 */
@@ -71,5 +70,4 @@ public interface ICSSMetadataElement
 	 * @return
 	 */
 	public String getExample();
-
 }

@@ -35,14 +35,15 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class ParameterElement implements Convertible
 {
@@ -88,20 +89,11 @@ public class ParameterElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setUsage(object.get(USAGE_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setUsage(StringUtil.getStringValue(object.get(USAGE_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		// types
-		Object types = object.get(TYPES_PROPERTY);
-
-		if (types != null && types.getClass().isArray())
-		{
-			for (Object type : (Object[]) types)
-			{
-				this.addType(type.toString());
-			}
-		}
+		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY));
 	}
 
 	/**
@@ -109,7 +101,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -117,7 +109,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -127,14 +119,7 @@ public class ParameterElement implements Convertible
 	 */
 	public List<String> getTypes()
 	{
-		List<String> result = this._types;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._types);
 	}
 
 	/**
@@ -144,7 +129,7 @@ public class ParameterElement implements Convertible
 	 */
 	public String getUsage()
 	{
-		return StringUtil.getValue(this._usage);
+		return StringUtil.getStringValue(this._usage);
 	}
 
 	/**

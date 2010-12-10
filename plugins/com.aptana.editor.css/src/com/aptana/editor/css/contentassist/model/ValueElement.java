@@ -41,7 +41,9 @@ import java.util.Map;
 import org.mortbay.util.ajax.JSON.Convertible;
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class ValueElement implements Convertible
 {
@@ -51,7 +53,7 @@ public class ValueElement implements Convertible
 
 	private String _name;
 	private String _description;
-	private List<UserAgentElement> _userAgents = new ArrayList<UserAgentElement>();
+	private List<UserAgentElement> _userAgents;
 
 	/**
 	 * ValueElement
@@ -67,7 +69,15 @@ public class ValueElement implements Convertible
 	 */
 	public void addUserAgent(UserAgentElement userAgent)
 	{
-		this._userAgents.add(userAgent);
+		if (userAgent != null)
+		{
+			if (this._userAgents == null)
+			{
+				this._userAgents = new ArrayList<UserAgentElement>();
+			}
+
+			this._userAgents.add(userAgent);
+		}
 	}
 
 	/*
@@ -77,26 +87,10 @@ public class ValueElement implements Convertible
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setName(object.get(NAME_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setName(StringUtil.getStringValue(object.get(NAME_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 
-		// user agents
-		Object userAgents = object.get(USER_AGENTS_PROPERTY);
-
-		if (userAgents != null && userAgents.getClass().isArray())
-		{
-			for (Object userAgent : (Object[]) userAgents)
-			{
-				if (userAgent instanceof Map)
-				{
-					UserAgentElement ua = new UserAgentElement();
-
-					ua.fromJSON((Map) userAgent);
-
-					this.addUserAgent(ua);
-				}
-			}
-		}
+		this._userAgents = IndexUtil.createList(object.get(USER_AGENTS_PROPERTY), UserAgentElement.class);
 	}
 
 	/**
@@ -106,7 +100,7 @@ public class ValueElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -116,7 +110,7 @@ public class ValueElement implements Convertible
 	 */
 	public String getName()
 	{
-		return StringUtil.getValue(this._name);
+		return StringUtil.getStringValue(this._name);
 	}
 
 	/**
@@ -126,7 +120,7 @@ public class ValueElement implements Convertible
 	 */
 	public List<UserAgentElement> getUserAgents()
 	{
-		return this._userAgents;
+		return CollectionsUtil.getListValue(this._userAgents);
 	}
 
 	/**

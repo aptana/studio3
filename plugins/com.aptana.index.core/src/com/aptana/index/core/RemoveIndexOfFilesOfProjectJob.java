@@ -69,7 +69,7 @@ public class RemoveIndexOfFilesOfProjectJob extends IndexRequestJob
 			}
 			catch (IOException e)
 			{
-				IndexActivator.logError(e.getMessage(), e);
+				IndexPlugin.logError(e.getMessage(), e);
 			}
 			sub.done();
 		}

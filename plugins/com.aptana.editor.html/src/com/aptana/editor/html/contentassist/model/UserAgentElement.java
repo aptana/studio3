@@ -34,10 +34,18 @@
  */
 package com.aptana.editor.html.contentassist.model;
 
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
 import com.aptana.core.util.StringUtil;
 
-public class UserAgentElement
+public class UserAgentElement implements Convertible
 {
+	private static final String VERSION_PROPERTY = "version"; //$NON-NLS-1$
+	private static final String PLATFORM_PROPERTY = "platform"; //$NON-NLS-1$
+
 	private String _platform;
 	private String _version;
 
@@ -50,27 +58,13 @@ public class UserAgentElement
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
-	@Override
-	public boolean equals(Object obj)
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
 	{
-		boolean result = false;
-
-		if (this == obj)
-		{
-			result = true;
-		}
-		else
-		{
-			UserAgentElement that = (UserAgentElement) obj;
-
-			result = //
-					StringUtil.areEqual(this.getPlatform(), that.getPlatform()) //
-				&&	StringUtil.areEqual(this.getVersion(), that.getVersion()); //
-		}
-
-		return result;
+		this.setPlatform(StringUtil.getStringValue(object.get(PLATFORM_PROPERTY)));
+		this.setVersion(StringUtil.getStringValue(object.get(VERSION_PROPERTY)));
 	}
 
 	/**
@@ -80,7 +74,7 @@ public class UserAgentElement
 	 */
 	public String getPlatform()
 	{
-		return (this._platform != null) ? this._platform : StringUtil.EMPTY;
+		return StringUtil.getStringValue(this._platform);
 	}
 
 	/**
@@ -90,32 +84,7 @@ public class UserAgentElement
 	 */
 	public String getVersion()
 	{
-		return (this._version != null) ? this._version : StringUtil.EMPTY;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		int h = 0;
-
-		String[] items = new String[] { //
-			this.getPlatform(), //
-			this.getVersion() //
-		};
-
-		for (String item : items)
-		{
-			if (item != null)
-			{
-				h = 31 * h + item.hashCode();
-			}
-		}
-
-		return h;
+		return StringUtil.getStringValue(this._version);
 	}
 
 	/**
@@ -136,5 +105,15 @@ public class UserAgentElement
 	public void setVersion(String version)
 	{
 		this._version = version;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(PLATFORM_PROPERTY, this.getPlatform());
+		out.add(VERSION_PROPERTY, this.getVersion());
 	}
 }
