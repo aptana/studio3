@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
+package com.aptana.editor.xml;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +49,8 @@ import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.HTMLSourceConfiguration;
 import com.aptana.editor.html.parsing.HTMLParseState;
 
 @SuppressWarnings("nls")

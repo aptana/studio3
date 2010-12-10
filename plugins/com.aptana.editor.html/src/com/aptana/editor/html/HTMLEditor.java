@@ -57,6 +57,7 @@ import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
+import com.aptana.editor.xml.OpenTagCloser;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {

@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.editor.xml.OpenTagCloser;
+
 public class OpenTagCloserTest extends TestCase
 {
 	private TextViewer viewer;
