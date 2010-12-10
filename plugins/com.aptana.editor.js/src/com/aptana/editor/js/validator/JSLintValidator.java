@@ -49,6 +49,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.ScriptOrFnNode;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.optimizer.Codegen;
+import org.mozilla.rhino.RhinoPlugin;
 
 import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.common.validator.IValidationItem;
@@ -56,7 +57,6 @@ import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.parsing.IJSParserConstants;
-import com.aptana.libraries.LibrariesPlugin;
 
 public class JSLintValidator implements IValidator
 {
@@ -65,7 +65,7 @@ public class JSLintValidator implements IValidator
 	private static Script jsLintScript;
 	static
 	{
-		URL url = LibrariesPlugin.getDefault().getBundle().getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$
+		URL url = RhinoPlugin.getBundle().getEntry("/" + JSLINT_FILENAME); //$NON-NLS-1$
 		if (url != null)
 		{
 			String source = null;
