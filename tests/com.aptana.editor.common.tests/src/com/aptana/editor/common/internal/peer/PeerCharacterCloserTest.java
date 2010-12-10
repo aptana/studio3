@@ -169,7 +169,7 @@ public class PeerCharacterCloserTest extends TestCase
 
 			protected char[] getPairs(String scope)
 			{
-				return new char[] { '(', ')', '"', '"'};
+				return new char[] { '(', ')', '"', '"' };
 			}
 
 			@Override
@@ -222,7 +222,7 @@ public class PeerCharacterCloserTest extends TestCase
 			}
 		};
 		viewer.setDocument(document);
-		
+
 		viewer.setSelectedRange(5, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -273,17 +273,12 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("function x()\n" + "{\n" + "    if (false)\n" + "    {}\n" + "\n" + "    if (false)\n" + "    {\n"
 				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
 	}
-	
+
 	public void testStudio3_1213()
 	{
-		setDocument("bundle do |bundle|\n" +
-"  bundle.author = 'Ed Spencer'\n" +
-"  bundle.contact_email_rot_13 = 'null'\n" +
-"  bundle.description =  \"A bundle for ExtJS\"\n" +
-"\n" +
-"  bundle.menu \"ExtJS do |main_menu|\n" +
-"  end\n" +
-"end");
+		setDocument("bundle do |bundle|\n" + "  bundle.author = 'Ed Spencer'\n"
+				+ "  bundle.contact_email_rot_13 = 'null'\n" + "  bundle.description =  \"A bundle for ExtJS\"\n"
+				+ "\n" + "  bundle.menu \"ExtJS do |main_menu|\n" + "  end\n" + "end");
 		viewer.setSelectedRange(154, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -306,6 +301,59 @@ public class PeerCharacterCloserTest extends TestCase
 		VerifyEvent event = sendEvent('"');
 
 		assertTrue(event.doit); // Don't pair, insert single character!
+	}
+
+	public void testignoresRubyHashesForHTMLTagPairs()
+	{
+		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor and then sent a keypress to it...
+		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n ";
+		document = new Document(src)
+		{
+			public ITypedRegion[] computePartitioning(int offset, int length) throws BadLocationException
+			{
+				return new ITypedRegion[] { 
+						new TypedRegion(0, 3, "__common_start_switch_tag"),
+						new TypedRegion(3, 21, "__rb__dftl_partition_content_type"),
+						new TypedRegion(24, 8, "__rb_string_single"),
+						new TypedRegion(32, 12, "__rb__dftl_partition_content_type"),
+						new TypedRegion(44, 43, "__rb_string_single"),
+						new TypedRegion(87, 1, "__rb__dftl_partition_content_type"),
+						new TypedRegion(88, 2, "__common_end_switch_tag"),
+						new TypedRegion(90, 1, "__html__dftl_partition_content_type") };
+			}
+
+			public String getContentType(int offset) throws BadLocationException
+			{
+				return "__html__dftl_partition_content_type";
+			}
+		};
+		viewer.setDocument(document);
+		viewer.setSelectedRange(src.length() - 1, 0);
+		closer = new PeerCharacterCloser(viewer)
+		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if ((offset >= 0 && offset <= 3) || (offset >= 89 && offset <= 90))
+					return "text.html.ruby source.erb.embedded.html";
+				if ((offset >= 4 && offset <= 24) || (offset >= 33 && offset <= 44) || (offset == 88))
+					return "text.html.ruby source.ruby.rails.embedded.html";
+				if ((offset >= 25 && offset <= 32) || (offset >= 45 && offset <= 87))
+					return "text.html.ruby source.ruby.rails.embedded.html string.quoted.single.ruby";
+				return "text.html.ruby";
+			}
+		};
+		VerifyEvent event = sendEvent('<');
+		// Make sure we pair this!
+		assertFalse("Should have paired the character!", event.doit);
+		assertEquals("<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n<> ",
+				document.get());
 	}
 
 	protected IDocument setDocument(String src)

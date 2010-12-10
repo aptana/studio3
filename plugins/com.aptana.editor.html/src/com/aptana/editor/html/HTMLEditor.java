@@ -61,11 +61,9 @@ import com.aptana.editor.html.parsing.IHTMLParserConstants;
 public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
 
 	private Map<Annotation, Position> fTagPairOccurrences;
-
-	// quotes
 
 	@Override
 	protected void initializeEditor()
