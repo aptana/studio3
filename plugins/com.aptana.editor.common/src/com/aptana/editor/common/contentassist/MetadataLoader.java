@@ -71,21 +71,24 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * createMetadataReader
+	 * Create a new instance of the metadata reader that will be used to process the metadata files. It is expected that
+	 * this will be called only once. However, it is used as a local in loadMetadata so that it will be garbaged
+	 * collected after that methods returns. If you do decide to cache the instance returned here, keep in mind that you
+	 * may want a mechanism in place to null it out later
 	 * 
 	 * @return
 	 */
 	protected abstract T createMetadataReader();
 
 	/**
-	 * getBundle
+	 * Grab the bundle which will be used to locate files via FileLocator.find
 	 * 
 	 * @return
 	 */
 	protected abstract Bundle getBundle();
 
 	/**
-	 * getDefaultIndexVersion
+	 * Return the default value used for the metadata index version number when no version number has yet to be defined
 	 * 
 	 * @return
 	 */
@@ -95,35 +98,36 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * getIndexVersion
+	 * Return the current metadata index version number that should be active in the language's index.
 	 * 
 	 * @return
 	 */
 	protected abstract double getIndexVersion();
 
 	/**
-	 * getIndexVersionKey
+	 * Return the preference key that stores the current metadata index version number
 	 * 
 	 * @return
 	 */
 	protected abstract String getIndexVersionKey();
 
 	/**
-	 * getMetadataFiles
+	 * Return a list of resources that should be loaded and processed by the metadata reader returned by
+	 * createMetadataReader
 	 * 
 	 * @return
 	 */
 	protected abstract String[] getMetadataFiles();
 
 	/**
-	 * getPluginId
+	 * Return the plugin ID that should be used to retrieve the current metadata index version number from preferences
 	 * 
 	 * @return
 	 */
 	protected abstract String getPluginId();
 
 	/**
-	 * loadMetadata
+	 * Process all metadata files via the metadata reader returned by createMetadataReader
 	 * 
 	 * @param monitor
 	 * @param reader
@@ -173,7 +177,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * rebuildMetadataIndex
+	 * Rebuild the current language's metadata index. Note that the old index is not automatically removed. This is
+	 * typically done in writeIndex
 	 * 
 	 * @param monitor
 	 */
@@ -206,16 +211,17 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * 
+	 * Sub-classes should implement this if they need to do more than just rebuilding the metadata index when the index
+	 * version changes
 	 */
 	protected void postRebuild()
 	{
-		// Sub-classes should implement this if they need to do more than just rebuilding the metadata index when the
-		// index version changes
+		// empty
 	}
 
 	/**
-	 * updateVersionPreference
+	 * Update the current metadata index version number so that it matches the value returned by getIndexVersion. This
+	 * is called once the metadata index has been updated
 	 */
 	protected void updateVersionPreference()
 	{
@@ -233,7 +239,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * versionChanged
+	 * Determine if the last saved metadata index version number matches the expected value. Return false if they do not
+	 * match
 	 * 
 	 * @return
 	 */
@@ -250,7 +257,8 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * writeIndex
+	 * Write all metadata to the language's index. This will be called after all resources have been processed in
+	 * loadMetadata
 	 * 
 	 * @param reader
 	 */
