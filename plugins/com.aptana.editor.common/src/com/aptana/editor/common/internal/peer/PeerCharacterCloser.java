@@ -382,7 +382,6 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		catch (BadLocationException e)
 		{
 			// ignore
-			e.printStackTrace();
 		}
 		return false;
 	}
