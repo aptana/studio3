@@ -32,31 +32,45 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.tests;
+package com.aptana.core.util;
 
-import com.aptana.core.util.CollectionsUtilTest;
-import com.aptana.core.util.EclipseUtilTest;
-import com.aptana.core.util.FirefoxUtilTest;
-import com.aptana.core.util.IOUtilTest;
-import com.aptana.core.util.StringUtilTest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
-public class AllTests
-{
+public class FirefoxUtilTest extends TestCase {
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("Test for com.aptana.core.util.tests");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(StringUtilTest.class);
-		suite.addTestSuite(IOUtilTest.class);
-		suite.addTestSuite(CollectionsUtilTest.class);
-		suite.addTestSuite(EclipseUtilTest.class);
-		suite.addTestSuite(FirefoxUtilTest.class);
-		//$JUnit-END$
-		return suite;
+	private static final String PROFILES_INI = "[General]\n" +
+			"StartWithLastProfile=1\n" +
+			"\n" + 
+			"[Profile0]\n" +
+			"Name=default\n" +
+			"IsRelative=1\n" +
+			"Path=Profiles/0sw283qs.default\n" +
+			"\n" +
+			"[Profile1]\n" +
+			"Name=additional\n" +
+			"IsRelative=0\n" +
+			"Path=/tmp/Profiles/0sw283qs.additional\n" +
+			"";
+	
+	public void testReadProfiles() throws IOException {
+		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
+		assertTrue(dir.delete());
+		assertTrue(dir.mkdir());
+		File file = new File(dir, "profiles.ini");
+		assertTrue(file.createNewFile());
+		OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(file));
+		w.write(PROFILES_INI);
+		w.close();
+
+		File[] profiles = FirefoxUtil.readProfiles(dir);
+		assertNotNull(profiles);
+		assertEquals(2, profiles.length);
+		assertEquals(new File(dir, "Profiles/0sw283qs.default"), profiles[0]);
+		assertEquals(new File("/tmp/Profiles/0sw283qs.additional"), profiles[1]);
 	}
-
 }
