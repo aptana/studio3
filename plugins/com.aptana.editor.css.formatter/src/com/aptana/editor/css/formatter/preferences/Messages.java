@@ -21,6 +21,7 @@ public class Messages extends NLS
 	public static String CSSFormatterControlStatementsPage_tab_size_group_option;
 	public static String CSSFormatterModifyDialog_blank_lines_page_tab_name;
 	public static String CSSFormatterModifyDialog_braces_page_tab_name;
+	public static String CSSFormatterModifyDialog_comments_page_tab_name;
 	public static String CSSFormatterModifyDialog_indentation_page_tab_name;
 	public static String CSSFormatterModifyDialog_CSS_formater_title;
 	static

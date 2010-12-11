@@ -100,8 +100,8 @@ public class CSSFormatterNodeRewriter extends FormatterNodeRewriter
 
 	private class CSSCommentInfo
 	{
-		boolean isMultiLine;
-		boolean isFirstLine;
+		final boolean isMultiLine;
+		final boolean isFirstLine;
 
 		CSSCommentInfo(boolean isMultiLine, boolean isFirstLine)
 		{

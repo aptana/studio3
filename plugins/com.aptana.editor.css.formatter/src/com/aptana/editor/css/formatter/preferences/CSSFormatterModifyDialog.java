@@ -60,6 +60,6 @@ public class CSSFormatterModifyDialog extends FormatterModifyDialog
 				this));
 		addTabPage(Messages.CSSFormatterModifyDialog_braces_page_tab_name, new CSSFormatterBracesPage(this));
 		addTabPage(Messages.CSSFormatterModifyDialog_blank_lines_page_tab_name, new CSSFormatterBlankLinesPage(this));
-		addTabPage("Comments", new CSSFormatterCommentsPage(this));
+		addTabPage(Messages.CSSFormatterModifyDialog_comments_page_tab_name, new CSSFormatterCommentsPage(this));
 	}
 }
