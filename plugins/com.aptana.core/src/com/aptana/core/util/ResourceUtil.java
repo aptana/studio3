@@ -53,7 +53,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
@@ -272,12 +271,13 @@ public class ResourceUtil
 	}
 	
 	/**
-	 * getPath
+	 * Returns raw path string for the provided element which could be
+	 * an uniform resource, URI or plain String.
 	 *
 	 * @param element
 	 * @return path
 	 */
-	public static String getPath( Object element ) {
+	public static String getPath(Object element) {
 		if ( element instanceof IUniformResource ) {
 			IUniformResource resource = (IUniformResource) element;
 			IPath path = (IPath) resource.getAdapter(IPath.class);
@@ -311,16 +311,14 @@ public class ResourceUtil
 	}
 	
 	/**
-	 * findWorkspaceFile
+	 * Finds workspace file for the provided workspace-relative path
 	 *
 	 * @param filePath
 	 * @return IFile
 	 */
-	public static IFile findWorkspaceFile(String filePath) {
-		IPath path = new Path(filePath);
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
-		if ( resource instanceof IFile )
-		{
+	public static IFile findWorkspaceFile(IPath filePath) {
+		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
+		if ( resource instanceof IFile ) {
 			return (IFile) resource;
 		}
 		return null;
