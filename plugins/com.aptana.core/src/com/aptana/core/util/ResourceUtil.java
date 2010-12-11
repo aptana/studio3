@@ -46,8 +46,6 @@ import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -59,7 +57,6 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.resources.IUniformResource;
 
 public class ResourceUtil
 {
@@ -269,47 +266,7 @@ public class ResourceUtil
 		}
 		return addBuilder;
 	}
-	
-	/**
-	 * Returns raw path string for the provided element which could be
-	 * an uniform resource, URI or plain String.
-	 *
-	 * @param element
-	 * @return path
-	 */
-	public static String getPath(Object element) {
-		if ( element instanceof IUniformResource ) {
-			IUniformResource resource = (IUniformResource) element;
-			IPath path = (IPath) resource.getAdapter(IPath.class);
-			if (path == null) {
-				IStorage storage = (IStorage) resource.getAdapter(IStorage.class);
-				if (storage != null) {
-					path = (IPath) storage.getAdapter(IPath.class);
-				}
-			}
-			if ( path != null ) {
-				return path.toOSString();	
-			} else {
-				return resource.getURI().toString();
-			}			
-		}
-		if ( element instanceof String ) {
-			try {
-				element = new URI((String) element);
-			} catch (URISyntaxException e) {
-			}	
-		}
-		if ( element instanceof URI ) {
-			URI uri = (URI) element;
-			if ( "file".equals(uri.getScheme()) ) //$NON-NLS-1$
-			{
-				return uri.getSchemeSpecificPart();
-			}
-			return uri.toString();
-		}
-		return null;
-	}
-	
+		
 	/**
 	 * Finds workspace file for the provided workspace-relative path
 	 *
@@ -317,11 +274,7 @@ public class ResourceUtil
 	 * @return IFile
 	 */
 	public static IFile findWorkspaceFile(IPath filePath) {
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
-		if ( resource instanceof IFile ) {
-			return (IFile) resource;
-		}
-		return null;
+		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
 	}
 
 	/**

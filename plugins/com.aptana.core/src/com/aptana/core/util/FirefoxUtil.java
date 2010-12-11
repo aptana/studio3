@@ -67,6 +67,9 @@ import com.aptana.core.CorePlugin;
  */
 public final class FirefoxUtil {
 
+	private static final String VALUE_PATTERN = "^(.[^=]*)=(.*)$"; //$NON-NLS-1$
+	private static final String SECTION_PATTERN = "^\\x5B(.*)\\x5D$"; //$NON-NLS-1$
+	
 	private static final String[] WIN32_PROFILES_LOCATIONS = {
 		"%APPDATA%\\Mozilla\\Firefox\\" //$NON-NLS-1$
 	};
@@ -103,7 +106,7 @@ public final class FirefoxUtil {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
 				File dir = new File(location);
-				if (!dir.isDirectory() || !dir.exists()) {
+				if (!dir.isDirectory()) {
 					continue;
 				}
 				CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
@@ -134,7 +137,7 @@ public final class FirefoxUtil {
 
 				for (int j = 0; j < profiles.length; ++j) {
 					File profile = profiles[j];
-					if (profile.exists() && profile.isDirectory()) {
+					if (profile.isDirectory()) {
 						CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
 						return Path.fromOSString(profile.getAbsolutePath());
 					}
@@ -160,8 +163,8 @@ public final class FirefoxUtil {
 				String line;
 				Map<String, Map<String, String>> sections = new LinkedHashMap<String, Map<String, String>>();
 				Map<String, String> last = null;
-				Pattern sectionPattern = Pattern.compile("^\\x5B(.*)\\x5D$"); //$NON-NLS-1$
-				Pattern valuePattern = Pattern.compile("^(.[^=]*)=(.*)$"); //$NON-NLS-1$
+				Pattern sectionPattern = Pattern.compile(SECTION_PATTERN);
+				Pattern valuePattern = Pattern.compile(VALUE_PATTERN);
 				while ((line = r.readLine()) != null) {
 					Matcher matcher = sectionPattern.matcher(line);
 					if (matcher.find()) {
