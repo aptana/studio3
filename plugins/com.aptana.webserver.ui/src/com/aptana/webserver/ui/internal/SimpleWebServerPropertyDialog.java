@@ -66,6 +66,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.IPropertyDialogProvider;
 import com.aptana.webserver.core.SimpleWebServerConfiguration;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
@@ -228,6 +229,7 @@ public class SimpleWebServerPropertyDialog extends TitleAreaDialog implements IP
 			IPath path = Path.fromOSString(documentRootText.getText());
 			source.setDocumentRootPath(path);
 		}
+		WebServerCorePlugin.getDefault().saveServerConfigurations();
 		super.okPressed();
 	}
 

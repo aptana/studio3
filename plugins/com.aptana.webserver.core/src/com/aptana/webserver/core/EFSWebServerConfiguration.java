@@ -76,13 +76,13 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 					URI uri = URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
 					return uri.toURL();
 				} catch (URISyntaxException e) {
-					Activator.log(e);
+					WebServerCorePlugin.log(e);
 				} catch (MalformedURLException e) {
-					Activator.log(e);
+					WebServerCorePlugin.log(e);
 				}
 			}
 		} catch (CoreException e) {
-			Activator.log(e);
+			WebServerCorePlugin.log(e);
 		}
 		return null;
 	}
@@ -110,7 +110,7 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 			try {
 				baseURL = new URL(child.getTextData());
 			} catch (MalformedURLException e) {
-				Activator.log(e);
+				WebServerCorePlugin.log(e);
 			}
 		}
 		child = memento.getChild(ELEMENT_DOCUMENT_ROOT);
@@ -120,7 +120,7 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 				try {
 					documentRoot = URI.create(text);
 				} catch (IllegalArgumentException e) {
-					Activator.log(e);
+					WebServerCorePlugin.log(e);
 				}
 			}
 		}
