@@ -32,29 +32,19 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.tests;
 
-import com.aptana.core.util.CollectionsUtilTest;
-import com.aptana.core.util.EclipseUtilTest;
-import com.aptana.core.util.IOUtilTest;
-import com.aptana.core.util.StringUtilTest;
+package com.aptana.core.util;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.eclipse.core.runtime.IPath;
 
-public class AllTests
-{
+import junit.framework.TestCase;
 
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite("Test for com.aptana.core.util.tests");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(StringUtilTest.class);
-		suite.addTestSuite(IOUtilTest.class);
-		suite.addTestSuite(CollectionsUtilTest.class);
-		suite.addTestSuite(EclipseUtilTest.class);
-		//$JUnit-END$
-		return suite;
+public class EclipseUtilTest extends TestCase {
+
+	public void testGetApplicationLauncher() {
+		IPath path = EclipseUtil.getApplicationLauncher();
+		assertNotNull(path);
+		assertTrue("Eclipse".equalsIgnoreCase(path.removeFileExtension().lastSegment())
+				|| "AptanaStudio3".equalsIgnoreCase(path.removeFileExtension().lastSegment()));
 	}
-
 }
