@@ -35,6 +35,8 @@
 package com.aptana.core.tests;
 
 import com.aptana.core.util.CollectionsUtilTest;
+import com.aptana.core.util.EclipseUtilTest;
+import com.aptana.core.util.FirefoxUtilTest;
 import com.aptana.core.util.IOUtilTest;
 import com.aptana.core.util.StringUtilTest;
 
@@ -51,6 +53,8 @@ public class AllTests
 		suite.addTestSuite(StringUtilTest.class);
 		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(CollectionsUtilTest.class);
+		suite.addTestSuite(EclipseUtilTest.class);
+		suite.addTestSuite(FirefoxUtilTest.class);
 		//$JUnit-END$
 		return suite;
 	}

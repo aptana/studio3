@@ -60,7 +60,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.ui.UIPlugin;
+import com.aptana.ui.epl.UIEplPlugin;
 
 /**
  * @author Max Stepanov
@@ -342,14 +342,14 @@ public class InputURLDialog extends Dialog {
 	}
 	
 	protected IMemento getMemento() {
-		File file = UIPlugin.getDefault().getStateLocation().append(URLS).addFileExtension(XML).toFile();
+		File file = UIEplPlugin.getDefault().getStateLocation().append(URLS).addFileExtension(XML).toFile();
 		if (file.exists()) {
 			try {
 				FileReader reader = new FileReader(file);
 				XMLMemento memento = XMLMemento.createReadRoot(reader);
 				return memento;
 			} catch (Exception e) {
-				UIPlugin.log(e);
+				UIEplPlugin.log(e);
 			}
 		}
 		return null;
@@ -358,12 +358,12 @@ public class InputURLDialog extends Dialog {
 	protected void saveMemento() {
 		XMLMemento memento = XMLMemento.createWriteRoot(URLS);
 		saveList(memento);
-		File file = UIPlugin.getDefault().getStateLocation().append(URLS).addFileExtension(XML).toFile();
+		File file = UIEplPlugin.getDefault().getStateLocation().append(URLS).addFileExtension(XML).toFile();
 		try {
 			FileWriter writer = new FileWriter(file);
 			memento.save(writer);
 		} catch (IOException e) {
-			UIPlugin.log(e);
+			UIEplPlugin.log(e);
 		}
 
 	}

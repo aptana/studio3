@@ -35,6 +35,8 @@
 
 package com.aptana.core.util;
 
+import org.osgi.framework.Version;
+
 /**
  * @author Max Stepanov
  *
@@ -54,16 +56,7 @@ public final class VersionUtil {
 	 * @return positive if left > right, zero if left == right, negative otherwise
 	 */
 	public static int compareVersions(String left, String right) {
-		int result;
-		String[] lparts = left.split("\\."); //$NON-NLS-1$
-		String[] rparts = right.split("\\."); //$NON-NLS-1$
-		for( int i = 0; i < lparts.length && i < rparts.length; ++i) {
-			result = lparts[i].compareToIgnoreCase(rparts[i]);
-			if(result != 0) {
-				return result;
-			}
-		}
-		return (lparts.length - rparts.length);
+		return Version.parseVersion(left).compareTo(Version.parseVersion(right));
 	}
 
 }

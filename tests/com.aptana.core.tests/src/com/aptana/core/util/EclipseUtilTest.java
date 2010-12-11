@@ -33,71 +33,18 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ui.util;
+package com.aptana.core.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.eclipse.core.runtime.IPath;
 
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import junit.framework.TestCase;
 
-import com.aptana.ui.UIPlugin;
+public class EclipseUtilTest extends TestCase {
 
-/**
- * @author Max Stepanov
- *
- */
-public final class WorkbenchBrowserUtil {
-
-	/**
-	 * 
-	 */
-	private WorkbenchBrowserUtil() {
-	}
-
-	public static void launchExternalBrowser(String url) {
-		try {
-			launchExternalBrowser(new URL(url));
-		} catch (MalformedURLException e) {
-			UIPlugin.log(e);
-		}
-	}
-
-	public static void launchExternalBrowser(URL url) {
-		launchExternalBrowser(url, null);
-	}
-
-	public static IWebBrowser launchExternalBrowser(String url, String browserId) {
-		try {
-			return launchExternalBrowser(new URL(url), browserId);
-		} catch (MalformedURLException e) {
-			UIPlugin.log(e);
-		}
-		return null;
-	}
-
-	public static IWebBrowser launchExternalBrowser(URL url, String browserId) {
-		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
-		if (browserId != null) {
-			try {
-				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null, null);
-				if (webBrowser != null) {
-					webBrowser.openURL(url);
-					return webBrowser;
-				}
-			} catch (PartInitException e) {
-				UIPlugin.log(e);
-			}
-		}
-		try {
-			IWebBrowser webBrowser = support.getExternalBrowser();
-			webBrowser.openURL(url);
-			return webBrowser;
-		} catch (PartInitException e) {
-			UIPlugin.log(e);
-		}
-		return null;
+	public void testGetApplicationLauncher() {
+		IPath path = EclipseUtil.getApplicationLauncher();
+		assertNotNull(path);
+		assertTrue("Eclipse".equalsIgnoreCase(path.removeFileExtension().lastSegment())
+				|| "AptanaStudio3".equalsIgnoreCase(path.removeFileExtension().lastSegment()));
 	}
 }
