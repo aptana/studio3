@@ -69,31 +69,35 @@ public final class WorkbenchBrowserUtil {
 		launchExternalBrowser(url, null);
 	}
 
-	public static void launchExternalBrowser(String url, String browserId) {
+	public static IWebBrowser launchExternalBrowser(String url, String browserId) {
 		try {
-			launchExternalBrowser(new URL(url), browserId);
+			return launchExternalBrowser(new URL(url), browserId);
 		} catch (MalformedURLException e) {
 			UIPlugin.log(e);
 		}
+		return null;
 	}
 
-	public static void launchExternalBrowser(URL url, String browserId) {
+	public static IWebBrowser launchExternalBrowser(URL url, String browserId) {
 		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
 		if (browserId != null) {
 			try {
 				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null, null);
 				if (webBrowser != null) {
 					webBrowser.openURL(url);
-					return;
+					return webBrowser;
 				}
 			} catch (PartInitException e) {
 				UIPlugin.log(e);
 			}
 		}
 		try {
-			support.getExternalBrowser().openURL(url);
+			IWebBrowser webBrowser = support.getExternalBrowser();
+			webBrowser.openURL(url);
+			return webBrowser;
 		} catch (PartInitException e) {
 			UIPlugin.log(e);
 		}
+		return null;
 	}
 }
