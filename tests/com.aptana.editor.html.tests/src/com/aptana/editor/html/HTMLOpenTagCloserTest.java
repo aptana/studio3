@@ -46,10 +46,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-public class OpenTagCloserTest extends TestCase
+public class HTMLOpenTagCloserTest extends TestCase
 {
-	private TextViewer viewer;
-	private OpenTagCloser closer;
+	protected TextViewer viewer;
+	protected HTMLOpenTagCloser closer;
 
 	@Override
 	protected void setUp() throws Exception
@@ -60,7 +60,7 @@ public class OpenTagCloserTest extends TestCase
 		if (shell == null)
 			shell = new Shell(display);
 		viewer = new TextViewer(shell, SWT.NONE);
-		closer = new OpenTagCloser(viewer)
+		closer = new HTMLOpenTagCloser(viewer)
 		{
 			protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
 			{
@@ -197,16 +197,6 @@ public class OpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
-	public void testDoesntCloseSpecialERBTags()
-	{
-		IDocument document = setDocument("<%= %");
-		VerifyEvent event = createGreaterThanKeyEvent(5);
-		closer.verifyKey(event);
-
-		assertEquals("<%= %", document.get());
-		assertTrue(event.doit);
-	}
-
 	public void testDoesntCloseComments()
 	{
 		IDocument document = setDocument("<!-- ");
@@ -253,7 +243,7 @@ public class OpenTagCloserTest extends TestCase
 		return new VerifyEvent(e);
 	}
 
-	private IDocument setDocument(String string)
+	protected IDocument setDocument(String string)
 	{
 		IDocument document = new Document(string);
 		viewer.setDocument(document);
