@@ -32,24 +32,16 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+package com.aptana.editor.xml;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Point;
-
-import com.aptana.editor.html.parsing.HTMLParseState;
 
 @SuppressWarnings("nls")
 public class OpenTagCloser implements VerifyKeyListener
@@ -62,11 +54,9 @@ public class OpenTagCloser implements VerifyKeyListener
 		this.textViewer = textViewer;
 	}
 
-	public static OpenTagCloser install(ITextViewer textViewer)
+	public void install()
 	{
-		OpenTagCloser pairMatcher = new OpenTagCloser(textViewer);
-		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
-		return pairMatcher;
+		textViewer.getTextWidget().addVerifyKeyListener(this);
 	}
 
 	public void verifyKey(VerifyEvent event)
@@ -111,7 +101,7 @@ public class OpenTagCloser implements VerifyKeyListener
 				return;
 
 			// Check to see if this tag is already closed...
-			if (tagClosed(document, openTag))
+			if (TagUtil.tagClosed(document, openTag))
 			{
 				return;
 			}
@@ -144,7 +134,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		}
 		catch (BadLocationException e)
 		{
-			HTMLPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
+			XMLPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, XMLPlugin.PLUGIN_ID, e.getMessage(), e));
 		}
 	}
 
@@ -159,237 +149,16 @@ public class OpenTagCloser implements VerifyKeyListener
 	 */
 	protected boolean shouldAutoClose(IDocument document, int offset, VerifyEvent event)
 	{
-		if (document.getDocumentPartitioner() == null)
-		{
-			return true;
-		}
-		// Only auto-close in HTML
-		ITypedRegion[] typedRegions = document.getDocumentPartitioner().computePartitioning(offset, 0);
-		if (typedRegions != null && typedRegions.length > 0)
-		{
-			if (typedRegions[0].getType().startsWith(HTMLSourceConfiguration.PREFIX))
-			{
-				return true;
-			}
-		}
-		return false;
+		// FIXME What criteria do we use for XML?
+		return true;
 	}
 
 	protected boolean skipOpenTag(String openTag)
 	{
-		return openTag == null || openTag.startsWith("<%") || openTag.startsWith("<!");
+		return openTag == null || openTag.startsWith("<!");
 	}
 
-	/**
-	 * Returns null when no match found! Assumes the document has been partitioned via HTML partition scanner
-	 * 
-	 * @param document
-	 * @param offset
-	 * @return
-	 */
-	protected static IRegion findMatchingTag(IDocument document, int offset)
-	{
-		try
-		{
-			ITypedRegion region = document.getPartition(offset);
-			// if region isn't HTML_TAG, HTML_SCRIPT, HTML_SVG, HTML_STYLE return null here
-			if (isntTagPartition(region))
-			{
-				return null;
-			}
-			String src = document.get(region.getOffset(), region.getLength());
-			if (src.startsWith("</"))
-			{
-				return findMatchingOpen(document, region);
-			}
-			// Handle self-closing tags!
-			if (src.endsWith("/>"))
-			{
-				return null;
-			}
-			return findMatchingClose(document, region);
-		}
-		catch (BadLocationException e)
-		{
-			HTMLPlugin.logError(e.getMessage(), e);
-		}
-		return null;
-	}
-
-	private static boolean isntTagPartition(ITypedRegion region)
-	{
-		return !region.getType().equals(HTMLSourceConfiguration.HTML_TAG)
-				&& !region.getType().equals(HTMLSourceConfiguration.HTML_SCRIPT)
-				&& !region.getType().equals(HTMLSourceConfiguration.HTML_STYLE)
-				&& !region.getType().equals(HTMLSourceConfiguration.HTML_SVG);
-	}
-
-	private static IRegion findMatchingClose(IDocument document, ITypedRegion region) throws BadLocationException
-	{
-		return findMatch(document, region, true);
-	}
-
-	private static IRegion findMatchingOpen(IDocument document, ITypedRegion region) throws BadLocationException
-	{
-		return findMatch(document, region, false);
-	}
-
-	private static IRegion findMatch(IDocument document, ITypedRegion region, boolean findClose)
-			throws BadLocationException
-	{
-		String tagSrc = document.get(region.getOffset(), region.getLength());
-		if (tagSrc == null)
-		{
-			return null;
-		}
-
-		String tagName = getTagName(tagSrc);
-		int start;
-		int length;
-		if (findClose)
-		{
-			// search forwards
-			start = region.getOffset() + region.getLength();
-			length = document.getLength() - start;
-		}
-		else
-		{
-			// search backwards
-			start = 0;
-			length = region.getOffset() - 1;
-		}
-		List<ITypedRegion> previousPartitions = Arrays.asList(document.computePartitioning(start, length));
-		if (!findClose)
-		{
-			// search backwards
-			Collections.reverse(previousPartitions);
-		}
-
-		// Actually make a "stack" of open and close tags for this tag name and see if it's
-		// unbalanced
-		int stack = 1;
-		for (ITypedRegion pp : previousPartitions)
-		{
-			if (isntTagPartition(pp))
-			{
-				continue;
-			}
-			String src = document.get(pp.getOffset(), pp.getLength());
-			if (src.startsWith("</" + tagName + " ") || src.startsWith("</" + tagName + ">"))
-			{
-				// close!
-				if (findClose)
-				{
-					stack--;
-				}
-				else
-				{
-					stack++;
-				}
-			}
-			else if (src.startsWith("<" + tagName + " ") || src.startsWith("<" + tagName + ">"))
-			{
-				// open!
-				if (findClose)
-				{
-					stack++;
-				}
-				else
-				{
-					stack--;
-				}
-			}
-			if (stack == 0)
-			{
-				return pp;
-			}
-		}
-
-		return null;
-	}
-
-	public static boolean tagClosed(IDocument document, String openTag)
-	{
-		// TODO use findMatchingClose(document, region)?
-		// Actually make a "stack" of open and close tags for this tag name and see if it's unbalanced
-		String tagName = getTagName(openTag);
-
-		int stack = 0;
-		String src = document.get();
-		int x = 0;
-		int toAdd = tagName.length() + 1;
-		// Count number of open tags
-		while (true)
-		{
-			x = src.indexOf("<" + tagName, x);
-			if (x == -1)
-				break;
-			x += toAdd;
-			char c = '>';
-			if (x < src.length())
-			{
-				c = src.charAt(x);
-			}
-			if (c == '>' || Character.isWhitespace(c))
-			{
-				stack++;
-			}
-		}
-
-		// Subtract number of close tags
-		x = 0;
-		toAdd = tagName.length() + 2;
-		while (true)
-		{
-			x = src.indexOf("</" + tagName, x);
-			if (x == -1)
-				break;
-			x += toAdd;
-			char c = '>';
-			if (x < src.length())
-			{
-				c = src.charAt(x);
-			}
-			if (c == '>' || Character.isWhitespace(c))
-			{
-				stack--;
-			}
-		}
-		// if we had more equal number of closed (or more than open), then the tag is closed.
-		return stack <= 0;
-	}
-
-	/**
-	 * Assumes tag is in format <tag.name(\s*.*)>, returns tag.name
-	 * 
-	 * @param openTag
-	 * @return
-	 */
-	private static String getTagName(String openTag)
-	{
-		if (openTag.startsWith("<"))
-		{
-			openTag = openTag.substring(1);
-		}
-		if (openTag.startsWith("/"))
-		{
-			openTag = openTag.substring(1);
-		}
-		int index = openTag.indexOf(">");
-		if (index != -1)
-		{
-			openTag = openTag.substring(0, index);
-		}
-		openTag = openTag.trim();
-		int spaceIndex = openTag.indexOf(' ');
-		if (spaceIndex != -1)
-		{
-			openTag = openTag.substring(0, spaceIndex);
-		}
-		return openTag;
-	}
-
-	private static String getMatchingCloseTag(String openTag)
+	private String getMatchingCloseTag(String openTag)
 	{
 
 		int index = openTag.indexOf(' ');
@@ -403,7 +172,7 @@ public class OpenTagCloser implements VerifyKeyListener
 		return closeTag;
 	}
 
-	private static String getOpenTag(IDocument document, int offset) throws BadLocationException
+	private String getOpenTag(IDocument document, int offset) throws BadLocationException
 	{
 		// Read current tag, see if it's self-closing or has been closed later...
 		int start = offset - 1;
@@ -444,14 +213,18 @@ public class OpenTagCloser implements VerifyKeyListener
 		{
 			return null;
 		}
-		HTMLParseState state = new HTMLParseState();
-		state.setEditState(document.get(), null, 0, 0);
-		if (state.isEmptyTagType(toCheck))
+		if (isEmptyTagType(document, toCheck))
 		{
 			return null;
 		}
 		// Return a not necessarily good tag. May contain attrs and an additional ">", but we rely on that later...
 		return "<" + tagName + ">";
+	}
+
+	protected boolean isEmptyTagType(IDocument doc, String tagName)
+	{
+		// FIXME Check DTD or whatever to see if tag is a self-closing one for this XML doc!
+		return false;
 	}
 
 	protected boolean isAutoInsertCharacter(char character)

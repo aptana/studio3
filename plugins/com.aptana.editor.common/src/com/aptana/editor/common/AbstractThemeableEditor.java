@@ -238,8 +238,12 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		fPeerCharacterCloser = PeerCharacterCloser.install(getSourceViewer());
+		
+		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if preceding char is '<'...
+		fPeerCharacterCloser = new PeerCharacterCloser(getSourceViewer());
+		fPeerCharacterCloser.install();
 		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
+
 		fCursorChangeListened = true;
 
 		fSelectionChangedListener = new SelectionChangedListener();
@@ -585,7 +589,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
 		if(event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE)) {
 			fPeerCharacterCloser.setAutoInsertEnabled((Boolean)event.getNewValue());
-		}
+	}
 	}
 
 	public synchronized FileService getFileService()
@@ -796,5 +800,5 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		IPreferenceStore store = getPreferenceStore();
 		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
-	}
+}
 }
