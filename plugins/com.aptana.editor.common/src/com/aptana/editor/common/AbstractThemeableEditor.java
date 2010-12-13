@@ -236,7 +236,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		PeerCharacterCloser.install(getSourceViewer());
+		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if preceding char is '<'...
+		new PeerCharacterCloser(getSourceViewer()).install();
 		fCursorChangeListened = true;
 
 		fSelectionChangedListener = new SelectionChangedListener();

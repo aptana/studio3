@@ -94,16 +94,14 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
-	PeerCharacterCloser(ITextViewer textViewer)
+	public PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer)
+	public void install()
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
-		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
-		return pairMatcher;
+		textViewer.getTextWidget().addVerifyKeyListener(this);
 	}
 
 	/**
