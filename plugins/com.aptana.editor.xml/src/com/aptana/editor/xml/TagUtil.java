@@ -23,10 +23,12 @@ public class TagUtil
 		String src = document.get();
 		int x = 0;
 		int toAdd = tagName.length() + 1;
+		String openTagPrefix = "<" + tagName; //$NON-NLS-1$
+		String closeTagPrefix = "</" + tagName; //$NON-NLS-1$
 		// Count number of open tags
 		while (true)
 		{
-			x = src.indexOf("<" + tagName, x); //$NON-NLS-1$
+			x = src.indexOf(openTagPrefix, x);
 			if (x == -1)
 				break;
 			x += toAdd;
@@ -46,7 +48,7 @@ public class TagUtil
 		toAdd = tagName.length() + 2;
 		while (true)
 		{
-			x = src.indexOf("</" + tagName, x); //$NON-NLS-1$
+			x = src.indexOf(closeTagPrefix, x);
 			if (x == -1)
 				break;
 			x += toAdd;
@@ -145,6 +147,12 @@ public class TagUtil
 			Collections.reverse(previousPartitions);
 		}
 
+		final String closeTag = "</" + tagName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+		final String closeTagWithSpace = "</" + tagName + " "; //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String openTag = "<" + tagName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
+		final String openTagWithSpace = "<" + tagName + " "; //$NON-NLS-1$ //$NON-NLS-2$
+
 		// Actually make a "stack" of open and close tags for this tag name and see if it's
 		// unbalanced
 		int stack = 1;
@@ -155,7 +163,7 @@ public class TagUtil
 				continue;
 			}
 			String src = document.get(pp.getOffset(), pp.getLength());
-			if (src.startsWith("</" + tagName + " ") || src.startsWith("</" + tagName + ">")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			if (src.startsWith(closeTagWithSpace) || src.startsWith(closeTag))
 			{
 				// close!
 				if (findClose)
@@ -167,7 +175,7 @@ public class TagUtil
 					stack++;
 				}
 			}
-			else if (src.startsWith("<" + tagName + " ") || src.startsWith("<" + tagName + ">")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			else if (src.startsWith(openTagWithSpace) || src.startsWith(openTag))
 			{
 				// open!
 				if (findClose)

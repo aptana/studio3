@@ -64,10 +64,11 @@ import com.aptana.editor.xml.TagUtil;
 public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
+																				// quotes
 
 	private Map<Annotation, Position> fTagPairOccurrences;
-	
+
 	private static Collection<String> tagPartitions = new ArrayList<String>();
 	static
 	{
@@ -76,7 +77,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		tagPartitions.add(HTMLSourceConfiguration.HTML_STYLE);
 		tagPartitions.add(HTMLSourceConfiguration.HTML_SVG);
 	}
-	
+
 	@Override
 	protected void initializeEditor()
 	{
