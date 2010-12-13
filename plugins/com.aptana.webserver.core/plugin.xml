@@ -11,5 +11,11 @@
             name="%type.webserver.name">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.webserver.core.preferences.WebServerPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
