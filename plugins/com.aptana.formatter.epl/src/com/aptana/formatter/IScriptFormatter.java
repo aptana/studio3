@@ -54,6 +54,24 @@ public interface IScriptFormatter
 	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection, IFormattingContext context) throws FormatterException;
 
 	/**
+	 * Format <code>source</code>, and returns the formatted string.
+	 * <p>
+	 * It returns null if the given string cannot be formatted.
+	 * </p>
+	 * 
+	 * @param source
+	 *            full source module content
+	 * @param offset
+	 *            the offset of the region to format
+	 * @param length
+	 *            the length of the region to format
+	 * @param indentationLevel
+	 *            the additional indent level
+	 * @param context 
+	 */
+	String formatToString(String source, int offset, int length, int indentationLevel, boolean isSelection, IFormattingContext context) throws FormatterException;
+	
+	/**
 	 * Set a flag on this formatter to indicate that it will be running as a slave formatter by the multi-pass
 	 * formatter.
 	 * 

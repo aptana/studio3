@@ -189,6 +189,29 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		return null;
 	}
 
+	public String formatToString(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
+	{
+		String input = new String(source.substring(offset, offset + length));
+		IParseRootNode parseResult = ParserPoolFactory.parse(this.getMainContentType(), input);
+
+		try
+		{
+			if (parseResult != null)
+			{
+				return format(input, parseResult, indentationLevel, offset, isSelection);
+			}
+		}
+		catch (Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(e);
+		}
+
+		return null;
+	}
+	
 	/**
 	 * format
 	 * 
@@ -266,4 +289,5 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	{
 		return getInt(IPreferenceConstants.FORMATTER_TAB_SIZE);
 	}
+
 }

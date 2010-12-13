@@ -172,9 +172,9 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -187,6 +187,45 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			FormatterPlugin.logError(e);
 		}
 		return null;
+	}
+
+	public String formatToString(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException
+	{
+
+		String input = new String(source.substring(offset, offset + length));
+		IParser parser = checkoutParser();
+		IParseState parseState = new ParseState();
+		parseState.setEditState(input, null, 0, 0);
+		try
+		{
+			IParseRootNode parseResult = parser.parse(parseState);
+			checkinParser(parser);
+			if (parseResult != null)
+			{
+				return format(input, parseResult, indentationLevel, offset, isSelection);
+			}
+		}
+		catch (beaver.Parser.Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
+			if (FormatterPlugin.DEBUG)
+			{
+				FormatterPlugin.logError(e);
+			}
+
+		}
+		catch (Exception e)
+		{
+			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
+					ERROR_DISPLAY_TIMEOUT, true);
+			FormatterPlugin.logError(e);
+		}
+
+		// We just return the source unchanged if we can't format it
+		return source;
 	}
 
 	/*
@@ -217,12 +256,12 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	}
 
 	/**
-	 * Do the actual formatting of the CSS.
+	 * Do the actual formatting of the XML.
 	 * 
 	 * @param input
 	 *            The String input
 	 * @param parseResult
-	 *            An CSS parser result - {@link IParseRootNode}
+	 *            An XML parser result - {@link IParseRootNode}
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @return A formatted string
@@ -260,10 +299,10 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(XMLFormatterConstants.WRAP_COMMENTS, getBoolean(XMLFormatterConstants.WRAP_COMMENTS));
 		document.setInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS));
-		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-				IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
-				XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;

@@ -1,0 +1,14 @@
+input[type=checkbox] {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
+  
+input[type=checkbox] {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
+  
+input:before {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
