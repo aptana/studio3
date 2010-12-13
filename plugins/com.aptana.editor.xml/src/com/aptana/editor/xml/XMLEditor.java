@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.xml;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +49,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -64,6 +67,11 @@ public class XMLEditor extends AbstractThemeableEditor
 	private static final char[] XML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
 			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
 	private Map<Annotation, Position> fTagPairOccurrences;
+	private static Collection<String> tagPartitions = new ArrayList<String>();
+	static
+	{
+		tagPartitions.add(XMLSourceConfiguration.TAG);
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -76,6 +84,22 @@ public class XMLEditor extends AbstractThemeableEditor
 
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
+	}
+	
+	@Override
+	public void createPartControl(Composite parent)
+	{
+		super.createPartControl(parent);
+		// Install a verify key listener that auto-closes unclosed open tags!
+		installOpenTagCloser();
+	}
+
+	/**
+	 * Install a tag closer to auto-close unclosed open tags.
+	 */
+	protected void installOpenTagCloser()
+	{
+		new OpenTagCloser(getSourceViewer()).install();
 	}
 
 	/**
@@ -185,7 +209,7 @@ public class XMLEditor extends AbstractThemeableEditor
 			XMLElementNode en = (XMLElementNode) node;
 			if (!en.isSelfClosing())
 			{
-				IRegion match = OpenTagCloser.findMatchingTag(document, offset);
+				IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions );
 				if (match != null)
 				{
 					// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new

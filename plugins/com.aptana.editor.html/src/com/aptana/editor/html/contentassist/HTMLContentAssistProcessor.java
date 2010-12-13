@@ -83,6 +83,7 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.xml.OpenTagCloser;
+import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -614,7 +615,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!OpenTagCloser.tagClosed(doc, element.getName()))
+						if (!TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -890,7 +891,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						continue;
 					}
 					String elementName = parts[0].toLowerCase();
-					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
+					if (!unclosedElements.contains(elementName) && !TagUtil.tagClosed(_document, elementName))
 					{
 						unclosedElements.add(elementName);
 					}
