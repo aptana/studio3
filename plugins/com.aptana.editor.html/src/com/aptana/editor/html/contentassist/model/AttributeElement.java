@@ -81,7 +81,7 @@ public class AttributeElement extends BaseElement
 	 */
 	public void addReference(String reference)
 	{
-		if (reference != null && reference.isEmpty() == false)
+		if (reference != null && reference.length() > 0)
 		{
 			if (this._references == null)
 			{

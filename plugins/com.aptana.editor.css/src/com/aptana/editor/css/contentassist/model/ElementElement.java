@@ -69,7 +69,7 @@ public class ElementElement extends BaseElement
 	 */
 	public void addProperty(String name)
 	{
-		if (name != null && name.isEmpty() == false)
+		if (name != null && name.length() > 0)
 		{
 			if (this._properties == null)
 			{

@@ -48,14 +48,12 @@ import java.util.List;
  * @author Max Stepanov
  */
 public final class SocketUtil {
-	/**
-	 * SocketUtil
-	 */
+
 	private SocketUtil() {
 	}
 
 	/**
-	 * findFreePort
+	 * Find free port
 	 * 
 	 * @return int
 	 */
@@ -76,6 +74,36 @@ public final class SocketUtil {
 		return -1;
 	}
 
+	/**
+	 * Find free port in range
+	 * 
+	 * @return int
+	 */
+	public static int findFreePort(int start, int end) {
+		ServerSocket socket = null;
+		try {
+			for (int port = start; port <= end; ++port) {
+				try {
+					socket = new ServerSocket(port);
+					return socket.getLocalPort();
+				} catch (IOException ignore) {
+				}
+			}
+		} finally {
+			if (socket != null) {
+				try {
+					socket.close();
+				} catch (IOException ignore) {
+				}
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Returns list of machine assigned IP addresses
+	 * @return
+	 */
 	public static InetAddress[] getLocalAddresses() {
 		List<InetAddress> addrs = new ArrayList<InetAddress>();
 		try {

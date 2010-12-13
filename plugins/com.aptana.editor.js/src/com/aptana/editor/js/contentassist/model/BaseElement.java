@@ -43,9 +43,10 @@ import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexDocument;
 import com.aptana.index.core.IndexUtil;
 
-public class BaseElement implements Convertible
+public class BaseElement implements Convertible, IndexDocument
 {
 	private static final String USER_AGENTS_PROPERTY = "userAgents"; //$NON-NLS-1$
 	private static final String SINCE_PROPERTY = "since"; //$NON-NLS-1$

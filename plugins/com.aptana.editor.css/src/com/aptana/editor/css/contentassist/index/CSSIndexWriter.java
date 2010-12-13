@@ -36,24 +36,16 @@ package com.aptana.editor.css.contentassist.index;
 
 import java.net.URI;
 
-import org.mortbay.util.ajax.JSON;
-
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexWriter;
 
-public class CSSIndexWriter
+public class CSSIndexWriter extends IndexWriter
 {
-	/**
-	 * CSSIndexWriter
-	 */
-	public CSSIndexWriter()
-	{
-	}
-
 	/**
 	 * getDocumentPath
 	 * 
@@ -72,12 +64,12 @@ public class CSSIndexWriter
 	 */
 	public void writeElement(Index index, ElementElement element)
 	{
-		if (index != null)
+		if (index != null && element != null)
 		{
 			String key = StringUtil.join( //
 				CSSIndexConstants.DELIMITER, //
 				element.getName(), //
-				JSON.toString(element) //
+				this.serialize(element) //
 				);
 
 			index.addEntry(CSSIndexConstants.ELEMENT, key, this.getDocumentPath());
@@ -92,12 +84,12 @@ public class CSSIndexWriter
 	 */
 	public void writeProperty(Index index, PropertyElement property)
 	{
-		if (index != null)
+		if (index != null && property != null)
 		{
 			String key = StringUtil.join( //
 				CSSIndexConstants.DELIMITER, //
 				property.getName(), //
-				JSON.toString(property) //
+				this.serialize(property) //
 				);
 
 			index.addEntry(CSSIndexConstants.PROPERTY, key, this.getDocumentPath());
@@ -112,10 +104,10 @@ public class CSSIndexWriter
 	 */
 	public void writePseudoClass(Index index, PseudoClassElement pseudoClass)
 	{
-		if (index != null)
+		if (index != null && pseudoClass != null)
 		{
-			String key = JSON.toString(pseudoClass);
-			
+			String key = this.serialize(pseudoClass);
+
 			index.addEntry(CSSIndexConstants.PSUEDO_CLASS, key, this.getDocumentPath());
 		}
 	}
@@ -128,10 +120,10 @@ public class CSSIndexWriter
 	 */
 	public void writePseudoElement(Index index, PseudoElementElement pseudoElement)
 	{
-		if (index != null)
+		if (index != null && pseudoElement != null)
 		{
-			String key = JSON.toString(pseudoElement);
-			
+			String key = this.serialize(pseudoElement);
+
 			index.addEntry(CSSIndexConstants.PSUEDO_ELEMENT, key, this.getDocumentPath());
 		}
 	}

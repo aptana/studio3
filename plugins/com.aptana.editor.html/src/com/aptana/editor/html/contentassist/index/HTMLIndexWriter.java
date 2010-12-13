@@ -36,24 +36,16 @@ package com.aptana.editor.html.contentassist.index;
 
 import java.net.URI;
 
-import org.mortbay.util.ajax.JSON;
-
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexWriter;
 
-public class HTMLIndexWriter
+public class HTMLIndexWriter extends IndexWriter
 {
-	/**
-	 * HTMLIndexWriter
-	 */
-	public HTMLIndexWriter()
-	{
-	}
-
 	/**
 	 * getDocumentPath
 	 * 
@@ -72,13 +64,16 @@ public class HTMLIndexWriter
 	 */
 	public void writeAttribute(Index index, AttributeElement attribute)
 	{
-		String key = StringUtil.join( //
-			HTMLIndexConstants.DELIMITER, //
-			attribute.getName(), //
-			JSON.toString(attribute) //
-			);
+		if (index != null && attribute != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				attribute.getName(), //
+				this.serialize(attribute) //
+				);
 
-		index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
+		}
 	}
 
 	/**
@@ -89,13 +84,16 @@ public class HTMLIndexWriter
 	 */
 	public void writeElement(Index index, ElementElement element)
 	{
-		String key = StringUtil.join( //
-			HTMLIndexConstants.DELIMITER, //
-			element.getName(), //
-			JSON.toString(element) //
-			);
+		if (index != null && element != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				element.getName(), //
+				this.serialize(element) //
+				);
 
-		index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
+		}
 	}
 
 	/**
@@ -106,12 +104,16 @@ public class HTMLIndexWriter
 	 */
 	public void writeEntity(Index index, EntityElement entity)
 	{
-		String key = StringUtil.join( //
-			HTMLIndexConstants.DELIMITER, //
-			entity.getName(), JSON.toString(entity) //
-			);
+		if (index != null && entity != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				entity.getName(), //
+				this.serialize(entity) //
+				);
 
-		index.addEntry(HTMLIndexConstants.ENTITY, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.ENTITY, key, this.getDocumentPath());
+		}
 	}
 
 	/**
@@ -122,11 +124,15 @@ public class HTMLIndexWriter
 	 */
 	public void writeEvent(Index index, EventElement event)
 	{
-		String key = StringUtil.join( //
-			HTMLIndexConstants.DELIMITER, //
-			event.getName(), JSON.toString(event) //
-			);
+		if (index != null && event != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				event.getName(), //
+				this.serialize(event) //
+				);
 
-		index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
+		}
 	}
 }

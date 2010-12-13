@@ -37,7 +37,6 @@ package com.aptana.editor.js.inferencing;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,6 @@ import java.util.Set;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -83,8 +81,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNodeTypeInferrer extends JSTreeWalker
 {
-	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.allOf(ContentSelector.class);
-	
 	private JSScope _scope;
 	private Index _index;
 	private URI _location;
@@ -362,7 +358,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			IParseNode lhs = node.getLeftHandSide();
 			IParseNode rhs = node.getRightHandSide();
-			
+
 			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
 			while (lhs.getNodeType() == JSNodeTypes.ADD)
 			{
@@ -374,7 +370,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					break;
 				}
 			}
-			
+
 			if (lhs instanceof JSStringNode || rhs instanceof JSStringNode)
 			{
 				type = JSTypeConstants.STRING_TYPE;
@@ -383,7 +379,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				List<String> lhsTypes = this.getTypes(lhs);
 				List<String> rhsTypes = this.getTypes(rhs);
-	
+
 				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
 				{
 					type = JSTypeConstants.STRING_TYPE;
@@ -546,7 +542,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			for (String typeName : this.getTypes(lhs))
 			{
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, MEMBER_CONTENT);
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 
 				if (property != null)
 				{
@@ -613,7 +609,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
-			property = this._queryHelper.getGlobal(this._index, name, MEMBER_CONTENT);
+			property = this._queryHelper.getGlobal(this._index, name);
 		}
 
 		if (property != null)

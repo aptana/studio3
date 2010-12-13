@@ -43,11 +43,12 @@ import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexDocument;
 
 /**
  * BaseElement
  */
-public abstract class BaseElement implements Convertible
+public abstract class BaseElement implements Convertible, IndexDocument
 {
 	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
 	private static final String NAME_PROPERTY = "name"; //$NON-NLS-1$

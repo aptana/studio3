@@ -185,6 +185,8 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		IndexManager.getInstance().removeIndex(URI.create(JSIndexConstants.METADATA_INDEX_LOCATION));
 
 		JSIndexWriter indexer = new JSIndexWriter();
+		
+		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
 		Index index = JSIndexQueryHelper.getIndex();
 
 		// write types

@@ -82,4 +82,41 @@ public class CollectionsUtilTest extends TestCase
 		assertFalse(result.contains(4));
 		assertFalse(result.contains(5));
 	}
+
+	public void testNullListValue()
+	{
+		List<String> list = CollectionsUtil.getListValue(null);
+
+		assertNotNull(list);
+		assertEquals(0, list.size());
+	}
+
+	public void testListValue()
+	{
+		List<String> list = new ArrayList<String>();
+		List<String> result = CollectionsUtil.getListValue(list);
+
+		assertSame(list, result);
+	}
+
+	public void testIsEmptyWithNull()
+	{
+		assertTrue(CollectionsUtil.isEmpty(null));
+	}
+
+	public void testIsEmptyWithEmptyList()
+	{
+		List<String> list = new ArrayList<String>();
+
+		assertTrue(CollectionsUtil.isEmpty(list));
+	}
+
+	public void testIsEmptyWithNonEmptyList()
+	{
+		List<String> list = new ArrayList<String>();
+
+		list.add("abc");
+
+		assertFalse(CollectionsUtil.isEmpty(list));
+	}
 }

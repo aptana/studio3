@@ -37,16 +37,15 @@ package com.aptana.editor.js.contentassist.index;
 import java.net.URI;
 import java.util.List;
 
-import org.mortbay.util.ajax.JSON;
-
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexWriter;
 
-public class JSIndexWriter
+public class JSIndexWriter extends IndexWriter
 {
 	/**
 	 * getDocumentPath
@@ -71,7 +70,7 @@ public class JSIndexWriter
 			JSIndexConstants.DELIMITER, //
 			function.getOwningType(), //
 			function.getName(), //
-			JSON.toString(function) //
+			this.serialize(function) //
 		);
 		
 		index.addEntry(JSIndexConstants.FUNCTION, value, location);
@@ -90,7 +89,7 @@ public class JSIndexWriter
 			JSIndexConstants.DELIMITER, //
 			property.getOwningType(), //
 			property.getName(), //
-			JSON.toString(property) //
+			this.serialize(property) //
 		);
 		
 		index.addEntry(JSIndexConstants.PROPERTY, value, location);
@@ -123,7 +122,7 @@ public class JSIndexWriter
 			
 			if (parentTypes.isEmpty() == false)
 			{
-				parentType = StringUtil.join(",", parentTypes); //$NON-NLS-1$
+				parentType = StringUtil.join(JSIndexConstants.SUB_DELIMITER, parentTypes);
 			}
 			else if (type.equals(JSTypeConstants.OBJECT_TYPE) == false)
 			{

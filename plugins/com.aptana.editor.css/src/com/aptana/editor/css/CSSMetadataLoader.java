@@ -134,6 +134,8 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		IndexManager.getInstance().removeIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
+		
+		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
 		Index index = CSSIndexQueryHelper.getIndex();
 
 		for (ElementElement element : reader.getElements())
