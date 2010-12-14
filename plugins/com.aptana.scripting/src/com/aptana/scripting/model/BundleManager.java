@@ -93,18 +93,40 @@ public class BundleManager
 
 		public IStatus run(IProgressMonitor monitor)
 		{
+			// TODO Check for a cached config file, something like ".cache.yml" which contains pre-cached info about
+			// bundle so we don't need to load all scripts into memory on startup and can do so lazily!
+
 			List<File> bundleScripts = getBundleScripts(bundleDirectory);
 			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size());
 
 			if (bundleScripts.size() > 0)
 			{
-				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-
-				for (File script : bundleScripts)
+				boolean bundleAdded = false;
+				File cacheFile = new File(bundleDirectory, "cache.yml");
+				if (cacheFile.exists())
 				{
-					sub.subTask(script.getAbsolutePath());
-					loadScript(script, true, bundleLoadPaths);
-					sub.worked(1);
+					// TODO Check if any files have been added/modified since timestamp of cache file... if so,
+					// ignore/rebuild cache
+					BundleElement be = new BundleCacher().load(cacheFile);
+					if (be != null)
+					{
+						addBundle(be);
+						bundleAdded = true;
+					}
+				}
+				if (!bundleAdded)
+				{
+					List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+					for (File script : bundleScripts)
+					{
+						sub.subTask(script.getAbsolutePath());
+						loadScript(script, true, bundleLoadPaths);
+						sub.worked(1);
+					}
+
+					// TODO Now traverse the bundle and just write out a cache file!
+					new BundleCacher().cache(bundleDirectory);
 				}
 			}
 
@@ -216,11 +238,14 @@ public class BundleManager
 			INSTANCE = new BundleManager();
 
 			// setup default application bundles path
-			URL url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-
-			if (url != null)
+			URL url = null;
+			if (ScriptingActivator.getDefault() != null) // For when run outside the IDE...
 			{
-				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
+				url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+				if (url != null)
+				{
+					INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
+				}
 			}
 
 			// get possible user override
@@ -241,12 +266,14 @@ public class BundleManager
 						}
 						else
 						{
-							ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+							ScriptingActivator.logError(
+									Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
 						}
 					}
 					else
 					{
-						ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+						ScriptingActivator.logError(
+								Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
 					}
 				}
 				else
@@ -263,7 +290,23 @@ public class BundleManager
 
 			if (validUserBundlePath == false)
 			{
-				String OS = Platform.getOS();
+				String OS = null;
+				if (Platform.isRunning())
+				{
+					OS = Platform.getOS();
+				}
+				else
+				{
+					OS = System.getProperty("os.name");
+					if (OS.contains("mac"))
+					{
+						OS = Platform.OS_MACOSX;
+					}
+					else if (OS.contains("inux"))
+					{
+						OS = Platform.OS_LINUX;
+					}
+				}
 				String userHome = System.getProperty(USER_HOME_PROPERTY);
 
 				// setup default user bundles path
@@ -310,8 +353,8 @@ public class BundleManager
 			String pathString = path.getName();
 
 			result = COMMANDS_DIRECTORY_NAME.equals(pathString) //
-				|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
-				|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
+					|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
+					|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
 		}
 
 		return result;
@@ -1102,7 +1145,7 @@ public class BundleManager
 	{
 		return this.getCommands(null);
 	}
-	
+
 	/**
 	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
 	 * are returned in this list
@@ -1595,22 +1638,26 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
+								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+							new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
 		if (result == false && message != null && message.length() > 0)
@@ -1649,7 +1696,7 @@ public class BundleManager
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
-		if (EclipseUtil.isTesting() == false)
+		if (EclipseUtil.isTesting() == false && Platform.isRunning())
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
 
@@ -1765,7 +1812,8 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;

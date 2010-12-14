@@ -55,9 +55,9 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
@@ -346,8 +346,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
-					this.getPath(), OS });
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS,
+					new Object[] { this.getPath(), OS });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -407,6 +407,28 @@ public class CommandElement extends AbstractBundleElement
 		}
 
 		return result;
+	}
+
+	/**
+	 * Used for YAML serialization.
+	 */
+	public Map<Platform, String[]> getKeyBindingMap()
+	{
+		return this._keyBindings;
+	}
+
+	/**
+	 * Used for YAML deserialization.
+	 */
+	public void setKeyBindingMap(Map<Platform, List<String>> keybindingMap)
+	{
+		if (keybindingMap != null)
+		{
+			for (Map.Entry<Platform, List<String>> entry : keybindingMap.entrySet())
+			{
+				setKeyBindings(entry.getKey().getName(), entry.getValue().toArray(new String[entry.getValue().size()]));
+			}
+		}
 	}
 
 	/**
@@ -482,7 +504,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._runType.getName();
 	}
-	
+
 	/**
 	 * Get the values associated with the specified trigger type
 	 * 
@@ -492,12 +514,12 @@ public class CommandElement extends AbstractBundleElement
 	public String[] getTriggerTypeValues(TriggerType type)
 	{
 		String[] result = NO_TRIGGER_VALUES;
-		
+
 		if (type != null && type != TriggerType.UNDEFINED)
 		{
 			String propertyName = type.getPropertyName();
 			Object value = this.get(propertyName);
-			
+
 			if (value instanceof String[])
 			{
 				result = (String[]) value;
@@ -505,10 +527,10 @@ public class CommandElement extends AbstractBundleElement
 			else if (value instanceof Object[])
 			{
 				Object[] objects = (Object[]) value;
-				
+
 				result = new String[objects.length];
-				
-				for (int i = 0; i < objects.length; i++)	
+
+				for (int i = 0; i < objects.length; i++)
 				{
 					result[i] = objects[i].toString();
 				}
@@ -518,7 +540,7 @@ public class CommandElement extends AbstractBundleElement
 				result = new String[] { value.toString() };
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -660,6 +682,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	protected void printBody(SourcePrinter printer)
 	{
+		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
@@ -885,8 +908,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Undefined_Key_Binding, new Object[] { this
-					.getPath() });
+			String message = MessageFormat.format(Messages.CommandElement_Undefined_Key_Binding,
+					new Object[] { this.getPath() });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -908,11 +931,11 @@ public class CommandElement extends AbstractBundleElement
 			{
 				this._keyBindings = new HashMap<Platform, String[]>();
 			}
-			
+
 			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
 			int i = 0;
 			String[] uppercase = new String[keyBindings.length];
-			for(String binding : keyBindings)
+			for (String binding : keyBindings)
 			{
 				uppercase[i++] = binding.toUpperCase();
 			}
@@ -920,8 +943,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
-					this.getPath(), OS });
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS,
+					new Object[] { this.getPath(), OS });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -1006,7 +1029,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this.setTrigger(type, NO_TRIGGER_VALUES);
 	}
-	
+
 	/**
 	 * setTrigger
 	 * 
@@ -1015,11 +1038,11 @@ public class CommandElement extends AbstractBundleElement
 	public void setTrigger(String type, String[] values)
 	{
 		TriggerType triggerType = TriggerType.get(type);
-		
+
 		if (triggerType != TriggerType.UNDEFINED && values != null)
 		{
 			String propertyName = triggerType.getPropertyName();
-			
+
 			this.put(propertyName, values);
 		}
 	}

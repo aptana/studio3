@@ -242,6 +242,21 @@ public class BundleElement extends AbstractElement
 		return result;
 	}
 
+	public void setChildren(List<AbstractBundleElement> children)
+	{
+		synchronized (this._children)
+		{
+			this._children = new ArrayList<AbstractBundleElement>();
+		}
+		if (children != null)
+		{
+			for (AbstractBundleElement child : children)
+			{
+				addChild(child);
+			}
+		}
+	}
+
 	/**
 	 * Return a list of children that are of the specified type. Note that sub-types of the specified type will not be
 	 * included in the resulting list
@@ -809,7 +824,8 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setFoldingMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
+				&& endRegexp.isNil() == false)
 		{
 			synchronized (foldingStartMarkersLock)
 			{
@@ -844,7 +860,8 @@ public class BundleElement extends AbstractElement
 	 */
 	public void setIndentMarkers(String scope, RubyRegexp startRegexp, RubyRegexp endRegexp)
 	{
-		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null && endRegexp.isNil() == false)
+		if (!StringUtil.isEmpty(scope) && startRegexp != null && startRegexp.isNil() == false && endRegexp != null
+				&& endRegexp.isNil() == false)
 		{
 			synchronized (increaseIndentMarkersLock)
 			{

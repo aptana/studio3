@@ -45,7 +45,7 @@ public class ProjectTemplateElement extends AbstractBundleElement
 		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON
 	}
 
-	private Type fType;
+	private Type fType = Type.UNDEFINED;
 	private String fLocation;
 	private String fDescription;
 
@@ -183,5 +183,15 @@ public class ProjectTemplateElement extends AbstractBundleElement
 		{
 			fType = Type.UNDEFINED;
 		}
+	}
+	
+	/**
+	 * setType
+	 * 
+	 * @param type
+	 */
+	public void setType(Type type)
+	{
+		fType = type;
 	}
 }
