@@ -21,11 +21,6 @@ public class FormattingTests extends AbstractFormatterTestCase
 	private static String FILE_TYPE = "css"; //$NON-NLS-1$
 	private Map<String, String> prefs;
 
-	public void oneTimeSetUp() throws Exception
-	{
-
-	}
-
 	@Override
 	public void setUp() throws Exception
 	{
