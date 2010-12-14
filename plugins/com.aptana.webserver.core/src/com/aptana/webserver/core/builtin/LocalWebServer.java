@@ -35,11 +35,44 @@
 
 package com.aptana.webserver.core.builtin;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.http.impl.DefaultHttpResponseFactory;
+import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
+import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
+import org.apache.http.nio.protocol.BufferingHttpServiceHandler;
+import org.apache.http.nio.reactor.IOEventDispatch;
+import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.BasicHttpProcessor;
+import org.apache.http.protocol.HttpRequestHandler;
+import org.apache.http.protocol.HttpRequestHandlerRegistry;
+import org.apache.http.protocol.ResponseConnControl;
+import org.apache.http.protocol.ResponseContent;
+import org.apache.http.protocol.ResponseDate;
+import org.apache.http.protocol.ResponseServer;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.preferences.WebServerPreferences;
 
 /**
  * @author Max Stepanov
@@ -47,18 +80,96 @@ import com.aptana.webserver.core.EFSWebServerConfiguration;
  */
 public class LocalWebServer {
 
+	private static final int SOCKET_TIMEOUT = 10000;
+	private static final int WORKER_COUNT = 2;
+	
 	private final EFSWebServerConfiguration configuration;
+	private Thread thread;
 	
 	/**
 	 * 
+	 * @throws CoreException 
 	 */
-	public LocalWebServer(URI documentRoot) {
+	public LocalWebServer(URI documentRoot) throws CoreException {
+		InetAddress host = WebServerPreferences.getServerAddress();
+		int[] portRange = WebServerPreferences.getPortRange();
+		int port = SocketUtil.findFreePort(portRange[0], portRange[1]);
+		if (port <= 0) {
+			port = SocketUtil.findFreePort(); // default to any free port
+		}
 		configuration = new EFSWebServerConfiguration();
 		configuration.setDocumentRoot(documentRoot);
+		try {
+			configuration.setBaseURL(new URL("http", host.getHostAddress(), port, "/"));
+		} catch (MalformedURLException e) {
+			WebServerCorePlugin.log(e);
+		}
+		startServer(host, port, EFS.getStore(documentRoot));
 	}
+	
 	
 	public AbstractWebServerConfiguration getConfiguration() {
 		return configuration;
+	}
+	
+	private void startServer(final InetAddress host, final int port, final IFileStore documentRoot) {
+		thread = new Thread() {
+			@Override
+			public void run() {
+				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(documentRoot));
+			}
+		};
+		thread.setDaemon(true);
+		thread.start();
+	}
+	
+	private void stopServer() {
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
+		}
+	}
+	
+	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler) {
+		HttpParams params = new BasicHttpParams();
+		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
+			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+			.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
+			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore"));
+		
+		BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
+		httpProcessor.addInterceptor(new ResponseDate());
+		httpProcessor.addInterceptor(new ResponseServer());
+		httpProcessor.addInterceptor(new ResponseContent());
+		httpProcessor.addInterceptor(new ResponseConnControl());
+
+        HttpRequestHandlerRegistry handlerRegistry = new HttpRequestHandlerRegistry();
+        handlerRegistry.register("*", httpRequestHandler);
+
+        BufferingHttpServiceHandler serviceHandler = new BufferingHttpServiceHandler(
+                httpProcessor,
+                new DefaultHttpResponseFactory(),
+                new DefaultConnectionReuseStrategy(),
+                params);
+        serviceHandler.setHandlerResolver(handlerRegistry);
+        serviceHandler.setEventListener(new LocalWebServerLogger());
+        
+        IOEventDispatch eventDispatch = new DefaultServerIOEventDispatch(serviceHandler, params);
+        try {
+			ListeningIOReactor reactor = new DefaultListeningIOReactor(WORKER_COUNT, params);
+			reactor.listen(socketAddress);
+			reactor.execute(eventDispatch);
+        } catch (InterruptedIOException e) {
+        	return;
+		} catch (IOReactorException e) {
+			WebServerCorePlugin.log(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			WebServerCorePlugin.log(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }
