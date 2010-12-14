@@ -36,6 +36,7 @@
 package com.aptana.webserver.core.preferences;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,17 +60,19 @@ public class WebServerPreferences {
 	 * 
 	 * @return
 	 */
-	public static String getServerAddress() {
-		String serverAddress = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS;
+	public static InetAddress getServerAddress() {
 		IEclipsePreferences node = new DefaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
 		String address = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null);
 		for(InetAddress i : SocketUtil.getLocalAddresses()) {
 			if(i.getHostAddress().equals(address)) {
-				serverAddress = address;
-				break;
+				return i;
 			}
 		}
-		return serverAddress;	
+		try {
+			return InetAddress.getByName(IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS);
+		} catch (UnknownHostException e) {
+			return null;
+		}
 	}
 	
 	/**
