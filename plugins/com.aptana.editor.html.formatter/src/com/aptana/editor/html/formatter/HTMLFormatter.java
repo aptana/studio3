@@ -199,55 +199,6 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		return null;
 	}
 
-	public String formatToString(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException
-	{
-		if (!ScriptFormatterManager.hasFormatterFor(getMainContentType()))
-		{
-			throw new FormatterException(FormatterMessages.Formatter_contentErrorMessage);
-		}
-		String input = source.substring(offset, offset + length);
-		IParser parser = checkoutParser();
-		String mainContentType = getMainContentType();
-		if (!(parser instanceof HTMLParser) && !(parser instanceof CompositeParser))
-		{
-			// Check it back in and request a specific HTML parser.
-			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
-			// HTNLParser (like PHPParser).
-			checkinParser(parser, mainContentType);
-			mainContentType = IHTMLParserConstants.LANGUAGE;
-			parser = checkoutParser(mainContentType);
-		}
-		try
-		{
-			IParseState parseState = new HTMLParseState();
-			parseState.setEditState(input, null, 0, 0);
-			IParseNode parseResult = parser.parse(parseState);
-			checkinParser(parser, mainContentType);
-			if (parseResult != null)
-			{
-				return format(input, parseResult, indentationLevel, isSelection);
-			}
-		}
-		catch (beaver.Parser.Exception e)
-		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
-			if (FormatterPlugin.DEBUG)
-			{
-				FormatterPlugin.logError(e);
-			}
-		}
-		catch (Throwable t)
-		{
-			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
-					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(t);
-		}
-		return null;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()

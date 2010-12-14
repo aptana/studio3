@@ -189,45 +189,6 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		return null;
 	}
 
-	public String formatToString(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException
-	{
-
-		String input = new String(source.substring(offset, offset + length));
-		IParser parser = checkoutParser();
-		IParseState parseState = new ParseState();
-		parseState.setEditState(input, null, 0, 0);
-		try
-		{
-			IParseRootNode parseResult = parser.parse(parseState);
-			checkinParser(parser);
-			if (parseResult != null)
-			{
-				return format(input, parseResult, indentationLevel, offset, isSelection);
-			}
-		}
-		catch (beaver.Parser.Exception e)
-		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
-					ERROR_DISPLAY_TIMEOUT, true);
-			if (FormatterPlugin.DEBUG)
-			{
-				FormatterPlugin.logError(e);
-			}
-
-		}
-		catch (Exception e)
-		{
-			StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus,
-					ERROR_DISPLAY_TIMEOUT, true);
-			FormatterPlugin.logError(e);
-		}
-
-		// We just return the source unchanged if we can't format it
-		return source;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.formatter.ui.IScriptFormatter#getIndentSize()

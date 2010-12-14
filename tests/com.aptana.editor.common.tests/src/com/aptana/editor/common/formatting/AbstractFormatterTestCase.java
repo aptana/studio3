@@ -2,22 +2,32 @@ package com.aptana.editor.common.formatting;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.formatter.IScriptFormatter;
 
 import junit.framework.TestCase;
 
+/**
+ * AbstractFormatterTestCase <br>
+ * This class provides the basic functionality that should be used for all formatting tests. A formatting test should
+ * extend this class and implement the method to compare the two formatted files (with white space).
+ */
 public abstract class AbstractFormatterTestCase extends TestCase
 {
 	// Folder where the formatting files are located
-	protected static String FORMATTING_FOLDER = "formatting";
+	protected static String FORMATTING_FOLDER = "formatting"; //$NON-NLS-1$
+	protected static final String FORMATTING_PREFIX = "formatted_"; //$NON-NLS-1$
 
 	protected IScriptFormatter formatter;
 	protected String formatterId;
@@ -31,21 +41,26 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	protected void formatterTest(String sourceFile, String resultFile) throws IOException
 	{
 		String source = getContent(sourceFile);
-		assertNotNull(sourceFile + " is null", source);
-		
-		String formattedText = formatter.formatToString(source, 0, source.length(), 0, false, null);
-		String expectedResult = getContent(resultFile);
+		assertNotNull(sourceFile + " is null", source); //$NON-NLS-1$
 
-		assertNotNull("Could not format " + resultFile, formattedText);
-		assertTrue("contents of " + sourceFile + " do not match contents of " + resultFile + " without white spaces.",
-				compareIgnoreWhiteSpace(formattedText, expectedResult));
-		assertTrue("contents of " + sourceFile + " do not match contents of " + resultFile + " (with white spaces)",
-				compareWithWhiteSpace(formattedText, expectedResult));
+		TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
+		String expectedResult = getContent(resultFile);
+		if (formattedTextEdit instanceof ReplaceEdit)
+		{
+			String formattedText = ((ReplaceEdit) formattedTextEdit).getText();
+
+			assertTrue("contents of " + sourceFile + " do not match contents of " + resultFile, //$NON-NLS-1$ //$NON-NLS-2$
+					compareWithWhiteSpace(formattedText, expectedResult));
+		}
+		else if (!(formattedTextEdit instanceof MultiTextEdit))
+		{
+			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
+		}
 	}
 
 	protected String getContent(String filename) throws IOException
 	{
-		filename = FORMATTING_FOLDER + "/" + filename;
+		filename = FORMATTING_FOLDER + "/" + filename; //$NON-NLS-1$
 		File file = new File(filename);
 
 		if (file.exists())
@@ -54,53 +69,68 @@ public abstract class AbstractFormatterTestCase extends TestCase
 					Path.fromPortableString(filename), false);
 
 			// Add back a newline character since IOUtil.read() removes the last newline char from the file
-			return IOUtil.read(stream) + "\n";
+			return IOUtil.read(stream) + "\n"; //$NON-NLS-1$
 		}
-
 		return null;
 	}
 
-	protected abstract boolean compareIgnoreWhiteSpace(String original, String formattedText);
-
-	protected abstract boolean compareWithWhiteSpace(String original, String formattedText);
-
 	protected void generateFormattedFiles(String fileType) throws IOException
 	{
-
-		// Search for test files with the name "test{number}.{filetype}" where number is an integer and filetype is the
-		// filetype extension (xml, html, js, css, etc.)
-
-		int i = 1;
+		// Search for files of a particular fileType inside the formatting folder, format the files and create a
+		// resulting file with the prefix 'formatted_'
 		String source;
-		String formattedText;
 		FileWriter formattedStream;
-		String formattedPath = new String("test1_f.");
-		String sourcePath = new String("test1.");
-		formattedPath = FORMATTING_FOLDER + "/" + formattedPath + fileType;
-		sourcePath += fileType;
+		String formattedPath;
+		String sourcePath;
+		File formattedFile;
 
-		while ((source = getContent(sourcePath)) != null)
+		String[] files = getFilesToFormat(FORMATTING_FOLDER, fileType);
+
+		for (String file : files)
 		{
-
-			// format the test files and create a formatted version test{number}_f.{filetype}
-			// NOTE: formatted tests need to be reviewed manually to make sure they are correct before proceeding with
-			// normal tests
-			File formattedFile = new File(formattedPath);
-			if (!formattedFile.exists())
+			sourcePath = file;
+			formattedPath = FORMATTING_FOLDER + "/" + FORMATTING_PREFIX + file; //$NON-NLS-1$
+			if ((source = getContent(sourcePath)) != null)
 			{
-				formattedStream = new FileWriter(new File(formattedPath));
-				formattedText = formatter.formatToString(source, 0, source.length(), 0, false, null);
-				if (formattedText != null && compareIgnoreWhiteSpace(source, formattedText))
+				formattedFile = new File(formattedPath);
+				// Don't overwrite the formatted file if it is already there
+				if (!formattedFile.exists())
 				{
-					formattedStream.write(formattedText);
+					formattedStream = new FileWriter(formattedFile);
+					TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
+					if (formattedTextEdit instanceof ReplaceEdit)
+					{
+						formattedStream.write(((ReplaceEdit) formattedTextEdit).getText());
+					}
+					else if ((formattedTextEdit instanceof MultiTextEdit))
+					{
+						// write original content if the formatted text is same as original
+						formattedStream.write(source);
+					}
+					formattedStream.close();
 				}
-				formattedStream.close();
 			}
-			formattedPath = formattedPath.replace(String.valueOf(i), String.valueOf(i + 1));
-			sourcePath = sourcePath.replace(String.valueOf(i), String.valueOf(i + 1));
-
-			i++;
 		}
 	}
+
+	protected String[] getFilesToFormat(String directory, String fileType)
+	{
+		File formattingDirectory = new File(directory);
+		final String fileExtension = fileType;
+		FilenameFilter filter = new FilenameFilter()
+		{
+			public boolean accept(File dir, String name)
+			{
+				if (name.contains(FORMATTING_PREFIX) || !name.endsWith(fileExtension))
+				{
+					return false;
+				}
+				return true;
+			}
+		};
+		return formattingDirectory.list(filter);
+	}
+
+	protected abstract boolean compareWithWhiteSpace(String original, String formattedText);
 
 }

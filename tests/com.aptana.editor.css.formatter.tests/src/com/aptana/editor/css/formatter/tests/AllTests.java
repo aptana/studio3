@@ -40,7 +40,7 @@ import junit.framework.TestSuite;
 public class AllTests
 {
 
-	public static Test suite()
+	public static Test suite() throws Exception
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.formatter.tests");
 		// $JUnit-BEGIN$
