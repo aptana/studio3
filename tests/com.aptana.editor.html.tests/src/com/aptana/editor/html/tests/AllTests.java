@@ -43,7 +43,7 @@ import com.aptana.editor.html.HTMLParserTypeAttributeTest;
 import com.aptana.editor.html.HTMLScannerTest;
 import com.aptana.editor.html.HTMLSourcePartitionScannerTest;
 import com.aptana.editor.html.HTMLTagScannerTest;
-import com.aptana.editor.html.OpenTagCloserTest;
+import com.aptana.editor.html.HTMLOpenTagCloserTest;
 
 public class AllTests
 {
@@ -59,7 +59,7 @@ public class AllTests
 		suite.addTestSuite(HTMLTagScannerTest.class);
 //		suite.addTestSuite(HTMLTagScannerPerformanceTest.class);
 		suite.addTestSuite(HTMLEditorTest.class);
-		suite.addTestSuite(OpenTagCloserTest.class);
+		suite.addTestSuite(HTMLOpenTagCloserTest.class);
 		suite.addTest(com.aptana.editor.html.outline.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.contentassist.AllTests.suite());
 		// $JUnit-END$

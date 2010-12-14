@@ -525,9 +525,9 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="%page.name.0"/>
+            class="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            id="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            name="%page.editors.name"/>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.TasksPreferencePage"

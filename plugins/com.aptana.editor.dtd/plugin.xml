@@ -9,6 +9,7 @@
             default="true"
             extensions="dtd"
             id="com.aptana.editor.dtd"
+            icon="icons/dtd.png"
             name="%editor.name">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.dtd">

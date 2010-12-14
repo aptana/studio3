@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.html;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,13 +59,24 @@ import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
+import com.aptana.editor.xml.TagUtil;
 
 public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
-			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single quotes
+			'\'', '"', '"', '<', '>', '\u201C', '\u201D', '\u2018', '\u2019' }; // curly double quotes, curly single
+																				// quotes
 
 	private Map<Annotation, Position> fTagPairOccurrences;
+
+	private static Collection<String> tagPartitions = new ArrayList<String>();
+	static
+	{
+		tagPartitions.add(HTMLSourceConfiguration.HTML_TAG);
+		tagPartitions.add(HTMLSourceConfiguration.HTML_SCRIPT);
+		tagPartitions.add(HTMLSourceConfiguration.HTML_STYLE);
+		tagPartitions.add(HTMLSourceConfiguration.HTML_SVG);
+	}
 
 	@Override
 	protected void initializeEditor()
@@ -114,7 +127,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	 */
 	protected void installOpenTagCloser()
 	{
-		OpenTagCloser.install(getSourceViewer());
+		new HTMLOpenTagCloser(getSourceViewer()).install();
 	}
 
 	@Override
@@ -178,7 +191,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 		// Calculate current pair
 		Map<Annotation, Position> occurrences = new HashMap<Annotation, Position>();
 		IDocument document = getSourceViewer().getDocument();
-		IRegion match = OpenTagCloser.findMatchingTag(document, offset);
+		IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions);
 		if (match != null)
 		{
 			// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new ones!

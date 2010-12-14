@@ -8,6 +8,7 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
             extensions="idl"
+            icon="icons/idl.png"
             id="com.aptana.editor.idl"
             name="%editor.name">
          <contentTypeBinding

@@ -18,6 +18,7 @@
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
             extensions="svg"
+            icon="icons/svg.png"
             id="com.aptana.editor.svg"
             name="%editor.svg.name">
       </editor>

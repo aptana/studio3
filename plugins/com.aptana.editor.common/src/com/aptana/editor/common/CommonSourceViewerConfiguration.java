@@ -70,6 +70,7 @@ import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
@@ -85,8 +86,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
 	private IPreferenceChangeListener fThemeChangeListener;
+	private IPreferenceChangeListener fAutoActivationListener;
 	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
-
+	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 200;
+	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
+	
 	/**
 	 * CommonSourceViewerConfiguration
 	 * 
@@ -107,6 +111,11 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	{
 		fTextEditor = null;
 		fDoubleClickStrategy = null;
+		if (fAutoActivationListener != null)
+		{
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(fAutoActivationListener);
+			fAutoActivationListener = null;
+		}
 		if (fThemeChangeListener != null)
 		{
 			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
@@ -183,11 +192,17 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 		if (fPreferenceStore != null)
 		{
-			// assistant.enableAutoActivation(fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_ACTIVATION));
-			// assistant.setAutoActivationDelay(fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY));
-			assistant.enableAutoActivation(true);
-			assistant.setAutoActivationDelay(200);
+			setAutoActivationOptions(assistant);
 		}
+
+		fAutoActivationListener = new IPreferenceChangeListener()
+		{
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				setAutoActivationOptions(assistant);
+			}
+		};
+		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
 
@@ -206,7 +221,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
+		
 		return assistant;
+	}
+
+	private void setAutoActivationOptions(final ContentAssistant assistant)
+	{
+		int delay = fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY);
+		if(delay >= 0) {
+			assistant.enableAutoActivation(true);
+			assistant.setAutoActivationDelay(delay);				
+		}
+		else {
+			assistant.enableAutoActivation(false);
+		}
 	}
 
 	/**
