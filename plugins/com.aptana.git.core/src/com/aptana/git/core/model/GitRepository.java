@@ -64,7 +64,11 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -567,19 +571,71 @@ public class GitRepository
 	public boolean switchBranch(String branchName)
 	{
 		if (branchName == null)
+		{
 			return false;
+		}
 
-		// FIXME Before switching branches, check for existence of every open project attached to this repo on the new
+		// Before switching branches, check for existence of every open project attached to this repo on the new
 		// branch!
-		// git cat-file -e <new_branchName>:<path/to/project>/.project, look for exit code 0 to represent exists
 		// If it doesn't exist, close the project first!
 		// if we fail to switch branches, re-open the ones we auto-closed!
+		final Set<IProject> projectsNotExistingOnNewBranch = new HashSet<IProject>();
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			if (!project.isAccessible())
+			{
+				// TODO What if we have a closed project because it doesn't exist here, but it does on the new branch. Auto-open after switch?
+				continue;
+			}
+			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
+			if (other != null && other.equals(this))
+			{
+				// Check if the project exists on the other branch!
+				Map<Integer, String> result = GitExecutable
+						.instance()
+						.runInBackground(
+								workingDirectory(),
+								"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
+								branchName
+										+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
+				if (result.keySet().iterator().next().intValue() != 0)
+				{
+					projectsNotExistingOnNewBranch.add(project);
+				}
+			}
+		}
+		// Now close all of the affectedProjects.
+		for (IProject project : projectsNotExistingOnNewBranch)
+		{
+			try
+			{
+				project.close(new NullProgressMonitor());
+			}
+			catch (CoreException e)
+			{
+				GitPlugin.logError(e);
+			}
+		}
 
 		String oldBranchName = currentBranch.simpleRef().shortName();
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
 				branchName);
 		if (result.keySet().iterator().next().intValue() != 0)
+		{
+			// Re-open the affectedProjects!
+			for (IProject project : projectsNotExistingOnNewBranch)
+			{
+				try
+				{
+					project.open(new NullProgressMonitor());
+				}
+				catch (CoreException e)
+				{
+					GitPlugin.logError(e);
+				}
+			}
 			return false;
+		}
 		_headRef = null;
 		readCurrentBranch();
 		fireBranchChangeEvent(oldBranchName, branchName);
