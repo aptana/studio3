@@ -568,6 +568,13 @@ public class GitRepository
 	{
 		if (branchName == null)
 			return false;
+
+		// FIXME Before switching branches, check for existence of every open project attached to this repo on the new
+		// branch!
+		// git cat-file -e <new_branchName>:<path/to/project>/.project, look for exit code 0 to represent exists
+		// If it doesn't exist, close the project first!
+		// if we fail to switch branches, re-open the ones we auto-closed!
+
 		String oldBranchName = currentBranch.simpleRef().shortName();
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
 				branchName);
