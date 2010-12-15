@@ -184,15 +184,15 @@ public final class BrowserUtil {
 		 * Firefox
 		 */
 		if (Firefox.isBrowserExecutable(browserExecutable)) {
-			File profile = FirefoxUtil.findDefaultProfileLocation();
+			IPath profile = FirefoxUtil.findDefaultProfileLocation();
 			if (profile != null) {
 				boolean available = false;
 				if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) != null) {
 					String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 					// Check for compatible Firebug version
 					if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) { //$NON-NLS-1$
-						File extension = new File(new File(profile, EXTENSIONS), EXTENSION_ID[1]);
-						available = extension.exists() && !new File(extension, DEBUGGER_FILE).exists();
+						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
+						available = extension.toFile().exists() && !extension.append(DEBUGGER_FILE).toFile().exists();
 					}
 
 				}
@@ -334,7 +334,7 @@ public final class BrowserUtil {
 
 			boolean installed = false;
 			if (Firefox.isBrowserExecutable(browserExecutable)) {
-				File profile = FirefoxUtil.findDefaultProfileLocation();
+				IPath profile = FirefoxUtil.findDefaultProfileLocation();
 				if (profile != null) {
 					try {
 						/*
@@ -348,8 +348,8 @@ public final class BrowserUtil {
 											"warning_" + "Previous version of AptanaDebugger extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
 							return false;
 						}
-						File extension = new File(new File(profile, EXTENSIONS), EXTENSION_ID[1]);
-						if (extension.exists() && new File(extension, DEBUGGER_FILE).exists()) {
+						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
+						if (extension.toFile().exists() && extension.append(DEBUGGER_FILE).toFile().exists()) {
 							prompter
 									.handleStatus(
 											installDebuggerPromptStatus,
@@ -367,11 +367,11 @@ public final class BrowserUtil {
 
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) == null) {
 							installed = Firefox.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
-									EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], new File(profile, EXTENSIONS));
+									EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], profile.append(EXTENSIONS).toFile());
 						}
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile) == null) {
 							installed = Firefox.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
-									EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], new File(profile, EXTENSIONS));
+									EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], profile.append(EXTENSIONS).toFile());
 						}
 
 						if (installed) {

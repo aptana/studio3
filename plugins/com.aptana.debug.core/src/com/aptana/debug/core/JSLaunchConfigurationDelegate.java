@@ -364,7 +364,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 			if (debugAvailable) {
 
-				int port = SocketUtil.findFreePort();
+				int port = SocketUtil.findFreePort(null);
 				if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
 					port = 2525;
 				}

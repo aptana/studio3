@@ -62,8 +62,8 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.aptana.core.resources.IUniformResourceMarker;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.debug.core.model.IJSLineBreakpoint;
+import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
 
 /**
@@ -119,7 +119,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 		IMarker marker = breakpoint.getMarker();
 		if (marker instanceof IUniformResourceMarker)
 		{
-			fileName = ResourceUtil.getPath(((IUniformResourceMarker) marker).getUniformResource());
+			fileName = DebugUtil.getPath(((IUniformResourceMarker) marker).getUniformResource());
 		}
 		else
 		{

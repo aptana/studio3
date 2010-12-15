@@ -219,10 +219,10 @@ public final class FirefoxUtil {
 	 * @param profileDir
 	 * @return
 	 */
-	public static String getExtensionVersion(String extensionID, File profileDir) {
-		File dir = new File(new File(profileDir, "extensions"), extensionID); //$NON-NLS-1$
-		if (dir.exists()) {
-			File installRdf = new File(dir, "install.rdf"); //$NON-NLS-1$
+	public static String getExtensionVersion(String extensionID, IPath profileDir) {
+		IPath dir = profileDir.append("extensions").append(extensionID); //$NON-NLS-1$
+		if (dir.toFile().exists()) {
+			File installRdf = dir.append("install.rdf").toFile(); //$NON-NLS-1$
 			if (installRdf.exists()) {
 				try {
 					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

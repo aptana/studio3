@@ -36,7 +36,6 @@
 package com.aptana.debug.core.util;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -61,14 +60,14 @@ import com.aptana.debug.core.JSDebugPlugin;
  * @author Max Stepanov
  * 
  */
-public final class FirebugUtils {
+public final class FirebugUtil {
 
 	private static final String PREF_FORMAT = "user_pref(\"extensions.firebug.externalEditors{0}\", \"{1}\");"; //$NON-NLS-1$
 
 	/**
 	 * 
 	 */
-	private FirebugUtils() {
+	private FirebugUtil() {
 	}
 
 	public static boolean registerEditor(String name, IPath path, String cmdLine) {
@@ -77,7 +76,7 @@ public final class FirebugUtils {
 	}
 
 	public static boolean registerEditor(String id, String name, IPath path, String cmdLine) {
-		File profile = FirefoxUtil.findDefaultProfileLocation();
+		IPath profile = FirefoxUtil.findDefaultProfileLocation();
 		if (profile == null) {
 			return false;
 		}
@@ -87,11 +86,11 @@ public final class FirebugUtils {
 		options.put("cmdline", cmdLine); //$NON-NLS-1$
 		options.put("image", StringUtil.EMPTY); //$NON-NLS-1$
 
-		File prefs = new File(profile, "prefs.js"); //$NON-NLS-1$
+		IPath prefs = profile.append("prefs.js"); //$NON-NLS-1$
 		LineNumberReader reader = null;
 		PrintWriter writer = null;
 		try {
-			reader = new LineNumberReader(new InputStreamReader(new FileInputStream(prefs), "UTF8")); //$NON-NLS-1$
+			reader = new LineNumberReader(new InputStreamReader(new FileInputStream(prefs.toFile()), "UTF8")); //$NON-NLS-1$
 			String line;
 			ArrayList<String> lines = new ArrayList<String>();
 			boolean editorsFound = false;
@@ -163,13 +162,13 @@ public final class FirebugUtils {
 			}
 			if (doWrite) {
 				writer = new PrintWriter(
-						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(prefs), "UTF8"))); //$NON-NLS-1$
+						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
 				for (Iterator<String> i = lines.iterator(); i.hasNext();) {
 					writer.println((String) i.next());
 				}
 			}
 		} catch (IOException e) {
-			JSDebugPlugin.log(MessageFormat.format("Reading '{0}' fails", prefs.getAbsolutePath()), e); //$NON-NLS-1$
+			JSDebugPlugin.log(MessageFormat.format("Reading '{0}' fails", prefs.toOSString()), e); //$NON-NLS-1$
 		} finally {
 			if (reader != null) {
 				try {

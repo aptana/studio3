@@ -73,7 +73,7 @@ import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
 import com.aptana.debug.core.JSLaunchConfigurationHelper;
-import com.aptana.debug.core.util.FirebugUtils;
+import com.aptana.debug.core.util.FirebugUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.ui.PopupSchedulingRule;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
@@ -108,7 +108,7 @@ public class Startup implements IStartup {
 	private void registerAsFirebugEditor() {
 		IPath launcher = EclipseUtil.getApplicationLauncher();
 		if ( launcher != null ) {
-			FirebugUtils.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
+			FirebugUtil.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

@@ -475,7 +475,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			String type = args[3];
 			if (SRC.equals(type) && args.length >= 6) {
 				String fileName = resolveSourceFile(Util.decodeData(args[4]));
-				IFile file = ResourceUtil.findWorkspaceFile(fileName);
+				IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
 				if (file != null) {
 					fileName = file.getFullPath().makeRelative().toString();
 				}
@@ -490,7 +490,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 										: Messages.JSDebugTarget_EvalScript);
 					}
 					String fileName = resolveSourceFile(Util.decodeData(subargs[2]));
-					IFile file = ResourceUtil.findWorkspaceFile(fileName);
+					IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
 					if (file != null) {
 						fileName = file.getFullPath().makeRelative().toString();
 					}
@@ -685,7 +685,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				JSDebugScriptElement topScriptElement = (JSDebugScriptElement) topScriptElements.get(fileName);
 				if (topScriptElement == null) {
 					String name = fileName;
-					IFile file = ResourceUtil.findWorkspaceFile(fileName);
+					IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
 					if (file != null) {
 						name = file.getFullPath().toString();
 					}
@@ -1691,7 +1691,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param breakpoints
 	 * @return IBreakpoint
 	 */
-	protected IBreakpoint findBreakpointIn(String filename, int lineNumber, IBreakpoint[] breakpoints) {
+	protected IBreakpoint findBreakpointIn(String fileName, int lineNumber, IBreakpoint[] breakpoints) {
 		for (int i = 0; i < breakpoints.length; ++i) {
 			IBreakpoint breakpoint = breakpoints[i];
 			if (getDebugTarget().supportsBreakpoint(breakpoint)) {
@@ -1701,18 +1701,18 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 						boolean fileMatched = false;
 						if (marker instanceof IUniformResourceMarker) {
 							URI breakpointURI = ((IUniformResourceMarker) marker).getUniformResource().getURI();
-							fileMatched = new URI(Util.fixupURI(filename)).equals(breakpointURI);
+							fileMatched = new URI(Util.fixupURI(fileName)).equals(breakpointURI);
 						} else if (marker.getResource() instanceof IWorkspaceRoot) {
 							URI breakpointURI = URI.create((String) marker
 									.getAttribute(IDebugConstants.BREAKPOINT_LOCATION));
-							fileMatched = new URI(Util.fixupURI(filename)).equals(breakpointURI);
+							fileMatched = new URI(Util.fixupURI(fileName)).equals(breakpointURI);
 						} else {
-							IFile file = ResourceUtil.findWorkspaceFile(filename);
+							IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
 							if (file != null) {
 								fileMatched = file.equals(marker.getResource());
 							} else {
 								File breakpointFile = marker.getResource().getLocation().toFile();
-								fileMatched = new File(filename).equals(breakpointFile);
+								fileMatched = new File(fileName).equals(breakpointFile);
 							}
 						}
 						if (fileMatched && ((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber) {

@@ -50,11 +50,11 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.model.IJSLineBreakpoint;
+import com.aptana.debug.core.util.DebugUtil;
 
 /**
  * @author Max Stepanov
@@ -159,7 +159,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 				attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
-						ResourceUtil.getPath(resource), Integer.toString(lineNumber)));
+						DebugUtil.getPath(resource), Integer.toString(lineNumber)));
 				ensureMarker().setAttributes(attributes);
 
 				register(register);

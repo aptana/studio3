@@ -50,11 +50,11 @@ import org.eclipse.debug.core.model.IBreakpoint;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.model.IJSExceptionBreakpoint;
+import com.aptana.debug.core.util.DebugUtil;
 
 /**
  * @author Max Stepanov
@@ -156,7 +156,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(
 						Messages.JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1,
-								ResourceUtil.getPath(resource), exceptionTypeName));
+								DebugUtil.getPath(resource), exceptionTypeName));
 				ensureMarker().setAttributes(attributes);
 
 				register(register);
