@@ -71,13 +71,13 @@ import com.aptana.webserver.core.WebServerCorePlugin;
  */
 /* package */ class LocalWebServerHttpRequestHandler implements HttpRequestHandler {
 
-	private static final String METHOD_GET = "GET";
-	private static final String METHOD_POST = "POST";
-	private static final String METHOD_HEAD = "HEAD";
+	private static final String METHOD_GET = "GET"; //$NON-NLS-1$
+	private static final String METHOD_POST = "POST"; //$NON-NLS-1$
+	private static final String METHOD_HEAD = "HEAD"; //$NON-NLS-1$
 	
-    private final static String HTML_TEXT_TYPE = "text/html";
+    private final static String HTML_TEXT_TYPE = "text/html"; //$NON-NLS-1$
 
-    private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?");
+    private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?"); //$NON-NLS-1$
     
 	private EFSWebServerConfiguration configuration;
 	
@@ -95,7 +95,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 		try {
 			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
-				String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
+				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
 				URI uri = URI.create(target);
 				IFileStore fileStore = configuration.resolve(uri);
 				IFileInfo fileInfo = fileStore.fetchInfo();
@@ -107,10 +107,10 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 				}
 				if (!fileInfo.exists()) {
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", target)));
+					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", target))); //$NON-NLS-1$
 				} else if (fileInfo.isDirectory()) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
-					response.setEntity(createTextEntity("Access Denied"));
+					response.setEntity(createTextEntity("Access Denied")); //$NON-NLS-1$
 				} else {
 					response.setStatusCode(HttpStatus.SC_OK);
 					if (METHOD_GET.equals(method)) {
@@ -130,20 +130,20 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 					}
 				}
 			} else if (METHOD_POST.equals(method)) {
-				throw new MethodNotSupportedException(method + " method not supported");
+				throw new MethodNotSupportedException(method + " method not supported"); //$NON-NLS-1$
 			} else {
-				throw new MethodNotSupportedException(method + " method not supported");
+				throw new MethodNotSupportedException(method + " method not supported"); //$NON-NLS-1$
 			}
 		} catch (CoreException e) {
 			WebServerCorePlugin.log(e);
 			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-			response.setEntity(createTextEntity("Internal Server Error"));
+			response.setEntity(createTextEntity("Internal Server Error")); //$NON-NLS-1$
 		}
 	}
 	
 	private static HttpEntity createTextEntity(String text) throws UnsupportedEncodingException {
 		NStringEntity entity = new NStringEntity(
-				MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text),
+				MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text), //$NON-NLS-1$
 				HTTP.UTF_8);
 		entity.setContentType(HTML_TEXT_TYPE+HTTP.CHARSET_PARAM+HTTP.UTF_8);
 		return entity;

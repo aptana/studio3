@@ -51,35 +51,35 @@ import org.apache.http.nio.protocol.EventListener;
 	 * @see org.apache.http.nio.protocol.EventListener#fatalIOException(java.io.IOException, org.apache.http.nio.NHttpConnection)
 	 */
 	public void fatalIOException(IOException ex, NHttpConnection conn) {
-		System.out.println("fatalIOException "+ex.getMessage());
+		System.out.println("fatalIOException "+ex.getMessage()); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#fatalProtocolException(org.apache.http.HttpException, org.apache.http.nio.NHttpConnection)
 	 */
 	public void fatalProtocolException(HttpException ex, NHttpConnection conn) {
-		System.out.println("fatalProtocolException "+ex.getMessage());
+		System.out.println("fatalProtocolException "+ex.getMessage()); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionOpen(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionOpen(NHttpConnection conn) {
-		System.out.println("connectionOpen");
+		System.out.println("connectionOpen"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionClosed(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionClosed(NHttpConnection conn) {
-		System.out.println("connectionClosed");
+		System.out.println("connectionClosed"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionTimeout(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionTimeout(NHttpConnection conn) {
-		System.out.println("connectionTimeout");
+		System.out.println("connectionTimeout"); //$NON-NLS-1$
 	}
 
 }

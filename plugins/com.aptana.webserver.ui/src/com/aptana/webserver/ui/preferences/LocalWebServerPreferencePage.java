@@ -67,7 +67,7 @@ public class LocalWebServerPreferencePage extends FieldEditorPreferencePage impl
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		setMessage("Built-in Web Server Preferences");
+		setMessage(Messages.LocalWebServerPreferencePage_Message);
 	}
 
 	/* (non-Javadoc)
@@ -79,10 +79,10 @@ public class LocalWebServerPreferencePage extends FieldEditorPreferencePage impl
 		for (InetAddress i : SocketUtil.getLocalAddresses()) {
 			addresses.add(new String[] { i.getHostAddress(), i.getHostAddress() });
 		}
-		addField(new ComboFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, StringUtil.makeFormLabel("IP Address"), addresses.toArray(new String[addresses.size()][]), getFieldEditorParent()));
-		addField(new StringFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, StringUtil.makeFormLabel("Port(s)"), 11, getFieldEditorParent()) {
+		addField(new ComboFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Address_Label), addresses.toArray(new String[addresses.size()][]), getFieldEditorParent()));
+		addField(new StringFieldEditor(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, StringUtil.makeFormLabel(Messages.LocalWebServerPreferencePage_Port_Label), 11, getFieldEditorParent()) {
 			{
-				setErrorMessage("Enter a valid port number or range");
+				setErrorMessage(Messages.LocalWebServerPreferencePage_PortError_Message);
 				setEmptyStringAllowed(true);
 			}
 			@Override

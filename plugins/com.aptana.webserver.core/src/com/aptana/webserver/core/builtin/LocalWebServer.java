@@ -63,13 +63,11 @@ import org.apache.http.protocol.ResponseConnControl;
 import org.apache.http.protocol.ResponseContent;
 import org.apache.http.protocol.ResponseDate;
 import org.apache.http.protocol.ResponseServer;
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.SocketUtil;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.core.preferences.WebServerPreferences;
@@ -88,21 +86,21 @@ public class LocalWebServer {
 	private Thread thread;
 	private ListeningIOReactor reactor;
 	
-	/**
-	 * 
-	 * @throws CoreException 
-	 */
 	public LocalWebServer(URI documentRoot) throws CoreException {
+		this(createConfigurationForDocumentRoot(documentRoot));
+	}
+	
+	public LocalWebServer(EFSWebServerConfiguration configuration) throws CoreException {
+		Assert.isLegal(configuration.getDocumentRoot() != null, "DocumentRoot should be set"); //$NON-NLS-1$
+		this.configuration = configuration;
 		InetAddress host = WebServerPreferences.getServerAddress();
 		int[] portRange = WebServerPreferences.getPortRange();
 		int port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
 		if (port <= 0) {
 			port = SocketUtil.findFreePort(host); // default to any free port
 		}
-		configuration = new EFSWebServerConfiguration();
-		configuration.setDocumentRoot(documentRoot);
 		try {
-			configuration.setBaseURL(new URL("http", host.getHostAddress(), port, "/"));
+			configuration.setBaseURL(new URL("http", host.getHostAddress(), port, "/")); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (MalformedURLException e) {
 			WebServerCorePlugin.log(e);
 		}
@@ -116,7 +114,7 @@ public class LocalWebServer {
 		stopServer();
 	}
 	
-	public AbstractWebServerConfiguration getConfiguration() {
+	public EFSWebServerConfiguration getConfiguration() {
 		return configuration;
 	}
 	
@@ -148,13 +146,13 @@ public class LocalWebServer {
 	}
 	
 	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler) {
-		System.out.println(MessageFormat.format("Starting webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort())));
+		System.out.println(MessageFormat.format("Starting webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort()))); //$NON-NLS-1$
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
 			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
 			.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 16*1024)
 			.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
-			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore"));
+			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore")); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		BasicHttpProcessor httpProcessor = new BasicHttpProcessor();
 		httpProcessor.addInterceptor(new ResponseDate());
@@ -163,7 +161,7 @@ public class LocalWebServer {
 		httpProcessor.addInterceptor(new ResponseConnControl());
 
         HttpRequestHandlerRegistry handlerRegistry = new HttpRequestHandlerRegistry();
-        handlerRegistry.register("*", httpRequestHandler);
+        handlerRegistry.register("*", httpRequestHandler); //$NON-NLS-1$
 
         BufferingHttpServiceHandler serviceHandler = new BufferingHttpServiceHandler(
                 httpProcessor,
@@ -189,8 +187,13 @@ public class LocalWebServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			System.out.println(MessageFormat.format("Stopped webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort())));
+			System.out.println(MessageFormat.format("Stopped webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort()))); //$NON-NLS-1$
 		}
 	}
 
+	private static EFSWebServerConfiguration createConfigurationForDocumentRoot(URI documentRoot) {
+		EFSWebServerConfiguration configuration = new EFSWebServerConfiguration();
+		configuration.setDocumentRoot(documentRoot);
+		return configuration;
+	}
 }
