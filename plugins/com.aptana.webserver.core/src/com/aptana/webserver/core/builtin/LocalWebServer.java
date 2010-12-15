@@ -106,7 +106,7 @@ public class LocalWebServer {
 		} catch (MalformedURLException e) {
 			WebServerCorePlugin.log(e);
 		}
-		startServer(host, port, EFS.getStore(documentRoot));
+		startServer(host, port, configuration);
 	}
 	
 	/**
@@ -120,11 +120,11 @@ public class LocalWebServer {
 		return configuration;
 	}
 	
-	private void startServer(final InetAddress host, final int port, final IFileStore documentRoot) {
+	private void startServer(final InetAddress host, final int port, final EFSWebServerConfiguration configuration) {
 		thread = new Thread() {
 			@Override
 			public void run() {
-				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(documentRoot));
+				runServer(new InetSocketAddress(host, port), new LocalWebServerHttpRequestHandler(configuration));
 			}
 		};
 		thread.setDaemon(true);

@@ -59,10 +59,10 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -79,13 +79,13 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 
     private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?");
     
-	private IFileStore documentRoot;
+	private EFSWebServerConfiguration configuration;
 	
 	/**
 	 * @param documentRoot
 	 */
-	public LocalWebServerHttpRequestHandler(IFileStore documentRoot) {
-		this.documentRoot = documentRoot;
+	public LocalWebServerHttpRequestHandler(EFSWebServerConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	/* (non-Javadoc)
@@ -97,8 +97,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
 				String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
 				URI uri = URI.create(target);
-				IPath path = Path.fromPortableString(uri.getPath());
-				IFileStore fileStore = documentRoot.getFileStore(path);
+				IFileStore fileStore = configuration.resolve(uri);
 				IFileInfo fileInfo = fileStore.fetchInfo();
 				if (fileInfo.isDirectory()) {
 					fileInfo = getIndex(fileStore);
@@ -108,7 +107,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 				}
 				if (!fileInfo.exists()) {
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", path.toPortableString())));
+					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", target)));
 				} else if (fileInfo.isDirectory()) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 					response.setEntity(createTextEntity("Access Denied"));

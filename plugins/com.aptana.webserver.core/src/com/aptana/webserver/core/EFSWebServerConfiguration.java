@@ -44,6 +44,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.core.epl.IMemento;
@@ -95,8 +96,29 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 		if (!isValid()) {
 			return null;
 		}
-		// TODO
-		return null;
+		try {
+			return resolve(url.toURI().relativize(baseURL.toURI()));
+		} catch (URISyntaxException e) {
+			WebServerCorePlugin.log(e);
+			return null;
+		}
+	}
+	
+	/**
+	 * Resolves URI relative to server base URL
+	 * @param uri
+	 * @return
+	 */
+	public IFileStore resolve(URI uri) {
+		if (!isValid()) {
+			return null;
+		}
+		try {
+			return EFS.getStore(documentRoot).getFileStore(Path.fromPortableString(uri.getPath()));
+		} catch (CoreException e) {
+			WebServerCorePlugin.log(e);
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
