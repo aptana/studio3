@@ -107,10 +107,10 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 				}
 				if (!fileInfo.exists()) {
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", target))); //$NON-NLS-1$
+					response.setEntity(createTextEntity(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, target)));
 				} else if (fileInfo.isDirectory()) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
-					response.setEntity(createTextEntity("Access Denied")); //$NON-NLS-1$
+					response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_FORBIDDEN));
 				} else {
 					response.setStatusCode(HttpStatus.SC_OK);
 					if (METHOD_GET.equals(method)) {
@@ -130,14 +130,15 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 					}
 				}
 			} else if (METHOD_POST.equals(method)) {
-				throw new MethodNotSupportedException(method + " method not supported"); //$NON-NLS-1$
+				// TODO
+				throw new MethodNotSupportedException(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
 			} else {
-				throw new MethodNotSupportedException(method + " method not supported"); //$NON-NLS-1$
+				throw new MethodNotSupportedException(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
 			}
 		} catch (CoreException e) {
 			WebServerCorePlugin.log(e);
 			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-			response.setEntity(createTextEntity("Internal Server Error")); //$NON-NLS-1$
+			response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_INTERNAL_SERVER_ERROR));
 		}
 	}
 	

@@ -52,6 +52,8 @@ import com.aptana.webserver.core.WebServerCorePlugin;
  */
 public class WebServerPreferences {
 
+	private static final String PORTS_PATTERN = "^(\\d+)(-(\\d+))?$"; //$NON-NLS-1$
+	
 	private WebServerPreferences() {
 	}
 
@@ -85,7 +87,7 @@ public class WebServerPreferences {
 		int portsEnd = IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1];
 		String portsString = node.get(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS, null);
 		if (portsString != null && portsString.length() > 0) {
-			Matcher matcher = Pattern.compile("^(\\d+)(-(\\d+))?$").matcher(portsString); //$NON-NLS-1$
+			Matcher matcher = Pattern.compile(PORTS_PATTERN).matcher(portsString); 
 			if (matcher.matches()) {
 				try {
 					int start = Integer.parseInt(matcher.group(1));

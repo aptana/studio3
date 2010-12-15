@@ -80,8 +80,9 @@ import com.aptana.webserver.core.preferences.WebServerPreferences;
 public class LocalWebServer {
 
 	private static final int SOCKET_TIMEOUT = 10000;
-	private static final int STARTUP_TIMEOUT = 5000;
-	private static final int SHUTDOWN_TIMEOUT = 2000;
+	private static final long STARTUP_TIMEOUT = 5000;
+	private static final long SHUTDOWN_TIMEOUT = 2000;
+	private static final int SOCKET_BUFFER_SIZE = 16*1024;
 	private static final int WORKER_COUNT = 2;
 	
 	private final EFSWebServerConfiguration configuration;
@@ -163,7 +164,7 @@ public class LocalWebServer {
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
 			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
-			.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 16*1024)
+			.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, SOCKET_BUFFER_SIZE)
 			.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
 			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore")); //$NON-NLS-1$ //$NON-NLS-2$
 		
@@ -193,12 +194,8 @@ public class LocalWebServer {
         	return;
 		} catch (IOReactorException e) {
 			WebServerCorePlugin.log(e);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			WebServerCorePlugin.log(e);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} finally {
 			System.out.println(MessageFormat.format("Stopped webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort()))); //$NON-NLS-1$
 		}
