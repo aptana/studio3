@@ -389,8 +389,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance()
-							.getServerConfigurations())
+					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)
