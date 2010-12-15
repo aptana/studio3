@@ -541,6 +541,11 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : this.getTypes(lhs))
 			{
+				if (JSTypeUtil.isFunctionPrefix(typeName))
+				{
+					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
+				}
+				
 				// lookup up rhs name in type and add that value's type here
 				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 
