@@ -41,14 +41,20 @@ public class HTMLTagUtil
 {
 	/**
 	 * Is the current Lexeme a HTML tag
+	 * 
 	 * @param lexeme
 	 * @return
 	 */
-	public static boolean isTag(Lexeme<HTMLTokenType> lexeme) {
-		if(lexeme != null && lexeme.getType() == HTMLTokenType.STRUCTURE_TAG || lexeme.getType() == HTMLTokenType.BLOCK_TAG || lexeme.getType() == HTMLTokenType.INLINE_TAG) {
+	public static boolean isTag(Lexeme<HTMLTokenType> lexeme)
+	{
+		if (lexeme != null && HTMLTokenType.STRUCTURE_TAG.equals(lexeme.getType())
+				|| HTMLTokenType.BLOCK_TAG.equals(lexeme.getType())
+				|| HTMLTokenType.INLINE_TAG.equals(lexeme.getType()))
+		{
 			return true;
 		}
-		else {
+		else
+		{
 			return false;
 		}
 	}
