@@ -35,14 +35,35 @@
 
 package com.aptana.webserver.core.builtin;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.MethodNotSupportedException;
+import org.apache.http.nio.entity.NFileEntity;
+import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
@@ -50,6 +71,14 @@ import org.eclipse.core.filesystem.IFileStore;
  */
 /* package */ class LocalWebServerHttpRequestHandler implements HttpRequestHandler {
 
+	private static final String METHOD_GET = "GET";
+	private static final String METHOD_POST = "POST";
+	private static final String METHOD_HEAD = "HEAD";
+	
+    private final static String HTML_TEXT_TYPE = "text/html";
+
+    private final static Pattern PATTERN_INDEX = Pattern.compile("(index|default)\\.x?html?");
+    
 	private IFileStore documentRoot;
 	
 	/**
@@ -63,6 +92,71 @@ import org.eclipse.core.filesystem.IFileStore;
 	 * @see org.apache.http.protocol.HttpRequestHandler#handle(org.apache.http.HttpRequest, org.apache.http.HttpResponse, org.apache.http.protocol.HttpContext)
 	 */
 	public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+		try {
+			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
+			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
+				String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
+				URI uri = URI.create(target);
+				IPath path = Path.fromPortableString(uri.getPath());
+				IFileStore fileStore = documentRoot.getFileStore(path);
+				IFileInfo fileInfo = fileStore.fetchInfo();
+				if (fileInfo.isDirectory()) {
+					fileInfo = getIndex(fileStore);
+					if (fileInfo.exists()) {
+						fileStore = fileStore.getChild(fileInfo.getName());
+					}
+				}
+				if (!fileInfo.exists()) {
+					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+					response.setEntity(createTextEntity(MessageFormat.format("File {0} not found", path.toPortableString())));
+				} else if (fileInfo.isDirectory()) {
+					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
+					response.setEntity(createTextEntity("Access Denied"));
+				} else {
+					response.setStatusCode(HttpStatus.SC_OK);
+					if (METHOD_GET.equals(method)) {
+							final File file = fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+							response.setEntity(new NFileEntity(file,  HTML_TEXT_TYPE) {
+								@Override
+								public void finish() {
+									super.finish();
+									if (!file.delete()) {
+										file.deleteOnExit();
+									}
+								}
+								
+							});
+					} else {
+						response.setEntity(null);
+					}
+				}
+			} else if (METHOD_POST.equals(method)) {
+				throw new MethodNotSupportedException(method + " method not supported");
+			} else {
+				throw new MethodNotSupportedException(method + " method not supported");
+			}
+		} catch (CoreException e) {
+			WebServerCorePlugin.log(e);
+			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+			response.setEntity(createTextEntity("Internal Server Error"));
+		}
+	}
+	
+	private static HttpEntity createTextEntity(String text) throws UnsupportedEncodingException {
+		NStringEntity entity = new NStringEntity(
+				MessageFormat.format("<html><body><h1>{0}</h1></body></html>", text),
+				HTTP.UTF_8);
+		entity.setContentType(HTML_TEXT_TYPE+HTTP.CHARSET_PARAM+HTTP.UTF_8);
+		return entity;
+	}
+	
+	private static IFileInfo getIndex(IFileStore parent) throws CoreException {
+		for (IFileInfo fileInfo : parent.childInfos(EFS.NONE, new NullProgressMonitor())) {
+			if (fileInfo.exists() && PATTERN_INDEX.matcher(fileInfo.getName()).matches()) {
+				return fileInfo;
+			}
+		}
+		return EFS.getNullFileSystem().getStore(Path.EMPTY).fetchInfo();
 	}
 
 }

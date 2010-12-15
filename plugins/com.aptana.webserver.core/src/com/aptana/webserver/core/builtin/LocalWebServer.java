@@ -42,8 +42,8 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.text.MessageFormat;
 
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
 import org.apache.http.impl.nio.DefaultServerIOEventDispatch;
@@ -81,10 +81,12 @@ import com.aptana.webserver.core.preferences.WebServerPreferences;
 public class LocalWebServer {
 
 	private static final int SOCKET_TIMEOUT = 10000;
+	private static final int SHUTDOWN_TIMEOUT = 2000;
 	private static final int WORKER_COUNT = 2;
 	
 	private final EFSWebServerConfiguration configuration;
 	private Thread thread;
+	private ListeningIOReactor reactor;
 	
 	/**
 	 * 
@@ -93,9 +95,9 @@ public class LocalWebServer {
 	public LocalWebServer(URI documentRoot) throws CoreException {
 		InetAddress host = WebServerPreferences.getServerAddress();
 		int[] portRange = WebServerPreferences.getPortRange();
-		int port = SocketUtil.findFreePort(portRange[0], portRange[1]);
+		int port = SocketUtil.findFreePort(host, portRange[0], portRange[1]);
 		if (port <= 0) {
-			port = SocketUtil.findFreePort(); // default to any free port
+			port = SocketUtil.findFreePort(host); // default to any free port
 		}
 		configuration = new EFSWebServerConfiguration();
 		configuration.setDocumentRoot(documentRoot);
@@ -107,6 +109,12 @@ public class LocalWebServer {
 		startServer(host, port, EFS.getStore(documentRoot));
 	}
 	
+	/**
+	 * Stop the server and dispose any resources associated with it
+	 */
+	public void dispose() {
+		stopServer();
+	}
 	
 	public AbstractWebServerConfiguration getConfiguration() {
 		return configuration;
@@ -125,14 +133,26 @@ public class LocalWebServer {
 	
 	private void stopServer() {
 		if (thread != null && thread.isAlive()) {
+			if (reactor != null) {
+				try {
+					reactor.shutdown(SHUTDOWN_TIMEOUT);
+				} catch (IOException ignore) {
+				}
+			}
 			thread.interrupt();
+			try {
+				thread.join(SHUTDOWN_TIMEOUT);
+			} catch (InterruptedException ignore) {
+			}
 		}
 	}
 	
 	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler) {
+		System.out.println(MessageFormat.format("Starting webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort())));
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
 			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
+			.setIntParameter(CoreConnectionPNames.SOCKET_BUFFER_SIZE, 16*1024)
 			.setBooleanParameter(CoreConnectionPNames.TCP_NODELAY, true)
 			.setParameter(CoreProtocolPNames.ORIGIN_SERVER, "HttpComponents/"+EclipseUtil.getPluginVersion("org.apache.httpcomponents.httpcore"));
 		
@@ -155,7 +175,7 @@ public class LocalWebServer {
         
         IOEventDispatch eventDispatch = new DefaultServerIOEventDispatch(serviceHandler, params);
         try {
-			ListeningIOReactor reactor = new DefaultListeningIOReactor(WORKER_COUNT, params);
+			reactor = new DefaultListeningIOReactor(WORKER_COUNT, params);
 			reactor.listen(socketAddress);
 			reactor.execute(eventDispatch);
         } catch (InterruptedIOException e) {
@@ -168,8 +188,9 @@ public class LocalWebServer {
 			WebServerCorePlugin.log(e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			System.out.println(MessageFormat.format("Stopped webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort())));
 		}
-
 	}
 
 }
