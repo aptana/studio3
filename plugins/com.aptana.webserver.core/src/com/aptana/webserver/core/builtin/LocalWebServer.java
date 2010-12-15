@@ -51,6 +51,7 @@ import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.nio.protocol.BufferingHttpServiceHandler;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListeningIOReactor;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
@@ -79,6 +80,7 @@ import com.aptana.webserver.core.preferences.WebServerPreferences;
 public class LocalWebServer {
 
 	private static final int SOCKET_TIMEOUT = 10000;
+	private static final int STARTUP_TIMEOUT = 5000;
 	private static final int SHUTDOWN_TIMEOUT = 2000;
 	private static final int WORKER_COUNT = 2;
 	
@@ -127,6 +129,17 @@ public class LocalWebServer {
 		};
 		thread.setDaemon(true);
 		thread.start();
+		Thread.yield();
+		long startTime = System.currentTimeMillis();
+		while( thread.isAlive() && (System.currentTimeMillis() - startTime) < STARTUP_TIMEOUT ) {
+			if (reactor != null && reactor.getStatus() == IOReactorStatus.ACTIVE) {
+				break;
+			}
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException ignore) {
+			}
+		}
 	}
 	
 	private void stopServer() {
