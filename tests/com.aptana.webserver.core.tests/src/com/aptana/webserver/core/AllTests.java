@@ -32,45 +32,22 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.webserver.core;
 
-package com.aptana.preview.internal.impl;
+import com.aptana.webserver.core.builtin.LocalWebServerTest;
 
-import java.net.URL;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import org.eclipse.core.runtime.CoreException;
+public class AllTests
+{
 
-import com.aptana.preview.IPreviewHandler;
-import com.aptana.preview.PreviewConfig;
-import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.WebServerCorePlugin;
-
-/**
- * @author Max Stepanov
- * 
- */
-public class WebServerPreviewHandler implements IPreviewHandler {
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
-	 */
-	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
-		if (serverConfiguration != null) {
-			URL url = serverConfiguration.resolve(config.getFileStore());
-			if (url != null) {
-				return new PreviewConfig(url);
-			}
-		} else {
-			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
-				URL url = configuration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
-				}
-			}
-		}
-		return null;
+	public static Test suite()
+	{
+		TestSuite suite = new TestSuite(AllTests.class.getName());
+		// $JUnit-BEGIN$
+		suite.addTestSuite(LocalWebServerTest.class);
+		// $JUnit-END$
+		return suite;
 	}
 }

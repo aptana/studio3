@@ -72,6 +72,7 @@ import com.aptana.ui.util.UIUtils;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.ServerConfigurationManager;
 import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
+import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.ui.Activator;
 
 /**
@@ -122,7 +123,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 			}
 
 		});
-		viewer.setInput(ServerConfigurationManager.getInstance());
+		viewer.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager());
 
 		Composite buttonContainer = new Composite(composite, SWT.NONE);
 		buttonContainer.setLayoutData(GridDataFactory.fillDefaults().grab(false, true).create());
@@ -161,17 +162,17 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 						return super.getText(element);
 					}
 				});
-				dlg.setInput(ServerConfigurationManager.getInstance().getConfigurationTypes());
+				dlg.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getConfigurationTypes());
 				dlg.setTitle(Messages.ServersPreferencePage_Title);
 				Object[] result;
 				if (dlg.open() == Window.OK && (result = dlg.getResult()) != null && result.length == 1) {
 					String typeId = ((ConfigurationType) result[0]).getId();
 					try {
-						AbstractWebServerConfiguration newConfiguration = ServerConfigurationManager.getInstance()
+						AbstractWebServerConfiguration newConfiguration = WebServerCorePlugin.getDefault().getServerConfigurationManager()
 								.createServerConfiguration(typeId);
 						if (newConfiguration != null) {
 							if (editServerConfiguration(newConfiguration)) {
-								ServerConfigurationManager.getInstance().addServerConfiguration(newConfiguration);
+								WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(newConfiguration);
 								viewer.refresh();
 							}
 						}
@@ -201,7 +202,7 @@ public class ServersPreferencePage extends PreferencePage implements IWorkbenchP
 				if (selection != null
 						&& MessageDialog.openQuestion(getShell(), Messages.ServersPreferencePage_DeletePrompt_Title,
 								Messages.ServersPreferencePage_DeletePrompt_Message)) {
-					ServerConfigurationManager.getInstance().removeServerConfiguration(selection);
+					WebServerCorePlugin.getDefault().getServerConfigurationManager().removeServerConfiguration(selection);
 					viewer.refresh();
 				}
 			}

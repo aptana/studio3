@@ -38,7 +38,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class ProjectPreviewUtil
 {
@@ -52,7 +52,7 @@ public class ProjectPreviewUtil
 				String name = project.getPersistentProperty(IPreviewConstants.PROJECT_PREVIEW_SERVER);
 				if (name != null)
 				{
-					return ServerConfigurationManager.getInstance().findServerConfiguration(name);
+					return WebServerCorePlugin.getDefault().getServerConfigurationManager().findServerConfiguration(name);
 				}
 			}
 			catch (CoreException e)

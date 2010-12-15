@@ -90,7 +90,7 @@ import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -829,9 +829,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
 				addedProposal = true;
 			}
-		}
+			}
 		return addedProposal;
-	}
+		}
 
 	/**
 	 * addCloseTagProposals

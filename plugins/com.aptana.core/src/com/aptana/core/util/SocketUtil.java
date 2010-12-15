@@ -53,14 +53,15 @@ public final class SocketUtil {
 	}
 
 	/**
-	 * Find free port
+	 * Find free port for the specified IP address
 	 * 
 	 * @return int
 	 */
-	public static int findFreePort() {
+	public static int findFreePort(InetAddress address) {
 		ServerSocket socket = null;
 		try {
-			socket = new ServerSocket(0);
+			socket = new ServerSocket(0, 0, address);
+			socket.setReuseAddress(true);
 			return socket.getLocalPort();
 		} catch (IOException ignore) {
 		} finally {
@@ -75,16 +76,17 @@ public final class SocketUtil {
 	}
 
 	/**
-	 * Find free port in range
+	 * Find free port in range for the specified IP address
 	 * 
 	 * @return int
 	 */
-	public static int findFreePort(int start, int end) {
+	public static int findFreePort(InetAddress address, int start, int end) {
 		ServerSocket socket = null;
 		try {
 			for (int port = start; port <= end; ++port) {
 				try {
-					socket = new ServerSocket(port);
+					socket = new ServerSocket(port, 0, address);
+					socket.setReuseAddress(true);
 					return socket.getLocalPort();
 				} catch (IOException ignore) {
 				}

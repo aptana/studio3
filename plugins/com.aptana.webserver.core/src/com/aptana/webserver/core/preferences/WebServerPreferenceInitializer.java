@@ -33,44 +33,29 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal.impl;
+package com.aptana.webserver.core.preferences;
 
-import java.net.URL;
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import org.eclipse.core.runtime.CoreException;
-
-import com.aptana.preview.IPreviewHandler;
-import com.aptana.preview.PreviewConfig;
-import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
- * 
+ *
  */
-public class WebServerPreviewHandler implements IPreviewHandler {
+public class WebServerPreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
-	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
-		if (serverConfiguration != null) {
-			URL url = serverConfiguration.resolve(config.getFileStore());
-			if (url != null) {
-				return new PreviewConfig(url);
-			}
-		} else {
-			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
-				URL url = configuration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
-				}
-			}
-		}
-		return null;
+	@Override
+	public void initializeDefaultPreferences() {
+		IEclipsePreferences node = new DefaultScope().getNode(WebServerCorePlugin.PLUGIN_ID);
+		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_ADDRESS, IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_ADDRESS);
+		node.put(IWebServerPreferenceConstants.PREF_HTTP_SERVER_PORTS,
+				IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[0] + "-" + IWebServerPreferenceConstants.DEFAULT_HTTP_SERVER_PORTS_RANGE[1]); //$NON-NLS-1$
 	}
+
 }
