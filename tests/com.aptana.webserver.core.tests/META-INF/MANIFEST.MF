@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: com.aptana.webserver.core.tests;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: %Bundle-Vendor
+Fragment-Host: com.aptana.webserver.core
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.junit
