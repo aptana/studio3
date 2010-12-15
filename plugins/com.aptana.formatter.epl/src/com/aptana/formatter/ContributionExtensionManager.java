@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.formatter.epl.FormatterPlugin;
+
 /**
  * Abstract base class that can be used to manage extension point contributions that may have more then one
  * implementation.
@@ -169,7 +171,7 @@ public abstract class ContributionExtensionManager
 		}
 		catch (CoreException e)
 		{
-			e.printStackTrace();
+			FormatterPlugin.logError(e);
 		}
 		return null;
 	}
