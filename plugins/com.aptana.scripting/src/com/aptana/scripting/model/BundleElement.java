@@ -386,6 +386,19 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * For YAML serialization.
+	 * 
+	 * @param indentMarkers
+	 */
+	public void setDecreaseIndentMarkers(Map<ScopeSelector, RubyRegexp> indentMarkers)
+	{
+		synchronized (decreaseIndentMarkersLock)
+		{
+			this._decreaseIndentMarkers = indentMarkers;
+		}
+	}
+
+	/**
 	 * getDefaultName
 	 * 
 	 * @return
@@ -465,11 +478,24 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * For YAML serialization.
+	 * 
+	 * @param fileTypeRegistry
+	 */
+	public void setFileTypeRegistry(Map<String, String> fileTypeRegistry)
+	{
+		synchronized (fileTypeRegistryLock)
+		{
+			this._fileTypeRegistry = fileTypeRegistry;
+		}
+	}
+
+	/**
 	 * getFileTypes
 	 * 
 	 * @return
 	 */
-	List<String> getFileTypes()
+	public List<String> getFileTypes()
 	{
 		List<String> result;
 
@@ -486,6 +512,19 @@ public class BundleElement extends AbstractElement
 		}
 
 		return result;
+	}
+
+	/**
+	 * For YAML serialization.
+	 * 
+	 * @param fileTypes
+	 */
+	public void setFileTypes(List<String> fileTypes)
+	{
+		synchronized (fileTypesLock)
+		{
+			this._fileTypes = fileTypes;
+		}
 	}
 
 	/**
@@ -513,6 +552,19 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * For YAML serialization.
+	 * 
+	 * @param startMarkers
+	 */
+	public void setFoldingStartMarkers(Map<ScopeSelector, RubyRegexp> startMarkers)
+	{
+		synchronized (foldingStartMarkersLock)
+		{
+			this._foldingStartMarkers = startMarkers;
+		}
+	}
+
+	/**
 	 * getFoldingStopMarkers
 	 * 
 	 * @return
@@ -537,6 +589,19 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * For YAML serialization.
+	 * 
+	 * @param stopMarkers
+	 */
+	public void setFoldingStopMarkers(Map<ScopeSelector, RubyRegexp> stopMarkers)
+	{
+		synchronized (foldingStopMarkersLock)
+		{
+			this._foldingStopMarkers = stopMarkers;
+		}
+	}
+
+	/**
 	 * getFoldingStartMarkers
 	 * 
 	 * @return
@@ -558,6 +623,19 @@ public class BundleElement extends AbstractElement
 		}
 
 		return result;
+	}
+
+	/**
+	 * For YAML serialization.
+	 * 
+	 * @return
+	 */
+	public void setIncreaseIndentMarkers(Map<ScopeSelector, RubyRegexp> indentMarkers)
+	{
+		synchronized (increaseIndentMarkersLock)
+		{
+			this._increaseIndentMarkers = indentMarkers;
+		}
 	}
 
 	/**

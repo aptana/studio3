@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
@@ -28,12 +29,26 @@ import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
 
+import com.aptana.scope.ScopeSelector;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
+/**
+ * This class serializes and deserializes the scripting model for a given bundle.
+ * 
+ * @author cwilliams
+ */
 public class BundleCacher
 {
 
-	public void cache(File bundleDirectory)
+	/**
+	 * The file where we store our serialized model.
+	 */
+	private static final String CACHE_FILE = "cache.yml"; //$NON-NLS-1$
+
+	private static final String REGEXP_TAG = "!regexp"; //$NON-NLS-1$
+
+	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
 		// Force bundle manager to load the bundle...
 		if (!Platform.isRunning())
@@ -51,7 +66,7 @@ public class BundleCacher
 		FileWriter writer = null;
 		try
 		{
-			File configFile = new File(bundleDirectory, "cache.yml");
+			File configFile = new File(bundleDirectory, CACHE_FILE);
 			writer = new FileWriter(configFile);
 
 			Yaml yaml = createYAML();
@@ -59,8 +74,7 @@ public class BundleCacher
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -78,8 +92,25 @@ public class BundleCacher
 		}
 	}
 
-	public BundleElement load(File cacheFile)
+	public BundleElement load(File bundleDirectory, List<File> bundleFiles)
 	{
+		File cacheFile = new File(bundleDirectory, CACHE_FILE);
+		if (!cacheFile.exists())
+		{
+			return null;
+		}
+		// Compare lastMod versus all the bundleFiles.
+		long lastMod = cacheFile.lastModified();
+		for (File file : bundleFiles)
+		{
+			// TODO Just update the cache with the updated files/diff!
+			if (file.lastModified() > lastMod)
+			{
+				// One of the files is newer, don't load cache!
+				return null;
+			}
+		}
+
 		// Load up the bundle contents from the cache
 		BundleElement be = null;
 		FileReader reader = null;
@@ -88,11 +119,12 @@ public class BundleCacher
 			Yaml yaml = createYAML();
 			reader = new FileReader(cacheFile);
 			be = (BundleElement) yaml.load(reader);
+			// FIXME Handle if a file referenced by one of the model elements has been deleted! Remove from the model
+			// and rewrite the cache?
 		}
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ScriptingActivator.logError(e.getMessage(), e);
 		}
 		finally
 		{
@@ -121,7 +153,7 @@ public class BundleCacher
 		public MyRepresenter()
 		{
 			this.representers.put(RubyRegexp.class, new RepresentRubyRegexp());
-			// addClassTag(MenuElement.class, "!menu");
+			this.representers.put(ScopeSelector.class, new RepresentScopeSelector());
 		}
 
 		@Override
@@ -134,12 +166,12 @@ public class BundleCacher
 			Set<Property> set = super.getProperties(type);
 			if (CommandElement.class.isAssignableFrom(type) || type.equals(EnvironmentElement.class))
 			{
-				// drop runtime and invoke block properties
+				// drop runtime, invoke, and invoke block properties
 				Set<Property> toRemove = new HashSet<Property>();
 				for (Property prop : set)
 				{
-					if (prop.getName().equals("invokeBlock") || prop.getName().equals("runtime")
-							|| prop.getName().equals("invoke"))
+					if (prop.getName().equals("invokeBlock") || prop.getName().equals("runtime") //$NON-NLS-1$ //$NON-NLS-2$
+							|| prop.getName().equals("invoke")) //$NON-NLS-1$
 					{
 						toRemove.add(prop);
 					}
@@ -152,13 +184,33 @@ public class BundleCacher
 			return set;
 		}
 
+		/**
+		 * Store ruby regexps as strings.
+		 * 
+		 * @author cwilliams
+		 */
 		private class RepresentRubyRegexp implements Represent
 		{
 			public Node representData(Object data)
 			{
 				RubyRegexp dice = (RubyRegexp) data;
 				String value = dice.toString();
-				return representScalar(new Tag("!regexp"), value);
+				return representScalar(new Tag(REGEXP_TAG), value);
+			}
+		}
+
+		/**
+		 * Store scope selectors as strings.
+		 * 
+		 * @author cwilliams
+		 */
+		private class RepresentScopeSelector implements Represent
+		{
+			public Node representData(Object data)
+			{
+				ScopeSelector dice = (ScopeSelector) data;
+				String value = dice.toString();
+				return representScalar(new Tag("!scope"), value);
 			}
 		}
 	}
@@ -167,7 +219,8 @@ public class BundleCacher
 	{
 		public RubyRegexpConstructor()
 		{
-			this.yamlConstructors.put(new Tag("!regexp"), new ConstructRubyRegexp());
+			this.yamlConstructors.put(new Tag("!scope"), new ConstructScopeSelector());
+			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(BundleElement.class), new ConstructBundleElement());
 			this.yamlConstructors.put(new Tag(MenuElement.class), new ConstructMenuElement());
 			this.yamlConstructors.put(new Tag(SnippetElement.class), new ConstructSnippetElement());
@@ -180,8 +233,17 @@ public class BundleCacher
 
 			// Tell it that "children" field for MenuElement is a list of MenuElements
 			TypeDescription menuDescription = new TypeDescription(MenuElement.class);
-			menuDescription.putListPropertyType("children", MenuElement.class);
+			menuDescription.putListPropertyType("children", MenuElement.class); //$NON-NLS-1$
 			addTypeDescription(menuDescription);
+		}
+
+		private class ConstructScopeSelector extends AbstractConstruct
+		{
+			public Object construct(Node node)
+			{
+				String val = (String) constructScalar((ScalarNode) node);
+				return new ScopeSelector(val);
+			}
 		}
 
 		private class ConstructRubyRegexp extends AbstractConstruct
@@ -196,9 +258,14 @@ public class BundleCacher
 
 		private abstract class AbstractBundleElementConstruct extends ConstructMapping
 		{
+			/**
+			 * Grab the path from the mapping node and grab it's value!
+			 * 
+			 * @param node
+			 * @return
+			 */
 			protected String getPath(Node node)
 			{
-				// TODO Grab the path from the mapping node and grab it's value!
 				String path = null;
 				MappingNode map = (MappingNode) node;
 				List<NodeTuple> nodes = map.getValue();
@@ -241,8 +308,6 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(CommandElement.class);
-				// FIXME Need to create a "lazy" subclass that grabs file on path and generates invoke block on-demand
-				// and then runs it!
 				CommandElement be = new CommandElement(getPath(node))
 				{
 					private CommandElement real;
@@ -293,9 +358,7 @@ public class BundleCacher
 					{
 						if (real == null)
 						{
-							// Remove this placeholder
 							BundleElement owning = getOwningBundle();
-							// owning.removeChild(this);
 							// remove all elements that are declared in the same file, since they'll end up getting
 							// loaded below.
 							List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
@@ -375,9 +438,7 @@ public class BundleCacher
 					{
 						if (real == null)
 						{
-							// Remove this placeholder
 							BundleElement owning = getOwningBundle();
-							// owning.removeChild(this);
 							// remove all elements that are declared in the same file, since they'll end up getting
 							// loaded below.
 							List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());

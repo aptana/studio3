@@ -93,45 +93,37 @@ public class BundleManager
 
 		public IStatus run(IProgressMonitor monitor)
 		{
-			// TODO Check for a cached config file, something like ".cache.yml" which contains pre-cached info about
-			// bundle so we don't need to load all scripts into memory on startup and can do so lazily!
-
 			List<File> bundleScripts = getBundleScripts(bundleDirectory);
-			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size());
-
-			if (bundleScripts.size() > 0)
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size() + 1);
+			try
 			{
-				boolean bundleAdded = false;
-				File cacheFile = new File(bundleDirectory, "cache.yml");
-				if (cacheFile.exists())
+				if (bundleScripts.size() > 0)
 				{
-					// TODO Check if any files have been added/modified since timestamp of cache file... if so,
-					// ignore/rebuild cache
-					BundleElement be = new BundleCacher().load(cacheFile);
+					BundleCacher cacher = new BundleCacher();
+					BundleElement be = cacher.load(bundleDirectory, bundleScripts);
 					if (be != null)
 					{
 						addBundle(be);
-						bundleAdded = true;
 					}
-				}
-				if (!bundleAdded)
-				{
-					List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-
-					for (File script : bundleScripts)
+					else
 					{
-						sub.subTask(script.getAbsolutePath());
-						loadScript(script, true, bundleLoadPaths);
-						sub.worked(1);
-					}
+						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
 
-					// TODO Now traverse the bundle and just write out a cache file!
-					new BundleCacher().cache(bundleDirectory);
+						for (File script : bundleScripts)
+						{
+							sub.subTask(script.getAbsolutePath());
+							loadScript(script, true, bundleLoadPaths);
+							sub.worked(1);
+						}
+
+						cacher.cache(bundleDirectory, sub.newChild(1));
+					}
 				}
 			}
-
-			sub.done();
-
+			finally
+			{
+				sub.done();
+			}
 			return Status.OK_STATUS;
 		}
 	}
