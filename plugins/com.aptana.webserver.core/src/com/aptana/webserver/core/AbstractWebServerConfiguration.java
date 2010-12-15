@@ -66,6 +66,8 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 
 	public abstract IFileStore resolve(URL url);
 
+	public abstract URL getBaseURL();
+	
 	protected void loadState(IMemento memento) {
 		IMemento child = memento.getChild(ELEMENT_NAME);
 		if (child != null) {

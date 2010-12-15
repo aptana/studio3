@@ -90,6 +90,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs = NO_PAIRS;
+	private boolean autoInsertEnabled = true;
 
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
@@ -524,10 +525,22 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	private boolean isAutoInsertEnabled()
+	/**
+	 * Do we automatically insert matching characters?
+	 * @param autoInsertEnabled
+	 */
+	public boolean isAutoInsertEnabled()
 	{
-		// TODO Set up a pref to turn this on or off
-		return true;
+		return autoInsertEnabled;
+	}
+	
+	/**
+	 * Set the automatic insertion of matching characters on or off
+	 * @param autoInsertEnabled
+	 */
+	public void setAutoInsertEnabled(boolean autoInsertEnabled)
+	{
+		this.autoInsertEnabled = autoInsertEnabled;
 	}
 
 	/**

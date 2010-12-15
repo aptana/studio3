@@ -9,6 +9,7 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
             extensions="tld,pt,cpt,dtml,rss,opml"
+            icon="icons/xml.png"
             id="com.aptana.editor.xml"
             name="%editor.xml.name">
          <contentTypeBinding
