@@ -36,21 +36,14 @@ package com.aptana.editor.html.contentassist;
 
 import java.text.MessageFormat;
 
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentPartitioner;
+import junit.framework.TestCase;
 
-import com.aptana.editor.common.ExtendedFastPartitioner;
-import com.aptana.editor.common.IExtendedPartitioner;
-import com.aptana.editor.common.NullPartitionerSwitchStrategy;
+import org.eclipse.jface.text.IDocument;
+
 import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
-import com.aptana.editor.html.HTMLSourceConfiguration;
+import com.aptana.editor.html.HTMLTestUtil;
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
-
-import junit.framework.TestCase;
 
 public abstract class LocationTestCase extends TestCase
 {
@@ -61,24 +54,9 @@ public abstract class LocationTestCase extends TestCase
 	 * @param source
 	 * @return
 	 */
-	protected IDocument createDocument(String source)
+	protected IDocument createDocument(String source, boolean stripCursor)
 	{
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-			HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
-			new NullSubPartitionScanner(),
-			new NullPartitionerSwitchStrategy()
-		);
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(
-			partitionScanner,
-			HTMLSourceConfiguration.getDefault().getContentTypes()
-		);
-		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-		
-		final IDocument document = new Document(source);
-		partitioner.connect(document);
-		document.setDocumentPartitioner(partitioner);
-		
-		return document;
+		return HTMLTestUtil.createDocument(source, stripCursor);
 	}
 	
 	/**
@@ -91,7 +69,7 @@ public abstract class LocationTestCase extends TestCase
 	 */
 	protected void coarseLocationTests(String source, LocationTypeRange ... ranges)
 	{
-		IDocument document = this.createDocument(source);
+		IDocument document = this.createDocument(source, false);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
 		
 		for (LocationTypeRange range : ranges)
@@ -121,7 +99,7 @@ public abstract class LocationTestCase extends TestCase
 	 */
 	protected void fineLocationTests(String source, LocationTypeRange ... ranges)
 	{
-		IDocument document = this.createDocument(source);
+		IDocument document = this.createDocument(source, false);
 		HTMLContentAssistProcessor processor = new HTMLContentAssistProcessor(null);
 		
 		for (LocationTypeRange range : ranges)
@@ -139,5 +117,5 @@ public abstract class LocationTestCase extends TestCase
 				assertEquals(message, range.LocationType, LocationType);
 			}
 		}
-	}
+	}	
 }

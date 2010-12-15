@@ -43,6 +43,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.contentassist.LexemeProvider;
+import com.aptana.editor.html.HTMLMetadataLoader;
+import com.aptana.editor.html.HTMLTestUtil;
+import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
+import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+
 public class HTMLContentAssistProcessorTest extends LocationTestCase
 {
 
@@ -57,6 +63,10 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	{
 		super.setUp();
 
+		HTMLMetadataLoader loader = new HTMLMetadataLoader();
+		loader.schedule();
+		loader.join();
+
 		fProcessor = new HTMLContentAssistProcessor(null);
 	}
 
@@ -69,323 +79,87 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	public void testLinkProposal()
 	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("a", proposals);
-
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<a></a>", fDocument.get());
+		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "a", "<a></a>", null);
 	}
 
 	public void testDOCTYPEProposal()
 	{
-		int offset = 2;
-		IDocument fDocument = createDocument("<!");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
+		Point p = new Point(10, 0);
+		assertCompletionCorrect("<!|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
+		assertCompletionCorrect("<!D|", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
+		assertCompletionCorrect("<!D| html>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE html>", p);
+		assertCompletionCorrect("<|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
+		assertCompletionCorrect("<!|>", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
+		assertCompletionCorrect("<!D|OCTYP >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
+		assertCompletionCorrect("<!D|OCTYPE >", '\t', ELEMENT_PROPOSALS_COUNT, "!DOCTYPE", "<!DOCTYPE >", p);
 	}
-	
-	public void testDOCTYPEProposal2()
-	{
-		int offset = 3;
-		IDocument fDocument = createDocument("<!D");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
 
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
-	public void testDOCTYPEProposal3()
-	{
-		int offset = 3;
-		IDocument fDocument = createDocument("<!D html>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE html>", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
-	public void testDOCTYPEProposal4()
-	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
-	public void testDOCTYPEProposal5()
-	{
-		int offset = 2;
-		IDocument fDocument = createDocument("<!>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
-	public void testDOCTYPEProposal6()
-	{
-		int offset = 3;
-		IDocument fDocument = createDocument("<!DOCTYP >");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
-	public void testDOCTYPEProposal7()
-	{
-		int offset = 3;
-		IDocument fDocument = createDocument("<!DOCTYPE >");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("!DOCTYPE", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE >", fDocument.get());
-		Point p = viewer.getSelectedRange();
-		assertEquals(10, p.x);
-		assertEquals(0, p.y);
-	}
-	
 	public void testDOCTYPEValueReplacement()
 	{
-		int offset = 10;
-		IDocument fDocument = createDocument("<!DOCTYPE html>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE HTML>", fDocument.get());
-	}
-	
-	public void testDOCTYPEValueReplacement2()
-	{
-		int offset = 10;
-		IDocument fDocument = createDocument("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n	\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE HTML>", fDocument.get());
-	}
-
-	public void testABBRProposal()
-	{
-		int offset = 2;
-		IDocument fDocument = createDocument("<a>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("abbr", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<abbr></abbr>", fDocument.get());
-	}
-
-	public void testABBRCaseSensitiveProposal()
-	{
-		int offset = 2;
-		IDocument fDocument = createDocument("<A>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("abbr", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<abbr></abbr>", fDocument.get());
-	}
-	
-	public void testElementWhichIsClosedProposal()
-	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<></a>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("a", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<a></a>", fDocument.get());
-	}
-
-	public void testElementWhichIsClosedProposal2()
-	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<></a>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("abbr", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<abbr></abbr></a>", fDocument.get());
-	}
-
-	public void testElementWhichIsClosedProposal3()
-	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<</a>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("abbr", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<abbr></abbr></a>", fDocument.get());
-	}
-
-	public void testIMGProposal()
-	{
-		int offset = 1;
-		IDocument fDocument = createDocument("<");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(ELEMENT_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("img", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<img />", fDocument.get());
-	}
-
-	public void testHTML5DoctypeProposal()
-	{
-		int offset = 10;
-		IDocument fDocument = createDocument("<!doctype >");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("HTML 5", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!doctype HTML>", fDocument.get());
-	}
-
-	public void testHTML401StrictDoctypeProposal()
-	{
-		int offset = 10;
-		IDocument fDocument = createDocument("<!DOCTYPE ");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(DOCTYPE_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal linkProposal = findProposal("HTML 4.01 Strict", proposals);
-
-		assertTrue(((ICompletionProposalExtension2) linkProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) linkProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"",
-				fDocument.get());
+		assertCompletionCorrect("<!DOCTYPE |html>", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null);
+		assertCompletionCorrect(
+				"<!DOCTYPE |html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n	\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">",
+				'\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!DOCTYPE HTML>", null);
 	}
 
 	public void testCloseTagProposal()
 	{
-		int offset = 7;
-		IDocument fDocument = createDocument("<ul>\n</>");
+		String document = "<a>Test <b>Item</b>";
+		IDocument fDocument = createDocument(document, false);
+
 		char trigger = '\t';
 		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(1, proposals.length);
-		ICompletionProposal closeProposal = findProposal("ul", proposals);
 
-		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("<ul>\n</ul>", fDocument.get());
+		// Should be no unclosed tags at this point
+		fProcessor.doComputeCompletionProposals(viewer, 0, trigger, false);
+		assertEquals(0, fProcessor.getUnclosedTagNames(0).size());
+
+		fProcessor.doComputeCompletionProposals(viewer, 1, trigger, false);
+		assertEquals(0, fProcessor.getUnclosedTagNames(1).size());
+
+		fProcessor.doComputeCompletionProposals(viewer, 2, trigger, false);
+		assertEquals(0, fProcessor.getUnclosedTagNames(2).size());
+
+		fProcessor.doComputeCompletionProposals(viewer, 3, trigger, false);
+		assertEquals(1, fProcessor.getUnclosedTagNames(3).size());
+
+		// show unclosed tag once we get past the '>'
+		fProcessor.doComputeCompletionProposals(viewer, 4, trigger, false);
+		assertEquals(1, fProcessor.getUnclosedTagNames(4).size());
+	}
+
+	public void testABBRProposal()
+	{
+		assertCompletionCorrect("<a|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null);
+		assertCompletionCorrect("<A|>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr>", null);
+	}
+
+	public void testElementWhichIsClosedProposal()
+	{
+		assertCompletionCorrect("<|></a>", '\t', ELEMENT_PROPOSALS_COUNT, "a", "<a></a>", null);
+		assertCompletionCorrect("<|></a>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr></a>", null);
+		assertCompletionCorrect("<|</a>", '\t', ELEMENT_PROPOSALS_COUNT, "abbr", "<abbr></abbr></a>", null);
 	}
 
 	public void testCloseTagWithNoUnclosedTagsProposal()
 	{
-		int offset = 2;
-		IDocument fDocument = createDocument("</>");
-		char trigger = '\t';
-		ITextViewer viewer = createTextViewer(fDocument);
-		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
-		assertEquals(CLOSE_TAG_PROPOSALS_COUNT, proposals.length);
-		ICompletionProposal closeProposal = findProposal("ul", proposals);
+		assertCompletionCorrect("</|>", '\t', CLOSE_TAG_PROPOSALS_COUNT, "/ul", "</ul>", null);
+	}
 
-		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
-		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
-		assertEquals("</ul>", fDocument.get());
+	public void testIMGProposal()
+	{
+		assertCompletionCorrect("<|", '\t', ELEMENT_PROPOSALS_COUNT, "img", "<img />", null);
+	}
+
+	public void testHTML5DoctypeProposal()
+	{
+		assertCompletionCorrect("<!doctype |>", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 5", "<!doctype HTML>", null);
+	}
+
+	public void testHTML401StrictDoctypeProposal()
+	{
+		assertCompletionCorrect("<!DOCTYPE |", '\t', DOCTYPE_PROPOSALS_COUNT, "HTML 4.01 Strict",
+				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"", null);
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
@@ -407,4 +181,38 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		return viewer;
 	}
 
+	protected void assertLocation(String document, LocationType location)
+	{
+
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		IDocument fDocument = HTMLTestUtil.createDocument(document, true);
+
+		LexemeProvider<HTMLTokenType> lexemeProvider = HTMLTestUtil.createLexemeProvider(fDocument, offset);
+		LocationType l = fProcessor.getOpenTagLocationType(lexemeProvider, offset);
+
+		assertEquals(location, l);
+	}
+
+	protected void assertCompletionCorrect(String document, char trigger, int proposalCount, String proposalToSelect,
+			String postCompletion, Point point)
+	{
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		IDocument fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);
+		assertEquals(proposalCount, proposals.length);
+		ICompletionProposal closeProposal = findProposal(proposalToSelect, proposals);
+
+		assertTrue(((ICompletionProposalExtension2) closeProposal).validate(fDocument, offset, null));
+		((ICompletionProposalExtension2) closeProposal).apply(viewer, trigger, SWT.NONE, offset);
+		assertEquals(postCompletion, fDocument.get());
+
+		if (point != null)
+		{
+			Point p = viewer.getSelectedRange();
+			assertEquals(point.x, p.x);
+			assertEquals(point.y, p.y);
+		}
+	}
 }

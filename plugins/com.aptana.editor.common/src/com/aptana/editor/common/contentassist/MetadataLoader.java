@@ -198,15 +198,17 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		if (this.versionChanged())
+		synchronized (this.getClass())
 		{
-			this.rebuildMetadataIndex(monitor);
+			if (this.versionChanged())
+			{
+				this.rebuildMetadataIndex(monitor);
 
-			this.updateVersionPreference();
+				this.updateVersionPreference();
 
-			this.postRebuild();
+				this.postRebuild();
+			}
 		}
-
 		return Status.OK_STATUS;
 	}
 
@@ -247,11 +249,11 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	protected boolean versionChanged()
 	{
 		double expectedVersion = Platform.getPreferencesService().getDouble( //
-			this.getPluginId(), //
-			this.getIndexVersionKey(), //
-			getDefaultIndexVersion(), //
-			null //
-			);
+				this.getPluginId(), //
+				this.getIndexVersionKey(), //
+				getDefaultIndexVersion(), //
+				null //
+				);
 
 		return expectedVersion != this.getIndexVersion();
 	}

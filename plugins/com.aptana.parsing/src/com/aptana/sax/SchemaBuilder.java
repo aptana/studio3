@@ -376,7 +376,7 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @return A validating XML reader that will recognize and validate against the loaded schema
 	 * @throws SchemaInitializationException
 	 */
-	public static Schema fromXML(InputStream in, Object handler) throws SchemaInitializationException
+	public static synchronized Schema fromXML(InputStream in, Object handler) throws SchemaInitializationException
 	{
 		Schema result = new Schema(handler);
 
