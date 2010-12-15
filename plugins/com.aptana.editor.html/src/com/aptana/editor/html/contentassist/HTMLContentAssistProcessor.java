@@ -90,7 +90,7 @@ import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -388,7 +388,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance().getServerConfigurations())
+					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)

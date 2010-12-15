@@ -33,44 +33,60 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal.impl;
+package com.aptana.webserver.core.builtin;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.preview.IPreviewHandler;
-import com.aptana.preview.PreviewConfig;
-import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.WebServerCorePlugin;
+import junit.framework.TestCase;
 
 /**
  * @author Max Stepanov
  * 
  */
-public class WebServerPreviewHandler implements IPreviewHandler {
+public class LocalWebServerTest extends TestCase {
+	private static final String PAGE_CONTENTS = "<html><head><title>Test</title></head><body><h1>Test Page</h1></body>";
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
-	 */
-	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
-		if (serverConfiguration != null) {
-			URL url = serverConfiguration.resolve(config.getFileStore());
-			if (url != null) {
-				return new PreviewConfig(url);
+	public void testBasicGet() throws IOException, CoreException {
+		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
+		assertTrue(dir.delete());
+		assertTrue(dir.mkdir());
+		File file = new File(dir, "index.html");
+		assertTrue(file.createNewFile());
+		OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(file));
+		w.write(PAGE_CONTENTS);
+		w.close();
+
+		LocalWebServer webServer = null;
+		try {
+			webServer = new LocalWebServer(EFS.getLocalFileSystem().fromLocalFile(dir).toURI());
+			URL url = webServer.getConfiguration().getBaseURL();
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setAllowUserInteraction(false);
+			connection.setInstanceFollowRedirects(true);
+			connection.setUseCaches(false);
+			InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
+			StringBuffer sb = new StringBuffer();
+			int n;
+			char[] cbuf = new char[1024];
+			while ((n = in.read(cbuf)) > 0) {
+				sb.append(new String(cbuf, 0, n));
 			}
-		} else {
-			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
-				URL url = configuration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
-				}
+			in.close();
+			assertEquals(PAGE_CONTENTS, sb.toString());
+		} finally {
+			if (webServer != null) {
+				webServer.dispose();
 			}
 		}
-		return null;
 	}
 }

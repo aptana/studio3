@@ -33,44 +33,35 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.preview.internal.impl;
+package com.aptana.webserver.core.preferences;
 
-import java.net.URL;
-
-import org.eclipse.core.runtime.CoreException;
-
-import com.aptana.preview.IPreviewHandler;
-import com.aptana.preview.PreviewConfig;
-import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
- * 
+ *
  */
-public class WebServerPreviewHandler implements IPreviewHandler {
+public interface IWebServerPreferenceConstants {
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
+	String PREFIX = WebServerCorePlugin.PLUGIN_ID;
+	
+	/**
+	 * IP address used by built-in HTTP server
 	 */
-	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
-		if (serverConfiguration != null) {
-			URL url = serverConfiguration.resolve(config.getFileStore());
-			if (url != null) {
-				return new PreviewConfig(url);
-			}
-		} else {
-			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
-				URL url = configuration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
-				}
-			}
-		}
-		return null;
-	}
+	String PREF_HTTP_SERVER_ADDRESS = PREFIX + ".http_server_address"; //$NON-NLS-1$
+
+	/**
+	 * Ports list used by built-in HTTP server
+	 */
+	String PREF_HTTP_SERVER_PORTS = PREFIX + ".http_server_ports"; //$NON-NLS-1$
+
+	/**
+	 * Default IP address
+	 */
+	String DEFAULT_HTTP_SERVER_ADDRESS = "127.0.0.1"; //$NON-NLS-1$
+	
+	/**
+	 * Default ports range
+	 */
+	int[] DEFAULT_HTTP_SERVER_PORTS_RANGE = new int[] { 8020, 8079 };
 }
