@@ -48,7 +48,7 @@ import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.ExceptionElement;
@@ -226,7 +226,7 @@ public class JSMetadataReader extends MetadataReader
 					{
 						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Supertype_Name, superType, typeName);
 
-						Activator.logError(message, null);
+						JSPlugin.logError(message, null);
 					}
 				}
 			}
@@ -239,7 +239,7 @@ public class JSMetadataReader extends MetadataReader
 		{
 			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName);
 
-			Activator.logError(message, null);
+			JSPlugin.logError(message, null);
 		}
 	}
 
@@ -278,7 +278,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			Activator.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName, null);
+			JSPlugin.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName, null);
 		}
 	}
 
@@ -391,7 +391,7 @@ public class JSMetadataReader extends MetadataReader
 				{
 					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, type, parameterName);
 
-					Activator.logError(message, null);
+					JSPlugin.logError(message, null);
 				}
 			}
 
@@ -451,7 +451,7 @@ public class JSMetadataReader extends MetadataReader
 				{
 					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName);
 
-					Activator.logError(message, null);
+					JSPlugin.logError(message, null);
 				}
 			}
 
@@ -499,7 +499,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			Activator.logError(Messages.JSMetadataReader_Invalid_Return_Type + type, null);
+			JSPlugin.logError(Messages.JSMetadataReader_Invalid_Return_Type + type, null);
 		}
 	}
 
@@ -899,7 +899,7 @@ public class JSMetadataReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(Activator.getDefault().getBundle(), Path.fromPortableString(JS_METADATA_SCHEMA), false);
+			return FileLocator.openStream(JSPlugin.getDefault().getBundle(), Path.fromPortableString(JS_METADATA_SCHEMA), false);
 		}
 		catch (IOException e)
 		{

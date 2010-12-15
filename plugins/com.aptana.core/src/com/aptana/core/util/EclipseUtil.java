@@ -34,6 +34,8 @@
  */
 package com.aptana.core.util;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -166,7 +168,8 @@ public class EclipseUtil
 	}
 	
 	/**
-	 * getApplicationLauncher
+	 * Returns path to application launcher executable
+	 * 
 	 * @return
 	 */
 	public static IPath getApplicationLauncher() {
@@ -174,7 +177,7 @@ public class EclipseUtil
 	}
 
 	/**
-	 * getApplicationLauncher
+	 * Returns path to application launcher executable
 	 * 
 	 * @param asSplashLauncher
 	 * @return
@@ -196,33 +199,32 @@ public class EclipseUtil
 			if ( location != null ) {
 				launcher = new Path(location.getURL().getFile());
 				if ( launcher.toFile().isDirectory() ) {
-					launcher = launcher.append("aptana"); //$NON-NLS-1$
+					String[] executableFiles = launcher.toFile().list(new FilenameFilter() {
+						public boolean accept(File dir, String name) {
+							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
+							name = path.removeFileExtension().lastSegment();
+							String ext = path.getFileExtension();
+							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+								if (!"app".equals(ext)) {
+									return false;
+								}
+							}
+							if ("Eclipse".equalsIgnoreCase(name) || "AptanaStudio3".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+								return true;
+							}
+							return false;
+						}
+					});
+					if (executableFiles.length > 0) {
+						launcher = launcher.append(executableFiles[0]);
+					}
 				}
 			}
 		}
 		if ( !launcher.toFile().exists() ) {
-			if ( Platform.OS_WIN32.equals(Platform.getOS()) ) {
-				launcher = launcher.addFileExtension("exe"); //$NON-NLS-1$
-			}
-			if ( !launcher.toFile().exists() ) {
-				launcher = null;
-			}
-		} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-			int count = launcher.segmentCount();
-			int appIndex = -1;
-			for(int i = 0; i < count; ++i) {
-				if(launcher.segment(i).indexOf(".app") != -1) { //$NON-NLS-1$
-					if(appIndex != -1) {
-						if(launcher.segment(i).toLowerCase().indexOf("splash") != -1) { //$NON-NLS-1$
-							break;
-						}
-					}
-					appIndex = i;
-				}
-			}
-			if(!asSplashLauncher && appIndex != -1) {
-				launcher = launcher.removeLastSegments(count-appIndex-1).removeTrailingSeparator();
-			}
+			return null;
+		}
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {
 			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
 		}
 		return launcher;

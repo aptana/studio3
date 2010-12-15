@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -46,7 +46,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (new DefaultScope()).getNode(Activator.PLUGIN_ID);
+		IEclipsePreferences prefs = (new DefaultScope()).getNode(HTMLPlugin.PLUGIN_ID);
+		
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
 	}
 }

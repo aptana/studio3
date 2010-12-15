@@ -42,4 +42,9 @@ package com.aptana.editor.xml;
 public interface IXMLConstants {
 
 	public String CONTENT_TYPE_XML = "com.aptana.contenttype.xml"; //$NON-NLS-1$
+	
+	/**
+	 * The annotation type/id used to mark tag pair occurrences.
+	 */
+	public String TAG_PAIR_OCCURRENCE_ID = "com.aptana.xml.tagPair.occurrences"; //$NON-NLS-1$
 }

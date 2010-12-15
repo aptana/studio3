@@ -34,33 +34,18 @@
  */
 package com.aptana.editor.html.contentassist.index;
 
-import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
+import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
-import com.aptana.editor.html.contentassist.model.UserAgentElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexWriter;
 
-public class HTMLIndexWriter
+public class HTMLIndexWriter extends IndexWriter
 {
-	private HTMLMetadataReader _reader;
-	private Map<UserAgentElement,String> _userAgentKeyMap = new HashMap<UserAgentElement,String>();
-
-	/**
-	 * HTMLIndexWriter
-	 */
-	public HTMLIndexWriter()
-	{
-		this._reader = new HTMLMetadataReader();
-	}
-
 	/**
 	 * getDocumentPath
 	 * 
@@ -68,18 +53,7 @@ public class HTMLIndexWriter
 	 */
 	protected URI getDocumentPath()
 	{
-		return URI.create(HTMLIndexConstants.METADATA);
-	}
-
-	/**
-	 * loadXML
-	 * 
-	 * @param stream
-	 * @throws Exception
-	 */
-	public void loadXML(InputStream stream) throws Exception
-	{
-		this._reader.loadXML(stream);
+		return URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION);
 	}
 
 	/**
@@ -88,24 +62,18 @@ public class HTMLIndexWriter
 	 * @param index
 	 * @param attribute
 	 */
-	protected void writeAttribute(Index index, AttributeElement attribute)
+	public void writeAttribute(Index index, AttributeElement attribute)
 	{
-		String[] columns = new String[] {
-			attribute.getName(),
-			attribute.getType(),
-			attribute.getElement(),
-			"", // specifications //$NON-NLS-1$
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, attribute.getUserAgents())),
-			attribute.getDeprecated(),
-			attribute.getDescription(),
-			attribute.getHint(),
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, attribute.getReferences()),
-			attribute.getRemark(),
-			"" // values //$NON-NLS-1$
-		};
-		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+		if (index != null && attribute != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				attribute.getName(), //
+				this.serialize(attribute) //
+				);
 
-		index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.ATTRIBUTE, key, this.getDocumentPath());
+		}
 	}
 
 	/**
@@ -114,25 +82,38 @@ public class HTMLIndexWriter
 	 * @param index
 	 * @param element
 	 */
-	protected void writeElement(Index index, ElementElement element)
+	public void writeElement(Index index, ElementElement element)
 	{
-		String[] columns = new String[] {
-			element.getName(),
-			element.getDisplayName(),
-			element.getRelatedClass(),
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getAttributes()),
-			"", // specifications, //$NON-NLS-1$
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, element.getUserAgents())),
-			element.getDeprecated(),
-			element.getDescription(),
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getEvents()),
-			element.getExample(),
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, element.getReferences()),
-			element.getRemark()
-		};
-		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
+		if (index != null && element != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				element.getName(), //
+				this.serialize(element) //
+				);
 
-		index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
+			index.addEntry(HTMLIndexConstants.ELEMENT, key, this.getDocumentPath());
+		}
+	}
+
+	/**
+	 * writeEntity
+	 * 
+	 * @param index
+	 * @param entity
+	 */
+	public void writeEntity(Index index, EntityElement entity)
+	{
+		if (index != null && entity != null)
+		{
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				entity.getName(), //
+				this.serialize(entity) //
+				);
+
+			index.addEntry(HTMLIndexConstants.ENTITY, key, this.getDocumentPath());
+		}
 	}
 
 	/**
@@ -141,89 +122,17 @@ public class HTMLIndexWriter
 	 * @param index
 	 * @param event
 	 */
-	protected void writeEvent(Index index, EventElement event)
+	public void writeEvent(Index index, EventElement event)
 	{
-		String[] columns = new String[] {
-			event.getName(),
-			event.getType(),
-			"", // specifications //$NON-NLS-1$
-			StringUtil.join(HTMLIndexConstants.SUB_DELIMITER, this.writeUserAgents(index, event.getUserAgents())),
-			event.getDescription(),
-			event.getRemark()
-		};
-		String key = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-
-		index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
-	}
-
-	/**
-	 * writeToIndex
-	 * 
-	 * @param index
-	 */
-	public void writeToIndex(Index index)
-	{
-		for (ElementElement element : this._reader.getElements())
+		if (index != null && event != null)
 		{
-			this.writeElement(index, element);
+			String key = StringUtil.join( //
+				HTMLIndexConstants.DELIMITER, //
+				event.getName(), //
+				this.serialize(event) //
+				);
+
+			index.addEntry(HTMLIndexConstants.EVENT, key, this.getDocumentPath());
 		}
-
-		for (AttributeElement attribute : this._reader.getAttributes())
-		{
-			this.writeAttribute(index, attribute);
-		}
-
-		for (EventElement event : this._reader.getEvents())
-		{
-			this.writeEvent(index, event);
-		}
-	}
-
-	/**
-	 * writeUserAgent
-	 * 
-	 * @param index
-	 * @param userAgent
-	 * @return
-	 */
-	protected String writeUserAgent(Index index, UserAgentElement userAgent)
-	{
-		String key = this._userAgentKeyMap.get(userAgent);
-
-		if (key == null)
-		{
-			key = Integer.toString(this._userAgentKeyMap.size());
-
-			String[] columns = new String[] {
-				key,
-				userAgent.getPlatform(),
-				userAgent.getVersion()
-			};
-			String value = StringUtil.join(HTMLIndexConstants.DELIMITER, columns);
-
-			index.addEntry(HTMLIndexConstants.USER_AGENT, value, this.getDocumentPath());
-
-			this._userAgentKeyMap.put(userAgent, key);
-		}
-
-		return key;
-	}
-
-	/**
-	 * writeUserAgents
-	 * 
-	 * @param userAgents
-	 * @return
-	 */
-	protected List<String> writeUserAgents(Index index, List<UserAgentElement> userAgents)
-	{
-		List<String> keys = new LinkedList<String>();
-
-		for (UserAgentElement userAgent : userAgents)
-		{
-			keys.add(this.writeUserAgent(index, userAgent));
-		}
-
-		return keys;
 	}
 }

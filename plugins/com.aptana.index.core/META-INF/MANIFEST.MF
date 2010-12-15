@@ -3,11 +3,12 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.index.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.index.core.IndexActivator
+Bundle-Activator: com.aptana.index.core.IndexPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.core.filesystem;visibility:=reexport
+ org.eclipse.core.filesystem;visibility:=reexport,
+ org.mortbay.jetty.util
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.index.core

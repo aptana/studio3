@@ -36,12 +36,19 @@ package com.aptana.editor.html.contentassist.index;
 
 public interface HTMLIndexConstants
 {
-	static final String PREFIX = "html."; //$NON-NLS-1$
+	// the content format version of the JS index files
+	// 0.1 - Initial version
+	// 0.11 - Using JSON for element and property content assist model elements
+	public static final double INDEX_VERSION = 0.1;
+
+	// for debugging, comment the line above, and uncomment the following
+	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
 
 	// general constants
+	static final String PREFIX = "html."; //$NON-NLS-1$
 	static final String DELIMITER = "\0"; //$NON-NLS-1$
 	static final String SUB_DELIMITER = ","; //$NON-NLS-1$
-	static final String METADATA = "metadata:/html"; //$NON-NLS-1$
+	static final String METADATA_INDEX_LOCATION = "metadata:/html"; //$NON-NLS-1$
 	static final String CORE = "HTML Core"; //$NON-NLS-1$
 
 	// index categories
@@ -49,6 +56,7 @@ public interface HTMLIndexConstants
 	static final String ATTRIBUTE = PREFIX + "attribute"; //$NON-NLS-1$
 	static final String EVENT = PREFIX + "event"; //$NON-NLS-1$
 	static final String USER_AGENT = PREFIX + "user_agent"; //$NON-NLS-1$
+	static final String ENTITY = PREFIX + "entity"; //$NON-NLS-1$
 
 	static final String RESOURCE_CSS = PREFIX + "resource.css"; //$NON-NLS-1$
 	static final String RESOURCE_JS = PREFIX + "resource.js"; //$NON-NLS-1$

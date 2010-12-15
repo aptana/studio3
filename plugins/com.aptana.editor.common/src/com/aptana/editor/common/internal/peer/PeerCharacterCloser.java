@@ -90,20 +90,19 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs = NO_PAIRS;
+	private boolean autoInsertEnabled = true;
 
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
-	PeerCharacterCloser(ITextViewer textViewer)
+	public PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer)
+	public void install()
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
-		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
-		return pairMatcher;
+		textViewer.getTextWidget().addVerifyKeyListener(this);
 	}
 
 	/**
@@ -268,7 +267,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
-		return yay == null ? NO_PAIRS: yay.getPairs();
+		return yay == null ? NO_PAIRS : yay.getPairs();
 	}
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
@@ -280,66 +279,100 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	{
 		try
 		{
-			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for
-														// comment scope matching
+			String partition = document.getContentType(offset);
+			int index = partition.indexOf('_', 2);
+			String prefix = partition.substring(0, index);
+
+			// Iterate through partitions sharing same prefix, which is a hacky way of doing "same language"
 			int stackLevel = 0;
-			for (int i = 0; i < before.length(); i++)
+			ITypedRegion[] partitions = document.computePartitioning(0, document.getLength());
+			for (ITypedRegion part : partitions)
 			{
+				if (!part.getType().startsWith(prefix))
+				{
+					continue;
+				}
 
-				char c = before.charAt(i);
-				if (c == openingChar && openingChar == closingCharacter)
+				int start = part.getOffset();
+				int end = start + part.getLength();
+				if (offset > start)
 				{
-					if (!ignoreScope(document, i))
+					int beforeEnd = end;
+					// read up until offset
+					if (offset < end)
 					{
-						stackLevel++;
-						stackLevel = stackLevel % 2;
+						beforeEnd = offset;
 					}
-				}
-				else if (c == openingChar)
-				{
-					if (!ignoreScope(document, i))
+					String before = document.get(start, beforeEnd - start);
+					if (before.trim().length() != 0) // skip whitespace only partitions for perf reasons
 					{
-						stackLevel++;
-					}
-				}
-				else if (c == closingCharacter)
-				{
-					if (!ignoreScope(document, i))
-					{
-						stackLevel--;
-					}
-				}
-			}
+						for (int i = 0; i < before.length(); i++)
+						{
 
-			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need
-																				// offsets to match for comment scope
-																				// matching
-			for (int i = 0; i < after.length(); i++)
-			{
-				char c = after.charAt(i);
-				if (c == openingChar && openingChar == closingCharacter)
-				{
-					if (!ignoreScope(document, offset + i))
-					{
-						stackLevel++;
-						stackLevel = stackLevel % 2;
+							char c = before.charAt(i);
+							if (c == openingChar && openingChar == closingCharacter)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel++;
+									stackLevel = stackLevel % 2;
+								}
+							}
+							else if (c == openingChar)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel++;
+								}
+							}
+							else if (c == closingCharacter)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel--;
+								}
+							}
+						}
 					}
 				}
-				else if (c == openingChar)
+				if (offset < end)
 				{
-					if (!ignoreScope(document, offset + i))
+					int startAfter = start;
+					if (offset > start)
 					{
-						stackLevel++;
+						startAfter = offset;
 					}
-				}
-				else if (c == closingCharacter)
-				{
-					if (!ignoreScope(document, offset + i))
+					String after = document.get(startAfter, end - startAfter);
+
+					// offsets to match for comment scope
+					// matching
+					for (int i = 0; i < after.length(); i++)
 					{
-						stackLevel--;
-						if (stackLevel < 0)
-							return true;
+						char c = after.charAt(i);
+						if (c == openingChar && openingChar == closingCharacter)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel++;
+								stackLevel = stackLevel % 2;
+							}
+						}
+						else if (c == openingChar)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel++;
+							}
+						}
+						else if (c == closingCharacter)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel--;
+								if (stackLevel < 0)
+									return true;
+							}
+						}
 					}
 				}
 			}
@@ -380,8 +413,9 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		char c = event.character;
 		int beginning = 0;
 		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
-		// partition if we can. 
-		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to single string/comment partition?
+		// partition if we can.
+		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to
+		// single string/comment partition?
 		if (document instanceof IDocumentExtension3)
 		{
 			try
@@ -401,8 +435,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
-//			if (ignoreScope(document, beginning + index))
-//				continue;
+			// if (ignoreScope(document, beginning + index))
+			// continue;
 			open = !open;
 			if (open)
 			{
@@ -491,10 +525,22 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	private boolean isAutoInsertEnabled()
+	/**
+	 * Do we automatically insert matching characters?
+	 * @param autoInsertEnabled
+	 */
+	public boolean isAutoInsertEnabled()
 	{
-		// TODO Set up a pref to turn this on or off
-		return true;
+		return autoInsertEnabled;
+	}
+	
+	/**
+	 * Set the automatic insertion of matching characters on or off
+	 * @param autoInsertEnabled
+	 */
+	public void setAutoInsertEnabled(boolean autoInsertEnabled)
+	{
+		this.autoInsertEnabled = autoInsertEnabled;
 	}
 
 	/**

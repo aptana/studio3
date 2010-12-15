@@ -71,10 +71,9 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
-import com.aptana.editor.html.OpenTagCloser;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -83,13 +82,15 @@ import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.xml.OpenTagCloser;
+import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -114,9 +115,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		IN_ATTRIBUTE_VALUE
 	};
 
-	static final Image ELEMENT_ICON = Activator.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = Activator.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = Activator.getImage("/icons/event.gif"); //$NON-NLS-1$
+	static final Image ELEMENT_ICON = HTMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
+	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+	private static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 	private static final Map<String, String> DOCTYPES;
 
@@ -222,7 +223,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 			}
 
-			String[] userAgents = element.getUserAgentNames();
+			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 			for (String attribute : element.getAttributes())
@@ -387,7 +388,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance().getServerConfigurations())
+					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)
@@ -475,7 +476,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e);
+			HTMLPlugin.logError(e);
 		}
 
 		return proposals;
@@ -614,7 +615,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!OpenTagCloser.tagClosed(doc, element.getName()))
+						if (!TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -853,7 +854,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	private CommonCompletionProposal createCloseTagProposal(ElementElement element, int offset)
 	{
-		String[] userAgents = element.getUserAgentNames();
+		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 		String replaceString = element.getName();
 
@@ -890,7 +891,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						continue;
 					}
 					String elementName = parts[0].toLowerCase();
-					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
+					if (!unclosedElements.contains(elementName) && !TagUtil.tagClosed(_document, elementName))
 					{
 						unclosedElements.add(elementName);
 					}

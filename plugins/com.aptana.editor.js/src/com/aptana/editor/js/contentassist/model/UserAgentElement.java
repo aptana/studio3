@@ -64,44 +64,16 @@ public class UserAgentElement implements Convertible
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj)
-	{
-		boolean result = false;
-
-		if (this == obj)
-		{
-			result = true;
-		}
-		else
-		{
-			UserAgentElement that = (UserAgentElement) obj;
-
-			result = //
-			this.getDescription().equals(that.getDescription()) //
-				&& this.getOS().equals(that.getOS()) //
-				&& this.getOSVersion().equals(that.getOSVersion()) //
-				&& this.getPlatform().equals(that.getPlatform()) //
-				&& this.getVersion().equals(that.getVersion()); //
-		}
-
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
 	 */
 	@SuppressWarnings("rawtypes")
 	public void fromJSON(Map object)
 	{
-		this.setPlatform(object.get(PLATFORM_PROPERTY).toString());
-		this.setVersion(object.get(VERSION_PROPERTY).toString());
-		this.setOS(object.get(OS_PROPERTY).toString());
-		this.setOSVersion(object.get(OS_VERSION_PROPERTY).toString());
-		this.setDescription(object.get(DESCRIPTION_PROPERTY).toString());
+		this.setPlatform(StringUtil.getStringValue(object.get(PLATFORM_PROPERTY)));
+		this.setVersion(StringUtil.getStringValue(object.get(VERSION_PROPERTY)));
+		this.setOS(StringUtil.getStringValue(object.get(OS_PROPERTY)));
+		this.setOSVersion(StringUtil.getStringValue(object.get(OS_VERSION_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
 	}
 
 	/**
@@ -111,17 +83,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getDescription()
 	{
-		return StringUtil.getValue(this._description);
-	}
-
-	/**
-	 * getKey
-	 * 
-	 * @return
-	 */
-	public String getKey()
-	{
-		return Integer.toString(this.hashCode());
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -131,7 +93,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getOS()
 	{
-		return StringUtil.getValue(this._os);
+		return StringUtil.getStringValue(this._os);
 	}
 
 	/**
@@ -141,7 +103,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getOSVersion()
 	{
-		return StringUtil.getValue(this._osVersion);
+		return StringUtil.getStringValue(this._osVersion);
 	}
 
 	/**
@@ -151,7 +113,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getPlatform()
 	{
-		return StringUtil.getValue(this._platform);
+		return StringUtil.getStringValue(this._platform);
 	}
 
 	/**
@@ -161,35 +123,7 @@ public class UserAgentElement implements Convertible
 	 */
 	public String getVersion()
 	{
-		return StringUtil.getValue(this._version);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		int h = 0;
-
-		String[] items = new String[] { //
-		this.getDescription(), //
-			this.getOS(), //
-			this.getOSVersion(), //
-			this.getPlatform(), //
-			this.getVersion() //
-		};
-
-		for (String item : items)
-		{
-			if (item != null)
-			{
-				h = 31 * h + item.hashCode();
-			}
-		}
-
-		return h;
+		return StringUtil.getStringValue(this._version);
 	}
 
 	/**

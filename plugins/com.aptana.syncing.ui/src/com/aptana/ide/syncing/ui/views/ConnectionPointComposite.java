@@ -558,7 +558,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		column.setText(COLUMN_NAMES[1]);
 
 		column = new TreeColumn(tree, SWT.LEFT);
-		column.setWidth(125);
+		column.setWidth(150);
 		column.setText(COLUMN_NAMES[2]);
 
 		fTreeViewer.setContentProvider(new FileTreeContentProvider());

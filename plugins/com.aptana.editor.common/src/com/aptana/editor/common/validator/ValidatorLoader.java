@@ -143,7 +143,7 @@ public class ValidatorLoader
 					continue;
 				}
 				ValidatorReference validator = new ValidatorReference(name, language, element);
-				List<ValidatorReference> list = validators.get(language);
+				List<ValidatorReference> list = validators.get(languageType);
 				if (list == null)
 				{
 					list = new ArrayList<ValidatorReference>();

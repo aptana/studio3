@@ -35,15 +35,16 @@
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.mortbay.util.ajax.JSON.Output;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.index.core.IndexUtil;
 
 public class PropertyElement extends BaseElement
 {
@@ -140,36 +141,13 @@ public class PropertyElement extends BaseElement
 	{
 		super.fromJSON(object);
 
-		this.setOwningType(object.get(OWNING_TYPE_PROPERTY).toString());
+		this.setOwningType(StringUtil.getStringValue(object.get(OWNING_TYPE_PROPERTY)));
 		this.setIsClassProperty(Boolean.TRUE == object.get(IS_CLASS_PROPERTY));
 		this.setIsInstanceProperty(Boolean.TRUE == object.get(IS_INSTANCE_PROPERTY));
 		this.setIsInternal(Boolean.TRUE == object.get(IS_INTERNAL_PROPERTY));
 
-		// types
-		Object types = object.get(TYPES_PROPERTY);
-
-		if (types != null && types.getClass().isArray())
-		{
-			for (Object type : (Object[]) types)
-			{
-				ReturnTypeElement rt = new ReturnTypeElement();
-
-				rt.fromJSON((Map) type);
-
-				this.addType(rt);
-			}
-		}
-
-		// examples
-		Object examples = object.get(EXAMPLES_PROPERTY);
-
-		if (examples != null && examples.getClass().isArray())
-		{
-			for (Object example : (Object[]) examples)
-			{
-				this.addExample(example.toString());
-			}
-		}
+		this._types = IndexUtil.createList(object.get(TYPES_PROPERTY), ReturnTypeElement.class);
+		this._examples = IndexUtil.createList(object.get(EXAMPLES_PROPERTY));
 	}
 
 	/**
@@ -179,14 +157,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<String> getExamples()
 	{
-		List<String> result = this._examples;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._examples);
 	}
 
 	/**
@@ -196,7 +167,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public String getOwningType()
 	{
-		return StringUtil.getValue(this._owningType);
+		return StringUtil.getStringValue(this._owningType);
 	}
 
 	/**
@@ -206,20 +177,11 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<String> getTypeNames()
 	{
-		List<String> result;
+		List<String> result = new ArrayList<String>();
 
-		if (this._types != null)
+		for (ReturnTypeElement type : this.getTypes())
 		{
-			result = new ArrayList<String>(this._types.size());
-
-			for (ReturnTypeElement type : this._types)
-			{
-				result.add(type.getType());
-			}
-		}
-		else
-		{
-			result = Collections.emptyList();
+			result.add(type.getType());
 		}
 
 		return result;
@@ -232,14 +194,7 @@ public class PropertyElement extends BaseElement
 	 */
 	public List<ReturnTypeElement> getTypes()
 	{
-		List<ReturnTypeElement> result = this._types;
-
-		if (result == null)
-		{
-			result = Collections.emptyList();
-		}
-
-		return result;
+		return CollectionsUtil.getListValue(this._types);
 	}
 
 	/**

@@ -61,7 +61,7 @@ public final class ServerConfigurationManager {
 
 	public static final String STATE_FILENAME = "webservers"; //$NON-NLS-1$
 
-	private static final String EXTENSION_POINT_ID = Activator.PLUGIN_ID + ".webServerTypes"; //$NON-NLS-1$
+	private static final String EXTENSION_POINT_ID = WebServerCorePlugin.PLUGIN_ID + ".webServerTypes"; //$NON-NLS-1$
 	private static final String TAG_TYPE = "type"; //$NON-NLS-1$
 	protected static final String ATT_ID = "id"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
@@ -71,7 +71,6 @@ public final class ServerConfigurationManager {
 	private static final String ELEMENT_SERVER = "server"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 
-	private static ServerConfigurationManager instance;
 	private Map<String, IConfigurationElement> configurationElements = new HashMap<String, IConfigurationElement>();
 	private List<ConfigurationType> types = new ArrayList<ConfigurationType>();
 	private List<AbstractWebServerConfiguration> serverConfigurations = Collections.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
@@ -98,15 +97,8 @@ public final class ServerConfigurationManager {
 	/**
 	 * 
 	 */
-	private ServerConfigurationManager() {
+	/* package */ ServerConfigurationManager() {
 		readExtensionRegistry();
-	}
-
-	public static ServerConfigurationManager getInstance() {
-		if (instance == null) {
-			instance = new ServerConfigurationManager();
-		}
-		return instance;
 	}
 
 	private void readExtensionRegistry() {

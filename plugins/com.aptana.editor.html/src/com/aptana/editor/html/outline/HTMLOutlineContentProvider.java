@@ -57,7 +57,7 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -265,15 +265,15 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				}
 				catch (FileNotFoundException e)
 				{
-					Activator.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					HTMLPlugin.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, MessageFormat.format(
 							Messages.HTMLOutlineContentProvider_FileNotFound_Error, e.getMessage())) };
 				}
 				catch (Exception e)
 				{
-					Activator.getDefault().getLog()
-							.log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+					HTMLPlugin.getDefault().getLog()
+							.log(new Status(IStatus.ERROR, HTMLPlugin.PLUGIN_ID, e.getMessage(), e));
 					elements = new Object[] { new OutlinePlaceholderItem(IStatus.ERROR, e.getMessage()) };
 				}
 				final Object[] finalElements = elements;

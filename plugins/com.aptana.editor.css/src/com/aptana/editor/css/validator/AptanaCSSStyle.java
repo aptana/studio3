@@ -44,7 +44,7 @@ import org.w3c.css.properties.css1.CssProperty;
 import org.w3c.css.properties.css3.Css3Style;
 import org.w3c.css.util.Utf8Properties;
 
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 
 /**
  * Aptana CSS Style.
@@ -66,7 +66,7 @@ public class AptanaCSSStyle extends Css3Style
 		}
 		catch (IOException e)
 		{
-			Activator.logError(Messages.AptanaCSSStyle_ERR_UnableToLoadProperties, e);
+			CSSPlugin.logError(Messages.AptanaCSSStyle_ERR_UnableToLoadProperties, e);
 		}
 	}
 

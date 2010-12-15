@@ -43,6 +43,7 @@ import java.io.LineNumberReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -51,6 +52,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -64,6 +67,9 @@ import com.aptana.core.CorePlugin;
  */
 public final class FirefoxUtil {
 
+	private static final String VALUE_PATTERN = "^(.[^=]*)=(.*)$"; //$NON-NLS-1$
+	private static final String SECTION_PATTERN = "^\\x5B(.*)\\x5D$"; //$NON-NLS-1$
+	
 	private static final String[] WIN32_PROFILES_LOCATIONS = {
 		"%APPDATA%\\Mozilla\\Firefox\\" //$NON-NLS-1$
 	};
@@ -90,17 +96,17 @@ public final class FirefoxUtil {
 	}
 
 	/**
-	 * findDefaultProfileLocation
+	 * Find location of user's default(current) Firefox profile.
 	 * 
-	 * @return File
+	 * @return IPath
 	 */
-	public static File findDefaultProfileLocation() {
+	public static IPath findDefaultProfileLocation() {
 		String[] locations = (String[]) LOCATIONS.get(Platform.getOS());
 		if (locations != null) {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
 				File dir = new File(location);
-				if (!dir.isDirectory() || !dir.exists()) {
+				if (!dir.isDirectory()) {
 					continue;
 				}
 				CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
@@ -131,9 +137,9 @@ public final class FirefoxUtil {
 
 				for (int j = 0; j < profiles.length; ++j) {
 					File profile = profiles[j];
-					if (profile.exists() && profile.isDirectory()) {
+					if (profile.isDirectory()) {
 						CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
-						return profile;
+						return Path.fromOSString(profile.getAbsolutePath());
 					}
 				}
 			}
@@ -147,7 +153,7 @@ public final class FirefoxUtil {
 	 * @param file
 	 * @return File[]
 	 */
-	private static File[] readProfiles(File dir) {
+	protected static File[] readProfiles(File dir) {
 		List<File> list = new ArrayList<File>();
 		File profilesIni = new File(dir, "profiles.ini"); //$NON-NLS-1$
 		if (profilesIni.exists()) {
@@ -155,10 +161,10 @@ public final class FirefoxUtil {
 			try {
 				r = new LineNumberReader(new FileReader(profilesIni));
 				String line;
-				Map<String, Map<String, String>> sections = new HashMap<String, Map<String, String>>();
+				Map<String, Map<String, String>> sections = new LinkedHashMap<String, Map<String, String>>();
 				Map<String, String> last = null;
-				Pattern sectionPattern = Pattern.compile("^\\x5B(.*)\\x5D$"); //$NON-NLS-1$
-				Pattern valuePattern = Pattern.compile("^(.[^=]*)=(.*)$"); //$NON-NLS-1$
+				Pattern sectionPattern = Pattern.compile(SECTION_PATTERN);
+				Pattern valuePattern = Pattern.compile(VALUE_PATTERN);
 				while ((line = r.readLine()) != null) {
 					Matcher matcher = sectionPattern.matcher(line);
 					if (matcher.find()) {
@@ -207,7 +213,7 @@ public final class FirefoxUtil {
 	}
 
 	/**
-	 * Get extension version
+	 * Get version for the specified Firefox extension ID
 	 * 
 	 * @param extensionID
 	 * @param profileDir

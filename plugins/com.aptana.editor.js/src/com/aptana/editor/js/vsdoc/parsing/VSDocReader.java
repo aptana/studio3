@@ -44,7 +44,7 @@ import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
 import com.aptana.editor.common.contentassist.MetadataReader;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.sdoc.model.DocumentationBlock;
 import com.aptana.editor.js.sdoc.model.ExampleTag;
@@ -311,7 +311,7 @@ public class VSDocReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(Activator.getDefault().getBundle(),
+			return FileLocator.openStream(JSPlugin.getDefault().getBundle(),
 					Path.fromPortableString(METADATA_SCHEMA_XML), false);
 		}
 		catch (IOException e)

@@ -25,6 +25,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
+import com.aptana.formatter.epl.FormatterPlugin;
+
 /**
  * Abstract base class that can be used to manage extension point contributions that may have more then one
  * implementation.
@@ -45,9 +47,9 @@ public abstract class ContributionExtensionManager
 
 	private IContributionSelector defaultSelector;
 
-	private Map<String, List<IContributedExtension>> contentTypeToContribMap = new HashMap<String, List<IContributedExtension>>();
-	private Map<String, Object> contentTypeToSelectorMap = new HashMap<String, Object>();
-	private Map<IContributedExtension, String> contribToContentTypeMap = new HashMap<IContributedExtension, String>();
+	private Map<String, List<IConfigurationElement>> contentTypeToContribMap = new HashMap<String, List<IConfigurationElement>>();
+	private Map<String, IConfigurationElement> contentTypeToSelectorMap = new HashMap<String, IConfigurationElement>();
+	private Map<IConfigurationElement, String> contribToContentTypeMap = new HashMap<IConfigurationElement, String>();
 
 	protected ContributionExtensionManager()
 	{
@@ -59,18 +61,54 @@ public abstract class ContributionExtensionManager
 	public IContributedExtension[] getContributions(String contentType)
 	{
 		List<IContributedExtension> contributions = getContributionsByContentType(contentType);
-		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
+		return contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
 
 	public IContributedExtension[] getAllContributions()
 	{
-		Collection<List<IContributedExtension>> values = contentTypeToContribMap.values();
+
+		Collection<List<IConfigurationElement>> values = contentTypeToContribMap.values();
 		List<IContributedExtension> contributions = new ArrayList<IContributedExtension>();
-		for (List<IContributedExtension> contribution : values)
+		for (List<IConfigurationElement> contribution : values)
 		{
-			contributions.addAll(contribution);
+			contributions.addAll(createContributors(contribution));
 		}
-		return (IContributedExtension[]) contributions.toArray(new IContributedExtension[contributions.size()]);
+		return contributions.toArray(new IContributedExtension[contributions.size()]);
+	}
+
+	private List<IContributedExtension> createContributors(List<IConfigurationElement> contributions)
+	{
+		List<IContributedExtension> list = new ArrayList<IContributedExtension>();
+		for (IConfigurationElement element : contributions)
+		{
+			IContributedExtension contrib = createContributor(element);
+			if (contrib != null)
+			{
+				list.add(contrib);
+			}
+		}
+		return list;
+	}
+
+	private IContributedExtension createContributor(IConfigurationElement element)
+	{
+		try
+		{
+			IContributedExtension object = (IContributedExtension) element.createExecutableExtension(CLASS_TAG);
+			if (isValidContribution(object))
+			{
+				/*
+				 * handle the case where the contribution is not the object that was just created.
+				 */
+				IContributedExtension contrib = (IContributedExtension) configureContribution(object, element);
+				return contrib;
+			}
+		}
+		catch (CoreException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public IContributedExtension getSelectedContribution(String contentType)
@@ -117,12 +155,25 @@ public abstract class ContributionExtensionManager
 			return Collections.emptyList();
 		}
 
-		return contentTypeToContribMap.get(contentType);
+		return createContributors(contentTypeToContribMap.get(contentType));
 	}
 
 	protected final IContributionSelector getSelector(String natureId)
 	{
-		return (IContributionSelector) contentTypeToSelectorMap.get(natureId);
+		IConfigurationElement ice = contentTypeToSelectorMap.get(natureId);
+		try
+		{
+			Object object = ice.createExecutableExtension(CLASS_TAG);
+			if (object instanceof IContributionSelector)
+			{
+				return (IContributionSelector) object;
+			}
+		}
+		catch (CoreException e)
+		{
+			FormatterPlugin.logError(e);
+		}
+		return null;
 	}
 
 	/**
@@ -136,7 +187,7 @@ public abstract class ContributionExtensionManager
 	{
 		if (contentTypeToContribMap.containsKey(contentType))
 		{
-			List<IContributedExtension> list = contentTypeToContribMap.get(contentType);
+			List<IConfigurationElement> list = contentTypeToContribMap.get(contentType);
 			return !list.isEmpty();
 		}
 
@@ -167,14 +218,14 @@ public abstract class ContributionExtensionManager
 		Iterator<String> keys = contentTypeToContribMap.keySet().iterator();
 		while (keys.hasNext())
 		{
-			List<IContributedExtension> list = contentTypeToContribMap.get(keys.next());
+			List<IConfigurationElement> list = contentTypeToContribMap.get(keys.next());
 
-			for (Iterator<IContributedExtension> iter = list.iterator(); iter.hasNext();)
+			for (Iterator<IConfigurationElement> iter = list.iterator(); iter.hasNext();)
 			{
-				IContributedExtension contrib = iter.next();
-				if (contrib.getId().equals(id))
+				IConfigurationElement contrib = iter.next();
+				if (contrib.getAttribute(IContributedExtension.ID).equals(id))
 				{
-					return contrib;
+					return createContributor(contrib);
 				}
 			}
 		}
@@ -230,49 +281,20 @@ public abstract class ContributionExtensionManager
 
 	protected final void addContribution(String contentType, IConfigurationElement element)
 	{
-		try
+		List<IConfigurationElement> list = contentTypeToContribMap.get(contentType);
+		if (list == null)
 		{
-			IContributedExtension object = (IContributedExtension) element.createExecutableExtension(CLASS_TAG);
-
-			if (isValidContribution(object))
-			{
-				/*
-				 * handle the case where the contribution is not the object that was just created.
-				 */
-				IContributedExtension contrib = (IContributedExtension) configureContribution(object, element);
-
-				List<IContributedExtension> list = contentTypeToContribMap.get(contentType);
-				if (list == null)
-				{
-					list = new ArrayList<IContributedExtension>();
-					contentTypeToContribMap.put(contentType, list);
-				}
-
-				list.add(contrib);
-				contribToContentTypeMap.put(object, contentType);
-			}
+			list = new ArrayList<IConfigurationElement>();
 		}
-		catch (CoreException e)
-		{
-			e.printStackTrace();
-		}
+		list.add(element);
+		contentTypeToContribMap.put(contentType, list);
+		contribToContentTypeMap.put(element, contentType);
 	}
 
 	protected final void addSelector(String natureId, IConfigurationElement element)
 	{
-		try
-		{
-			Object object = element.createExecutableExtension(CLASS_TAG);
-			if (object instanceof IContributionSelector)
-			{
-				// XXX: what if multiple extensions define a selector
-				contentTypeToSelectorMap.put(natureId, object);
-			}
-		}
-		catch (CoreException e)
-		{
-			e.printStackTrace();
-		}
+		// XXX: what if multiple extensions define a selector
+		contentTypeToSelectorMap.put(natureId, element);
 	}
 
 	private void loadChildren(String contentType, IConfigurationElement[] innerElements)

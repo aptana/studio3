@@ -42,6 +42,7 @@ import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
 @SuppressWarnings("restriction")
 public class PreferenceInitializer extends AbstractPreferenceInitializer
@@ -64,6 +65,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
 		store.setDefault(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
+
+		// mark occurrences
+		store.setDefault(IPreferenceConstants.EDITOR_MARK_OCCURRENCES, true);
+
+		// content assist
+		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY, CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY);
+
+		// insert matching characters
+		prefs.putBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE, true);
 	}
 
 }

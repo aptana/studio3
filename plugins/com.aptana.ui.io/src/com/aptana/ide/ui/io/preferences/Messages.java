@@ -39,65 +39,31 @@ import org.eclipse.osgi.util.NLS;
 /**
  * NLS
  */
-public final class Messages extends NLS {
+public final class Messages extends NLS
+{
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
 
-    /**
-     * PermissionsGroup_All
-     */
-    public static String PermissionsGroup_All;
+	public static String FTPPreferencePage_LBL_ReopenRemote;
 
-    /**
-     * PermissionsGroup_Execute
-     */
-    public static String PermissionsGroup_Execute;
+	public static String PermissionsGroup_All;
+	public static String PermissionsGroup_Execute;
+	public static String PermissionsGroup_Group;
+	public static String PermissionsGroup_Read;
+	public static String PermissionsGroup_Title;
+	public static String PermissionsGroup_User;
+	public static String PermissionsGroup_Write;
+	public static String PermissionPreferencePage_DirectoryGroupTitle;
+	public static String PermissionPreferencePage_FileGroupTitle;
+	public static String PermissionPreferencePage_Notes;
 
-    /**
-     * PermissionsGroup_Group
-     */
-    public static String PermissionsGroup_Group;
+	static
+	{
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
 
-    /**
-     * PermissionsGroup_Read
-     */
-    public static String PermissionsGroup_Read;
-
-    /**
-     * PermissionsGroup_Title
-     */
-    public static String PermissionsGroup_Title;
-
-    /**
-     * PermissionsGroup_User
-     */
-    public static String PermissionsGroup_User;
-
-    /**
-     * PermissionsGroup_Write
-     */
-    public static String PermissionsGroup_Write;
-
-    /**
-     * PermissionPreferencePage_DirectoryGroupTitle
-     */
-    public static String PermissionPreferencePage_DirectoryGroupTitle;
-
-    /**
-     * PermissionPreferencePage_GroupTitle
-     */
-    public static String PermissionPreferencePage_FileGroupTitle;
-
-    /**
-     * PermissionPreferencePage_Notes
-     */
-    public static String PermissionPreferencePage_Notes;
-
-    static {
-        NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-    }
-
-    private Messages() {
-        // Do not instantiate
-    }
+	private Messages()
+	{
+		// Do not instantiate
+	}
 }

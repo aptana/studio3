@@ -40,32 +40,33 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.core.resources.IUniformResource;
 
 public class ResourceUtil
 {
 	private static final String UNC_PREFIX = "//"; //$NON-NLS-1$
 	private static final String SCHEME_FILE = "file"; //$NON-NLS-1$
 
+	// Leaving these here at the moment, since I can't think of a better place to put them
+	private static final String APTANA_NATURE_PREFIX = "com.aptana."; //$NON-NLS-1$
+	private static final String RAILS_NATURE_PREFIX = "org.radrails.rails."; //$NON-NLS-1$
+	
 	private ResourceUtil()
 	{
 	}
@@ -265,85 +266,220 @@ public class ResourceUtil
 		}
 		return addBuilder;
 	}
-
-	public static boolean addNature(IProjectDescription description, String natureId)
-	{
-		String[] natures = description.getNatureIds();
-		boolean addNature = true;
-		// Don't add duplicate
-		for (int i = 0; i < natures.length; ++i)
-		{
-			if (natures[i].equals(natureId))
-			{
-				addNature = false;
-				break;
-			}
-		}
-		// add nature to project
-		if (addNature)
-		{
-			String[] newNatures = new String[natures.length + 1];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = natureId;
-			description.setNatureIds(newNatures);
-		}
-
-		return addNature;
-	}
-	
+		
 	/**
-	 * getPath
-	 *
-	 * @param element
-	 * @return path
-	 */
-	public static String getPath( Object element ) {
-		if ( element instanceof IUniformResource ) {
-			IUniformResource resource = (IUniformResource) element;
-			IPath path = (IPath) resource.getAdapter(IPath.class);
-			if (path == null) {
-				IStorage storage = (IStorage) resource.getAdapter(IStorage.class);
-				if (storage != null) {
-					path = (IPath) storage.getAdapter(IPath.class);
-				}
-			}
-			if ( path != null ) {
-				return path.toOSString();	
-			} else {
-				return resource.getURI().toString();
-			}			
-		}
-		if ( element instanceof String ) {
-			try {
-				element = new URI((String) element);
-			} catch (URISyntaxException e) {
-			}	
-		}
-		if ( element instanceof URI ) {
-			URI uri = (URI) element;
-			if ( "file".equals(uri.getScheme()) ) //$NON-NLS-1$
-			{
-				return uri.getSchemeSpecificPart();
-			}
-			return uri.toString();
-		}
-		return null;
-	}
-	
-	/**
-	 * findWorkspaceFile
+	 * Finds workspace file for the provided workspace-relative path
 	 *
 	 * @param filePath
 	 * @return IFile
 	 */
-	public static IFile findWorkspaceFile(String filePath) {
-		IPath path = new Path(filePath);
-		IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
-		if ( resource instanceof IFile )
-		{
-			return (IFile) resource;
-		}
-		return null;
+	public static IFile findWorkspaceFile(IPath filePath) {
+		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(filePath);
 	}
 
+	/**
+		 * Remove a builder from the given project. Return boolean indicating if it was removed (if doesn't exist on the
+		 * project we'll return a false. if there's an error, we'll throw a CoreException).
+		 * 
+		 * @param project
+		 * @param id
+		 * @throws CoreException
+		 */
+		public static boolean removeBuilder(IProject project, String id) throws CoreException
+		{
+			IProjectDescription desc = project.getDescription();
+			if (removeBuilder(desc, id))
+			{
+				project.setDescription(desc, null);
+				return true;
+			}
+			return false;
+		}
+	
+		/**
+		 * Remove a builder from the given project description. Does NOT save/set on project. Return boolean indicating if
+		 * it was removed (if already removed from description we'll return a false).
+		 * 
+		 * @param description
+		 * @param builderId
+		 * @throws CoreException
+		 */
+		public static boolean removeBuilder(IProjectDescription description, String builderId)
+		{
+			ICommand[] commands = description.getBuildSpec();
+			boolean removeBuilder = false;
+	
+			ArrayList<ICommand> builders = new ArrayList<ICommand>();
+			for (int i = 0; i < commands.length; i++)
+			{
+				ICommand iCommand = commands[i];
+				if (!iCommand.getBuilderName().equals(builderId))
+				{
+					builders.add(iCommand);
+				}
+				else
+				{
+					removeBuilder = true;
+				}
+			}
+			description.setBuildSpec(builders.toArray(new ICommand[0]));
+			return removeBuilder;
+		}
+	
+		/**
+		 * Add a nature to the given project. Return boolean indicating if it was added (if already exists on the project
+		 * we'll return a false. if there's an error, we'll throw a CoreException).
+		 * 
+		 * @param project
+		 * @param id
+		 * @throws CoreException
+		 */
+		public static boolean addNature(IProject project, String id) throws CoreException
+		{
+			IProjectDescription desc = project.getDescription();
+			if (addNature(desc, id))
+			{
+				project.setDescription(desc, null);
+				return true;
+			}
+			return false;
+		}
+	
+		/**
+		 * Adds a nature to the project. Returns true if added, false if the nature already existed on the project
+		 * @param description
+		 * @param natureId
+		 * @return
+		 */
+		public static boolean addNature(IProjectDescription description, String natureId)
+		{
+			String[] natures = description.getNatureIds();
+			boolean addNature = true;
+			// Don't add duplicate
+			for (int i = 0; i < natures.length; ++i)
+			{
+				if (natures[i].equals(natureId))
+				{
+					addNature = false;
+					break;
+				}
+			}
+			// add nature to project
+			if (addNature)
+			{
+				String[] newNatures = new String[natures.length + 1];
+				System.arraycopy(natures, 0, newNatures, 0, natures.length);
+				newNatures[natures.length] = natureId;
+				description.setNatureIds(newNatures);
+			}
+
+			return addNature;
+		}
+	
+		/**
+		 * Remove a nature from the given project. Return boolean indicating if it was removed (if doesn't exist on the
+		 * project we'll return a false. if there's an error, we'll throw a CoreException).
+		 * 
+		 * @param project
+		 * @param id
+		 * @throws CoreException
+		 */
+		public static boolean removeNature(IProject project, String id) throws CoreException
+		{
+			IProjectDescription desc = project.getDescription();
+			if (removeNature(desc, id))
+			{
+				project.setDescription(desc, null);
+				return true;
+			}
+			return false;
+		}
+	
+		/**
+		 * Remove nature from the project. Returns true if removed, false if the nature did not exist on the project
+		 * @param description
+		 * @param natureId
+		 * @return
+		 */
+		public static boolean removeNature(IProjectDescription description, String natureId)
+		{
+			String[] natures = description.getNatureIds();
+			boolean removeNature = false;
+	
+			ArrayList<String> newNatures = new ArrayList<String>(); 
+			for (int i = 0; i < natures.length; i++)
+			{
+				if (!natures[i].equals(natureId))
+				{
+					newNatures.add(natures[i]);
+				}
+				else
+				{
+					removeNature = true;
+				}
+			}
+	
+			description.setNatureIds(newNatures.toArray(new String[0]));
+			return removeNature;
+		}
+		
+		/**
+		 * Determines if the nature is one belonging to Aptana
+		 * 
+		 * @param natureId
+		 *            The natureID in question
+		 * @return
+		 */
+		public static boolean isAptanaNature(String natureId)
+		{
+			return natureId != null
+					&& (natureId.startsWith(APTANA_NATURE_PREFIX) || natureId.startsWith(RAILS_NATURE_PREFIX));
+		}
+	
+		/**
+		 * Reurns a list of all the natures that belong to Aptana.
+		 * 
+		 * @param description
+		 * @return
+		 */
+		public static String[] getAptanaNatures(IProjectDescription description)
+		{
+			String[] natures = description.getNatureIds();
+			ArrayList<String> newNatures = new ArrayList<String>();
+	
+			// Add Aptana natures to list
+			for (int i = 0; i < natures.length; i++)
+			{
+				if (isAptanaNature(natures[i]))
+				{
+					newNatures.add(natures[i]);
+				}
+			}
+	
+			return newNatures.toArray(new String[0]);
+		}
+	
+		/**
+		 * Removes the passed-in builder if there are zero Aptana natures left on the project.
+		 * 
+		 * @param description
+		 * @param builderId
+		 * @return
+		 * @throws CoreException 
+		 */
+		public static boolean removeBuilderIfOrphaned(IProject project, String builderId) throws CoreException
+		{
+			String[] natures = getAptanaNatures(project.getDescription());
+			if (natures.length == 0)
+			{
+				return removeBuilder(project, builderId);
+			}
+			else
+			{
+				return false;
+			}
+	
+		}
+	
+	
 }

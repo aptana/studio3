@@ -43,7 +43,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.navigator.ILinkHelper;
 
-import com.aptana.ide.ui.io.navigator.actions.EditorUtils.RemoteFileStoreEditorInput;
+import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 
 public class FilesystemLinkHelper implements ILinkHelper
 {
@@ -71,7 +71,7 @@ public class FilesystemLinkHelper implements ILinkHelper
 			FileSystemObject file = (FileSystemObject) element;
 			IFileStore fileStore = file.getFileStore();
 			IFileInfo fileInfo = file.getFileInfo();
-			IEditorPart editorPart = aPage.findEditor(new RemoteFileStoreEditorInput(fileStore, fileStore, fileInfo));
+			IEditorPart editorPart = aPage.findEditor(new UniformFileStoreEditorInput(fileStore, fileStore, fileInfo));
 			if (editorPart != null)
 			{
 				aPage.bringToTop(editorPart);

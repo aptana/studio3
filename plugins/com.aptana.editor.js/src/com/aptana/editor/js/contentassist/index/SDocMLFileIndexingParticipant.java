@@ -36,7 +36,6 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.EnumSet;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -46,9 +45,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
@@ -115,7 +113,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, EnumSet.allOf(ContentSelector.class));
+				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
 
 				if (window == null)
 				{
@@ -165,7 +163,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 			}
 			catch (Throwable e)
 			{
-				Activator.logError(e.getMessage(), e);
+				JSPlugin.logError(e.getMessage(), e);
 			}
 		}
 		finally

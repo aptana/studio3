@@ -42,6 +42,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -364,6 +368,62 @@ public class GitRepositoryTest extends TestCase
 		assertSwitchBranch("master");
 	}
 
+	public void testSwitchBranchClosesOpenProjectsThatDontExistOnDestinationBranch() throws Throwable
+	{
+		testAddBranch();
+
+		assertEquals("master", fRepo.currentBranch());
+		assertSwitchBranch("my_new_branch");
+
+		GitIndex index = fRepo.index();
+		assertTrue(index.changedFiles().isEmpty());
+
+		// Create a new project on this branch!
+		String projectName = "project_on_branch" + System.currentTimeMillis();
+
+		File projectDir = fRepo.workingDirectory().append(projectName).toFile();
+		projectDir.mkdirs();
+
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject project = workspace.getRoot().getProject(projectName);
+
+		IProjectDescription description = workspace.newProjectDescription(projectName);
+		description.setLocation(fRepo.workingDirectory().append(projectName));
+		project.create(description, new NullProgressMonitor());
+
+		// Commit the project on this branch!
+		index.refresh(new NullProgressMonitor());
+
+		// Now there should be a single file that's been changed!
+		List<ChangedFile> changed = index.changedFiles();
+		assertFalse(changed.isEmpty());
+		assertEquals(1, changed.size());
+
+		// Make sure it's shown as having unstaged changes only and is NEW
+		assertUnstaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		// Stage the new file
+		assertFalse(changed.isEmpty());
+		assertTrue(index.stageFiles(changed));
+		assertStaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		index.commit("Initial commit");
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
+
+		assertSwitchBranch("master");
+
+		// Assert that the new project is closed!
+		project = workspace.getRoot().getProject(projectName);
+		assertFalse(project.isOpen());
+		
+		// assert that there's no .project file stranded there
+		File dotProject = new File(projectDir, IProjectDescription.DESCRIPTION_FILE_NAME);
+		assertFalse(dotProject.exists());
+	}
+
 	public void testDeleteUnMergedBranch() throws Throwable
 	{
 		testAddBranch();
@@ -521,7 +581,7 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected void assertSwitchBranch(String branchName)
 	{
-		assertTrue(fRepo.switchBranch(branchName));
+		assertTrue(fRepo.switchBranch(branchName, new NullProgressMonitor()));
 		assertEquals(branchName, fRepo.currentBranch());
 	}
 }

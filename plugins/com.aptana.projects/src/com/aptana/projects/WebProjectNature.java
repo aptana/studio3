@@ -55,7 +55,7 @@ public class WebProjectNature implements IProjectNature
 
 	public void deconfigure() throws CoreException
 	{
-		// TODO Remove builder?
+		ResourceUtil.removeBuilderIfOrphaned(getProject(), UnifiedBuilder.ID);
 	}
 
 	public IProject getProject()

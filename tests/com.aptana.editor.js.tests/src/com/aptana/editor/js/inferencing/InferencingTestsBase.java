@@ -40,7 +40,6 @@ import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,11 +55,10 @@ import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ResourceUtil;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.parsing.JSParser;
@@ -81,7 +79,6 @@ public abstract class InferencingTestsBase extends TestCase
 		}
 	}
 
-	private static final EnumSet<ContentSelector> PARENT_TYPES_AND_PROPERTIES = EnumSet.of(ContentSelector.PARENT_TYPES, ContentSelector.PROPERTIES);
 	private JSIndexReader _reader;
 
 	/**
@@ -301,7 +298,7 @@ public abstract class InferencingTestsBase extends TestCase
 		IFileStore store = null;
 		try
 		{
-			URL url = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), path, null);
+			URL url = FileLocator.find(Platform.getBundle(JSPlugin.PLUGIN_ID), path, null);
 			url = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(url);
 			store = EFS.getStore(fileURI);
@@ -360,7 +357,7 @@ public abstract class InferencingTestsBase extends TestCase
 	 */
 	protected TypeElement getType(String typeName)
 	{
-		return this._reader.getType(this.getIndex(), typeName, PARENT_TYPES_AND_PROPERTIES);
+		return this._reader.getType(this.getIndex(), typeName, true);
 	}
 
 	/**

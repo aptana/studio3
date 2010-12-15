@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +86,6 @@ import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
@@ -95,9 +93,6 @@ import com.aptana.ui.epl.UIEplPlugin;
 public class ProjectNaturesPage extends PropertyPage implements IWorkbenchPropertyPage, ICheckStateListener,
 		SelectionListener
 {
-
-	private static final String APTANA_NATURE_PREFIX = "com.aptana."; //$NON-NLS-1$
-	private static final String RAILS_NATURE_PREFIX = "org.radrails.rails."; //$NON-NLS-1$
 	private static final Image APTANA_NATURE_IMAGE = UIEplPlugin.getImage("icons/aptana_nature.gif"); //$NON-NLS-1$;
 
 	private CheckboxTableViewer fTableViewer;
@@ -217,22 +212,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				{
 					IProjectDescription description = fProject.getDescription();
 					description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
-					// Use IResource.AVOID_NATURE_CONFIG to avoid any warning about the natures.
-					// We have to use it since not all of the Natures that are defined in the system
-					// are valid and some are forced into the project in a non-standard way.
-					fProject.setDescription(description, IResource.AVOID_NATURE_CONFIG, monitor);
-
-					for (Iterator<String> iterator = natureIds.iterator(); iterator.hasNext();)
-					{
-						String natureId = iterator.next();
-						if (isAptanaNature(natureId))
-						{
-							ResourceUtil.addBuilder(fProject, UnifiedBuilder.ID);
-							
-							// Exit, as we only need to add once, independent of # of Aptana natures.
-							break;
-						}												
-					}
+					fProject.setDescription(description, monitor);
 				}
 				catch (CoreException e)
 				{
@@ -451,7 +431,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 					natureId = descriptor.getNatureId();
 					if (natureId != null)
 					{
-						if (isAptanaNature(natureId))
+						if (ResourceUtil.isAptanaNature(natureId))
 						{
 							elements.add(natureId);
 							fNatureDescriptions.put(natureId, descriptor.getLabel());
@@ -487,11 +467,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 			public int compare(String o1, String o2)
 			{
 				// set Aptana natures ahead of others
-				if (isAptanaNature(o1))
+				if (ResourceUtil.isAptanaNature(o1))
 				{
-					return isAptanaNature(o2) ? o1.compareTo(o2) : -1;
+					return ResourceUtil.isAptanaNature(o2) ? o1.compareTo(o2) : -1;
 				}
-				return isAptanaNature(o2) ? 1 : o1.compareTo(o2);
+				return ResourceUtil.isAptanaNature(o2) ? 1 : o1.compareTo(o2);
 			}
 		});
 	}
@@ -518,12 +498,6 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 	{
 		return (fInitialPrimaryNature == null && fPrimaryNature != null)
 				|| !fInitialPrimaryNature.equals(fPrimaryNature);
-	}
-
-	private static boolean isAptanaNature(String natureId)
-	{
-		return natureId != null
-				&& (natureId.startsWith(APTANA_NATURE_PREFIX) || natureId.startsWith(RAILS_NATURE_PREFIX));
 	}
 
 	private class NaturesLabelProvider extends LabelProvider implements IFontProvider
@@ -558,7 +532,7 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 				return reg.get(nature);
 			}
 			catch(Exception e) {
-				return isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;				
+				return ResourceUtil.isAptanaNature(element.toString()) ? APTANA_NATURE_IMAGE : null;				
 			}
 		}
 

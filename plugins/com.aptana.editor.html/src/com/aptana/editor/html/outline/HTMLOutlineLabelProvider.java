@@ -43,7 +43,7 @@ import com.aptana.editor.common.outline.CommonOutlineItem;
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
@@ -52,7 +52,7 @@ import com.aptana.editor.js.parsing.IJSParserConstants;
 public class HTMLOutlineLabelProvider extends CompositeOutlineLabelProvider
 {
 
-	private static final Image ELEMENT_ICON = Activator.getImage("icons/element.png"); //$NON-NLS-1$
+	private static final Image ELEMENT_ICON = HTMLPlugin.getImage("icons/element.png"); //$NON-NLS-1$
 
 	public HTMLOutlineLabelProvider()
 	{

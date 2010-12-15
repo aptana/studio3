@@ -1,0 +1,44 @@
+Manifest-Version: 1.0
+Private-Package: !*
+Bundle-ClassPath: httpcore-4.0.1.jar,
+ httpcore-nio-4.0.1.jar
+Implementation-Vendor: Apache Software Foundation
+Implementation-Vendor-Id: org.apache
+Specification-Title: Apache HttpCore OSGi bundle
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.html
+Bundle-SymbolicName: org.apache.httpcomponents.httpcore
+X-Compile-Target-JDK: 1.5
+Implementation-Version: 4.0.1
+Specification-Vendor: Apache Software Foundation
+Bundle-Name: Apache HttpCore OSGi bundle
+Created-By: Apache Maven Bundle Plugin
+X-Compile-Source-JDK: 1.5
+Bundle-Vendor: Apache Software Foundation
+Bundle-Version: 4.0.1
+Tool: Bnd-0.0.255
+Build-Jdk: 1.6.0_10
+Bnd-LastModified: 1245349107201
+Bundle-ManifestVersion: 2
+Bundle-Description: HttpComponents Core (OSGi bundle)
+Embed-Dependency: *;scope=compile|runtime;inline=false
+Bundle-DocURL: http://www.apache.org/
+Export-Package: org.apache.http,
+ org.apache.http.entity,
+ org.apache.http.impl,
+ org.apache.http.impl.entity,
+ org.apache.http.impl.io,
+ org.apache.http.impl.nio,
+ org.apache.http.impl.nio.codecs,
+ org.apache.http.impl.nio.reactor,
+ org.apache.http.io,
+ org.apache.http.message,
+ org.apache.http.nio,
+ org.apache.http.nio.entity,
+ org.apache.http.nio.params,
+ org.apache.http.nio.protocol,
+ org.apache.http.nio.reactor,
+ org.apache.http.nio.util,
+ org.apache.http.params,
+ org.apache.http.protocol,
+ org.apache.http.util
+

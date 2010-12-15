@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.EnumSet;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -46,14 +45,13 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.index.JSMetadataReader;
 import com.aptana.editor.js.contentassist.index.ScriptDocException;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -93,7 +91,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	{
 		JSIndexReader reader = new JSIndexReader();
 		
-		return reader.getType(this.getIndex(), typeName, EnumSet.allOf(ContentSelector.class));
+		return reader.getType(this.getIndex(), typeName, true);
 	}
 	
 	/**
@@ -104,7 +102,7 @@ public class JSMetadataIndexWriterTests extends TestCase
 	 */
 	private InputStream loadResource(String resource)
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+		URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), new Path(resource), null);
 		InputStream stream = null;
 
 		if (url != null)
