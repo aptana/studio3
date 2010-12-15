@@ -2,8 +2,6 @@ package com.aptana.git.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
@@ -46,8 +44,7 @@ public class DeleteBranchItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-		SortedSet<String> localBranches = new TreeSet<String>(repo.localBranches());
-		for (final String branchName : localBranches)
+		for (final String branchName : repo.localBranches())
 		{
 			contributions.add(new ContributionItem()
 			{

@@ -2,7 +2,6 @@ package com.aptana.git.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
@@ -45,9 +44,7 @@ public class MergeBranchItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-
-		Set<String> branches = repo.allBranches();
-		for (final String branchName : branches)
+		for (final String branchName : repo.allBranches())
 		{
 			contributions.add(new ContributionItem()
 			{
