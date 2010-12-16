@@ -1,0 +1,17 @@
+table th {
+ background-color: silver;
+}
+
+@media print {
+.class1 {
+ display:none;
+}
+
+.class2 {
+   display: none;
+}
+
+h1 {
+    display: block;
+    }
+}

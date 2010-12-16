@@ -52,6 +52,7 @@ public class UITests
 																		// us to have to run in UI!
 		suite.addTest(com.aptana.editor.common.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.css.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.css.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.idl.AllTests.suite());
