@@ -143,7 +143,7 @@ public class CommandElement extends AbstractBundleElement
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private Map<Platform, InvokeUnion> _invokeUnionMap;
-	private Map<Platform, String[]> _keyBindings;
+	private Map<Platform, List<String>> _keyBindings;
 	private InputType[] _inputTypes;
 	private String _inputPath;
 	private OutputType _outputType;
@@ -381,7 +381,7 @@ public class CommandElement extends AbstractBundleElement
 	public String[] getKeyBindings()
 	{
 		Platform[] platforms = Platform.getCurrentPlatforms();
-		String[] result = null;
+		List<String> result = null;
 
 		if (this._keyBindings == null)
 		{
@@ -394,7 +394,7 @@ public class CommandElement extends AbstractBundleElement
 			{
 				result = this._keyBindings.get(platform);
 
-				if (result != null && result.length > 0)
+				if (result != null && result.size() > 0)
 				{
 					break;
 				}
@@ -406,13 +406,13 @@ public class CommandElement extends AbstractBundleElement
 			result = this._keyBindings.get(Platform.ALL);
 		}
 
-		return result;
+		return result.toArray(new String[result.size()]);
 	}
 
 	/**
 	 * Used for YAML serialization.
 	 */
-	public Map<Platform, String[]> getKeyBindingMap()
+	public Map<Platform, List<String>> getKeyBindingMap()
 	{
 		return this._keyBindings;
 	}
@@ -704,7 +704,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			printer.printlnWithIndent("keys {").increaseIndent(); //$NON-NLS-1$
 
-			for (Map.Entry<Platform, String[]> entry : this._keyBindings.entrySet())
+			for (Map.Entry<Platform, List<String>> entry : this._keyBindings.entrySet())
 			{
 				printer.printWithIndent(entry.getKey().getName()).print(": "); //$NON-NLS-1$
 
@@ -929,15 +929,15 @@ public class CommandElement extends AbstractBundleElement
 		{
 			if (this._keyBindings == null)
 			{
-				this._keyBindings = new HashMap<Platform, String[]>();
+				this._keyBindings = new HashMap<Platform, List<String>>();
 			}
 
 			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
 			int i = 0;
-			String[] uppercase = new String[keyBindings.length];
+			List<String> uppercase = new ArrayList<String>(keyBindings.length);
 			for (String binding : keyBindings)
 			{
-				uppercase[i++] = binding.toUpperCase();
+				uppercase.add(binding.toUpperCase());
 			}
 			this._keyBindings.put(bindingOS, uppercase);
 		}

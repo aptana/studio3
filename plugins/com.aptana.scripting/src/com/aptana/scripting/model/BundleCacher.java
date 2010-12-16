@@ -377,6 +377,10 @@ public class BundleCacher
 					public String getInvoke()
 					{
 						lazyLoad();
+						if (real == null)
+						{
+							return null;
+						}
 						return real.getInvoke();
 					}
 
@@ -384,6 +388,10 @@ public class BundleCacher
 					public RubyProc getInvokeBlock()
 					{
 						lazyLoad();
+						if (real == null)
+						{
+							return null;
+						}
 						return real.getInvokeBlock();
 					}
 
@@ -391,6 +399,10 @@ public class BundleCacher
 					public CommandResult execute(CommandContext context)
 					{
 						lazyLoad();
+						if (real == null)
+						{
+							return null;
+						}
 						return real.execute(context);
 					}
 
@@ -398,6 +410,10 @@ public class BundleCacher
 					public Ruby getRuntime()
 					{
 						lazyLoad();
+						if (real == null)
+						{
+							return null;
+						}
 						return real.getRuntime();
 					}
 
@@ -413,6 +429,10 @@ public class BundleCacher
 						if (real == null)
 						{
 							BundleElement owning = getOwningBundle();
+							if (owning == null) // we haven't even been attached yet!
+							{
+								return;
+							}
 							// remove all elements that are declared in the same file, since they'll end up getting
 							// loaded below.
 							List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());

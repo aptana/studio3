@@ -64,7 +64,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
@@ -99,8 +98,13 @@ public class BundleManager
 			{
 				if (bundleScripts.size() > 0)
 				{
-					BundleCacher cacher = new BundleCacher();
-					BundleElement be = cacher.load(bundleDirectory, bundleScripts);
+					boolean useCache = Boolean.valueOf(System.getProperty("use.bundle.cache", Boolean.TRUE.toString()));
+
+					BundleElement be = null;
+					if (useCache)
+					{
+						be = getCacher().load(bundleDirectory, bundleScripts);
+					}
 					if (be != null)
 					{
 						addBundle(be);
@@ -116,7 +120,10 @@ public class BundleManager
 							sub.worked(1);
 						}
 
-						cacher.cache(bundleDirectory, sub.newChild(1));
+						if (useCache)
+						{
+							getCacher().cache(bundleDirectory, sub.newChild(1));
+						}
 					}
 				}
 			}
@@ -207,6 +214,17 @@ public class BundleManager
 	public static BundleManager getInstance()
 	{
 		return getInstance(null, null);
+	}
+
+	private BundleCacher cacher;
+
+	protected BundleCacher getCacher()
+	{
+		if (cacher == null)
+		{
+			cacher = new BundleCacher();
+		}
+		return cacher;
 	}
 
 	/**
@@ -1688,21 +1706,21 @@ public class BundleManager
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
-		if (EclipseUtil.isTesting() == false && Platform.isRunning())
-		{
-			job.setRule(new SerialPerObjectRule(counter++));
-
-			if (counter >= Runtime.getRuntime().availableProcessors())
-			{
-				counter = 0;
-			}
-
-			job.schedule();
-		}
-		else
-		{
-			job.run(new NullProgressMonitor());
-		}
+		// if (EclipseUtil.isTesting() == false && Platform.isRunning())
+		// {
+		// job.setRule(new SerialPerObjectRule(counter++));
+		//
+		// if (counter >= Runtime.getRuntime().availableProcessors())
+		// {
+		// counter = 0;
+		// }
+		//
+		// job.schedule();
+		// }
+		// else
+		// {
+		job.run(new NullProgressMonitor());
+		// }
 	}
 
 	/**
