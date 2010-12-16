@@ -34,11 +34,14 @@
  */
 package com.aptana.core.util;
 
+import java.util.regex.Pattern;
+
 /**
  * @author Max Stepanov
  */
 public final class VersionUtil
 {
+	private static Pattern versionPattern = Pattern.compile("\\.");
 
 	/**
 	 * 
@@ -59,8 +62,8 @@ public final class VersionUtil
 	public static int compareVersions(String left, String right)
 	{
 		int result;
-		String[] lparts = left.split("\\."); //$NON-NLS-1$
-		String[] rparts = right.split("\\."); //$NON-NLS-1$
+		String[] lparts = versionPattern.split(left); //$NON-NLS-1$
+		String[] rparts = versionPattern.split(right); //$NON-NLS-1$
 		for (int i = 0; i < lparts.length && i < rparts.length; ++i)
 		{
 			try
