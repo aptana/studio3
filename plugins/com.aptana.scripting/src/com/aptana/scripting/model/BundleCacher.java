@@ -48,6 +48,8 @@ public class BundleCacher
 
 	private static final String REGEXP_TAG = "!regexp"; //$NON-NLS-1$
 
+	private Yaml yaml;
+
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
 		// Force bundle manager to load the bundle...
@@ -92,7 +94,7 @@ public class BundleCacher
 		}
 	}
 
-	public BundleElement load(File bundleDirectory, List<File> bundleFiles)
+	public BundleElement load(final File bundleDirectory, List<File> bundleFiles)
 	{
 		File cacheFile = new File(bundleDirectory, CACHE_FILE);
 		if (!cacheFile.exists())
@@ -106,7 +108,9 @@ public class BundleCacher
 			// TODO Just update the cache with the updated files/diff!
 			if (file.lastModified() > lastMod)
 			{
-				// One of the files is newer, don't load cache!
+				// One of the files is newer, don't load cache! This will reload everything from disk and rewrite the
+				// cache
+				ScriptingActivator.logInfo(file.getPath() + " is newer than cache file, invalidating cache");
 				return null;
 			}
 		}
@@ -119,12 +123,20 @@ public class BundleCacher
 			Yaml yaml = createYAML();
 			reader = new FileReader(cacheFile);
 			be = (BundleElement) yaml.load(reader);
-			// FIXME Handle if a file referenced by one of the model elements has been deleted! Remove from the model
-			// and rewrite the cache?
+			// FIXME If a file is deleted, remove all the elements contributed from that path and rewrite the cache!
+			// (i.e. just update the diff!)
+			if (anyFileDeleted(be))
+			{
+				// If any file is deleted, just ignore the cache, load it all up normally and then it'll rewrite a new
+				// cache.
+				return null;
+			}
 		}
 		catch (Exception e)
 		{
 			ScriptingActivator.logError(e.getMessage(), e);
+			ScriptingActivator.logInfo("Due to error loading YAML, bundle at " + bundleDirectory.getAbsolutePath()
+					+ " will not be loaded from cache");
 		}
 		finally
 		{
@@ -143,9 +155,51 @@ public class BundleCacher
 		return be;
 	}
 
+	private boolean anyFileDeleted(BundleElement be)
+	{
+		for (AbstractBundleElement abe : be.getChildren())
+		{
+			String path = abe.getPath();
+			if (!new File(path).exists())
+			{
+				ScriptingActivator.logInfo(path + " doesn't exist, invalidating cache");
+				return true;
+			}
+			if (abe instanceof MenuElement)
+			{
+				MenuElement menu = (MenuElement) abe;
+				return anyFileDeleted(menu);
+			}
+		}
+		return false;
+	}
+
+	private boolean anyFileDeleted(MenuElement parent)
+	{
+		if (parent == null || !parent.hasChildren())
+		{
+			return false;
+		}
+		for (MenuElement child : parent.getChildren())
+		{
+			String path = child.getPath();
+			if (!new File(path).exists())
+			{
+				ScriptingActivator.logInfo(path + " doesn't exist, invalidating cache");
+				return true;
+			}
+			return anyFileDeleted(child);
+		}
+		return false;
+	}
+
 	private Yaml createYAML()
 	{
-		return new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
+		if (yaml == null)
+		{
+			yaml = new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
+		}
+		return yaml;
 	}
 
 	private class MyRepresenter extends Representer
