@@ -161,6 +161,10 @@ public abstract class ContributionExtensionManager
 	protected final IContributionSelector getSelector(String natureId)
 	{
 		IConfigurationElement ice = contentTypeToSelectorMap.get(natureId);
+		if (ice == null)
+		{
+			return null;
+		}
 		try
 		{
 			Object object = ice.createExecutableExtension(CLASS_TAG);

@@ -90,6 +90,27 @@ public class GitRepository
 {
 
 	/**
+	 * Order branches alphabetically, with local branches all appearing before remote ones.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class BranchNameComparator implements Comparator<String>
+	{
+		public int compare(String o1, String o2)
+		{
+			if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return 1;
+			}
+			if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return -1;
+			}
+			return o1.compareTo(o2);
+		}
+	}
+
+	/**
 	 * Filename to store ignores of files.
 	 */
 	public static final String GITIGNORE = ".gitignore"; //$NON-NLS-1$
@@ -517,21 +538,7 @@ public class GitRepository
 	 */
 	public Set<String> allBranches()
 	{
-		// Return local branches first!
-		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
-		{
-
-			public int compare(String o1, String o2)
-			{
-				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return 1;
-				if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return -1;
-				return o1.compareTo(o2);
-			}
-		});
-		localFirst.addAll(branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE));
-		return localFirst;
+		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
 	}
 
 	private Set<String> branches(GitRef.TYPE... types)
@@ -539,7 +546,10 @@ public class GitRepository
 		if (types == null || types.length == 0)
 			return Collections.emptySet();
 		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
-		Set<String> allBranches = new HashSet<String>();
+
+		// Sort branches. Make sure local ones always come before remote
+		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
+
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
