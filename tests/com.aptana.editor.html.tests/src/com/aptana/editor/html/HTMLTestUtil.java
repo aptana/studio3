@@ -57,28 +57,24 @@ public class HTMLTestUtil
 	 */
 	public static IDocument createDocument(String source, boolean stripCursor)
 	{
-		if(stripCursor) {
+		if (stripCursor)
+		{
 			source = source.replaceAll("\\|", "");
 		}
 
-		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(
-			HTMLSourceConfiguration.getDefault().createSubPartitionScanner(),
-			new NullSubPartitionScanner(),
-			new NullPartitionerSwitchStrategy()
-		);
-		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(
-			partitionScanner,
-			HTMLSourceConfiguration.getDefault().getContentTypes()
-		);
+		CompositePartitionScanner partitionScanner = new CompositePartitionScanner(HTMLSourceConfiguration.getDefault()
+				.createSubPartitionScanner(), new NullSubPartitionScanner(), new NullPartitionerSwitchStrategy());
+		IDocumentPartitioner partitioner = new ExtendedFastPartitioner(partitionScanner, HTMLSourceConfiguration
+				.getDefault().getContentTypes());
 		partitionScanner.setPartitioner((IExtendedPartitioner) partitioner);
-		
+
 		final IDocument document = new Document(source);
 		partitioner.connect(document);
 		document.setDocumentPartitioner(partitioner);
-		
+
 		return document;
 	}
-	
+
 	/**
 	 * createLexemeProvider
 	 * 
@@ -102,13 +98,15 @@ public class HTMLTestUtil
 			}
 		};
 	}
-	
+
 	/**
 	 * Finds the cursor position in the specific text
+	 * 
 	 * @param text
 	 * @return
 	 */
-	public static int findCursorOffset(String text) {
+	public static int findCursorOffset(String text)
+	{
 		return text.indexOf("|");
 	}
 

@@ -47,11 +47,11 @@ public class HTMLTagUtil
 	 */
 	public static boolean isTag(Lexeme<HTMLTokenType> lexeme)
 	{
-		if (lexeme != null && HTMLTokenType.STRUCTURE_TAG.equals(lexeme.getType())
-				|| HTMLTokenType.BLOCK_TAG.equals(lexeme.getType())
-				|| HTMLTokenType.INLINE_TAG.equals(lexeme.getType()))
+		if (lexeme != null)
 		{
-			return true;
+			HTMLTokenType type = lexeme.getType();
+			return HTMLTokenType.STRUCTURE_TAG.equals(type) || HTMLTokenType.BLOCK_TAG.equals(type)
+					|| HTMLTokenType.INLINE_TAG.equals(type);
 		}
 		else
 		{

@@ -41,17 +41,6 @@ import com.aptana.parsing.lexer.Lexeme;
 
 public class HTMLTagUtilTest extends TestCase
 {
-
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-	}
-
-	protected void tearDown() throws Exception
-	{
-		super.tearDown();
-	}
-
 	public void testIsTag()
 	{
 		assertTrue(HTMLTagUtil.isTag(new Lexeme<HTMLTokenType>(HTMLTokenType.BLOCK_TAG, 0, 2, "<a>")));

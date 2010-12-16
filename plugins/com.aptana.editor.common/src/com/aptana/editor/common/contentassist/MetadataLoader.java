@@ -37,6 +37,8 @@ package com.aptana.editor.common.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,12 +47,14 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 
 /**
@@ -68,6 +72,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 		super(name);
 
 		setPriority(Job.LONG);
+		setRule(new MetadataRule(getMetadataFiles()));
 	}
 
 	/**
@@ -198,16 +203,13 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		synchronized (this.getClass())
+		if (this.versionChanged())
 		{
-			if (this.versionChanged())
-			{
-				this.rebuildMetadataIndex(monitor);
+			this.rebuildMetadataIndex(monitor);
 
-				this.updateVersionPreference();
+			this.updateVersionPreference();
 
-				this.postRebuild();
-			}
+			this.postRebuild();
 		}
 		return Status.OK_STATUS;
 	}
@@ -265,4 +267,41 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	 * @param reader
 	 */
 	protected abstract void writeIndex(T reader);
+
+	/**
+	 * Scheduling rule to allow loaders to have exclusive access while loading a particular set of metadata files.
+	 */
+	static class MetadataRule implements ISchedulingRule
+	{
+		List<String> files;
+
+		public MetadataRule(String[] files)
+		{
+			this.files = Arrays.asList(files);
+		}
+
+		public boolean contains(ISchedulingRule rule)
+		{
+			return rule == this;
+		}
+
+		public boolean isConflicting(ISchedulingRule rule)
+		{
+			if (contains(rule))
+			{
+				return true;
+			}
+			if (rule != this && rule instanceof MetadataRule)
+			{
+				List<String> otherFiles = ((MetadataRule) rule).getFiles();
+				return CollectionsUtil.intersect(otherFiles, getFiles()).size() > 0;
+			}
+			return false;
+		}
+
+		public List<String> getFiles()
+		{
+			return this.files;
+		}
+	}
 }

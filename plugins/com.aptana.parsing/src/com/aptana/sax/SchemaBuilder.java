@@ -72,8 +72,6 @@ public final class SchemaBuilder extends ValidatingReader
 	private static String SCHEMA_1_0_NAMESPACE = "http://www.aptana.com/2005/schema/1.0"; //$NON-NLS-1$
 	private static String SCHEMA_1_1_NAMESPACE = "http://www.aptana.com/2007/schema/1.1"; //$NON-NLS-1$
 
-	private static SchemaBuilder _builder = null;
-
 	private Schema _newSchema;
 	private Stack<SchemaElement> _elementStack;
 	private SchemaElement _currentElement;
@@ -376,14 +374,11 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @return A validating XML reader that will recognize and validate against the loaded schema
 	 * @throws SchemaInitializationException
 	 */
-	public static synchronized Schema fromXML(InputStream in, Object handler) throws SchemaInitializationException
+	public static Schema fromXML(InputStream in, Object handler) throws SchemaInitializationException
 	{
 		Schema result = new Schema(handler);
 
-		if (_builder == null)
-		{
-			_builder = new SchemaBuilder();
-		}
+		SchemaBuilder _builder = new SchemaBuilder();
 
 		// setup selector schema and reset in case it has been used previously
 		_builder._schema = _builder._versionSelectorSchema;

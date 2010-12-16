@@ -389,7 +389,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations())
+					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault()
+							.getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)
@@ -828,9 +829,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
 				addedProposal = true;
 			}
-			}
-		return addedProposal;
 		}
+		return addedProposal;
+	}
 
 	/**
 	 * addCloseTagProposals
@@ -871,10 +872,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-		String replaceString = "/" + element.getName();
+		String replaceString = "/" + element.getName(); //$NON-NLS-1$
 		Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme(); // Open of tag
-		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name		
-		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag		
+		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
+		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
 		int replaceLength = 0;
 
@@ -882,12 +883,13 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		// If our cursor is before the tag in the lexeme list, assume we aren't
 		// modifying the current tag after the cursor, but rather inserting a whole new tag
 		int replaceOffset = offset;
-		
+
 		// In this case, we see our offset is greater than the start of the
 		// list, so we assume we are replacing
-		if(offset > firstLexeme.getStartingOffset()) {
+		if (offset > firstLexeme.getStartingOffset())
+		{
 			replaceOffset = firstLexeme.getStartingOffset() + 1;
-			if (firstLexeme.getText().equals("</"))
+			if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 			{
 				// we'll replace the "/"
 				replaceLength += 1;
@@ -897,8 +899,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength += tagLexeme.getLength();
 			}
 			// current tag isn't closed, so we will close it for the user
-			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType())) {
-				replaceString += ">";
+			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
+			{
+				replaceString += ">"; //$NON-NLS-1$
 			}
 		}
 		else
@@ -906,23 +909,24 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				// add the close of the tag, since we're in a situation like <|<a>
-				replaceString += ">";
+				replaceString += ">"; //$NON-NLS-1$
 				String previous = _document.get(offset - 1, 1);
 				// situation like </|<a>
-				if("/".equals(previous)) {
+				if ("/".equals(previous)) { //$NON-NLS-1$
 					replaceOffset -= 1;
 					replaceLength += 1;
 				}
 			}
 			catch (BadLocationException e)
 			{
+				// safe to ignore
 			}
 		}
 
 		int cursorPosition = replaceString.length();
 
 		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, replaceOffset, replaceLength,
-				cursorPosition, ELEMENT_ICON, "/" + element.getName(), null, element.getDescription());
+				cursorPosition, ELEMENT_ICON, "/" + element.getName(), null, element.getDescription()); //$NON-NLS-1$
 
 		proposal.setFileLocation(HTMLIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgentIcons);
@@ -1105,7 +1109,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
 				if (LocationType.IN_CLOSE_TAG.equals(location))
 				{
-					text = "/" + text; // proposals have "/" at the front
+					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
 				}
 
 				this.setSelectedProposal(text, result);
