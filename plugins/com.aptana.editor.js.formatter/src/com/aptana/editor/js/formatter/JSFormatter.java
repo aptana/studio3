@@ -213,7 +213,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		return null;
 	}
-
+	
 	/**
 	 * @param input
 	 * @param output
@@ -368,4 +368,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		return document;
 	}
+
+
 }
