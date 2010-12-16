@@ -9,6 +9,9 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -45,17 +48,24 @@ public abstract class AbstractFormatterTestCase extends TestCase
 
 		TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
 		String expectedResult = getContent(resultFile);
-		if (formattedTextEdit instanceof ReplaceEdit)
+		IDocument document = new org.eclipse.jface.text.Document(source);
+		
+		try
 		{
-			String formattedText = ((ReplaceEdit) formattedTextEdit).getText();
-
+			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
+			formattedTextEdit.apply(document);
 			assertTrue("contents of " + sourceFile + " do not match contents of " + resultFile, //$NON-NLS-1$ //$NON-NLS-2$
-					compareWithWhiteSpace(formattedText, expectedResult));
+					compareWithWhiteSpace(document.get(), expectedResult));
 		}
-		else if (!(formattedTextEdit instanceof MultiTextEdit))
+		catch (MalformedTreeException e)
 		{
 			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
 		}
+		catch (BadLocationException e)
+		{
+			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
+		}
+		
 	}
 
 	protected String getContent(String filename) throws IOException

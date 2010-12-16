@@ -14,7 +14,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 {
 	// Turn this flag on for development only (used to generate the formatted files)
 	// To generate formatted files, place css files under the 'formatting' folder
-	private static boolean INITIALIZE_MODE = true;
+	private static boolean INITIALIZE_MODE = false;
 
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.css.formatterFactory"; //$NON-NLS-1$
 	private static String FORMATTER_ID = "com.aptana.editor.css.formatter.tests"; //$NON-NLS-1$
@@ -40,7 +40,6 @@ public class FormattingTests extends AbstractFormatterTestCase
 		super.setUp();
 	}
 
-	@Override
 	protected boolean compareWithWhiteSpace(String original, String formattedText)
 	{
 		return original.equals(formattedText);

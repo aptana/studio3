@@ -8,14 +8,16 @@ Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jface.text,
- com.aptana.formatter.epl;bundle-version="3.0.0",
- com.aptana.formatter.ui.epl;bundle-version="3.0.0",
+ com.aptana.formatter.epl,
+ com.aptana.formatter.ui.epl,
  com.aptana.parsing,
  com.aptana.ui.epl,
  com.aptana.editor.common,
  com.aptana.editor.css,
- com.aptana.core;bundle-version="3.0.0",
+ com.aptana.core,
  org.eclipse.ui.editors
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
+Export-Package: com.aptana.editor.css.formatter
+Eclipse-ExtensibleAPI: true
