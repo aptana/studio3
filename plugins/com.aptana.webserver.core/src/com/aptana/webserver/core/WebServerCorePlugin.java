@@ -1,5 +1,7 @@
 package com.aptana.webserver.core;
 
+import org.eclipse.core.internal.resources.DelayedSnapshotJob;
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.ISaveContext;
 import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.resources.ISavedState;
@@ -17,17 +19,20 @@ import org.osgi.framework.BundleContext;
  * @author Max Stepanov
  *
  */
-public class Activator extends Plugin {
+@SuppressWarnings("restriction")
+public class WebServerCorePlugin extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.webserver.core"; //$NON-NLS-1$
 
 	// The shared instance
-	private static Activator plugin;
+	private static WebServerCorePlugin plugin;
+	
+	private ServerConfigurationManager serverConfigurationManager;
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
+	 * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext )
 	 */
 	@SuppressWarnings("deprecation")
 	public void start(BundleContext context) throws Exception {
@@ -37,19 +42,20 @@ public class Activator extends Plugin {
 		if (lastState != null) {
 			IPath location = lastState.lookup(new Path(ServerConfigurationManager.STATE_FILENAME));
 			if (location != null) {
-				ServerConfigurationManager.getInstance().loadState(getStateLocation().append(location));
+				getServerConfigurationManager().loadState(getStateLocation().append(location));
 			}
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
+	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext )
 	 */
 	@SuppressWarnings("deprecation")
 	public void stop(BundleContext context) throws Exception {
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
 		plugin = null;
+		serverConfigurationManager = null;
 		super.stop(context);
 	}
 
@@ -58,7 +64,7 @@ public class Activator extends Plugin {
 	 * 
 	 * @return the shared instance
 	 */
-	public static Activator getDefault() {
+	public static WebServerCorePlugin getDefault() {
 		return plugin;
 	}
 
@@ -77,6 +83,25 @@ public class Activator extends Plugin {
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
 	}
+
+	/**
+	 * Get instance of server configuration manager
+	 * @return
+	 */
+	public ServerConfigurationManager getServerConfigurationManager() {
+		if (serverConfigurationManager == null) {
+			serverConfigurationManager = new ServerConfigurationManager();
+		}
+		return serverConfigurationManager;
+	}
+
+	/**
+	 * Save state of server configurations
+	 */
+	public void saveServerConfigurations() {
+		new DelayedSnapshotJob(((Workspace) ResourcesPlugin.getWorkspace()).getSaveManager()).schedule();
+	}
+
 
 	private class WorkspaceSaveParticipant implements ISaveParticipant {
 
@@ -126,7 +151,7 @@ public class Activator extends Plugin {
 		public void saving(ISaveContext context) throws CoreException {
 			IPath savePath = new Path(ServerConfigurationManager.STATE_FILENAME).addFileExtension(Integer
 					.toString(context.getSaveNumber()));
-			ServerConfigurationManager.getInstance().saveState(getStateLocation().append(savePath));
+			getServerConfigurationManager().saveState(getStateLocation().append(savePath));
 			context.map(new Path(ServerConfigurationManager.STATE_FILENAME), savePath);
 			context.needSaveNumber();
 		}

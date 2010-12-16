@@ -44,7 +44,7 @@ import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.SourceConfig;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
@@ -64,8 +64,7 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 				return new PreviewConfig(url);
 			}
 		} else {
-			for (AbstractWebServerConfiguration configuration : ServerConfigurationManager.getInstance()
-					.getServerConfigurations()) {
+			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
 				URL url = configuration.resolve(config.getFileStore());
 				if (url != null) {
 					return new PreviewConfig(url);

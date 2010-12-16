@@ -64,7 +64,11 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -72,6 +76,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.util.IOUtil;
@@ -83,6 +88,27 @@ import com.aptana.git.core.model.GitRef.TYPE;
 
 public class GitRepository
 {
+
+	/**
+	 * Order branches alphabetically, with local branches all appearing before remote ones.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class BranchNameComparator implements Comparator<String>
+	{
+		public int compare(String o1, String o2)
+		{
+			if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return 1;
+			}
+			if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return -1;
+			}
+			return o1.compareTo(o2);
+		}
+	}
 
 	/**
 	 * Filename to store ignores of files.
@@ -512,21 +538,7 @@ public class GitRepository
 	 */
 	public Set<String> allBranches()
 	{
-		// Return local branches first!
-		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
-		{
-
-			public int compare(String o1, String o2)
-			{
-				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return 1;
-				if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return -1;
-				return o1.compareTo(o2);
-			}
-		});
-		localFirst.addAll(branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE));
-		return localFirst;
+		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
 	}
 
 	private Set<String> branches(GitRef.TYPE... types)
@@ -534,7 +546,10 @@ public class GitRepository
 		if (types == null || types.length == 0)
 			return Collections.emptySet();
 		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
-		Set<String> allBranches = new HashSet<String>();
+
+		// Sort branches. Make sure local ones always come before remote
+		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
+
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
@@ -564,19 +579,116 @@ public class GitRepository
 	 *            the new branch to use as the working branch
 	 * @return true if the switch happened. false otherwise.
 	 */
-	public boolean switchBranch(String branchName)
+	public boolean switchBranch(String branchName, IProgressMonitor monitor)
 	{
 		if (branchName == null)
+		{
 			return false;
-		String oldBranchName = currentBranch.simpleRef().shortName();
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
-				branchName);
-		if (result.keySet().iterator().next().intValue() != 0)
-			return false;
-		_headRef = null;
-		readCurrentBranch();
-		fireBranchChangeEvent(oldBranchName, branchName);
-		return true;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, 4);
+		try
+		{
+			// Before switching branches, check for existence of every open project attached to this repo on the new
+			// branch!
+			// If it doesn't exist, close the project first!
+			// if we fail to switch branches, re-open the ones we auto-closed!
+			final Set<IProject> projectsNotExistingOnNewBranch = getProjectsThatDontExistOnBranch(branchName,
+					sub.newChild(1));
+			// Now close all of the affectedProjects.
+			closeProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
+
+			String oldBranchName = currentBranch.simpleRef().shortName();
+			Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
+					branchName);
+			sub.worked(1);
+			if (result.keySet().iterator().next().intValue() != 0)
+			{
+				openProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
+				return false;
+			}
+			_headRef = null;
+			readCurrentBranch();
+			fireBranchChangeEvent(oldBranchName, branchName);
+			sub.worked(1);
+			return true;
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	private void openProjects(Set<IProject> projects, IProgressMonitor monitor)
+	{
+		if (projects == null)
+		{
+			return;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, projects.size());
+		for (IProject project : projects)
+		{
+			try
+			{
+				project.open(sub.newChild(1));
+			}
+			catch (CoreException e)
+			{
+				GitPlugin.logError(e);
+			}
+		}
+		sub.done();
+	}
+
+	private void closeProjects(final Set<IProject> projects, IProgressMonitor monitor)
+	{
+		if (projects == null)
+		{
+			return;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, projects.size());
+		for (IProject project : projects)
+		{
+			try
+			{
+				project.close(sub.newChild(1));
+			}
+			catch (CoreException e)
+			{
+				GitPlugin.logError(e);
+			}
+		}
+		sub.done();
+	}
+
+	private Set<IProject> getProjectsThatDontExistOnBranch(final String branchName, IProgressMonitor monitor)
+	{
+		Set<IProject> projectsNotExistingOnNewBranch = new HashSet<IProject>();
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			if (!project.isAccessible())
+			{
+				// TODO What if we have a closed project because it doesn't exist here, but it does on the new
+				// branch. Auto-open after switch?
+				continue;
+			}
+			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
+			if (other != null && other.equals(this))
+			{
+				// Check if the project exists on the other branch!
+				Map<Integer, String> result = GitExecutable
+						.instance()
+						.runInBackground(
+								workingDirectory(),
+								"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
+								branchName
+										+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
+				if (result.keySet().iterator().next().intValue() != 0)
+				{
+					projectsNotExistingOnNewBranch.add(project);
+				}
+			}
+		}
+		return projectsNotExistingOnNewBranch;
 	}
 
 	private void readCurrentBranch()
