@@ -48,9 +48,9 @@ import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
-import com.aptana.debug.core.model.IJSVariable;
 import com.aptana.debug.internal.ui.IDebugUIConstants;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov

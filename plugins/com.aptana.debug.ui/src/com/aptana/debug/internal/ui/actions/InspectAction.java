@@ -43,8 +43,8 @@ import org.eclipse.debug.core.model.IWatchExpressionListener;
 import org.eclipse.debug.core.model.IWatchExpressionResult;
 import org.eclipse.debug.ui.DebugUITools;
 
-import com.aptana.debug.core.model.JSInspectExpression;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov
@@ -102,7 +102,7 @@ public class InspectAction extends WatchAction implements IWatchExpressionListen
 	 */
 	protected void displayResult(IWatchExpressionResult result)
 	{
-		DebugPlugin.getDefault().getExpressionManager().addExpression(new JSInspectExpression(result));
+		DebugPlugin.getDefault().getExpressionManager().addExpression(JSDebugModel.createInspectExpression(result));
 		showExpressionsView();
 	}
 }

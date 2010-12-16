@@ -62,9 +62,9 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.aptana.core.resources.IUniformResourceMarker;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov

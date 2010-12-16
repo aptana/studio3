@@ -52,7 +52,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSStackFrame;
+import com.aptana.js.debug.core.model.IJSStackFrame;
 
 /**
  * @author Max Stepanov

@@ -61,8 +61,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSDebugTarget;
-import com.aptana.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.debug.ui.DebugUiPlugin;
 
 /**

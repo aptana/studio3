@@ -45,9 +45,9 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.internal.ui.dialogs.HitCountDialog;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov

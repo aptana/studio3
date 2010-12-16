@@ -40,7 +40,7 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IValue;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov
@@ -223,42 +223,42 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#isLocal()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#isLocal()
 	 */
 	public boolean isLocal() throws DebugException {
 		return (flags & FLAGS_LOCAL) != 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#isException()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#isException()
 	 */
 	public boolean isException() throws DebugException {
 		return (flags & FLAGS_EXCEPTION) != 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#isArgument()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#isArgument()
 	 */
 	public boolean isArgument() throws DebugException {
 		return (flags & FLAGS_ARGUMENT) != 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#isConst()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#isConst()
 	 */
 	public boolean isConst() throws DebugException {
 		return (flags & FLAGS_CONST) != 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#isTopLevel()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#isTopLevel()
 	 */
 	public boolean isTopLevel() throws DebugException {
 		return (flags & FLAGS_TOPLEVEL) != 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSVariable#getFullName()
+	 * @see com.aptana.js.debug.core.model.IJSVariable#getFullName()
 	 */
 	public String getFullName() {
 		String fullname = getQualifier();

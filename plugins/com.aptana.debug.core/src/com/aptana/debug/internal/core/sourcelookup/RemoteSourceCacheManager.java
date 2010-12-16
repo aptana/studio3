@@ -43,7 +43,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugTarget;
 
-import com.aptana.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.debug.internal.core.IFileContentRetriever;
 
 /**

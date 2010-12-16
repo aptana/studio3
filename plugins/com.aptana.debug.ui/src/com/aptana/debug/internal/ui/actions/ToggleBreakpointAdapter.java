@@ -50,7 +50,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.resources.IUniformResource;
-import com.aptana.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov

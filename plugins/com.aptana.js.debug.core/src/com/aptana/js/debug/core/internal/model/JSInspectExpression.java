@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.internal.model;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.debug.core.DebugEvent;
@@ -41,18 +41,20 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IErrorReportingExpression;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IWatchExpressionResult;
+
+import com.aptana.js.debug.core.model.IJSInspectExpression;
 
 /**
  * @author Max Stepanov
  */
-public class JSInspectExpression extends PlatformObject implements IErrorReportingExpression, IDebugEventSetListener {
+public class JSInspectExpression extends PlatformObject implements IJSInspectExpression {
 
 	private IWatchExpressionResult fResult;
 	private String fExpression;
 	private IValue fValue;
+	private IDebugEventSetListener debugEventSetListener;
 
 	/**
 	 * JSInspectExpression
@@ -64,7 +66,7 @@ public class JSInspectExpression extends PlatformObject implements IErrorReporti
 		super();
 		fExpression = expression;
 		fValue = value;
-		DebugPlugin.getDefault().addDebugEventListener(this);
+		DebugPlugin.getDefault().addDebugEventListener(debugEventSetListener = new DebugEventSetListener());
 	}
 
 	/**
@@ -119,7 +121,7 @@ public class JSInspectExpression extends PlatformObject implements IErrorReporti
 	 * @see org.eclipse.debug.core.model.IExpression#dispose()
 	 */
 	public void dispose() {
-		DebugPlugin.getDefault().removeDebugEventListener(this);
+		DebugPlugin.getDefault().removeDebugEventListener(debugEventSetListener);
 	}
 
 	/**
@@ -134,18 +136,6 @@ public class JSInspectExpression extends PlatformObject implements IErrorReporti
 	 */
 	public ILaunch getLaunch() {
 		return getDebugTarget().getLaunch();
-	}
-
-	/**
-	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
-	 */
-	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; i++) {
-			DebugEvent event = events[i];
-			if (event.getKind() == DebugEvent.TERMINATE && event.getSource().equals(getDebugTarget())) {
-				DebugPlugin.getDefault().getExpressionManager().removeExpression(this);
-			}
-		}
 	}
 
 	/**
@@ -167,6 +157,22 @@ public class JSInspectExpression extends PlatformObject implements IErrorReporti
 			return new String[] { exception.getMessage() };
 		}
 		return new String[0];
+	}
+	
+	private class DebugEventSetListener implements IDebugEventSetListener {
+
+		/* (non-Javadoc)
+		 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
+		 */
+		public void handleDebugEvents(DebugEvent[] events) {
+			for (int i = 0; i < events.length; i++) {
+				DebugEvent event = events[i];
+				if (event.getKind() == DebugEvent.TERMINATE && event.getSource().equals(getDebugTarget())) {
+					DebugPlugin.getDefault().getExpressionManager().removeExpression(JSInspectExpression.this);
+				}
+			}
+		}
+		
 	}
 
 }

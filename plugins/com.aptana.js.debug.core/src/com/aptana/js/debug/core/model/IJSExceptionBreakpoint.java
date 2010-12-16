@@ -32,53 +32,21 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
-import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.model.IBreakpoint;
 
 /**
  * @author Max Stepanov
  */
-public interface IJSScriptElement extends IDebugElement {
+public interface IJSExceptionBreakpoint extends IBreakpoint {
+	
 	/**
-	 * getName
+	 * Returns exception type name
 	 * 
 	 * @return String
+	 * @throws CoreException
 	 */
-	String getName();
-
-	/**
-	 * getLocation
-	 * 
-	 * @return String
-	 */
-	String getLocation();
-
-	/**
-	 * getParent
-	 * 
-	 * @return IJSScriptElement
-	 */
-	IJSScriptElement getParent();
-
-	/**
-	 * getChildren
-	 * 
-	 * @return IJSScriptElement[]
-	 */
-	IJSScriptElement[] getChildren();
-
-	/**
-	 * getBaseLine
-	 * 
-	 * @return int
-	 */
-	int getBaseLine();
-
-	/**
-	 * getLineExtent
-	 * 
-	 * @return int
-	 */
-	int getLineExtent();
+	String getExceptionTypeName() throws CoreException;
 }

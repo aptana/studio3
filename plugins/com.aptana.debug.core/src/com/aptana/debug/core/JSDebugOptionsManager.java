@@ -51,8 +51,8 @@ import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 
 import com.aptana.core.resources.IUniformResourceMarker;
-import com.aptana.debug.core.model.IJSDebugTarget;
-import com.aptana.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov

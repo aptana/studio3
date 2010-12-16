@@ -49,7 +49,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import com.aptana.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
 

@@ -42,7 +42,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
-import com.aptana.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
 
 /**
  * @author Max Stepanov

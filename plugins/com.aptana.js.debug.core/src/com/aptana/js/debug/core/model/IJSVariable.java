@@ -32,29 +32,60 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
 
 /**
  * @author Max Stepanov
  */
-public interface IJSStackFrame extends IStackFrame {
+public interface IJSVariable extends IVariable {
+	
 	/**
-	 * getSourceFileName
+	 * Returns if this variable is a constant
 	 * 
-	 * @return String
-	 */
-	String getSourceFileName();
-
-	/**
-	 * findVariable
-	 * 
-	 * @param variableName
-	 * @return IVariable
+	 * @return boolean
 	 * @throws DebugException
 	 */
-	IVariable findVariable(String variableName) throws DebugException;
+	boolean isConst() throws DebugException;
+
+	/**
+	 * Returns if this variable is a local variable
+	 * 
+	 * @return boolean
+	 * @throws DebugException
+	 */
+	boolean isLocal() throws DebugException;
+
+	/**
+	 * Returns if this variable is a function argument
+	 * 
+	 * @return boolean
+	 * @throws DebugException
+	 */
+	boolean isArgument() throws DebugException;
+
+	/**
+	 * Returns if this variable is an exception caught
+	 * 
+	 * @return boolean
+	 * @throws DebugException
+	 */
+	boolean isException() throws DebugException;
+
+	/**
+	 * Returns if this variable is in a global scope
+	 * 
+	 * @return boolean
+	 * @throws DebugException
+	 */
+	boolean isTopLevel() throws DebugException;
+
+	/**
+	 * Returns full variable name
+	 * 
+	 * @return
+	 */
+	String getFullName();
 }

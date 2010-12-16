@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model.provisional;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IWatchpoint;

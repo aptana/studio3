@@ -32,20 +32,30 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IVariable;
 
 /**
  * @author Max Stepanov
  */
-public interface IJSExceptionBreakpoint extends IBreakpoint {
+public interface IJSStackFrame extends IStackFrame {
+	
 	/**
-	 * getExceptionTypeName
+	 * Source location for this stack frame
 	 * 
 	 * @return String
-	 * @throws CoreException
 	 */
-	String getExceptionTypeName() throws CoreException;
+	String getSourceFileName();
+
+	/**
+	 * Find a variable by name in this stack frame
+	 * 
+	 * @param variableName
+	 * @return IVariable
+	 * @throws DebugException
+	 */
+	IVariable findVariable(String variableName) throws DebugException;
 }

@@ -39,7 +39,7 @@ import java.util.List;
 
 import org.eclipse.debug.core.model.IDebugTarget;
 
-import com.aptana.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSScriptElement;
 
 /**
  * @author Max Stepanov
@@ -81,21 +81,21 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getName()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getLocation()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLocation()
 	 */
 	public String getLocation() {
 		return getParent().getLocation();
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getChildren()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getChildren()
 	 */
 	public IJSScriptElement[] getChildren() {
 		if (children.size() > 0) {
@@ -105,21 +105,21 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getParent()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getParent()
 	 */
 	public IJSScriptElement getParent() {
 		return parent;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getBaseLine()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getBaseLine()
 	 */
 	public int getBaseLine() {
 		return baseLine;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getLineExtent()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLineExtent()
 	 */
 	public int getLineExtent() {
 		return lineExtent;

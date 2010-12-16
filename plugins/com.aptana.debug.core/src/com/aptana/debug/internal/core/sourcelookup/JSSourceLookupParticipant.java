@@ -38,9 +38,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 
-import com.aptana.debug.core.model.IJSScriptElement;
-import com.aptana.debug.core.model.IJSStackFrame;
-import com.aptana.debug.core.model.ISourceLink;
+import com.aptana.js.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSStackFrame;
+import com.aptana.js.debug.core.model.ISourceLink;
 import com.aptana.debug.internal.core.IFileContentRetriever;
 
 /**

@@ -40,8 +40,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.aptana.debug.core.model.JSDebugModel;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
+import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.ui.dialogs.InputURLDialog;
 
 /**

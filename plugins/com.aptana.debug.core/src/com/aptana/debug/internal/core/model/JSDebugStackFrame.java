@@ -43,7 +43,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 
-import com.aptana.debug.core.model.IJSStackFrame;
+import com.aptana.js.debug.core.model.IJSStackFrame;
 
 /**
  * @author Max Stepanov
@@ -308,7 +308,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSStackFrame#getSourceFileName()
+	 * @see com.aptana.js.debug.core.model.IJSStackFrame#getSourceFileName()
 	 */
 	public String getSourceFileName() {
 		return sourceFile;
@@ -353,7 +353,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSStackFrame#findVariable(java.lang.String)
+	 * @see com.aptana.js.debug.core.model.IJSStackFrame#findVariable(java.lang.String)
 	 */
 	public IVariable findVariable(String variableName) throws DebugException {
 		IVariable[] vars = getVariables();

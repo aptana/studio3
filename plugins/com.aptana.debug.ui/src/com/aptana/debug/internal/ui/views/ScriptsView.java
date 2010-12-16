@@ -57,7 +57,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.internal.ui.JSDebugModelPresentation;
 import com.aptana.debug.internal.ui.actions.OpenScriptSourceAction;

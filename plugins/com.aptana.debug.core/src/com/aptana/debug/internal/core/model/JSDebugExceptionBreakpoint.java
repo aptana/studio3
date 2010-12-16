@@ -53,8 +53,8 @@ import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.debug.core.util.DebugUtil;
+import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 
 /**
  * @author Max Stepanov
@@ -189,7 +189,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSExceptionBreakpoint#getExceptionTypeName()
+	 * @see com.aptana.js.debug.core.model.IJSExceptionBreakpoint#getExceptionTypeName()
 	 */
 	public String getExceptionTypeName() throws CoreException {
 		IMarker m = getMarker();

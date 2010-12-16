@@ -53,8 +53,8 @@ import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.core.util.DebugUtil;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov
@@ -200,7 +200,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#getHitCount()
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#getHitCount()
 	 */
 	public int getHitCount() throws CoreException {
 		IMarker m = getMarker();
@@ -211,7 +211,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#setHitCount(int)
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#setHitCount(int)
 	 */
 	public void setHitCount(int count) throws CoreException {
 		IMarker m = getMarker();
@@ -221,7 +221,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#getCondition()
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#getCondition()
 	 */
 	public String getCondition() throws CoreException {
 		IMarker m = getMarker();
@@ -232,7 +232,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#setCondition(java.lang.String)
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#setCondition(java.lang.String)
 	 */
 	public void setCondition(String condition) throws CoreException {
 		IMarker m = getMarker();
@@ -242,7 +242,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#isConditionEnabled()
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#isConditionEnabled()
 	 */
 	public boolean isConditionEnabled() throws CoreException {
 		IMarker m = getMarker();
@@ -253,7 +253,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#setConditionEnabled(boolean)
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#setConditionEnabled(boolean)
 	 */
 	public void setConditionEnabled(boolean enabled) throws CoreException {
 		IMarker m = getMarker();
@@ -263,7 +263,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#isConditionSuspendOnTrue()
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#isConditionSuspendOnTrue()
 	 */
 	public boolean isConditionSuspendOnTrue() throws CoreException {
 		IMarker m = getMarker();
@@ -274,7 +274,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSLineBreakpoint#setConditionSuspendOnTrue(boolean)
+	 * @see com.aptana.js.debug.core.model.IJSLineBreakpoint#setConditionSuspendOnTrue(boolean)
 	 */
 	public void setConditionSuspendOnTrue(boolean suspendOnTrue) throws CoreException {
 		IMarker m = getMarker();

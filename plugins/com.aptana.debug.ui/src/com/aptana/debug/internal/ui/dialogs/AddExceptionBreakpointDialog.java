@@ -53,9 +53,9 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 
-import com.aptana.debug.core.model.IJSExceptionBreakpoint;
-import com.aptana.debug.core.model.JSDebugModel;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov

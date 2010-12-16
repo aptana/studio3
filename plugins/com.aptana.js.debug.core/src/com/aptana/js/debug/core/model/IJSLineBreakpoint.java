@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.ILineBreakpoint;
@@ -41,8 +41,9 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
  * @author Max Stepanov
  */
 public interface IJSLineBreakpoint extends ILineBreakpoint {
+	
 	/**
-	 * isRunToLine
+	 * Returns if this breakpoint is run-to-line temporary breakpoint
 	 * 
 	 * @return boolean
 	 * @throws CoreException

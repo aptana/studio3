@@ -37,7 +37,7 @@ package com.aptana.debug.internal.ui;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.IActionFilter;
 
-import com.aptana.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov

@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSImplicitBreakpoint;
+import com.aptana.js.debug.core.model.IJSImplicitBreakpoint;
 
 /**
  * @author Max Stepanov
@@ -83,35 +83,35 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSImplicitBreakpoint#getFileName()
+	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#getFileName()
 	 */
 	public String getFileName() throws CoreException {
 		return fileName;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSImplicitBreakpoint#isDebuggerKeyword()
+	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isDebuggerKeyword()
 	 */
 	public boolean isDebuggerKeyword() {
 		return (type == TYPE_DEBUGGER_KEYWORD);
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSImplicitBreakpoint#isFirstLine()
+	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isFirstLine()
 	 */
 	public boolean isFirstLine() {
 		return (type == TYPE_FIRST_LINE);
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSImplicitBreakpoint#isException()
+	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isException()
 	 */
 	public boolean isException() {
 		return (type == TYPE_EXCEPTION);
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSImplicitBreakpoint#isWatchpoint()
+	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isWatchpoint()
 	 */
 	public boolean isWatchpoint() {
 		return (type == TYPE_EXCEPTION);

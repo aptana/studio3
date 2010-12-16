@@ -67,19 +67,19 @@ import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSDebugTarget;
-import com.aptana.debug.core.model.IJSExceptionBreakpoint;
-import com.aptana.debug.core.model.IJSImplicitBreakpoint;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
-import com.aptana.debug.core.model.IJSScriptElement;
-import com.aptana.debug.core.model.IJSStackFrame;
-import com.aptana.debug.core.model.IJSVariable;
-import com.aptana.debug.core.model.IJSWatchpoint;
-import com.aptana.debug.core.model.ISourceLink;
-import com.aptana.debug.core.model.JSInspectExpression;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
+import com.aptana.js.debug.core.model.IJSImplicitBreakpoint;
+import com.aptana.js.debug.core.model.IJSInspectExpression;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
+import com.aptana.js.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSStackFrame;
+import com.aptana.js.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.ISourceLink;
+import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 
 /**
  * @author Max Stepanov
@@ -173,7 +173,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 					return getBreakpointImage(breakpoint);
 				}
 			}
-			else if (element instanceof JSInspectExpression)
+			else if (element instanceof IJSInspectExpression)
 			{
 				return DebugUIImages.get(DebugUIImages.IMG_OBJS_INSPECT);
 			}

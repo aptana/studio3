@@ -39,7 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter;
 
-import com.aptana.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov

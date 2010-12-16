@@ -39,7 +39,7 @@
       <objectContribution
             adaptable="true"
             id="com.aptana.debug.ui.jsBreakpointActions"
-            objectClass="com.aptana.debug.core.model.IJSLineBreakpoint">
+            objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint">
          <action
                class="com.aptana.debug.internal.ui.actions.BreakpointHitCountAction"
                enablesFor="1"
@@ -326,7 +326,7 @@
      <objectContribution
            adaptable="false"
            id="com.aptana.debug.ui.FilteredJSVariableActions"
-           objectClass="com.aptana.debug.core.model.IJSVariable">
+           objectClass="com.aptana.js.debug.core.model.IJSVariable">
         <action
               class="com.aptana.debug.internal.ui.actions.NewDetailFormatterAction"
               enablesFor="1"
@@ -351,7 +351,7 @@
      <objectContribution
            adaptable="false"
            id="com.aptana.debug.ui.FilteredJSVariableActions"
-           objectClass="com.aptana.debug.core.model.IJSVariable">
+           objectClass="com.aptana.js.debug.core.model.IJSVariable">
         <action
               class="com.aptana.debug.internal.ui.actions.RemoveDetailFormatterAction"
               enablesFor="1"
@@ -377,7 +377,7 @@
      <!-- objectContribution
            adaptable="false"
            id="com.aptana.debug.ui.FilteredJSVariableActions"
-           objectClass="com.aptana.debug.core.model.IJSVariable">
+           objectClass="com.aptana.js.debug.core.model.IJSVariable">
         <action
               class="com.aptana.debug.internal.ui.actions.NewWatchpointAction"
               enablesFor="1"
@@ -534,7 +534,7 @@
          <adapter type="java.util.Enumeration"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.model.IJSScriptElement"
+            adaptableType="com.aptana.js.debug.core.model.IJSScriptElement"
             class="com.aptana.debug.internal.ui.util.SourceDisplayAdapter$Factory">
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
@@ -542,7 +542,7 @@
          <adapter type="org.eclipse.debug.internal.ui.contexts.provisional.ISourceDisplayAdapter"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.model.ISourceLink"
+            adaptableType="com.aptana.js.debug.core.model.ISourceLink"
             class="com.aptana.debug.internal.ui.util.SourceDisplayAdapter$Factory">
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
@@ -575,7 +575,7 @@
         class="com.aptana.debug.internal.ui.propertypages.JSLineBreakpointPropertyPage"
         id="com.aptana.debug.ui.propertypages.common"
         name="%page.name.common"
-        objectClass="com.aptana.debug.core.model.IJSLineBreakpoint"/>
+        objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint"/>
    </extension>
    <extension
          point="org.eclipse.debug.core.statusHandlers">
@@ -667,7 +667,7 @@
                         value="true"/>
                   <or>
                      <objectClass name="org.eclipse.jface.text.ITextSelection"/>
-                     <objectClass name="com.aptana.debug.core.model.IJSVariable"/>
+                     <objectClass name="com.aptana.js.debug.core.model.IJSVariable"/>
                   </or>
                </and>
             </enablement>
@@ -690,7 +690,7 @@
                         value="true"/>
                   <or>
                      <objectClass name="org.eclipse.jface.text.ITextSelection"/>
-                     <objectClass name="com.aptana.debug.core.model.IJSVariable"/>
+                     <objectClass name="com.aptana.js.debug.core.model.IJSVariable"/>
                   </or>
                </and>
             </enablement>
@@ -854,12 +854,12 @@
          <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.model.IJSVariable"
+            adaptableType="com.aptana.js.debug.core.model.IJSVariable"
             class="com.aptana.debug.internal.ui.ActionFilterAdapterFactory">
          <adapter type="org.eclipse.ui.IActionFilter"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.model.IJSVariable"
+            adaptableType="com.aptana.js.debug.core.model.IJSVariable"
             class="com.aptana.debug.internal.ui.WatchExpressionAdapterFactory">
          <adapter type="org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter"/>
       </factory>

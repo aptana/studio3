@@ -41,9 +41,9 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.ui.IActionFilter;
 
 import com.aptana.debug.core.JSDetailFormattersManager;
-import com.aptana.debug.core.model.IJSVariable;
-import com.aptana.debug.core.model.JSDebugModel;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov

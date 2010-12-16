@@ -64,8 +64,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.debug.core.model.IJSScriptElement;
-import com.aptana.debug.core.model.ISourceLink;
+import com.aptana.js.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.ISourceLink;
 import com.aptana.debug.ui.DebugUiPlugin;
 
 /**

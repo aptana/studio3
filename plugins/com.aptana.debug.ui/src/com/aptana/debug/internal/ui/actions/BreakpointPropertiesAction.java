@@ -45,8 +45,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.PropertyDialogAction;
 
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov

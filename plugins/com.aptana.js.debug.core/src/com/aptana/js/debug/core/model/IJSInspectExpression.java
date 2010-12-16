@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,59 +32,15 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
 
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.model.IVariable;
+package com.aptana.js.debug.core.model;
+
+import org.eclipse.debug.core.model.IErrorReportingExpression;
 
 /**
  * @author Max Stepanov
+ *
  */
-public interface IJSVariable extends IVariable {
-	/**
-	 * isConst
-	 * 
-	 * @return boolean
-	 * @throws DebugException
-	 */
-	boolean isConst() throws DebugException;
+public interface IJSInspectExpression extends IErrorReportingExpression {
 
-	/**
-	 * isLocal
-	 * 
-	 * @return boolean
-	 * @throws DebugException
-	 */
-	boolean isLocal() throws DebugException;
-
-	/**
-	 * isArgument
-	 * 
-	 * @return boolean
-	 * @throws DebugException
-	 */
-	boolean isArgument() throws DebugException;
-
-	/**
-	 * isException
-	 * 
-	 * @return boolean
-	 * @throws DebugException
-	 */
-	boolean isException() throws DebugException;
-
-	/**
-	 * isTopLevel
-	 * 
-	 * @return boolean
-	 * @throws DebugException
-	 */
-	boolean isTopLevel() throws DebugException;
-
-	/**
-	 * Returns full variable name
-	 * 
-	 * @return
-	 */
-	String getFullName();
 }

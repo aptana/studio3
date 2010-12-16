@@ -32,42 +32,20 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.js.debug.core.model;
 
-package com.aptana.debug.internal.ui.actions;
-
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.IStructuredSelection;
-
-import com.aptana.debug.ui.DebugUiPlugin;
-import com.aptana.js.debug.core.model.IJSVariable;
-import com.aptana.js.debug.core.model.JSDebugModel;
+import org.eclipse.debug.core.model.IDebugElement;
 
 /**
  * @author Max Stepanov
- *
  */
-public class NewWatchpointAction extends ObjectActionDelegate {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+public interface ISourceLink extends IDebugElement {
+	
+	/**
+	 * Source location (path or URL)
+	 * 
+	 * @return String
 	 */
-	public void run(IAction action) {
-		IStructuredSelection selection = getCurrentSelection();
-		if (selection == null || selection.size() != 1) {
-			return;
-		}
-		Object element = selection.getFirstElement();
-		try {
-			if (element instanceof IJSVariable) {
-				JSDebugModel.createWatchpoint((IJSVariable) element);
-				refreshCurrentSelection();
-			}
-		}
-		catch (CoreException e) {
-			DebugUiPlugin.log(e);
-			return;
-		}
-	}
+	String getLocation();
 
 }

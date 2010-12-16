@@ -92,12 +92,12 @@ import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.ILaunchConfigurationConstants;
 import com.aptana.debug.core.JSDebugPlugin;
 import com.aptana.debug.core.JSDetailFormattersManager;
-import com.aptana.debug.core.model.IJSDebugTarget;
-import com.aptana.debug.core.model.IJSExceptionBreakpoint;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
-import com.aptana.debug.core.model.IJSScriptElement;
-import com.aptana.debug.core.model.IJSWatchpoint;
-import com.aptana.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
+import com.aptana.js.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 import com.aptana.debug.core.xhr.IXHRService;
 import com.aptana.debug.internal.core.DbgSourceURLStreamHandler;
 import com.aptana.debug.internal.core.IFileContentRetriever;
@@ -934,14 +934,14 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#isFilterConstructors()
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#isFilterConstructors()
 	 */
 	public boolean isFilterConstructors() {
 		return (stepFilterMask & FILTER_CONSTRUCTORS) > 0;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#setFilterConstructors(boolean)
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#setFilterConstructors(boolean)
 	 */
 	public void setFilterConstructors(boolean filter) {
 		if (filter) {
@@ -981,28 +981,28 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#getStepFilters()
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getStepFilters()
 	 */
 	public String[] getStepFilters() {
 		return stepFilters;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#setStepFilters(java.lang.String[])
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#setStepFilters(java.lang.String[])
 	 */
 	public void setStepFilters(String[] list) {
 		stepFilters = list;
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#getAttribute(java.lang.String)
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getAttribute(java.lang.String)
 	 */
 	public String getAttribute(String key) {
 		return getLaunch().getAttribute(key);
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#setAttribute(java.lang.String,
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#setAttribute(java.lang.String,
 	 *      java.lang.String)
 	 */
 	public void setAttribute(String key, String value) {
@@ -1433,7 +1433,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#computeValueDetails(org.eclipse.debug.core.model.IValue)
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#computeValueDetails(org.eclipse.debug.core.model.IValue)
 	 */
 	public String computeValueDetails(IValue value) throws DebugException {
 		if (!isSuspended()) {
@@ -1845,7 +1845,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSDebugTarget#getTopScriptElements()
+	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getTopScriptElements()
 	 */
 	public IJSScriptElement[] getTopScriptElements() {
 		return (IJSScriptElement[]) topScriptElements.values().toArray(new IJSScriptElement[topScriptElements.size()]);

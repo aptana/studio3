@@ -36,7 +36,7 @@ package com.aptana.debug.internal.core.model;
 
 import org.eclipse.debug.core.model.IDebugTarget;
 
-import com.aptana.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSScriptElement;
 
 /**
  * @author Max Stepanov
@@ -55,14 +55,14 @@ public class JSDebugTopScriptElement extends JSDebugScriptElement {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSScriptElement#getLocation()
+	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLocation()
 	 */
 	public String getLocation() {
 		return location;
 	}
 
 	/**
-	 * @see com.aptana.debug.internal.core.model.JSDebugScriptElement#setParent(com.aptana.debug.core.model.IJSScriptElement)
+	 * @see com.aptana.debug.internal.core.model.JSDebugScriptElement#setParent(com.aptana.js.debug.core.model.IJSScriptElement)
 	 */
 	protected void setParent(IJSScriptElement parent) {
 	}

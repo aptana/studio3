@@ -62,7 +62,7 @@ import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.debug.internal.ui.DebugUIImages;
 
 /**

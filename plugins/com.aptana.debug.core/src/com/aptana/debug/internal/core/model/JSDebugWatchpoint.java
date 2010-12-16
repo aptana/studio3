@@ -50,8 +50,8 @@ import org.eclipse.debug.core.model.IBreakpoint;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.IDebugConstants;
-import com.aptana.debug.core.model.IJSVariable;
-import com.aptana.debug.core.model.IJSWatchpoint;
+import com.aptana.js.debug.core.model.IJSVariable;
+import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 
 /**
  * @author Max Stepanov
@@ -156,7 +156,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.IJSWatchpoint#getVariableName()
+	 * @see com.aptana.js.debug.core.model.provisional.IJSWatchpoint#getVariableName()
 	 */
 	public String getVariableName() throws CoreException {
 		return ensureMarker().getAttribute(IDebugConstants.WATCHPOINT_VARIABLE_NAME, StringUtil.EMPTY);

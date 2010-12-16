@@ -41,9 +41,9 @@ import org.eclipse.jface.window.Window;
 
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.JSDetailFormattersManager;
-import com.aptana.debug.core.model.IJSVariable;
 import com.aptana.debug.internal.ui.dialogs.DetailFormatterDialog;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov

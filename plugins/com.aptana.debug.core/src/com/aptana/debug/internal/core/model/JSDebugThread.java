@@ -47,8 +47,8 @@ import org.eclipse.debug.core.model.IThread;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.debug.core.model.IJSLineBreakpoint;
 import com.aptana.debug.internal.core.Util;
+import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
  * @author Max Stepanov

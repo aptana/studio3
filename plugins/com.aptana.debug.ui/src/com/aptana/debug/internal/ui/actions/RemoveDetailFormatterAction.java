@@ -40,8 +40,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.JSDetailFormattersManager;
-import com.aptana.debug.core.model.IJSVariable;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSVariable;
 
 /**
  * @author Max Stepanov

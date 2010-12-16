@@ -47,8 +47,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.debug.core.model.JSInspectExpression;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.model.IJSInspectExpression;
+import com.aptana.js.debug.core.model.JSDebugModel;
 
 /**
  * @author Max Stepanov
@@ -61,7 +62,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	private static final String ACTION_DEFININIITION_ID = "com.aptana.debug.ui.commands.Inspect"; //$NON-NLS-1$
 
 	private ITextViewer viewer;
-	private JSInspectExpression expression;
+	private IJSInspectExpression expression;
 
 	/**
 	 * see org.eclipse.jface.text.information.IInformationProvider#getInformation(org.eclipse.jface.text.ITextViewer,
@@ -92,7 +93,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 	 */
 	protected void showPopup(final IWatchExpressionResult result)
 	{
-		expression = new JSInspectExpression(result);
+		expression = JSDebugModel.createInspectExpression(result);
 		Window displayPopup = new InspectPopupDialog(getShell(), getPopupAnchor(viewer), ACTION_DEFININIITION_ID, expression);
 		if (displayPopup != null)
 		{

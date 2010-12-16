@@ -32,49 +32,54 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.model.ILineBreakpoint;
+import org.eclipse.debug.core.model.IDebugElement;
 
 /**
  * @author Max Stepanov
  */
-public interface IJSImplicitBreakpoint extends ILineBreakpoint {
+public interface IJSScriptElement extends IDebugElement {
+	
 	/**
-	 * getFileName
+	 * Function name
 	 * 
 	 * @return String
-	 * @throws CoreException
 	 */
-	String getFileName() throws CoreException;
+	String getName();
 
 	/**
-	 * isDebuggerKeyword
+	 * Function location (path or URL)
 	 * 
-	 * @return boolean
+	 * @return String
 	 */
-	boolean isDebuggerKeyword();
+	String getLocation();
 
 	/**
-	 * isFirstLine
+	 * Parent function
 	 * 
-	 * @return boolean
+	 * @return IJSScriptElement
 	 */
-	boolean isFirstLine();
+	IJSScriptElement getParent();
 
 	/**
-	 * isException
+	 * Nested functions
 	 * 
-	 * @return boolean
+	 * @return IJSScriptElement[]
 	 */
-	boolean isException();
+	IJSScriptElement[] getChildren();
 
 	/**
-	 * isWatchpoint
+	 * The first line of the function in source code
 	 * 
-	 * @return boolean
+	 * @return int
 	 */
-	boolean isWatchpoint();
+	int getBaseLine();
 
+	/**
+	 * Length of the function in lines
+	 * 
+	 * @return int
+	 */
+	int getLineExtent();
 }

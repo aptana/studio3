@@ -34,7 +34,7 @@
  */
 package com.aptana.debug.internal.core.model;
 
-import com.aptana.debug.core.model.ISourceLink;
+import com.aptana.js.debug.core.model.ISourceLink;
 
 /**
  * @author Max Stepanov
@@ -54,7 +54,7 @@ public class JSDebugSourceLink extends JSDebugElement implements ISourceLink {
 	}
 
 	/**
-	 * @see com.aptana.debug.core.model.ISourceLink#getLocation()
+	 * @see com.aptana.js.debug.core.model.ISourceLink#getLocation()
 	 */
 	public String getLocation() {
 		return location;

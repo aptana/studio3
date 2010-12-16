@@ -32,19 +32,50 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.model;
+package com.aptana.js.debug.core.model;
 
-import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.model.ILineBreakpoint;
 
 /**
  * @author Max Stepanov
  */
-public interface ISourceLink extends IDebugElement {
+public interface IJSImplicitBreakpoint extends ILineBreakpoint {
+	
 	/**
-	 * getLocation
+	 * Returns breakpoint location filename
 	 * 
 	 * @return String
+	 * @throws CoreException
 	 */
-	String getLocation();
+	String getFileName() throws CoreException;
+
+	/**
+	 * Returns if this breakpoint is a debugger keyword hard-coded breakpoint
+	 * 
+	 * @return boolean
+	 */
+	boolean isDebuggerKeyword();
+
+	/**
+	 * Returns if this breakpoint is a first-line stop breakpoint
+	 * 
+	 * @return boolean
+	 */
+	boolean isFirstLine();
+
+	/**
+	 * Returns if this breakpoint is a exception stop breakpoint
+	 * 
+	 * @return boolean
+	 */
+	boolean isException();
+
+	/**
+	 * Returns if this breakpoint is a watchpoint stop breakpoint
+	 * 
+	 * @return boolean
+	 */
+	boolean isWatchpoint();
 
 }

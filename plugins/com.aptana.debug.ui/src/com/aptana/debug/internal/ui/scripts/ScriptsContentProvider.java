@@ -37,8 +37,8 @@ package com.aptana.debug.internal.ui.scripts;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.aptana.debug.core.model.IJSDebugTarget;
-import com.aptana.debug.core.model.IJSScriptElement;
+import com.aptana.js.debug.core.model.IJSDebugTarget;
+import com.aptana.js.debug.core.model.IJSScriptElement;
 
 /**
  * @author Max Stepanov
