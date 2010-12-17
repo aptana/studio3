@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -42,8 +43,13 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		formatterId = codeFormatterId;
 	}
 
-	protected void formatterTest(String sourceFile, String resultFile) throws IOException
+	protected void formatterTest(String sourceFile, String fileType) throws IOException
 	{
+		String resultFile = FORMATTING_PREFIX + sourceFile;
+		String[] formattedFiles = getFiles(FORMATTING_FOLDER, fileType, true);
+
+		assertTrue(resultFile + "does not exist", Arrays.binarySearch(formattedFiles, resultFile) >= 0);
+
 		String source = getContent(sourceFile);
 		assertNotNull(sourceFile + " is null", source); //$NON-NLS-1$
 
@@ -72,17 +78,11 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	protected String getContent(String filename) throws IOException
 	{
 		filename = FORMATTING_FOLDER + "/" + filename; //$NON-NLS-1$
-		File file = new File(filename);
+		InputStream stream = FileLocator.openStream(Platform.getBundle(formatterId), Path.fromPortableString(filename),
+				false);
 
-		if (file.exists())
-		{
-			InputStream stream = FileLocator.openStream(Platform.getBundle(formatterId),
-					Path.fromPortableString(filename), false);
-
-			// Add back a newline character since IOUtil.read() removes the last newline char from the file
-			return IOUtil.read(stream) + "\n"; //$NON-NLS-1$
-		}
-		return null;
+		// Add back a newline character since IOUtil.read() removes the last newline char from the file
+		return IOUtil.read(stream) + "\n"; //$NON-NLS-1$
 	}
 
 	protected void generateFormattedFiles(String fileType) throws IOException
@@ -93,38 +93,36 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		FileWriter formattedStream;
 		String formattedPath;
 		String sourcePath;
-		File formattedFile;
 
-		String[] files = getFilesToFormat(FORMATTING_FOLDER, fileType);
+		String[] files = getFiles(FORMATTING_FOLDER, fileType, false);
+		String[] formattedFiles = getFiles(FORMATTING_FOLDER, fileType, true);
 
 		for (String file : files)
 		{
-			sourcePath = file;
-			formattedPath = FORMATTING_FOLDER + "/" + FORMATTING_PREFIX + file; //$NON-NLS-1$
-			if ((source = getContent(sourcePath)) != null)
+			// Don't overwrite the formatted file if it is already there
+			if (Arrays.binarySearch(formattedFiles, FORMATTING_PREFIX + file) < 0)
 			{
-				formattedFile = new File(formattedPath);
-				// Don't overwrite the formatted file if it is already there
-				if (!formattedFile.exists())
+				sourcePath = file;
+				formattedPath = FORMATTING_FOLDER + "/" + FORMATTING_PREFIX + file; //$NON-NLS-1$
+				source = getContent(sourcePath);
+				formattedStream = new FileWriter(new File(formattedPath));
+				TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
+				if (formattedTextEdit instanceof ReplaceEdit)
 				{
-					formattedStream = new FileWriter(formattedFile);
-					TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
-					if (formattedTextEdit instanceof ReplaceEdit)
-					{
-						formattedStream.write(((ReplaceEdit) formattedTextEdit).getText());
-					}
-					else if ((formattedTextEdit instanceof MultiTextEdit))
-					{
-						// write original content if the formatted text is same as original
-						formattedStream.write(source);
-					}
-					formattedStream.close();
+					formattedStream.write(((ReplaceEdit) formattedTextEdit).getText());
 				}
+				else if ((formattedTextEdit instanceof MultiTextEdit))
+				{
+					// write original content if the formatted text is same as original
+					formattedStream.write(source);
+				}
+				formattedStream.close();
 			}
+
 		}
 	}
 
-	protected String[] getFilesToFormat(String directory, String fileType)
+	protected String[] getFiles(String directory, String fileType, boolean grabOnlyFormattedFiles)
 	{
 		@SuppressWarnings("unchecked")
 		Enumeration<String> entryPaths = Platform.getBundle(formatterId).getEntryPaths(directory);
@@ -135,9 +133,24 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		{
 			path = entryPaths.nextElement();
 			path = path.replaceAll(FORMATTING_FOLDER + "[/\\\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			if (!path.startsWith(FORMATTING_PREFIX) && path.endsWith(fileType))
+
+			// Check for correct file type
+			if (path.endsWith(fileType))
 			{
-				filePaths.add(path);
+				if (grabOnlyFormattedFiles)
+				{
+					if (path.startsWith(FORMATTING_PREFIX))
+					{
+						filePaths.add(path);
+					}
+				}
+				else
+				{
+					if (!path.startsWith(FORMATTING_PREFIX))
+					{
+						filePaths.add(path);
+					}
+				}
 			}
 		}
 

@@ -62,11 +62,11 @@ public class FormattingTests extends AbstractFormatterTestCase
 
 	public void testFilesInFormattingFolder() throws Exception
 	{
-		String[] files = getFilesToFormat(FORMATTING_FOLDER, FILE_TYPE);
+		String[] files = getFiles(FORMATTING_FOLDER, FILE_TYPE, false);
 
 		for (String file : files)
 		{
-			formatterTest(file, FORMATTING_PREFIX + file);
+			formatterTest(file, FILE_TYPE);
 		}
 
 		// Tests that are not working are named without the .css extension
