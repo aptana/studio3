@@ -6,12 +6,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
@@ -52,6 +54,81 @@ public class BundleCacher
 	private static final String SCOPE_SELECTOR_TAG = "!scope"; //$NON-NLS-1$
 
 	private Yaml yaml;
+	private LoadCycleListener listener;
+
+	private class BundleCacheInvalidatingLoadCycleListener implements LoadCycleListener
+	{
+		public void scriptUnloaded(File script)
+		{
+			// if file has been deleted, delete the cache file!
+			if (!script.exists())
+			{
+				File bundleDir = getBundleDir(script);
+				File cacheFile = new File(bundleDir, CACHE_FILE);
+				cacheFile.delete();
+			}
+		}
+
+		public void scriptReloaded(File script)
+		{
+			// if file is newer than cache, delete the cache file!
+			File bundleDir = getBundleDir(script);
+			File cacheFile = new File(bundleDir, CACHE_FILE);
+
+			List<File> bundleFiles = new ArrayList<File>();
+			bundleFiles.add(script);
+			if (anyFilesNewer(cacheFile, bundleFiles, new NullProgressMonitor()))
+			{
+				cacheFile.delete();
+			}
+		}
+
+		public void scriptLoaded(File script)
+		{
+			// if file is newer than cache, delete the cache file!
+			File bundleDir = getBundleDir(script);
+			File cacheFile = new File(bundleDir, CACHE_FILE);
+
+			List<File> bundleFiles = new ArrayList<File>();
+			bundleFiles.add(script);
+			if (anyFilesNewer(cacheFile, bundleFiles, new NullProgressMonitor()))
+			{
+				cacheFile.delete();
+			}
+		}
+	}
+
+	public BundleCacher()
+	{
+		listener = new BundleCacheInvalidatingLoadCycleListener();
+		BundleManager.getInstance().addLoadCycleListener(listener);
+	}
+
+	public File getBundleDir(File script)
+	{
+		File parent = script.getParentFile();
+		if (parent == null)
+		{
+			return null;
+		}
+		if (parent.isDirectory())
+		{
+			if (parent.getName().endsWith(".ruble")) //$NON-NLS-1$
+			{
+				return parent;
+			}
+		}
+		return getBundleDir(parent);
+	}
+
+	public void dispose()
+	{
+		if (listener != null)
+		{
+			BundleManager.getInstance().removeLoadCycleListener(listener);
+		}
+		listener = null;
+	}
 
 	public void cache(File bundleDirectory, IProgressMonitor monitor)
 	{
