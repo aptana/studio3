@@ -64,6 +64,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.scope.IScopeSelector;
@@ -665,7 +666,7 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptReloaded(script);
+				listener.scriptUnloaded(script);
 			}
 		}
 	}
@@ -1706,21 +1707,21 @@ public class BundleManager
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
-		// if (EclipseUtil.isTesting() == false && Platform.isRunning())
-		// {
-		// job.setRule(new SerialPerObjectRule(counter++));
-		//
-		// if (counter >= Runtime.getRuntime().availableProcessors())
-		// {
-		// counter = 0;
-		// }
-		//
-		// job.schedule();
-		// }
-		// else
-		// {
-		job.run(new NullProgressMonitor());
-		// }
+		if (EclipseUtil.isTesting() == false && Platform.isRunning())
+		{
+			job.setRule(new SerialPerObjectRule(counter++));
+
+			if (counter >= Runtime.getRuntime().availableProcessors())
+			{
+				counter = 0;
+			}
+
+			job.schedule();
+		}
+		else
+		{
+			job.run(new NullProgressMonitor());
+		}
 	}
 
 	/**
