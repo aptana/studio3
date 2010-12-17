@@ -52,26 +52,27 @@ public class BundleCacher
 
 	private static final String REGEXP_TAG = "!regexp"; //$NON-NLS-1$
 	private static final String SCOPE_SELECTOR_TAG = "!scope"; //$NON-NLS-1$
+	private static final String ENVIRONMENT_TAG = "!environment"; //$NON-NLS-1$
+	private static final String COMMAND_TAG = "!command"; //$NON-NLS-1$
 
-	private Yaml yaml;
 	private LoadCycleListener listener;
 
 	private class BundleCacheInvalidatingLoadCycleListener implements LoadCycleListener
 	{
 		public void scriptUnloaded(File script)
 		{
-			// if file has been deleted, delete the cache file!
+			// if file has been deleted, update the cache!
 			if (!script.exists())
 			{
 				File bundleDir = getBundleDir(script);
-				File cacheFile = new File(bundleDir, CACHE_FILE);
-				cacheFile.delete();
+				// Update the cache
+				cache(bundleDir, new NullProgressMonitor());
 			}
 		}
 
 		public void scriptReloaded(File script)
 		{
-			// if file is newer than cache, delete the cache file!
+			// if file is newer than cache, update the cache!
 			File bundleDir = getBundleDir(script);
 			File cacheFile = new File(bundleDir, CACHE_FILE);
 
@@ -79,13 +80,14 @@ public class BundleCacher
 			bundleFiles.add(script);
 			if (anyFilesNewer(cacheFile, bundleFiles, new NullProgressMonitor()))
 			{
-				cacheFile.delete();
+				// Update the cache
+				cache(bundleDir, new NullProgressMonitor());
 			}
 		}
 
 		public void scriptLoaded(File script)
 		{
-			// if file is newer than cache, delete the cache file!
+			// if file is newer than cache, update the cache!
 			File bundleDir = getBundleDir(script);
 			File cacheFile = new File(bundleDir, CACHE_FILE);
 
@@ -93,7 +95,8 @@ public class BundleCacher
 			bundleFiles.add(script);
 			if (anyFilesNewer(cacheFile, bundleFiles, new NullProgressMonitor()))
 			{
-				cacheFile.delete();
+				// Update the cache
+				cache(bundleDir, new NullProgressMonitor());
 			}
 		}
 	}
@@ -139,20 +142,26 @@ public class BundleCacher
 		}
 		// grab the bundle model
 		BundleElement be = BundleManager.getInstance().getBundleFromPath(bundleDirectory);
+		cache(be);
+	}
+
+	protected boolean cache(BundleElement be)
+	{
 		if (be == null)
 		{
-			return;
+			return false;
 		}
 
 		// Now write the config file out...
 		FileWriter writer = null;
 		try
 		{
-			File configFile = new File(bundleDirectory, CACHE_FILE);
+			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
 			writer = new FileWriter(configFile);
 
 			Yaml yaml = createYAML();
 			yaml.dump(be, writer);
+			return true;
 		}
 		catch (IOException e)
 		{
@@ -172,6 +181,7 @@ public class BundleCacher
 				}
 			}
 		}
+		return false;
 	}
 
 	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor)
@@ -323,11 +333,7 @@ public class BundleCacher
 
 	private Yaml createYAML()
 	{
-		if (yaml == null)
-		{
-			yaml = new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
-		}
-		return yaml;
+		return new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
 	}
 
 	private class MyRepresenter extends Representer
@@ -336,6 +342,8 @@ public class BundleCacher
 		{
 			this.representers.put(RubyRegexp.class, new RepresentRubyRegexp());
 			this.representers.put(ScopeSelector.class, new RepresentScopeSelector());
+			this.addClassTag(LazyCommandElement.class, new Tag(COMMAND_TAG));
+			this.addClassTag(LazyEnvironmentElement.class, new Tag(ENVIRONMENT_TAG));
 		}
 
 		@Override
@@ -404,6 +412,8 @@ public class BundleCacher
 		{
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
+			this.yamlConstructors.put(new Tag(COMMAND_TAG), new ConstructCommandElement());
+			this.yamlConstructors.put(new Tag(ENVIRONMENT_TAG), new ConstructEnvironmentElement());
 			this.yamlConstructors.put(new Tag(BundleElement.class), new ConstructBundleElement());
 			this.yamlConstructors.put(new Tag(MenuElement.class), new ConstructMenuElement());
 			this.yamlConstructors.put(new Tag(SnippetElement.class), new ConstructSnippetElement());
@@ -491,98 +501,7 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(CommandElement.class);
-				CommandElement be = new CommandElement(getPath(node))
-				{
-					private CommandElement real;
-
-					@Override
-					public boolean isExecutable()
-					{
-						// HACK
-						return true;
-					}
-
-					@Override
-					public String getInvoke()
-					{
-						lazyLoad();
-						if (real == null)
-						{
-							return null;
-						}
-						return real.getInvoke();
-					}
-
-					@Override
-					public RubyProc getInvokeBlock()
-					{
-						lazyLoad();
-						if (real == null)
-						{
-							return null;
-						}
-						return real.getInvokeBlock();
-					}
-
-					@Override
-					public CommandResult execute(CommandContext context)
-					{
-						lazyLoad();
-						if (real == null)
-						{
-							return null;
-						}
-						return real.execute(context);
-					}
-
-					@Override
-					public Ruby getRuntime()
-					{
-						lazyLoad();
-						if (real == null)
-						{
-							return null;
-						}
-						return real.getRuntime();
-					}
-
-					@Override
-					public CommandContext createCommandContext()
-					{
-						lazyLoad();
-						return new CommandContext(real);
-					}
-
-					private synchronized void lazyLoad()
-					{
-						if (real == null)
-						{
-							BundleElement owning = getOwningBundle();
-							if (owning == null) // we haven't even been attached yet!
-							{
-								return;
-							}
-							// remove all elements that are declared in the same file, since they'll end up getting
-							// loaded below.
-							List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
-							for (AbstractElement element : elements)
-							{
-								if (element instanceof AbstractBundleElement)
-								{
-									AbstractBundleElement abe = (AbstractBundleElement) element;
-									owning.removeChild(abe);
-								}
-							}
-
-							// Now load up the file so it really loads into the BundleManager
-							BundleManager.getInstance().loadScript(new File(getPath()));
-
-							// Now for whatever code is holding a reference to this, redirect method calls to the
-							// real command
-							real = owning.getCommandByName(getDisplayName());
-						}
-					}
-				};
+				CommandElement be = new LazyCommandElement(getPath(node));
 				construct2ndStep(node, be);
 				return be;
 			}
@@ -626,51 +545,7 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(EnvironmentElement.class);
-				EnvironmentElement be = new EnvironmentElement(getPath(node))
-				{
-					private EnvironmentElement real;
-
-					@Override
-					public RubyProc getInvokeBlock()
-					{
-						lazyLoad();
-						return real.getInvokeBlock();
-					}
-
-					private synchronized void lazyLoad()
-					{
-						if (real == null)
-						{
-							BundleElement owning = getOwningBundle();
-							// remove all elements that are declared in the same file, since they'll end up getting
-							// loaded below.
-							List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
-							for (AbstractElement element : elements)
-							{
-								if (element instanceof AbstractBundleElement)
-								{
-									AbstractBundleElement abe = (AbstractBundleElement) element;
-									owning.removeChild(abe);
-								}
-							}
-
-							// Now load up the file so it really loads into the BundleManager
-							BundleManager.getInstance().loadScript(new File(getPath()));
-
-							// Now for whatever code is holding a reference to this, redirect method calls to the
-							// real command
-							List<EnvironmentElement> envs = owning.getEnvs();
-							for (EnvironmentElement env : envs)
-							{
-								if (env.getPath().equals(getPath()))
-								{
-									real = env;
-									break;
-								}
-							}
-						}
-					}
-				};
+				EnvironmentElement be = new LazyEnvironmentElement(getPath(node));
 				construct2ndStep(node, be);
 				return be;
 			}
@@ -706,6 +581,167 @@ public class BundleCacher
 				SmartTypingPairsElement be = new SmartTypingPairsElement(getPath(node));
 				construct2ndStep(node, be);
 				return be;
+			}
+		}
+	}
+
+	/**
+	 * Lazily loads the real command element from disk when we try to access the invoke string/block or try to execute
+	 * it, since that stuff doesn't get serialized.
+	 * 
+	 * @author cwilliams
+	 */
+	private class LazyCommandElement extends CommandElement
+	{
+		private CommandElement real;
+
+		public LazyCommandElement(String path)
+		{
+			super(path);
+		}
+
+		@Override
+		public boolean isExecutable()
+		{
+			// HACK
+			return true;
+		}
+
+		@Override
+		public String getInvoke()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvoke();
+		}
+
+		@Override
+		public RubyProc getInvokeBlock()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvokeBlock();
+		}
+
+		@Override
+		public CommandResult execute(CommandContext context)
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.execute(context);
+		}
+
+		@Override
+		public Ruby getRuntime()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getRuntime();
+		}
+
+		@Override
+		public CommandContext createCommandContext()
+		{
+			lazyLoad();
+			return new CommandContext(real);
+		}
+
+		private synchronized void lazyLoad()
+		{
+			if (real == null)
+			{
+				BundleElement owning = getOwningBundle();
+				if (owning == null) // we haven't even been attached yet!
+				{
+					return;
+				}
+				// remove all elements that are declared in the same file, since they'll end up getting
+				// loaded below.
+				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
+				for (AbstractElement element : elements)
+				{
+					if (element instanceof AbstractBundleElement)
+					{
+						AbstractBundleElement abe = (AbstractBundleElement) element;
+						owning.removeChild(abe);
+					}
+				}
+
+				// Now load up the file so it really loads into the BundleManager
+				BundleManager.getInstance().loadScript(new File(getPath()));
+
+				// Now for whatever code is holding a reference to this, redirect method calls to the
+				// real command
+				real = owning.getCommandByName(getDisplayName());
+			}
+		}
+	}
+
+	/**
+	 * Lazily loads the real environment element from disk when we try to access the invoke block, since that doesn't
+	 * get serialized.
+	 * 
+	 * @author cwilliams
+	 */
+	private class LazyEnvironmentElement extends EnvironmentElement
+	{
+		private EnvironmentElement real;
+
+		public LazyEnvironmentElement(String path)
+		{
+			super(path);
+		}
+
+		@Override
+		public RubyProc getInvokeBlock()
+		{
+			lazyLoad();
+			return real.getInvokeBlock();
+		}
+
+		private synchronized void lazyLoad()
+		{
+			if (real == null)
+			{
+				BundleElement owning = getOwningBundle();
+				// remove all elements that are declared in the same file, since they'll end up getting
+				// loaded below.
+				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
+				for (AbstractElement element : elements)
+				{
+					if (element instanceof AbstractBundleElement)
+					{
+						AbstractBundleElement abe = (AbstractBundleElement) element;
+						owning.removeChild(abe);
+					}
+				}
+
+				// Now load up the file so it really loads into the BundleManager
+				BundleManager.getInstance().loadScript(new File(getPath()));
+
+				// Now for whatever code is holding a reference to this, redirect method calls to the
+				// real command
+				List<EnvironmentElement> envs = owning.getEnvs();
+				for (EnvironmentElement env : envs)
+				{
+					if (env.getPath().equals(getPath()))
+					{
+						real = env;
+						break;
+					}
+				}
 			}
 		}
 	}
