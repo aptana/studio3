@@ -26,5 +26,13 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="com.aptana.parsing.parser">
+      <parser
+            class="com.aptana.editor.yaml.parsing.YAMLParser"
+            content-type="com.aptana.contenttype.yml"
+            language="text/yaml">
+      </parser>
+   </extension>
 
 </plugin>
