@@ -2,9 +2,10 @@ package com.aptana.editor.common.formatting;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
@@ -49,7 +50,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
 		String expectedResult = getContent(resultFile);
 		IDocument document = new org.eclipse.jface.text.Document(source);
-		
+
 		try
 		{
 			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
@@ -65,7 +66,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		{
 			assertNotNull("Could not format " + resultFile, formattedTextEdit); //$NON-NLS-1$
 		}
-		
+
 	}
 
 	protected String getContent(String filename) throws IOException
@@ -125,20 +126,22 @@ public abstract class AbstractFormatterTestCase extends TestCase
 
 	protected String[] getFilesToFormat(String directory, String fileType)
 	{
-		File formattingDirectory = new File(directory);
-		final String fileExtension = fileType;
-		FilenameFilter filter = new FilenameFilter()
+		@SuppressWarnings("unchecked")
+		Enumeration<String> entryPaths = Platform.getBundle(formatterId).getEntryPaths(directory);
+		ArrayList<String> filePaths = new ArrayList<String>();
+		String path;
+
+		while (entryPaths.hasMoreElements())
 		{
-			public boolean accept(File dir, String name)
+			path = entryPaths.nextElement();
+			path = path.replaceAll(FORMATTING_FOLDER + "[/\\\\]", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (!path.startsWith(FORMATTING_PREFIX) && path.endsWith(fileType))
 			{
-				if (name.contains(FORMATTING_PREFIX) || !name.endsWith(fileExtension))
-				{
-					return false;
-				}
-				return true;
+				filePaths.add(path);
 			}
-		};
-		return formattingDirectory.list(filter);
+		}
+
+		return (String[]) filePaths.toArray(new String[filePaths.size()]);
 	}
 
 	protected abstract boolean compareWithWhiteSpace(String original, String formattedText);

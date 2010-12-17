@@ -42,6 +42,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Utility functions for set-like operations on collections
+ */
 public class CollectionsUtil
 {
 	/**
@@ -59,24 +62,51 @@ public class CollectionsUtil
 		list.addAll(set);
 	}
 
-	public static <T> Collection<T> getNonOverlapping(Collection<T> coll1, Collection<T> coll2)
+	/**
+	 * Given two collections of elements of type <T>, return a collection with the items which
+	 * only appear in one collection or the other
+	 * 
+	 * @param <T> Type
+	 * @param collection1 Collection #1
+	 * @param collection2 Collection #2
+	 * @return Collection with items unique to each list
+	 */
+	public static <T> Collection<T> getNonOverlapping(Collection<T> collection1, Collection<T> collection2)
 	{
-		Collection<T> result = union(coll1, coll2);
-		result.removeAll(intersect(coll1, coll2));
+		Collection<T> result = union(collection1, collection2);
+		result.removeAll(intersect(collection1, collection2));
 		return result;
 	}
 
-	public static <T> Collection<T> intersect(Collection<T> coll1, Collection<T> coll2)
+	/**
+	 * Given two collections of elements of type <T>, return a collection with the items which
+	 * only appear in both lists
+	 * 
+	 * @param <T> Type
+	 * @param collection1 Collection #1
+	 * @param collection2 Collection #2
+	 * @return Collection with items common to both lists
+	 */
+	public static <T> Collection<T> intersect(Collection<T> collection1, Collection<T> collection2)
 	{
-		Set<T> intersection = new HashSet<T>(coll1);
-		intersection.retainAll(new HashSet<T>(coll2));
+		Set<T> intersection = new HashSet<T>(collection1);
+		intersection.retainAll(new HashSet<T>(collection2));
 		return intersection;
 	}
 
-	public static <T> Collection<T> union(Collection<T> coll1, Collection<T> coll2)
+	/**
+	 * Given two collections of elements of type <T>, return a collection containing the
+	 * items from both lists
+	 * 
+	 * @param <T> Type
+	 * @param collection1 Collection #1
+	 * @param collection2 Collection #2
+	 * @return Collection with items from both lists
+	 */
+	public static <T> Collection<T> union(Collection<T> collection1, Collection<T> collection2)
 	{
-		Set<T> union = new HashSet<T>(coll1);
-		union.addAll(new HashSet<T>(coll2));
+		Set<T> union = new HashSet<T>(collection1);
+		union.addAll(new HashSet<T>(collection2));
 		return new ArrayList<T>(union);
 	}
 
