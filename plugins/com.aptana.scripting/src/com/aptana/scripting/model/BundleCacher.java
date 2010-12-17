@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
 import org.jruby.RubyProc;
 import org.jruby.RubyRegexp;
@@ -47,6 +49,7 @@ public class BundleCacher
 	private static final String CACHE_FILE = "cache.yml"; //$NON-NLS-1$
 
 	private static final String REGEXP_TAG = "!regexp"; //$NON-NLS-1$
+	private static final String SCOPE_SELECTOR_TAG = "!scope"; //$NON-NLS-1$
 
 	private Yaml yaml;
 
@@ -94,82 +97,130 @@ public class BundleCacher
 		}
 	}
 
-	public BundleElement load(final File bundleDirectory, List<File> bundleFiles)
+	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor)
 	{
-		File cacheFile = new File(bundleDirectory, CACHE_FILE);
-		if (!cacheFile.exists())
-		{
-			return null;
-		}
-		// Compare lastMod versus all the bundleFiles.
-		long lastMod = cacheFile.lastModified();
-		for (File file : bundleFiles)
-		{
-			// TODO Just update the cache with the updated files/diff!
-			if (file.lastModified() > lastMod)
-			{
-				// One of the files is newer, don't load cache! This will reload everything from disk and rewrite the
-				// cache
-				ScriptingActivator.logInfo(file.getPath() + " is newer than cache file, invalidating cache");
-				return null;
-			}
-		}
-
-		// Load up the bundle contents from the cache
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		BundleElement be = null;
-		FileReader reader = null;
 		try
 		{
-			Yaml yaml = createYAML();
-			reader = new FileReader(cacheFile);
-			be = (BundleElement) yaml.load(reader);
-			// FIXME If a file is deleted, remove all the elements contributed from that path and rewrite the cache!
-			// (i.e. just update the diff!)
-			if (anyFileDeleted(be))
+			File cacheFile = new File(bundleDirectory, CACHE_FILE);
+			if (!cacheFile.exists())
 			{
-				// If any file is deleted, just ignore the cache, load it all up normally and then it'll rewrite a new
-				// cache.
 				return null;
 			}
-		}
-		catch (Exception e)
-		{
-			ScriptingActivator.logError(e.getMessage(), e);
-			ScriptingActivator.logInfo("Due to error loading YAML, bundle at " + bundleDirectory.getAbsolutePath()
-					+ " will not be loaded from cache");
+
+			// IF any file is newer, ignore the cache, it'll get rewritten
+			if (anyFilesNewer(cacheFile, bundleFiles, sub.newChild(10)))
+			{
+				return null;
+			}
+
+			// Load up the bundle contents from the cache
+			FileReader reader = null;
+			try
+			{
+				Yaml yaml = createYAML();
+				reader = new FileReader(cacheFile);
+				sub.subTask(MessageFormat.format("Loading cached version of bundle at {0}",
+						bundleDirectory.getAbsolutePath()));
+				be = (BundleElement) yaml.load(reader);
+				sub.worked(80);
+
+				// If any file has been deleted, ignore the cache, it'll get rewritten
+				if (anyFileDeleted(be, sub.newChild(10)))
+				{
+					return null;
+				}
+			}
+			catch (Exception e)
+			{
+				ScriptingActivator.logError(e.getMessage(), e);
+				ScriptingActivator.logInfo(MessageFormat.format(
+						"Due to error loading YAML, bundle at {0} will not be loaded from cache",
+						bundleDirectory.getAbsolutePath()));
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
+						reader.close();
+					}
+					catch (IOException e)
+					{
+						// ignore
+					}
+				}
+			}
 		}
 		finally
 		{
-			if (reader != null)
-			{
-				try
-				{
-					reader.close();
-				}
-				catch (IOException e)
-				{
-					// ignore
-				}
-			}
+			sub.done();
 		}
 		return be;
 	}
 
-	private boolean anyFileDeleted(BundleElement be)
+	private boolean anyFilesNewer(File cacheFile, List<File> bundleFiles, IProgressMonitor monitor)
 	{
-		for (AbstractBundleElement abe : be.getChildren())
+		SubMonitor sub = SubMonitor.convert(monitor, bundleFiles.size());
+		try
 		{
-			String path = abe.getPath();
-			if (!new File(path).exists())
+			// Compare lastMod versus all the bundleFiles.
+			long lastMod = cacheFile.lastModified();
+			for (File file : bundleFiles)
 			{
-				ScriptingActivator.logInfo(path + " doesn't exist, invalidating cache");
-				return true;
+				sub.subTask(MessageFormat.format("Checking timestamp of {0}", file.getAbsolutePath()));
+				// TODO Just update the cache with the updated files/diff!
+				if (file.lastModified() > lastMod)
+				{
+					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
+					// the
+					// cache
+					ScriptingActivator.logInfo(MessageFormat.format("{0} is newer than cache file, invalidating cache",
+							file.getPath()));
+					return true;
+				}
 			}
-			if (abe instanceof MenuElement)
+		}
+		finally
+		{
+			sub.done();
+		}
+		return false;
+	}
+
+	private boolean anyFileDeleted(BundleElement be, IProgressMonitor monitor)
+	{
+		// FIXME If a file is deleted, remove all the elements contributed from that path and rewrite the cache!
+		// (i.e. just update the diff!)
+		List<AbstractBundleElement> children = be.getChildren();
+		if (children == null)
+		{
+			return false;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, children.size());
+		try
+		{
+			for (AbstractBundleElement abe : be.getChildren())
 			{
-				MenuElement menu = (MenuElement) abe;
-				return anyFileDeleted(menu);
+				String path = abe.getPath();
+				if (!new File(path).exists())
+				{
+					ScriptingActivator.logInfo(MessageFormat.format("{0} doesn't exist, invalidating cache", path));
+					return true;
+				}
+				if (abe instanceof MenuElement)
+				{
+					MenuElement menu = (MenuElement) abe;
+					return anyFileDeleted(menu);
+				}
+				sub.worked(1);
 			}
+		}
+		finally
+		{
+			sub.done();
 		}
 		return false;
 	}
@@ -185,7 +236,7 @@ public class BundleCacher
 			String path = child.getPath();
 			if (!new File(path).exists())
 			{
-				ScriptingActivator.logInfo(path + " doesn't exist, invalidating cache");
+				ScriptingActivator.logInfo(MessageFormat.format("{0} doesn't exist, invalidating cache", path));
 				return true;
 			}
 			return anyFileDeleted(child);
@@ -264,16 +315,17 @@ public class BundleCacher
 			{
 				ScopeSelector dice = (ScopeSelector) data;
 				String value = dice.toString();
-				return representScalar(new Tag("!scope"), value);
+				return representScalar(new Tag(SCOPE_SELECTOR_TAG), value);
 			}
 		}
 	}
 
 	class RubyRegexpConstructor extends Constructor
 	{
+
 		public RubyRegexpConstructor()
 		{
-			this.yamlConstructors.put(new Tag("!scope"), new ConstructScopeSelector());
+			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(BundleElement.class), new ConstructBundleElement());
 			this.yamlConstructors.put(new Tag(MenuElement.class), new ConstructMenuElement());

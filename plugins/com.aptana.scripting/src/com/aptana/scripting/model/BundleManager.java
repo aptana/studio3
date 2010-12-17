@@ -103,7 +103,7 @@ public class BundleManager
 					BundleElement be = null;
 					if (useCache)
 					{
-						be = getCacher().load(bundleDirectory, bundleScripts);
+						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
 					}
 					if (be != null)
 					{
