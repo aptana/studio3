@@ -1,5 +1,7 @@
 package com.aptana.editor.yaml;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -50,6 +52,17 @@ public class YAMLPlugin extends AbstractUIPlugin
 	public static YAMLPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	public static Image getImage(String path)
+	{
+		Image image = getDefault().getImageRegistry().get(path);
+		if (image == null)
+		{
+			ImageDescriptor desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
+			getDefault().getImageRegistry().put(path, desc);
+		}
+		return getDefault().getImageRegistry().get(path);
 	}
 
 }

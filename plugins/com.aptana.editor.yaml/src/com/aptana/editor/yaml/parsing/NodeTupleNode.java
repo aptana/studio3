@@ -12,6 +12,7 @@ public class NodeTupleNode extends ParseNode
 	public NodeTupleNode(NodeTuple tuple)
 	{
 		super(IYAMLParserConstants.LANGUAGE);
+		setLocation(tuple.getKeyNode().getStartMark().getIndex(), tuple.getValueNode().getEndMark().getIndex() - 1);
 		this.tuple = tuple;
 		traverse();
 	}

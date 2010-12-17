@@ -12,6 +12,7 @@ public class ScalarParseNode extends ParseNode
 	public ScalarParseNode(ScalarNode node)
 	{
 		super(IYAMLParserConstants.LANGUAGE);
+		setLocation(node.getStartMark().getIndex(), node.getEndMark().getIndex() - 1);
 		this.node = node;
 	}
 

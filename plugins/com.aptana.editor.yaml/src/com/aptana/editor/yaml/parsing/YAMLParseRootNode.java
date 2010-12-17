@@ -17,8 +17,8 @@ public class YAMLParseRootNode extends ParseRootNode
 	public YAMLParseRootNode(Node yamlRoot)
 	{
 		// FIXME The start and end are busted! Need to determine the real offset!
-		super(IYAMLParserConstants.LANGUAGE, new Symbol[0], yamlRoot.getStartMark().getColumn(), yamlRoot.getEndMark()
-				.getColumn());
+		super(IYAMLParserConstants.LANGUAGE, new Symbol[0], yamlRoot.getStartMark().getIndex(), yamlRoot.getEndMark()
+				.getIndex());
 		traverse(yamlRoot);
 	}
 

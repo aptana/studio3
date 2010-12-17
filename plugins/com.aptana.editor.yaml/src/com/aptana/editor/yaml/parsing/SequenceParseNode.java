@@ -15,6 +15,7 @@ public class SequenceParseNode extends ParseNode
 	public SequenceParseNode(SequenceNode node)
 	{
 		super(IYAMLParserConstants.LANGUAGE);
+		setLocation(node.getStartMark().getIndex(), node.getEndMark().getIndex());
 		this.node = node;
 		traverse();
 	}

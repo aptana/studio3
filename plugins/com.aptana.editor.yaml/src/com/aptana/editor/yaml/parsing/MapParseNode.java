@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import com.aptana.parsing.ast.ParseNode;
 
@@ -15,6 +16,7 @@ public class MapParseNode extends ParseNode
 	public MapParseNode(MappingNode node)
 	{
 		super(IYAMLParserConstants.LANGUAGE);
+		setLocation(node.getStartMark().getIndex(), node.getEndMark().getIndex() - 1);
 		this.node = node;
 		traverse();
 	}
@@ -31,6 +33,11 @@ public class MapParseNode extends ParseNode
 	@Override
 	public String getText()
 	{
-		return node.getTag().getValue();
+		Tag tag = node.getTag();
+		if (tag.startsWith(Tag.PREFIX))
+		{
+			return tag.getClassName();
+		}
+		return tag.getValue();
 	}
 }
