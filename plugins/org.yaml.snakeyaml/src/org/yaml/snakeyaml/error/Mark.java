@@ -115,6 +115,11 @@ public final class Mark {
     public int getLine() {
         return line;
     }
+    
+    public int getIndex()
+    {
+    	return pointer;
+    }
 
     /**
      * starts with 0
