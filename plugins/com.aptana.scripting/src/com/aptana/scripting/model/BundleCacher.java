@@ -73,21 +73,16 @@ public class BundleCacher
 		public void scriptReloaded(File script)
 		{
 			// if file is newer than cache, update the cache!
-			File bundleDir = getBundleDir(script);
-			File cacheFile = new File(bundleDir, CACHE_FILE);
-
-			List<File> bundleFiles = new ArrayList<File>();
-			bundleFiles.add(script);
-			if (anyFilesNewer(cacheFile, bundleFiles, new NullProgressMonitor()))
-			{
-				// Update the cache
-				cache(bundleDir, new NullProgressMonitor());
-			}
+			updateCacheIfNecessary(script);
 		}
 
 		public void scriptLoaded(File script)
 		{
-			// if file is newer than cache, update the cache!
+			updateCacheIfNecessary(script);
+		}
+
+		private void updateCacheIfNecessary(File script)
+		{
 			File bundleDir = getBundleDir(script);
 			File cacheFile = new File(bundleDir, CACHE_FILE);
 
@@ -107,21 +102,9 @@ public class BundleCacher
 		BundleManager.getInstance().addLoadCycleListener(listener);
 	}
 
-	public File getBundleDir(File script)
+	protected File getBundleDir(File script)
 	{
-		File parent = script.getParentFile();
-		if (parent == null)
-		{
-			return null;
-		}
-		if (parent.isDirectory())
-		{
-			if (parent.getName().endsWith(".ruble")) //$NON-NLS-1$
-			{
-				return parent;
-			}
-		}
-		return getBundleDir(parent);
+		return BundleManager.getInstance().getBundleDirectory(script);
 	}
 
 	public void dispose()
@@ -208,7 +191,7 @@ public class BundleCacher
 			{
 				Yaml yaml = createYAML();
 				reader = new FileReader(cacheFile);
-				sub.subTask(MessageFormat.format("Loading cached version of bundle at {0}",
+				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
 				be = (BundleElement) yaml.load(reader);
 				sub.worked(80);
@@ -222,8 +205,7 @@ public class BundleCacher
 			catch (Exception e)
 			{
 				ScriptingActivator.logError(e.getMessage(), e);
-				ScriptingActivator.logInfo(MessageFormat.format(
-						"Due to error loading YAML, bundle at {0} will not be loaded from cache",
+				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_LoadingYAMLError,
 						bundleDirectory.getAbsolutePath()));
 			}
 			finally
@@ -257,14 +239,15 @@ public class BundleCacher
 			long lastMod = cacheFile.lastModified();
 			for (File file : bundleFiles)
 			{
-				sub.subTask(MessageFormat.format("Checking timestamp of {0}", file.getAbsolutePath()));
+				sub.subTask(MessageFormat.format(Messages.BundleCacher_ComparingTimestampSubTaskName,
+						file.getAbsolutePath()));
 				// TODO Just update the cache with the updated files/diff!
 				if (file.lastModified() > lastMod)
 				{
 					// One of the files is newer, don't load cache! This will reload everything from disk and rewrite
 					// the
 					// cache
-					ScriptingActivator.logInfo(MessageFormat.format("{0} is newer than cache file, invalidating cache",
+					ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_OutOfDateCacheMsg,
 							file.getPath()));
 					return true;
 				}
@@ -294,7 +277,8 @@ public class BundleCacher
 				String path = abe.getPath();
 				if (!new File(path).exists())
 				{
-					ScriptingActivator.logInfo(MessageFormat.format("{0} doesn't exist, invalidating cache", path));
+					ScriptingActivator.logInfo(MessageFormat.format(
+							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path));
 					return true;
 				}
 				if (abe instanceof MenuElement)
@@ -323,7 +307,8 @@ public class BundleCacher
 			String path = child.getPath();
 			if (!new File(path).exists())
 			{
-				ScriptingActivator.logInfo(MessageFormat.format("{0} doesn't exist, invalidating cache", path));
+				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg,
+						path));
 				return true;
 			}
 			return anyFileDeleted(child);
@@ -360,16 +345,14 @@ public class BundleCacher
 				Set<Property> toRemove = new HashSet<Property>();
 				for (Property prop : set)
 				{
-					if (prop.getName().equals("invokeBlock") || prop.getName().equals("runtime") //$NON-NLS-1$ //$NON-NLS-2$
-							|| prop.getName().equals("invoke")) //$NON-NLS-1$
+					if ("invokeBlock".equals(prop.getName()) || "runtime".equals(prop.getName()) //$NON-NLS-1$ //$NON-NLS-2$
+							|| "invoke".equals(prop.getName())) //$NON-NLS-1$
 					{
 						toRemove.add(prop);
 					}
 				}
-				for (Property prop : toRemove)
-				{
-					set.remove(prop);
-				}
+
+				set.removeAll(toRemove);
 			}
 			return set;
 		}
@@ -449,6 +432,8 @@ public class BundleCacher
 			}
 		}
 
+		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
+		// reduce duplication!
 		private abstract class AbstractBundleElementConstruct extends ConstructMapping
 		{
 			/**
@@ -460,23 +445,26 @@ public class BundleCacher
 			protected String getPath(Node node)
 			{
 				String path = null;
-				MappingNode map = (MappingNode) node;
-				List<NodeTuple> nodes = map.getValue();
-				for (NodeTuple tuple : nodes)
+				if (node instanceof MappingNode)
 				{
-					Node keyNode = tuple.getKeyNode();
-					if (keyNode instanceof ScalarNode)
+					MappingNode map = (MappingNode) node;
+					List<NodeTuple> nodes = map.getValue();
+					for (NodeTuple tuple : nodes)
 					{
-						ScalarNode scalar = (ScalarNode) keyNode;
-						String valueOfKey = scalar.getValue();
-						if ("path".equals(valueOfKey)) //$NON-NLS-1$
+						Node keyNode = tuple.getKeyNode();
+						if (keyNode instanceof ScalarNode)
 						{
-							Node valueNode = tuple.getValueNode();
-							if (valueNode instanceof ScalarNode)
+							ScalarNode scalar = (ScalarNode) keyNode;
+							String valueOfKey = scalar.getValue();
+							if ("path".equals(valueOfKey)) //$NON-NLS-1$
 							{
-								ScalarNode scalarValue = (ScalarNode) valueNode;
-								path = scalarValue.getValue();
-								break;
+								Node valueNode = tuple.getValueNode();
+								if (valueNode instanceof ScalarNode)
+								{
+									ScalarNode scalarValue = (ScalarNode) valueNode;
+									path = scalarValue.getValue();
+									break;
+								}
 							}
 						}
 					}
@@ -603,7 +591,7 @@ public class BundleCacher
 		@Override
 		public boolean isExecutable()
 		{
-			// HACK
+			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can tell better if this is executable on this os!
 			return true;
 		}
 

@@ -78,8 +78,27 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	/**
+	 * System property that holds the OS name
+	 */
+	private static final String OS_NAME = "os.name"; //$NON-NLS-1$
+	/**
+	 * OS name fragment to use to match against Linux
+	 */
+	private static final String OS_NAME_LINUX = "inux"; //$NON-NLS-1$
+	/**
+	 * OS name fragment to use to match against Macs
+	 */
+	private static final String OS_NAME_MAC = "mac"; //$NON-NLS-1$
+	
+	/**
+	 * System property to forcibly turn off caching.
+	 */
+	private static final String USE_BUNDLE_CACHE = "use.bundle.cache"; //$NON-NLS-1$
+
 	private class BundleLoadJob extends Job
 	{
+		
 		private File bundleDirectory;
 
 		BundleLoadJob(File bundleDirectory)
@@ -99,7 +118,7 @@ public class BundleManager
 			{
 				if (bundleScripts.size() > 0)
 				{
-					boolean useCache = Boolean.valueOf(System.getProperty("use.bundle.cache", Boolean.TRUE.toString()));
+					boolean useCache = Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
 
 					BundleElement be = null;
 					if (useCache)
@@ -219,7 +238,7 @@ public class BundleManager
 
 	private BundleCacher cacher;
 
-	protected BundleCacher getCacher()
+	protected synchronized BundleCacher getCacher()
 	{
 		if (cacher == null)
 		{
@@ -308,12 +327,12 @@ public class BundleManager
 				}
 				else
 				{
-					OS = System.getProperty("os.name");
-					if (OS.contains("mac"))
+					OS = System.getProperty(OS_NAME);
+					if (OS.contains(OS_NAME_MAC))
 					{
 						OS = Platform.OS_MACOSX;
 					}
-					else if (OS.contains("inux"))
+					else if (OS.contains(OS_NAME_LINUX))
 					{
 						OS = Platform.OS_LINUX;
 					}
@@ -1565,8 +1584,8 @@ public class BundleManager
 						// one and move on
 
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1; //$NON-NLS-1$
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1; //$NON-NLS-1$
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{

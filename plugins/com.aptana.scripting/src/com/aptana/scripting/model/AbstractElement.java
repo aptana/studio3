@@ -309,20 +309,20 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 			}
 		}
 	}
-	
+
 	public Map<String, Object> getCustomProperties()
 	{
-		return this._customProperties;
+		return new HashMap<String, Object>(this._customProperties);
 	}
 
 	public void setCustomProperties(Map<String, Object> props)
 	{
-		this._customProperties = new HashMap<String, Object>();
-		if (props != null)
+		synchronized (propertyLock)
 		{
-			for (Map.Entry<String, Object> p : props.entrySet())
+			this._customProperties = null;
+			if (props != null)
 			{
-				put(p.getKey(), p.getValue());
+				this._customProperties = new HashMap<String, Object>(props);
 			}
 		}
 	}
