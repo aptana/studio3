@@ -312,6 +312,10 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 
 	public Map<String, Object> getCustomProperties()
 	{
+		if (this._customProperties == null)
+		{
+			return null;
+		}
 		return new HashMap<String, Object>(this._customProperties);
 	}
 
