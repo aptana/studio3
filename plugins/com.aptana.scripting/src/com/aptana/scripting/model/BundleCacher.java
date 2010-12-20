@@ -262,6 +262,10 @@ public class BundleCacher
 
 	private boolean anyFileDeleted(BundleElement be, IProgressMonitor monitor)
 	{
+		if (be == null)
+		{
+			return false;
+		}
 		// FIXME If a file is deleted, remove all the elements contributed from that path and rewrite the cache!
 		// (i.e. just update the diff!)
 		List<AbstractBundleElement> children = be.getChildren();
