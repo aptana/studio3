@@ -188,7 +188,7 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 
 		return null;
 	}
-
+	
 	/**
 	 * format
 	 * 
@@ -266,4 +266,5 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 	{
 		return getInt(IPreferenceConstants.FORMATTER_TAB_SIZE);
 	}
+
 }

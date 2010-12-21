@@ -53,13 +53,6 @@ public interface IScriptFormatter
 	 */
 	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection, IFormattingContext context) throws FormatterException;
 
-	/**
-	 * Set a flag on this formatter to indicate that it will be running as a slave formatter by the multi-pass
-	 * formatter.
-	 * 
-	 * @param isSlave
-	 * @see #isSlave()
-	 */
 	void setIsSlave(boolean isSlave);
 
 	/**

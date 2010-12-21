@@ -139,14 +139,13 @@ public class FileService
 					{
 						listener.parseFinished();
 					}
-
-					fValidationManager.validate(source, fLanguage);
 				}
 				catch (Exception e)
 				{
 					// not logging the parsing error here since the source could be in an intermediate state of being
 					// edited by the user
 				}
+				fValidationManager.validate(source, fLanguage);
 			}
 		}
 	}

@@ -34,6 +34,7 @@
  */
 package com.aptana.index.core.ui.handlers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +43,15 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
-
-import com.aptana.index.core.IndexManager;
-import com.aptana.index.core.IndexProjectJob;
 
 public class RebuildHandler extends AbstractHandler
 {
@@ -67,15 +71,26 @@ public class RebuildHandler extends AbstractHandler
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		IndexManager manager = IndexManager.getInstance();
-
-		for (IProject p : this._projects)
+		for (final IProject p : this._projects)
 		{
-			// remove project index
-			manager.removeIndex(p.getLocationURI());
+			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName()))
+			{
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					try
+					{
+						p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+					}
+					catch (CoreException e)
+					{
+						return e.getStatus();
+					}
+					return Status.OK_STATUS;
+				}
 
-			// and then re-build it
-			new IndexProjectJob(p).schedule();
+			};
+			job.schedule();
 		}
 
 		return null;

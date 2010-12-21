@@ -54,7 +54,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.editor.common.contentassist.InformationControl;
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.theme.ColorManager;
 import com.aptana.theme.Theme;
@@ -103,7 +103,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		}
 		catch (BadLocationException e)
 		{
-			Activator.logError(e.getMessage(), e);
+			CSSPlugin.logError(e.getMessage(), e);
 		}
 		return new Region(offset, 0);
 	}

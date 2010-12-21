@@ -45,7 +45,8 @@ public enum TriggerType
 {
 	UNDEFINED("undefined"), // $NON-NLS-1$
 	PREFIX("prefix"), // $NON-NLS-1$
-	FILE_WATCHER("file_watcher"); // $NON-NLS-1$
+	FILE_WATCHER("file_watcher"), // $NON-NLS-1$
+	EXECUTION_LISTENER("execution_listener"); // $NON-NLS-1$
 
 	private static Map<String, TriggerType> NAME_MAP;
 	private String _name;

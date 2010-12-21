@@ -63,7 +63,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (MalformedURLException e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 	}
 
@@ -94,7 +94,7 @@ public class ViewReleaseNotesCommandHandler extends AbstractHandler
 		}
 		catch (PartInitException e)
 		{
-			UIPlugin.logError(e.getLocalizedMessage(), e);
+			UIPlugin.log(e);
 		}
 
 		return null;

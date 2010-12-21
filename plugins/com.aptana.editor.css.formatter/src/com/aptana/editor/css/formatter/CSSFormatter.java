@@ -113,7 +113,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 				final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 				final FormatterDocument formatterDocument = createFormatterDocument(source, offset);
 				IFormatterContainerNode root = builder.build(parseResult, formatterDocument);
-				new CSSFormatterNodeRewriter(parseResult).rewrite(root);
+				new CSSFormatterNodeRewriter(parseResult, formatterDocument).rewrite(root);
 				IFormatterContext context = new CSSFormatterContext(0);
 				FormatterIndentDetector detector = new FormatterIndentDetector(offset);
 				try
@@ -174,9 +174,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -241,7 +241,7 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		final CSSFormatterNodeBuilder builder = new CSSFormatterNodeBuilder();
 		final FormatterDocument document = createFormatterDocument(input, offset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
-		new CSSFormatterNodeRewriter(parseResult).rewrite(root);
+		new CSSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new CSSFormatterContext(indentationLevel);
 		FormatterWriter writer = new FormatterWriter(document, lineSeparator, createIndentGenerator());
 		writer.setWrapLength(getInt(CSSFormatterConstants.WRAP_COMMENTS_LENGTH));

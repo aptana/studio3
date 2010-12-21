@@ -39,7 +39,7 @@ import java.text.MessageFormat;
 import org.w3c.css.properties.css1.CssProperty;
 import org.w3c.css.util.Utf8Properties;
 
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 
 /**
  * Aptana CSS inheritance properties.
@@ -61,7 +61,7 @@ public class AptanaCSSInheritanceProperties
 		}
 		catch (Exception e)
 		{
-			Activator.logError(
+			CSSPlugin.logError(
 					MessageFormat.format(Messages.AptanaCSSInheritanceProperties_ERR_FailToLoad, PROPERTIES_FILE), e);
 		}
 	}

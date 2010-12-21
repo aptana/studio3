@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.webserver.ui.preferences.ServersPreferencePage"
+            id="com.aptana.webserver.preferences.servers"
+            name="%page.servers.name">
+      </page>
+      <page
+            category="com.aptana.webserver.preferences.servers"
+            class="com.aptana.webserver.ui.preferences.LocalWebServerPreferencePage"
+            id="com.aptana.webserver.preferences.servers.local"
+            name="%page.servers.local.name">
+      </page>
+   </extension>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.webserver.ui.internal.SimpleWebServerPropertyDialog$Provider"
+            id="com.aptana.webserver.dialogs.simpleServer"
+            objectClass="com.aptana.webserver.core.SimpleWebServerConfiguration">
+      </dialog>
+   </extension>
+   <extension
+         point="com.aptana.ui.imageAssociations">
+      <image
+            icon="icons/obj16/server.png"
+            id="com.aptana.preview.server.simple">
+      </image>
+   </extension>
+
+</plugin>

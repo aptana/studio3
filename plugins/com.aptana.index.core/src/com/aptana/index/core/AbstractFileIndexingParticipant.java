@@ -2,6 +2,7 @@ package com.aptana.index.core;
 
 import java.io.File;
 import java.net.URI;
+import java.text.MessageFormat;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -36,7 +37,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 	}
 
@@ -88,7 +89,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 					}
 					catch (CoreException e)
 					{
-						IndexActivator.logError(e);
+						IndexPlugin.logError(e);
 					}
 				}
 			}
@@ -99,7 +100,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 	}
 
@@ -115,4 +116,16 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	{
 		index.addEntry(category, word, file.toURI());
 	}
+	
+	/**
+	 * Returns a display string for use when indexing files
+	 * @param index
+	 * @param file
+	 * @return
+	 */
+	protected String getIndexingMessage(Index index, IFileStore file)
+	{
+		return MessageFormat.format("Indexing {0}", index.getRelativeDocumentPath(file.toURI()).toString());
+	}
+
 }

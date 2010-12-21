@@ -34,12 +34,16 @@
  */
 package com.aptana.core.tests;
 
-import com.aptana.core.util.CollectionsUtilTest;
-import com.aptana.core.util.IOUtilTest;
-import com.aptana.core.util.StringUtilTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import com.aptana.core.util.CollectionsUtilTest;
+import com.aptana.core.util.EclipseUtilTest;
+import com.aptana.core.util.FirefoxUtilTest;
+import com.aptana.core.util.IOUtilTest;
+import com.aptana.core.util.ResourceUtilTest;
+import com.aptana.core.util.StringUtilTest;
+import com.aptana.core.util.VersionUtilTest;
 
 public class AllTests
 {
@@ -48,9 +52,13 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("Test for com.aptana.core.util.tests");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(StringUtilTest.class);
-		suite.addTestSuite(IOUtilTest.class);
 		suite.addTestSuite(CollectionsUtilTest.class);
+		suite.addTestSuite(EclipseUtilTest.class);
+		suite.addTestSuite(FirefoxUtilTest.class);
+		suite.addTestSuite(IOUtilTest.class);
+		suite.addTestSuite(ResourceUtilTest.class);
+		suite.addTestSuite(StringUtilTest.class);
+		suite.addTestSuite(VersionUtilTest.class);
 		//$JUnit-END$
 		return suite;
 	}

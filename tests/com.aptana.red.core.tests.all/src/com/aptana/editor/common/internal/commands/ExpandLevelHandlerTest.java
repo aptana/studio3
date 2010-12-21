@@ -86,7 +86,7 @@ public class ExpandLevelHandlerTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		Class.forName("com.aptana.editor.html.Activator");
+		Class.forName("com.aptana.editor.html.HTMLPlugin");
 		project = createProject();
 
 		// Create and open an HTML file

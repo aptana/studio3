@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.editor.css;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.editor.css.Activator
+Bundle-Activator: com.aptana.editor.css.CSSPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -20,8 +20,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.ide,
  com.aptana.scripting,
- com.aptana.libraries,
- com.aptana.ui
+ com.aptana.ui,
+ org.mortbay.jetty.util,
+ org.w3c.css
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin
@@ -33,4 +34,4 @@ Export-Package: com.aptana.editor.css,
  com.aptana.editor.css.parsing.ast,
  com.aptana.editor.css.text
 Eclipse-ExtensibleAPI: true
-Eclipse-RegisterBuddy: com.aptana.libraries
+Eclipse-RegisterBuddy: org.w3c.css

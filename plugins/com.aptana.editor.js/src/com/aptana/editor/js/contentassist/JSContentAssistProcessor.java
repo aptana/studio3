@@ -58,10 +58,9 @@ import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -83,38 +82,8 @@ import com.aptana.parsing.lexer.Range;
 
 public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	private static final Image JS_FUNCTION = Activator.getImage("/icons/js_function.png"); //$NON-NLS-1$
-	private static final Image JS_PROPERTY = Activator.getImage("/icons/js_property.png"); //$NON-NLS-1$
-
-	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.SINCE, //
-		ContentSelector.TYPES, //
-		ContentSelector.USER_AGENTS //
-		);
-	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of(ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.DOCUMENTS, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.TYPES //
-		);
-	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of(ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.DOCUMENTS, //
-		ContentSelector.EXAMPLES, //
-		ContentSelector.PARAMETERS, //
-		ContentSelector.PARENT_TYPES, //
-		ContentSelector.RETURN_TYPES, //
-		ContentSelector.SINCE, //
-		ContentSelector.TYPES, //
-		ContentSelector.USER_AGENTS //
-		);
-
+	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
+	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -143,7 +112,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_SELECTOR);
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 
 		if (globals != null)
 		{
@@ -170,7 +139,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex(), PROJECT_GLOBAL_SELECTOR);
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex());
 
 		if (projectGlobals != null && projectGlobals.isEmpty() == false)
 		{
@@ -235,7 +204,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
 					}
-					
+
 					if (JSTypeUtil.isFunctionPrefix(type))
 					{
 						String functionType = JSTypeUtil.getFunctionSignatureType(type);
@@ -360,7 +329,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		allTypes.add(0, typeName);
 
 		// add properties and methods
-		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes, TYPE_PROPERTY_SELECTOR);
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes);
 
 		typeName = JSModelFormatter.getTypeDisplayName(typeName);
 

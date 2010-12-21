@@ -37,7 +37,6 @@ package com.aptana.editor.js.inferencing;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,6 @@ import java.util.Set;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -358,12 +356,34 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 		if (node.getNodeType() == JSNodeTypes.ADD)
 		{
-			List<String> lhsTypes = this.getTypes(node.getLeftHandSide());
-			List<String> rhsTypes = this.getTypes(node.getRightHandSide());
+			IParseNode lhs = node.getLeftHandSide();
+			IParseNode rhs = node.getRightHandSide();
 
-			if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
+			while (lhs.getNodeType() == JSNodeTypes.ADD)
+			{
+				rhs = lhs.getLastChild();
+				lhs = lhs.getFirstChild();
+
+				if (rhs instanceof JSStringNode)
+				{
+					break;
+				}
+			}
+
+			if (lhs instanceof JSStringNode || rhs instanceof JSStringNode)
 			{
 				type = JSTypeConstants.STRING_TYPE;
+			}
+			else
+			{
+				List<String> lhsTypes = this.getTypes(lhs);
+				List<String> rhsTypes = this.getTypes(rhs);
+
+				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
+				{
+					type = JSTypeConstants.STRING_TYPE;
+				}
 			}
 		}
 
@@ -521,9 +541,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : this.getTypes(lhs))
 			{
+				if (JSTypeUtil.isFunctionPrefix(typeName))
+				{
+					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
+				}
+				
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, EnumSet.of(ContentSelector.RETURN_TYPES,
-					ContentSelector.TYPES));
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 
 				if (property != null)
 				{
@@ -590,7 +614,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
-			property = this._queryHelper.getGlobal(this._index, name, EnumSet.of(ContentSelector.TYPES, ContentSelector.RETURN_TYPES));
+			property = this._queryHelper.getGlobal(this._index, name);
 		}
 
 		if (property != null)

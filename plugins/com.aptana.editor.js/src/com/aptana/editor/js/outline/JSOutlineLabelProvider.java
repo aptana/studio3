@@ -37,20 +37,20 @@ package com.aptana.editor.js.outline;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CommonOutlineLabelProvider;
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.outline.JSOutlineItem.Type;
 
 public class JSOutlineLabelProvider extends CommonOutlineLabelProvider
 {
-	private static final Image ARRAY_ICON = Activator.getImage("icons/array-literal.png"); //$NON-NLS-1$
-	private static final Image BOOLEAN_ICON = Activator.getImage("icons/boolean.png"); //$NON-NLS-1$
-	private static final Image FUNCTION_ICON = Activator.getImage("icons/js_function.png"); //$NON-NLS-1$
-	private static final Image PROPERTY_ICON = Activator.getImage("icons/js_property.png"); //$NON-NLS-1$
-	private static final Image NULL_ICON = Activator.getImage("icons/null.png"); //$NON-NLS-1$
-	private static final Image NUMBER_ICON = Activator.getImage("icons/number.png"); //$NON-NLS-1$
-	private static final Image OBJECT_LITERAL_ICON = Activator.getImage("icons/object-literal.png"); //$NON-NLS-1$
-	private static final Image REGEX_ICON = Activator.getImage("icons/regex.png"); //$NON-NLS-1$
-	private static final Image STRING_ICON = Activator.getImage("icons/string.png"); //$NON-NLS-1$
+	private static final Image ARRAY_ICON = JSPlugin.getImage("icons/array-literal.png"); //$NON-NLS-1$
+	private static final Image BOOLEAN_ICON = JSPlugin.getImage("icons/boolean.png"); //$NON-NLS-1$
+	private static final Image FUNCTION_ICON = JSPlugin.getImage("icons/js_function.png"); //$NON-NLS-1$
+	private static final Image PROPERTY_ICON = JSPlugin.getImage("icons/js_property.png"); //$NON-NLS-1$
+	private static final Image NULL_ICON = JSPlugin.getImage("icons/null.png"); //$NON-NLS-1$
+	private static final Image NUMBER_ICON = JSPlugin.getImage("icons/number.png"); //$NON-NLS-1$
+	private static final Image OBJECT_LITERAL_ICON = JSPlugin.getImage("icons/object-literal.png"); //$NON-NLS-1$
+	private static final Image REGEX_ICON = JSPlugin.getImage("icons/regex.png"); //$NON-NLS-1$
+	private static final Image STRING_ICON = JSPlugin.getImage("icons/string.png"); //$NON-NLS-1$
 
 	@Override
 	public Image getImage(Object element)

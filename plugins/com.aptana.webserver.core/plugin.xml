@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="webServerTypes" name="%extension-point.name" schema="schema/webServerTypes.exsd"/>
+
+   <extension
+         point="com.aptana.webserver.core.webServerTypes">
+      <type
+            class="com.aptana.webserver.core.SimpleWebServerConfiguration"
+            id="com.aptana.webserver.simple"
+            name="%type.webserver.name">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.webserver.core.preferences.WebServerPreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

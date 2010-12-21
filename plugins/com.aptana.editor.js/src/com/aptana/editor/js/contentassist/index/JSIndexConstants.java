@@ -47,7 +47,12 @@ public interface JSIndexConstants
 	// 0.17 - Modified static properties in DOM files, changing them to instance where appropriate.
 	// 0.18 - Window now inherits from Global
 	// 0.19 - Fix Document.forms type in dom_2.xml
-	public static final double INDEX_VERSION = 0.19;
+	// 0.20 - Added Error class as a property of Window
+	// 0.21 - Using JSON for property and function content assist model elements
+	public static final double INDEX_VERSION = 0.21;
+
+	// for debugging, comment the line above, and uncomment the following
+	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
 
 	// general constants
 	static final String PREFIX = "js."; //$NON-NLS-1$

@@ -34,6 +34,7 @@
  */
 package com.aptana.ide.syncing.core.old;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,6 +44,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -114,8 +116,6 @@ public class SyncJob extends Job implements ISyncEventHandler
 	 */
 	public static final int DOWNLOAD = 2;
 
-	private static final String NAME = "Syncing"; //$NON-NLS-1$
-
 	private Synchronizer fSyncer;
 	private List<VirtualFileSyncPair> fPairs;
 	private int fDirection;
@@ -124,7 +124,6 @@ public class SyncJob extends Job implements ISyncEventHandler
 
 	private List<VirtualFileSyncPair> fCompletedPairs;
 	private int fErrorPairs;
-	private IProgressMonitor progressMonitor;
 
 	private Client fClient;
 
@@ -145,9 +144,9 @@ public class SyncJob extends Job implements ISyncEventHandler
 	 *            the client to receive feedbacks on the progress of syncing
 	 */
 	public SyncJob(Synchronizer syncer, List<VirtualFileSyncPair> pairs, int direction, boolean deleteRemote,
-			boolean deleteLocal, Client client)
+			boolean deleteLocal, Client client, String name)
 	{
-		super(NAME);
+		super(MessageFormat.format("Synchronizing {0}", name));
 		fSyncer = syncer;
 		fPairs = pairs;
 		fDirection = direction;
@@ -217,18 +216,18 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue()
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncContinue(IProgressMonitor)
 	 */
-	public boolean syncContinue() {
-		return !progressMonitor.isCanceled();
+	public boolean syncContinue(IProgressMonitor monitor) {
+		return !monitor.isCanceled();
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(VirtualFileSyncPair)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(VirtualFileSyncPair, IProgressMonitor)
 	 */
-	public void syncDone(VirtualFileSyncPair item)
+	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{
-		if (progressMonitor.isCanceled())
+		if (monitor.isCanceled())
 		{
 			return;
 		}
@@ -246,15 +245,14 @@ public class SyncJob extends Job implements ISyncEventHandler
 		{
 			fClient.syncDone(item, isDone());
 		}
-		progressMonitor.worked(1);
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(VirtualFileSyncPair, Exception)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(VirtualFileSyncPair, Exception, IProgressMonitor)
 	 */
-	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e)
+	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
 	{
-		if (progressMonitor.isCanceled())
+		if (monitor.isCanceled())
 		{
 			return false;
 		}
@@ -268,11 +266,11 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(VirtualFileSyncPair, int, int)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(VirtualFileSyncPair, int, int, IProgressMonitor)
 	 */
-	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems)
+	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
 	{
-		if (progressMonitor.isCanceled())
+		if (monitor.isCanceled())
 		{
 			return false;
 		}
@@ -284,11 +282,11 @@ public class SyncJob extends Job implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(VirtualFileSyncPair, long)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(VirtualFileSyncPair, long, IProgressMonitor)
 	 */
-	public void syncTransferring(VirtualFileSyncPair item, long bytes)
+	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor)
 	{
-		if (progressMonitor.isCanceled())
+		if (monitor.isCanceled())
 		{
 			return;
 		}
@@ -312,8 +310,6 @@ public class SyncJob extends Job implements ISyncEventHandler
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		this.progressMonitor = monitor;
-
 		if (fPairs.size() == 0)
 		{
 			// nothing to be synced (likely because all files are skipped), so considers it finished
@@ -324,18 +320,18 @@ public class SyncJob extends Job implements ISyncEventHandler
 		}
 		else
 		{
-			monitor.beginTask("Syncing files", fPairs.size()); //$NON-NLS-1$
+			SubMonitor sub = SubMonitor.convert(monitor, "Syncing files", fPairs.size()); //$NON-NLS-1$
 			VirtualFileSyncPair[] pairs = fPairs.toArray(new VirtualFileSyncPair[fPairs.size()]);
 			switch (fDirection)
 			{
 				case BOTH:
-					fullSync(pairs);
+					fullSync(pairs, sub.newChild(fPairs.size()));
 					break;
 				case UPLOAD:
-					upload(pairs);
+					upload(pairs, sub.newChild(fPairs.size()));
 					break;
 				case DOWNLOAD:
-					download(pairs);
+					download(pairs, sub.newChild(fPairs.size()));
 					break;
 			}
 		}
@@ -343,16 +339,16 @@ public class SyncJob extends Job implements ISyncEventHandler
 		return Status.OK_STATUS;
 	}
 
-	private boolean fullSync(VirtualFileSyncPair[] pairs)
+	private boolean fullSync(VirtualFileSyncPair[] pairs, IProgressMonitor sub)
 	{
-		return fSyncer.fullSyncAndDelete(pairs, fDeleteLocal, fDeleteRemote, this.progressMonitor);
+		return fSyncer.fullSyncAndDelete(pairs, fDeleteLocal, fDeleteRemote, sub);
 	}
 
-	private boolean download(VirtualFileSyncPair[] pairs)
+	private boolean download(VirtualFileSyncPair[] pairs, IProgressMonitor sub)
 	{
 		try
 		{
-			fSyncer.downloadAndDelete(pairs, fDeleteLocal, this.progressMonitor);
+			fSyncer.downloadAndDelete(pairs, fDeleteLocal, sub);
 			return true;
 		}
 		catch (CoreException e)
@@ -361,11 +357,11 @@ public class SyncJob extends Job implements ISyncEventHandler
 		return false;
 	}
 
-	private boolean upload(VirtualFileSyncPair[] pairs)
+	private boolean upload(VirtualFileSyncPair[] pairs, IProgressMonitor sub)
 	{
 		try
 		{
-			fSyncer.uploadAndDelete(pairs, fDeleteRemote, this.progressMonitor);
+			fSyncer.uploadAndDelete(pairs, fDeleteRemote, sub);
 			return true;
 		}
 		catch (CoreException e)

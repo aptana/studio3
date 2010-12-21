@@ -407,4 +407,15 @@ public abstract class StringUtil
 	{
 		return text == null || text.trim().length() == 0;
 	}
+
+	/**
+	 * getStringValue
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public static String getStringValue(Object object)
+	{
+		return (object != null) ? object.toString() : EMPTY;
+	}
 }

@@ -67,7 +67,7 @@ import com.aptana.ide.syncing.ui.navigator.ProjectSitesManager;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle

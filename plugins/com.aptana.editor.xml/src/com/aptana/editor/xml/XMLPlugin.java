@@ -34,6 +34,8 @@
  */
 package com.aptana.editor.xml;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -103,5 +105,10 @@ public class XMLPlugin extends AbstractUIPlugin
 	public static ImageDescriptor getImageDescriptor(String path)
 	{
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	public static void logError(String message, Throwable e)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
 	}
 }

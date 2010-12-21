@@ -34,10 +34,18 @@
  */
 package com.aptana.editor.js.contentassist.model;
 
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Convertible;
+import org.mortbay.util.ajax.JSON.Output;
+
 import com.aptana.core.util.StringUtil;
 
-public class ReturnTypeElement
+public class ReturnTypeElement implements Convertible
 {
+	private static final String DESCRIPTION_PROPERTY = "description"; //$NON-NLS-1$
+	private static final String TYPE_PROPERTY = "type"; //$NON-NLS-1$
+
 	private String _description;
 	private String _type;
 
@@ -72,6 +80,17 @@ public class ReturnTypeElement
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		this.setType(StringUtil.getStringValue(object.get(TYPE_PROPERTY)));
+		this.setDescription(StringUtil.getStringValue(object.get(DESCRIPTION_PROPERTY)));
+	}
+
 	/**
 	 * getDescription
 	 * 
@@ -79,7 +98,7 @@ public class ReturnTypeElement
 	 */
 	public String getDescription()
 	{
-		return this._description;
+		return StringUtil.getStringValue(this._description);
 	}
 
 	/**
@@ -89,7 +108,7 @@ public class ReturnTypeElement
 	 */
 	public String getType()
 	{
-		return this._type;
+		return StringUtil.getStringValue(this._type);
 	}
 
 	/*
@@ -127,5 +146,15 @@ public class ReturnTypeElement
 	public void setType(String type)
 	{
 		this._type = type;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mortbay.util.ajax.JSON.Convertible#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	public void toJSON(Output out)
+	{
+		out.add(TYPE_PROPERTY, this.getType());
+		out.add(DESCRIPTION_PROPERTY, this.getDescription());
 	}
 }

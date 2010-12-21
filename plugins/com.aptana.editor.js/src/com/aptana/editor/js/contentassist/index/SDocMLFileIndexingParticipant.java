@@ -36,7 +36,6 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.util.EnumSet;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -46,16 +45,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.editor.js.Activator;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.index.core.IFileStoreIndexingParticipant;
+import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 
-public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticipant
+public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
 	/*
 	 * (non-Javadoc)
@@ -98,7 +96,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 		}
 		try
 		{
-			sub.subTask(file.getName());
+			sub.subTask(getIndexingMessage(index, file));
 
 			try
 			{
@@ -115,7 +113,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
-				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, EnumSet.allOf(ContentSelector.class));
+				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
 
 				if (window == null)
 				{
@@ -165,7 +163,7 @@ public class SDocMLFileIndexingParticipant implements IFileStoreIndexingParticip
 			}
 			catch (Throwable e)
 			{
-				Activator.logError(e.getMessage(), e);
+				JSPlugin.logError(e.getMessage(), e);
 			}
 		}
 		finally

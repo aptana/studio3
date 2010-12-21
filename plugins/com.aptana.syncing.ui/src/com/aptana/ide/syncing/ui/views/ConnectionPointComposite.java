@@ -104,8 +104,8 @@ import com.aptana.ide.ui.io.navigator.actions.FileSystemRenameAction;
 import com.aptana.ide.ui.io.navigator.actions.OpenFileAction;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.SWTUtils;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -558,7 +558,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		column.setText(COLUMN_NAMES[1]);
 
 		column = new TreeColumn(tree, SWT.LEFT);
-		column.setWidth(125);
+		column.setWidth(150);
 		column.setText(COLUMN_NAMES[2]);
 
 		fTreeViewer.setContentProvider(new FileTreeContentProvider());

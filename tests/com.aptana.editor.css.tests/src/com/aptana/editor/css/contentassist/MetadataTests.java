@@ -43,7 +43,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.editor.css.Activator;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.contentassist.index.CSSMetadataReader;
 
 public class MetadataTests extends TestCase
@@ -63,7 +63,7 @@ public class MetadataTests extends TestCase
 	 */
 	protected void loadMetadata(String resource)
 	{
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), new Path(resource), null);
+		URL url = FileLocator.find(CSSPlugin.getDefault().getBundle(), new Path(resource), null);
 
 		assertNotNull(url);
 		

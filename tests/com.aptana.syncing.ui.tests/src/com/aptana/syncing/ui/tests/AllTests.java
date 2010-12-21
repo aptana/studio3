@@ -44,7 +44,6 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(SyncingUITest.class);
 		// $JUnit-END$
 		return suite;
 	}

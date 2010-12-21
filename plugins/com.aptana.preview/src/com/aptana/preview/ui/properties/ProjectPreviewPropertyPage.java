@@ -62,12 +62,12 @@ import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.preview.Activator;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.preview.server.AbstractWebServerConfiguration;
-import com.aptana.preview.server.ServerConfigurationManager;
-import com.aptana.preview.server.ServerConfigurationManager.ConfigurationType;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.PropertyDialogsRegistry;
-import com.aptana.ui.UIUtils;
+import com.aptana.ui.util.UIUtils;
+import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.ServerConfigurationManager.ConfigurationType;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
@@ -209,7 +209,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 				return super.getText(element);
 			}
 		});
-		dialog.setInput(ServerConfigurationManager.getInstance().getConfigurationTypes());
+		dialog.setInput(WebServerCorePlugin.getDefault().getServerConfigurationManager().getConfigurationTypes());
 		dialog.setTitle(Messages.ProjectPreviewPropertyPage_ChooseServerType);
 
 		Object[] result;
@@ -218,13 +218,12 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 			String typeId = ((ConfigurationType) result[0]).getId();
 			try
 			{
-				AbstractWebServerConfiguration newConfiguration = ServerConfigurationManager.getInstance()
-						.createServerConfiguration(typeId);
+				AbstractWebServerConfiguration newConfiguration = WebServerCorePlugin.getDefault().getServerConfigurationManager().createServerConfiguration(typeId);
 				if (newConfiguration != null)
 				{
 					if (editServerConfiguration(newConfiguration))
 					{
-						ServerConfigurationManager.getInstance().addServerConfiguration(newConfiguration);
+						WebServerCorePlugin.getDefault().getServerConfigurationManager().addServerConfiguration(newConfiguration);
 						updateServersContent();
 						fServersCombo.setSelection(new StructuredSelection(newConfiguration));
 						// forces an update of widget enablements
@@ -306,8 +305,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 			case SERVER:
 				fNoSettingRadio.setSelection(false);
 				fServerRadio.setSelection(true);
-				List<AbstractWebServerConfiguration> servers = ServerConfigurationManager.getInstance()
-						.getServerConfigurations();
+				List<AbstractWebServerConfiguration> servers = WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations();
 				comboControl = fServersCombo.getControl();
 				if (servers.size() == 0)
 				{
@@ -327,8 +325,7 @@ public class ProjectPreviewPropertyPage extends PropertyPage implements IWorkben
 
 	private void updateServersContent()
 	{
-		List<AbstractWebServerConfiguration> servers = ServerConfigurationManager.getInstance()
-				.getServerConfigurations();
+		List<AbstractWebServerConfiguration> servers = WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations();
 		if (servers.size() == 0)
 		{
 			Object[] input = new Object[] { Messages.ProjectPreviewPropertyPage_NoPreviewServer };

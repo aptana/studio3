@@ -82,9 +82,9 @@ import com.aptana.ide.filesystem.s3.S3ConnectionPoint;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
-import com.aptana.ui.UIUtils;
 import com.aptana.ui.s3.S3UIPlugin;
 import com.aptana.ui.s3.dialogs.Messages;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov

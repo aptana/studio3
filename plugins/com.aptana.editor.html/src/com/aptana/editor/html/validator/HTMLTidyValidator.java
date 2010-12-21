@@ -52,7 +52,8 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 
 public class HTMLTidyValidator implements IValidator
 {
@@ -83,7 +84,7 @@ public class HTMLTidyValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			Activator.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
+			HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
 		}
 		finally
 		{
@@ -114,7 +115,7 @@ public class HTMLTidyValidator implements IValidator
 		}
 		catch (Exception e)
 		{
-			Activator.logError(Messages.HTMLTidyValidator_ERR_Tidy, e);
+			HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_Tidy, e);
 		}
 		out.flush();
 
@@ -132,7 +133,7 @@ public class HTMLTidyValidator implements IValidator
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
 
-			if (message != null)
+			if (message != null && !manager.isIgnored(message, IHTMLParserConstants.LANGUAGE))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{

@@ -35,6 +35,7 @@
 package com.aptana.parsing;
 
 import com.aptana.parsing.ast.IParseNode;
+import com.aptana.parsing.lexer.IRange;
 
 public class ParseState implements IParseState
 {
@@ -45,6 +46,8 @@ public class ParseState implements IParseState
 	private char[] fInsertedText;
 	private int fStartingOffset;
 	private int fRemovedLength;
+
+	private IRange[] fSkippedRanges;
 
 	// represents the root node of the parsing result
 	private IParseNode fParseResult;
@@ -59,6 +62,7 @@ public class ParseState implements IParseState
 	{
 		fInsertedText = NO_CHARS;
 		fRemovedLength = 0;
+		fSkippedRanges = null;
 	}
 
 	public IParseNode getParseResult()
@@ -86,17 +90,28 @@ public class ParseState implements IParseState
 		return fStartingOffset;
 	}
 
+	public IRange[] getSkippedRanges()
+	{
+		return fSkippedRanges;
+	}
+
 	public void setEditState(String source, String insertedText, int startingOffset, int removedLength)
 	{
 		fSource = (source != null) ? source.toCharArray() : NO_CHARS;
 		fInsertedText = (insertedText != null) ? insertedText.toCharArray() : NO_CHARS;
 		fStartingOffset = startingOffset;
 		fRemovedLength = removedLength;
+		fSkippedRanges = null;
 	}
 
 	public void setParseResult(IParseNode result)
 	{
 		fParseResult = result;
+	}
+
+	public void setSkippedRanges(IRange[] ranges)
+	{
+		fSkippedRanges = ranges;
 	}
 
 	public String toString()

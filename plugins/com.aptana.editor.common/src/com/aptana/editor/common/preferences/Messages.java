@@ -40,6 +40,10 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
 
+	public static String CommonEditorPreferencePage_Default_Editor_Preference_Link;
+
+	public static String CommonEditorPreferencePage_Editor_Preferences;
+
 	public static String TasksPreferencePage_CaseSensitiveLabel;
 	public static String TasksPreferencePage_Description;
 	public static String TasksPreferencePage_EditTagTitle;
@@ -53,6 +57,71 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_All;
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
+
+	public static String EditorsPreferencePage_Close_Matching_Character_Pairs;
+
+	public static String EditorsPreferencePage_Colorize_Matching_Character_Pairs;
+
+	public static String EditorsPreferencePage_Content_Assist;
+
+	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
+
+	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
+
+	
+	/**
+	 * EditorsPreferencePage_EditLink
+	 */
+	public static String EditorsPreferencePage_EditLink;
+
+	/**
+	 * EditorsPreferencePage_Formatting
+	 */
+	public static String EditorsPreferencePage_Formatting;
+	
+	public static String EditorsPreferencePage_HomeEndBehavior;
+
+	public static String EditorsPreferencePage_JumpsStartEnd;
+	
+	/**
+	 * EditorsPreferencePage_MarkOccurrences
+	 */
+	public static String EditorsPreferencePage_MarkOccurrences;
+
+	/**
+	 * EditorsPreferencePage_PreferenceDescription
+	 */
+	public static String EditorsPreferencePage_PreferenceDescription;
+	
+	/**
+	 * EditorsPreferencePage_TabInsertion
+	 */
+	public static String EditorsPreferencePage_TabInsertion;
+	public static String EditorsPreferencePage_ToggleBetween;
+
+	public static String EditorsPreferencePage_Typing;
+	
+	/**
+	 * EditorsPreferencePage_UseSpaces
+	 */
+	public static String EditorsPreferencePage_UseSpaces;
+	
+	/**
+	 * EditorsPreferencePage_UseTabs
+	 */
+	public static String EditorsPreferencePage_UseTabs;
+	
+	/**
+	 * EditorsPreferencePage_GeneralTextEditorPrefLink
+	 */
+	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
+	
+	public static String ValidationPreferencePage_ERR_EmptyExpression;
+	public static String ValidationPreferencePage_Filter_Description;
+	public static String ValidationPreferencePage_Ignore_Message;
+	public static String ValidationPreferencePage_Ignore_Title;
+	public static String ValidationPreferencePage_LBL_Filter;
+	public static String ValidationPreferencePage_LBL_Validators;
 
 	static
 	{

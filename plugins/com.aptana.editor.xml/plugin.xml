@@ -9,6 +9,7 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             default="true"
             extensions="tld,pt,cpt,dtml,rss,opml"
+            icon="icons/xml.png"
             id="com.aptana.editor.xml"
             name="%editor.xml.name">
          <contentTypeBinding
@@ -29,6 +30,41 @@
             content-type="com.aptana.contenttype.xml"
             language="text/xml">
       </parser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="com.aptana.xml.tagPair.occurrences"
+            colorPreferenceKey="xmlTagPairOccurrenceIndicationColor"
+            colorPreferenceValue="212,212,212"
+            contributesToHeader="false"
+            highlightPreferenceKey="xmlTagPairOccurrenceIndicationHighlighting"
+            highlightPreferenceValue="true"
+            isGoToNextNavigationTarget="true"
+            isGoToNextNavigationTargetKey="isOccurrenceGoToNextNavigationTarget"
+            isGoToPreviousNavigationTarget="true"
+            isGoToPreviousNavigationTargetKey="isOccurrenceGoToPreviousNavigationTarget"
+            label="%specification.tagpair.label"
+            overviewRulerPreferenceKey="xmlTagPairOccurrenceIndicationInOverviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="4"
+            showInNextPrevDropdownToolbarAction="true"
+            showInNextPrevDropdownToolbarActionKey="showOccurrenceInNextPrevDropdownToolbarAction"
+            textPreferenceKey="xmlTagPairOccurrenceIndication"
+            textPreferenceValue="false"
+            textStylePreferenceKey="xmlTagPairOccurrenceIndicationTextStyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="xmlTagPairOccurrenceIndicationInVerticalRuler"
+            verticalRulerPreferenceValue="false">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="0"
+            name="com.aptana.xml.tagPair.occurrences"
+            super="com.aptana.editor.common.occurrence">
+      </type>
    </extension>
 
 </plugin>

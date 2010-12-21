@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="Tidy.jar"/>
-	<classpathentry exported="true" kind="lib" path="velocity.jar"/>
-	<classpathentry exported="true" kind="lib" path="css-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="derby.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

@@ -54,7 +54,7 @@ public class ScriptFormatterManager extends ContributionExtensionManager
 
 	/**
 	 * Returns the main Content-Type that this factory is set for. The content-type that is returned is the one defined
-	 * in the extension contribution of the given facotry.
+	 * in the extension contribution of the given factory.
 	 * 
 	 * @param factory
 	 *            An {@link IScriptFormatterFactory}

@@ -55,6 +55,8 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String CorePlugin_Adding_Unified_Builders;
+	public static String CorePlugin_Hooking_Filewatchers;
 	public static String CoreStrings_Add;
 	public static String CoreStrings_Browse;
 	public static String CoreStrings_Delete;
@@ -68,5 +70,6 @@ public final class Messages extends NLS
 	public static String CoreStrings_Rename;
 	public static String CoreStrings_Continue;
 	public static String CoreStrings_Cancel;
+	public static String CoreStrings_Help;
 
 }

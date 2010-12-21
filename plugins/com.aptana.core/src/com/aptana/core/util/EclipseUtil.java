@@ -34,12 +34,17 @@
  */
 package com.aptana.core.util;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Bundle;
 
 public class EclipseUtil
@@ -161,4 +166,68 @@ public class EclipseUtil
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
 		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
 	}
+	
+	/**
+	 * Returns path to application launcher executable
+	 * 
+	 * @return
+	 */
+	public static IPath getApplicationLauncher() {
+		return getApplicationLauncher(false);
+	}
+
+	/**
+	 * Returns path to application launcher executable
+	 * 
+	 * @param asSplashLauncher
+	 * @return
+	 */
+	public static IPath getApplicationLauncher(boolean asSplashLauncher) {
+		IPath launcher = null;
+		String cmdline = System.getProperty("eclipse.commands"); //$NON-NLS-1$
+		if ( cmdline != null && cmdline.length() > 0 ) {
+			String[] args = cmdline.split("\n"); //$NON-NLS-1$
+			for( int i = 0; i < args.length; ++i ) {
+				if ( "-launcher".equals(args[i]) && (i+1) < args.length ) { //$NON-NLS-1$
+					launcher = Path.fromOSString(args[i+1]);
+					break;
+				}
+			}
+		}
+		if ( launcher == null ) {
+			Location location = Platform.getInstallLocation();
+			if ( location != null ) {
+				launcher = new Path(location.getURL().getFile());
+				if ( launcher.toFile().isDirectory() ) {
+					String[] executableFiles = launcher.toFile().list(new FilenameFilter() {
+						public boolean accept(File dir, String name) {
+							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
+							name = path.removeFileExtension().lastSegment();
+							String ext = path.getFileExtension();
+							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+								if (!"app".equals(ext)) {
+									return false;
+								}
+							}
+							if ("Eclipse".equalsIgnoreCase(name) || "AptanaStudio3".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$
+								return true;
+							}
+							return false;
+						}
+					});
+					if (executableFiles.length > 0) {
+						launcher = launcher.append(executableFiles[0]);
+					}
+				}
+			}
+		}
+		if ( !launcher.toFile().exists() ) {
+			return null;
+		}
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {
+			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
+		}
+		return launcher;
+	}
+
 }

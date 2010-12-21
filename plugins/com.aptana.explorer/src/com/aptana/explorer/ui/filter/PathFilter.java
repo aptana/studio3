@@ -50,7 +50,6 @@ import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.core.util.URLEncoder;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
-import com.aptana.editor.ruby.index.IRubyIndexConstants;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 import com.aptana.index.core.QueryResult;
@@ -204,7 +203,7 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		return result;
 	}
 
-	private boolean doIsLeafMatch(Viewer viewer, Object element)
+	protected boolean doIsLeafMatch(Viewer viewer, Object element)
 	{
 		IResource resource = (IResource) element;
 		if (resource.equals(filterResource))
@@ -221,6 +220,11 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 			return true;
 		}
 
+		return isRequired(resource);
+	}
+
+	private boolean isRequired(IResource resource)
+	{
 		// check if the resource is included by the filtered file or vise versa
 		if (queryResults == null)
 		{
@@ -230,8 +234,7 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 			Index index = IndexManager.getInstance().getIndex(resource.getProject().getLocationURI());
 			try
 			{
-				queryResults = index.query(new String[] { HTMLIndexConstants.RESOURCE_CSS,
-						HTMLIndexConstants.RESOURCE_JS, IRubyIndexConstants.REQUIRE }, null, 0);
+				queryResults = index.query(indexCategories(), null, 0);
 			}
 			catch (IOException e)
 			{
@@ -283,6 +286,11 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 			}
 		}
 		return false;
+	}
+
+	protected String[] indexCategories()
+	{
+		return new String[] { HTMLIndexConstants.RESOURCE_CSS, HTMLIndexConstants.RESOURCE_JS };
 	}
 
 	private String getFilterResourceURI()

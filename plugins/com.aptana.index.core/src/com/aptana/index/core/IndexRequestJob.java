@@ -55,7 +55,7 @@ abstract class IndexRequestJob extends Job
 	 * @param name
 	 * @param containerURI
 	 */
-	public IndexRequestJob(String name, URI containerURI)
+	protected IndexRequestJob(String name, URI containerURI)
 	{
 		super(name);
 		this.containerURI = containerURI;
@@ -69,9 +69,9 @@ abstract class IndexRequestJob extends Job
 	 * 
 	 * @param containerURI
 	 */
-	public IndexRequestJob(URI containerURI)
+	protected IndexRequestJob(URI containerURI)
 	{
-		this(MessageFormat.format("Indexing {0}", containerURI.toString()), containerURI);
+		this(MessageFormat.format(Messages.IndexRequestJob_Name, containerURI.toString()), containerURI);
 	}
 
 	/*
@@ -107,7 +107,7 @@ abstract class IndexRequestJob extends Job
 		}
 		catch (CoreException e)
 		{
-			IndexActivator.logError(e);
+			IndexPlugin.logError(e);
 		}
 		return null;
 	}
@@ -154,7 +154,7 @@ abstract class IndexRequestJob extends Job
 			return map;
 		}
 
-		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID, FILE_INDEXING_PARTICIPANTS_ID);
+		IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, FILE_INDEXING_PARTICIPANTS_ID);
 		if (extensionPoint == null)
 		{
 			return map;
@@ -202,7 +202,7 @@ abstract class IndexRequestJob extends Job
 
 			if (registry != null)
 			{
-				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexActivator.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID);
+				IExtensionPoint extensionPoint = registry.getExtensionPoint(IndexPlugin.PLUGIN_ID, INDEX_FILTER_PARTICIPANTS_ID);
 
 				if (extensionPoint != null)
 				{
@@ -220,7 +220,7 @@ abstract class IndexRequestJob extends Job
 								}
 								catch (CoreException e)
 								{
-									IndexActivator.logError(e);
+									IndexPlugin.logError(e);
 								}
 							}
 						}
@@ -328,7 +328,7 @@ abstract class IndexRequestJob extends Job
 					}
 					catch (CoreException e)
 					{
-						IndexActivator.logError(e);
+						IndexPlugin.logError(e);
 					}
 				}
 			}

@@ -56,7 +56,7 @@ import com.aptana.editor.common.tasks.TaskTag;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.html.Activator;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
@@ -174,7 +174,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param file
 	 * @param current
 	 */
-	private void processNode(Index index, IFileStore file, String source, IParseNode current)
+	protected void processNode(Index index, IFileStore file, String source, IParseNode current)
 	{
 		if (current instanceof HTMLSpecialNode)
 		{
@@ -236,7 +236,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 	 * @param parent
 	 * @param monitor
 	 */
-	private void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
+	public void walkAST(Index index, IFileStore file, String source, IParseNode parent, IProgressMonitor monitor)
 	{
 		if (parent != null)
 		{
@@ -294,7 +294,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			if (file != null)
 			{
-				sub.subTask(file.getName());
+				sub.subTask(getIndexingMessage(index, file));
 
 				removeTasks(file, sub.newChild(10));
 
@@ -316,7 +316,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		}
 		catch (Throwable e)
 		{
-			Activator
+			HTMLPlugin
 					.logError(
 							MessageFormat.format(Messages.HTMLFileIndexingParticipant_Error_During_Indexing,
 									file.getName()), e);
