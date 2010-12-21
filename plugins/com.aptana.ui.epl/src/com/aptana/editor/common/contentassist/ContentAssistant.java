@@ -44,6 +44,8 @@ import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.StyledTextContent;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -368,12 +370,20 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			{
 				return;
 			}
+
 			// Only act on characters that are trigger candidates. This
 			// avoids computing the model selection on every keystroke
+			boolean validAssistLocation = false;
 			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0)
 			{
-				stop();
-				return;
+				StyledText styledText = (StyledText) e.widget;
+				IDocument document = fContentAssistSubjectControlAdapter.getDocument();
+				int offset = styledText.getCaretOffset();
+				validAssistLocation = isValidAssistLocation(e.character, e.keyCode, document, offset); 
+				if(!validAssistLocation) {
+					stop();
+					return;
+				}
 			}
 
 			int showStyle;
@@ -383,7 +393,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			activation = fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(
 					ContentAssistant.this, pos);
 
-			if (contains(activation, e.character) && !fProposalPopup.isActive())
+			if ((contains(activation, e.character) || validAssistLocation) && !fProposalPopup.isActive())
 			{
 				showStyle = SHOW_PROPOSALS;
 				fProposalPopup.setActivationKey(e.character);
@@ -392,7 +402,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			{
 				activation = fContentAssistSubjectControlAdapter.getContextInformationAutoActivationCharacters(
 						ContentAssistant.this, pos);
-				if (contains(activation, e.character) && fContextInfoPopup != null && !fContextInfoPopup.isActive())
+				if ((contains(activation, e.character) || validAssistLocation) && fContextInfoPopup != null && !fContextInfoPopup.isActive())
 				{
 					showStyle = SHOW_CONTEXT_INFO;
 				}
@@ -1247,6 +1257,67 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	}
 
 	/**
+	 * Computes the sorted set of all proposal activation trigger characters.
+	 * 
+	 * @return the sorted set of all proposal activation trigger characters
+	 * @since 3.1
+	 */
+	private String computeCompletionProposalAutoActivationTriggers()
+	{
+		if (fProcessors == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
+
+		StringBuffer buf = new StringBuffer(5);
+		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+		
+		while (iter.hasNext())
+		{
+			Entry<String,IContentAssistProcessor> entry = iter.next();
+			IContentAssistProcessor processor = entry.getValue();
+			char[] triggers = processor.getCompletionProposalAutoActivationCharacters();			
+			if (triggers != null)
+			{
+				buf.append(triggers);
+			}
+		}
+		
+		return buf.toString();
+	}
+	
+	/**
+	 * Computes the sorted set of all context info activation trigger characters.
+	 * 
+	 * @return the sorted set of all context info activation trigger characters
+	 * @since 3.1
+	 */
+	private String computeContextInformationAutoActivationTriggers()
+	{
+		if (fProcessors == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
+
+		StringBuffer buf = new StringBuffer(5);
+		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+		
+		while (iter.hasNext())
+		{
+			Entry<String,IContentAssistProcessor> entry = iter.next();
+			IContentAssistProcessor processor = entry.getValue();
+			char[] triggers = processor.getContextInformationAutoActivationCharacters();
+			
+			if (triggers != null)
+			{
+				buf.append(triggers);
+			}
+		}
+		
+		return buf.toString();
+	}
+	
+	/**
 	 * Computes the sorted set of all auto activation trigger characters.
 	 * 
 	 * @return the sorted set of all auto activation trigger characters
@@ -1282,6 +1353,59 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		}
 		
 		return buf.toString();
+	}
+	
+	/**
+	 * @param offset 
+	 * @param document 
+	 */
+	private boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
+//		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+//		
+//		while (iter.hasNext())
+//		{
+//			Entry<String,IContentAssistProcessor> entry = iter.next();
+//			IContentAssistProcessor processor = entry.getValue();
+//			if(processor instanceof ICommonContentAssistProcessor) {
+//				boolean valid = ((ICommonContentAssistProcessor)processor).isValidIdentifier(c, keyCode, document, offset);
+//				if(valid) {
+//					return true;
+//				}
+//			}
+//		}
+//
+//		return false;
+
+//		if (fProcessors == null)
+//		{
+//			return ""; //$NON-NLS-1$
+//		}
+//
+//		StringBuffer buf = new StringBuffer(5);
+//		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+//		
+//		while (iter.hasNext())
+//		{
+//			Entry<String,IContentAssistProcessor> entry = iter.next();
+//			IContentAssistProcessor processor = entry.getValue();
+//			char[] triggers = processor.getCompletionProposalAutoActivationCharacters();
+//			
+//			if (triggers != null)
+//			{
+//				buf.append(triggers);
+//			}
+//			
+//			triggers = processor.getContextInformationAutoActivationCharacters();
+//			
+//			if (triggers != null)
+//			{
+//				buf.append(triggers);
+//			}
+//		}
+//		
+//		return buf.toString();
 	}
 
 	/**

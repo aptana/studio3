@@ -804,4 +804,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		if(lexeme != null) {
+			System.out.println(lexeme.toString());
+		}
+		if(lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		// return ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '$';
+	}
+
 }

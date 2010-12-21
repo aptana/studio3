@@ -51,6 +51,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -612,5 +613,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
 	}
 }

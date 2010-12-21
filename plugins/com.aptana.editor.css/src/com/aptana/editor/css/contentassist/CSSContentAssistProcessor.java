@@ -1129,4 +1129,24 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		if(lexeme != null) {
+			System.out.println(lexeme.toString());
+		}
+		if(lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		//return ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#' || c == '.';
+	}
 }

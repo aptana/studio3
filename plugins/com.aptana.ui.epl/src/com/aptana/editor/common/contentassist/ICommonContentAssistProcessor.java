@@ -9,6 +9,7 @@
  */
 package com.aptana.editor.common.contentassist;
 
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
@@ -24,4 +25,14 @@ public interface ICommonContentAssistProcessor
 	 * @return
 	 */
 	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated);
+	
+	/**
+	 * Is the current position a valid identifier?
+	 * @param c
+	 * @param keyCode
+	 * @param document
+	 * @param offset
+	 * @return
+	 */
+	boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset);
 }

@@ -61,6 +61,7 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -1538,5 +1539,32 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
+//		if(keyCode == SWT.ESC) {
+//			return false;
+//		}
+//		
+//		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+//		Lexeme<HTMLTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+//		if(lexeme != null) {
+//			System.out.println(lexeme.toString());
+//			System.out.println(offset);
+//		}
+//		if(lexeme != null) {
+//			HTMLTokenType type = lexeme.getType();
+//			return type != HTMLTokenType.DOUBLE_QUOTED_STRING; // && type != HTMLTokenType.TAG_END && type != HTMLTokenType.TAG_SELF_CLOSE;
+//		}
+//		else {
+//			return false;
+//		}
+		//return ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#' || c == '.';
 	}
 }
