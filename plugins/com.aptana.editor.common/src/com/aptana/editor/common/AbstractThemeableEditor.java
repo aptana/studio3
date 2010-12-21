@@ -238,11 +238,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		
-		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if preceding char is '<'...
+
+		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if
+		// preceding char is '<'...
 		fPeerCharacterCloser = new PeerCharacterCloser(getSourceViewer());
 		fPeerCharacterCloser.install();
-		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
+		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(
+				IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
 
 		fCursorChangeListened = true;
 
@@ -374,10 +376,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
 
-            @Override
+			@Override
 			protected void handleDispose()
 			{
-				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to report a bug with eclipse to clean this up.
+				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to
+				// report a bug with eclipse to clean this up.
 				try
 				{
 					Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
@@ -420,15 +423,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 						{
 							// The code above might change the content type that is used to
 							// get the formatter, but we still need to save the original content-type so that the
-							// IScriptFormatter instance will handle the any required parsing by calling the right IParser.
+							// IScriptFormatter instance will handle the any required parsing by calling the right
+							// IParser.
 							factory.setMainContentType(contentType.getParts()[0]);
-							
+
 							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
 							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
 									IResource.class);
-							context
-									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
-											.getId());
+							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
 							IProject project = (file != null) ? file.getProject() : null;
 							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
 							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
@@ -587,9 +589,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
-		if(event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE)) {
-			fPeerCharacterCloser.setAutoInsertEnabled((Boolean)event.getNewValue());
-	}
+		if (event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
+		{
+			fPeerCharacterCloser.setAutoInsertEnabled((Boolean) event.getNewValue());
+		}
 	}
 
 	public synchronized FileService getFileService()
@@ -631,36 +634,62 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	public void select(IRange element, boolean checkIfOutlineActive)
 	{
-		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+		try
 		{
-			// disables listening to cursor change so we don't get into the loop of setting selections between editor
-			// and outline
-			fCursorChangeListened = false;
-			setSelectedElement(element);
+			if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+			{
+				// disables listening to cursor change so we don't get into the loop of setting selections between
+				// editor
+				// and outline
+				fCursorChangeListened = false;
+				setSelectedElement(element);
+			}
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
 	protected void setSelectedElement(IRange element)
 	{
-		int offset = element.getStartingOffset();
-		int length = element.getLength();
-		setHighlightRange(offset, length, false);
-		selectAndReveal(offset, length);
+		if (element == null)
+		{
+			return;
+		}
+		try
+		{
+			int offset = element.getStartingOffset();
+			int length = element.getLength();
+			setHighlightRange(offset, length, false);
+			selectAndReveal(offset, length);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 	protected void selectionChanged()
 	{
-		if (fCursorChangeListened)
+		try
 		{
-			if (hasOutlinePageCreated() && isLinkedWithEditor())
+			if (fCursorChangeListened)
 			{
-				getOutlinePage().select(computeHighlightedOutlineNode());
+				if (hasOutlinePageCreated() && isLinkedWithEditor())
+				{
+					getOutlinePage().select(computeHighlightedOutlineNode());
+				}
+			}
+			else
+			{
+				// re-enables listening to cursor change
+				fCursorChangeListened = true;
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			// re-enables listening to cursor change
-			fCursorChangeListened = true;
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
@@ -680,7 +709,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 	}
 
-	ICommandElementsProvider getCommandElementsProvider()
+	synchronized ICommandElementsProvider getCommandElementsProvider()
 	{
 		if (fCommandElementsProvider == null)
 		{
@@ -696,11 +725,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	protected String getCursorPosition()
 	{
-		String raw = super.getCursorPosition();
-		StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
-		String line = tokenizer.nextToken();
-		String column = tokenizer.nextToken();
-		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+		String raw = null;
+		try
+		{
+			raw = super.getCursorPosition();
+			StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
+			String line = tokenizer.nextToken();
+			String column = tokenizer.nextToken();
+			return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return raw;
 	}
 
 	/**
@@ -712,12 +750,24 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	protected Object getOutlineElementAt(int caret)
 	{
-		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null)
+		try
 		{
-			return null;
+			if (fOutlinePage == null)
+			{
+				return null;
+			}
+			IParseNode astNode = getASTNodeAt(caret);
+			if (astNode == null)
+			{
+				return null;
+			}
+			return fOutlinePage.getOutlineItem(astNode);
 		}
-		return fOutlinePage.getOutlineItem(astNode);
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return null;
 	}
 
 	/**
@@ -730,12 +780,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected IParseNode getASTNodeAt(int offset)
 	{
-		IParseNode root = getFileService().getParseResult();
-		if (root == null)
+		try
 		{
-			return null;
+			IParseNode root = getFileService().getParseResult();
+			if (root == null)
+			{
+				return null;
+			}
+			return root.getNodeAtOffset(offset);
 		}
-		return root.getNodeAtOffset(offset);
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return null;
 	}
 
 	private boolean isLinkedWithEditor()
@@ -800,5 +858,5 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		IPreferenceStore store = getPreferenceStore();
 		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
-}
+	}
 }
