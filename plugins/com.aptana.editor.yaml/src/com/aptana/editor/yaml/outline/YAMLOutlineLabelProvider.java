@@ -15,6 +15,15 @@ import com.aptana.parsing.ast.IParseNode;
 public class YAMLOutlineLabelProvider extends CommonOutlineLabelProvider
 {
 
+	private static final String TUPLE_IMAGE = "icons/property.png"; //$NON-NLS-1$
+	private static final String SEQUENCE_IMAGE = "icons/array-literal.png"; //$NON-NLS-1$
+	private static final String SELECTOR_IMAGE = "icons/selector.png"; //$NON-NLS-1$
+	private static final String STRING_IMAGE = "icons/string.png"; //$NON-NLS-1$
+	private static final String NUMBER_IMAGE = "icons/number.png"; //$NON-NLS-1$
+	// FIXME This numbner detection pattern was stolen from YAMLCodeScanner
+	private final static Pattern p = Pattern
+			.compile("(\\+|-)?((0(x|X|o|O)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?"); //$NON-NLS-1$
+
 	@Override
 	public String getText(Object element)
 	{
@@ -29,32 +38,29 @@ public class YAMLOutlineLabelProvider extends CommonOutlineLabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
-		// TODO use special icons for references. Can we get that from Node.isResolved() ?
+		// TODO use special icons for references/pointers. Can we get that from Node.isResolved() ?
 		if (element instanceof ScalarParseNode)
 		{
-			// TODO If scalar matches certain formats, we can say it's not just a string, but a number/date/whatever
+			// TODO Check for date format
 			ScalarParseNode spn = (ScalarParseNode) element;
 			String text = spn.getText();
-			// FIXME Stolen from YAMLCodeScanner
-			Pattern p = Pattern
-					.compile("(\\+|-)?((0(x|X|o|O)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?");
 			if (p.matcher(text).matches())
 			{
-				return YAMLPlugin.getImage("icons/number.png");
+				return YAMLPlugin.getImage(NUMBER_IMAGE);
 			}
-			return YAMLPlugin.getImage("icons/string.png");
+			return YAMLPlugin.getImage(STRING_IMAGE);
 		}
 		if (element instanceof MapParseNode)
 		{
-			return YAMLPlugin.getImage("icons/selector.png");
+			return YAMLPlugin.getImage(SELECTOR_IMAGE);
 		}
 		if (element instanceof SequenceParseNode)
 		{
-			return YAMLPlugin.getImage("icons/array-literal.png");
+			return YAMLPlugin.getImage(SEQUENCE_IMAGE);
 		}
 		if (element instanceof NodeTupleNode)
 		{
-			return YAMLPlugin.getImage("icons/property.png");
+			return YAMLPlugin.getImage(TUPLE_IMAGE);
 		}
 		return super.getImage(element);
 	}
