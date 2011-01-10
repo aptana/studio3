@@ -305,7 +305,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 				if (fileContents != null && fileContents.trim().length() > 0)
 				{
 					HTMLParseState parseState = new HTMLParseState();
-					parseState.setEditState(fileContents, null, 0, 0); //$NON-NLS-1$
+					parseState.setEditState(fileContents, null, 0, 0);
 
 					IParseNode parseNode = ParserPoolFactory.parse(IHTMLParserConstants.LANGUAGE, parseState);
 					sub.worked(50);

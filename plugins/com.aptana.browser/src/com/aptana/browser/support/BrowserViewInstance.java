@@ -73,7 +73,7 @@ public class BrowserViewInstance extends InternalBrowserInstance {
 			workbenchPage = workbenchWindow.getActivePage();
 		}
 		if (workbenchPage == null) {
-			throw new PartInitException("Cannot get Workbench page");
+			throw new PartInitException("Cannot get Workbench page"); //$NON-NLS-1$
 		}
 		if (view == null) {
 			view = (WebBrowserView) workbenchPage.showView(WebBrowserView.VIEW_ID, getId(), IWorkbenchPage.VIEW_CREATE);

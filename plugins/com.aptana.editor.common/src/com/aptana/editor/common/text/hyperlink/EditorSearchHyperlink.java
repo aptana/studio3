@@ -81,7 +81,7 @@ public class EditorSearchHyperlink implements IHyperlink
 
 	public String getHyperlinkText()
 	{
-		return MessageFormat.format("Open in {0}", document.toString());
+		return MessageFormat.format("Open in {0}", document.toString()); //$NON-NLS-1$
 	}
 
 	public void open()

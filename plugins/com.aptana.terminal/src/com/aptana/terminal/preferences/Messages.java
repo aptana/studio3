@@ -39,7 +39,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.terminal.preferences.messages"; //$NON-NLS-1$
+
 	public static String TerminalPreferencePage_Close_View_On_Exit;
+	public static String TerminalPreferencePage_LBL_WorkingDirectory;
+
 	static
 	{
 		// initialize resource bundle

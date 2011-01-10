@@ -47,7 +47,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = (new DefaultScope()).getNode(HTMLPlugin.PLUGIN_ID);
-		
+
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
 	}

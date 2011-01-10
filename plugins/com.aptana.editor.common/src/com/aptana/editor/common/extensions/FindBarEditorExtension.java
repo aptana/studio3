@@ -83,7 +83,7 @@ public class FindBarEditorExtension
 			textEditor = (ITextEditor) editor.getAdapter(ITextEditor.class);
 			if (textEditor == null)
 			{
-				throw new AssertionError("The editor passed must either be an ITextEditor or provide adaptation to it.");
+				throw new AssertionError("The editor passed must either be an ITextEditor or provide adaptation to it."); //$NON-NLS-1$
 			}
 		}
 		this.fEditor = new WeakReference<ITextEditor>(textEditor);

@@ -25,12 +25,13 @@ public final class Messages extends NLS
 		// Do not instantiate
 	}
 
+	public static String WizardFolderImportPage_ERR_FolderNotExist;
+	public static String WizardFolderImportPage_ERR_NoFolderSelected;
+	public static String WizardFolderImportPage_ERR_NoProjectName;
+	public static String WizardFolderImportPage_ERR_ProjectNameExists;
 	public static String WizardFolderImportPage_ExistingFolderAsNewProject;
-
 	public static String WizardFolderImportPage_SelectFolder;
-
 	public static String WizardFolderImportPage_ProjectName;
-
 	public static String WizardFolderImportPage_ErrorInitializingFolderImportWizard;
 
 	static

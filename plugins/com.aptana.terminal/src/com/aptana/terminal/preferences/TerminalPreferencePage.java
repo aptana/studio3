@@ -46,15 +46,16 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import com.aptana.terminal.Activator;
 
 public class TerminalPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-	BooleanFieldEditor closeOnExitEditor;
-	DirectoryFieldEditor workingDirectoryEditor;
+
+	private BooleanFieldEditor closeOnExitEditor;
+	private DirectoryFieldEditor workingDirectoryEditor;
 	
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
 	 */
 	protected void createFieldEditors() {
-		workingDirectoryEditor = new DirectoryFieldEditor(IPreferenceConstants.WORKING_DIRECTORY, "Working directory", getFieldEditorParent());
+		workingDirectoryEditor = new DirectoryFieldEditor(IPreferenceConstants.WORKING_DIRECTORY, Messages.TerminalPreferencePage_LBL_WorkingDirectory, getFieldEditorParent());
 		closeOnExitEditor = new BooleanFieldEditor(IPreferenceConstants.CLOSE_VIEW_ON_EXIT, Messages.TerminalPreferencePage_Close_View_On_Exit, getFieldEditorParent());
 		
 		addField(workingDirectoryEditor);
