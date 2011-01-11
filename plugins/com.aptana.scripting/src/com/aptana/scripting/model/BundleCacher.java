@@ -438,6 +438,7 @@ public class BundleCacher
 
 		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
 		// reduce duplication!
+		// FIXME Don't rely on extending ContsructMapping, it was originally private! If we can rewrite this, we can remove snakeyaml plugin and use the included version in JRuby 1.6!
 		private abstract class AbstractBundleElementConstruct extends ConstructMapping
 		{
 			/**

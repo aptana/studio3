@@ -1,3 +1,32 @@
+#
+# Copyright (C) 2008, 2009 Wayne Meissner
+# Copyright (C) 2009 Luc Heinrich
+# Copyright (c) 2007, 2008 Evan Phoenix
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of the Evan Phoenix nor the names of its contributors
+#   may be used to endorse or promote products derived from this software
+#   without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 module FFI
   TypeDefs = Hash.new
 
@@ -9,8 +38,16 @@ module FFI
   def self.find_type(name, type_map = nil)
     type = if name.is_a?(FFI::Type)
       name
+
+    elsif name.is_a?(DataConverter)
+      (type_map || TypeDefs)[name] = Type::Mapped.new(name)
+
+    elsif name.respond_to?("native_type") && name.respond_to?("to_native") && name.respond_to?("from_native")
+      FFI::Type::Mapped.new(name)
+
     elsif type_map
       type_map[name]
+    
     end || TypeDefs[name]
 
     raise TypeError, "Unable to resolve type '#{name}'" unless type
@@ -90,18 +127,28 @@ module FFI
   # Converts NUL-terminated C strings
   add_typedef(Type::STRING, :string)
 
-  # Returns a [ String, Pointer ] tuple so the C memory for the string can be freed
-  add_typedef(Type::STRPTR, :strptr)
-
   # Converts FFI::Buffer objects
   add_typedef(Type::BUFFER_IN, :buffer_in)
   add_typedef(Type::BUFFER_OUT, :buffer_out)
   add_typedef(Type::BUFFER_INOUT, :buffer_inout)
+
   add_typedef(Type::VARARGS, :varargs)
 
-  # Use for a C struct with a char [] embedded inside.
-  add_typedef(NativeType::CHAR_ARRAY, :char_array)
+  add_typedef(Type::BOOL, :bool)
 
+  # Returns a [ String, Pointer ] tuple so the C memory for the string can be freed
+  class StrPtrConverter
+    extend DataConverter
+    native_type Type::POINTER
+
+    def self.from_native(val, ctx)
+      [ val.null? ? Qnil : val.get_string(0), val ]
+    end
+
+  end
+
+  add_typedef(StrPtrConverter, :strptr)
+  
   TypeSizes = {
     1 => :char,
     2 => :short,
@@ -117,12 +164,10 @@ module FFI
     # Be like C, use int as the default type size.
     return :int
   end
+
   def self.type_size(type)
-    if type.kind_of?(Type) || (type = find_type(type))
-      return type.size
+    find_type(type).size
     end
-    raise ArgumentError, "Unknown native type"
-  end
 
   # Load all the platform dependent types
   begin
