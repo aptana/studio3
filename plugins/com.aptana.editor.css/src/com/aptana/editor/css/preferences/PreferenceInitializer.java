@@ -38,7 +38,10 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -53,6 +56,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
+
+		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
+		String[] filtered = new String[] { ".*Unknown pseudo-element.*" }; //$NON-NLS-1$
+		prefs.put(ICSSParserConstants.LANGUAGE + ":" //$NON-NLS-1$
+				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
+				StringUtil.join("####", filtered)); //$NON-NLS-1$
 	}
 
 }
