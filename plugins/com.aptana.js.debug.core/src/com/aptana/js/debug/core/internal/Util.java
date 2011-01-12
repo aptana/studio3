@@ -35,10 +35,8 @@
 package com.aptana.js.debug.core.internal;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.util.regex.Pattern;
 
 
@@ -50,24 +48,6 @@ public final class Util {
 	private static final Pattern CHECK_VARIABLE = Pattern.compile("\\A\\w+(?:\\.\\w+)*\\z"); //$NON-NLS-1$
 
 	private Util() {
-	}
-
-	/**
-	 * decodeURL
-	 * 
-	 * @param url
-	 * @return String
-	 */
-	public static String decodeURL(String url) {
-		try {
-			return URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
-		} catch (Exception ignore) {
-		}
-		try {
-			return URLDecoder.decode(url, "ASCII"); //$NON-NLS-1$
-		} catch (UnsupportedEncodingException ignore) {
-		}
-		return url;
 	}
 
 	/**

@@ -45,7 +45,6 @@ import java.util.List;
 
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.DebugCorePlugin;
-import com.aptana.js.debug.core.internal.Util;
 
 /**
  * @author Max Stepanov

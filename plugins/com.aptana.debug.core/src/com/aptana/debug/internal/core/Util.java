@@ -1,5 +1,5 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
+ * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
  * dual-licensed under both the Aptana Public License and the GNU General
  * Public license. You may elect to use one or the other of these licenses.
  * 
@@ -32,31 +32,40 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.sourcelookup;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.sourcelookup.ISourceContainer;
-import org.eclipse.debug.core.sourcelookup.ISourcePathComputerDelegate;
+package com.aptana.debug.internal.core;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
- * Computes the default source lookup path for an JS launch configuration. The
- * default source lookup is a container that knows how to map the fully
- * qualified file system paths to either the <code>IFile</code> within the
- * workspace or a <code>LocalFileStorage</code> for buildfiles not in the
- * workspace.
+ * @author Max Stepanov
+ *
  */
-public class SourcePathComputerDelegate implements ISourcePathComputerDelegate {
+public final class Util {
 
-	/*
-	 * @see org.eclipse.debug.core.sourcelookup.ISourcePathComputerDelegate#computeSourceContainers(org.eclipse.debug.core.ILaunchConfiguration,
-	 *      org.eclipse.core.runtime.IProgressMonitor)
+	/**
+	 * 
 	 */
-	public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-		return new ISourceContainer[] {
-				new LocalFileSourceContainer(),
-				new RemoteSourceContainer()
-			};
+	private Util() {
 	}
+
+	/**
+	 * decodeURL
+	 * 
+	 * @param url
+	 * @return String
+	 */
+	public static String decodeURL(String url) {
+		try {
+			return URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
+		} catch (Exception ignore) {
+		}
+		try {
+			return URLDecoder.decode(url, "ASCII"); //$NON-NLS-1$
+		} catch (UnsupportedEncodingException ignore) {
+		}
+		return url;
+	}
+
 }
