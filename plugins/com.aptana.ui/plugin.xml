@@ -201,7 +201,8 @@
             </dynamic>
             <visibleWhen
                   checkEnabled="false">
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="org.eclipse.core.resources.IResource">
                   </instanceof>
