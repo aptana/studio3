@@ -45,7 +45,8 @@ import java.net.URLStreamHandler;
  * 
  */
 public class DbgSourceURLStreamHandler extends URLStreamHandler {
-	private static DbgSourceURLStreamHandler instanse;
+	
+	private static DbgSourceURLStreamHandler instance;
 
 	/*
 	 * (non-Javadoc)
@@ -57,10 +58,10 @@ public class DbgSourceURLStreamHandler extends URLStreamHandler {
 	}
 
 	public static DbgSourceURLStreamHandler getDefault() {
-		if (instanse == null) {
-			instanse = new DbgSourceURLStreamHandler();
+		if (instance == null) {
+			instance = new DbgSourceURLStreamHandler();
 		}
-		return instanse;
+		return instance;
 	}
 
 }

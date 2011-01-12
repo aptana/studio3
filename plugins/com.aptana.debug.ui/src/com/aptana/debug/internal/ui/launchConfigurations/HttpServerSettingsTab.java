@@ -76,10 +76,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSDebugOptionsManager;
 import com.aptana.debug.internal.ui.dialogs.HttpServerPathDialog;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSDebugOptionsManager;
 
 /**
  * @author Max Stepanov

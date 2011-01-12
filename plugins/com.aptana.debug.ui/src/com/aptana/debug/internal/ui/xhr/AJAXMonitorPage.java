@@ -61,7 +61,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.Page;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.xhr.IXHRTransfer;
+import com.aptana.js.debug.core.model.xhr.IXHRTransfer;
 
 /**
  * @author Max Stepanov

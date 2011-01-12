@@ -38,8 +38,8 @@ package com.aptana.debug.internal.ui.xhr;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.aptana.debug.core.xhr.IHeader;
-import com.aptana.debug.core.xhr.IXHRService;
+import com.aptana.js.debug.core.model.xhr.IHeader;
+import com.aptana.js.debug.core.model.xhr.IXHRService;
 
 /**
  * @author Max Stepanov

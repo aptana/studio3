@@ -60,7 +60,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.core.resources.IUniformResource;
-import com.aptana.debug.core.IDebugConstants;
+import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.debug.ui.DebugUiPlugin;
@@ -119,7 +119,7 @@ public class RunToLineAdapter implements IRunToLineTarget
 					IBreakpoint breakpoint = null;
 					Map<String, Object> attributes = new HashMap<String, Object>();
 					attributes.put(IBreakpoint.PERSISTED, Boolean.FALSE);
-					attributes.put(IDebugConstants.RUN_TO_LINE, Boolean.TRUE);
+					attributes.put(IJSDebugConstants.RUN_TO_LINE, Boolean.TRUE);
 					breakpoint = JSDebugModel.createLineBreakpointForResource(resource[0], lineNumber[0], attributes,
 							false);
 					errorMessage = Messages.RunToLineAdapter_UnableToLocateDebugTarget;

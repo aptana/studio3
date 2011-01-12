@@ -44,7 +44,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.aptana.core.util.URLEncoder;
-import com.aptana.debug.core.JSDebugPlugin;
+import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.js.debug.core.internal.Util;
 
 /**
  * @author Max Stepanov
@@ -131,7 +132,7 @@ public class LocalResourceMapper {
 	 * @throws MalformedURLException
 	 */
 	public void addMapping(URL baseURL, File rootDir) throws MalformedURLException {
-		JSDebugPlugin.log("LocalResourceMapper: " + baseURL.toExternalForm() + " = " + rootDir); //$NON-NLS-1$ //$NON-NLS-2$
+		DebugCorePlugin.log("LocalResourceMapper: " + baseURL.toExternalForm() + " = " + rootDir); //$NON-NLS-1$ //$NON-NLS-2$
 		try {
 			Entry newEntry = new Entry(baseURL, rootDir);
 			int index = 0;
@@ -148,7 +149,7 @@ public class LocalResourceMapper {
 			}
 			entries.add(0, newEntry);
 		} catch (URISyntaxException e) {
-			JSDebugPlugin.log(e);
+			DebugCorePlugin.log(e);
 		}
 	}
 
@@ -163,13 +164,13 @@ public class LocalResourceMapper {
 		try {
 			url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getPath());
 		} catch (MalformedURLException e) {
-			JSDebugPlugin.log(e);
+			DebugCorePlugin.log(e);
 		}
 		File file = null;
 		for (Iterator<Entry> i = entries.iterator(); file == null && i.hasNext();) {
 			file = ((Entry) i.next()).resolveServerURL(url);
 		}
-		JSDebugPlugin.log("LocalResourceMapper: " + url.toExternalForm() + " -> " + file); //$NON-NLS-1$ //$NON-NLS-2$
+		DebugCorePlugin.log("LocalResourceMapper: " + url.toExternalForm() + " -> " + file); //$NON-NLS-1$ //$NON-NLS-2$
 		return file;
 	}
 
@@ -185,7 +186,7 @@ public class LocalResourceMapper {
 			for (Iterator<Entry> i = entries.iterator(); remoteURI == null && i.hasNext();) {
 				remoteURI = ((Entry) i.next()).resolveLocalURI(localURI);
 			}
-			JSDebugPlugin.log("LocalResourceMapper: " + localURI + " -> " + remoteURI); //$NON-NLS-1$ //$NON-NLS-2$
+			DebugCorePlugin.log("LocalResourceMapper: " + localURI + " -> " + remoteURI); //$NON-NLS-1$ //$NON-NLS-2$
 			if (remoteURI != null) {
 				return remoteURI;
 			}

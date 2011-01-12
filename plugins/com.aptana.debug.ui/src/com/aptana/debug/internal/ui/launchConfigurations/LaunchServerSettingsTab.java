@@ -68,10 +68,10 @@ import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.internal.ui.ActiveResourcePathGetterAdapter;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 
 /**
  * Launch settings tab

@@ -55,8 +55,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.IUpdate;
 
-import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.IJSDebugConstants;
 
 /**
  * @author Max Stepanov
@@ -75,9 +75,9 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 	protected IBreakpoint determineBreakpoint()
 	{
 		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(
-				IDebugConstants.ID_DEBUG_MODEL);
+				IJSDebugConstants.ID_DEBUG_MODEL);
 		IBreakpoint[] phpBreakpoints=DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(
-				IDebugConstants.PHP_DEBUG_MODEL);
+				IJSDebugConstants.PHP_DEBUG_MODEL);
 		ArrayList<IBreakpoint>allBreakPoints=new ArrayList<IBreakpoint>();
 		allBreakPoints.addAll(Arrays.asList(breakpoints));
 		allBreakPoints.addAll(Arrays.asList(phpBreakpoints));

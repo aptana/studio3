@@ -48,10 +48,10 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.debug.core.preferences.IJSDebugPreferenceNames;
+import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.internal.ui.IDebugUIConstants;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 /**
  * @author Max Stepanov
@@ -158,7 +158,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	 */
 	protected Preferences getPreferences()
 	{
-		return JSDebugPlugin.getDefault().getPluginPreferences();
+		return DebugCorePlugin.getDefault().getPluginPreferences();
 	}
 
 	private void setInitialValues()
@@ -204,7 +204,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, suspendOnExceptions.getSelection());
 		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, suspendOnErrors.getSelection());
 		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, suspendOnDebuggerKeyword.getSelection());
-		JSDebugPlugin.getDefault().savePluginPreferences();
+		DebugCorePlugin.getDefault().savePluginPreferences();
 
 		IPreferenceStore uiStore = DebugUiPlugin.getDefault().getPreferenceStore();
 		uiStore.setValue(IDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, confirmExitDebugger.getSelection());

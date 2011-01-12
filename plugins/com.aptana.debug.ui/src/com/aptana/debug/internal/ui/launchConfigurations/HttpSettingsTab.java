@@ -49,9 +49,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 
 /**
  * @author Max Stepanov

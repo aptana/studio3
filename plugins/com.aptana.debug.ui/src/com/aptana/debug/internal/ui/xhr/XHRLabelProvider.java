@@ -42,8 +42,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.xhr.IHeader;
-import com.aptana.debug.core.xhr.IXHRTransfer;
+import com.aptana.js.debug.core.model.xhr.IHeader;
+import com.aptana.js.debug.core.model.xhr.IXHRTransfer;
 
 /**
  * @author Max Stepanov

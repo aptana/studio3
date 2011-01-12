@@ -4,15 +4,15 @@
    <extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
-            class="com.aptana.debug.internal.core.model.JSDebugLineBreakpoint"
+            class="com.aptana.js.debug.core.internal.model.JSDebugLineBreakpoint"
             id="com.aptana.debug.core.lineBreakpoint"
             markerType="com.aptana.debug.core.lineBreakpointMarker"/>
       <breakpoint
-            class="com.aptana.debug.internal.core.model.JSDebugExceptionBreakpoint"
+            class="com.aptana.js.debug.core.internal.model.JSDebugExceptionBreakpoint"
             id="com.aptana.debug.core.exceptionBreakpoint"
             markerType="com.aptana.debug.core.exceptionBreakpointMarker"/>
       <breakpoint
-            class="com.aptana.debug.internal.core.model.JSDebugWatchpoint"
+            class="com.aptana.js.debug.core.internal.model.JSDebugWatchpoint"
             id="com.aptana.debug.core.variableWatchpoint"
             markerType="com.aptana.debug.core.watchpointMarker"/>
    </extension>
@@ -40,20 +40,20 @@
    <extension
          point="org.eclipse.debug.core.sourceLocators">
       <sourceLocator
-            class="com.aptana.debug.internal.core.sourcelookup.JSSourceLookupDirector"
+            class="com.aptana.js.debug.core.internal.sourcelookup.JSSourceLookupDirector"
             id="com.aptana.debug.core.sourceLookupDirector"
             name="%sourceLocator.name"/>
    </extension>
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
       <sourcePathComputer
-            class="com.aptana.debug.internal.core.sourcelookup.JSSourcePathComputerDelegate"
+            class="com.aptana.debug.core.sourcelookup.SourcePathComputerDelegate"
             id="com.aptana.debug.core.sourcePathComputer"/>
    </extension>
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="com.aptana.debug.core.JSLaunchConfigurationDelegate"
+            delegate="com.aptana.js.debug.core.JSLaunchConfigurationDelegate"
             id="com.aptana.debug.core.jsLaunchConfigurationType"
             modes="run,debug"
             name="%launchConfigurationType.webbrowser.name"
@@ -62,7 +62,7 @@
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
       </launchConfigurationType>
       <launchConfigurationType
-            delegate="com.aptana.debug.core.JSRemoteLaunchConfigurationDelegate"
+            delegate="com.aptana.js.debug.core.JSRemoteLaunchConfigurationDelegate"
             id="com.aptana.debug.core.jsRemoteLaunchConfigurationType"
             modes="run,debug"
             name="%launchConfigurationType.remote.name"
@@ -75,11 +75,11 @@
          point="org.eclipse.debug.core.watchExpressionDelegates">
       <watchExpressionDelegate
             debugModel="com.aptana.debug.core"
-            delegateClass="com.aptana.debug.internal.core.model.WatchExpressionDelegate"/>
+            delegateClass="com.aptana.js.debug.core.internal.model.WatchExpressionDelegate"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="com.aptana.debug.internal.core.preferences.JSDebugPreferenceInitializer"/>
+      <initializer class="com.aptana.js.debug.core.internal.preferences.JSDebugPreferenceInitializer"/>
    </extension>
 
 </plugin>

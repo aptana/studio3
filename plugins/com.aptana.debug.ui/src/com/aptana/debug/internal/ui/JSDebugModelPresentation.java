@@ -66,10 +66,10 @@ import org.eclipse.ui.IEditorInput;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.IDebugConstants;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.internal.ui.util.SourceDisplayUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.js.debug.core.model.IJSImplicitBreakpoint;
@@ -283,7 +283,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 					}
 					else if (marker.getResource() instanceof IWorkspaceRoot)
 					{
-						URI uri = URI.create((String) marker.getAttribute(IDebugConstants.BREAKPOINT_LOCATION));
+						URI uri = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 						if ("file".equals(uri.getScheme())) { //$NON-NLS-1$
 							fileName = DebugUtil.getPath(uri);
 							IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));

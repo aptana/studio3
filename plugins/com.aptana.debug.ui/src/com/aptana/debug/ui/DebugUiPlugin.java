@@ -61,7 +61,7 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.UniformResourceStorage;
-import com.aptana.debug.core.IDebugConstants;
+import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.debug.internal.ui.DebugUIImages;
 
@@ -281,7 +281,7 @@ public class DebugUiPlugin extends AbstractUIPlugin
 	{
 		if (fUtilPresentation == null)
 		{
-			fUtilPresentation = DebugUITools.newDebugModelPresentation(IDebugConstants.ID_DEBUG_MODEL);
+			fUtilPresentation = DebugUITools.newDebugModelPresentation(IJSDebugConstants.ID_DEBUG_MODEL);
 		}
 		return fUtilPresentation;
 	}

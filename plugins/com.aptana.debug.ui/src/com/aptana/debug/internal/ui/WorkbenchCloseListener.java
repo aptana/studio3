@@ -44,8 +44,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.debug.core.JSDebugOptionsManager;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.JSDebugOptionsManager;
 
 /**
  * @author Max Stepanov

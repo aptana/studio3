@@ -38,8 +38,9 @@ package com.aptana.debug.core;
  * @author Max Stepanov
  */
 public interface IDetailFormattersChangeListener {
+	
 	/**
-	 * detailFormattersChanged
+	 * Notifies listener about changes in detail formatters
 	 */
 	void detailFormattersChanged();
 }

@@ -51,11 +51,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
 
-import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSDebugPlugin;
-import com.aptana.debug.core.JSLaunchConfigurationHelper;
-import com.aptana.debug.core.preferences.IJSDebugPreferenceNames;
+import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
+import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 /**
  * @author Max Stepanov
@@ -142,7 +142,7 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab
 			}
 			else
 			{
-				setValuesFrom(JSDebugPlugin.getDefault().getPluginPreferences());
+				setValuesFrom(DebugCorePlugin.getDefault().getPluginPreferences());
 			}
 		}
 		catch (CoreException ignore)

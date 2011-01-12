@@ -514,12 +514,12 @@
          <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.JSLaunchConfigurationDelegate"
+            adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationDelegate"
             class="com.aptana.debug.internal.ui.ActiveResourcePathGetterAdapterFactory">
          <adapter type="com.aptana.debug.core.IActiveResourcePathGetterAdapter"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.JSDebugPlugin"
+            adaptableType="com.aptana.debug.core.DebugCorePlugin"
             class="com.aptana.debug.internal.ui.EditorOpenAdapterFactory">
          <adapter type="com.aptana.debug.core.IEditorOpenAdapter"/>
       </factory>
@@ -529,7 +529,7 @@
          <adapter type="org.eclipse.jface.text.ITextHover"/>
       </factory>
       <factory
-            adaptableType="com.aptana.debug.core.JSLaunchConfigurationHelper"
+            adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationHelper"
             class="com.aptana.debug.internal.ui.WebBrowserEnumeratorAdapterFactory">
          <adapter type="java.util.Enumeration"/>
       </factory>

@@ -38,7 +38,7 @@ package com.aptana.debug.core;
 /**
  * Information about a detail formatter.
  */
-public class DetailFormatter implements Comparable<Object> {
+public final class DetailFormatter implements Comparable<Object> {
 
 	private boolean fEnabled;
 

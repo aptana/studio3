@@ -52,9 +52,9 @@ import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.launchConfigurations.LaunchHistory;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.ILaunchConfigurationConstants;
-import com.aptana.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 
 /**
  * @author Max Stepanov

@@ -61,8 +61,8 @@ import org.eclipse.ui.part.IPage;
 import org.eclipse.ui.part.PageBook;
 
 import com.aptana.debug.core.util.DebugUtil;
-import com.aptana.debug.core.xhr.IXHRService;
 import com.aptana.debug.internal.ui.xhr.AJAXMonitorPage;
+import com.aptana.js.debug.core.model.xhr.IXHRService;
 
 /**
  * @author Max Stepanov

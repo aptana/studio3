@@ -51,7 +51,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.debug.core.IDebugConstants;
+import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSStackFrame;
 
 /**
@@ -191,7 +191,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension
 	{
 		if (modelPresentation == null)
 		{
-			modelPresentation = DebugUITools.newDebugModelPresentation(IDebugConstants.ID_DEBUG_MODEL);
+			modelPresentation = DebugUITools.newDebugModelPresentation(IJSDebugConstants.ID_DEBUG_MODEL);
 			modelPresentation.setAttribute(IDebugModelPresentation.DISPLAY_VARIABLE_TYPE_NAMES, Boolean.TRUE);
 		}
 		return modelPresentation;
