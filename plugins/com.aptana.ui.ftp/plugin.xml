@@ -54,6 +54,16 @@
                </count>
             </visibleWhen>
          </command>
+         <command
+               commandId="com.aptana.ui.ftp.command.duplicate"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <count
+                     value="1">
+               </count>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -67,6 +77,12 @@
             defaultHandler="com.aptana.ide.ui.ftp.handlers.NewFTPConnectionHandler"
             id="com.aptana.ui.ftp.command.add"
             name="%newFTPConnectionAction.label">
+      </command>
+      <command
+            categoryId="com.aptana.ui.ftp.category"
+            defaultHandler="com.aptana.ide.ui.ftp.handlers.DuplicateConnectionHandler"
+            id="com.aptana.ui.ftp.command.duplicate"
+            name="%duplicateAction.label">
       </command>
    </extension>
 
