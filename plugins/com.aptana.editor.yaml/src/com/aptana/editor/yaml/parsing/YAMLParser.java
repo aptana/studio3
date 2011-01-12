@@ -24,8 +24,8 @@ public class YAMLParser implements IParser
 		CharArrayReader reader = new CharArrayReader(parseState.getSource());
 		Node root = getSourceParser().compose(reader);
 		
-		// TODO Convert YAML nodes to our own!
-		YAMLParseRootNode yamlRoot = new YAMLParseRootNode(root);
+		// Convert YAML nodes to our own!
+		YAMLParseRootNode yamlRoot = new YAMLParseRootNode(root, parseState);
 		
 		parseState.setParseResult(yamlRoot);
 
