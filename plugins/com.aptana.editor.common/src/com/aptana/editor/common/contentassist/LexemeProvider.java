@@ -176,10 +176,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getCeilingLexeme
+	 * Gets the lexeme at the specified offset. If it is a whitespace character it will return the next (higher) lexeme
+	 * if one exists. If not found it will return null.
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the lexeme at the given offset or the lexeme immediately following the offset if none exists at
+	 *         the given offset
 	 */
 	public Lexeme<T> getCeilingLexeme(int offset)
 	{
@@ -189,9 +191,9 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getFirstLexeme
+	 * Returns the first lexeme in the list. If there is no lexeme at that position (i.e. empty list), returns null
 	 * 
-	 * @return
+	 * @return The first lexeme, or null
 	 */
 	public Lexeme<T> getFirstLexeme()
 	{
@@ -199,10 +201,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 	
 	/**
-	 * getFloorLexeme
+	 * Gets the lexeme at the specified offset. If it is a whitespace character it will return the previous (lower)
+	 * lexeme if one exists. If not found it will return null.
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the lexeme at the given offset or the lexeme immediately preceding the offset if none exists at
+	 *         the given offset
 	 */
 	public Lexeme<T> getFloorLexeme(int offset)
 	{
@@ -212,9 +216,9 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 	
 	/**
-	 * getLastLexeme
+	 * Returns the last lexeme in the list. If there is no lexeme at that position (i.e. empty list), returns null
 	 * 
-	 * @return
+	 * @return The last lexeme, or null
 	 */
 	public Lexeme<T> getLastLexeme()
 	{
@@ -222,10 +226,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getLexeme
+	 * Get a lexeme at the specified index. This method will return null if the index
+	 * is not within the range of this lexeme list
 	 * 
 	 * @param index
-	 * @return
+	 *            The index to retrieve
+	 * @return The lexeme at the specified index
 	 */
 	public Lexeme<T> getLexeme(int index)
 	{
@@ -240,10 +246,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getLexemeCeilingIndex
+	 * Get the index of the lexeme at the specified offset. If it is a whitespace character it will return the next
+	 * (higher) lexeme if one exists. If not found it will return -1.
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the lexeme at the given offset or the lexeme immediately following the offset if none exists at
+	 *         the given offset
 	 */
 	public int getLexemeCeilingIndex(int offset)
 	{
@@ -274,10 +282,12 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getLexemeFloorIndex
+	 * Get the index of the lexeme at the specified offset. If it is a whitespace character it will return the previous
+	 * (lower) lexeme if one exists. If not found it will return -1.
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the lexeme at the given offset or the lexeme immediately preceding the offset if none exists at
+	 *         the given offset
 	 */
 	public int getLexemeFloorIndex(int offset)
 	{
@@ -307,10 +317,10 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getLexemeFromOffset
+	 * Get the index of the lexeme at the specified offset
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the lexeme at the given offset. Returns null if no lexeme is at the given offset.
 	 */
 	public Lexeme<T> getLexemeFromOffset(int offset)
 	{
@@ -320,10 +330,11 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * getLexemeIndex
+	 * Get the index of the lexeme at the specified offset
 	 * 
 	 * @param offset
-	 * @return
+	 * @return Returns the index of the lexeme at the given offset. A negative value will be returned if there is no
+	 *         lexeme at the given offset
 	 */
 	public int getLexemeIndex(int offset)
 	{
@@ -369,9 +380,9 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * size
+	 * Return the size of this list
 	 * 
-	 * @return
+	 * @return The list size
 	 */
 	public int size()
 	{

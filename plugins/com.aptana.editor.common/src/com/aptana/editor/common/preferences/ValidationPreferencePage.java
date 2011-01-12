@@ -190,6 +190,27 @@ public class ValidationPreferencePage extends PreferencePage implements IWorkben
 		return super.performOk();
 	}
 
+	@Override
+	protected void performDefaults()
+	{
+		List<ValidatorLanguage> languages = ValidatorLoader.getInstance().getLanguages();
+		String languageType, list;
+		for (ValidatorLanguage language : languages)
+		{
+			languageType = language.getType();
+			list = getPreferenceStore().getDefaultString(getFilterExpressionsPrefKey(languageType));
+			if (!StringUtil.isEmpty(list))
+			{
+				List<String> expressions = new ArrayList<String>();
+				expressions.addAll(Arrays.asList(list.split(FILTER_DELIMITER)));
+				filterExpressionsMap.put(languageType, expressions);
+			}
+		}
+		updateFilterExpressions();
+
+		super.performDefaults();
+	}
+
 	private Control createValidators(Composite parent)
 	{
 		Group group = new Group(parent, SWT.NONE);

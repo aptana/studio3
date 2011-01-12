@@ -2,8 +2,6 @@ package com.aptana.git.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
@@ -46,29 +44,39 @@ public class SwitchBranchItem extends AbstractDynamicBranchItem
 		}
 
 		Collection<IContributionItem> contributions = new ArrayList<IContributionItem>();
-
-		SortedSet<String> localBranches = new TreeSet<String>(repo.localBranches());
-		for (final String branchName : localBranches)
+		for (final String branchName : repo.localBranches())
 		{
-			contributions.add(new ContributionItem()
+			contributions.add(new SwitchBranchContributionItem(repo, branchName));
+		}
+		return contributions.toArray(new IContributionItem[contributions.size()]);
+	}
+
+	private class SwitchBranchContributionItem extends ContributionItem
+	{
+
+		private GitRepository repo;
+		private String branchName;
+
+		SwitchBranchContributionItem(GitRepository repo, String branchName)
+		{
+			this.repo = repo;
+			this.branchName = branchName;
+		}
+
+		@Override
+		public void fill(Menu menu, int index)
+		{
+			MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
+			menuItem.setText(branchName);
+			menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
+			menuItem.addSelectionListener(new SelectionAdapter()
 			{
-				@Override
-				public void fill(Menu menu, int index)
+				public void widgetSelected(SelectionEvent e)
 				{
-					MenuItem menuItem = new MenuItem(menu, SWT.PUSH, index++);
-					menuItem.setText(branchName);
-					menuItem.setEnabled(!branchName.equals(repo.currentBranch()));
-					menuItem.addSelectionListener(new SelectionAdapter()
-					{
-						public void widgetSelected(SelectionEvent e)
-						{
-							// what to do when menu is subsequently selected.
-							SwitchBranchHandler.switchBranch(repo, branchName);
-						}
-					});
+					// what to do when menu is subsequently selected.
+					SwitchBranchHandler.switchBranch(repo, branchName);
 				}
 			});
 		}
-		return contributions.toArray(new IContributionItem[contributions.size()]);
 	}
 }

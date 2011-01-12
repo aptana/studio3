@@ -54,7 +54,7 @@ public class ShowTerminalHandler extends AbstractHandler {
 
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IPath workingDirectory = null;
-		String title = "Terminal";
+		String title = Messages.ShowTerminalHandler_LBL_Terminal;
 		String viewId = null;
 		
 		String workingDirectoryPref = Activator.getDefault().getPreferenceStore().getString(IPreferenceConstants.WORKING_DIRECTORY);

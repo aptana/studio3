@@ -42,5 +42,5 @@ public interface IPreferenceContants
 	/**
 	 * The value is a double used to indicate the current format being used by the HTML index categories.
 	 */
-	String HTML_INDEX_VERSION = "HTML_INDEX_VERSION";
+	String HTML_INDEX_VERSION = "HTML_INDEX_VERSION"; //$NON-NLS-1$
 }

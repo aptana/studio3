@@ -1,7 +1,6 @@
 package com.aptana.editor.html.preferences;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IWorkbench;
 
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLPlugin;
@@ -14,7 +13,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	public HTMLPreferencePage()
 	{
 		super();
-		setDescription("Preferences for the Aptana HTML Editor");
+		setDescription(Messages.HTMLPreferencePage_LBL_Description);
 		setPreferenceStore( HTMLPlugin.getDefault().getPreferenceStore());
 	}
 

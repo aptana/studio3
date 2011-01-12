@@ -92,16 +92,21 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 	@Override
 	public void disconnect(Object element)
 	{
-		IDocument document = getDocument(element);
+		FileInfo fileInfo = getFileInfo(element);
 
-		if (document != null)
+		if (fileInfo.fCount == 1)
 		{
-			IDocumentPartitioner partitioner = document.getDocumentPartitioner();
+			IDocument document = getDocument(element);
 
-			if (partitioner != null)
+			if (document != null)
 			{
-				partitioner.disconnect();
-				document.setDocumentPartitioner(null);
+				IDocumentPartitioner partitioner = document.getDocumentPartitioner();
+
+				if (partitioner != null)
+				{
+					partitioner.disconnect();
+					document.setDocumentPartitioner(null);
+				}
 			}
 		}
 

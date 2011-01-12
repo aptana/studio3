@@ -272,12 +272,12 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	public boolean hasProperty(String property)
 	{
 		boolean result;
-		
+
 		synchronized (propertyLock)
 		{
 			result = this._customProperties != null && this._customProperties.containsKey(property);
 		}
-		
+
 		return result;
 	}
 
@@ -310,6 +310,27 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		}
 	}
 
+	public Map<String, Object> getCustomProperties()
+	{
+		if (this._customProperties == null)
+		{
+			return null;
+		}
+		return new HashMap<String, Object>(this._customProperties);
+	}
+
+	public void setCustomProperties(Map<String, Object> props)
+	{
+		synchronized (propertyLock)
+		{
+			this._customProperties = null;
+			if (props != null)
+			{
+				this._customProperties = new HashMap<String, Object>(props);
+			}
+		}
+	}
+
 	/**
 	 * setDisplayName
 	 * 
@@ -325,7 +346,7 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 	 * 
 	 * @param path
 	 */
-	void setPath(String path)
+	public void setPath(String path)
 	{
 		if (StringUtil.areNotEqual(this._path, path))
 		{

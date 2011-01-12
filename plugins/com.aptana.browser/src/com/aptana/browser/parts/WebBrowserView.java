@@ -73,7 +73,7 @@ public class WebBrowserView extends ViewPart {
 				if (event.current == 0) {
 					IProgressMonitor progressMonitor = getStatusBarProgressMonitor();
 					progressMonitor.done();
-					progressMonitor.beginTask("", event.total);
+					progressMonitor.beginTask("", event.total); //$NON-NLS-1$
 					progressWorked = 0;
 				}
 				if (progressWorked < event.current) {

@@ -246,7 +246,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 					context.setInputStream(new ByteArrayInputStream(viewer.getDocument().get().getBytes()));
 					CommandResult result = ce.execute(context);
 
-					if (!result.executedSuccessfully())
+					if (result == null || !result.executedSuccessfully())
 					{
 						continue;
 					}

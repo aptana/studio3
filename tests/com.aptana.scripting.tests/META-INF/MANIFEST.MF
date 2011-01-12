@@ -8,5 +8,6 @@ Fragment-Host: com.aptana.scripting;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.junit
+ org.junit,
+ org.eclipse.test.performance
 Export-Package: com.aptana.scripting.tests

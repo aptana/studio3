@@ -281,7 +281,7 @@ public class EditorCommandsMenuContributor extends ContributionItem {
 
 				// A command attached to the menu item may not be executable on
 				// the current platform in which case we skip the menu item
-				if (command != null && (!command.isExecutable())) {
+				if (command != null && (!command.isExecutable())) { // FIXME We need to determine if the command applies to the current OS here...
 					continue;
 				}
 				final MenuItem menuItem = new MenuItem(menu, SWT.PUSH);

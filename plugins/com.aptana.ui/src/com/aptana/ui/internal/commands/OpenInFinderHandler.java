@@ -140,8 +140,8 @@ public class OpenInFinderHandler extends AbstractHandler
 		}
 		
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$ //$NON-NLS-2$
-				file.getAbsolutePath()); //$NON-NLS-1$
+		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$
+				file.getAbsolutePath());
 		if (result == null || result.isEmpty())
 		{
 			return false;

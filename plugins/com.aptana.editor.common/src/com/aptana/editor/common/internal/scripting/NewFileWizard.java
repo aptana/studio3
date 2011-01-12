@@ -141,6 +141,10 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		context.put("TM_NEW_FILE", absoluteFilePath.toOSString()); //$NON-NLS-1$
 		context.put("TM_NEW_FILE_DIRECTORY", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
 		CommandResult result = template.execute(context);
+		if (result == null)
+		{
+			return null;
+		}
 		return result.getOutputString();
 	}
 }

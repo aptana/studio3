@@ -51,6 +51,13 @@ public class MenuElement extends AbstractBundleElement
 
 	private Object childrenLock = new Object();
 
+	// FIXME this is needed for YAML serializing because I can't figure out how to get it to use my special representer
+	// when loading a collection of them...
+	public MenuElement()
+	{
+		this(null);
+	}
+
 	/**
 	 * Snippet
 	 * 
@@ -108,6 +115,21 @@ public class MenuElement extends AbstractBundleElement
 		}
 
 		return result;
+	}
+
+	public synchronized void setChildren(List<MenuElement> children)
+	{
+		synchronized (childrenLock)
+		{
+			this._children = new ArrayList<MenuElement>();
+		}
+		if (children != null)
+		{
+			for (MenuElement child : children)
+			{
+				addMenu(child);
+			}
+		}
 	}
 
 	/**
@@ -268,12 +290,12 @@ public class MenuElement extends AbstractBundleElement
 	protected void printBody(SourcePrinter printer)
 	{
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		
+
 		if (this.getScopeSelector() != null)
 		{
 			printer.printWithIndent("scope: ").println(this.getScopeSelector().toString()); //$NON-NLS-1$
 		}
-		
+
 		printer.printWithIndent("command: ").println(this.getCommandName()); //$NON-NLS-1$
 
 		synchronized (childrenLock)

@@ -220,7 +220,7 @@ public class JSMetadataReader extends MetadataReader
 					if (this.isValidTypeIdentifier(superType))
 					{
 						type.addParentType(superType);
-						clas.addParentType(getTypeClass(superType)); //$NON-NLS-1$ //$NON-NLS-2$
+						clas.addParentType(getTypeClass(superType));
 					}
 					else
 					{
