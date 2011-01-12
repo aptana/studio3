@@ -90,6 +90,12 @@ public class CSSValidator implements IValidator
 	private static final Pattern PROPERTIES_PATTERN = Pattern.compile(
 			"<([-A-Za-z0-9_:]+)>(.*?)</\\1>", Pattern.MULTILINE | Pattern.DOTALL); //$NON-NLS-1$
 
+	// CSS3 properties that the validator doesn't recognize yet and need to be ignored
+	@SuppressWarnings("nls")
+	private static final String[] CSS3_PROPERTIES = { "box-shadow", "column-count", "column-width", "column-gap",
+			"column-rule", "border-radius", "border-top-right-radius", "border-bottom-right-radius",
+			"border-bottom-left-radius", "border-top-left-radius" };
+
 	public CSSValidator()
 	{
 		loadAptanaCSSProfile();
@@ -273,7 +279,7 @@ public class CSSValidator implements IValidator
 			}
 			message = StringEscapeUtils.unescapeHtml(message);
 
-			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE))
+			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE) && !containsCSS3Property(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				manager.addError(message, lineNumber, 0, 0, sourcePath);
@@ -389,5 +395,17 @@ public class CSSValidator implements IValidator
 			result.put(key, value);
 		}
 		return result;
+	}
+
+	private static boolean containsCSS3Property(String message)
+	{
+		for (String property : CSS3_PROPERTIES)
+		{
+			if (message.indexOf(property) > -1)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
