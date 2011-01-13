@@ -39,7 +39,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ui.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ui.util.messages"; //$NON-NLS-1$
 
 	public static String UIUtils_Error;
 

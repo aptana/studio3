@@ -338,7 +338,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 	private Composite createSitePresentation(Composite parent)
 	{
 		final Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(5, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.horizontalSpacing = 0;
@@ -361,9 +361,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				focusedConnection = fSource;
 			}
 		});
-
-		final Sash leftSash = new Sash(main, SWT.VERTICAL);
-		leftSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
 		// transfer arrows
 		final Composite directions = new Composite(main, SWT.NONE);
@@ -390,9 +387,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
 		fTransferSyncButton.addSelectionListener(this);
 
-		final Sash rightSash = new Sash(main, SWT.VERTICAL);
-		rightSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-
 		// destination end point
 		fTarget = new ConnectionPointComposite(main, Messages.FTPManagerComposite_LBL_Target, this);
 		fTarget.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -408,62 +402,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 			public void focusGained(FocusEvent e)
 			{
 				focusedConnection = fTarget;
-			}
-		});
-		
-		leftSash.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent event)
-			{
-				if (event.detail != SWT.DRAG)
-				{
-					layout();
-				}
-			}
-
-			private void layout()
-			{
-				Rectangle overallBounds = main.getBounds();
-				Rectangle leftSashBounds = leftSash.getBounds();
-				Rectangle middleBounds = directions.getBounds();
-				Rectangle rightSashBounds = rightSash.getBounds();
-
-				fSource.getControl().setBounds(0, 0, leftSashBounds.x, overallBounds.height);
-				int x = leftSashBounds.x + leftSashBounds.width;
-				directions.setBounds(x, 0, middleBounds.width, overallBounds.height);
-				x += middleBounds.width;
-				rightSash.setBounds(x, 0, rightSashBounds.width, overallBounds.height);
-				x += rightSashBounds.width;
-				fTarget.getControl().setBounds(x, 0, overallBounds.width - x, overallBounds.height);
-			}
-		});
-
-		rightSash.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent event)
-			{
-				if (event.detail != SWT.DRAG)
-				{
-					layout();
-				}
-			}
-
-			private void layout()
-			{
-				Rectangle overallBounds = main.getBounds();
-				Rectangle leftSashBounds = leftSash.getBounds();
-				Rectangle middleBounds = directions.getBounds();
-				Rectangle rightSashBounds = rightSash.getBounds();
-
-				int x = rightSashBounds.x + rightSashBounds.width;
-				fTarget.getControl().setBounds(x, 0, overallBounds.width - x, overallBounds.height);
-				x = rightSashBounds.x - middleBounds.width;
-				directions.setBounds(x, 0, middleBounds.width, overallBounds.height);
-				x -= leftSashBounds.width;
-				leftSash.setBounds(x, 0, leftSashBounds.width, overallBounds.height);
-				fSource.getControl().setBounds(0, 0, x, overallBounds.height);
 			}
 		});
 
