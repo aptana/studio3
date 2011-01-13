@@ -33,14 +33,28 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.core;
+package com.aptana.core.internal.preferences;
+
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+
+import com.aptana.core.CorePlugin;
+import com.aptana.core.ICorePreferenceConstants;
 
 /**
  * @author Max Stepanov
  *
  */
-public interface ICorePreferenceConstants {
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	String PREF_SHELL_EXECUTABLE_PATH = "shell_executable_path"; //$NON-NLS-1$
-	String PREF_WEB_FILES = "web_files"; //$NON-NLS-1$
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 */
+	@Override
+	public void initializeDefaultPreferences() {
+		IEclipsePreferences preferences = new DefaultScope().getNode(CorePlugin.PLUGIN_ID);
+		preferences.put(ICorePreferenceConstants.PREF_WEB_FILES, "*.js;*.htm;*.html;*.xhtm;*.xhtml;*.css;*.xml;*.xsl;*.xslt;*.fla;*.gif;*.jpg;*.jpeg;*.php;*.asp;*.jsp;*.png;*.as;*.sdoc;*.swf;*.shtml;*.txt;*.aspx;*.asmx;");
+	}
+
 }
