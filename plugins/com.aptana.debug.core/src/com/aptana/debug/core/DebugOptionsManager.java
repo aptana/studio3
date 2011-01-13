@@ -67,7 +67,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 	/**
 	 * DEBUGGER_ACTIVE_SUFFIX
 	 */
-	public static final String DEBUGGER_ACTIVE_SUFFIX = ".debuggerActive"; //$NON-NLS-1$
+	private static final String DEBUGGER_ACTIVE_SUFFIX = ".debuggerActive"; //$NON-NLS-1$
 	
 	/**
 	 * DETAIL_FORMATTER_IS_ENABLED
@@ -106,6 +106,10 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 	 */
 	public void shutdown() {
 		DebugPlugin.getDefault().removeDebugEventListener(this);
+	}
+	
+	public static boolean isDebuggerActive(String modelIdentifier) {
+		return "true".equals(System.getProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX));
 	}
 
 	/**

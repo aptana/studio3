@@ -8,7 +8,7 @@
             id="com.aptana.debug.ui.setStartPageMenuContribution"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="com.aptana.debug.internal.ui.actions.DefaultWebPreviewActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.DefaultWebPreviewActionDelegate"
                enablesFor="1"
                id="com.aptana.debug.ui.DefaultWebPreviewAction"
                label="%action.label.setStartPage"
@@ -25,7 +25,7 @@
             id="com.aptana.debug.ui.unsetStartPageMenuContribution"
             objectClass="org.eclipse.core.resources.IFile">
          <action
-               class="com.aptana.debug.internal.ui.actions.RemoveStartPageAction"
+               class="com.aptana.js.debug.ui.internal.actions.RemoveStartPageAction"
                enablesFor="1"
                id="com.aptana.debug.ui.RemoveStartPageAction"
                label="%action.label.unsetStartPage"
@@ -41,7 +41,7 @@
             id="com.aptana.debug.ui.jsBreakpointActions"
             objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint">
          <action
-               class="com.aptana.debug.internal.ui.actions.BreakpointHitCountAction"
+               class="com.aptana.js.debug.ui.internal.actions.BreakpointHitCountAction"
                enablesFor="1"
                helpContextId="hit_count_action_context"
                icon="icons/full/elcl16/sethitcount_co.gif"
@@ -49,7 +49,7 @@
                label="%action.label.hitcount"
                menubarPath="emptyBreakpointGroup"/>
          <action
-               class="com.aptana.debug.internal.ui.actions.BreakpointPropertiesAction"
+               class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesAction"
                enablesFor="1"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.debug.ui.actions.BreakpointProperties"
@@ -60,7 +60,7 @@
            id="com.aptana.debug.ui.RulerPopupActions"
            targetID="com.aptana.ide.editors.HTMLEditor#UnifiedRulerContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.BreakpointPropertiesRulerActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.debug.ui.actions.htmlBreakpointPropertiesRulerActionDelegate"
                label="%action.label.breakpoint.properties.html"
@@ -76,7 +76,7 @@
            id="com.aptana.debug.ui.RulerPopupActions"
            targetID="com.aptana.ide.editors.JSEditor#UnifiedRulerContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.BreakpointPropertiesRulerActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.debug.ui.actions.jsBreakpointPropertiesRulerActionDelegate"
                label="%action.label.breakpoint.properties.js"
@@ -92,7 +92,7 @@
            id="com.aptana.debug.ui.RulerPopupActions"
            targetID="com.aptana.ide.editors.PHPEditor#UnifiedRulerContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.BreakpointPropertiesRulerActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
                helpContextId="breakpoint_properties_action_context"
                id="com.aptana.debug.ui.actions.phpBreakpointPropertiesRulerActionDelegate"
                label="%action.label.breakpoint.properties.php"
@@ -108,7 +108,7 @@
            id="com.aptana.debug.ui.debugViewerContribution"
            targetID="org.eclipse.debug.ui.DebugView">
         <action
-              class="com.aptana.debug.internal.ui.actions.SuspendOnActionDelegate"
+              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
               enablesFor="1"
               icon="icons/full/elcl16/suspend_ondebugger.gif"
               id="com.aptana.debug.ui.actions.suspendOnDebuggerKeywords"
@@ -117,7 +117,7 @@
               state="false"
               style="toggle"/>
         <action
-              class="com.aptana.debug.internal.ui.actions.SuspendOnActionDelegate"
+              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
               enablesFor="1"
               icon="icons/full/elcl16/suspend_onerror.gif"
               id="com.aptana.debug.ui.actions.suspendOnErrors"
@@ -126,7 +126,7 @@
               state="false"
               style="toggle"/>
         <action
-              class="com.aptana.debug.internal.ui.actions.SuspendOnActionDelegate"
+              class="com.aptana.js.debug.ui.internal.actions.SuspendOnActionDelegate"
               enablesFor="1"
               icon="icons/full/elcl16/suspend_onexception.gif"
               id="com.aptana.debug.ui.actions.suspendOnExceptions"
@@ -144,7 +144,7 @@
            id="com.aptana.debug.ui.ContextPopupActions"
            targetID="com.aptana.ide.editors.HTMLEditor#UnifiedEditorContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.PopupInspectAction"
+               class="com.aptana.js.debug.ui.internal.actions.PopupInspectAction"
                definitionId="com.aptana.debug.ui.commands.Inspect"
                enablesFor="+"
                helpContextId="inspect_action_context"
@@ -162,7 +162,7 @@
             </enablement>
          </action>
          <action
-               class="com.aptana.debug.internal.ui.actions.WatchAction"
+               class="com.aptana.js.debug.ui.internal.actions.WatchAction"
                enablesFor="+"
                helpContextId="watch_action_context"
                icon="icons/full/etool16/watch_exp.gif"
@@ -205,7 +205,7 @@
            id="com.aptana.debug.ui.ContextPopupActions"
            targetID="com.aptana.ide.editors.JSEditor#UnifiedEditorContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.PopupInspectAction"
+               class="com.aptana.js.debug.ui.internal.actions.PopupInspectAction"
                definitionId="com.aptana.debug.ui.commands.Inspect"
                enablesFor="+"
                helpContextId="inspect_action_context"
@@ -223,7 +223,7 @@
             </enablement>
          </action>
          <action
-               class="com.aptana.debug.internal.ui.actions.WatchAction"
+               class="com.aptana.js.debug.ui.internal.actions.WatchAction"
                enablesFor="+"
                helpContextId="watch_action_context"
                icon="icons/full/etool16/watch_exp.gif"
@@ -266,7 +266,7 @@
            id="com.aptana.debug.ui.ContextPopupActions"
            targetID="com.aptana.ide.editors.PHPEditor#UnifiedEditorContext">
          <action
-               class="com.aptana.debug.internal.ui.actions.PopupInspectAction"
+               class="com.aptana.js.debug.ui.internal.actions.PopupInspectAction"
                definitionId="com.aptana.debug.ui.commands.Inspect"
                enablesFor="+"
                helpContextId="inspect_action_context"
@@ -284,7 +284,7 @@
             </enablement>
          </action>
          <action
-               class="com.aptana.debug.internal.ui.actions.WatchAction"
+               class="com.aptana.js.debug.ui.internal.actions.WatchAction"
                enablesFor="+"
                helpContextId="watch_action_context"
                icon="icons/full/etool16/watch_exp.gif"
@@ -328,7 +328,7 @@
            id="com.aptana.debug.ui.FilteredJSVariableActions"
            objectClass="com.aptana.js.debug.core.model.IJSVariable">
         <action
-              class="com.aptana.debug.internal.ui.actions.NewDetailFormatterAction"
+              class="com.aptana.js.debug.ui.internal.actions.NewDetailFormatterAction"
               enablesFor="1"
               helpContextId="new_detail_formatter_action_context"
               id="com.aptana.debug.ui.actions.NewDetailFormatter"
@@ -353,7 +353,7 @@
            id="com.aptana.debug.ui.FilteredJSVariableActions"
            objectClass="com.aptana.js.debug.core.model.IJSVariable">
         <action
-              class="com.aptana.debug.internal.ui.actions.RemoveDetailFormatterAction"
+              class="com.aptana.js.debug.ui.internal.actions.RemoveDetailFormatterAction"
               enablesFor="1"
               helpContextId="remove_detail_formatter_action_context"
               id="com.aptana.debug.ui.actions.RemoveDetailFormatter"
@@ -361,7 +361,7 @@
               menubarPath="emptyNavigationGroup"
               tooltip="%removeDetailFormatter.tooltip"/>
         <action
-              class="com.aptana.debug.internal.ui.actions.EditDetailFormatterAction"
+              class="com.aptana.js.debug.ui.internal.actions.EditDetailFormatterAction"
               enablesFor="1"
               helpContextId="edit_detail_formatter_action_context"
               id="com.aptana.debug.ui.actions.EditDetailFormatter"
@@ -435,7 +435,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="com.aptana.debug.internal.ui.launchConfigurations.JSLaunchConfigurationTabGroup"
+            class="com.aptana.js.debug.ui.internal.launchConfigurations.JSLaunchConfigurationTabGroup"
             description="%launchConfigurationTabGroup.description.js"
             id="com.aptana.debug.ui.jsLaunchConfigurationTabGroup"
             type="com.aptana.debug.core.jsLaunchConfigurationType">
@@ -445,7 +445,7 @@
          <launchMode mode="run"/>
       </launchConfigurationTabGroup>
       <launchConfigurationTabGroup
-            class="com.aptana.debug.internal.ui.launchConfigurations.JSRemoteLaunchConfigurationTabGroup"
+            class="com.aptana.js.debug.ui.internal.launchConfigurations.JSRemoteLaunchConfigurationTabGroup"
             description="%launchConfigurationTabGroup.description.jsremote"
             id="com.aptana.debug.ui.jsRemoteLaunchConfigurationTabGroup"
             type="com.aptana.debug.core.jsRemoteLaunchConfigurationType">
@@ -458,7 +458,7 @@
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
       <debugModelPresentation
-            class="com.aptana.debug.internal.ui.JSDebugModelPresentation"
+            class="com.aptana.js.debug.ui.internal.JSDebugModelPresentation"
             id="com.aptana.debug.core"/>
    </extension>
    <extension
@@ -475,7 +475,7 @@
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
       <shortcut
-            class="com.aptana.debug.internal.ui.JSLaunchShortcut"
+            class="com.aptana.js.debug.ui.internal.JSLaunchShortcut"
             icon="icons/full/obj16/launch-httpServer.gif"
             id="com.aptana.debug.ui.jsApplicationShortcut"
             label="%shortcut.label.js"
@@ -509,33 +509,33 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="com.aptana.ide.editors.unified.UnifiedEditor"
-            class="com.aptana.debug.internal.ui.actions.RetargettableActionAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.actions.RetargettableActionAdapterFactory">
          <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
          <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationDelegate"
-            class="com.aptana.debug.internal.ui.ActiveResourcePathGetterAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.ActiveResourcePathGetterAdapterFactory">
          <adapter type="com.aptana.debug.core.IActiveResourcePathGetterAdapter"/>
       </factory>
       <factory
             adaptableType="com.aptana.debug.core.DebugCorePlugin"
-            class="com.aptana.debug.internal.ui.EditorOpenAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.EditorOpenAdapterFactory">
          <adapter type="com.aptana.debug.core.IEditorOpenAdapter"/>
       </factory>
       <factory
             adaptableType="com.aptana.ide.editors.unified.hover.LexemeTextHover"
-            class="com.aptana.debug.internal.ui.hovers.DebugHoverAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover$Factory">
          <adapter type="org.eclipse.jface.text.ITextHover"/>
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationHelper"
-            class="com.aptana.debug.internal.ui.WebBrowserEnumeratorAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.WebBrowserEnumeratorAdapterFactory">
          <adapter type="java.util.Enumeration"/>
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.model.IJSScriptElement"
-            class="com.aptana.debug.internal.ui.util.SourceDisplayAdapter$Factory">
+            class="com.aptana.js.debug.ui.internal.sourcelookup.SourceDisplayAdapter$Factory">
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
          </adapter>
@@ -543,7 +543,7 @@
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.model.ISourceLink"
-            class="com.aptana.debug.internal.ui.util.SourceDisplayAdapter$Factory">
+            class="com.aptana.js.debug.ui.internal.sourcelookup.SourceDisplayAdapter$Factory">
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
          </adapter>
@@ -572,7 +572,7 @@
          point="org.eclipse.ui.propertyPages">
   <page
         adaptable="true"
-        class="com.aptana.debug.internal.ui.propertypages.JSLineBreakpointPropertyPage"
+        class="com.aptana.js.debug.ui.internal.propertypages.JSLineBreakpointPropertyPage"
         id="com.aptana.debug.ui.propertypages.common"
         name="%page.name.common"
         objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint"/>
@@ -580,12 +580,12 @@
    <extension
          point="org.eclipse.debug.core.statusHandlers">
       <statusHandler
-            class="com.aptana.debug.internal.ui.InstallDebuggerPromptStatusHandler"
+            class="com.aptana.js.debug.ui.internal.InstallDebuggerPromptStatusHandler"
             code="301"
             id="com.aptana.debug.ui.installDebuggerPromptStatusHandler"
             plugin="com.aptana.debug.core"/>
       <statusHandler
-            class="com.aptana.debug.internal.ui.LaunchDebuggerPromptStatusHandler"
+            class="com.aptana.js.debug.ui.internal.LaunchDebuggerPromptStatusHandler"
             code="302"
             id="com.aptana.debug.ui.launchBrowserPromptStatusHandler"
             plugin="com.aptana.debug.core"/>
@@ -595,14 +595,14 @@
       <view
             allowMultiple="false"
             category="org.eclipse.debug.ui"
-            class="com.aptana.debug.internal.ui.views.AJAXMonitorView"
+            class="com.aptana.js.debug.ui.internal.views.AJAXMonitorView"
             icon="icons/full/obj16/xhrmon.gif"
             id="com.aptana.debug.ui.AJAXMonitorView"
             name="%AJAXMonitorView.name"/>
       <view
             allowMultiple="false"
             category="org.eclipse.debug.ui"
-            class="com.aptana.debug.internal.ui.views.ScriptsView"
+            class="com.aptana.js.debug.ui.internal.views.ScriptsView"
             icon="icons/full/obj16/script.gif"
             id="com.aptana.debug.ui.scriptsView"
             name="%scriptsView.name"/>
@@ -610,7 +610,7 @@
    <extension
          point="org.eclipse.ui.console.consolePatternMatchListeners">
       <consolePatternMatchListener
-            class="com.aptana.debug.internal.ui.console.JSConsoleTracker"
+            class="com.aptana.debug.ui.console.ConsoleTracker"
             id="com.aptana.debug.ui.JSConsoleTracker"
             regex="(?i)\([^(]*\.\w+:\d+\)">
          <enablement>
@@ -650,7 +650,7 @@
             <separator name="jsGroup"/>
          </menu>
          <action
-               class="com.aptana.debug.internal.ui.actions.PopupInspectAction"
+               class="com.aptana.js.debug.ui.internal.actions.PopupInspectAction"
                definitionId="com.aptana.debug.ui.commands.Inspect"
                disabledIcon="icons/full/dtool16/inspect.gif"
                helpContextId="inspect_action_context"
@@ -673,7 +673,7 @@
             </enablement>
          </action>
          <action
-               class="com.aptana.debug.internal.ui.actions.WatchAction"
+               class="com.aptana.js.debug.ui.internal.actions.WatchAction"
                disabledIcon="icons/full/dtool16/watch_exp.gif"
                enablesFor="+"
                helpContextId="watch_action_context"
@@ -696,7 +696,7 @@
             </enablement>
          </action>
          <action
-               class="com.aptana.debug.internal.ui.actions.AddExceptionBreakpointAction"
+               class="com.aptana.js.debug.ui.internal.actions.AddExceptionBreakpointAction"
                icon="icons/full/elcl16/exc_catch.gif"
                id="com.aptana.debug.ui.actions.AddExceptionBreakpoint"
                label="%addExceptionBreakpointAction.accel.label"
@@ -712,7 +712,7 @@
                style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
          <action
-               class="com.aptana.debug.internal.ui.actions.OpenURLAction"
+               class="com.aptana.js.debug.ui.internal.actions.OpenURLAction"
                definitionId="com.aptana.debug.ui.commands.openURL"
                icon="icons/full/etool16/url_file.gif"
                id="com.aptana.debug.ui.actions.openURL"
@@ -761,20 +761,20 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ide.core.ui.preferences.GeneralPreferencePage"
-            class="com.aptana.debug.internal.ui.preferences.JSDebugPreferencePage"
+            class="com.aptana.js.debug.ui.internal.preferences.JSDebugPreferencePage"
             id="com.aptana.debug.ui.preferences.jsDebug"
             name="%Preferences.jsDebug.name">
          <keywordReference id="org.eclipse.debug.ui.general"/>
       </page>
       <page
             category="com.aptana.debug.ui.preferences.jsDebug"
-            class="com.aptana.debug.internal.ui.preferences.JSDetailFormattersPreferencePage"
+            class="com.aptana.js.debug.ui.internal.preferences.JSDetailFormattersPreferencePage"
             id="com.aptana.debug.ui.preferences.jsDetailFormatters"
             name="%Preferences.jsDetailFormatters.name"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
-      <initializer class="com.aptana.debug.internal.ui.preferences.JSDebugUIPreferenceInitializer"/>
+      <initializer class="com.aptana.js.debug.ui.internal.preferences.JSDebugUIPreferenceInitializer"/>
    </extension>
    <extension
          point="org.eclipse.ui.viewActions">
@@ -782,13 +782,13 @@
             id="com.aptana.debug.ui.variableViewContribution"
             targetID="org.eclipse.debug.ui.VariableView">
          <action
-               class="com.aptana.debug.internal.ui.actions.DetailOptionsActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.DetailOptionsActionDelegate"
                id="com.aptana.debug.ui.variableViewActions.DetailOptions"
                label="%detailOptionsAction.label"
                menubarPath="javascriptActions"
                style="push"/>
          <action
-               class="com.aptana.debug.internal.ui.actions.ShowConstantsActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.ShowConstantsActionDelegate"
                icon="icons/full/elcl16/constant_co.gif"
                id="com.aptana.debug.ui.variableViewActions.ShowConstants"
                label="%showConstantsAction.label"
@@ -803,13 +803,13 @@
             id="com.aptana.debug.ui.expressionViewContribution"
             targetID="org.eclipse.debug.ui.ExpressionView">
          <action
-               class="com.aptana.debug.internal.ui.actions.DetailOptionsActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.DetailOptionsActionDelegate"
                id="com.aptana.debug.ui.variableViewActions.DetailOptions"
                label="%detailOptionsAction.label"
                menubarPath="javascriptActions"
                style="push"/>
          <action
-               class="com.aptana.debug.internal.ui.actions.ShowConstantsActionDelegate"
+               class="com.aptana.js.debug.ui.internal.actions.ShowConstantsActionDelegate"
                icon="icons/full/elcl16/constant_co.gif"
                id="com.aptana.debug.ui.variableViewActions.ShowConstants"
                label="%showConstantsAction.label"
@@ -832,7 +832,7 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="com.aptana.debug.internal.ui.decorators.StartPageDecorator"
+            class="com.aptana.js.debug.ui.internal.decorators.StartPageDecorator"
             icon="icons/full/ovr16/start_page_ovr.gif"
             id="com.aptana.debug.ui.decorators.StartPageDecorator"
             label="%decorator.label.startPage"
@@ -855,23 +855,23 @@
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.model.IJSVariable"
-            class="com.aptana.debug.internal.ui.ActionFilterAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.ActionFilterAdapterFactory">
          <adapter type="org.eclipse.ui.IActionFilter"/>
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.model.IJSVariable"
-            class="com.aptana.debug.internal.ui.WatchExpressionAdapterFactory">
+            class="com.aptana.js.debug.ui.internal.WatchExpressionFactoryAdapter$Factory">
          <adapter type="org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter"/>
       </factory>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
-      <startup class="com.aptana.debug.internal.ui.Startup"/>
+      <startup class="com.aptana.js.debug.ui.internal.Startup"/>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="com.aptana.debug.internal.ui.StartPagePropertyTester"
+            class="com.aptana.js.debug.ui.internal.StartPagePropertyTester"
             id="com.aptana.debug.ui.StartPagePropertyTester"
             namespace="com.aptana.debug.ui"
             properties="isStartPage"
@@ -917,7 +917,7 @@
            />
            <colorDefinition
                  categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                 colorFactory="com.aptana.debug.internal.ui.DefaultColorFactory"
+                 colorFactory="com.aptana.js.debug.ui.internal.DefaultColorFactory"
                  id="com.aptana.ide.core.ui.background.color.ajaxmonitor.border"
                  isEditable="true"
                  label="%AJAXMonitorViewBackroundColor.name.border"

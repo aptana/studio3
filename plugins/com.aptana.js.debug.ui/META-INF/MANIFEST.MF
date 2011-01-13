@@ -5,10 +5,22 @@ Bundle-SymbolicName: com.aptana.js.debug.ui;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.js.debug.ui.JSDebugUIPlugin
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
+ org.eclipse.ui,
+ org.eclipse.jface.text,
  org.eclipse.debug.ui,
- com.aptana.js.debug.core
+ org.eclipse.ui.editors,
+ org.eclipse.ui.browser,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.ide,
+ com.aptana.core,
+ com.aptana.js.debug.core,
+ com.aptana.ui,
+ com.aptana.ui.epl,
+ com.aptana.debug.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.js.debug.ui
+Export-Package: com.aptana.js.debug.ui,
+ com.aptana.js.debug.ui.internal,
+ com.aptana.js.debug.ui.internal.launchConfigurations;x-friends:="com.aptana.ide.framework.apollo"

@@ -21,17 +21,18 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core,
  com.aptana.ui,
  com.aptana.ui.epl,
- com.aptana.debug.core
+ com.aptana.debug.core,
+ com.aptana.js.debug.core
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.debug.internal.ui,
- com.aptana.debug.internal.ui.launchConfigurations;x-friends:="com.aptana.ide.framework.apollo",
- com.aptana.debug.ui;
+Export-Package: com.aptana.debug.ui;
   uses:="org.osgi.framework,
    org.eclipse.debug.ui,
    org.eclipse.ui.plugin,
    org.eclipse.jface.resource,
    org.eclipse.swt.widgets,
    org.eclipse.core.runtime,
-   org.eclipse.ui"
+   org.eclipse.ui",
+ com.aptana.debug.ui.console,
+ com.aptana.debug.ui.internal;x-friends:="com.aptana.js.debug.ui"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
