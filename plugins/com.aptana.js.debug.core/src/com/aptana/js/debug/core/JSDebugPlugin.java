@@ -79,28 +79,4 @@ public class JSDebugPlugin extends Plugin {
 		getDefault().getLog().log(status);
 	}
 
-	/**
-	 * Forces to open source element in default editor
-	 * 
-	 * @param sourceElement
-	 */
-	public static void openInEditor(Object sourceElement) {
-		IEditorOpenAdapter adapter = (IEditorOpenAdapter) getDefault().getContributedAdapter(IEditorOpenAdapter.class);
-		if (adapter != null) {
-			adapter.openInEditor(sourceElement);
-		}
-	}
-
-	private Object getContributedAdapter(Class<?> clazz) {
-		Object adapter = null;
-		IAdapterManager manager = Platform.getAdapterManager();
-		if (manager.hasAdapter(this, clazz.getName())) {
-			adapter = manager.getAdapter(this, clazz.getName());
-			if (adapter == null) {
-				adapter = manager.loadAdapter(this, clazz.getName());
-			}
-		}
-		return adapter;
-	}
-
 }

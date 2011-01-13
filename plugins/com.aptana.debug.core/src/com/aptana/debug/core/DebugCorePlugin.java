@@ -34,12 +34,14 @@
  */
 package com.aptana.debug.core;
 
+import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.debug.internal.core.UniformResourceBreakpointChangeNotifier;
+import com.aptana.debug.core.internal.UniformResourceBreakpointChangeNotifier;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -110,6 +112,30 @@ public class DebugCorePlugin extends Plugin {
 
 	public static void log(IStatus status) {
 		getDefault().getLog().log(status);
+	}
+
+	/**
+	 * Forces to open source element in default editor
+	 * 
+	 * @param sourceElement
+	 */
+	public static void openInEditor(Object sourceElement) {
+		IEditorOpenAdapter adapter = (IEditorOpenAdapter) getDefault().getContributedAdapter(IEditorOpenAdapter.class);
+		if (adapter != null) {
+			adapter.openInEditor(sourceElement);
+		}
+	}
+
+	private Object getContributedAdapter(Class<?> clazz) {
+		Object adapter = null;
+		IAdapterManager manager = Platform.getAdapterManager();
+		if (manager.hasAdapter(this, clazz.getName())) {
+			adapter = manager.getAdapter(this, clazz.getName());
+			if (adapter == null) {
+				adapter = manager.loadAdapter(this, clazz.getName());
+			}
+		}
+		return adapter;
 	}
 
 }
