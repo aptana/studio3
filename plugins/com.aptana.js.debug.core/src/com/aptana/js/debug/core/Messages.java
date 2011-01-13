@@ -136,13 +136,10 @@ public final class Messages extends NLS {
 
 	public static String JSLaunchConfigurationDelegate_Empty_URL;
 
-	public static String JSLaunchConfigurationDelegate_Host_Not_Specified;
 
 	public static String JSLaunchConfigurationDelegate_No_Server_Type;
 
 	public static String JSLaunchConfigurationHelper_Empty_Server_URL;
-
-	public static String JSLaunchConfigurationHelper_Host_Not_Specified;
 
 	public static String JSLaunchConfigurationHelper_Malformed_URL;
 

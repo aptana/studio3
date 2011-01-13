@@ -53,11 +53,6 @@ public final class Messages extends NLS {
 	public static String WatchExpressionDelegate_ExpressionEvaluation;
 
 	/**
-	 * HttpServerProcess_LocalHTTPServer_0
-	 */
-	public static String HttpServerProcess_LocalHTTPServer_0;
-
-	/**
 	 * JSDebugThread_ThreadMain_0
 	 */
 	public static String JSDebugThread_ThreadMain_0;

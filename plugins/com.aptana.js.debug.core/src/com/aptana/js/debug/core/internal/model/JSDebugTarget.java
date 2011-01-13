@@ -86,6 +86,7 @@ import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
+import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
@@ -514,7 +515,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					sourceElement = ((ISourceLookupDirector) locator).getSourceElement(fileName);
 				}
 				if (sourceElement != null) {
-					JSDebugPlugin.openInEditor(sourceElement);
+					DebugCorePlugin.openInEditor(sourceElement);
 				}
 			}
 		}

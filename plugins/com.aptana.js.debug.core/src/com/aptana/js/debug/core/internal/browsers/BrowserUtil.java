@@ -55,7 +55,6 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.debug.core.DebugCorePlugin;
-import com.aptana.debug.internal.core.Messages;
 
 /**
  * @author Max Stepanov
