@@ -90,6 +90,11 @@ public class CSSFoldingComputer implements IFoldingComputer
 				children = combined;
 			}
 		}
+		else if (parseNode instanceof CSSMediaNode)
+		{
+			CSSMediaNode mediaNode = (CSSMediaNode) parseNode;
+			children = mediaNode.getStatements();
+		}
 		SubMonitor sub = SubMonitor.convert(monitor, 2 * children.length);
 
 		for (IParseNode child : children)
@@ -124,8 +129,8 @@ public class CSSFoldingComputer implements IFoldingComputer
 					newPositions.add(new Position(start, child.getLength() + toAdd));
 				}
 			}
-			if (((child instanceof ParseRootNode) || (child instanceof CSSMediaNode) || (child instanceof CSSPageNode))
-					&& child.hasChildren())
+			if ((child instanceof CSSMediaNode)
+					|| (((child instanceof ParseRootNode) || (child instanceof CSSPageNode)) && child.hasChildren()))
 			{
 				// Recurse into AST!
 				newPositions.addAll(getPositions(sub.newChild(1), child));

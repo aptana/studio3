@@ -87,4 +87,105 @@ public class CSSFoldingComputerTest extends TestCase
 		assertEquals(new Position(23, 36), positions.get(1)); // eats whole line at end
 		assertEquals(new Position(91, 33), positions.get(2)); // only can go so far as EOF
 	}
+
+	public void testCSSCommentFolding() throws Exception
+	{
+		String src = "/*\n * This is a comment.\n */\n";
+		folder = new CSSFoldingComputer(null, new Document(src))
+		{
+			protected IParseNode getAST()
+			{
+				IParseState parseState = new ParseState();
+				parseState.setEditState(getDocument().get(), null, 0, 0);
+				try
+				{
+					return new CSSParser().parse(parseState);
+				}
+				catch (Exception e)
+				{
+					fail(e.getMessage());
+				}
+				return null;
+			};
+		};
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		assertEquals(1, positions.size());
+		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+	}
+	
+	public void testMediaFolding() throws Exception
+	{
+		String src = "@media print {\n  body {\n    color: red;\n  }\n}\n";
+		folder = new CSSFoldingComputer(null, new Document(src))
+		{
+			protected IParseNode getAST()
+			{
+				IParseState parseState = new ParseState();
+				parseState.setEditState(getDocument().get(), null, 0, 0);
+				try
+				{
+					return new CSSParser().parse(parseState);
+				}
+				catch (Exception e)
+				{
+					fail(e.getMessage());
+				}
+				return null;
+			};
+		};
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		assertEquals(2, positions.size());
+		assertEquals(new Position(0, src.length() - 1), positions.get(0));
+		assertEquals(new Position(17, 27), positions.get(1));
+	}
+	
+	public void testPageFolding() throws Exception
+	{
+		String src = "@page {\n  margin: 3cm;\n}\n";
+		folder = new CSSFoldingComputer(null, new Document(src))
+		{
+			protected IParseNode getAST()
+			{
+				IParseState parseState = new ParseState();
+				parseState.setEditState(getDocument().get(), null, 0, 0);
+				try
+				{
+					return new CSSParser().parse(parseState);
+				}
+				catch (Exception e)
+				{
+					fail(e.getMessage());
+				}
+				return null;
+			};
+		};
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		assertEquals(1, positions.size());
+		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+	}
+	
+	public void testFontFaceFolding() throws Exception
+	{
+		String src = "@font-face {\n  font-family: Gentium;\n  src: url(http://site/fonts/Gentium.ttf);\n}\n";
+		folder = new CSSFoldingComputer(null, new Document(src))
+		{
+			protected IParseNode getAST()
+			{
+				IParseState parseState = new ParseState();
+				parseState.setEditState(getDocument().get(), null, 0, 0);
+				try
+				{
+					return new CSSParser().parse(parseState);
+				}
+				catch (Exception e)
+				{
+					fail(e.getMessage());
+				}
+				return null;
+			};
+		};
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		assertEquals(1, positions.size());
+		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+	}
 }

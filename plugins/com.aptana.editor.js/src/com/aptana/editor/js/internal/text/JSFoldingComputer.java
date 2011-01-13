@@ -16,6 +16,7 @@ import com.aptana.editor.common.text.reconciler.Messages;
 import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
+import com.aptana.editor.js.parsing.ast.JSForNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
@@ -30,6 +31,7 @@ public class JSFoldingComputer implements IFoldingComputer
 
 	private IDocument fDocument;
 	private AbstractThemeableEditor fEditor;
+	private ArrayList<Integer> fLines;
 
 	public JSFoldingComputer(AbstractThemeableEditor editor, IDocument document)
 	{
@@ -49,6 +51,7 @@ public class JSFoldingComputer implements IFoldingComputer
 	 */
 	public List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
 	{
+		fLines = new ArrayList<Integer>();
 		int lineCount = fDocument.getNumberOfLines();
 		if (lineCount <= 1) // Quick hack fix for minified files. We need at least two lines to have folding!
 		{
@@ -70,6 +73,7 @@ public class JSFoldingComputer implements IFoldingComputer
 
 		List<Position> newPositions = getPositions(sub.newChild(length), parseNode);
 		sub.done();
+		fLines = null;
 		return newPositions;
 	}
 
@@ -98,22 +102,37 @@ public class JSFoldingComputer implements IFoldingComputer
 
 		for (IParseNode child : children)
 		{
-			if ((child instanceof JSCommentNode) || (child instanceof JSFunctionNode)
-					|| (child instanceof JSObjectNode) || (child instanceof JSSwitchNode)
-					|| (child instanceof JSStatementsNode) || (child instanceof JSArrayNode)
-					|| (child instanceof JSGroupNode) || (child instanceof JSArgumentsNode)
-					|| (child instanceof JSParametersNode))
+			if ((child instanceof JSCommentNode)
+					|| (child instanceof JSFunctionNode)
+					|| (child instanceof JSObjectNode)
+					|| (child instanceof JSSwitchNode)
+					|| (child instanceof JSStatementsNode && !(parseNode instanceof JSFunctionNode || parseNode instanceof JSForNode))
+					|| (child instanceof JSArrayNode) || (child instanceof JSGroupNode)
+					|| (child instanceof JSArgumentsNode) || (child instanceof JSParametersNode)
+					|| (child instanceof JSForNode))
 			{
 				int start = child.getStartingOffset();
 				boolean add = true;
 				try
 				{
-					// Don't set up folding for stuff starting and ending on same line
 					int line = fDocument.getLineOfOffset(start);
-					int endLine = fDocument.getLineOfOffset(child.getEndingOffset());
-					if (endLine == line)
+					// Don't bother adding multiple positions for the same starting line
+					if (fLines.contains(line))
 					{
 						add = false;
+					}
+					else
+					{
+						// Don't set up folding for stuff starting and ending on same line
+						int endLine = fDocument.getLineOfOffset(child.getEndingOffset());
+						if (endLine == line)
+						{
+							add = false;
+						}
+						else
+						{
+							fLines.add(line);
+						}
 					}
 				}
 				catch (BadLocationException e)
@@ -123,12 +142,13 @@ public class JSFoldingComputer implements IFoldingComputer
 				if (add)
 				{
 					int toAdd = 1;
-					if (child instanceof JSArgumentsNode || child instanceof JSFunctionNode)
+					if (child instanceof JSArgumentsNode)
 					{
 						toAdd = 2;
 					}
-					// FIXME Use start of line as start position? Don't add another position on same line!
-					newPositions.add(new Position(start, child.getLength() + toAdd));
+					int length = child.getLength() + toAdd;
+					int end = Math.min(getDocument().getLength(), start + length);
+					newPositions.add(new Position(start, end - start));
 				}
 			}
 			if (child.hasChildren())
