@@ -32,53 +32,82 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.internal.core;
 
-import org.eclipse.osgi.util.NLS;
+package com.aptana.debug.core.internal;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
- * @author Ingo Muschenetz
+ * @author Max Stepanov
+ * 
  */
-public final class Messages extends NLS {
-	private static final String BUNDLE_NAME = "com.aptana.debug.internal.core.messages"; //$NON-NLS-1$
+public class CompositeResourceResolver /*implements IHttpResourceResolver*/ {
 
-	private Messages() {
+	/**
+	 * Entry
+	 */
+	private class Entry {
+		String path;
+		File dir;
+
+		Entry(String path, File dir) {
+			this.path = path;
+			this.dir = dir;
+		}
 	}
 
-	static {
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	private ArrayList<Entry> paths = new ArrayList<Entry>();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.aptana.ide.server.resolvers.IHttpResourceResolver#getResource(com.aptana.ide.server.http.RequestLineParser)
+	 */
+	/*
+	public IHttpResource getResource(RequestLineParser requestLine) throws HttpServerException {
+		String request = requestLine.getUri();
+		for (Iterator i = paths.iterator(); i.hasNext();) {
+			Entry entry = (Entry) i.next();
+			String path = entry.path;
+			if (request.startsWith(path)) {
+				String subpath = request.substring(path.length());
+				File dir = entry.dir;
+				if (dir.exists()) {
+					File file = new File(dir, subpath.replace('/', File.separatorChar));
+					if (file.exists() && file.isFile()) {
+						return new FileHttpResource(file);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	*/
+
+	public void addPath(String path, File dir) {
+		if (path.length() == 0 || path.charAt(0) != '/') {
+			path = '/' + path;
+		}
+		if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
+			path = path.substring(0, path.length() - 1);
+		}
+
+		int index = 0;
+		for (Iterator i = paths.iterator(); i.hasNext(); ++index) {
+			Entry entry = (Entry) i.next();
+			int cmp = path.compareTo(entry.path);
+			if (cmp > 0) {
+				paths.add(index, new Entry(path, dir));
+				return;
+			} else if (cmp == 0) {
+				entry.dir = dir;
+				return;
+			}
+		}
+		paths.add(new Entry(path, dir));
 	}
 
-	public static String BrowserUtil_FirefoxProfileNotFound;
-
-	/**
-	 * BrowserUtil_Found
-	 */
-	public static String BrowserUtil_Found;
-
-	/**
-	 * BrowserUtil_NotFound
-	 */
-	public static String BrowserUtil_NotFound;
-
-	/**
-	 * BrowserUtil_CheckingExtension
-	 */
-	public static String BrowserUtil_CheckingExtension;
-
-	/**
-	 * BrowserUtil_InstallingDebugExtension
-	 */
-	public static String BrowserUtil_InstallingDebugExtension;
-
-	/**
-	 * BrowserUtil_InstallError
-	 */
-	public static String BrowserUtil_InstallError;
-
-	/**
-	 * BrowserUtil_ExtensionInstallationFailed
-	 */
-	public static String BrowserUtil_ExtensionInstallationFailed;
 }

@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain Eclipse Public Licensed code and certain additional terms
+ * with certain other free and open source software ("FOSS") code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -32,36 +32,53 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
+package com.aptana.debug.core.internal;
 
-package com.aptana.debug.internal.core;
-
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
+import org.eclipse.osgi.util.NLS;
 
 /**
- * @author Max Stepanov
- * 
+ * @author Ingo Muschenetz
  */
-public class DbgSourceURLStreamHandler extends URLStreamHandler {
-	
-	private static DbgSourceURLStreamHandler instance;
+public final class Messages extends NLS {
+	private static final String BUNDLE_NAME = "com.aptana.debug.core.internal.messages"; //$NON-NLS-1$
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
+	private Messages() {
+	}
+
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	public static String BrowserUtil_FirefoxProfileNotFound;
+
+	/**
+	 * BrowserUtil_Found
 	 */
-	protected URLConnection openConnection(URL u) throws IOException {
-		return null;
-	}
+	public static String BrowserUtil_Found;
 
-	public static DbgSourceURLStreamHandler getDefault() {
-		if (instance == null) {
-			instance = new DbgSourceURLStreamHandler();
-		}
-		return instance;
-	}
+	/**
+	 * BrowserUtil_NotFound
+	 */
+	public static String BrowserUtil_NotFound;
 
+	/**
+	 * BrowserUtil_CheckingExtension
+	 */
+	public static String BrowserUtil_CheckingExtension;
+
+	/**
+	 * BrowserUtil_InstallingDebugExtension
+	 */
+	public static String BrowserUtil_InstallingDebugExtension;
+
+	/**
+	 * BrowserUtil_InstallError
+	 */
+	public static String BrowserUtil_InstallError;
+
+	/**
+	 * BrowserUtil_ExtensionInstallationFailed
+	 */
+	public static String BrowserUtil_ExtensionInstallationFailed;
 }

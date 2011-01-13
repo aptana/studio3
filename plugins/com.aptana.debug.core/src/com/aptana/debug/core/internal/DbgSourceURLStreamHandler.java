@@ -17,7 +17,7 @@
  * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  * 
  * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
+ * with certain Eclipse Public Licensed code and certain additional terms
  * pursuant to Section 7 of the GPL. You may view the exception and these
  * terms on the web at http://www.aptana.com/legal/gpl/.
  * 
@@ -33,81 +33,35 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.debug.internal.core;
+package com.aptana.debug.core.internal;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 
 /**
  * @author Max Stepanov
  * 
  */
-public class CompositeResourceResolver /*implements IHttpResourceResolver*/ {
-
-	/**
-	 * Entry
-	 */
-	private class Entry {
-		String path;
-		File dir;
-
-		Entry(String path, File dir) {
-			this.path = path;
-			this.dir = dir;
-		}
-	}
-
-	private ArrayList<Entry> paths = new ArrayList<Entry>();
+public class DbgSourceURLStreamHandler extends URLStreamHandler {
+	
+	private static DbgSourceURLStreamHandler instance;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.aptana.ide.server.resolvers.IHttpResourceResolver#getResource(com.aptana.ide.server.http.RequestLineParser)
+	 * @see java.net.URLStreamHandler#openConnection(java.net.URL)
 	 */
-	/*
-	public IHttpResource getResource(RequestLineParser requestLine) throws HttpServerException {
-		String request = requestLine.getUri();
-		for (Iterator i = paths.iterator(); i.hasNext();) {
-			Entry entry = (Entry) i.next();
-			String path = entry.path;
-			if (request.startsWith(path)) {
-				String subpath = request.substring(path.length());
-				File dir = entry.dir;
-				if (dir.exists()) {
-					File file = new File(dir, subpath.replace('/', File.separatorChar));
-					if (file.exists() && file.isFile()) {
-						return new FileHttpResource(file);
-					}
-				}
-			}
-		}
+	protected URLConnection openConnection(URL u) throws IOException {
 		return null;
 	}
-	*/
 
-	public void addPath(String path, File dir) {
-		if (path.length() == 0 || path.charAt(0) != '/') {
-			path = '/' + path;
+	public static DbgSourceURLStreamHandler getDefault() {
+		if (instance == null) {
+			instance = new DbgSourceURLStreamHandler();
 		}
-		if (path.length() > 1 && path.charAt(path.length() - 1) == '/') {
-			path = path.substring(0, path.length() - 1);
-		}
-
-		int index = 0;
-		for (Iterator i = paths.iterator(); i.hasNext(); ++index) {
-			Entry entry = (Entry) i.next();
-			int cmp = path.compareTo(entry.path);
-			if (cmp > 0) {
-				paths.add(index, new Entry(path, dir));
-				return;
-			} else if (cmp == 0) {
-				entry.dir = dir;
-				return;
-			}
-		}
-		paths.add(new Entry(path, dir));
+		return instance;
 	}
 
 }
