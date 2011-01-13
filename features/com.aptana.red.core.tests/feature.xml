@@ -88,6 +88,7 @@
       <import plugin="com.aptana.editor.yaml"/>
       <import plugin="com.aptana.editor.idl"/>
       <import plugin="com.aptana.editor.css.formatter"/>
+      <import plugin="com.aptana.editor.json"/>
    </requires>
 
    <plugin
@@ -335,6 +336,14 @@
 
    <plugin
          id="com.aptana.editor.css.formatter.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.json.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
