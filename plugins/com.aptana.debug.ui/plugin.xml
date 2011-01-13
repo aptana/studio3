@@ -5,12 +5,12 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="false"
-            id="com.aptana.debug.ui.setStartPageMenuContribution"
+            id="com.aptana.js.debug.ui.setStartPageMenuContribution"
             objectClass="org.eclipse.core.resources.IFile">
          <action
                class="com.aptana.js.debug.ui.internal.actions.DefaultWebPreviewActionDelegate"
                enablesFor="1"
-               id="com.aptana.debug.ui.DefaultWebPreviewAction"
+               id="com.aptana.js.debug.ui.DefaultWebPreviewAction"
                label="%action.label.setStartPage"
                menubarPath="additions">
          </action>
@@ -872,90 +872,9 @@
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="com.aptana.js.debug.ui.internal.StartPagePropertyTester"
-            id="com.aptana.debug.ui.StartPagePropertyTester"
-            namespace="com.aptana.debug.ui"
+            id="com.aptana.js.debug.ui.StartPagePropertyTester"
+            namespace="com.aptana.js.debug.ui"
             properties="isStartPage"
             type="org.eclipse.core.resources.IFile"/>
    </extension>
-   <extension
-             point="org.eclipse.ui.themes">
-          <themeElementCategory
-          		
-                id="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                parentId="com.aptana.ide.core.ui.apearance"
-                label="%AJAXMonitorViewBackroundColor.name.category">
-                <description>
-                	%themeElementCategory.description.ajax
-                </description>
-          </themeElementCategory>
-          <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance"
-                colorFactory="com.aptana.ide.core.ui.ListBackgroundColorFactory"
-                id="com.aptana.ide.core.ui.background.color.scriptsView"
-                isEditable="true"
-                label="%ScriptViewBackroundColor.name"/>                    
-          <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.background.color.ajaxmonitor"
-                isEditable="true"
-                value="255,255,255"
-                label="%AJAXMonitorViewBackroundColor.name"                
-           />
-           <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.background.color.ajaxmonitor.request"
-                isEditable="true"
-                value="255,255,255"
-                label="%AJAXMonitorViewBackroundColor.name.request"                
-           />
-           <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.background.color.ajaxmonitor.response"
-                isEditable="true"
-                value="255,255,255"
-                label="%AJAXMonitorViewBackroundColor.name.response"                
-           />
-           <colorDefinition
-                 categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                 colorFactory="com.aptana.js.debug.ui.internal.DefaultColorFactory"
-                 id="com.aptana.ide.core.ui.background.color.ajaxmonitor.border"
-                 isEditable="true"
-                 label="%AJAXMonitorViewBackroundColor.name.border"
-                 /> 
-           <!--  -->
-          <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance"
-                colorFactory="com.aptana.ide.core.ui.DefaultForegroundFactory"
-                id="com.aptana.ide.core.ui.foreground.color.scriptsView"
-                isEditable="true"
-                label="%ScriptViewforeroundColor.name"/>     
-          <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.foreground.color.ajaxmonitor"
-                isEditable="true"
-                colorFactory="com.aptana.ide.core.ui.DefaultForegroundFactory"
-                label="%AJAXMonitorViewforeroundColor.name"                
-           />
-           <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.foreground.color.ajaxmonitor.request"
-                isEditable="true"
-                colorFactory="com.aptana.ide.core.ui.DefaultForegroundFactory"
-                label="%AJAXMonitorViewforeroundColor.name.request"                
-           />
-           <colorDefinition
-                categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                id="com.aptana.ide.core.ui.foreground.color.ajaxmonitor.response"
-                isEditable="true"
-                colorFactory="com.aptana.ide.core.ui.DefaultForegroundFactory"
-                label="%AJAXMonitorViewforeroundColor.name.response"                
-           />
-           <colorDefinition
-                 categoryId="com.aptana.ide.core.ui.apearance.ajaxMonitor"
-                 colorFactory="com.aptana.ide.core.ui.DefaultForegroundFactory"
-                 id="com.aptana.ide.core.ui.foreground.color.ajaxmonitor.border"
-                 isEditable="true"
-                 label="%AJAXMonitorViewforeroundColor.name.border"
-                 />                
-       </extension>
 </plugin>
