@@ -62,7 +62,7 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	private IProgressMonitor fMonitor;
 
-	private RubyRegexpFolder folder;
+	private IFoldingComputer folder;
 
 	public CommonReconcilingStrategy(AbstractThemeableEditor editor)
 	{
@@ -82,14 +82,20 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 
 	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion)
 	{
-		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an "incremental reconciler" to get just dirty region
+		// TODO Only recalculate the folding diff in the dirty region? Requires us to set this as an
+		// "incremental reconciler" to get just dirty region
 		reconcile(false);
 	}
 
 	public void setDocument(IDocument document)
 	{
-		folder = new RubyRegexpFolder(fEditor, document);
+		folder = createFoldingComputer(document);
 		fEditor.getFileService().setDocument(document);
+	}
+
+	protected IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return fEditor.createFoldingComputer(document);
 	}
 
 	public void initialReconcile()

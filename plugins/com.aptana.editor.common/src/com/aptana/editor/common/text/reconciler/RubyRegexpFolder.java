@@ -55,18 +55,22 @@ import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.scripting.model.BundleManager;
 
-class RubyRegexpFolder
+// FIXME Move this to an internal package!
+public class RubyRegexpFolder implements IFoldingComputer
 {
 
 	private IDocument fDocument;
 	private AbstractThemeableEditor fEditor;
 
-	RubyRegexpFolder(AbstractThemeableEditor editor, IDocument document)
+	public RubyRegexpFolder(AbstractThemeableEditor editor, IDocument document)
 	{
 		this.fDocument = document;
 		this.fEditor = editor;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
 	{
 		int lineCount = fDocument.getNumberOfLines();
