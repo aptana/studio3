@@ -37,6 +37,11 @@ public class JSFoldingComputer implements IFoldingComputer
 		this.fEditor = editor;
 	}
 
+	protected IDocument getDocument()
+	{
+		return fDocument;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.
@@ -50,7 +55,7 @@ public class JSFoldingComputer implements IFoldingComputer
 			return Collections.emptyList();
 		}
 
-		IParseNode parseNode = fEditor.getFileService().getParseResult();
+		IParseNode parseNode = getAST();
 		int length = parseNode.getChildCount();
 		if (parseNode instanceof ParseRootNode)
 		{
@@ -66,6 +71,11 @@ public class JSFoldingComputer implements IFoldingComputer
 		List<Position> newPositions = getPositions(sub.newChild(length), parseNode);
 		sub.done();
 		return newPositions;
+	}
+
+	protected IParseNode getAST()
+	{
+		return fEditor.getFileService().getParseResult();
 	}
 
 	private List<Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)

@@ -33,6 +33,11 @@ public class CSSFoldingComputer implements IFoldingComputer
 		this.fEditor = editor;
 	}
 
+	protected IDocument getDocument()
+	{
+		return fDocument;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.
@@ -46,7 +51,7 @@ public class CSSFoldingComputer implements IFoldingComputer
 			return Collections.emptyList();
 		}
 
-		IParseNode parseNode = fEditor.getFileService().getParseResult();
+		IParseNode parseNode = getAST();
 		int length = parseNode.getChildCount();
 		if (parseNode instanceof ParseRootNode)
 		{
@@ -62,6 +67,11 @@ public class CSSFoldingComputer implements IFoldingComputer
 		List<Position> newPositions = getPositions(sub.newChild(length), parseNode);
 		sub.done();
 		return newPositions;
+	}
+
+	protected IParseNode getAST()
+	{
+		return fEditor.getFileService().getParseResult();
 	}
 
 	private List<Position> getPositions(IProgressMonitor monitor, IParseNode parseNode)
@@ -105,7 +115,13 @@ public class CSSFoldingComputer implements IFoldingComputer
 				}
 				if (add)
 				{
-					newPositions.add(new Position(start, child.getLength() + 1));
+					// If start + length + 1 goes past end of document, it fails!
+					int toAdd = 1;
+					if (start + child.getLength() + 1 >= fDocument.getLength())
+					{
+						toAdd = 0;
+					}
+					newPositions.add(new Position(start, child.getLength() + toAdd));
 				}
 			}
 			if (((child instanceof ParseRootNode) || (child instanceof CSSMediaNode) || (child instanceof CSSPageNode))

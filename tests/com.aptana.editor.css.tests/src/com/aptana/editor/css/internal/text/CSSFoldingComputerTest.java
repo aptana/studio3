@@ -32,31 +32,59 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.css.tests;
+package com.aptana.editor.css.internal.text;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
 
-import com.aptana.editor.css.CSSCodeScannerTest;
-import com.aptana.editor.css.CSSEditorTest;
-import com.aptana.editor.css.CSSSourcePartitionScannerTest;
-import com.aptana.editor.css.internal.text.CSSFoldingComputerTest;
+import junit.framework.TestCase;
 
-public class AllTests
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.Position;
+
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.css.parsing.CSSParser;
+import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ParseState;
+import com.aptana.parsing.ast.IParseNode;
+
+public class CSSFoldingComputerTest extends TestCase
 {
 
-	public static Test suite()
+	private IFoldingComputer folder;
+
+	@Override
+	protected void tearDown() throws Exception
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.css.tests");
-		// $JUnit-BEGIN$
-		suite.addTestSuite(CSSSourcePartitionScannerTest.class);
-		suite.addTestSuite(CSSCodeScannerTest.class);
-		suite.addTestSuite(CSSEditorTest.class);
-		suite.addTestSuite(CSSFoldingComputerTest.class);
-		suite.addTest(com.aptana.editor.css.parsing.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.outline.AllTests.suite());
-		suite.addTest(com.aptana.editor.css.contentassist.AllTests.suite());
-		// $JUnit-END$
-		return suite;
+		folder = null;
+		super.tearDown();
+	}
+
+	public void testBasicCSSFolding() throws Exception
+	{
+		String src = "body {\n" + "	color: red;\n" + "}\n" + "\n" + "div p {\n" + "	background-color: green;\n" + "}\n"
+				+ "\n" + ".one-liner { color: orange; }\n" + "\n" + "#id { \n" + "	font-family: monospace;\n" + "}";
+		folder = new CSSFoldingComputer(null, new Document(src))
+		{
+			protected IParseNode getAST()
+			{
+				IParseState parseState = new ParseState();
+				parseState.setEditState(getDocument().get(), null, 0, 0);
+				try
+				{
+					return new CSSParser().parse(parseState);
+				}
+				catch (Exception e)
+				{
+					fail(e.getMessage());
+				}
+				return null;
+			};
+		};
+		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
+		assertEquals(3, positions.size());
+		assertEquals(new Position(0, 22), positions.get(0)); // eats whole line at end
+		assertEquals(new Position(23, 36), positions.get(1)); // eats whole line at end
+		assertEquals(new Position(91, 33), positions.get(2)); // only can go so far as EOF
 	}
 }
