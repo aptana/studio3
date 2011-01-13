@@ -119,6 +119,11 @@ class RubyRegexpFolder
 			{
 				// check to see if we have an open folding region at this indent level...
 				int indent = findIndent(line);
+				// Subtract one if we're handling /* */ folding!
+				if (line.trim().startsWith("*")) //$NON-NLS-1$
+				{
+					indent--;
+				}
 				if (starts.containsKey(indent))
 				{
 					IRubyObject endMatcher = endRegexp.match_m(endRegexp.getRuntime().getCurrentContext(), rLine);

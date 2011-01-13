@@ -69,14 +69,14 @@
             type="text/javascript">
       </language>
       <validator
-            class="com.aptana.editor.js.validator.JSLintValidator"
-            language="text/javascript"
-            name="%validator.jslint.name">
-      </validator>
-      <validator
             class="com.aptana.editor.js.validator.MozillaJsValidator"
             language="text/javascript"
             name="%validator.mozilla.name">
+      </validator>
+      <validator
+            class="com.aptana.editor.js.validator.JSLintValidator"
+            language="text/javascript"
+            name="%validator.jslint.name">
       </validator>
    </extension>
 

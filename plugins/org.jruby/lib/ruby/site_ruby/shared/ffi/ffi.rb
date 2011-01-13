@@ -73,6 +73,7 @@ require 'ffi/library'
 require 'ffi/memorypointer'
 require 'ffi/autopointer'
 require 'ffi/struct'
+require 'ffi/union'
 require 'ffi/io'
 require 'ffi/variadic'
 require 'ffi/errno'
@@ -86,9 +87,9 @@ module FFI
     # Mangle the library name to reflect the native library naming conventions
     lib = Platform::LIBC if lib == 'c'
     if lib && File.basename(lib) == lib
-      ext = ".#{Platform::LIBSUFFIX}"
       lib = Platform::LIBPREFIX + lib unless lib =~ /^#{Platform::LIBPREFIX}/
-      lib += ext unless lib =~ /#{ext}/
+      r = Platform::IS_LINUX ? "\\.so($|\\.[1234567890]+)" : "\\.#{Platform::LIBSUFFIX}$"
+      lib += ".#{Platform::LIBSUFFIX}" unless lib =~ /#{r}/
     end
     lib
   end

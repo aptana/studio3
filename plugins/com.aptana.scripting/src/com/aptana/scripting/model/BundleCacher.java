@@ -23,10 +23,12 @@ import org.jruby.util.KCode;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
+import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -438,7 +440,8 @@ public class BundleCacher
 
 		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
 		// reduce duplication!
-		private abstract class AbstractBundleElementConstruct extends ConstructMapping
+		// FIXME Don't rely on extending ContsructMapping, it was originally private! If we can rewrite this, we can remove snakeyaml plugin and use the included version in JRuby 1.6!
+		private abstract class AbstractBundleElementConstruct extends AbstractConstruct
 		{
 			/**
 			 * Grab the path from the mapping node and grab it's value!
@@ -483,7 +486,8 @@ public class BundleCacher
 			{
 				node.setType(BundleElement.class);
 				BundleElement be = new BundleElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -494,7 +498,8 @@ public class BundleCacher
 			{
 				node.setType(CommandElement.class);
 				CommandElement be = new LazyCommandElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -505,7 +510,8 @@ public class BundleCacher
 			{
 				node.setType(SnippetElement.class);
 				SnippetElement be = new SnippetElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -516,7 +522,8 @@ public class BundleCacher
 			{
 				node.setType(MenuElement.class);
 				MenuElement be = new MenuElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -527,7 +534,8 @@ public class BundleCacher
 			{
 				node.setType(ProjectTemplateElement.class);
 				ProjectTemplateElement be = new ProjectTemplateElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -538,7 +546,8 @@ public class BundleCacher
 			{
 				node.setType(EnvironmentElement.class);
 				EnvironmentElement be = new LazyEnvironmentElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -549,7 +558,8 @@ public class BundleCacher
 			{
 				node.setType(TemplateElement.class);
 				TemplateElement be = new TemplateElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -560,7 +570,8 @@ public class BundleCacher
 			{
 				node.setType(ContentAssistElement.class);
 				ContentAssistElement be = new ContentAssistElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}
@@ -571,7 +582,8 @@ public class BundleCacher
 			{
 				node.setType(SmartTypingPairsElement.class);
 				SmartTypingPairsElement be = new SmartTypingPairsElement(getPath(node));
-				construct2ndStep(node, be);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
 				return be;
 			}
 		}

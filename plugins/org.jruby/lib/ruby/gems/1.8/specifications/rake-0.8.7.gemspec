@@ -17,14 +17,13 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--line-numbers", "--main", "README", "--title", "Rake -- Ruby Make"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{rake}
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.4.2}
   s.summary = %q{Ruby based make-like utility.}
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 2
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
     else
     end
   else
