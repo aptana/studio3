@@ -409,7 +409,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				{
 					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 							.getContentType(getDocument(), 0);
-					if (contentType.getPartCount() > 0)
+					if (contentType != null && contentType.getPartCount() > 0)
 					{
 						String mainContentType = contentType.getParts()[0];
 						// We need to make sure that in case the given content type is actually a nested language in

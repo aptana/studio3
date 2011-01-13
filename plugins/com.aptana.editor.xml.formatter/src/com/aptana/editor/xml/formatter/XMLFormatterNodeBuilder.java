@@ -188,7 +188,15 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		// Recursively call this method till we are done with all the children under this node.
 		addNodes(node.getChildren());
 
-		checkedPop(formatterNode, -1);
+		if (node.getChildCount() == 0)
+		{
+			checkedPop(formatterNode, -1);
+		}
+		else
+		{
+			checkedPop(formatterNode, endOffset);
+		}
+
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
 	}

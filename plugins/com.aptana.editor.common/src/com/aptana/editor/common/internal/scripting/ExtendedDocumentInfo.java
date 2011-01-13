@@ -76,17 +76,24 @@ import com.aptana.scripting.model.BundleManager;
 	public QualifiedContentType getContentType(IDocument document, int offset) throws BadLocationException
 	{
 		QualifiedContentType result = new QualifiedContentType(defaultContentType);
-		// get partition at offset
-		String contentType = document.getContentType(offset);
-		// grab the top level document type that this partition is a subtype of
-		String subdocContentType = contentTypesAssociation.get(contentType);
-		if (subdocContentType != null && !subdocContentType.equals(result.getLastPart()))
+		try
 		{
-			// if our content type/scope doesn't have this language level scope at the end, add it to the end
-			result = result.subtype(subdocContentType);
+			// get partition at offset
+			String contentType = document.getContentType(offset);
+			// grab the top level document type that this partition is a subtype of
+			String subdocContentType = contentTypesAssociation.get(contentType);
+			if (subdocContentType != null && !subdocContentType.equals(result.getLastPart()))
+			{
+				// if our content type/scope doesn't have this language level scope at the end, add it to the end
+				result = result.subtype(subdocContentType);
+			}
+			// add partition to end
+			return result.subtype(contentType);
 		}
-		// add partition to end
-		return result.subtype(contentType);
+		catch (Exception e)
+		{
+			return result;
+		}
 	}
 
 	/**
