@@ -45,12 +45,6 @@ import org.eclipse.core.resources.IResource;
  */
 public class StartPagePropertyTester extends PropertyTester {
 
-	/**
-	 * 
-	 */
-	public StartPagePropertyTester() {
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

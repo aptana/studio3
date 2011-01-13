@@ -50,7 +50,7 @@ public class JSDebugPreferenceInitializer extends AbstractPreferenceInitializer 
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		IEclipsePreferences node = new DefaultScope().getNode(DebugCorePlugin.getDefault().getBundle().getSymbolicName());
+		IEclipsePreferences node = new DefaultScope().getNode(DebugCorePlugin.PLUGIN_ID);
 
 		// default preferences
 		node.putBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false);

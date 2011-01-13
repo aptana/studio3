@@ -58,7 +58,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
-import com.aptana.debug.internal.core.LocalResourceMapper;
+import com.aptana.debug.core.internal.LocalResourceMapper;
 import com.aptana.js.debug.core.internal.model.DebugConnection;
 import com.aptana.js.debug.core.internal.model.HttpServerProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugProcess;
