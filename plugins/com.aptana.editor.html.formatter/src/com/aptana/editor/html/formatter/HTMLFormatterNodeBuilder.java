@@ -320,7 +320,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// Create content node when the HTMLElementNode does not have any children
 			if (!node.hasChildren())
 			{
-				if (textStartOffset >= textEndOffset)
+				if (textStartOffset > textEndOffset)
 				{
 					if (textStartOffset == endOffset)
 					{
