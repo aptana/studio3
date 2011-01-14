@@ -55,6 +55,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
 import com.aptana.editor.xml.parsing.IXMLParserConstants;
@@ -239,5 +241,11 @@ public class XMLEditor extends AbstractThemeableEditor
 		}
 		// no new pair, so don't highlight anything
 		fTagPairOccurrences = null;
+	}
+	
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new XMLFoldingComputer(this, document);
 	}
 }
