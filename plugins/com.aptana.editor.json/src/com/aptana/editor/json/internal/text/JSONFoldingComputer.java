@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -98,6 +99,7 @@ public class JSONFoldingComputer implements IFoldingComputer
 			{
 				int start = child.getStartingOffset();
 				boolean add = true;
+				int end = child.getEndingOffset() + 1;
 				try
 				{
 					int line = fDocument.getLineOfOffset(start);
@@ -116,6 +118,10 @@ public class JSONFoldingComputer implements IFoldingComputer
 						}
 						else
 						{
+							// When we can, use the end of the end line as the end offset, so it looks nicer in the
+							// editor.
+							IRegion endLineRegion = fDocument.getLineInformation(endLine);
+							end = endLineRegion.getOffset() + endLineRegion.getLength() + 1;
 							fLines.add(line);
 						}
 					}
@@ -126,8 +132,7 @@ public class JSONFoldingComputer implements IFoldingComputer
 				}
 				if (add)
 				{
-					int length = child.getLength() + 1;
-					int end = Math.min(getDocument().getLength(), start + length);
+					end = Math.min(getDocument().getLength(), end);
 					newPositions.add(new Position(start, end - start));
 				}
 			}
