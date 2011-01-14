@@ -55,6 +55,7 @@ import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
 import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
  * @author Max Stepanov
@@ -87,7 +88,7 @@ public final class BrowserUtil {
 
 	private static final Map<String, Boolean> browserCache = new HashMap<String, Boolean>(4);
 
-	private static final IStatus installDebuggerPromptStatus = new Status(IStatus.INFO, DebugCorePlugin.PLUGIN_ID, 301, StringUtil.EMPTY, null);
+	private static final IStatus installDebuggerPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 301, StringUtil.EMPTY, null);
 
 	private BrowserUtil() {
 	}

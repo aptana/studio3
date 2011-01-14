@@ -539,7 +539,6 @@
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
          </adapter>
-         <adapter type="org.eclipse.debug.internal.ui.contexts.provisional.ISourceDisplayAdapter"/>
       </factory>
       <factory
             adaptableType="com.aptana.js.debug.core.model.ISourceLink"
@@ -547,25 +546,24 @@
          <adapter
                type="org.eclipse.debug.ui.sourcelookup.ISourceDisplay">
          </adapter>
-         <adapter type="org.eclipse.debug.internal.ui.contexts.provisional.ISourceDisplayAdapter"/>
       </factory>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension targetID="com.aptana.ide.js.ui.WebPerspective">
+      <perspectiveExtension targetID="com.aptana.ui.WebPerspective">
          <actionSet id="org.eclipse.debug.ui.launchActionSet"/>
          <actionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
-         <actionSet id="com.aptana.debug.ui.JSDebugActionSet"/>
+         <actionSet id="com.aptana.js.debug.ui.actionSet"/>
       </perspectiveExtension>
       <perspectiveExtension targetID="org.eclipse.debug.ui.DebugPerspective">
-         <actionSet id="com.aptana.debug.ui.JSDebugActionSet"/>
+         <actionSet id="com.aptana.js.debug.ui.actionSet"/>
          <view
-               id="com.aptana.debug.ui.scriptsView"
+               id="com.aptana.js.debug.ui.scriptsView"
                relationship="stack"
                relative="org.eclipse.debug.ui.ExpressionView"
                visible="true"/>
-         <viewShortcut id="com.aptana.debug.ui.scriptsView"/>
-         <viewShortcut id="com.aptana.debug.ui.AJAXMonitorView"/>
+         <viewShortcut id="com.aptana.js.debug.ui.scriptsView"/>
+         <viewShortcut id="com.aptana.js.debug.ui.AJAXMonitorView"/>
       </perspectiveExtension>
    </extension>
    <extension
@@ -573,7 +571,7 @@
   <page
         adaptable="true"
         class="com.aptana.js.debug.ui.internal.propertypages.JSLineBreakpointPropertyPage"
-        id="com.aptana.debug.ui.propertypages.common"
+        id="com.aptana.js.debug.ui.propertypages.common"
         name="%page.name.common"
         objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint"/>
    </extension>
@@ -582,13 +580,13 @@
       <statusHandler
             class="com.aptana.js.debug.ui.internal.InstallDebuggerPromptStatusHandler"
             code="301"
-            id="com.aptana.debug.ui.installDebuggerPromptStatusHandler"
-            plugin="com.aptana.debug.core"/>
+            id="com.aptana.js.debug.ui.installDebuggerPromptStatusHandler"
+            plugin="com.aptana.js.debug.core"/>
       <statusHandler
             class="com.aptana.js.debug.ui.internal.LaunchDebuggerPromptStatusHandler"
             code="302"
-            id="com.aptana.debug.ui.launchBrowserPromptStatusHandler"
-            plugin="com.aptana.debug.core"/>
+            id="com.aptana.js.debug.ui.launchBrowserPromptStatusHandler"
+            plugin="com.aptana.js.debug.core"/>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -597,21 +595,21 @@
             category="org.eclipse.debug.ui"
             class="com.aptana.js.debug.ui.internal.views.AJAXMonitorView"
             icon="icons/full/obj16/xhrmon.gif"
-            id="com.aptana.debug.ui.AJAXMonitorView"
+            id="com.aptana.js.debug.ui.AJAXMonitorView"
             name="%AJAXMonitorView.name"/>
       <view
             allowMultiple="false"
             category="org.eclipse.debug.ui"
             class="com.aptana.js.debug.ui.internal.views.ScriptsView"
             icon="icons/full/obj16/script.gif"
-            id="com.aptana.debug.ui.scriptsView"
+            id="com.aptana.js.debug.ui.scriptsView"
             name="%scriptsView.name"/>
    </extension>
    <extension
          point="org.eclipse.ui.console.consolePatternMatchListeners">
       <consolePatternMatchListener
             class="com.aptana.debug.ui.console.ConsoleTracker"
-            id="com.aptana.debug.ui.JSConsoleTracker"
+            id="com.aptana.js.debug.ui.consoleTracker"
             regex="(?i)\([^(]*\.\w+:\d+\)">
          <enablement>
             <or>
@@ -626,14 +624,14 @@
          point="org.eclipse.ui.bindings">
       <key
             commandId="com.aptana.debug.ui.commands.Inspect"
-            contextId="com.aptana.ide.editors.UnifiedEditorsScope"
+            contextId="com.aptana.editor.context"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+I"/>
    </extension>
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="com.aptana.debug.ui.JSDebugActionSet"
+            id="com.aptana.js.debug.ui.actionSet"
             label="%JSDebugActionSet.label"
             visible="false">
          <menu
@@ -649,14 +647,14 @@
                helpContextId="inspect_action_context"
                hoverIcon="icons/full/etool16/inspect.gif"
                icon="icons/full/etool16/inspect.gif"
-               id="com.aptana.debug.ui.actions.Inspect"
+               id="com.aptana.js.debug.ui.actions.Inspect"
                label="%InspectAction.label"
                menubarPath="org.eclipse.ui.run/jsGroup"
                style="push">
             <enablement>
                <and>
                   <systemProperty
-                        name="com.aptana.debug.core.debuggerActive"
+                        name="com.aptana.js.debug.core.debuggerActive"
                         value="true"/>
                   <or>
                      <objectClass name="org.eclipse.jface.text.ITextSelection"/>
@@ -672,14 +670,14 @@
                helpContextId="watch_action_context"
                hoverIcon="icons/full/etool16/watch_exp.gif"
                icon="icons/full/etool16/watch_exp.gif"
-               id="com.aptana.debug.ui.actions.Watch"
+               id="com.aptana.js.debug.ui.actions.Watch"
                label="%WatchAction.label"
                menubarPath="org.eclipse.ui.run/jsGroup"
                style="push">
             <enablement>
                <and>
                   <systemProperty
-                        name="com.aptana.debug.core.debuggerActive"
+                        name="com.aptana.js.debug.core.debuggerActive"
                         value="true"/>
                   <or>
                      <objectClass name="org.eclipse.jface.text.ITextSelection"/>
@@ -691,7 +689,7 @@
          <action
                class="com.aptana.js.debug.ui.internal.actions.AddExceptionBreakpointAction"
                icon="icons/full/elcl16/exc_catch.gif"
-               id="com.aptana.debug.ui.actions.AddExceptionBreakpoint"
+               id="com.aptana.js.debug.ui.actions.AddExceptionBreakpoint"
                label="%addExceptionBreakpointAction.accel.label"
                menubarPath="org.eclipse.ui.run/jsGroup"/>
          <action
@@ -700,7 +698,7 @@
                disabledIcon="$nl$/icons/full/obj16/linebreakpoint_d.gif"
                helpContextId="toggle_breakpoint_action_context"
                icon="$nl$/icons/full/obj16/linebreakpoint_e.gif"
-               id="com.aptana.debug.ui.actions.ToggleBreakpoint"
+               id="com.aptana.js.debug.ui.actions.ToggleBreakpoint"
                label="%ToggleBreakpointAction.label"
                style="push"
                toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
@@ -708,7 +706,7 @@
                class="com.aptana.js.debug.ui.internal.actions.OpenURLAction"
                definitionId="com.aptana.debug.ui.commands.openURL"
                icon="icons/full/etool16/url_file.gif"
-               id="com.aptana.debug.ui.actions.openURL"
+               id="com.aptana.js.debug.ui.actions.openURL"
                label="%OpenURLAction.label"
                menubarPath="file/new.ext"
                style="push"
@@ -719,50 +717,50 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            id="com.aptana.debug.ui.debugging"
+            id="com.aptana.js.debug.ui.debugging"
             name="%Context.jsDebugging.name"
             parentId="org.eclipse.debug.ui.debugging"/>
    </extension>
    <extension
          point="org.eclipse.debug.ui.debugModelContextBindings">
       <modelContextBinding
-            contextId="com.aptana.debug.ui.debugging"
-            debugModelId="com.aptana.debug.core"/>
+            contextId="com.aptana.js.debug.ui.debugging"
+            debugModelId="com.aptana.js.debug.core"/>
    </extension>
    <extension
          point="org.eclipse.debug.ui.contextViewBindings">
       <contextViewBinding
-            contextId="com.aptana.debug.ui.debugging"
+            contextId="com.aptana.js.debug.ui.debugging"
             viewId="org.eclipse.debug.ui.DebugView"/>
       <contextViewBinding
-            contextId="com.aptana.debug.ui.debugging"
+            contextId="com.aptana.js.debug.ui.debugging"
             viewId="org.eclipse.debug.ui.VariableView"/>
       <contextViewBinding
             autoOpen="true"
-            contextId="com.aptana.debug.ui.debugging"
+            contextId="com.aptana.js.debug.ui.debugging"
             viewId="org.eclipse.debug.ui.ExpressionView"/>
       <contextViewBinding
             autoOpen="true"
-            contextId="com.aptana.debug.ui.debugging"
-            viewId="com.aptana.debug.ui.scriptsView"/>
+            contextId="com.aptana.js.debug.ui.debugging"
+            viewId="com.aptana.js.debug.ui.scriptsView"/>
       <contextViewBinding
             autoOpen="true"
-            contextId="com.aptana.debug.ui.debugging"
-            viewId="com.aptana.debug.ui.AJAXMonitorView"/>
+            contextId="com.aptana.js.debug.ui.debugging"
+            viewId="com.aptana.js.debug.ui.AJAXMonitorView"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="com.aptana.ide.core.ui.preferences.GeneralPreferencePage"
+            category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.js.debug.ui.internal.preferences.JSDebugPreferencePage"
-            id="com.aptana.debug.ui.preferences.jsDebug"
+            id="com.aptana.js.debug.ui.preferences"
             name="%Preferences.jsDebug.name">
          <keywordReference id="org.eclipse.debug.ui.general"/>
       </page>
       <page
-            category="com.aptana.debug.ui.preferences.jsDebug"
+            category="com.aptana.js.debug.ui.preferences"
             class="com.aptana.js.debug.ui.internal.preferences.JSDetailFormattersPreferencePage"
-            id="com.aptana.debug.ui.preferences.jsDetailFormatters"
+            id="com.aptana.js.debug.ui.preferences.detailFormatters"
             name="%Preferences.jsDetailFormatters.name"/>
    </extension>
    <extension

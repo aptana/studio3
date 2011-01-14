@@ -87,7 +87,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 	/**
 	 * launchBrowserPromptStatus
 	 */
-	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, DebugCorePlugin.PLUGIN_ID, 302, StringUtil.EMPTY, null);
+	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 302, StringUtil.EMPTY, null);
 
 	/**
 	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration,
