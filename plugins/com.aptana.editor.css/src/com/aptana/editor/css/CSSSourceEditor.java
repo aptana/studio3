@@ -35,10 +35,13 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
@@ -100,5 +103,11 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
 		return CSSPlugin.getDefault().getPreferenceStore();
+	}
+	
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new CSSFoldingComputer(this, document);
 	}
 }

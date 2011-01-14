@@ -34,9 +34,13 @@
  */
 package com.aptana.editor.json;
 
+import org.eclipse.jface.text.IDocument;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.json.internal.text.JSONFoldingComputer;
 import com.aptana.editor.json.outline.JSONOutlineContentProvider;
 import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 import com.aptana.editor.json.parsing.IJSONParserConstants;
@@ -78,5 +82,11 @@ public class JSONEditor extends AbstractThemeableEditor
 
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new JSONDocumentProvider());
+	}
+	
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new JSONFoldingComputer(this, document);
 	}
 }

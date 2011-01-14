@@ -37,6 +37,8 @@ package com.aptana.editor.js.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import com.aptana.editor.js.internal.text.JSFoldingComputerTest;
+
 public class AllTests
 {
 
@@ -44,6 +46,7 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite("All tests for com.aptana.editor.js");
 		// $JUnit-BEGIN$
+		suite.addTestSuite(JSFoldingComputerTest.class);
 		suite.addTest(com.aptana.editor.js.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.contentassist.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.index.AllTests.suite());

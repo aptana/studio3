@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.TextViewer;
@@ -97,6 +98,8 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
@@ -858,5 +861,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		IPreferenceStore store = getPreferenceStore();
 		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
+	}
+
+	/**
+	 * Create the implementation of the folding computer. Default is to use regexp defined in bundle/ruble for this
+	 * language. Can be overridden on a per-editor basis.
+	 * 
+	 * @param document
+	 * @return
+	 */
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new RubyRegexpFolder(this, document);
 	}
 }
