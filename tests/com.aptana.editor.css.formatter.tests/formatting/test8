@@ -9,21 +9,38 @@ css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
 ==CONTENT==
-/*************** #pageName styles **************/
-
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+table th {
+ background-color: silver;
 }
 
+@media print {
+.class1 {
+ display:none;
+}
 
+.class2 {
+   display: none;
+}
 
+h1 {
+    display: block;
+    }
+}
 
 ==FORMATTED==
-/*************** #pageName styles **************/
+table th {
+    background-color: silver;
+}
 
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+@media print {
+    .class1 {
+        display:none;
+    }
+    .class2 {
+        display: none;
+    }
+    h1 {
+        display: block;
+    }
 }
 

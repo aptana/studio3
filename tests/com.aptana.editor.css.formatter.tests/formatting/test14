@@ -9,21 +9,17 @@ css.formatter.line.after.declaration=0
 css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
 ==CONTENT==
-/*************** #pageName styles **************/
-
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+.mobd15 .layer2 {
+    border-bottom: 1px solid #174974 !important;
+    padding: 5px 5pt 5px 5px;
+*height:1%;
+text-align:left;
 }
-
-
-
-
 ==FORMATTED==
-/*************** #pageName styles **************/
-
-#pageName {
-    margin: 0px;
-    padding: 0px 0px 0px 10px;
+.mobd15 .layer2 {
+    border-bottom: 1px solid #174974 !important;
+    padding: 5px 5pt 5px 5px;
+    *
+    height:1%;
+    text-align:left;
 }
-
