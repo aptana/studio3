@@ -75,9 +75,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @see http://dev.w3.org/html5/spec/Overview.html#void-elements
 	 */
 	@SuppressWarnings("nls")
-	protected static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br",
-			"col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track",
-			"wbr"));
+	public static final HashSet<String> VOID_ELEMENTS = new HashSet<String>(Arrays.asList("area", "base", "br", "col",
+			"command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"));
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
@@ -147,8 +146,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				if (VOID_ELEMENTS.contains(name) || !hasInlineClosingTag(elementNode))
 				{
 					FormatterBlockWithBeginNode formatterNode = new FormatterVoidElementNode(document, name);
-					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(), elementNode
-							.getEndingOffset() + 1));
+					formatterNode.setBegin(createTextNode(document, elementNode.getStartingOffset(),
+							elementNode.getEndingOffset() + 1));
 					push(formatterNode);
 					checkedPop(formatterNode, -1);
 				}
@@ -291,9 +290,9 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 
 		boolean createdContentNode = false;
-		formatterNode = new FormatterDefaultElementNode(document, type, node.hasChildren());
-		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(), beginNodeRange
-				.getEndingOffset() + 1));
+		formatterNode = new FormatterDefaultElementNode(document, type, node.getChildren());
+		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
+				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
 		if (node.getNodeType() == HTMLNodeTypes.SPECIAL)
 		{
@@ -351,7 +350,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		else
 		{
-			checkedPop(formatterNode, endOffset);
+			checkedPop(formatterNode, getEndWithoutWhiteSpaces(endOffset - 1, document) + 1);
 		}
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
