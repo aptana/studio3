@@ -474,6 +474,13 @@
                id="com.aptana.editor.common.open.in.file.manager">
          </dynamic>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:file?after=new.ext">
+         <menu
+               id="com.aptana.file.template.menu"
+               label="%menu.file.template.label">
+         </menu>
+      </menuContribution>
 	</extension>
 	<extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
