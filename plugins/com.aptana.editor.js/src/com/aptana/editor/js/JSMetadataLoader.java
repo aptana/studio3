@@ -36,6 +36,7 @@ package com.aptana.editor.js;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -203,5 +204,16 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		{
 			JSPlugin.logError(e.getMessage(), e);
 		}
+	}
+	
+	protected boolean indexCorrupt()
+	{
+		Index index = JSIndexQueryHelper.getIndex();
+		if (index == null)
+		{
+			return true;
+		}
+		List<String> categories = index.getCategories();
+		return categories == null || categories.isEmpty();
 	}
 }

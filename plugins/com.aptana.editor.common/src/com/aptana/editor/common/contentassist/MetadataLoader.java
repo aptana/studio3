@@ -203,7 +203,7 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	@Override
 	protected IStatus run(IProgressMonitor monitor)
 	{
-		if (this.versionChanged())
+		if (this.versionChanged() || this.indexCorrupt())
 		{
 			this.rebuildMetadataIndex(monitor);
 
@@ -213,6 +213,14 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 		}
 		return Status.OK_STATUS;
 	}
+
+	/**
+	 * Perform a sanity check ont he existing index to verify that it's valid. If the index is corrupt, we'll force a
+	 * rebuild of it.
+	 * 
+	 * @return
+	 */
+	protected abstract boolean indexCorrupt();
 
 	/**
 	 * Sub-classes should implement this if they need to do more than just rebuilding the metadata index when the index

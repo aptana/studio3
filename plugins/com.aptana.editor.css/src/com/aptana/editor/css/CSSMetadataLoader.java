@@ -36,6 +36,7 @@ package com.aptana.editor.css;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.osgi.framework.Bundle;
 
@@ -134,8 +135,9 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 		IndexManager.getInstance().removeIndex(URI.create(CSSIndexConstants.METADATA_INDEX_LOCATION));
 
 		CSSIndexWriter indexer = new CSSIndexWriter();
-		
-		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
+
+		// TODO: The following should be done in the index writer, but this will introduce a dependency to
+		// com.aptana.parsing in com.aptana.index.core
 		Index index = CSSIndexQueryHelper.getIndex();
 
 		for (ElementElement element : reader.getElements())
@@ -167,4 +169,15 @@ public class CSSMetadataLoader extends MetadataLoader<CSSMetadataReader>
 			CSSPlugin.logError(e.getMessage(), e);
 		}
 	}
+
+	protected boolean indexCorrupt()
+	{
+		Index index = CSSIndexQueryHelper.getIndex();
+		if (index == null)
+		{
+			return true;
+		}
+		List<String> categories = index.getCategories();
+		return categories == null || categories.isEmpty();
+	};
 }

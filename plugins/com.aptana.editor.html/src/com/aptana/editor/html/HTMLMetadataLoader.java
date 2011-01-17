@@ -36,6 +36,7 @@ package com.aptana.editor.html;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import org.osgi.framework.Bundle;
 
@@ -169,5 +170,16 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		{
 			HTMLPlugin.logError(e.getMessage(), e);
 		}
+	}
+	
+	protected boolean indexCorrupt()
+	{
+		Index index = HTMLIndexQueryHelper.getIndex();
+		if (index == null)
+		{
+			return true;
+		}
+		List<String> categories = index.getCategories();
+		return categories == null || categories.isEmpty();
 	}
 }
