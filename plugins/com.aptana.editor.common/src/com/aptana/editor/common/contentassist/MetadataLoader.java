@@ -56,6 +56,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.index.core.Index;
 
 /**
  * MetadataLoader
@@ -215,12 +216,26 @@ public abstract class MetadataLoader<T extends MetadataReader> extends Job
 	}
 
 	/**
-	 * Perform a sanity check ont he existing index to verify that it's valid. If the index is corrupt, we'll force a
+	 * Perform a sanity check on the existing index to verify that it's valid. If the index is corrupt, we'll force a
 	 * rebuild of it.
 	 * 
 	 * @return
 	 */
-	protected abstract boolean indexCorrupt();
+	protected boolean indexCorrupt()
+	{
+		Index index = getIndex();
+		if (index == null)
+		{
+			return true;
+		}
+		List<String> categories = index.getCategories();
+		return categories == null || categories.isEmpty();
+	};
+	
+	/**
+	 * Grab the index containing the metadata.
+	 */
+	protected abstract Index getIndex();
 
 	/**
 	 * Sub-classes should implement this if they need to do more than just rebuilding the metadata index when the index

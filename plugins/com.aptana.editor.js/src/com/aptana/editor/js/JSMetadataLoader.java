@@ -36,7 +36,6 @@ package com.aptana.editor.js;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -188,7 +187,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		JSIndexWriter indexer = new JSIndexWriter();
 		
 		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
-		Index index = JSIndexQueryHelper.getIndex();
+		Index index = getIndex();
 
 		// write types
 		for (TypeElement type : reader.getTypes())
@@ -206,14 +205,9 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		}
 	}
 	
-	protected boolean indexCorrupt()
+	@Override
+	protected Index getIndex()
 	{
-		Index index = JSIndexQueryHelper.getIndex();
-		if (index == null)
-		{
-			return true;
-		}
-		List<String> categories = index.getCategories();
-		return categories == null || categories.isEmpty();
+		return JSIndexQueryHelper.getIndex();
 	}
 }
