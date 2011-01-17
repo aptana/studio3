@@ -35,6 +35,7 @@
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
@@ -50,6 +51,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 
 	private TextAttribute lastAttribute;
 	private String scope;
+	private IRegion fLastLine;
+	private int fCountForLine;
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
@@ -61,6 +64,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
+			fLastLine = null;
+			fCountForLine = 0;
 			int offset = region.getOffset();
 			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 		}
@@ -72,6 +77,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			super.createPresentation(presentation, region);
 			scope = null;
+			fLastLine = null;
+			fCountForLine = 0;
 		}
 	}
 
@@ -112,5 +119,44 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
 		return lastAttribute;
+	}
+
+	@Override
+	protected void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
+	{
+		try
+		{
+			// first time, grab line info
+			if (fLastLine == null)
+			{
+				fLastLine = fDocument.getLineInformationOfOffset(offset);
+				fCountForLine = 1;
+			}
+			else
+			{
+				// is this still on the same line?
+				if (offset > (fLastLine.getOffset() + fLastLine.getLength()))
+				{
+					// it's a new line, reset counter, update line region
+					fCountForLine = 0;
+					fLastLine = fDocument.getLineInformationOfOffset(offset);
+				}
+				else
+				{
+					// same line, update counter
+					fCountForLine++;
+					if (fCountForLine > 200)
+					{
+						// only record 200 styles per line!
+						return;
+					}
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		super.addRange(presentation, offset, length, attr);
 	}
 }
