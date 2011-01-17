@@ -34,17 +34,45 @@
  */
 package com.aptana.editor.xml.parsing.ast;
 
-public enum XMLNodeType
+/**
+ * @author klindsey
+ */
+public class XMLCDATANode extends XMLNode
 {
-	UNKNOWN, DECLARATION, ELEMENT, ERROR, COMMENT, CDATA;
 
-	/**
-	 * getIndex
-	 * 
-	 * @return
-	 */
-	public short getIndex()
+	private String fText;
+
+	public XMLCDATANode(String text, int start, int end)
 	{
-		return (short) ordinal();
+		super(XMLNodeType.CDATA, start, end);
+		fText = text;
+	}
+
+	@Override
+	public String getText()
+	{
+		return fText;
+	}
+
+	@Override
+	public String toString()
+	{
+		return fText;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!super.equals(obj) || !(obj instanceof XMLCDATANode))
+		{
+			return false;
+		}
+		return fText.equals(((XMLCDATANode) obj).fText);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode() * 31 + fText.hashCode();
 	}
 }

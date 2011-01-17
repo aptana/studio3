@@ -40,6 +40,7 @@ import java.util.Stack;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
+import com.aptana.editor.xml.parsing.ast.XMLCDATANode;
 import com.aptana.editor.xml.parsing.ast.XMLCommentNode;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
@@ -237,6 +238,19 @@ public class XMLParser implements IParser
 			fCurrentElement.addChild(comment);
 		}
 	}
+	
+	/**
+	 * processCDATA
+	 */
+	protected void processCDATA()
+	{
+		if (fCurrentElement != null)
+		{
+			XMLCDATANode comment = new XMLCDATANode(fCurrentLexeme.getText(), fCurrentLexeme.getStartingOffset(),
+					fCurrentLexeme.getEndingOffset());
+			fCurrentElement.addChild(comment);
+		}
+	}
 
 	/**
 	 * processEndTag
@@ -285,6 +299,10 @@ public class XMLParser implements IParser
 		{
 			case COMMENT:
 				processComment();
+				break;
+				
+			case CDATA:
+				processCDATA();
 				break;
 
 			case START_TAG:
