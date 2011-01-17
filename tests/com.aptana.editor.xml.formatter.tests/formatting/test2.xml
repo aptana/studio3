@@ -1,0 +1,34 @@
+==PREFS==
+xml.formatter.line.preserve=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.element=0
+xml.formatter.wrap.comments.length=80
+xml.formatter.wrap.comments=false
+xml.formatter.formatter.indentation.size=4
+xml.formatter.formatter.tabulation.size=4
+xml.formatter.formatter.tabulation.char=space
+==CONTENT==
+<xml>
+    <item
+     name="Pavel"
+    
+     age
+     =
+     "25"
+    
+	     index="10"
+    />
+</xml>
+==FORMATTED==
+<xml>
+    <item
+    name="Pavel"
+
+    age
+    =
+    "25"
+
+    index="10"
+    />
+</xml>

@@ -97,4 +97,14 @@ public class FormatterVoidElementNode extends FormatterBlockWithBeginNode
 	{
 		return isAddingBeginNewLine();
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#shouldConsumePreviousWhiteSpaces()
+	 */
+	public boolean shouldConsumePreviousWhiteSpaces()
+	{
+		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		return set.contains(element);
+	}
 }
