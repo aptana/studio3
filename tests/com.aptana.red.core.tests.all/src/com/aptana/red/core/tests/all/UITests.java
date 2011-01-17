@@ -55,6 +55,7 @@ public class UITests
 		suite.addTest(com.aptana.editor.css.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.dtd.AllTests.suite());
 		suite.addTest(com.aptana.editor.html.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.html.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.idl.AllTests.suite());
 		suite.addTest(com.aptana.editor.js.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.json.tests.AllTests.suite());
@@ -62,6 +63,7 @@ public class UITests
 		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
 		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
+		suite.addTest(com.aptana.editor.xml.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.yaml.tests.AllTests.suite());
 		// suite.addTest(com.aptana.explorer.tests.AllTests.suite()); // TODO Add Tests for explorer
 		suite.addTest(com.aptana.git.ui.AllTests.suite());

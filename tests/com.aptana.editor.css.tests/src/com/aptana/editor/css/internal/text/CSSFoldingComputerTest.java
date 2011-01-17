@@ -110,7 +110,7 @@ public class CSSFoldingComputerTest extends TestCase
 		};
 		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+		assertEquals(new Position(0, src.length()), positions.get(0));
 	}
 	
 	public void testMediaFolding() throws Exception
@@ -135,7 +135,7 @@ public class CSSFoldingComputerTest extends TestCase
 		};
 		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
 		assertEquals(2, positions.size());
-		assertEquals(new Position(0, src.length() - 1), positions.get(0));
+		assertEquals(new Position(0, src.length()), positions.get(0));
 		assertEquals(new Position(17, 27), positions.get(1));
 	}
 	
@@ -161,7 +161,7 @@ public class CSSFoldingComputerTest extends TestCase
 		};
 		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+		assertEquals(new Position(0, src.length()), positions.get(0));
 	}
 	
 	public void testFontFaceFolding() throws Exception
@@ -186,6 +186,6 @@ public class CSSFoldingComputerTest extends TestCase
 		};
 		List<Position> positions = folder.emitFoldingRegions(new NullProgressMonitor());
 		assertEquals(1, positions.size());
-		assertEquals(new Position(0, src.length() - 1), positions.get(0)); // eats whole line at end
+		assertEquals(new Position(0, src.length()), positions.get(0));
 	}
 }

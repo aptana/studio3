@@ -187,7 +187,7 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		JSIndexWriter indexer = new JSIndexWriter();
 		
 		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
-		Index index = JSIndexQueryHelper.getIndex();
+		Index index = getIndex();
 
 		// write types
 		for (TypeElement type : reader.getTypes())
@@ -203,5 +203,11 @@ public class JSMetadataLoader extends MetadataLoader<JSMetadataReader>
 		{
 			JSPlugin.logError(e.getMessage(), e);
 		}
+	}
+	
+	@Override
+	protected Index getIndex()
+	{
+		return JSIndexQueryHelper.getIndex();
 	}
 }

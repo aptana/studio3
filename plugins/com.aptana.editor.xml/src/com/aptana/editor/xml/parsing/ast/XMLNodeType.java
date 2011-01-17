@@ -36,7 +36,7 @@ package com.aptana.editor.xml.parsing.ast;
 
 public enum XMLNodeType
 {
-	UNKNOWN, DECLARATION, ELEMENT, ERROR, COMMENT;
+	UNKNOWN, DECLARATION, ELEMENT, ERROR, COMMENT, CDATA;
 
 	/**
 	 * getIndex

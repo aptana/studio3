@@ -37,9 +37,11 @@ package com.aptana.editor.html.formatter.nodes;
 import java.util.Set;
 
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
+import com.aptana.editor.html.formatter.HTMLFormatterNodeBuilder;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
 import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * A default tag node formatter is responsible of the formatting of a tag that has a begin and end, however, should not
@@ -50,16 +52,16 @@ import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
 public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 {
 	private String element;
-	private boolean children;
+	private IParseNode[] children;
 
 	/**
 	 * @param document
 	 */
-	public FormatterDefaultElementNode(IFormatterDocument document, String element, boolean hasChildrenInAST)
+	public FormatterDefaultElementNode(IFormatterDocument document, String element, IParseNode[] children)
 	{
 		super(document);
 		this.element = element;
-		this.children = hasChildrenInAST;
+		this.children = children;
 	}
 
 	/*
@@ -88,7 +90,16 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	protected boolean isAddingEndNewLine()
 	{
 		Set<String> set = getDocument().getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return (!set.contains(element) || children);
+		if (children == null || children.length == 0)
+		{
+			return (!set.contains(element));
+		}
+
+		// We only want to add a newline at the end if the last child is not in the exclusion list
+		IParseNode child = children[children.length - 1];
+		
+		return !(set.contains(element) && set.contains(child.getNameNode().getName()) && HTMLFormatterNodeBuilder.VOID_ELEMENTS.contains(child.getNameNode().getName()));
+		
 	}
 
 	/*
@@ -101,4 +112,5 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	{
 		return getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
 	}
+
 }

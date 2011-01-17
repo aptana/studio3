@@ -134,17 +134,6 @@ public class XMLParserScanner implements ITokenScanner
 	}
 
 	/**
-	 * isComment
-	 * 
-	 * @param data
-	 * @return
-	 */
-	private boolean isComment(Object data)
-	{
-		return (data != null && ((XMLTokenType) data) == XMLTokenType.COMMENT);
-	}
-
-	/**
 	 * nextLexeme
 	 */
 	public Lexeme<XMLTokenType> nextLexeme() throws IOException, Exception
@@ -152,7 +141,7 @@ public class XMLParserScanner implements ITokenScanner
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
 
-		while (token.isWhitespace() || isComment(data))
+		while (token.isWhitespace())
 		{
 			token = fTokenScanner.nextToken();
 			data = token.getData();

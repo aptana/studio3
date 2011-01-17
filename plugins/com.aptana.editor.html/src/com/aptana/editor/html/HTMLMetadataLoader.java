@@ -137,9 +137,10 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		IndexManager.getInstance().removeIndex(URI.create(HTMLIndexConstants.METADATA_INDEX_LOCATION));
 
 		HTMLIndexWriter indexer = new HTMLIndexWriter();
-		
-		// TODO: The following should be done in the index writer, but this will introduce a dependency to com.aptana.parsing in com.aptana.index.core
-		Index index = HTMLIndexQueryHelper.getIndex();
+
+		// TODO: The following should be done in the index writer, but this will introduce a dependency to
+		// com.aptana.parsing in com.aptana.index.core
+		Index index = getIndex();
 
 		for (ElementElement element : reader.getElements())
 		{
@@ -169,5 +170,11 @@ public class HTMLMetadataLoader extends MetadataLoader<HTMLMetadataReader>
 		{
 			HTMLPlugin.logError(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	protected Index getIndex()
+	{
+		return HTMLIndexQueryHelper.getIndex();
 	}
 }

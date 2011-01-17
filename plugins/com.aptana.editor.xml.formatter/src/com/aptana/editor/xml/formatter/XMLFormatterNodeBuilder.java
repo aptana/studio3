@@ -163,7 +163,7 @@ public class XMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			int textStartOffset = getBeginWithoutWhiteSpaces(previousCloseTagOffset + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endOffset - 1, document);
 
-			if (textStartOffset >= textEndOffset)
+			if (textStartOffset > textEndOffset)
 			{
 				if (textStartOffset == endOffset)
 				{
