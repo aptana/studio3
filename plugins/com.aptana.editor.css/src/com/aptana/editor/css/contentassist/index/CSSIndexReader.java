@@ -109,6 +109,33 @@ public class CSSIndexReader extends IndexReader
 		return result;
 	}
 
+	public List<ElementElement> getElements(Index index, String... names) throws IOException
+	{
+		List<ElementElement> result = new ArrayList<ElementElement>();
+
+		if (index != null && names != null)
+		{
+			for (String name : names)
+			{
+				List<QueryResult> elements = index.query( //
+					new String[] { CSSIndexConstants.ELEMENT }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
+
+				if (elements != null)
+				{
+					for (QueryResult element : elements)
+					{
+						result.add(this.createElement(element));
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * getProperties
 	 * 

@@ -80,6 +80,36 @@ public class CSSIndexQueryHelper
 	}
 
 	/**
+	 * getElement
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public ElementElement getElement(String name)
+	{
+		ElementElement result = null;
+
+		if (name != null && name.length() > 0)
+		{
+			try
+			{
+				List<ElementElement> elements = this._reader.getElements(getIndex(), name);
+
+				if (elements.isEmpty() == false)
+				{
+					result = elements.get(0);
+				}
+			}
+			catch (IOException e)
+			{
+				CSSPlugin.logError(e.getMessage(), e);
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getElements
 	 * 
 	 * @return
