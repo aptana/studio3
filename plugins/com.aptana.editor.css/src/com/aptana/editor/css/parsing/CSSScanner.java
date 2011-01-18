@@ -86,6 +86,7 @@ public class CSSScanner extends Scanner
 	{
 		IToken token = fTokenScanner.nextToken();
 		Object data = token.getData();
+
 		while (token.isWhitespace() || (data != null && data.equals(CSSTokenType.COMMENT)))
 		{
 			// ignores whitespace and keeps a record of the comments
@@ -93,27 +94,28 @@ public class CSSScanner extends Scanner
 			{
 				int offset = fTokenScanner.getTokenOffset();
 				int length = fTokenScanner.getTokenLength();
+
 				fComments.add(new Range(offset, offset + length - 1));
 			}
+
 			token = fTokenScanner.nextToken();
 			data = token.getData();
 		}
 
 		int offset = fTokenScanner.getTokenOffset();
 		int length = fTokenScanner.getTokenLength();
+		short type = (data != null) ? ((CSSTokenType) data).getShort() : CSSTokenType.EOF.getShort();
+		String text = null;
 
-		short type = CSSTokenType.EOF.getShort();
-		if (data != null)
-		{
-			type = ((CSSTokenType) data).getShort();
-		}
 		try
 		{
-			return new Symbol(type, offset, offset + length - 1, fDocument.get(offset, length));
+			text = fDocument.get(offset, length);
 		}
 		catch (BadLocationException e)
 		{
-			throw new Scanner.Exception(e.getLocalizedMessage());
+			// ignore
 		}
+
+		return new Symbol(type, offset, offset + length - 1, text);
 	}
 }
