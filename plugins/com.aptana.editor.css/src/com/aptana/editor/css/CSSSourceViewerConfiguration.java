@@ -42,12 +42,12 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
 		IContentAssistProcessor result = null;
-		
+
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || CSSSourceConfiguration.DEFAULT.equals(contentType))
 		{
 			result = new CSSContentAssistProcessor(getAbstractThemeableEditor());
 		}
-		
+
 		return result;
 	}
 
