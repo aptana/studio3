@@ -36,15 +36,23 @@ package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.mortbay.util.ajax.JSON.Output;
 
 import com.aptana.core.util.CollectionsUtil;
 import com.aptana.core.util.SourcePrinter;
 import com.aptana.core.util.StringUtil;
+import com.aptana.index.core.IndexUtil;
 
 public class TypeElement extends BaseElement
 {
+	private static final String FUNCTIONS_PROPERTY = "functions"; //$NON-NLS-1$
+	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
+
 	private List<String> _parentTypes;
 	private List<PropertyElement> _properties;
+	private boolean _serializeProperties;
 
 	/**
 	 * TypeElement
@@ -172,6 +180,16 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
+	 * getSerializeProperties
+	 * 
+	 * @return
+	 */
+	public boolean getSerializeProperties()
+	{
+		return this._serializeProperties;
+	}
+
+	/**
 	 * hasParentTypes
 	 * 
 	 * @return
@@ -189,6 +207,75 @@ public class TypeElement extends BaseElement
 	public boolean hasProperties()
 	{
 		return this._properties != null && this._properties.isEmpty() == false;
+	}
+
+	/**
+	 * setSerializeProperties
+	 * 
+	 * @param value
+	 */
+	public void setSerializeProperties(boolean value)
+	{
+		this._serializeProperties = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		if (object.containsKey(PROPERTIES_PROPERTY))
+		{
+			List<PropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY), PropertyElement.class);
+
+			for (PropertyElement property : properties)
+			{
+				this.addProperty(property);
+			}
+		}
+
+		if (object.containsKey(FUNCTIONS_PROPERTY))
+		{
+			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY), PropertyElement.class);
+
+			for (PropertyElement function : functions)
+			{
+				this.addProperty(function);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#toJSON(org.mortbay.util.ajax.JSON.Output)
+	 */
+	@Override
+	public void toJSON(Output out)
+	{
+		super.toJSON(out);
+
+		if (this._serializeProperties)
+		{
+			List<PropertyElement> properties = new ArrayList<PropertyElement>(this.getProperties());
+			List<FunctionElement> functions = new ArrayList<FunctionElement>();
+
+			for (PropertyElement property : properties)
+			{
+				if (property instanceof FunctionElement)
+				{
+					functions.add((FunctionElement) property);
+				}
+			}
+
+			properties.removeAll(functions);
+
+			out.add(PROPERTIES_PROPERTY, properties);
+			out.add(FUNCTIONS_PROPERTY, functions);
+		}
 	}
 
 	/**

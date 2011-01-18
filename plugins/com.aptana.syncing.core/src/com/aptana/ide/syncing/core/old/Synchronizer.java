@@ -53,7 +53,9 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.internal.filesystem.Policy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.core.ILoggable;
@@ -349,8 +351,17 @@ public class Synchronizer implements ILoggable
 		IFileStore[] clientFiles = new IFileStore[0];
 		IFileStore[] serverFiles = new IFileStore[0];
 		IFileInfo clientInfo = client.fetchInfo();
+		if (!clientInfo.exists())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.Synchronizer_ERR_RootNotExist, client.toString())));
+		}
 		IFileInfo serverInfo = server.fetchInfo();
-
+		if (!serverInfo.exists())
+		{
+			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, MessageFormat.format(
+					Messages.Synchronizer_ERR_RootNotExist, server.toString())));
+		}
 		try
 		{
 			setClientEventHandler(client, server);
