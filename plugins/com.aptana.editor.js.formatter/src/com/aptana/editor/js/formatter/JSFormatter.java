@@ -201,9 +201,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (FormatterException e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 		}
 		catch (Exception e)
 		{
@@ -213,7 +213,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param input
 	 * @param output
@@ -237,7 +237,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		{
 			inputComments.append(inputCommentsMatcher.group());
 			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
-			inputOffset = inputCommentsMatcher.end() + 1;
+			inputOffset = inputCommentsMatcher.end();
 		}
 		if (inputOffset < inputLength)
 		{
@@ -247,7 +247,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		{
 			outputComments.append(outputCommentsMatcher.group());
 			outputBuffer.append(output.subSequence(outputOffset, outputCommentsMatcher.start()));
-			outputOffset = outputCommentsMatcher.end() + 1;
+			outputOffset = outputCommentsMatcher.end();
 
 		}
 		if (outputOffset < outputLength)
@@ -368,6 +368,5 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		return document;
 	}
-
 
 }
