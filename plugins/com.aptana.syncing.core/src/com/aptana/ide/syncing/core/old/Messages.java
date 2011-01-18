@@ -83,6 +83,8 @@ public final class Messages extends NLS
 
 	public static String Synchronizer_Downloading_Files;
 
+	public static String Synchronizer_ERR_RootNotExist;
+
 	/**
 	 * Synchronizer_Error
 	 */
