@@ -203,31 +203,6 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 				System.out.println(lexeme.getType().name());
 		}
 
-		// try
-		// {
-		// String word = textViewer.getDocument().get(hoverRegion.getOffset(), hoverRegion.getLength());
-		//
-		// if (CSSColors.namedColorExists(word))
-		// {
-		// word = CSSColors.to6CharHexWithLeadingHash(word);
-		// }
-		// else
-		// {
-		// // Match against a pattern to verify it's a color
-		// if (!RGB_PATTERN.matcher(word).matches())
-		// {
-		// return null;
-		// }
-		// word = CSSColors.to6CharHexWithLeadingHash(word);
-		// }
-		//
-		// return parseHexRGB(word);
-		// }
-		// catch (BadLocationException e)
-		// {
-		// // ignores the exception; just assumes no hover info is available
-		// }
-
 		return result;
 	}
 
