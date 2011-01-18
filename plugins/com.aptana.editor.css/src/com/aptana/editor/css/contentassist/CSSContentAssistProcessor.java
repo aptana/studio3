@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -41,6 +42,7 @@ import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.editor.css.contentassist.model.ValueElement;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
+import com.aptana.editor.css.preferences.IPreferenceConstants;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
@@ -634,9 +636,14 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		// TODO: these should be defined in a preference page
-		return new char[] { '.', '#', ':', '\t' };
-		// return new char[] { ':', '\t', '{', ';' };
+		String chars = Platform.getPreferencesService().getString( //
+			CSSPlugin.PLUGIN_ID, //
+			IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*

@@ -27,6 +27,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
+		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "<'\"&");
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		String[] filtered = new String[] { ".*canvas.*" };

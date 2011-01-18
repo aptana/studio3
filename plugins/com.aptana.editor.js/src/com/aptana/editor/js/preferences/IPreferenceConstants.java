@@ -23,4 +23,10 @@ public interface IPreferenceConstants
 	 * The value is a double used to indicate the current format being used by the JS index categories.
 	 */
 	String JS_INDEX_VERSION = "JS_INDEX_VERSION"; //$NON-NLS-1$
+
+	/**
+	 * The value is a string where each character in the string will be used as an auto-activation character in
+	 * CSSContentAssistProcessor
+	 */
+	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS";
 }

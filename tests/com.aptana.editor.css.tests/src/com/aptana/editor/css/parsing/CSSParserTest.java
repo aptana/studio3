@@ -835,6 +835,17 @@ public class CSSParserTest extends TestCase
 		parseTest("a {}" + EOL + "b {}" + EOL); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/**
+	 * This case was causing the parser to go into an infinite loop. The scanner would get a bad location exception
+	 * after the comment and did not return EOF in that case. This caused the parser to loop endlessly
+	 * 
+	 * @throws Exception
+	 */
+	public void testCommentBug() throws Exception
+	{
+		parseTest("body {\n\tbackground: red;\n}\n\n/**\n * \n */", "body {background: red;}" + EOL);
+	}
+
 	protected void parseTest(String source) throws Exception
 	{
 		parseTest(source, source);

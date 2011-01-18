@@ -31,5 +31,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, DEFAULT_AUTO_INDENT_ON_RETURN);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
+		prefs.put(IPreferenceConstants.JS_ACTIVATION_CHARACTERS, ".");
 	}
 }

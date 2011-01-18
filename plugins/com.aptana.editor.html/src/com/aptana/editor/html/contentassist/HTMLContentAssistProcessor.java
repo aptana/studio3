@@ -25,6 +25,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -55,6 +56,7 @@ import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
@@ -1163,7 +1165,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return new char[] { '<', '\'', '"', '&' };
+		String chars = Platform.getPreferencesService().getString( //
+			HTMLPlugin.PLUGIN_ID, //
+			IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*

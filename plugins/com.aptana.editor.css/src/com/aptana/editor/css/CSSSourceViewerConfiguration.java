@@ -8,6 +8,7 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -40,7 +41,14 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new CSSContentAssistProcessor(getAbstractThemeableEditor());
+		IContentAssistProcessor result = null;
+
+		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || CSSSourceConfiguration.DEFAULT.equals(contentType))
+		{
+			result = new CSSContentAssistProcessor(getAbstractThemeableEditor());
+		}
+
+		return result;
 	}
 
 	/*

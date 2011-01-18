@@ -16,4 +16,10 @@ public interface IPreferenceConstants
 	 * The value is a double used to indicate the current format being used by the CSS index categories.
 	 */
 	String CSS_INDEX_VERSION = "CSS_INDEX_VERSION"; //$NON-NLS-1$
+
+	/**
+	 * The value is a string where each character in the string will be used as an auto-activation character in
+	 * CSSContentAssistProcessor
+	 */
+	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS";
 }
