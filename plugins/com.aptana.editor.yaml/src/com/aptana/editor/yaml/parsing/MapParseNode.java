@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 
 public class MapParseNode extends ParseNode
@@ -20,6 +21,11 @@ public class MapParseNode extends ParseNode
 		setLocation(YAMLParseRootNode.getStart(node, parseState), YAMLParseRootNode.getEnd(node, parseState));
 		this.node = node;
 		traverse(parseState);
+		if (getChildCount() > 0)
+		{
+			IParseNode lastChild = getChild(getChildCount() - 1);
+			setLocation(getStartingOffset(), lastChild.getEndingOffset());
+		}
 	}
 
 	private void traverse(IParseState parseState)

@@ -1,5 +1,7 @@
 package com.aptana.editor.yaml.parsing;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
@@ -18,7 +20,8 @@ public class YAMLParseRootNode extends ParseRootNode
 
 	public YAMLParseRootNode(Node yamlRoot, IParseState parseState)
 	{
-		super(IYAMLParserConstants.LANGUAGE, new Symbol[0], parseState.getStartingOffset(), parseState.getStartingOffset() + parseState.getSource().length);
+		super(IYAMLParserConstants.LANGUAGE, new Symbol[0], parseState.getStartingOffset(), parseState
+				.getStartingOffset() + parseState.getSource().length);
 		traverse(yamlRoot, parseState);
 	}
 
@@ -54,12 +57,21 @@ public class YAMLParseRootNode extends ParseRootNode
 		if (parseState != null)
 		{
 			lineOffset = offsetOfLine(startMark.getLine(), parseState.getSource());
-		}	
+		}
 		return lineOffset + startMark.getColumn();
 	}
-	
+
 	private static int offsetOfLine(int line, char[] source)
 	{
+
+		try
+		{
+			return new Document(new String(source)).getLineOffset(line);
+		}
+		catch (BadLocationException e)
+		{
+			// ignore
+		}
 		// cheat for first line
 		if (line == 0)
 		{
@@ -97,7 +109,8 @@ public class YAMLParseRootNode extends ParseRootNode
 		if (parseState != null)
 		{
 			lineOffset = offsetOfLine(endMark.getLine(), parseState.getSource());
-		}	
+			return Math.min(lineOffset + endMark.getColumn() - 1, parseState.getSource().length);
+		}
 		return lineOffset + endMark.getColumn() - 1;
 	}
 
