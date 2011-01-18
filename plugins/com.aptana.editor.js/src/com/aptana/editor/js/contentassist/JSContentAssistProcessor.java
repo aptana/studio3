@@ -74,6 +74,7 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -474,7 +475,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return new char[] { '.' };
+		String chars = Platform.getPreferencesService().getString( //
+			JSPlugin.PLUGIN_ID, //
+			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*

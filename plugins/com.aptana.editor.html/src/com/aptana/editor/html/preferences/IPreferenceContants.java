@@ -43,4 +43,10 @@ public interface IPreferenceContants
 	 * The value is a double used to indicate the current format being used by the HTML index categories.
 	 */
 	String HTML_INDEX_VERSION = "HTML_INDEX_VERSION"; //$NON-NLS-1$
+
+	/**
+	 * The value is a string where each character in the string will be used as an auto-activation character in
+	 * HTMLContentAssistProcessor
+	 */
+	String HTML_ACTIVATION_CHARACTERS = "HTML_ACTIVATION_CHARACTERS";
 }

@@ -57,6 +57,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
+		prefs.put(IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, ".#:\t\r\n");
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		String[] filtered = new String[] { ".*Unknown pseudo-element.*", ".*Property _.*", ".*-moz-.*", ".*-o-*",
