@@ -1,0 +1,261 @@
+==PREFS==
+css.formatter.wrap.comments.length=80
+css.formatter.line.after.element=1
+css.formatter.indent.blocks=same.line 
+css.formatter.formatter.indentation.size=4
+css.formatter.line.preserve=1
+css.formatter.formatter.tabulation.size=4
+css.formatter.line.after.declaration=0
+css.formatter.wrap.comments=false
+css.formatter.formatter.tabulation.char=space
+==CONTENT==
+body {
+  background-color:#FFFFFF;
+  margin: 0px 0px;
+  }
+
+a {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 11px; 
+  color: #0056A2; 
+  text-decoration: none;
+  line-height: 1.5em;
+  border-bottom: 1px dotted #6A92C7;
+  }
+
+a:link, a:visited {
+  border-bottom: 1px dotted #6A92C7;
+  }
+
+a:hover {
+  border-bottom: 1px dotted #0056A2;
+  }
+
+a.a10px, a.a10px:link, a.a10px:visited {
+  font-size:10px;
+  border-bottom: 1px dotted #B4C8E3;
+  }
+
+a.a10px:hover {
+  font-size: 10px;
+  border-bottom: 1px dotted #0056A2;
+  }
+
+a.afooter, a.afooter:link, a.afooter:visited {
+  font-size: 10px; 
+  color: #DAE4F1; 
+  border-bottom: 1px dotted #6A92C7 
+  }
+
+a.afooter:hover {
+  font-size: 10px;
+  color: #DAE4F1;
+  border-bottom: 1px dotted #DAE4F1
+  }
+
+.mainnavcells {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 12px; 
+  font-weight: bold; 
+  color: #FFFFFF; 
+  vertical-align: middle; 
+  width: 129px;  /* WIDTH OF MAINNAV CELLS */
+  padding: 0px 0px 0px 10px;  
+  cursor: hand
+  }
+
+.mainnavdots {
+  width: 1px; 
+  height: 25px
+  }
+
+.dotsx {
+  background-image: url(/images/dotsx.gif); 
+  background-repeat: repeat-x; 
+  height: 1px
+  }
+
+.dotsy {
+  background-image: url(/images/dotsy.gif); 
+  background-repeat: repeat-y; 
+  width: 1px
+  }
+
+.textblue10px {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 10px; 
+  color: #0056A2
+  }
+
+.textblue12px {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 11px; 
+  color: #0056A2;
+  line-height: 1.75em
+  }
+
+.h01 {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 20px; 
+  color: #0056A2; 
+  letter-spacing: 2px
+  }
+
+.h02 {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 12px; 
+  font-weight: bold;
+  color: #0056A2; 
+  letter-spacing: 1px;
+  }
+
+.footer {
+  font-family: Verdana, Geneva, sans-serif; 
+  font-size: 10px; 
+  color: #DAE4F1; 
+  text-align: right;
+  vertical-align: middle; 
+  padding: 0px 5px 0px 0px;
+  }
+
+.frontlabelbg {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
+  
+input[type=checkbox] {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
+  
+input:before {
+    background-color: #B4C8E3;
+    height: 10px;
+  }
+
+==FORMATTED==
+body {
+    background-color:#FFFFFF;
+    margin: 0px 0px;
+}
+
+a {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 11px;
+    color: #0056A2;
+    text-decoration: none;
+    line-height: 1.5em;
+    border-bottom: 1px dotted #6A92C7;
+}
+
+a:link, a:visited {
+    border-bottom: 1px dotted #6A92C7;
+}
+
+a:hover {
+    border-bottom: 1px dotted #0056A2;
+}
+
+a.a10px, a.a10px:link, a.a10px:visited {
+    font-size:10px;
+    border-bottom: 1px dotted #B4C8E3;
+}
+
+a.a10px:hover {
+    font-size: 10px;
+    border-bottom: 1px dotted #0056A2;
+}
+
+a.afooter, a.afooter:link, a.afooter:visited {
+    font-size: 10px;
+    color: #DAE4F1;
+    border-bottom: 1px dotted #6A92C7
+}
+
+a.afooter:hover {
+    font-size: 10px;
+    color: #DAE4F1;
+    border-bottom: 1px dotted #DAE4F1
+}
+
+.mainnavcells {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFFFFF;
+    vertical-align: middle;
+    width: 129px;
+    /* WIDTH OF MAINNAV CELLS */
+    padding: 0px 0px 0px 10px;
+    cursor: hand
+}
+
+.mainnavdots {
+    width: 1px;
+    height: 25px
+}
+
+.dotsx {
+    background-image: url(/images/dotsx.gif);
+    background-repeat: repeat-x;
+    height: 1px
+}
+
+.dotsy {
+    background-image: url(/images/dotsy.gif);
+    background-repeat: repeat-y;
+    width: 1px
+}
+
+.textblue10px {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 10px;
+    color: #0056A2
+}
+
+.textblue12px {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 11px;
+    color: #0056A2;
+    line-height: 1.75em
+}
+
+.h01 {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 20px;
+    color: #0056A2;
+    letter-spacing: 2px
+}
+
+.h02 {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #0056A2;
+    letter-spacing: 1px;
+}
+
+.footer {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 10px;
+    color: #DAE4F1;
+    text-align: right;
+    vertical-align: middle;
+    padding: 0px 5px 0px 0px;
+}
+
+.frontlabelbg {
+    background-color: #B4C8E3;
+    height: 10px;
+}
+
+input[type=checkbox] {
+    background-color: #B4C8E3;
+    height: 10px;
+}
+
+input:before {
+    background-color: #B4C8E3;
+    height: 10px;
+}
+

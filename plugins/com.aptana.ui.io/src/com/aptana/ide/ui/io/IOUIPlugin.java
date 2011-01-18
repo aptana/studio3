@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.ide.ui.io;
 
@@ -43,16 +16,28 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWindowListener;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
+import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -71,38 +56,43 @@ import com.aptana.ui.util.UIUtils;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class IOUIPlugin extends AbstractUIPlugin {
+public class IOUIPlugin extends AbstractUIPlugin
+{
 
-    // The plug-in ID
-    public static final String PLUGIN_ID = "com.aptana.ui.io"; //$NON-NLS-1$
+	// The plug-in ID
+	public static final String PLUGIN_ID = "com.aptana.ui.io"; //$NON-NLS-1$
 
-    // The shared instance
-    private static IOUIPlugin plugin;
+	// The shared instance
+	private static IOUIPlugin plugin;
 
-    private IConnectionPointListener connectionListener = new IConnectionPointListener() {
+	private IConnectionPointListener connectionListener = new IConnectionPointListener()
+	{
 
-        public void connectionPointChanged(ConnectionPointEvent event) {
+		public void connectionPointChanged(ConnectionPointEvent event)
+		{
 			IConnectionPoint connection = event.getConnectionPoint();
 			IConnectionPointManager manager = CoreIOPlugin.getConnectionPointManager();
 			ConnectionPointType type = manager.getType(connection);
-			if (type == null) {
-			    return;
+			if (type == null)
+			{
+				return;
 			}
-			
-			switch (event.getKind()) {
-			case ConnectionPointEvent.POST_ADD:
-			    refreshNavigatorViewAndSelect(
-			    		manager.getConnectionPointCategory(type.getCategory().getId()), connection);
-			    break;
-			case ConnectionPointEvent.POST_DELETE:
-			    refreshNavigatorView(manager.getConnectionPointCategory(type.getCategory().getId()));
-			    break;
-			case ConnectionPointEvent.POST_CHANGE:
-			    refreshNavigatorView(connection);
-			}
-        }
 
-    };
+			switch (event.getKind())
+			{
+				case ConnectionPointEvent.POST_ADD:
+					refreshNavigatorViewAndSelect(manager.getConnectionPointCategory(type.getCategory().getId()),
+							connection);
+					break;
+				case ConnectionPointEvent.POST_DELETE:
+					refreshNavigatorView(manager.getConnectionPointCategory(type.getCategory().getId()));
+					break;
+				case ConnectionPointEvent.POST_CHANGE:
+					refreshNavigatorView(connection);
+			}
+		}
+
+	};
 
 	private IPreferenceChangeListener themeChangeListener = new IPreferenceChangeListener()
 	{
@@ -115,52 +105,129 @@ public class IOUIPlugin extends AbstractUIPlugin {
 		}
 	};
 
-    /**
-     * The constructor
-     */
-    public IOUIPlugin() {
-    }
+	private final IPartListener fPartListener = new IPartListener()
+	{
 
-    /**
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
-        plugin = this;
-        CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
+		public void partActivated(IWorkbenchPart part)
+		{
+		}
+
+		public void partBroughtToTop(IWorkbenchPart part)
+		{
+		}
+
+		public void partClosed(IWorkbenchPart part)
+		{
+		}
+
+		public void partDeactivated(IWorkbenchPart part)
+		{
+		}
+
+		public void partOpened(IWorkbenchPart part)
+		{
+			if (part instanceof ProjectExplorer)
+			{
+				final Tree tree = ((ProjectExplorer) part).getCommonViewer().getTree();
+				tree.addMouseListener(new MouseAdapter()
+				{
+
+					@Override
+					public void mouseDown(MouseEvent e)
+					{
+						if (tree.getItem(new Point(e.x, e.y)) == null)
+						{
+							tree.deselectAll();
+							tree.notifyListeners(SWT.Selection, new Event());
+						}
+					}
+				});
+			}
+		}
+	};
+
+	private final IWindowListener fWindowListener = new IWindowListener()
+	{
+
+		public void windowActivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowClosed(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.removePartListener(fPartListener);
+			}
+		}
+
+		public void windowDeactivated(IWorkbenchWindow window)
+		{
+		}
+
+		public void windowOpened(IWorkbenchWindow window)
+		{
+			IPartService partService = window.getPartService();
+			if (partService != null)
+			{
+				partService.addPartListener(fPartListener);
+			}
+		}
+	};
+
+	/**
+	 * The constructor
+	 */
+	public IOUIPlugin()
+	{
+	}
+
+	/**
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception
+	{
+		super.start(context);
+		plugin = this;
+		CoreIOPlugin.getConnectionPointManager().addConnectionPointListener(connectionListener);
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(themeChangeListener);
-    }
+		addPartListener();
+	}
 
-    /**
-     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-     */
-    public void stop(BundleContext context) throws Exception {
-        CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
-        new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
-        plugin = null;
-        super.stop(context);
-    }
+	/**
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception
+	{
+		CoreIOPlugin.getConnectionPointManager().removeConnectionPointListener(connectionListener);
+		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(themeChangeListener);
+		removePartListener();
+		plugin = null;
+		super.stop(context);
+	}
 
-    /**
-     * Returns the shared instance
-     * 
-     * @return the shared instance
-     */
-    public static IOUIPlugin getDefault() {
-        return plugin;
-    }
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static IOUIPlugin getDefault()
+	{
+		return plugin;
+	}
 
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path.
-     * 
-     * @param path
-     *            the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-    }
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
 
 	/**
 	 * Returns an image for the image file at the given plug-in relative path.
@@ -186,60 +253,72 @@ public class IOUIPlugin extends AbstractUIPlugin {
 		return image;
 	}
 
-    /**
-     * Returns the active workbench window
-     * 
-     * @return the active workbench window
-     */
-    public static IWorkbenchWindow getActiveWorkbenchWindow() {
-        return getDefault().getWorkbench().getActiveWorkbenchWindow();
-    }
+	/**
+	 * Returns the active workbench window
+	 * 
+	 * @return the active workbench window
+	 */
+	public static IWorkbenchWindow getActiveWorkbenchWindow()
+	{
+		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+	}
 
-    /**
-     * Returns the active workbench shell or <code>null</code> if none
-     * 
-     * @return the active workbench shell or <code>null</code> if none
-     */
-    public static Shell getActiveWorkbenchShell() {
-        IWorkbenchWindow window = getActiveWorkbenchWindow();
-        if (window != null) {
-            return window.getShell();
-        }
-        return null;
-    }
+	/**
+	 * Returns the active workbench shell or <code>null</code> if none
+	 * 
+	 * @return the active workbench shell or <code>null</code> if none
+	 */
+	public static Shell getActiveWorkbenchShell()
+	{
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window != null)
+		{
+			return window.getShell();
+		}
+		return null;
+	}
 
-    /**
-     * getActivePage
-     * 
-     * @return IWorkbenchPage
-     */
-    public static IWorkbenchPage getActivePage() {
-        IWorkbenchWindow w = getActiveWorkbenchWindow();
-        if (w != null) {
-            return w.getActivePage();
-        }
-        return null;
-    }
+	/**
+	 * getActivePage
+	 * 
+	 * @return IWorkbenchPage
+	 */
+	public static IWorkbenchPage getActivePage()
+	{
+		IWorkbenchWindow w = getActiveWorkbenchWindow();
+		if (w != null)
+		{
+			return w.getActivePage();
+		}
+		return null;
+	}
 
-    public static void refreshNavigatorView(Object element) {
-        refreshNavigatorViewAndSelect(element, null);
-    }
+	public static void refreshNavigatorView(Object element)
+	{
+		refreshNavigatorViewAndSelect(element, null);
+	}
 
-    public static void refreshNavigatorViewAndSelect(final Object element, final Object selection) {
-        UIUtils.getDisplay().asyncExec(new Runnable() {
+	public static void refreshNavigatorViewAndSelect(final Object element, final Object selection)
+	{
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
 
-            public void run() {
-                try {
-                    IViewPart view = findView(IPageLayout.ID_PROJECT_EXPLORER);
-                    refreshNavigatorInternal(view, element, selection);
+			public void run()
+			{
+				try
+				{
+					IViewPart view = findView(IPageLayout.ID_PROJECT_EXPLORER);
+					refreshNavigatorInternal(view, element, selection);
 
-                    view = findView(RemoteNavigatorView.ID);
-                    refreshNavigatorInternal(view, element, selection);
-                } catch (PartInitException e) {
-                }
-            }
-        });
-    }
+					view = findView(RemoteNavigatorView.ID);
+					refreshNavigatorInternal(view, element, selection);
+				}
+				catch (PartInitException e)
+				{
+				}
+			}
+		});
+	}
 
 	private static void refreshNavigatorInternal(IViewPart viewPart, Object element, Object selection)
 	{
@@ -274,17 +353,20 @@ public class IOUIPlugin extends AbstractUIPlugin {
 		}
 	}
 
-    public static void logError(String msg, Exception e) {
-        log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
-    }
+	public static void logError(String msg, Exception e)
+	{
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+	}
 
-    public static void logImportant(String msg, Exception e) {
-        log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));
-    }
+	public static void logImportant(String msg, Exception e)
+	{
+		log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));
+	}
 
-    private static void log(IStatus status) {
-        getDefault().getLog().log(status);
-    }
+	private static void log(IStatus status)
+	{
+		getDefault().getLog().log(status);
+	}
 
 	private static IViewPart findView(String viewID) throws PartInitException
 	{
@@ -298,5 +380,61 @@ public class IOUIPlugin extends AbstractUIPlugin {
 			}
 		}
 		return null;
+	}
+
+	private void addPartListener()
+	{
+		IWorkbench workbench = null;
+		try
+		{
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			IPartService partService;
+			for (IWorkbenchWindow window : windows)
+			{
+				partService = window.getPartService();
+				if (partService != null)
+				{
+					partService.addPartListener(fPartListener);
+				}
+			}
+
+			// Listen on any future windows
+			PlatformUI.getWorkbench().addWindowListener(fWindowListener);
+		}
+	}
+
+	private void removePartListener()
+	{
+		IWorkbench workbench = null;
+		try
+		{
+			workbench = PlatformUI.getWorkbench();
+		}
+		catch (Exception e)
+		{
+			// ignore, may be running headless, like in tests
+		}
+		if (workbench != null)
+		{
+			IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
+			IPartService partService;
+			for (IWorkbenchWindow window : windows)
+			{
+				partService = window.getPartService();
+				if (partService != null)
+				{
+					partService.removePartListener(fPartListener);
+				}
+			}
+			PlatformUI.getWorkbench().removeWindowListener(fWindowListener);
+		}
 	}
 }

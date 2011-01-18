@@ -288,12 +288,12 @@ public abstract class RepositoryStatusHelper
 		if (t instanceof IncomingFileTransferException)
 		{
 			if (((IncomingFileTransferException) t).getErrorCode() == 477)
-				throw new ProtocolException("JRE Http Client Required");
+				throw new ProtocolException("JRE Http Client Required"); //$NON-NLS-1$
 		}
 		else if (t instanceof BrowseFileTransferException)
 		{
 			if (((BrowseFileTransferException) t).getErrorCode() == 477)
-				throw new ProtocolException("JRE Http Client Required");
+				throw new ProtocolException("JRE Http Client Required"); //$NON-NLS-1$
 		}
 	}
 
@@ -307,7 +307,7 @@ public abstract class RepositoryStatusHelper
 		if (t instanceof IncomingFileTransferException)
 		{
 			if (((IncomingFileTransferException) t).getErrorCode() == 401)
-				throw new ProtocolException("Authentication Failed");
+				throw new ProtocolException("Authentication Failed"); //$NON-NLS-1$
 			IStatus status = ((IncomingFileTransferException) t).getStatus();
 			t = status == null ? t : status.getException();
 			// From Use of Browse
@@ -315,7 +315,7 @@ public abstract class RepositoryStatusHelper
 		else if (t instanceof BrowseFileTransferException)
 		{
 			if (((BrowseFileTransferException) t).getErrorCode() == 401)
-				throw new ProtocolException("Authentication Failed");
+				throw new ProtocolException("Authentication Failed"); //$NON-NLS-1$
 			IStatus status = ((BrowseFileTransferException) t).getStatus();
 			t = status == null ? t : status.getException();
 		}
@@ -330,9 +330,9 @@ public abstract class RepositoryStatusHelper
 		// of http client.
 		String m = t.getMessage();
 		if (m != null && (m.indexOf(" 401 ") != -1 || m.indexOf(SERVER_REDIRECT) != -1)) //$NON-NLS-1$
-			throw new ProtocolException("Authentication Failed");
+			throw new ProtocolException("Authentication Failed"); //$NON-NLS-1$
 		if ("org.apache.commons.httpclient.RedirectException".equals(t.getClass().getName())) //$NON-NLS-1$
-			throw new ProtocolException("Authentication Failed");
+			throw new ProtocolException("Authentication Failed"); //$NON-NLS-1$
 	}
 
 	/**

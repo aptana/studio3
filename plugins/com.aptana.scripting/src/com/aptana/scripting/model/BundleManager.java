@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.File;
@@ -78,8 +51,27 @@ import com.aptana.scripting.model.filters.IsExecutableCommandFilter;
 
 public class BundleManager
 {
+	/**
+	 * System property that holds the OS name
+	 */
+	private static final String OS_NAME = "os.name"; //$NON-NLS-1$
+	/**
+	 * OS name fragment to use to match against Linux
+	 */
+	private static final String OS_NAME_LINUX = "inux"; //$NON-NLS-1$
+	/**
+	 * OS name fragment to use to match against Macs
+	 */
+	private static final String OS_NAME_MAC = "mac"; //$NON-NLS-1$
+	
+	/**
+	 * System property to forcibly turn off caching.
+	 */
+	private static final String USE_BUNDLE_CACHE = "use.bundle.cache"; //$NON-NLS-1$
+
 	private class BundleLoadJob extends Job
 	{
+		
 		private File bundleDirectory;
 
 		BundleLoadJob(File bundleDirectory)
@@ -94,22 +86,44 @@ public class BundleManager
 		public IStatus run(IProgressMonitor monitor)
 		{
 			List<File> bundleScripts = getBundleScripts(bundleDirectory);
-			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size());
-
-			if (bundleScripts.size() > 0)
+			SubMonitor sub = SubMonitor.convert(monitor, bundleScripts.size() + 1);
+			try
 			{
-				List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
-
-				for (File script : bundleScripts)
+				if (bundleScripts.size() > 0)
 				{
-					sub.subTask(script.getAbsolutePath());
-					loadScript(script, true, bundleLoadPaths);
-					sub.worked(1);
+					boolean useCache = Boolean.valueOf(System.getProperty(USE_BUNDLE_CACHE, Boolean.TRUE.toString()));
+
+					BundleElement be = null;
+					if (useCache)
+					{
+						be = getCacher().load(bundleDirectory, bundleScripts, sub.newChild(bundleScripts.size()));
+					}
+					if (be != null)
+					{
+						addBundle(be);
+					}
+					else
+					{
+						List<String> bundleLoadPaths = getBundleLoadPaths(bundleDirectory);
+
+						for (File script : bundleScripts)
+						{
+							sub.subTask(script.getAbsolutePath());
+							loadScript(script, true, bundleLoadPaths);
+							sub.worked(1);
+						}
+
+						if (useCache)
+						{
+							getCacher().cache(bundleDirectory, sub.newChild(1));
+						}
+					}
 				}
 			}
-
-			sub.done();
-
+			finally
+			{
+				sub.done();
+			}
 			return Status.OK_STATUS;
 		}
 	}
@@ -195,6 +209,17 @@ public class BundleManager
 		return getInstance(null, null);
 	}
 
+	private BundleCacher cacher;
+
+	protected synchronized BundleCacher getCacher()
+	{
+		if (cacher == null)
+		{
+			cacher = new BundleCacher();
+		}
+		return cacher;
+	}
+
 	/**
 	 * Return the singleton instance of BundleManager. Optional arguments allow for the explicit definition of the
 	 * directories used for application bundles and user bundles. However, this should only be used by unit tests. In
@@ -216,11 +241,14 @@ public class BundleManager
 			INSTANCE = new BundleManager();
 
 			// setup default application bundles path
-			URL url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
-
-			if (url != null)
+			URL url = null;
+			if (ScriptingActivator.getDefault() != null) // For when run outside the IDE...
 			{
-				INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
+				url = FileLocator.find(ScriptingActivator.getDefault().getBundle(), new Path(BUILTIN_BUNDLES), null);
+				if (url != null)
+				{
+					INSTANCE.applicationBundlesPath = ResourceUtil.resourcePathToString(url);
+				}
 			}
 
 			// get possible user override
@@ -241,12 +269,14 @@ public class BundleManager
 						}
 						else
 						{
-							ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
+							ScriptingActivator.logError(
+									Messages.BundleManager_USER_PATH_NOT_READ_WRITE + f.getAbsolutePath(), null);
 						}
 					}
 					else
 					{
-						ScriptingActivator.logError(Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
+						ScriptingActivator.logError(
+								Messages.BundleManager_USER_PATH_NOT_DIRECTORY + f.getAbsolutePath(), null);
 					}
 				}
 				else
@@ -263,7 +293,23 @@ public class BundleManager
 
 			if (validUserBundlePath == false)
 			{
-				String OS = Platform.getOS();
+				String OS = null;
+				if (Platform.isRunning())
+				{
+					OS = Platform.getOS();
+				}
+				else
+				{
+					OS = System.getProperty(OS_NAME);
+					if (OS.contains(OS_NAME_MAC))
+					{
+						OS = Platform.OS_MACOSX;
+					}
+					else if (OS.contains(OS_NAME_LINUX))
+					{
+						OS = Platform.OS_LINUX;
+					}
+				}
 				String userHome = System.getProperty(USER_HOME_PROPERTY);
 
 				// setup default user bundles path
@@ -310,8 +356,8 @@ public class BundleManager
 			String pathString = path.getName();
 
 			result = COMMANDS_DIRECTORY_NAME.equals(pathString) //
-				|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
-				|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
+					|| SNIPPETS_DIRECTORY_NAME.equals(pathString) //
+					|| TEMPLATES_DIRECTORY_NAME.equals(pathString);
 		}
 
 		return result;
@@ -612,7 +658,7 @@ public class BundleManager
 		{
 			for (LoadCycleListener listener : this.getLoadCycleListeners())
 			{
-				listener.scriptReloaded(script);
+				listener.scriptUnloaded(script);
 			}
 		}
 	}
@@ -1102,7 +1148,7 @@ public class BundleManager
 	{
 		return this.getCommands(null);
 	}
-	
+
 	/**
 	 * Return a list of all active commands. Note that bundle precedence is taken into account, so only visible elements
 	 * are returned in this list
@@ -1511,8 +1557,8 @@ public class BundleManager
 						// one and move on
 
 						// split on periods to see the specificity of scope name
-						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1; //$NON-NLS-1$
-						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1; //$NON-NLS-1$
+						int existingLength = StringUtil.characterInstanceCount(result, '.') + 1;
+						int newLength = StringUtil.characterInstanceCount(entry.getValue(), '.') + 1;
 
 						if (newLength > existingLength)
 						{
@@ -1595,22 +1641,26 @@ public class BundleManager
 					}
 					else
 					{
-						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] { bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
+						message = MessageFormat.format(Messages.BundleManager_No_Bundle_File, new Object[] {
+								bundleDirectory.getAbsolutePath(), BUNDLE_FILE });
 					}
 				}
 				else
 				{
-					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+					message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+							new Object[] { bundleDirectory.getAbsolutePath() });
 				}
 			}
 			else
 			{
-				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY, new Object[] { bundleDirectory.getAbsolutePath() });
+				message = MessageFormat.format(Messages.BundleManager_BUNDLE_FILE_NOT_A_DIRECTORY,
+						new Object[] { bundleDirectory.getAbsolutePath() });
 			}
 		}
 		else
 		{
-			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST, new Object[] { bundleDirectory.getAbsolutePath() });
+			message = MessageFormat.format(Messages.BundleManager_BUNDLE_DIRECTORY_DOES_NOT_EXIST,
+					new Object[] { bundleDirectory.getAbsolutePath() });
 		}
 
 		if (result == false && message != null && message.length() > 0)
@@ -1649,7 +1699,7 @@ public class BundleManager
 	{
 		BundleLoadJob job = new BundleLoadJob(bundleDirectory);
 
-		if (EclipseUtil.isTesting() == false)
+		if (EclipseUtil.isTesting() == false && Platform.isRunning())
 		{
 			job.setRule(new SerialPerObjectRule(counter++));
 
@@ -1765,7 +1815,8 @@ public class BundleManager
 
 		if (execute && script.canRead() == false)
 		{
-			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT, new Object[] { script.getAbsolutePath() });
+			String message = MessageFormat.format(Messages.BundleManager_UNREADABLE_SCRIPT,
+					new Object[] { script.getAbsolutePath() });
 
 			ScriptLogger.logError(message);
 			execute = false;

@@ -4,6 +4,7 @@ module PTY
   private
   module LibUtil
     extend FFI::Library
+    ffi_lib FFI::Library::LIBC
     # forkpty(3) is in libutil on linux, libc on MacOS/BSD
     if FFI::Platform.linux?
       ffi_lib 'libutil'
@@ -12,6 +13,7 @@ module PTY
   end
   module LibC
     extend FFI::Library
+    ffi_lib FFI::Library::LIBC
     attach_function :close, [ :int ], :int
     attach_function :strerror, [ :int ], :string
     attach_function :execv, [ :string, :buffer_in ], :int
@@ -24,10 +26,10 @@ module PTY
   def self.build_args(args)
     cmd = args.shift
     cmd_args = args.map do |arg|
-      MemoryPointer.from_string(arg)
+      FFI::MemoryPointer.from_string(arg)
     end
-    exec_args = MemoryPointer.new(:pointer, 1 + cmd_args.length + 1)
-    exec_cmd = MemoryPointer.from_string(cmd)
+    exec_args = FFI::MemoryPointer.new(:pointer, 1 + cmd_args.length + 1)
+    exec_cmd = FFI::MemoryPointer.from_string(cmd)
     exec_args[0].put_pointer(0, exec_cmd)
     cmd_args.each_with_index do |arg, i|
       exec_args[i + 1].put_pointer(0, arg)

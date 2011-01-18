@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
@@ -48,6 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.TextViewer;
@@ -97,6 +71,8 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
@@ -238,11 +214,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		super.createPartControl(findBarComposite);
 		this.fThemeableEditorFindBarExtension.createFindBar(getSourceViewer());
 		this.fThemeableEditorColorsExtension.overrideThemeColors();
-		
-		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if preceding char is '<'...
+
+		// TODO Let ERB editor override via subclass that does special handling of % pairing, where it only happens if
+		// preceding char is '<'...
 		fPeerCharacterCloser = new PeerCharacterCloser(getSourceViewer());
 		fPeerCharacterCloser.install();
-		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
+		fPeerCharacterCloser.setAutoInsertEnabled(getPreferenceStore().getBoolean(
+				IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE));
 
 		fCursorChangeListened = true;
 
@@ -374,10 +352,11 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				return new RulerLayout(RULER_EDITOR_GAP);
 			}
 
-            @Override
+			@Override
 			protected void handleDispose()
 			{
-				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to report a bug with eclipse to clean this up.
+				// HACK We force the widget command to be nulled out so it can be garbage collected. Might want to
+				// report a bug with eclipse to clean this up.
 				try
 				{
 					Field f = TextViewer.class.getDeclaredField("fWidgetCommand"); //$NON-NLS-1$
@@ -406,7 +385,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				{
 					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 							.getContentType(getDocument(), 0);
-					if (contentType.getPartCount() > 0)
+					if (contentType != null && contentType.getPartCount() > 0)
 					{
 						String mainContentType = contentType.getParts()[0];
 						// We need to make sure that in case the given content type is actually a nested language in
@@ -420,15 +399,14 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 						{
 							// The code above might change the content type that is used to
 							// get the formatter, but we still need to save the original content-type so that the
-							// IScriptFormatter instance will handle the any required parsing by calling the right IParser.
+							// IScriptFormatter instance will handle the any required parsing by calling the right
+							// IParser.
 							factory.setMainContentType(contentType.getParts()[0]);
-							
+
 							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
 							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
 									IResource.class);
-							context
-									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
-											.getId());
+							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
 							IProject project = (file != null) ? file.getProject() : null;
 							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
 							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
@@ -587,9 +565,10 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		super.handlePreferenceStoreChanged(event);
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
-		if(event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE)) {
-			fPeerCharacterCloser.setAutoInsertEnabled((Boolean)event.getNewValue());
-	}
+		if (event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
+		{
+			fPeerCharacterCloser.setAutoInsertEnabled((Boolean) event.getNewValue());
+		}
 	}
 
 	public synchronized FileService getFileService()
@@ -631,36 +610,62 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	public void select(IRange element, boolean checkIfOutlineActive)
 	{
-		if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+		try
 		{
-			// disables listening to cursor change so we don't get into the loop of setting selections between editor
-			// and outline
-			fCursorChangeListened = false;
-			setSelectedElement(element);
+			if (element != null && (!checkIfOutlineActive || isOutlinePageActive()))
+			{
+				// disables listening to cursor change so we don't get into the loop of setting selections between
+				// editor
+				// and outline
+				fCursorChangeListened = false;
+				setSelectedElement(element);
+			}
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
 	protected void setSelectedElement(IRange element)
 	{
-		int offset = element.getStartingOffset();
-		int length = element.getLength();
-		setHighlightRange(offset, length, false);
-		selectAndReveal(offset, length);
+		if (element == null)
+		{
+			return;
+		}
+		try
+		{
+			int offset = element.getStartingOffset();
+			int length = element.getLength();
+			setHighlightRange(offset, length, false);
+			selectAndReveal(offset, length);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 	protected void selectionChanged()
 	{
-		if (fCursorChangeListened)
+		try
 		{
-			if (hasOutlinePageCreated() && isLinkedWithEditor())
+			if (fCursorChangeListened)
 			{
-				getOutlinePage().select(computeHighlightedOutlineNode());
+				if (hasOutlinePageCreated() && isLinkedWithEditor())
+				{
+					getOutlinePage().select(computeHighlightedOutlineNode());
+				}
+			}
+			else
+			{
+				// re-enables listening to cursor change
+				fCursorChangeListened = true;
 			}
 		}
-		else
+		catch (Exception e)
 		{
-			// re-enables listening to cursor change
-			fCursorChangeListened = true;
+			CommonEditorPlugin.logError(e);
 		}
 	}
 
@@ -680,7 +685,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 	}
 
-	ICommandElementsProvider getCommandElementsProvider()
+	synchronized ICommandElementsProvider getCommandElementsProvider()
 	{
 		if (fCommandElementsProvider == null)
 		{
@@ -696,11 +701,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	protected String getCursorPosition()
 	{
-		String raw = super.getCursorPosition();
-		StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
-		String line = tokenizer.nextToken();
-		String column = tokenizer.nextToken();
-		return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+		String raw = null;
+		try
+		{
+			raw = super.getCursorPosition();
+			StringTokenizer tokenizer = new StringTokenizer(raw, " :"); //$NON-NLS-1$
+			String line = tokenizer.nextToken();
+			String column = tokenizer.nextToken();
+			return MessageFormat.format(Messages.AbstractThemeableEditor_CursorPositionLabel, line, column);
+		}
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return raw;
 	}
 
 	/**
@@ -712,12 +726,24 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	 */
 	protected Object getOutlineElementAt(int caret)
 	{
-		IParseNode astNode = getASTNodeAt(caret);
-		if (astNode == null)
+		try
 		{
-			return null;
+			if (fOutlinePage == null)
+			{
+				return null;
+			}
+			IParseNode astNode = getASTNodeAt(caret);
+			if (astNode == null)
+			{
+				return null;
+			}
+			return fOutlinePage.getOutlineItem(astNode);
 		}
-		return fOutlinePage.getOutlineItem(astNode);
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return null;
 	}
 
 	/**
@@ -730,12 +756,20 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 
 	protected IParseNode getASTNodeAt(int offset)
 	{
-		IParseNode root = getFileService().getParseResult();
-		if (root == null)
+		try
 		{
-			return null;
+			IParseNode root = getFileService().getParseResult();
+			if (root == null)
+			{
+				return null;
+			}
+			return root.getNodeAtOffset(offset);
 		}
-		return root.getNodeAtOffset(offset);
+		catch (Exception e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return null;
 	}
 
 	private boolean isLinkedWithEditor()
@@ -800,5 +834,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		IPreferenceStore store = getPreferenceStore();
 		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
-}
+	}
+
+	/**
+	 * Create the implementation of the folding computer. Default is to use regexp defined in bundle/ruble for this
+	 * language. Can be overridden on a per-editor basis.
+	 * 
+	 * @param document
+	 * @return
+	 */
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new RubyRegexpFolder(this, document);
+	}
 }

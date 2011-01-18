@@ -32,6 +32,13 @@
             </visibleWhen>
          </dynamic>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.file.template.menu?after=additions">
+         <dynamic
+               class="com.aptana.workbench.commands.NewFileTemplateMenuContributor"
+               id="com.aptana.file.template.dynamic">
+         </dynamic>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">

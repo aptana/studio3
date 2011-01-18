@@ -34,13 +34,12 @@
 ###### END LICENSE BLOCK ######
 
 require 'builtin/javasupport/java'
-require 'builtin/javasupport/proxy/array'
 require 'builtin/javasupport/utilities/base'
-require 'builtin/javasupport/utilities/array'
 require 'builtin/javasupport/core_ext'
 
 require 'builtin/java/java.lang'
 require 'builtin/java/java.util'
 require 'builtin/java/java.util.regex'
 require 'builtin/java/java.io'
+require 'builtin/java/java.net'
 require 'builtin/java/org.jruby.ast'
