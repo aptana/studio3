@@ -31,6 +31,7 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.CSSScopeScanner;
 import com.aptana.editor.css.contentassist.CSSIndexQueryHelper;
+import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.parsing.lexer.Lexeme;
@@ -143,10 +144,13 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		switch (lexeme.getType())
 		{
 			case COLOR:
+			{
 				result = parseHexRGB(CSSColors.to6CharHexWithLeadingHash(lexeme.getText()));
 				break;
+			}
 
 			case FUNCTION:
+			{
 				if ("rgb".equals(lexeme.getText()))
 				{
 					int start = lexeme.getEndingOffset();
@@ -168,8 +172,23 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 						}
 					}
 				}
+				break;
+			}
+
+			case ELEMENT:
+			{
+				CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+				ElementElement element = queryHelper.getElement(lexeme.getText());
+
+				if (element != null)
+				{
+					result = element.getDescription();
+				}
+				break;
+			}
 
 			case PROPERTY:
+			{
 				CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
 				PropertyElement property = queryHelper.getProperty(lexeme.getText());
 
@@ -178,6 +197,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 					result = property.getDescription();
 				}
 				break;
+			}
 
 			default:
 				System.out.println(lexeme.getType().name());
