@@ -12,8 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
@@ -144,7 +146,7 @@ public class BundleCacher
 			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
 			writer = new FileWriter(configFile);
 
-			Yaml yaml = createYAML();
+			Yaml yaml = createYAML(be.getBundleDirectory());
 			yaml.dump(be, writer);
 			return true;
 		}
@@ -191,7 +193,7 @@ public class BundleCacher
 			FileReader reader = null;
 			try
 			{
-				Yaml yaml = createYAML();
+				Yaml yaml = createYAML(bundleDirectory);
 				reader = new FileReader(cacheFile);
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
@@ -322,19 +324,39 @@ public class BundleCacher
 		return false;
 	}
 
-	private Yaml createYAML()
+	private Yaml createYAML(File bundleDirectory)
 	{
-		return new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
+		return new Yaml(new RubyRegexpConstructor(bundleDirectory), new MyRepresenter(bundleDirectory));
 	}
 
 	private class MyRepresenter extends Representer
 	{
-		public MyRepresenter()
+		private File bundleDirectory;
+
+		public MyRepresenter(File bundleDirectory)
 		{
+			this.bundleDirectory = bundleDirectory;
 			this.representers.put(RubyRegexp.class, new RepresentRubyRegexp());
 			this.representers.put(ScopeSelector.class, new RepresentScopeSelector());
 			this.addClassTag(LazyCommandElement.class, new Tag(COMMAND_TAG));
 			this.addClassTag(LazyEnvironmentElement.class, new Tag(ENVIRONMENT_TAG));
+		}
+
+		@Override
+		protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue,
+				Tag customTag)
+		{
+			if (javaBean instanceof AbstractElement)
+			{
+				if ("path".equals(property.getName())) //$NON-NLS-1$
+				{
+					String path = (String) propertyValue;
+					IPath relative = Path.fromOSString(path).makeRelativeTo(
+							Path.fromOSString(bundleDirectory.getAbsolutePath()));
+					propertyValue = relative.toOSString();
+				}
+			}
+			return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);
 		}
 
 		@Override
@@ -397,8 +419,11 @@ public class BundleCacher
 	class RubyRegexpConstructor extends Constructor
 	{
 
-		public RubyRegexpConstructor()
+		private File bundleDirectory;
+
+		public RubyRegexpConstructor(File bundleDirectory)
 		{
+			this.bundleDirectory = bundleDirectory;
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(COMMAND_TAG), new ConstructCommandElement());
@@ -440,7 +465,8 @@ public class BundleCacher
 
 		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
 		// reduce duplication!
-		// FIXME Don't rely on extending ContsructMapping, it was originally private! If we can rewrite this, we can remove snakeyaml plugin and use the included version in JRuby 1.6!
+		// FIXME Don't rely on extending ContsructMapping, it was originally private! If we can rewrite this, we can
+		// remove snakeyaml plugin and use the included version in JRuby 1.6!
 		private abstract class AbstractBundleElementConstruct extends AbstractConstruct
 		{
 			/**
@@ -474,6 +500,15 @@ public class BundleCacher
 								}
 							}
 						}
+					}
+				}
+				if (path != null)
+				{
+					IPath pathObj = Path.fromOSString(path);
+					if (!pathObj.isAbsolute())
+					{
+						// Prepend the bundle directory.
+						path = bundleDirectory.getAbsolutePath() + File.separator + path;
 					}
 				}
 				return path;
@@ -607,7 +642,8 @@ public class BundleCacher
 		@Override
 		public boolean isExecutable()
 		{
-			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can tell better if this is executable on this os!
+			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can
+			// tell better if this is executable on this os!
 			return true;
 		}
 
