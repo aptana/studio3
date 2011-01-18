@@ -3,6 +3,7 @@ package com.aptana.editor.yaml.parsing;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 
 import com.aptana.parsing.IParseState;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 
 public class NodeTupleNode extends ParseNode
@@ -16,6 +17,11 @@ public class NodeTupleNode extends ParseNode
 		setLocation(YAMLParseRootNode.getStart(tuple.getKeyNode(), parseState), YAMLParseRootNode.getEnd(tuple.getValueNode(), parseState));
 		this.tuple = tuple;
 		traverse(parseState);
+		if (getChildCount() > 0)
+		{
+			IParseNode lastChild = getChild(getChildCount() - 1);
+			setLocation(getStartingOffset(), lastChild.getEndingOffset());
+		}
 	}
 
 	private void traverse(IParseState parseState)
