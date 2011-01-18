@@ -6,6 +6,7 @@ import junit.framework.TestSuite;
 import com.aptana.editor.yaml.YAMLCodeScannerTest;
 import com.aptana.editor.yaml.YAMLSourcePartitionScannerTest;
 import com.aptana.editor.yaml.internal.text.YAMLFoldingComputerTest;
+import com.aptana.editor.yaml.parsing.YAMLParserTest;
 
 public class AllTests
 {
@@ -17,7 +18,7 @@ public class AllTests
 		suite.addTestSuite(YAMLSourcePartitionScannerTest.class);
 		suite.addTestSuite(YAMLCodeScannerTest.class);
 		suite.addTestSuite(YAMLFoldingComputerTest.class);
-		// TODO Write a unit test for the YAMLParser, check the offsets
+		suite.addTestSuite(YAMLParserTest.class);
 		// $JUnit-END$
 		return suite;
 	}

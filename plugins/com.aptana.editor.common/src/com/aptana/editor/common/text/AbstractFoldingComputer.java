@@ -64,24 +64,35 @@ public abstract class AbstractFoldingComputer
 		{
 			return Collections.emptyList();
 		}
-
-		IParseNode parseNode = getAST();
-		int length = parseNode.getChildCount();
-		if (parseNode instanceof ParseRootNode)
+		SubMonitor sub = null;
+		try
 		{
-			ParseRootNode prn = (ParseRootNode) parseNode;
-			IParseNode[] comments = prn.getCommentNodes();
-			if (comments != null && comments.length > 0)
+			IParseNode parseNode = getAST();
+			if (parseNode == null)
 			{
-				length += comments.length;
+				return Collections.emptyList();
+			}
+			int length = parseNode.getChildCount();
+			if (parseNode instanceof ParseRootNode)
+			{
+				ParseRootNode prn = (ParseRootNode) parseNode;
+				IParseNode[] comments = prn.getCommentNodes();
+				if (comments != null && comments.length > 0)
+				{
+					length += comments.length;
+				}
+			}
+			sub = SubMonitor.convert(monitor, Messages.CommonReconcilingStrategy_FoldingTaskName, length);
+			return getPositions(sub.newChild(length), parseNode);
+		}
+		finally
+		{
+			fLines = null;
+			if (sub != null)
+			{
+				sub.done();
 			}
 		}
-		SubMonitor sub = SubMonitor.convert(monitor, Messages.CommonReconcilingStrategy_FoldingTaskName, length);
-
-		List<Position> newPositions = getPositions(sub.newChild(length), parseNode);
-		fLines = null;
-		sub.done();
-		return newPositions;
 	}
 
 	protected IParseNode[] getChildren(IParseNode parseNode)
