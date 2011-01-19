@@ -54,7 +54,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 			 */
 			
 			/*
-			 * Test 16, 27, 8, 93: Studio 1.5 moves some of the comments into separate lines
+			 * Test 16, 27, 8, 93, 49: Studio 1.5 moves some of the comments into separate lines
 			 */
 			
 			/*
@@ -70,15 +70,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 			 */
 			
 			/*
-			 * Test 49: Moves some comments to next line
-			 */
-			
-			/*
 			 * Test 64: We move all excess spaces in front of single line comments (Studio 1.5 preserves them)
-			 */
-			
-			/*
-			 * Test 59: need to go back and verify this is working correctly
 			 */
 			
 			/*
