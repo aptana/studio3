@@ -9,14 +9,36 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSExpressionNode extends CSSNode
 {
-
+	/**
+	 * CSSExpressionNode
+	 * 
+	 * @param start
+	 * @param end
+	 */
 	public CSSExpressionNode(int start, int end)
 	{
 		super(CSSNodeTypes.EXPRESSION, start, end);
 	}
 
+	/**
+	 * CSSExpressionNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 */
 	public CSSExpressionNode(short type, int start, int end)
 	{
 		super(type, start, end);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }
