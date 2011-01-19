@@ -14,7 +14,6 @@ import junit.framework.TestCase;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.contentassist.LexemeProvider;
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 
 public class FineLocationTests extends TestCase
