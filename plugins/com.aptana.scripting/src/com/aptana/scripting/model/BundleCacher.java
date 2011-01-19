@@ -520,9 +520,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(BundleElement.class);
-				BundleElement be = new BundleElement(getPath(node));
+				String path = getPath(node);
+				BundleElement be = new BundleElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -532,9 +534,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(CommandElement.class);
-				CommandElement be = new LazyCommandElement(getPath(node));
+				String path = getPath(node);
+				CommandElement be = new LazyCommandElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -544,9 +548,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(SnippetElement.class);
-				SnippetElement be = new SnippetElement(getPath(node));
+				String path = getPath(node);
+				SnippetElement be = new SnippetElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -556,9 +562,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(MenuElement.class);
-				MenuElement be = new MenuElement(getPath(node));
+				String path = getPath(node);
+				MenuElement be = new MenuElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -568,9 +576,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(ProjectTemplateElement.class);
-				ProjectTemplateElement be = new ProjectTemplateElement(getPath(node));
+				String path = getPath(node);
+				ProjectTemplateElement be = new ProjectTemplateElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -580,9 +590,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(EnvironmentElement.class);
-				EnvironmentElement be = new LazyEnvironmentElement(getPath(node));
+				String path = getPath(node);
+				EnvironmentElement be = new LazyEnvironmentElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -592,9 +604,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(TemplateElement.class);
-				TemplateElement be = new TemplateElement(getPath(node));
+				String path = getPath(node);
+				TemplateElement be = new TemplateElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -604,9 +618,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(ContentAssistElement.class);
-				ContentAssistElement be = new ContentAssistElement(getPath(node));
+				String path = getPath(node);
+				ContentAssistElement be = new ContentAssistElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -616,9 +632,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(SmartTypingPairsElement.class);
-				SmartTypingPairsElement be = new SmartTypingPairsElement(getPath(node));
+				String path = getPath(node);
+				SmartTypingPairsElement be = new SmartTypingPairsElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
