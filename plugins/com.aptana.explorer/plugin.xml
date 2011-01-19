@@ -166,6 +166,11 @@
             id="com.aptana.explorer.commands.toggleChangedFilesFilter"
             name="%command.toggleChangedFilesFilter.name">
       </command>
+      <command
+            defaultHandler="com.aptana.explorer.internal.handlers.DeploySettingsHandler"
+            id="com.aptana.explorer.commands.ftp.settings"
+            name="Deployment Settings...">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -186,28 +191,134 @@
          </toolbar>
       </menuContribution>
       <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?before=group.deploy">
+            locationURI="menu:com.aptana.explorer.deploy">
+         <separator
+               name="group.deploy"
+               visible="true">
+         </separator>
+         <separator
+               name="group.command"
+               visible="true">
+         </separator>
+         <separator
+               name="group.wizard"
+               visible="true">
+         </separator>
+         <separator
+               name="additions">
+         </separator>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
          <command
                commandId="com.aptana.explorer.deploy"
                label="%Deploy.label"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <or>
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="cap">
+                     </test>
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="heroku">
+                     </test>
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="engineYard">
+                     </test>
+                  </or>
+               </iterate>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?before=group.cap">
-         <command
-               commandId="com.aptana.explorer.deploy"
-               label="%Deploy.label"
-               style="push">
-         </command>
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?before=group.ftp">
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
          <command
                commandId="com.aptana.explorer.deploy"
                label="%FTPDeploy.label"
                icon="icons/full/elcl16/arrow_up_down.png"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.explorer.internal.ui.HerokuContributionItem"
+               id="com.aptana.explorer.deploy.heroku">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="heroku">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.upload"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.download"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <separator
+               name="group.ftp.settings"
+               visible="true">
+         </separator>
+         <command
+               commandId="com.aptana.explorer.commands.ftp.settings"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
