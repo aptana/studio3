@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.formatter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
@@ -68,7 +71,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 	private FormatterDocument document;
 	private boolean hasErrors;
-	private int[] singleLineCommentEndOffsets;
+	private Set<Integer> singleLineCommentEndOffsets;
 
 	/**
 	 * @param parseResult
@@ -118,28 +121,19 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
 	{
-		singleLineCommentEndOffsets = new int[comments.length];
-		int i = 0;
+		singleLineCommentEndOffsets = new HashSet<Integer>();
 		for (IParseNode comment : comments)
 		{
 			if (comment.getNodeType() == JSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				singleLineCommentEndOffsets[i] = getBeginWithoutWhiteSpaces(comment.getEndingOffset());
-				i++;
+				singleLineCommentEndOffsets.add(getBeginWithoutWhiteSpaces(comment.getEndingOffset()));
 			}
 		}
 	}
 
-	private boolean hasSingleLineCommentOnPreviousLine(int element)
+	private boolean hasOffset(int element)
 	{
-		for (int i : singleLineCommentEndOffsets)
-		{
-			if (i == element)
-			{
-				return true;
-			}
-		}
-		return false;
+		return singleLineCommentEndOffsets.contains(element);
 	}
 
 	/**
@@ -166,7 +160,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			IParseNode body = node.getBody();
 			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document,
 					FormatterJSDeclarationNode.isPartOfExpression(node.getParent()),
-					hasSingleLineCommentOnPreviousLine(body.getStartingOffset()));
+					hasOffset(body.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(bodyNode);
 			super.visit(node);
@@ -318,15 +312,30 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			// Push the special do-while block node
 			JSNode body = (JSNode) node.getBody();
-			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document,
-					hasSingleLineCommentOnPreviousLine(body.getStartingOffset()));
-			doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
-			push(doWhileBlock);
-			// visit the body only
-			body.accept(this);
-			int blockEnd = body.getEndingOffset();
-			checkedPop(doWhileBlock, blockEnd);
-			doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd + 1));
+			int blockEnd;
+			boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
+			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document, hasOffset(body.getStartingOffset()));
+			if (bodyInBrackets)
+			{
+				doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
+				push(doWhileBlock);
+				// visit the body only
+				body.accept(this);
+				blockEnd = body.getEndingOffset();
+				checkedPop(doWhileBlock, blockEnd);
+				doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd + 1));
+			}
+			else
+			{
+
+				doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset()));
+				push(doWhileBlock);
+				// visit the body only
+				body.accept(this);
+				blockEnd = body.getEndingOffset() + 1;
+				checkedPop(doWhileBlock, blockEnd);
+				doWhileBlock.setEnd(createTextNode(document, blockEnd, blockEnd));
+			}
 
 			// now deal with the 'while' condition part. we need to include the word 'while' that appears
 			// somewhere between the block-end and the condition start.
@@ -394,7 +403,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				boolean hasCurlyBlock = nodeType == JSNodeTypes.STATEMENTS;
 				FormatterJSLoopNode loopNode = new FormatterJSLoopNode(document, hasCurlyBlock,
-						hasSingleLineCommentOnPreviousLine(body.getStartingOffset()));
+						hasOffset(body.getStartingOffset()));
 				int blockLength = hasCurlyBlock ? 1 : 0;
 				int bodyStart = body.getStartingOffset();
 				int bodyEnd = body.getEndingOffset() + 1 - blockLength;
@@ -439,8 +448,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			// push a switch-case body node
 			int blockStart = node.getLeftBrace().getStart();
-			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document,
-					hasSingleLineCommentOnPreviousLine(blockStart));
+			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasOffset(blockStart));
 			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
 			push(blockNode);
 			// visit the children under that block node
@@ -737,7 +745,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				// we have a 'case' with a curly-block
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document,
-						hasSingleLineCommentOnPreviousLine(lastChild.getStartingOffset()));
+						hasOffset(lastChild.getStartingOffset()));
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
 						lastChild.getStartingOffset() + 1));
 				push(caseBodyNode);
@@ -761,8 +769,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void pushBlockNode(JSNode block, boolean consumeEndingSemicolon)
 		{
-			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document,
-					hasSingleLineCommentOnPreviousLine(block.getStartingOffset()));
+			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document, hasOffset(block.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
 			push(bodyNode);
 			// visit the children
@@ -792,8 +799,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
 				// end would be empty)
-				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document,
-						hasSingleLineCommentOnPreviousLine(body.getStartingOffset()));
+				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document, hasOffset(body.getStartingOffset()));
 				boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
 				if (bodyInBrackets)
 				{
@@ -802,7 +808,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					push(blockNode);
 					visitChildren((JSNode) body);
 					checkedPop(blockNode, body.getEndingOffset());
-					int end = locateColonOrSemicolonInLine(blockNode.getEndOffset() + 1, document);
+					int end = blockNode.getEndOffset() + 1;
 					blockNode.setEnd(createTextNode(document, body.getEndingOffset(), end));
 				}
 				else
