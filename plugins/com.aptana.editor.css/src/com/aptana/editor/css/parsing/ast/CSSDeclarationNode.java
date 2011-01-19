@@ -147,7 +147,7 @@ public class CSSDeclarationNode extends CSSNode
 	public void setHasSemicolon(Symbol semicolon)
 	{
 		fHasSemicolon = true;
-		
+
 		this.setLocation(this.getStart(), semicolon.getEnd());
 	}
 
