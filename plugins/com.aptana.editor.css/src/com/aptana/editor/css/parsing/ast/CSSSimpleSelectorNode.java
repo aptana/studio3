@@ -55,22 +55,12 @@ public class CSSSimpleSelectorNode extends CSSNode
 		{
 			if (attributeSelectors.length > 0)
 			{
-				this.start = attributeSelectors[0].getStart();
-				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
+				this.setLocation(attributeSelectors[0].getStart(), attributeSelectors[attributeSelectors.length - 1].getEnd());
 			}
 		}
 		else
 		{
-			this.start = typeSelector.getStart();
-
-			if (attributeSelectors.length == 0)
-			{
-				this.end = typeSelector.getEnd();
-			}
-			else
-			{
-				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
-			}
+			this.setLocation(typeSelector.getStart(), (attributeSelectors.length == 0) ? typeSelector.getEnd() : attributeSelectors[attributeSelectors.length - 1].getEnd());
 		}
 	}
 

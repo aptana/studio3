@@ -22,9 +22,9 @@ public class FormatterJSCaseBodyNode extends FormatterJSBlockNode
 	/**
 	 * @param document
 	 */
-	public FormatterJSCaseBodyNode(IFormatterDocument document)
+	public FormatterJSCaseBodyNode(IFormatterDocument document, boolean singleLineCommentOnPreviousLine)
 	{
-		super(document);
+		super(document, singleLineCommentOnPreviousLine);
 	}
 
 	/*
@@ -40,8 +40,8 @@ public class FormatterJSCaseBodyNode extends FormatterJSBlockNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE));
+		return (singleLineCommentOnPreviousLine || CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_CASE)));
 	}
 
 }

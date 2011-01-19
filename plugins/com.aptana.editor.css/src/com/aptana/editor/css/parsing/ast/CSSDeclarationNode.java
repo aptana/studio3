@@ -64,16 +64,7 @@ public class CSSDeclarationNode extends CSSNode
 		fStatus = (status == null) ? null : status.value.toString();
 		setChildren(new CSSNode[] { value });
 
-		this.start = identifier.getStart();
-
-		if (status == null)
-		{
-			this.end = value.getEnd();
-		}
-		else
-		{
-			this.end = status.getEnd();
-		}
+		this.setLocation(identifier.getStart(), (status == null) ? value.getEnd() : status.getEnd());
 	}
 
 	/*
@@ -156,7 +147,8 @@ public class CSSDeclarationNode extends CSSNode
 	public void setHasSemicolon(Symbol semicolon)
 	{
 		fHasSemicolon = true;
-		this.end = semicolon.getEnd();
+
+		this.setLocation(this.getStart(), semicolon.getEnd());
 	}
 
 	/*

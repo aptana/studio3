@@ -78,7 +78,7 @@ public class FormatterTestFile
 
 		while (lineRead != null)
 		{
-			if (lineRead.matches("==[A-Z]+==")) //$NON-NLS-1$
+			if (lineRead.matches("[ ]*==[A-Z]+==")) //$NON-NLS-1$
 			{
 				tag = extractTag(lineRead);
 				lineRead = reader.readLine();
@@ -168,6 +168,7 @@ public class FormatterTestFile
 	protected Tag extractTag(String text)
 	{
 		text = text.replaceAll("==", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		text = text.replace(" ", "");
 		Tag tag;
 		if (text.equals(Tag.PREFS.toString()))
 		{
