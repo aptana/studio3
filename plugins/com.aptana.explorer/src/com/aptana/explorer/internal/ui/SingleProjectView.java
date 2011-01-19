@@ -83,11 +83,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.scripting.model.BundleElement;
-import com.aptana.scripting.model.BundleEntry;
-import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.CommandElement;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -110,7 +105,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private static final String RAILS_NATURE = "org.radrails.rails.core.railsnature"; //$NON-NLS-1$
 	private static final String WEB_NATURE = "com.aptana.projects.webnature"; //$NON-NLS-1$
 	private static final String PHP_NATURE = "com.aptana.editor.php.phpNature"; //$NON-NLS-1$
-	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
 
 	/**
 	 * Forced removal of context menu entries dynamically to match the context menu Andrew wants...
@@ -138,7 +132,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
-	private ISiteConnection[] siteConnections;
 	protected IProject selectedProject;
 
 	/**
@@ -155,15 +148,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
-	private static final String UPLOAD_MENU_ICON = "icons/full/elcl16/arrow_up.png"; //$NON-NLS-1$
-	private static final String DOWNLOAD_MENU_ICON = "icons/full/elcl16/arrow_down.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
-	// private static final String[] animationImage = {
-	private static final String[] animationImageUp = { "icons/full/elcl16/arrow_up.png" }; //$NON-NLS-1$
-	private static final String[] animationImageDown = { "icons/full/elcl16/arrow_down.png" }; //$NON-NLS-1$
-
-	private static final String GROUP_COMMAND = "group.command"; //$NON-NLS-1$
-	private static final String GROUP_FTP_SETTINGS = "group.ftp_settings"; //$NON-NLS-1$
 
 	@Override
 	public void createPartControl(final Composite parent)
@@ -388,73 +373,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				commandsMenu.setVisible(true);
 			}
 		});
-	}
-
-	private void addEngineYardMenuCommands(MenuManager menuManager)
-	{
-		menuManager.appendToGroup(GROUP_COMMAND, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-
-				// open ssh session
-
-				MenuItem item = new MenuItem(menu, SWT.PUSH);
-				item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
-				item.addSelectionListener(new SelectionAdapter()
-				{
-					public void widgetSelected(SelectionEvent e)
-					{
-						final CommandElement command;
-						command = getBundleCommand(BUNDLE_ENGINE_YARD, "Open SSH Session"); //$NON-NLS-1$
-						command.execute();
-					}
-				});
-
-				// Deployment Submenu
-				final MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
-				deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
-				Menu deploymentSubMenu = new Menu(menu);
-
-				createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(deploymentSubMenu, "Retrieve Logs", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(deploymentSubMenu, "Rebuild Environment", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(deploymentSubMenu, "Rollback App", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-				deploymentMenuItem.setMenu(deploymentSubMenu);
-
-				// Recipes Submenu
-				final MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
-				recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
-				Menu recipesSubMenu = new Menu(menu);
-
-				createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(recipesSubMenu, "Upload Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(recipesSubMenu, "Download Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-				recipesMenuItem.setMenu(recipesSubMenu);
-
-				// Maintenance Submenu
-				final MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-				maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
-				Menu maintenanceSubMenu = new Menu(menu);
-
-				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-				createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
-
-				maintenanceMenuItem.setMenu(maintenanceSubMenu);
-
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-
 	}
 
 	private IProject[] createProjectCombo(Composite parent)
@@ -1102,57 +1020,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				}
 			}
 		}
-	}
-
-	private void createDeploySubMenuItem(Menu menu, String cmd, String bundle)
-	{
-		final CommandElement command;
-		command = getBundleCommand(bundle, cmd);
-
-		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(cmd);
-		item.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				command.execute();
-			}
-		});
-	}
-
-	private boolean isEngineYardProject()
-	{
-		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
-
-		// Engine Yard gem does not work in Windows
-		if (!Platform.OS_WIN32.equals(Platform.getOS()))
-		{
-			if (type.equals(DeployType.ENGINEYARD))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private CommandElement getBundleCommand(String bundleName, String commandName)
-	{
-		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
-		if (entry == null)
-		{
-			return null;
-		}
-		for (BundleElement bundle : entry.getContributingBundles())
-		{
-			CommandElement command = bundle.getCommandByName(commandName);
-			if (command != null)
-			{
-				return command;
-			}
-		}
-		return null;
 	}
 
 	private static class TextSearchPageInput extends TextSearchInput
