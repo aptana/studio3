@@ -26,8 +26,7 @@ public class XMLNode extends ParseNode
 		super(IXMLParserConstants.LANGUAGE);
 
 		fType = type;
-		this.start = start;
-		this.end = end;
+		this.setLocation(start, end);
 	}
 
 	/**
