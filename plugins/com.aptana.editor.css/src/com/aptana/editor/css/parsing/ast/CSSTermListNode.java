@@ -9,31 +9,48 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSTermListNode extends CSSExpressionNode
 {
-
 	private String fSeparator;
 
+	/**
+	 * CSSTermListNode
+	 * 
+	 * @param left
+	 * @param right
+	 */
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right)
 	{
 		this(left, right, null);
 	}
 
+	/**
+	 * CSSTermListNode
+	 * 
+	 * @param left
+	 * @param right
+	 * @param separator
+	 */
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right, String separator)
 	{
 		super(CSSNodeTypes.TERM_LIST, left.getStart(), right.getEnd());
+
 		setChildren(new CSSExpressionNode[] { left, right });
 		fSeparator = separator;
 	}
 
-	public CSSExpressionNode getLeftExpression()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
 	{
-		return (CSSExpressionNode) getChild(0);
+		walker.visit(this);
 	}
 
-	public CSSExpressionNode getRightExpression()
-	{
-		return (CSSExpressionNode) getChild(1);
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -41,21 +58,53 @@ public class CSSTermListNode extends CSSExpressionNode
 		{
 			return false;
 		}
+
 		CSSTermListNode other = (CSSTermListNode) obj;
+
 		return toString().equals(other.toString());
 	}
 
+	/**
+	 * getLeftExpression
+	 * 
+	 * @return
+	 */
+	public CSSExpressionNode getLeftExpression()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	/**
+	 * getRightExpression
+	 * 
+	 * @return
+	 */
+	public CSSExpressionNode getRightExpression()
+	{
+		return (CSSExpressionNode) getChild(1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
+
 		text.append(getLeftExpression());
+
 		if (fSeparator == null)
 		{
 			text.append(" "); //$NON-NLS-1$
@@ -64,7 +113,9 @@ public class CSSTermListNode extends CSSExpressionNode
 		{
 			text.append(fSeparator);
 		}
+
 		text.append(getRightExpression());
+
 		return text.toString();
 	}
 }

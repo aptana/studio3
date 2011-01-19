@@ -9,9 +9,24 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSErrorDeclarationNode extends CSSDeclarationNode
 {
-
+	/**
+	 * CSSErrorDeclaration
+	 * 
+	 * @param start
+	 * @param end
+	 */
 	public CSSErrorDeclarationNode(int start, int end)
 	{
 		super(start, end);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
 	}
 }

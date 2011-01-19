@@ -9,7 +9,14 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSSelectorNode extends CSSNode
 {
-
+	/**
+	 * CSSSelectorNode
+	 * 
+	 * @param parent
+	 * @param simpleSelectors
+	 * @param start
+	 * @param end
+	 */
 	public CSSSelectorNode(CSSRuleNode parent, CSSSimpleSelectorNode[] simpleSelectors, int start, int end)
 	{
 		super(CSSNodeTypes.SELECTOR, start, end);
@@ -17,14 +24,33 @@ public class CSSSelectorNode extends CSSNode
 		setChildren(simpleSelectors);
 	}
 
-	public CSSRuleNode getRule()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
 	{
-		return (CSSRuleNode) getParent();
+		walker.visit(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
 		return (obj instanceof CSSSelectorNode) && super.equals(obj);
+	}
+
+	/**
+	 * getRule
+	 * 
+	 * @return
+	 */
+	public CSSRuleNode getRule()
+	{
+		return (CSSRuleNode) getParent();
 	}
 }

@@ -9,14 +9,7 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSAttributeSelectorNode extends CSSNode
 {
-
 	private String fAttributeText;
-
-	public CSSAttributeSelectorNode(String text, int start, int end)
-	{
-		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, end);
-		fAttributeText = text;
-	}
 
 	/**
 	 * ":" + function expression
@@ -27,14 +20,38 @@ public class CSSAttributeSelectorNode extends CSSNode
 	public CSSAttributeSelectorNode(CSSExpressionNode function, int start)
 	{
 		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, function.getEnd());
+
 		setChildren(new CSSNode[] { function });
 	}
 
-	public CSSExpressionNode getFunction()
+	/**
+	 * CSSAttributeSelectorNode
+	 * 
+	 * @param text
+	 * @param start
+	 * @param end
+	 */
+	public CSSAttributeSelectorNode(String text, int start, int end)
 	{
-		return (CSSExpressionNode) getChild(0);
+		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, end);
+
+		fAttributeText = text;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -42,16 +59,36 @@ public class CSSAttributeSelectorNode extends CSSNode
 		{
 			return false;
 		}
+
 		CSSAttributeSelectorNode other = (CSSAttributeSelectorNode) obj;
+
 		return toString().equals(other.toString());
 	}
 
+	/**
+	 * getFunction
+	 * 
+	 * @return
+	 */
+	public CSSExpressionNode getFunction()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
@@ -59,6 +96,7 @@ public class CSSAttributeSelectorNode extends CSSNode
 		{
 			return ":" + getFunction(); //$NON-NLS-1$
 		}
+
 		return fAttributeText;
 	}
 }

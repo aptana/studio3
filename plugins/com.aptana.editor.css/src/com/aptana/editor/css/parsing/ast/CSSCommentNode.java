@@ -9,15 +9,36 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSCommentNode extends CSSNode
 {
-
 	private String fText;
 
+	/**
+	 * CSSCommentNode
+	 * 
+	 * @param text
+	 * @param start
+	 * @param end
+	 */
 	public CSSCommentNode(String text, int start, int end)
 	{
 		super(CSSNodeTypes.COMMENT, start, end);
+
 		fText = text;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#getText()
+	 */
 	@Override
 	public String getText()
 	{
