@@ -52,7 +52,11 @@ public class CSSRuleNode extends CSSNode
 
 		if (selectors.length > 0)
 		{
-			this.start = selectors[0].getStart();
+			this.setLocation(selectors[0].getStart(), end);
+		}
+		else
+		{
+			this.setLocation(end, end - 1);
 		}
 
 		if (declarations instanceof CSSDeclarationNode)
@@ -83,8 +87,6 @@ public class CSSRuleNode extends CSSNode
 				declaration.setParent(fSelectors[0]);
 			}
 		}
-
-		this.end = end;
 	}
 
 	/*

@@ -36,8 +36,8 @@ public class CSSNode extends ParseNode
 		super(ICSSParserConstants.LANGUAGE);
 		
 		fType = type;
-		this.start = start;
-		this.end = end;
+		
+		this.setLocation(start, end);
 	}
 
 	/**
