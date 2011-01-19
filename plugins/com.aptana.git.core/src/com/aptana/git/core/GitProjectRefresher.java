@@ -57,7 +57,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 		{
 			Collection<IResource> files = new ArrayList<IResource>();
 			String output = result.values().iterator().next();
-			String[] lines = output.split("\r(\n)?|\n"); //$NON-NLS-1$
+			String[] lines = output.split("\r\n?|\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
 				if (line == null || line.trim().length() == 0)
