@@ -9,33 +9,65 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSTextNode extends CSSNode
 {
-
 	private String fText;
 
+	/**
+	 * CSSTextNode
+	 * 
+	 * @param text
+	 * @param start
+	 * @param end
+	 */
 	public CSSTextNode(String text, int start, int end)
 	{
 		super(CSSNodeTypes.TEXT, start, end);
 		fText = text;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
 	@Override
-	public String getText()
+	public void accept(CSSTreeWalker walker)
 	{
-		return fText;
+		walker.visit(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
 		return super.equals(obj) && (obj instanceof CSSTextNode) && fText.equals(((CSSTextNode) obj).fText);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#getText()
+	 */
+	@Override
+	public String getText()
+	{
+		return fText;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + fText.hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{

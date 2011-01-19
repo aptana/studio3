@@ -11,35 +11,61 @@ import beaver.Symbol;
 
 public class CSSDeclarationNode extends CSSNode
 {
-
 	private String fIdentifier;
 	private String fStatus;
 	private boolean fHasSemicolon;
 
+	/**
+	 * CSSDeclarationNode
+	 * 
+	 * @param start
+	 * @param end
+	 */
 	public CSSDeclarationNode(int start, int end)
 	{
 		super(CSSNodeTypes.DECLARATION, start, end);
 	}
 
+	/**
+	 * CSSDeclarationNode
+	 * 
+	 * @param semicolon
+	 */
 	public CSSDeclarationNode(Symbol semicolon)
 	{
 		super(CSSNodeTypes.DECLARATION, semicolon.getStart(), semicolon.getEnd());
+
 		fHasSemicolon = true;
 	}
 
+	/**
+	 * CSSDeclarationNode
+	 * 
+	 * @param identifier
+	 * @param value
+	 */
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value)
 	{
 		this(identifier, value, null);
 	}
 
+	/**
+	 * CSSDeclarationNode
+	 * 
+	 * @param identifier
+	 * @param value
+	 * @param status
+	 */
 	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value, Symbol status)
 	{
 		super(CSSNodeTypes.DECLARATION);
+
 		fIdentifier = identifier.value.toString();
 		fStatus = (status == null) ? null : status.value.toString();
 		setChildren(new CSSNode[] { value });
 
 		this.start = identifier.getStart();
+
 		if (status == null)
 		{
 			this.end = value.getEnd();
@@ -50,37 +76,20 @@ public class CSSDeclarationNode extends CSSNode
 		}
 	}
 
-	public CSSExpressionNode getAssignedValue()
-	{
-		return (CSSExpressionNode) getChild(0);
-	}
-
-	public void setHasSemicolon(Symbol semicolon)
-	{
-		fHasSemicolon = true;
-		this.end = semicolon.getEnd();
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
 	@Override
-	public String toString()
+	public void accept(CSSTreeWalker walker)
 	{
-		StringBuilder text = new StringBuilder();
-		if (fIdentifier != null)
-		{
-			text.append(fIdentifier);
-			text.append(": ").append(getAssignedValue()); //$NON-NLS-1$
-			if (fStatus != null)
-			{
-				text.append(" ").append(fStatus); //$NON-NLS-1$
-			}
-		}
-		if (fHasSemicolon)
-		{
-			text.append(";"); //$NON-NLS-1$
-		}
-		return text.toString();
+		walker.visit(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -93,18 +102,35 @@ public class CSSDeclarationNode extends CSSNode
 		{
 			return false;
 		}
+
 		CSSDeclarationNode otherDecl = (CSSDeclarationNode) obj;
+
 		if (fIdentifier == null)
 		{
 			// if there is no identifier, it's an empty declaration, and other fields are not set either, so no need to
 			// check them
 			return otherDecl.fIdentifier == null;
 		}
+
 		return fIdentifier.equals(otherDecl.fIdentifier)
-				&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus
-						.equals(otherDecl.fStatus))) && fHasSemicolon == otherDecl.fHasSemicolon;
+			&& ((fStatus == null && otherDecl.fStatus == null) || (fStatus != null && fStatus.equals(otherDecl.fStatus)))
+			&& fHasSemicolon == otherDecl.fHasSemicolon;
 	}
 
+	/**
+	 * getAssignedValue
+	 * 
+	 * @return
+	 */
+	public CSSExpressionNode getAssignedValue()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -112,10 +138,52 @@ public class CSSDeclarationNode extends CSSNode
 		{
 			return super.hashCode();
 		}
+
 		int hash = super.hashCode();
+
 		hash = hash * 31 + fIdentifier.hashCode();
 		hash = hash * 31 + (fStatus == null ? 0 : fStatus.hashCode());
 		hash = hash * 31 + Boolean.valueOf(fHasSemicolon).hashCode();
+
 		return hash;
+	}
+
+	/**
+	 * setHasSemicolon
+	 * 
+	 * @param semicolon
+	 */
+	public void setHasSemicolon(Symbol semicolon)
+	{
+		fHasSemicolon = true;
+		this.end = semicolon.getEnd();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder text = new StringBuilder();
+
+		if (fIdentifier != null)
+		{
+			text.append(fIdentifier);
+			text.append(": ").append(getAssignedValue()); //$NON-NLS-1$
+
+			if (fStatus != null)
+			{
+				text.append(" ").append(fStatus); //$NON-NLS-1$
+			}
+		}
+
+		if (fHasSemicolon)
+		{
+			text.append(";"); //$NON-NLS-1$
+		}
+
+		return text.toString();
 	}
 }

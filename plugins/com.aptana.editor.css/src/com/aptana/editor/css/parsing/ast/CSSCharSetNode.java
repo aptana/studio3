@@ -9,16 +9,37 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSCharSetNode extends CSSNode
 {
-
 	private String fEncoding;
 	private String fText;
 
+	/**
+	 * CSSCharSetNode
+	 * 
+	 * @param encoding
+	 * @param start
+	 * @param end
+	 */
 	public CSSCharSetNode(String encoding, int start, int end)
 	{
 		super(CSSNodeTypes.CHAR_SET, start, end);
+		
 		fEncoding = encoding;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -26,25 +47,37 @@ public class CSSCharSetNode extends CSSNode
 		{
 			return false;
 		}
+		
 		CSSCharSetNode other = (CSSCharSetNode) obj;
+		
 		return fEncoding.equals(other.fEncoding);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + fEncoding.hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		if (fText == null)
 		{
 			StringBuilder buf = new StringBuilder();
+			
 			buf.append("@charset ").append(fEncoding).append(";"); //$NON-NLS-1$ //$NON-NLS-2$
 			fText = buf.toString();
 		}
+		
 		return fText;
 	}
 }
