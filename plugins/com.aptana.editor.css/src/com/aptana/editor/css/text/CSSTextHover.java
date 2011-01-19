@@ -11,6 +11,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
@@ -41,6 +42,8 @@ import com.aptana.theme.ThemePlugin;
 
 public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
+	private static final String RGB = "rgb"; //$NON-NLS-1$
+
 	private static class ThemedInformationControl extends InformationControl implements IInformationControlExtension2
 	{
 		public ThemedInformationControl(Shell parent)
@@ -151,7 +154,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 
 			case FUNCTION:
 			{
-				if ("rgb".equals(lexeme.getText()))
+				if (RGB.equals(lexeme.getText()))
 				{
 					int start = lexeme.getEndingOffset();
 					List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
@@ -200,7 +203,10 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 			}
 
 			default:
-				System.out.println(lexeme.getType().name());
+				if (Platform.inDevelopmentMode())
+				{
+					System.out.println(lexeme.getType().name());
+				}
 		}
 
 		return result;
@@ -232,7 +238,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 					break;
 
 				case FUNCTION:
-					if ("rgb".equals(lexeme.getText()))
+					if (RGB.equals(lexeme.getText()))
 					{
 						int start = lexeme.getStartingOffset();
 						List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
@@ -316,7 +322,9 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 
 		if (token.length() != 7 && token.length() != 9)
 		{
-			ThemePlugin.logError(MessageFormat.format("Received RGB Hex value with invalid length: {0}", token), null); //$NON-NLS-1$
+			String message = MessageFormat.format(Messages.CSSTextHover_Invalid_RGB_Hex_Value, token);
+			
+			ThemePlugin.logError(message, null);
 
 			return new RGB(0, 0, 0);
 		}
