@@ -19,8 +19,7 @@ public class HTMLNode extends ParseNode
 	{
 		super(IHTMLParserConstants.LANGUAGE);
 		fType = type;
-		this.start = start;
-		this.end = end;
+		this.setLocation(start, end);
 	}
 
 	public HTMLNode(short type, HTMLNode[] children, int start, int end)

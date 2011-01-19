@@ -7,12 +7,14 @@
  */
 package com.aptana.parsing.ast;
 
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import beaver.spec.ast.Node;
 import beaver.spec.ast.TreeWalker;
 
+import com.aptana.parsing.ParsingPlugin;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
@@ -609,6 +611,47 @@ public class ParseNode extends Node implements IParseNode
 		{
 			((ParseNode) child).setParent(this);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see beaver.spec.ast.Node#setLocation(int, int)
+	 */
+	@Override
+	public void setLocation(int start, int end)
+	{
+		int diff = end - start;
+
+		// NOTE: a diff of -1 is used to indicate that the node is empty. If the diff is larger than that (in negative
+		// magnitude), then we consider the ending offset to be in error
+		if (diff < -1)
+		{
+			String source;
+
+			try
+			{
+				source = this.toString();
+			}
+			catch (Throwable t)
+			{
+				source = ""; //$NON-NLS-1
+			}
+
+			String message = MessageFormat.format( //
+				Messages.ParseNode_Bad_Ending_Offset, //
+				start, //
+				end, //
+				this.getLanguage(), //
+				this.getNodeType(), //
+				source //
+				);
+
+			ParsingPlugin.logError(message, null);
+
+			end = start - 1;
+		}
+
+		super.setLocation(start, end);
 	}
 
 	/**

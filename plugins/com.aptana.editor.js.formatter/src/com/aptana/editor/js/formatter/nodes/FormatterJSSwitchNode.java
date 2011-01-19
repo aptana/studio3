@@ -22,9 +22,9 @@ public class FormatterJSSwitchNode extends FormatterJSBlockNode
 	/**
 	 * @param document
 	 */
-	public FormatterJSSwitchNode(IFormatterDocument document)
+	public FormatterJSSwitchNode(IFormatterDocument document, boolean singleLineCommentOnPreviousLine)
 	{
-		super(document);
+		super(document, singleLineCommentOnPreviousLine);
 	}
 
 	/*
@@ -40,8 +40,8 @@ public class FormatterJSSwitchNode extends FormatterJSBlockNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH));
+		return (singleLineCommentOnPreviousLine || CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_BLOCK_IN_SWITCH)));
 	}
 
 }
