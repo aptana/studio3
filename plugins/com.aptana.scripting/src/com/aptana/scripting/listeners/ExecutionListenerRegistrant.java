@@ -213,8 +213,8 @@ public class ExecutionListenerRegistrant implements ElementVisibilityListener, I
 	public void postExecuteSuccess(String commandId, Object returnValue)
 	{
 		this.execute( //
-			commandId, //
-			"type", "postExecuteSuccess" //
+				commandId, //
+				"type", "postExecuteSuccess" //
 		);
 	}
 
@@ -263,16 +263,22 @@ public class ExecutionListenerRegistrant implements ElementVisibilityListener, I
 	 */
 	private void setup()
 	{
-		// listen for execution events
-		Object service = PlatformUI.getWorkbench().getService(ICommandService.class);
-
-		if (service instanceof ICommandService)
+		try
 		{
-			ICommandService commandService = (ICommandService) service;
+			// listen for execution events
+			Object service = PlatformUI.getWorkbench().getService(ICommandService.class);
 
-			commandService.addExecutionListener(this);
+			if (service instanceof ICommandService)
+			{
+				ICommandService commandService = (ICommandService) service;
+
+				commandService.addExecutionListener(this);
+			}
 		}
-
+		catch (IllegalStateException e)
+		{
+			// workbench not yet started, or may be running headless (like in core unit tests)
+		}
 		// listen for element visibility events
 		BundleManager manager = BundleManager.getInstance();
 

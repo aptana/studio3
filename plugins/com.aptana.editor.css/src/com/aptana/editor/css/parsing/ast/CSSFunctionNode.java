@@ -9,18 +9,34 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSFunctionNode extends CSSExpressionNode
 {
-
+	/**
+	 * CSSFunctionNode
+	 * 
+	 * @param expression
+	 * @param start
+	 * @param end
+	 */
 	public CSSFunctionNode(CSSExpressionNode expression, int start, int end)
 	{
 		super(CSSNodeTypes.FUNCTION, start, end);
+
 		setChildren(new CSSNode[] { expression });
 	}
 
-	public CSSExpressionNode getExpression()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
 	{
-		return (CSSExpressionNode) getChild(0);
+		walker.visit(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -28,21 +44,43 @@ public class CSSFunctionNode extends CSSExpressionNode
 		{
 			return false;
 		}
+
 		CSSFunctionNode other = (CSSFunctionNode) obj;
+
 		return toString().equals(other.toString());
 	}
 
+	/**
+	 * getExpression
+	 * 
+	 * @return
+	 */
+	public CSSExpressionNode getExpression()
+	{
+		return (CSSExpressionNode) getChild(0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
+
 		text.append("(").append(getExpression()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		return text.toString();
 	}
 }

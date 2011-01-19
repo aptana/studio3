@@ -11,33 +11,52 @@ import java.util.Arrays;
 
 public class CSSMediaNode extends CSSNode
 {
-
 	private CSSTextNode[] fMedias;
 	private CSSNode[] fStatements;
 	private String fText;
 
+	/**
+	 * CSSMediaNode
+	 * 
+	 * @param medias
+	 * @param statements
+	 * @param start
+	 * @param end
+	 */
+	public CSSMediaNode(CSSTextNode[] medias, CSSNode[] statements, int start, int end)
+	{
+		super(CSSNodeTypes.MEDIA, start, end);
+
+		fMedias = medias;
+		fStatements = statements;
+	}
+
+	/**
+	 * CSSMediaNode
+	 * 
+	 * @param medias
+	 * @param start
+	 * @param end
+	 */
 	public CSSMediaNode(CSSTextNode[] medias, int start, int end)
 	{
 		this(medias, new CSSNode[0], start, end);
 	}
 
-	public CSSMediaNode(CSSTextNode[] medias, CSSNode[] statements, int start, int end)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
 	{
-		super(CSSNodeTypes.MEDIA, start, end);
-		fMedias = medias;
-		fStatements = statements;
+		walker.visit(this);
 	}
 
-	public CSSTextNode[] getMedias()
-	{
-		return fMedias;
-	}
-
-	public CSSNode[] getStatements()
-	{
-		return fStatements;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -45,16 +64,44 @@ public class CSSMediaNode extends CSSNode
 		{
 			return false;
 		}
+
 		CSSMediaNode other = (CSSMediaNode) obj;
+
 		return Arrays.equals(fMedias, other.fMedias) && Arrays.equals(fStatements, other.fStatements);
 	}
 
+	/**
+	 * getMedias
+	 * 
+	 * @return
+	 */
+	public CSSTextNode[] getMedias()
+	{
+		return fMedias;
+	}
+
+	/**
+	 * getStatements
+	 * 
+	 * @return
+	 */
+	public CSSNode[] getStatements()
+	{
+		return fStatements;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		int hash = super.hashCode();
+
 		hash = hash * 31 + Arrays.hashCode(fMedias);
 		hash = hash * 31 + Arrays.hashCode(fStatements);
+
 		return hash;
 	}
 
@@ -64,19 +111,26 @@ public class CSSMediaNode extends CSSNode
 		if (fText == null)
 		{
 			StringBuilder text = new StringBuilder();
+
 			text.append("@media"); //$NON-NLS-1$
+
 			for (CSSTextNode media : fMedias)
 			{
 				text.append(" ").append(media); //$NON-NLS-1$
 			}
+
 			text.append("{"); //$NON-NLS-1$
+
 			for (CSSNode statement : fStatements)
 			{
 				text.append(statement);
 			}
+
 			text.append("}"); //$NON-NLS-1$
+
 			fText = text.toString();
 		}
+
 		return fText;
 	}
 }

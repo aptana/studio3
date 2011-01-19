@@ -12,37 +12,72 @@ import com.aptana.parsing.ast.ParseNode;
 
 public class CSSNode extends ParseNode
 {
-
 	private short fType;
 
+	/**
+	 * CSSNode
+	 * 
+	 * @param type
+	 */
 	protected CSSNode(short type)
 	{
 		this(type, 0, 0);
 	}
 
+	/**
+	 * CSSNode
+	 * 
+	 * @param type
+	 * @param start
+	 * @param end
+	 */
 	public CSSNode(short type, int start, int end)
 	{
 		super(ICSSParserConstants.LANGUAGE);
+		
 		fType = type;
-		this.start = start;
-		this.end = end;
+		
+		this.setLocation(start, end);
 	}
 
-	@Override
-	public String getText()
+	/**
+	 * CSSTreeWalker
+	 * 
+	 * @param walker
+	 */
+	public void accept(CSSTreeWalker walker)
 	{
-		return toString();
+		// sub-classes must override this method so their types will be
+		// recognized properly
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		return (obj instanceof CSSNode) && super.equals(obj);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getNodeType()
+	 */
 	@Override
 	public short getNodeType()
 	{
 		return fType;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#getText()
+	 */
 	@Override
-	public boolean equals(Object obj)
+	public String getText()
 	{
-		return (obj instanceof CSSNode) && super.equals(obj);
+		return toString();
 	}
 }

@@ -8,10 +8,13 @@
 package com.aptana.git.core;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -26,6 +29,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
+import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -44,7 +48,32 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 
 	public void branchChanged(BranchChangedEvent e)
 	{
-		refreshAffectedProjects(e.getRepository());
+		// Do a smarter diff and only refresh files that have changed between the two:
+		// git diff --name-only e.getOldBranchName() e.getNewBranchName()
+		Map<Integer, String> result = GitExecutable.instance().runInBackground(e.getRepository().workingDirectory(),
+				"diff", //$NON-NLS-1$
+				"--name-only", e.getOldBranchName(), e.getNewBranchName()); //$NON-NLS-1$
+		if (result != null && result.keySet().iterator().next() == 0)
+		{
+			Collection<IResource> files = new ArrayList<IResource>();
+			String output = result.values().iterator().next();
+			String[] lines = output.split("\r\n?|\n"); //$NON-NLS-1$
+			for (String line : lines)
+			{
+				if (line == null || line.trim().length() == 0)
+				{
+					continue;
+				}
+				IFile file = ResourcesPlugin.getWorkspace().getRoot()
+						.getFileForLocation(e.getRepository().workingDirectory().append(line));
+				files.add(file);
+			}
+			refreshResources(files, IResource.DEPTH_ZERO);
+		}
+		else
+		{
+			refreshAffectedProjects(e.getRepository());
+		}
 	}
 
 	@Override

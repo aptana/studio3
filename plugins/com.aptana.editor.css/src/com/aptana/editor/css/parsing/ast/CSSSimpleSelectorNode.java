@@ -16,22 +16,38 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class CSSSimpleSelectorNode extends CSSNode
 {
-
 	private String fTypeSelector;
 
-	public CSSSimpleSelectorNode(Symbol typeSelector)
-	{
-		this(typeSelector, new CSSAttributeSelectorNode[0]);
-	}
-
+	/**
+	 * CSSSimpleSelectorNode
+	 * 
+	 * @param attributeSelectors
+	 */
 	public CSSSimpleSelectorNode(CSSAttributeSelectorNode[] attributeSelectors)
 	{
 		this(null, attributeSelectors);
 	}
 
+	/**
+	 * CSSSimpleSelectorNode
+	 * 
+	 * @param typeSelector
+	 */
+	public CSSSimpleSelectorNode(Symbol typeSelector)
+	{
+		this(typeSelector, new CSSAttributeSelectorNode[0]);
+	}
+
+	/**
+	 * CSSSimpleSelectorNode
+	 * 
+	 * @param typeSelector
+	 * @param attributeSelectors
+	 */
 	public CSSSimpleSelectorNode(Symbol typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
 		super(CSSNodeTypes.SIMPLE_SELECTOR);
+
 		fTypeSelector = (typeSelector == null) ? null : typeSelector.value.toString();
 		setChildren(attributeSelectors);
 
@@ -39,30 +55,29 @@ public class CSSSimpleSelectorNode extends CSSNode
 		{
 			if (attributeSelectors.length > 0)
 			{
-				this.start = attributeSelectors[0].getStart();
-				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
+				this.setLocation(attributeSelectors[0].getStart(), attributeSelectors[attributeSelectors.length - 1].getEnd());
 			}
 		}
 		else
 		{
-			this.start = typeSelector.getStart();
-			if (attributeSelectors.length == 0)
-			{
-				this.end = typeSelector.getEnd();
-			}
-			else
-			{
-				this.end = attributeSelectors[attributeSelectors.length - 1].getEnd();
-			}
+			this.setLocation(typeSelector.getStart(), (attributeSelectors.length == 0) ? typeSelector.getEnd() : attributeSelectors[attributeSelectors.length - 1].getEnd());
 		}
 	}
 
-	public CSSAttributeSelectorNode[] getAttributeSelectors()
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
 	{
-		List<IParseNode> list = Arrays.asList(getChildren());
-		return list.toArray(new CSSAttributeSelectorNode[list.size()]);
+		walker.visit(this);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -70,34 +85,61 @@ public class CSSSimpleSelectorNode extends CSSNode
 		{
 			return false;
 		}
+
 		CSSSimpleSelectorNode other = (CSSSimpleSelectorNode) obj;
+
 		return toString().equals(other.toString());
 	}
 
+	/**
+	 * getAttributeSelectors
+	 * 
+	 * @return
+	 */
+	public CSSAttributeSelectorNode[] getAttributeSelectors()
+	{
+		List<IParseNode> list = Arrays.asList(getChildren());
+
+		return list.toArray(new CSSAttributeSelectorNode[list.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{
 		StringBuilder text = new StringBuilder();
+
 		if (fTypeSelector != null)
 		{
 			text.append(fTypeSelector);
 		}
+
 		CSSAttributeSelectorNode[] attributeSelectors = getAttributeSelectors();
 		int size = attributeSelectors.length;
+
 		for (int i = 0; i < size; ++i)
 		{
 			text.append(attributeSelectors[i]);
+
 			if (i < size - 1)
 			{
 				text.append(" "); //$NON-NLS-1$
 			}
 		}
+
 		return text.toString();
 	}
 }

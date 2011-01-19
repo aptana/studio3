@@ -11,15 +11,33 @@ import beaver.Symbol;
 
 public class CSSTermNode extends CSSExpressionNode
 {
-
 	private String fTerm;
 
+	/**
+	 * CSSTermNode
+	 * 
+	 * @param term
+	 */
 	public CSSTermNode(Symbol term)
 	{
 		super(CSSNodeTypes.TERM, term.getStart(), term.getEnd());
 		fTerm = term.value.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#accept(com.aptana.editor.css.parsing.ast.CSSTreeWalker)
+	 */
+	@Override
+	public void accept(CSSTreeWalker walker)
+	{
+		walker.visit(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.css.parsing.ast.CSSNode#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -31,12 +49,20 @@ public class CSSTermNode extends CSSExpressionNode
 		return fTerm.equals(other.fTerm);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + fTerm.hashCode();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.parsing.ast.ParseNode#toString()
+	 */
 	@Override
 	public String toString()
 	{

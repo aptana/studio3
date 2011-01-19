@@ -647,6 +647,12 @@ public class GitRepository
 			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
 			if (other != null && other.equals(this))
 			{
+				// If the git repo location is the project root, just return that it's ok!
+				if (project.getLocation().equals(workingDirectory()))
+				{
+					continue;
+				}
+
 				// Check if the project exists on the other branch!
 				Map<Integer, String> result = GitExecutable
 						.instance()
