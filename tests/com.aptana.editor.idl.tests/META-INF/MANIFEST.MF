@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: IDL Editor Tests
 Bundle-SymbolicName: com.aptana.editor.idl.tests
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: Aptana, Inc.
+Bundle-Vendor: Aptana
 Fragment-Host: com.aptana.editor.idl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit
