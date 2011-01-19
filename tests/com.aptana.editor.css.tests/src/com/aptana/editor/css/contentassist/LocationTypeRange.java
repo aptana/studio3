@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.css.contentassist;
 
-import com.aptana.editor.css.contentassist.CSSContentAssistProcessor.LocationType;
-
 class LocationTypeRange
 {
 	public final LocationType location;
