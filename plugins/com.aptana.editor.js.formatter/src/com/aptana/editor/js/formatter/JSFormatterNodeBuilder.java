@@ -122,6 +122,10 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
 	{
 		singleLineCommentEndOffsets = new HashSet<Integer>();
+		if (comments == null)
+		{
+			return;
+		}
 		for (IParseNode comment : comments)
 		{
 			if (comment.getNodeType() == JSNodeTypes.SINGLE_LINE_COMMENT)
