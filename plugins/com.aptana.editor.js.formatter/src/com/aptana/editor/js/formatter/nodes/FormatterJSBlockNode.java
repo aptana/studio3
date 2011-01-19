@@ -21,12 +21,15 @@ import com.aptana.formatter.ui.CodeFormatterConstants;
 public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 {
 
+	protected boolean singleLineCommentOnPreviousLine;
+	
 	/**
 	 * @param document
 	 */
-	public FormatterJSBlockNode(IFormatterDocument document)
+	public FormatterJSBlockNode(IFormatterDocument document, boolean singleLineCommentOnPreviousLine)
 	{
 		super(document);
+		this.singleLineCommentOnPreviousLine = singleLineCommentOnPreviousLine;
 	}
 
 	/*
@@ -56,8 +59,8 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument()
-				.getString(JSFormatterConstants.BRACE_POSITION_BLOCK));
+		return (singleLineCommentOnPreviousLine || CodeFormatterConstants.NEW_LINE.equals(getDocument()
+				.getString(JSFormatterConstants.BRACE_POSITION_BLOCK)));
 	}
 
 	/*

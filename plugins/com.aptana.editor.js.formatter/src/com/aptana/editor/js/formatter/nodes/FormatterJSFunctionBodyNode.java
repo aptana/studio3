@@ -27,9 +27,9 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	 * @param document
 	 * @param functionPartOfExpression 
 	 */
-	public FormatterJSFunctionBodyNode(IFormatterDocument document, boolean functionPartOfExpression)
+	public FormatterJSFunctionBodyNode(IFormatterDocument document, boolean functionPartOfExpression, boolean singleLineCommentOnPreviousLine)
 	{
-		super(document);
+		super(document, singleLineCommentOnPreviousLine);
 		this.functionPartOfExpression = functionPartOfExpression;
 	}
 
@@ -41,8 +41,8 @@ public class FormatterJSFunctionBodyNode extends FormatterJSBlockNode
 	protected boolean isAddingBeginNewLine()
 	{
 		// adds a new line before the start curly bracket
-		return CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
-				JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION));
+		return (singleLineCommentOnPreviousLine ||CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_FUNCTION_DECLARATION)));
 	}
 
 	/*
