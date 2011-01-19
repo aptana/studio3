@@ -76,7 +76,10 @@ public class CorePlugin extends Plugin
 				return Status.OK_STATUS;
 			}
 		};
-		addFilewatcherJob.schedule();
+		addFilewatcherJob.setSystem(true);
+		addFilewatcherJob.setPriority(Job.LONG);
+		addFilewatcherJob.schedule(250);
+		
 		addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 		{
 			protected IStatus run(IProgressMonitor monitor)
@@ -124,8 +127,9 @@ public class CorePlugin extends Plugin
 				return status;
 			}
 		};
-		addBuilderJob.schedule();
-
+		addBuilderJob.setSystem(true);
+		addBuilderJob.setPriority(Job.LONG);
+		addBuilderJob.schedule(250);
 	}
 
 	/*
@@ -239,6 +243,7 @@ public class CorePlugin extends Plugin
 	private void addProjectResourceListener()
 	{
 		fProjectsListener = new ResourceListener();
+		fProjectsListener.start();
 		// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
 	}
@@ -254,9 +259,8 @@ public class CorePlugin extends Plugin
 
 		private Map<IProject, Integer> fWatchers;
 
-		ResourceListener()
+		public void start()
 		{
-			// We also want to iterate over all the existing open projects and hook file watchers on them!
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
 			{
