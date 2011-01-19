@@ -49,14 +49,6 @@ import com.aptana.parsing.lexer.Range;
 
 public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 {
-	/**
-	 * LocationType
-	 */
-	static enum LocationType
-	{
-		ERROR, OUTSIDE_RULE, INSIDE_RULE, INSIDE_ARG, INSIDE_PROPERTY, INSIDE_VALUE
-	};
-
 	private static final Image ELEMENT_ICON = CSSPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
 	private static final Image PROPERTY_ICON = CSSPlugin.getImage("/icons/property.png"); //$NON-NLS-1$
 
