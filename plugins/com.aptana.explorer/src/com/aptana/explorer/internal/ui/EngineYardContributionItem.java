@@ -20,6 +20,10 @@ public class EngineYardContributionItem extends DeployContributionItem
 
 	private static final String BUNDLE_ENGINE_YARD = "Engine Yard"; //$NON-NLS-1$
 
+	public EngineYardContributionItem()
+	{
+	}
+
 	public EngineYardContributionItem(String id)
 	{
 		super(id);
@@ -71,11 +75,5 @@ public class EngineYardContributionItem extends DeployContributionItem
 		createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
 		createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance Off", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
 		maintenanceMenuItem.setMenu(maintenanceSubMenu);
-	}
-
-	@Override
-	public boolean isDynamic()
-	{
-		return true;
 	}
 }

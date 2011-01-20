@@ -7,6 +7,12 @@
  */
 package com.aptana.deploy;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -15,12 +21,55 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
+import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
+
 public class Activator extends AbstractUIPlugin
 {
 
 	private static final String PLUGIN_ID = "com.aptana.deploy"; //$NON-NLS-1$
 
 	private static Activator instance;
+
+	private IResourceChangeListener resourceListener = new IResourceChangeListener()
+	{
+
+		public void resourceChanged(IResourceChangeEvent event)
+		{
+			IResourceDelta delta = event.getDelta();
+			if (delta == null)
+			{
+				return;
+			}
+			try
+			{
+				delta.accept(new IResourceDeltaVisitor()
+				{
+
+					public boolean visit(IResourceDelta delta) throws CoreException
+					{
+						IResource resource = delta.getResource();
+						if (resource.getType() == IResource.ROOT)
+						{
+							return true;
+						}
+						if (resource.getType() == IResource.PROJECT)
+						{
+							if (delta.getKind() == IResourceDelta.REMOVED)
+							{
+								DeployPreferenceUtil.setDeployType(resource.getProject(), DeployType.NONE);
+							}
+						}
+						return false;
+					}
+				});
+			}
+			catch (CoreException e)
+			{
+				logError(e);
+			}
+		}
+	};
 
 	/*
 	 * (non-Javadoc)
@@ -30,6 +79,7 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(bundleContext);
 		instance = this;
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
 	}
 
 	/*
@@ -38,6 +88,8 @@ public class Activator extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext bundleContext) throws Exception
 	{
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+		instance = null;
 		super.stop(bundleContext);
 	}
 

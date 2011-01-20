@@ -78,8 +78,6 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.IScopeReference;
 import com.aptana.core.resources.IProjectContext;
-import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.IPreferenceConstants;
@@ -326,7 +324,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						DeployPreferenceUtil.setDeployType(selectedProject, DeployType.NONE);
 						DeleteResourceAction action = new DeleteResourceAction(getSite());
 						action.selectionChanged(new StructuredSelection(selectedProject));
 						action.run();

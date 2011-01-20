@@ -147,29 +147,14 @@
          </state>
       </command>
       <command
-            defaultHandler="com.aptana.explorer.internal.handlers.DeployHandler"
-            id="com.aptana.explorer.deploy"
-            name="%Deploy.label">
-      </command>
-      <command
             defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
             id="com.aptana.explorer.commands.openTerminal"
             name="%command.openTerminal.name">
       </command>
       <command
-            defaultHandler="com.aptana.explorer.internal.handlers.RunDeployWizardHandler"
-            id="com.aptana.explorer.deploywizard"
-            name="%DeployWizard.label">
-      </command>
-      <command
             defaultHandler="com.aptana.explorer.internal.handlers.ToggleChangedFilesFilter"
             id="com.aptana.explorer.commands.toggleChangedFilesFilter"
             name="%command.toggleChangedFilesFilter.name">
-      </command>
-      <command
-            defaultHandler="com.aptana.explorer.internal.handlers.DeploySettingsHandler"
-            id="com.aptana.explorer.commands.ftp.settings"
-            name="%command.deploysettings.name">
       </command>
    </extension>
    <extension
@@ -211,8 +196,7 @@
       <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
          <command
-               commandId="com.aptana.explorer.deploy"
-               label="%Deploy.label"
+               commandId="com.aptana.deploy.commands.deployApp"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -240,7 +224,7 @@
       <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
          <command
-               commandId="com.aptana.explorer.deploy"
+               commandId="com.aptana.deploy.commands.deployApp"
                label="%FTPDeploy.label"
                icon="icons/full/elcl16/arrow_up_down.png"
                style="push">
@@ -308,7 +292,7 @@
                visible="true">
          </separator>
          <command
-               commandId="com.aptana.explorer.commands.ftp.settings"
+               commandId="com.aptana.deploy.commands.ftp.settings"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -342,8 +326,7 @@
       <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.wizard">
          <command
-               commandId="com.aptana.explorer.deploywizard"
-               label="%DeployWizard.label"
+               commandId="com.aptana.deploy.commands.deploywizard"
                style="push">
          </command>
       </menuContribution>
@@ -1148,7 +1131,7 @@
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="com.aptana.explorer.deploy"
+            commandId="com.aptana.deploy.commands.deployApp"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+M3+D">

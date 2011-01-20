@@ -22,9 +22,19 @@ import com.aptana.scripting.model.CommandElement;
 public class DeployContributionItem extends ContributionItem
 {
 
+	public DeployContributionItem()
+	{
+	}
+
 	public DeployContributionItem(String id)
 	{
 		super(id);
+	}
+
+	@Override
+	public boolean isDynamic()
+	{
+		return true;
 	}
 
 	protected static void createDeploySubMenuItem(Menu menu, String cmd, String bundle)

@@ -30,6 +30,10 @@ public class HerokuContributionItem extends DeployContributionItem
 
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 
+	public HerokuContributionItem()
+	{
+	}
+
 	public HerokuContributionItem(String id)
 	{
 		super(id);
@@ -137,11 +141,5 @@ public class HerokuContributionItem extends DeployContributionItem
 		// may want to add backup commands
 		createDeploySubMenuItem(menu, "App Info", BUNDLE_HEROKU); //$NON-NLS-1$
 		createDeploySubMenuItem(menu, "Rename App", BUNDLE_HEROKU); //$NON-NLS-1$
-	}
-
-	@Override
-	public boolean isDynamic()
-	{
-		return true;
 	}
 }
