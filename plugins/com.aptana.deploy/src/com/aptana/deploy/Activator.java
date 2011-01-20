@@ -7,11 +7,8 @@
  */
 package com.aptana.deploy;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -36,37 +33,9 @@ public class Activator extends AbstractUIPlugin
 
 		public void resourceChanged(IResourceChangeEvent event)
 		{
-			IResourceDelta delta = event.getDelta();
-			if (delta == null)
+			if (event.getType() == IResourceChangeEvent.PRE_DELETE)
 			{
-				return;
-			}
-			try
-			{
-				delta.accept(new IResourceDeltaVisitor()
-				{
-
-					public boolean visit(IResourceDelta delta) throws CoreException
-					{
-						IResource resource = delta.getResource();
-						if (resource.getType() == IResource.ROOT)
-						{
-							return true;
-						}
-						if (resource.getType() == IResource.PROJECT)
-						{
-							if (delta.getKind() == IResourceDelta.REMOVED)
-							{
-								DeployPreferenceUtil.setDeployType(resource.getProject(), DeployType.NONE);
-							}
-						}
-						return false;
-					}
-				});
-			}
-			catch (CoreException e)
-			{
-				logError(e);
+				DeployPreferenceUtil.setDeployType(event.getResource().getProject(), DeployType.NONE);
 			}
 		}
 	};
