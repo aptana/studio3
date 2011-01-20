@@ -91,6 +91,7 @@
       <import plugin="com.aptana.editor.json"/>
       <import plugin="com.aptana.editor.xml.formatter"/>
       <import plugin="com.aptana.editor.html.formatter"/>
+      <import plugin="com.aptana.editor.js.formatter"/>
    </requires>
 
    <plugin
@@ -359,6 +360,7 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
+         
    <plugin
          id="com.aptana.editor.html.formatter.tests"
          download-size="0"
@@ -366,4 +368,13 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
+         
+   <plugin
+         id="com.aptana.editor.js.formatter.tests"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+         
 </feature>

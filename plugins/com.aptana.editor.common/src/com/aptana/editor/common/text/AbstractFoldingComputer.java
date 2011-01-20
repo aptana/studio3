@@ -56,7 +56,7 @@ public abstract class AbstractFoldingComputer
 	 * @see com.aptana.editor.common.text.reconciler.IFoldingComputer#emitFoldingRegions(org.eclipse.core.runtime.
 	 * IProgressMonitor)
 	 */
-	public List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
+	public synchronized List<Position> emitFoldingRegions(IProgressMonitor monitor) throws BadLocationException
 	{
 		fLines = new ArrayList<Integer>();
 		int lineCount = getDocument().getNumberOfLines();
@@ -120,6 +120,10 @@ public abstract class AbstractFoldingComputer
 		SubMonitor sub = SubMonitor.convert(monitor, 2 * children.length);
 		for (IParseNode child : children)
 		{
+			if (sub.isCanceled())
+			{
+				return newPositions;
+			}
 			if (isFoldable(child))
 			{
 				// FIXME We had hacks for the length for each language before. Do we need hooks to override that here?

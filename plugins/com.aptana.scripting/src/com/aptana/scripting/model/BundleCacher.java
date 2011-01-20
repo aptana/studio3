@@ -465,8 +465,6 @@ public class BundleCacher
 
 		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
 		// reduce duplication!
-		// FIXME Don't rely on extending ContsructMapping, it was originally private! If we can rewrite this, we can
-		// remove snakeyaml plugin and use the included version in JRuby 1.6!
 		private abstract class AbstractBundleElementConstruct extends AbstractConstruct
 		{
 			/**
@@ -567,7 +565,26 @@ public class BundleCacher
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
+				forcePathsOfChildren(be.getChildren());
 				return be;
+			}
+
+			private void forcePathsOfChildren(List<MenuElement> children)
+			{
+				if (children != null)
+				{
+					for (MenuElement child : children)
+					{
+						String childPath = child.getPath();
+						IPath pathObj = Path.fromOSString(childPath);
+						if (!pathObj.isAbsolute())
+						{
+							// Prepend the bundle directory.
+							child.setPath(bundleDirectory.getAbsolutePath() + File.separator + childPath);
+						}
+						forcePathsOfChildren(child.getChildren());
+					}
+				}
 			}
 		}
 
