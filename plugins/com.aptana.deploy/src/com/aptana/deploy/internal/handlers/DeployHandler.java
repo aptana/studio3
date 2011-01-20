@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.handlers;
+package com.aptana.deploy.internal.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -37,9 +37,8 @@ public class DeployHandler extends AbstractHandler
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		
 		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
-		
+
 		if (type == null)
 		{
 			if (isCapistranoProject(selectedProject))
@@ -115,29 +114,32 @@ public class DeployHandler extends AbstractHandler
 		}
 	}
 
-	private void deployWithCapistrano(){
+	private void deployWithCapistrano()
+	{
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
 		terminal.sendInput("cap deploy\n"); //$NON-NLS-1$
 	}
-	
-	private void deployWithEngineYard(){
+
+	private void deployWithEngineYard()
+	{
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
 		terminal.sendInput("ey deploy\n"); //$NON-NLS-1$
 	}
-	private void deployWithHeroku(){
+
+	private void deployWithHeroku()
+	{
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
 		terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
 	}
-	
-	private void deployWithFTP(){
+
+	private void deployWithFTP()
+	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
-		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-				.getActivePart());
-		action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()
-				.getSelection());
+		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
+		action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection());
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
 		if (sites.length > 1)
 		{
@@ -153,24 +155,24 @@ public class DeployHandler extends AbstractHandler
 		}
 		action.run(null);
 	}
-	
+
 	private boolean isEYProject(IProject selectedProject)
 	{
 
 		DeployType type = DeployPreferenceUtil.getDeployType(selectedProject);
-		
+
 		// Engine Yard gem does not work in Windows
-		if(!Platform.getOS().equals(Platform.OS_WIN32))
+		if (!Platform.getOS().equals(Platform.OS_WIN32))
 		{
 			if (type.equals(DeployType.ENGINEYARD))
 			{
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	private boolean isCapistranoProject(IProject selectedProject)
 	{
 		return selectedProject.getFile("Capfile").exists(); //$NON-NLS-1$

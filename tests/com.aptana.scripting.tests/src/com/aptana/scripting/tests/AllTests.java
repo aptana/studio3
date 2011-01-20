@@ -8,6 +8,7 @@
 package com.aptana.scripting.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import com.aptana.scripting.BundleConverterTest;
@@ -17,7 +18,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(AllTests.class.getName());
+		TestSuite suite = new TestSuite(AllTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.out.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.scripting.model.AllTests.suite());
 		suite.addTest(com.aptana.scope.AllTests.suite());

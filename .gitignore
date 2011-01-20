@@ -17,3 +17,9 @@ build/
 *.mode2v3
 native/**/Debug/
 native/**/Release/
+tests/com.aptana.scripting.tests/application-bundles/bundleWithCommand/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/bundleWithCommandReference/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/bundleWithMenu/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/loneBundle/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/bundleWithSnippet/cache.yml
+tests/com.aptana.scripting.tests/application-bundles/bundleWithCommand/cache.yml

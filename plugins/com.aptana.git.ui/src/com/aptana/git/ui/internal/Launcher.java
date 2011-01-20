@@ -22,7 +22,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.IDebugUIConstants;
-import org.eclipse.core.externaltools.internal.IExternalToolConstants;
+import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import com.aptana.console.process.ConsoleProcessFactory;
 import com.aptana.core.ShellExecutable;

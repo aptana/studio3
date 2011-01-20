@@ -10,18 +10,23 @@ package com.aptana.ui.util;
 
 import java.net.URI;
 
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -30,6 +35,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.ui.UIPlugin;
 
@@ -140,6 +146,26 @@ public final class UIUtils
 		if (input instanceof IPathEditorInput)
 		{
 			return URIUtil.toURI(((IPathEditorInput) input).getPath());
+		}
+		return null;
+	}
+
+	public static IProject getSelectedProject()
+	{
+		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
+				IEvaluationService.class);
+		if (evaluationService != null)
+		{
+			IEvaluationContext currentState = evaluationService.getCurrentState();
+			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (variable instanceof IStructuredSelection)
+			{
+				Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
+				if (selectedObject instanceof IResource)
+				{
+					return ((IResource) selectedObject).getProject();
+				}
+			}
 		}
 		return null;
 	}

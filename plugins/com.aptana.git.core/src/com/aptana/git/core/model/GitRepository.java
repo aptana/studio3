@@ -644,15 +644,16 @@ public class GitRepository
 				// branch. Auto-open after switch?
 				continue;
 			}
+			// If the git repo location is the project root, just return that it's ok!
+			if (project.getLocation().equals(workingDirectory()))
+			{
+				continue;
+			}
+			
+			// TODO Is there a way to use diff to get the list of projects that don't exist on branch?
 			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
 			if (other != null && other.equals(this))
 			{
-				// If the git repo location is the project root, just return that it's ok!
-				if (project.getLocation().equals(workingDirectory()))
-				{
-					continue;
-				}
-
 				// Check if the project exists on the other branch!
 				Map<Integer, String> result = GitExecutable
 						.instance()
