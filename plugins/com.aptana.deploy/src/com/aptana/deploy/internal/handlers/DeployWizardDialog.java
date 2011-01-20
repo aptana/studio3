@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.handlers;
+package com.aptana.deploy.internal.handlers;
 
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -21,17 +21,15 @@ public class DeployWizardDialog extends WizardDialog
 	{
 		super(parentShell, newWizard);
 	}
-	
-	protected void nextPressed(){
-		
+
+	protected void nextPressed()
+	{
 		IWizardPage page = getCurrentPage();
-		
-		if( page instanceof ILoginValidator && !((ILoginValidator) page).validateLogin())
+		if (page instanceof ILoginValidator && !((ILoginValidator) page).validateLogin())
 		{
 			return;
 		}
-		
+
 		super.nextPressed();
 	}
-
 }
