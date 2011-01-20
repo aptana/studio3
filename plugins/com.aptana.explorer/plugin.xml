@@ -147,11 +147,6 @@
          </state>
       </command>
       <command
-            defaultHandler="com.aptana.explorer.internal.handlers.OpenTerminalHandler"
-            id="com.aptana.explorer.commands.openTerminal"
-            name="%command.openTerminal.name">
-      </command>
-      <command
             defaultHandler="com.aptana.explorer.internal.handlers.ToggleChangedFilesFilter"
             id="com.aptana.explorer.commands.toggleChangedFilesFilter"
             name="%command.toggleChangedFilesFilter.name">
@@ -509,9 +504,8 @@
       <menuContribution
             locationURI="menu:com.aptana.explorer.gear?endof=group.open">
          <command
-               commandId="com.aptana.explorer.commands.openTerminal"
+               commandId="com.aptana.terminal.commands.openTerminal"
                icon="icons/full/obj16/terminal.png"
-               label="%command.openTerminal.name"
                style="push">
          </command>
       </menuContribution>
