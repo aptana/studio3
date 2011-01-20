@@ -475,7 +475,7 @@
          </dynamic>
       </menuContribution>
       <menuContribution
-            locationURI="menu:file?after=new.ext">
+            locationURI="menu:file?before=new.ext">
          <menu
                id="com.aptana.file.template.menu"
                label="%menu.file.template.label">
