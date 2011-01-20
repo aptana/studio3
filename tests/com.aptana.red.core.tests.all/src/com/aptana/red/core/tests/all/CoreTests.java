@@ -8,6 +8,7 @@
 package com.aptana.red.core.tests.all;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class CoreTests
@@ -15,7 +16,15 @@ public class CoreTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(CoreTests.class.getName());
+		TestSuite suite = new TestSuite(CoreTests.class.getName())
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.out.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		// $JUnit-BEGIN$
 		suite.addTest(com.aptana.core.tests.AllTests.suite());
 		suite.addTest(com.aptana.core.io.tests.AllTests.suite());

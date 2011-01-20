@@ -8,6 +8,7 @@
 package com.aptana.parsing.tests;
 
 import junit.framework.Test;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 @SuppressWarnings("nls")
@@ -16,7 +17,15 @@ public class AllTests
 
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.parsing");
+		TestSuite suite = new TestSuite("Test for com.aptana.parsing")
+		{
+			@Override
+			public void runTest(Test test, TestResult result)
+			{
+				System.out.println("Running test: " + test.toString());
+				super.runTest(test, result);
+			}
+		};
 		//$JUnit-BEGIN$
 		suite.addTest(com.aptana.parsing.ast.AllTests.suite());
 		//$JUnit-END$
