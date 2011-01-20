@@ -565,18 +565,26 @@ public class BundleCacher
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
-				List<MenuElement> children = be.getChildren();
-				for (MenuElement child : children)
+				forcePathsOfChildren(be.getChildren());
+				return be;
+			}
+
+			private void forcePathsOfChildren(List<MenuElement> children)
+			{
+				if (children != null)
 				{
-					String childPath = child.getPath();
-					IPath pathObj = Path.fromOSString(childPath);
-					if (!pathObj.isAbsolute())
+					for (MenuElement child : children)
 					{
-						// Prepend the bundle directory.
-						child.setPath(bundleDirectory.getAbsolutePath() + File.separator + childPath);
+						String childPath = child.getPath();
+						IPath pathObj = Path.fromOSString(childPath);
+						if (!pathObj.isAbsolute())
+						{
+							// Prepend the bundle directory.
+							child.setPath(bundleDirectory.getAbsolutePath() + File.separator + childPath);
+						}
+						forcePathsOfChildren(child.getChildren());
 					}
 				}
-				return be;
 			}
 		}
 
