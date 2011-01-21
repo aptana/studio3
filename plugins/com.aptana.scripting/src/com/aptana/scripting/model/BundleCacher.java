@@ -354,7 +354,7 @@ public class BundleCacher
 				if (!new File(path).exists())
 				{
 					ScriptingActivator.logInfo(MessageFormat.format(
-							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path));
+							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path, abe.toString()));
 					return true;
 				}
 				if (abe instanceof MenuElement)
@@ -384,7 +384,7 @@ public class BundleCacher
 			if (!new File(path).exists())
 			{
 				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg,
-						path));
+						path, child.toString()));
 				return true;
 			}
 			return anyFileDeleted(child);
