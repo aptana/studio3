@@ -649,7 +649,7 @@ public class GitRepository
 			{
 				continue;
 			}
-			
+
 			// TODO Is there a way to use diff to get the list of projects that don't exist on branch?
 			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
 			if (other != null && other.equals(this))
@@ -885,10 +885,37 @@ public class GitRepository
 	 */
 	public String[] commitsAhead(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return null;
+		}
 		return index().commitsBetween(remote.ref(), GitRef.REFS_HEADS + branchName);
+	}
+
+	/**
+	 * Grabs the remote branch that the passed in local branch is tracking. If tracking is not set up, we'll also try to
+	 * find the "matching" branch on "origin". See http://www.kernel.org/pub/software/scm/git/docs/git-push.html#OPTIONS
+	 * and http://www.kernel.org/pub/software/scm/git/docs/git-push.html#_examples for details on why we're doing this
+	 * (because git does).
+	 * 
+	 * @param localBranchName
+	 * @return
+	 */
+	private GitRef matchingRemoteBranch(String localBranchName)
+	{
+		GitRef remote = remoteTrackingBranch(localBranchName);
+		if (remote != null)
+		{
+			return remote;
+		}
+		String remoteMatchingName = "origin/" + localBranchName; //$NON-NLS-1$
+		// If tracking is not set up, git still checks "origin" remote for matching name
+		if (remoteBranches().contains(remoteMatchingName))
+		{
+			return GitRef.refFromString(GitRef.REFS_REMOTES + remoteMatchingName);
+		}
+		return null;
 	}
 
 	public ChangedFile getChangedFileForResource(IResource resource)
@@ -904,7 +931,7 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
 			return null;
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
@@ -921,7 +948,7 @@ public class GitRepository
 	@SuppressWarnings("nls")
 	public boolean shouldPull(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
 			return false;
 		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
