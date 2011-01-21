@@ -242,5 +242,12 @@
          </with>
       </definition>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="%category.web.name">
+      </category>
+   </extension>
 
 </plugin>
