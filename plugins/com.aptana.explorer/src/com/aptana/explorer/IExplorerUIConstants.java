@@ -25,4 +25,9 @@ public interface IExplorerUIConstants
 	 * "menu: com.aptana.explorer.deploy" URI.
 	 */
 	public static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
+
+	/**
+	 * The path to the icon for deploy menu
+	 */
+	public static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
 }
