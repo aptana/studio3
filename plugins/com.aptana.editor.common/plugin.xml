@@ -295,7 +295,7 @@
       <wizard
             name="%NewWizards.file"
             icon="$nl$/icons/full/etool16/text.png"
-            category="org.eclipse.ui.Basic"
+            category="com.aptana.ui.wizards.category"
             class="com.aptana.editor.common.internal.scripting.NewFileWizard"
             id="com.aptana.ui.wizards.new.file">
          <description>
@@ -305,6 +305,10 @@
                class="org.eclipse.core.resources.IResource">
          </selection>
       </wizard>
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="%category.web.name">
+      </category>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
