@@ -173,7 +173,7 @@ public class BundleCacher
 
 	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		SubMonitor sub = SubMonitor.convert(monitor, 120);
 		BundleElement be = null;
 		try
 		{
@@ -205,6 +205,7 @@ public class BundleCacher
 				{
 					return null;
 				}
+				fireScriptLoadedEvents(be, sub.newChild(20));
 			}
 			catch (Exception e)
 			{
@@ -232,6 +233,73 @@ public class BundleCacher
 			sub.done();
 		}
 		return be;
+	}
+
+	private void fireScriptLoadedEvents(BundleElement be, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		// Fire off the events that normally would get fired
+		Set<File> files = getFiles(be, sub.newChild(30));
+		for (File file : files)
+		{
+			BundleManager.getInstance().fireScriptLoadedEvent(file);
+			sub.worked(100 / files.size());
+		}
+		sub.done();
+	}
+
+	private Set<File> getFiles(BundleElement be, IProgressMonitor monitor)
+	{
+		Set<File> files = new HashSet<File>();
+		if (be == null)
+		{
+			return files;
+		}
+
+		String path = be.getPath();
+		files.add(new File(path));
+
+		List<AbstractBundleElement> children = be.getChildren();
+		if (children == null)
+		{
+			return files;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, children.size());
+		try
+		{
+			for (AbstractBundleElement abe : be.getChildren())
+			{
+				path = abe.getPath();
+				files.add(new File(path));
+				sub.worked(1);
+				if (abe instanceof MenuElement)
+				{
+					MenuElement menu = (MenuElement) abe;
+					files.addAll(getFiles(menu));
+				}
+			}
+		}
+		finally
+		{
+			sub.done();
+		}
+		return files;
+	}
+
+	private Set<File> getFiles(MenuElement parent)
+	{
+		if (parent == null || !parent.hasChildren())
+		{
+			return Collections.emptySet();
+		}
+		Set<File> files = new HashSet<File>();
+		for (MenuElement child : parent.getChildren())
+		{
+			String path = child.getPath();
+			files.add(new File(path));
+			files.addAll(getFiles(child));
+		}
+		return files;
 	}
 
 	private boolean anyFilesNewer(File cacheFile, List<File> bundleFiles, IProgressMonitor monitor)
