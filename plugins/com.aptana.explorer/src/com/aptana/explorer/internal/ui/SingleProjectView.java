@@ -145,7 +145,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
 	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
-	private static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
 	@Override
@@ -348,7 +347,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		final ToolBar deployToolBar = new ToolBar(parent, SWT.FLAT);
 		deployToolItem = new ToolItem(deployToolBar, SWT.DROP_DOWN);
-		deployToolItem.setImage(ExplorerPlugin.getImage(DEPLOY_MENU_ICON));
+		deployToolItem.setImage(ExplorerPlugin.getImage(IExplorerUIConstants.DEPLOY_MENU_ICON));
 		deployToolItem.setToolTipText(Messages.SingleProjectView_TTP_Deploy);
 		GridData deployComboData = new GridData(SWT.END, SWT.CENTER, true, false);
 		deployComboData.minimumWidth = 24;
@@ -361,7 +360,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				Point toolbarLocation = deployToolBar.getLocation();
 				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 				Point toolbarSize = deployToolBar.getSize();
-				// FIXME Move declaration/filling of menu to ext pt, that means removing fillDeployMenu!
 				final MenuManager deployMenuManager = new MenuManager(null, IExplorerUIConstants.DEPLOY_MENU_ID);
 				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
 				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
