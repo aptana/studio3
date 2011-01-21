@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
@@ -108,7 +109,7 @@ public class ScriptingConsole
 	 * @param colorKey
 	 * @return
 	 */
-	MessageConsoleStream getConsoleStream(MessageConsoleStream currentStream, String colorKey)
+	MessageConsoleStream getConsoleStream(final MessageConsoleStream currentStream, String colorKey)
 	{
 		if (currentStream == null || currentStream.isClosed())
 		{
@@ -119,7 +120,7 @@ public class ScriptingConsole
 			}
 
 			// create a new stream to take the place of the old one
-			MessageConsoleStream newStream = console.newMessageStream();
+			final MessageConsoleStream newStream = console.newMessageStream();
 
 			// add in new reference
 			streamColorMap.put(newStream, colorKey);
@@ -127,12 +128,18 @@ public class ScriptingConsole
 			// transfer current font and color settings, if possible
 			if (currentStream != null)
 			{
-				newStream.setColor(currentStream.getColor());
-				newStream.setFontStyle(currentStream.getFontStyle());
+				Display.getDefault().asyncExec(new Runnable() {
+
+					public void run()
+					{
+						newStream.setColor(currentStream.getColor());
+						newStream.setFontStyle(currentStream.getFontStyle());
+					}
+				});
 			}
 
 			// return the new console
-			currentStream = newStream;
+			return newStream;
 		}
 
 		return currentStream;
