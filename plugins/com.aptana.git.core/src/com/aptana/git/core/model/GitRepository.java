@@ -933,7 +933,9 @@ public class GitRepository
 	{
 		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return null;
+		}
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
@@ -950,7 +952,9 @@ public class GitRepository
 	{
 		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return false;
+		}
 		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 		if (commits != null && commits.length > 0)
 			return true;
@@ -958,7 +962,9 @@ public class GitRepository
 		boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
 				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
 		if (!performFetches)
+		{
 			return false;
+		}
 
 		// Use git ls-remote remotename remote-branchname
 		// Parse out the sha and compare vs the branch's local sha!
@@ -1006,8 +1012,7 @@ public class GitRepository
 		}
 		catch (FileNotFoundException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e);
 		}
 
 		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName);
@@ -1072,7 +1077,9 @@ public class GitRepository
 			String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 					"^remote\\." + string + "\\.url"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (output == null || output.trim().length() == 0)
+			{
 				continue;
+			}
 			remoteURLs.add(output.substring(output.indexOf(".url ") + 5)); //$NON-NLS-1$
 		}
 		return remoteURLs;
@@ -1092,15 +1099,21 @@ public class GitRepository
 		List<String> args = new ArrayList<String>();
 		args.add("branch"); //$NON-NLS-1$
 		if (track)
+		{
 			args.add("--track"); //$NON-NLS-1$
+		}
 		args.add(branchName);
 		if (startPoint != null && startPoint.trim().length() > 0)
+		{
 			args.add(startPoint);
+		}
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
 		if (result.keySet().iterator().next() != 0)
+		{
 			return false;
+		}
 		// Add branch to list in model!
 		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
 		fireBranchAddedEvent(branchName);
@@ -1130,7 +1143,9 @@ public class GitRepository
 				args.toArray(new String[args.size()]));
 		int exitCode = result.keySet().iterator().next();
 		if (exitCode != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
+		}
 		// Remove branch in model!
 		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
 		fireBranchRemovedEvent(branchName);
@@ -1149,9 +1164,13 @@ public class GitRepository
 		Map<Integer, String> result = GitExecutable.instance()
 				.runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
+		}
 		if (result.keySet().iterator().next() != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
@@ -1161,9 +1180,13 @@ public class GitRepository
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath.toOSString());
 		if (result == null)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
+		}
 		if (result.keySet().iterator().next() != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
@@ -1209,10 +1232,14 @@ public class GitRepository
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
+			{
 				continue;
+			}
 			GitRef ref = revSpec.simpleRef();
 			if (ref == null || ref.type() == null)
+			{
 				continue;
+			}
 			allRefs.add(ref.shortName());
 		}
 		return allRefs;
@@ -1260,14 +1287,18 @@ public class GitRepository
 	{
 		List<String> shas = new ArrayList<String>();
 		if (!mergeHeadFile().exists())
+		{
 			return shas;
+		}
 		BufferedReader reader = null;
 		try
 		{
 			reader = new BufferedReader(new FileReader(mergeHeadFile()));
 			String sha = null;
 			while ((sha = reader.readLine()) != null)
+			{
 				shas.add(sha);
+			}
 		}
 		catch (Exception e)
 		{
@@ -1276,6 +1307,7 @@ public class GitRepository
 		finally
 		{
 			if (reader != null)
+			{
 				try
 				{
 					reader.close();
@@ -1284,6 +1316,7 @@ public class GitRepository
 				{
 					// ignore
 				}
+			}
 		}
 		return shas;
 	}
@@ -1306,19 +1339,27 @@ public class GitRepository
 	public void firePullEvent()
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		PullEvent e = new PullEvent(this);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.pulled(e);
+		}
 	}
 
 	public void firePushEvent()
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		PushEvent e = new PushEvent(this);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.pushed(e);
+		}
 	}
 
 	/**
@@ -1352,7 +1393,9 @@ public class GitRepository
 	public void addListener(IGitRepositoryListener listener)
 	{
 		if (listener == null)
+		{
 			return;
+		}
 
 		if (listeners == null)
 		{
@@ -1367,7 +1410,9 @@ public class GitRepository
 	public void removeListener(IGitRepositoryListener listener)
 	{
 		if (listener == null || listeners == null)
+		{
 			return;
+		}
 		synchronized (listeners)
 		{
 			listeners.remove(listener);
