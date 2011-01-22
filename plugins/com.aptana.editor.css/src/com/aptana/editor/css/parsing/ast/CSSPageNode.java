@@ -20,62 +20,24 @@ public class CSSPageNode extends CSSNode
 	 * CSSPageNode
 	 * 
 	 * @param pageSelector
-	 * @param start
-	 * @param end
-	 */
-	public CSSPageNode(CSSPageSelectorNode pageSelector, int start, int end)
-	{
-		this(pageSelector, null, start, end);
-	}
-
-	/**
-	 * CSSPageNode
-	 * 
-	 * @param pageSelector
 	 * @param declarations
-	 * @param start
-	 * @param end
 	 */
-	@SuppressWarnings("unchecked")
-	public CSSPageNode(CSSPageSelectorNode pageSelector, Object declarations, int start, int end)
+	public CSSPageNode(List<CSSDeclarationNode> declarations)
 	{
-		super(CSSNodeTypes.PAGE, start, end);
+		super(CSSNodeTypes.PAGE);
 
-		fPageSelector = pageSelector;
-
-		if (declarations instanceof CSSDeclarationNode)
+		if (declarations != null)
 		{
-			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
-		}
-		else if (declarations instanceof List<?>)
-		{
-			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
-
-			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
+			this.setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
 	}
 
 	/**
 	 * CSSPageNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	public CSSPageNode(int start, int end)
+	public CSSPageNode()
 	{
-		this(null, null, start, end);
-	}
-
-	/**
-	 * CSSPageNode
-	 * 
-	 * @param declarations
-	 * @param start
-	 * @param end
-	 */
-	public CSSPageNode(Object declarations, int start, int end)
-	{
-		this(null, declarations, start, end);
+		this(null);
 	}
 
 	/*
@@ -135,6 +97,11 @@ public class CSSPageNode extends CSSNode
 	public int hashCode()
 	{
 		return super.hashCode() * 31 + toString().hashCode();
+	}
+
+	public void setSelector(CSSPageSelectorNode selector)
+	{
+		fPageSelector = selector;
 	}
 
 	/*

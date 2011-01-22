@@ -8,7 +8,9 @@
 package com.aptana.editor.css.parsing.ast;
 
 import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
+import com.aptana.parsing.ast.ParseRootNode;
 
 public class CSSNode extends ParseNode
 {
@@ -59,6 +61,32 @@ public class CSSNode extends ParseNode
 	public boolean equals(Object obj)
 	{
 		return (obj instanceof CSSNode) && super.equals(obj);
+	}
+
+	/**
+	 * @return
+	 */
+	public IParseNode getContainingStatementNode()
+	{
+		// move up to nearest statement
+		IParseNode result = this;
+		IParseNode parent = result.getParent();
+		
+		while (parent != null)
+		{
+			// TODO: need to test for specific "statement" node types
+			if (parent instanceof ParseRootNode)
+			{
+				break;
+			}
+			else
+			{
+				result = parent;
+				parent = parent.getParent();
+			}
+		}
+		
+		return result;
 	}
 
 	/*

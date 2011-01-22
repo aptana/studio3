@@ -9,6 +9,8 @@ package com.aptana.editor.css.parsing.ast;
 
 public class CSSFunctionNode extends CSSExpressionNode
 {
+	private String fName;
+
 	/**
 	 * CSSFunctionNode
 	 * 
@@ -16,11 +18,13 @@ public class CSSFunctionNode extends CSSExpressionNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSFunctionNode(CSSExpressionNode expression, int start, int end)
+	public CSSFunctionNode(String name, CSSExpressionNode expression)
 	{
-		super(CSSNodeTypes.FUNCTION, start, end);
+		super(CSSNodeTypes.FUNCTION);
 
-		setChildren(new CSSNode[] { expression });
+		fName = name;
+
+		this.setChildren(new CSSNode[] { expression });
 	}
 
 	/*
@@ -79,6 +83,7 @@ public class CSSFunctionNode extends CSSExpressionNode
 	{
 		StringBuilder text = new StringBuilder();
 
+		text.append(fName);
 		text.append("(").append(getExpression()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return text.toString();

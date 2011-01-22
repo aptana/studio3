@@ -76,6 +76,17 @@ public class CSSTreeWalker
 		this.visitChildren(node);
 	}
 
+	public void visit(CSSParseRootNode node)
+	{
+		for (IParseNode child : node)
+		{
+			if (child instanceof CSSNode)
+			{
+				((CSSNode) child).accept(this);
+			}
+		}
+	}
+	
 	public void visit(CSSRuleNode node)
 	{
 		this.visitChildren(node);

@@ -18,11 +18,11 @@ public class CSSPageSelectorNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSPageSelectorNode(String text, int start, int end)
+	public CSSPageSelectorNode(String identifier)
 	{
-		super(CSSNodeTypes.PAGE_SELECTOR, start, end);
+		super(CSSNodeTypes.PAGE_SELECTOR);
 
-		fText = text;
+		fText = identifier;
 	}
 
 	/*

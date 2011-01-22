@@ -18,9 +18,10 @@ public class CSSTextNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSTextNode(String text, int start, int end)
+	public CSSTextNode(String text)
 	{
-		super(CSSNodeTypes.TEXT, start, end);
+		super(CSSNodeTypes.TEXT);
+		
 		fText = text;
 	}
 

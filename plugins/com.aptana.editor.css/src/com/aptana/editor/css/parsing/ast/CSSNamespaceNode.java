@@ -15,26 +15,22 @@ public class CSSNamespaceNode extends CSSNode
 	/**
 	 * CSSNamespaceNode
 	 * 
-	 * @param start
 	 * @param uri
-	 * @param end
 	 */
-	public CSSNamespaceNode(int start, String uri, int end)
+	public CSSNamespaceNode(String uri)
 	{
-		this(start, null, uri, end);
+		this(null, uri);
 	}
 
 	/**
 	 * CSSNamespaceNode
 	 * 
-	 * @param start
 	 * @param prefix
 	 * @param uri
-	 * @param end
 	 */
-	public CSSNamespaceNode(int start, String prefix, String uri, int end)
+	public CSSNamespaceNode(String prefix, String uri)
 	{
-		super(CSSNodeTypes.NAMESPACE, start, end);
+		super(CSSNodeTypes.NAMESPACE);
 
 		fPrefix = prefix;
 		fUriStr = uri;

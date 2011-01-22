@@ -15,9 +15,9 @@ public class CSSErrorDeclarationNode extends CSSDeclarationNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSErrorDeclarationNode(int start, int end)
+	public CSSErrorDeclarationNode()
 	{
-		super(start, end);
+		super();
 	}
 
 	/*

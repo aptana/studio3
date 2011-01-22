@@ -16,36 +16,24 @@ public class CSSFontFaceNode extends CSSNode
 {
 	/**
 	 * CSSFontFaceNode
-	 * 
-	 * @param start
-	 * @param end
 	 */
-	public CSSFontFaceNode(int start, int end)
+	public CSSFontFaceNode()
 	{
-		this(start, null, end);
+		this(null);
 	}
 
 	/**
 	 * CSSFontFaceNode
 	 * 
-	 * @param start
 	 * @param declarations
-	 * @param end
 	 */
-	@SuppressWarnings("unchecked")
-	public CSSFontFaceNode(int start, Object declarations, int end)
+	public CSSFontFaceNode(List<CSSDeclarationNode> declarations)
 	{
-		super(CSSNodeTypes.FONTFACE, start, end);
+		super(CSSNodeTypes.FONTFACE);
 
-		if (declarations instanceof CSSDeclarationNode)
+		if (declarations != null)
 		{
-			setChildren(new CSSDeclarationNode[] { (CSSDeclarationNode) declarations });
-		}
-		else if (declarations instanceof List<?>)
-		{
-			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
-
-			setChildren(list.toArray(new CSSDeclarationNode[list.size()]));
+			this.setChildren(declarations.toArray(new CSSDeclarationNode[declarations.size()]));
 		}
 	}
 

@@ -21,21 +21,9 @@ public class CSSDeclarationNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSDeclarationNode(int start, int end)
+	protected CSSDeclarationNode()
 	{
-		super(CSSNodeTypes.DECLARATION, start, end);
-	}
-
-	/**
-	 * CSSDeclarationNode
-	 * 
-	 * @param semicolon
-	 */
-	public CSSDeclarationNode(Symbol semicolon)
-	{
-		super(CSSNodeTypes.DECLARATION, semicolon.getStart(), semicolon.getEnd());
-
-		fHasSemicolon = true;
+		super(CSSNodeTypes.DECLARATION);
 	}
 
 	/**
@@ -44,7 +32,7 @@ public class CSSDeclarationNode extends CSSNode
 	 * @param identifier
 	 * @param value
 	 */
-	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value)
+	public CSSDeclarationNode(String identifier, CSSExpressionNode value)
 	{
 		this(identifier, value, null);
 	}
@@ -56,15 +44,14 @@ public class CSSDeclarationNode extends CSSNode
 	 * @param value
 	 * @param status
 	 */
-	public CSSDeclarationNode(Symbol identifier, CSSExpressionNode value, Symbol status)
+	public CSSDeclarationNode(String identifier, CSSExpressionNode value, String status)
 	{
 		super(CSSNodeTypes.DECLARATION);
 
-		fIdentifier = identifier.value.toString();
-		fStatus = (status == null) ? null : status.value.toString();
-		setChildren(new CSSNode[] { value });
-
-		this.setLocation(identifier.getStart(), (status == null) ? value.getEnd() : status.getEnd());
+		fIdentifier = identifier;
+		fStatus = status;
+		
+		this.setChildren(new CSSNode[] { value });
 	}
 
 	/*

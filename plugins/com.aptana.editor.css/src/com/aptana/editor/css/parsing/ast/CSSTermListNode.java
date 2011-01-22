@@ -31,10 +31,11 @@ public class CSSTermListNode extends CSSExpressionNode
 	 */
 	public CSSTermListNode(CSSExpressionNode left, CSSExpressionNode right, String separator)
 	{
-		super(CSSNodeTypes.TERM_LIST, left.getStart(), right.getEnd());
+		super(CSSNodeTypes.TERM_LIST);
 
-		setChildren(new CSSExpressionNode[] { left, right });
-		fSeparator = separator;
+		this.fSeparator = separator;
+
+		this.setChildren(new CSSExpressionNode[] { left, right });
 	}
 
 	/*

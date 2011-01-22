@@ -17,9 +17,9 @@ public class CSSAttributeSelectorNode extends CSSNode
 	 * @param function
 	 *            the function expression
 	 */
-	public CSSAttributeSelectorNode(CSSExpressionNode function, int start)
+	public CSSAttributeSelectorNode(CSSExpressionNode function)
 	{
-		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, function.getEnd());
+		super(CSSNodeTypes.ATTRIBUTE_SELECTOR);
 
 		setChildren(new CSSNode[] { function });
 	}
@@ -31,9 +31,9 @@ public class CSSAttributeSelectorNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSAttributeSelectorNode(String text, int start, int end)
+	public CSSAttributeSelectorNode(String text)
 	{
-		super(CSSNodeTypes.ATTRIBUTE_SELECTOR, start, end);
+		super(CSSNodeTypes.ATTRIBUTE_SELECTOR);
 
 		fAttributeText = text;
 	}
