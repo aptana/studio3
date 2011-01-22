@@ -23,7 +23,7 @@ public class SFTPConnectionTest extends CommonConnectionTest
 	protected void setUp() throws Exception
 	{
 		SFTPConnectionPoint ftpcp = new SFTPConnectionPoint();
-		ftpcp.setHost(getConfig().getProperty("sftp.host", "10.10.1.60")); //$NON-NLS-1$ //$NON-NLS-2$
+		ftpcp.setHost(getConfig().getProperty("sftp.host", "10.0.1.30")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setLogin(getConfig().getProperty("sftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPassword(getConfig().getProperty("sftp.password",	//$NON-NLS-1$
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());

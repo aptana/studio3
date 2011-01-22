@@ -34,10 +34,6 @@
             %wizard.webproject.description
          </description>
       </wizard>
-      <category
-            id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
-      </category>
       <primaryWizard
             id="com.aptana.ui.wizards.NewWebProject">
       </primaryWizard>

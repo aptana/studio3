@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
 import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
+import com.enterprisedt.util.debug.Level;
 
 /**
  * @author Max Stepanov
