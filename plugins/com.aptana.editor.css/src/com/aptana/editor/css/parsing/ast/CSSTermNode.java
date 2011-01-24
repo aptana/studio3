@@ -7,8 +7,6 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-import beaver.Symbol;
-
 public class CSSTermNode extends CSSExpressionNode
 {
 	private String fTerm;
@@ -18,10 +16,11 @@ public class CSSTermNode extends CSSExpressionNode
 	 * 
 	 * @param term
 	 */
-	public CSSTermNode(Symbol term)
+	public CSSTermNode(String term)
 	{
-		super(CSSNodeTypes.TERM, term.getStart(), term.getEnd());
-		fTerm = term.value.toString();
+		super(CSSNodeTypes.TERM);
+
+		fTerm = term;
 	}
 
 	/*

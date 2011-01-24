@@ -20,27 +20,13 @@ public class CSSMediaNode extends CSSNode
 	 * 
 	 * @param medias
 	 * @param statements
-	 * @param start
-	 * @param end
 	 */
-	public CSSMediaNode(CSSTextNode[] medias, CSSNode[] statements, int start, int end)
+	public CSSMediaNode(CSSTextNode[] medias, CSSNode... statements)
 	{
-		super(CSSNodeTypes.MEDIA, start, end);
+		super(CSSNodeTypes.MEDIA);
 
 		fMedias = medias;
 		fStatements = statements;
-	}
-
-	/**
-	 * CSSMediaNode
-	 * 
-	 * @param medias
-	 * @param start
-	 * @param end
-	 */
-	public CSSMediaNode(CSSTextNode[] medias, int start, int end)
-	{
-		this(medias, new CSSNode[0], start, end);
 	}
 
 	/*

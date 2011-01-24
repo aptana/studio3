@@ -15,21 +15,9 @@ public class CSSExpressionNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSExpressionNode(int start, int end)
+	protected CSSExpressionNode(short type)
 	{
-		super(CSSNodeTypes.EXPRESSION, start, end);
-	}
-
-	/**
-	 * CSSExpressionNode
-	 * 
-	 * @param type
-	 * @param start
-	 * @param end
-	 */
-	public CSSExpressionNode(short type, int start, int end)
-	{
-		super(type, start, end);
+		super(type);
 	}
 
 	/*

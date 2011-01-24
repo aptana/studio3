@@ -8,7 +8,6 @@
 package com.aptana.core.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,16 +39,6 @@ public abstract class ProcessUtil
 		if (result == null || result.isEmpty())
 			return null;
 		return result.values().iterator().next();
-	}
-
-	/**
-	 * @deprecated Please use {@link IOUtil#read(InputStream, String)} instead with a value of "UTF-8".
-	 * @param stream
-	 * @return
-	 */
-	public static String read(InputStream stream)
-	{
-		return IOUtil.read(stream, "UTF-8"); //$NON-NLS-1$
 	}
 
 	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String... args)

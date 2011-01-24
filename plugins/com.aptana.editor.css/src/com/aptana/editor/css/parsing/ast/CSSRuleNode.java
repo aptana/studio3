@@ -9,10 +9,10 @@ package com.aptana.editor.css.parsing.ast;
 
 import java.util.List;
 
-import beaver.Symbol;
-
 public class CSSRuleNode extends CSSNode
 {
+	private static final CSSDeclarationNode[] NO_DECLARATIONS = new CSSDeclarationNode[0];
+
 	private CSSSelectorNode[] fSelectors;
 	private CSSDeclarationNode[] fDeclarations;
 
@@ -20,11 +20,10 @@ public class CSSRuleNode extends CSSNode
 	 * CSSRuleNode
 	 * 
 	 * @param selectors
-	 * @param end
 	 */
-	public CSSRuleNode(Symbol[] selectors, int end)
+	public CSSRuleNode(List<CSSSelectorNode> selectors)
 	{
-		this(selectors, null, end);
+		this(selectors, null);
 	}
 
 	/**
@@ -32,61 +31,15 @@ public class CSSRuleNode extends CSSNode
 	 * 
 	 * @param selectors
 	 * @param declarations
-	 * @param end
 	 */
-	@SuppressWarnings("unchecked")
-	public CSSRuleNode(Symbol[] selectors, Object declarations, int end)
+	public CSSRuleNode(List<CSSSelectorNode> selectors, List<CSSDeclarationNode> declarations)
 	{
 		super(CSSNodeTypes.RULE);
 
-		fSelectors = new CSSSelectorNode[selectors.length];
-
-		List<CSSSimpleSelectorNode> simpleSelectors;
-
-		for (int i = 0; i < selectors.length; ++i)
-		{
-			simpleSelectors = (List<CSSSimpleSelectorNode>) selectors[i].value;
-			fSelectors[i] = new CSSSelectorNode(this, simpleSelectors.toArray(new CSSSimpleSelectorNode[simpleSelectors.size()]), selectors[i].getStart(),
-				selectors[i].getEnd());
-		}
-
-		if (selectors.length > 0)
-		{
-			this.setLocation(selectors[0].getStart(), end);
-		}
-		else
-		{
-			this.setLocation(end, end - 1);
-		}
-
-		if (declarations instanceof CSSDeclarationNode)
-		{
-			fDeclarations = new CSSDeclarationNode[1];
-			fDeclarations[0] = (CSSDeclarationNode) declarations;
-		}
-		else if (declarations instanceof List<?>)
-		{
-			List<CSSDeclarationNode> list = (List<CSSDeclarationNode>) declarations;
-			int size = list.size();
-			fDeclarations = new CSSDeclarationNode[size];
-
-			for (int i = 0; i < size; ++i)
-			{
-				fDeclarations[i] = list.get(i);
-			}
-		}
-		else
-		{
-			fDeclarations = new CSSDeclarationNode[0];
-		}
-
-		if (fSelectors.length > 0)
-		{
-			for (CSSDeclarationNode declaration : fDeclarations)
-			{
-				declaration.setParent(fSelectors[0]);
-			}
-		}
+		fSelectors = selectors.toArray(new CSSSelectorNode[selectors.size()]);
+		fDeclarations = (declarations != null)
+			? declarations.toArray(new CSSDeclarationNode[declarations.size()])
+			: NO_DECLARATIONS;
 	}
 
 	/*
@@ -219,13 +172,20 @@ public class CSSRuleNode extends CSSNode
 		StringBuilder text = new StringBuilder();
 		CSSSelectorNode[] selectors = getSelectors();
 
-		for (int i = 0; i < selectors.length; ++i)
+		for (CSSSelectorNode selector : selectors)
 		{
-			text.append(selectors[i]);
+			String combinator = selector.getCombinator();
 
-			if (i < selectors.length - 1)
+			text.append(selector);
+
+			if (combinator != null && combinator.length() > 0)
 			{
-				text.append(", "); //$NON-NLS-1$
+				if (",".equals(combinator) == false)
+				{
+					text.append(" ");
+				}
+
+				text.append(combinator).append(" ");
 			}
 		}
 
@@ -236,6 +196,7 @@ public class CSSRuleNode extends CSSNode
 		for (int i = 0; i < declarations.length; ++i)
 		{
 			text.append(declarations[i]);
+
 			if (i < declarations.length - 1)
 			{
 				text.append(" "); //$NON-NLS-1$

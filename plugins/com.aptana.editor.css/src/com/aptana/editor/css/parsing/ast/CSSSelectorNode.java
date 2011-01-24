@@ -7,21 +7,22 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
+import com.aptana.core.util.StringUtil;
+
 public class CSSSelectorNode extends CSSNode
 {
+	private String fCombinator;
+
 	/**
 	 * CSSSelectorNode
 	 * 
-	 * @param parent
 	 * @param simpleSelectors
-	 * @param start
-	 * @param end
 	 */
-	public CSSSelectorNode(CSSRuleNode parent, CSSSimpleSelectorNode[] simpleSelectors, int start, int end)
+	public CSSSelectorNode(CSSSimpleSelectorNode... simpleSelectors)
 	{
-		super(CSSNodeTypes.SELECTOR, start, end);
-		setParent(parent);
-		setChildren(simpleSelectors);
+		super(CSSNodeTypes.SELECTOR);
+
+		this.setChildren(simpleSelectors);
 	}
 
 	/*
@@ -45,6 +46,16 @@ public class CSSSelectorNode extends CSSNode
 	}
 
 	/**
+	 * getCombinator
+	 * 
+	 * @return
+	 */
+	public String getCombinator()
+	{
+		return StringUtil.getStringValue(fCombinator);
+	}
+
+	/**
 	 * getRule
 	 * 
 	 * @return
@@ -52,5 +63,15 @@ public class CSSSelectorNode extends CSSNode
 	public CSSRuleNode getRule()
 	{
 		return (CSSRuleNode) getParent();
+	}
+
+	/**
+	 * setCombinator
+	 * 
+	 * @param combinator
+	 */
+	public void setCombinator(String combinator)
+	{
+		fCombinator = combinator;
 	}
 }

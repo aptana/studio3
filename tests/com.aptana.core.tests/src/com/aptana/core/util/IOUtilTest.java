@@ -69,13 +69,20 @@ public class IOUtilTest extends TestCase
 	{
 		String multilineString = "line one\r\nline two\r\nline three";
 		InputStream stream = new ByteArrayInputStream(multilineString.getBytes("UTF-8"));
-		assertEquals("line one\nline two\nline three", IOUtil.read(stream, "UTF-8"));
+		assertEquals("line one\r\nline two\r\nline three", IOUtil.read(stream, "UTF-8"));
 	}
 	
 	public void testReadWithMultipleLinesWithSlashR() throws Exception
 	{
 		String multilineString = "line one\rline two\rline three";
 		InputStream stream = new ByteArrayInputStream(multilineString.getBytes("UTF-8"));
-		assertEquals("line one\nline two\nline three", IOUtil.read(stream, "UTF-8"));
+		assertEquals("line one\rline two\rline three", IOUtil.read(stream, "UTF-8"));
+	}
+	
+	public void testReadWithEndingnewline() throws Exception
+	{
+		String multilineString = "line one\r\nline two\r\nline three\r\n";
+		InputStream stream = new ByteArrayInputStream(multilineString.getBytes("UTF-8"));
+		assertEquals("line one\r\nline two\r\nline three\r\n", IOUtil.read(stream, "UTF-8"));
 	}
 }

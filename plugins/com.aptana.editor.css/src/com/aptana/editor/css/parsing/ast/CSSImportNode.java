@@ -19,27 +19,13 @@ public class CSSImportNode extends CSSNode
 	 * 
 	 * @param uri
 	 * @param mediaList
-	 * @param start
-	 * @param end
 	 */
-	public CSSImportNode(String uri, CSSTextNode[] mediaList, int start, int end)
+	public CSSImportNode(String uri, CSSTextNode... mediaList)
 	{
-		super(CSSNodeTypes.IMPORT, start, end);
+		super(CSSNodeTypes.IMPORT);
 
 		fUriStr = uri;
 		fMediaList = mediaList;
-	}
-
-	/**
-	 * CSSImportNode
-	 * 
-	 * @param uri
-	 * @param start
-	 * @param end
-	 */
-	public CSSImportNode(String uri, int start, int end)
-	{
-		this(uri, new CSSTextNode[0], start, end);
 	}
 
 	/*

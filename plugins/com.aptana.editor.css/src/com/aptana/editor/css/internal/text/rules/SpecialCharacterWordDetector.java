@@ -19,11 +19,11 @@ public class SpecialCharacterWordDetector implements IWordDetector
 
 	public boolean isWordPart(char c)
 	{
-		return !Character.isLetterOrDigit(c);
+		return !Character.isWhitespace(c) && !Character.isLetterOrDigit(c);
 	}
 
 	public boolean isWordStart(char c)
 	{
-		return !Character.isLetterOrDigit(c);
+		return isWordPart(c);
 	}
 }

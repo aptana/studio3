@@ -1004,8 +1004,8 @@ public class GitRepository
 	{
 		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
 		// TODO Store the config contents and only read it again when last mod changes?
-		File configFile = gitFile("config");
-		String contents = "";
+		File configFile = gitFile("config"); //$NON-NLS-1$
+		String contents = ""; //$NON-NLS-1$
 		try
 		{
 			contents = IOUtil.read(new FileInputStream(configFile));
@@ -1015,7 +1015,7 @@ public class GitRepository
 			GitPlugin.logError(e);
 		}
 
-		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName);
+		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
 		if (index == -1)
 		{
 			return null;
@@ -1032,16 +1032,16 @@ public class GitRepository
 		}
 		String branchDetails = contents.substring(precedingBracket, trailingBracket);
 		String remoteBranchName = null;
-		String remoteName = "origin";
-		String[] lines = branchDetails.split("\\r?\\n|\\r");
+		String remoteName = "origin"; //$NON-NLS-1$
+		String[] lines = branchDetails.split("\\r?\\n|\\r"); //$NON-NLS-1$
 		for (String line : lines)
 		{
 			line = line.trim();
-			if (line.startsWith("remote = "))
+			if (line.startsWith("remote = ")) //$NON-NLS-1$
 			{
 				remoteName = line.substring(9);
 			}
-			else if (line.startsWith("[branch \""))
+			else if (line.startsWith("[branch \"")) //$NON-NLS-1$
 			{
 				remoteBranchName = line.substring(9, line.length() - 2);
 			}

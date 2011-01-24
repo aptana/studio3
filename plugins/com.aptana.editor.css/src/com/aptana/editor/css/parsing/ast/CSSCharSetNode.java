@@ -19,9 +19,9 @@ public class CSSCharSetNode extends CSSNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSCharSetNode(String encoding, int start, int end)
+	public CSSCharSetNode(String encoding)
 	{
-		super(CSSNodeTypes.CHAR_SET, start, end);
+		super(CSSNodeTypes.CHAR_SET);
 		
 		fEncoding = encoding;
 	}

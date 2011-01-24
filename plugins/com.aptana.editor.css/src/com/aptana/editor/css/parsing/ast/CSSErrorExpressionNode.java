@@ -15,9 +15,9 @@ public class CSSErrorExpressionNode extends CSSExpressionNode
 	 * @param start
 	 * @param end
 	 */
-	public CSSErrorExpressionNode(int start, int end)
+	public CSSErrorExpressionNode()
 	{
-		super(start, end);
+		super(CSSNodeTypes.EXPRESSION);
 	}
 
 	/*

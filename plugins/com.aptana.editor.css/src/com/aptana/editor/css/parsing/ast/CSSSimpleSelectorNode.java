@@ -10,8 +10,6 @@ package com.aptana.editor.css.parsing.ast;
 import java.util.Arrays;
 import java.util.List;
 
-import beaver.Symbol;
-
 import com.aptana.parsing.ast.IParseNode;
 
 public class CSSSimpleSelectorNode extends CSSNode
@@ -33,7 +31,7 @@ public class CSSSimpleSelectorNode extends CSSNode
 	 * 
 	 * @param typeSelector
 	 */
-	public CSSSimpleSelectorNode(Symbol typeSelector)
+	public CSSSimpleSelectorNode(String typeSelector)
 	{
 		this(typeSelector, new CSSAttributeSelectorNode[0]);
 	}
@@ -44,24 +42,13 @@ public class CSSSimpleSelectorNode extends CSSNode
 	 * @param typeSelector
 	 * @param attributeSelectors
 	 */
-	public CSSSimpleSelectorNode(Symbol typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
+	public CSSSimpleSelectorNode(String typeSelector, CSSAttributeSelectorNode[] attributeSelectors)
 	{
 		super(CSSNodeTypes.SIMPLE_SELECTOR);
 
-		fTypeSelector = (typeSelector == null) ? null : typeSelector.value.toString();
-		setChildren(attributeSelectors);
+		fTypeSelector = typeSelector;
 
-		if (typeSelector == null)
-		{
-			if (attributeSelectors.length > 0)
-			{
-				this.setLocation(attributeSelectors[0].getStart(), attributeSelectors[attributeSelectors.length - 1].getEnd());
-			}
-		}
-		else
-		{
-			this.setLocation(typeSelector.getStart(), (attributeSelectors.length == 0) ? typeSelector.getEnd() : attributeSelectors[attributeSelectors.length - 1].getEnd());
-		}
+		this.setChildren(attributeSelectors);
 	}
 
 	/*

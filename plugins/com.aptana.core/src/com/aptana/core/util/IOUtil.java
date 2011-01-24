@@ -58,20 +58,22 @@ public abstract class IOUtil
 		{
 			InputStreamReader inReader;
 			if (charset != null)
-				inReader = new InputStreamReader(stream, charset);
-			else
-				inReader = new InputStreamReader(stream);
-			BufferedReader reader = new BufferedReader(inReader);
-			StringBuilder template = new StringBuilder();
-			String line = null;
-			while ((line = reader.readLine()) != null)
 			{
-				template.append(line);
-				template.append("\n"); //$NON-NLS-1$
+				inReader = new InputStreamReader(stream, charset);
 			}
-			if (template.length() > 0)
-				template.deleteCharAt(template.length() - 1); // delete last extraneous newline
-			return template.toString();
+			else
+			{
+				inReader = new InputStreamReader(stream);
+			}
+			BufferedReader reader = new BufferedReader(inReader);
+			StringBuilder output = new StringBuilder();
+			char[] buffer = new char[1024 * 4];
+			int read = 0;
+			while ((read = reader.read(buffer)) != -1)
+			{
+				output.append(buffer, 0, read);
+			}
+			return output.toString();
 		}
 		catch (IOException e)
 		{
