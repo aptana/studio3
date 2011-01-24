@@ -115,7 +115,8 @@ public class DownloadAction extends BaseSyncAction
 				}
 				catch (Exception e)
 				{
-					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
+					SyncingUIPlugin.logError(Messages.DownloadAction_ERR_FailToDownload, e);
+					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.DownloadAction_ERR_FailToDownload, e);
 				}
 
 				return Status.OK_STATUS;

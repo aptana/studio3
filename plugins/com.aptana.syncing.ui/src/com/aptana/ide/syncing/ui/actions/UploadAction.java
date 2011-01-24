@@ -107,7 +107,8 @@ public class UploadAction extends BaseSyncAction
 				}
 				catch (Exception e)
 				{
-					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, e.getLocalizedMessage(), e);
+					SyncingUIPlugin.logError(Messages.UploadAction_ERR_FailToUpload, e);
+					return new Status(Status.ERROR, SyncingUIPlugin.PLUGIN_ID, Messages.UploadAction_ERR_FailToUpload, e);
 				}
 
 				return Status.OK_STATUS;
