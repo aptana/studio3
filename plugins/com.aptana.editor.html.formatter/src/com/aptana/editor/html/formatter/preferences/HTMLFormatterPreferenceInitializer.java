@@ -34,7 +34,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences store = new DefaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
-		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);

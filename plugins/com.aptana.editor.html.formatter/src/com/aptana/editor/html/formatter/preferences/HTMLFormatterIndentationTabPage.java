@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.formatter.HTMLFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -38,11 +39,12 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 {
 	private static final String INDENTATION_PREVIEW_FILE = "indentation-preview.html"; //$NON-NLS-1$
 	private final String[] tabOptionItems = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
-			CodeFormatterConstants.MIXED };
+			CodeFormatterConstants.MIXED, CodeFormatterConstants.EDITOR };
 	private final String[] tabOptionNames = new String[] {
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB,
-			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_MIXED };
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_MIXED,
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_EDITOR };
 
 	/**
 	 * Constructs a new HTMLFormatterIndentationTabPage
@@ -86,7 +88,7 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 				}
 			}
 		});
-		new TabOptionHandler(manager, tabOptions, indentationSize);
+		new TabOptionHandler(manager, tabOptions, indentationSize, tabSize);
 
 		group = SWTFactory.createGroup(parent, Messages.HTMLFormatterTabPage_exclusionsGroupLabel, 1, 1,
 				GridData.FILL_BOTH);
@@ -104,17 +106,21 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 		private IFormatterControlManager manager;
 		private Combo tabOptions;
 		private Text indentationSize;
+		private final Text tabSize;
 
 		/**
 		 * Constructor.
 		 * 
 		 * @param controlManager
+		 * @param tabSize
 		 */
-		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize)
+		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize,
+				Text tabSize)
 		{
 			this.manager = controlManager;
 			this.tabOptions = tabOptions;
 			this.indentationSize = indentationSize;
+			this.tabSize = tabSize;
 			tabOptions.addSelectionListener(this);
 			manager.addInitializeListener(this);
 		}
@@ -129,7 +135,13 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 			if (index >= 0)
 			{
 				final boolean tabMode = CodeFormatterConstants.TAB.equals(tabOptionItems[index]);
-				manager.enableControl(indentationSize, !tabMode);
+				final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(tabOptionItems[index]);
+				manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+				manager.enableControl(tabSize, !editorSettingsMode);
+				if (editorSettingsMode)
+				{
+					setEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				}
 			}
 		}
 
@@ -137,7 +149,14 @@ public class HTMLFormatterIndentationTabPage extends FormatterModifyTabPage
 		{
 			final boolean tabMode = CodeFormatterConstants.TAB.equals(manager
 					.getString(HTMLFormatterConstants.FORMATTER_TAB_CHAR));
-			manager.enableControl(indentationSize, !tabMode);
+			final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(manager
+					.getString(HTMLFormatterConstants.FORMATTER_TAB_CHAR));
+			manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+			manager.enableControl(tabSize, !editorSettingsMode);
+			if (editorSettingsMode)
+			{
+				setEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+			}
 		}
 	}
 

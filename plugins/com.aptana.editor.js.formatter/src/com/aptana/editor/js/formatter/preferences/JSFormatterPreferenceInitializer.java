@@ -34,7 +34,7 @@ public class JSFormatterPreferenceInitializer extends AbstractPreferenceInitiali
 	{
 		IEclipsePreferences store = new DefaultScope().getNode(JSFormatterPlugin.PLUGIN_ID);
 
-		store.put(JSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.put(JSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(JSFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(JSFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(JSFormatterConstants.WRAP_COMMENTS, false);
