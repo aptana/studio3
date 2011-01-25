@@ -66,5 +66,4 @@ public interface IContributedExtension
 	 * Returns the contribution priority
 	 */
 	int getPriority();
-
 }
