@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 
 import com.aptana.formatter.epl.FormatterPlugin;
 
@@ -44,6 +45,7 @@ public abstract class ContributionExtensionManager
 
 	private static final String SELECTOR_TAG = "selector"; //$NON-NLS-1$
 	private static final String CLASS_TAG = "class"; //$NON-NLS-1$
+	private static final String REQUIRED_ACTIVE_BUNDLE = "requiredActiveBundle"; //$NON-NLS-1$
 
 	private IContributionSelector defaultSelector;
 
@@ -64,24 +66,25 @@ public abstract class ContributionExtensionManager
 		return contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
 
-	public IContributedExtension[] getAllContributions()
+	public IContributedExtension[] getAllContributions(boolean forceBundleLoading)
 	{
 
 		Collection<List<IConfigurationElement>> values = contentTypeToContribMap.values();
 		List<IContributedExtension> contributions = new ArrayList<IContributedExtension>();
 		for (List<IConfigurationElement> contribution : values)
 		{
-			contributions.addAll(createContributors(contribution));
+			contributions.addAll(createContributors(contribution, forceBundleLoading));
 		}
 		return contributions.toArray(new IContributedExtension[contributions.size()]);
 	}
 
-	private List<IContributedExtension> createContributors(List<IConfigurationElement> contributions)
+	private List<IContributedExtension> createContributors(List<IConfigurationElement> contributions,
+			boolean forceBundleLoading)
 	{
 		List<IContributedExtension> list = new ArrayList<IContributedExtension>();
 		for (IConfigurationElement element : contributions)
 		{
-			IContributedExtension contrib = createContributor(element);
+			IContributedExtension contrib = createContributor(element, forceBundleLoading);
 			if (contrib != null)
 			{
 				list.add(contrib);
@@ -90,18 +93,22 @@ public abstract class ContributionExtensionManager
 		return list;
 	}
 
-	private IContributedExtension createContributor(IConfigurationElement element)
+	private IContributedExtension createContributor(IConfigurationElement element, boolean forceBundleLoading)
 	{
 		try
 		{
-			IContributedExtension object = (IContributedExtension) element.createExecutableExtension(CLASS_TAG);
-			if (isValidContribution(object))
+			String requiredBundle = element.getAttribute(REQUIRED_ACTIVE_BUNDLE);
+			if (forceBundleLoading || requiredBundle == null || isLoadedBundle(requiredBundle))
 			{
-				/*
-				 * handle the case where the contribution is not the object that was just created.
-				 */
-				IContributedExtension contrib = (IContributedExtension) configureContribution(object, element);
-				return contrib;
+				IContributedExtension object = (IContributedExtension) element.createExecutableExtension(CLASS_TAG);
+				if (isValidContribution(object))
+				{
+					/*
+					 * handle the case where the contribution is not the object that was just created.
+					 */
+					IContributedExtension contrib = (IContributedExtension) configureContribution(object, element);
+					return contrib;
+				}
 			}
 		}
 		catch (CoreException e)
@@ -109,6 +116,14 @@ public abstract class ContributionExtensionManager
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Returns true if the given configuration element is in a bundle that was already loaded.
+	 */
+	public static boolean isLoadedBundle(String bundle)
+	{
+		return Platform.getBundle(bundle).getState() == Bundle.ACTIVE;
 	}
 
 	public IContributedExtension getSelectedContribution(String contentType)
@@ -155,7 +170,7 @@ public abstract class ContributionExtensionManager
 			return Collections.emptyList();
 		}
 
-		return createContributors(contentTypeToContribMap.get(contentType));
+		return createContributors(contentTypeToContribMap.get(contentType), false);
 	}
 
 	protected final IContributionSelector getSelector(String natureId)
@@ -229,7 +244,7 @@ public abstract class ContributionExtensionManager
 				IConfigurationElement contrib = iter.next();
 				if (contrib.getAttribute(IContributedExtension.ID).equals(id))
 				{
-					return createContributor(contrib);
+					return createContributor(contrib, false);
 				}
 			}
 		}

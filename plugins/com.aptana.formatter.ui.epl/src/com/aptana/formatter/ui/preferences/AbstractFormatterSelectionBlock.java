@@ -124,7 +124,7 @@ public abstract class AbstractFormatterSelectionBlock extends AbstractOptionsBlo
 	public AbstractFormatterSelectionBlock(IStatusChangeListener context, IProject project,
 			IWorkbenchPreferenceContainer container)
 	{
-		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST), container);
+		super(context, project, ProfileManager.collectPreferenceKeys(TEMP_LIST, true), container);
 		Collections.sort(TEMP_LIST, new Comparator<IScriptFormatterFactory>()
 		{
 			public int compare(IScriptFormatterFactory s1, IScriptFormatterFactory s2)

@@ -10,7 +10,8 @@
                description="%editor.css.formatter.description"
                id="com.aptana.editor.css.formatterFactory"
                name="%editor.css.formatter.name"
-               priority="10">
+               priority="10"
+               requiredActiveBundle="com.aptana.editor.css">
          </formatterFactory>
       </engineContribution>
    </extension>
