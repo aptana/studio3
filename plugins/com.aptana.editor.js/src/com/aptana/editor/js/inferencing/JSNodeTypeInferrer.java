@@ -104,7 +104,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					{
 						for (Type parameterType : param.getTypes())
 						{
-							this.addType(parameterType.getName());
+							String type = parameterType.getName();
+
+							// TODO: Temporary hack for jQuery CA until we resolve
+							// handling of function properties and derived types
+							if ("jQuery".equals(type))
+							{
+								type = "Function<jQuery>:jQuery";
+							}
+
+							this.addType(type);
 							foundType = true;
 						}
 					}
@@ -518,7 +527,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				{
 					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
 				}
-				
+
 				// lookup up rhs name in type and add that value's type here
 				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 

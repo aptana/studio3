@@ -14,6 +14,7 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.syncing.core.internal.messages"; //$NON-NLS-1$
 
 	public static String SyncUtils_Copying;
+	public static String SyncUtils_ERR_FailToClose;
 	public static String SyncUtils_ERR_Reading;
 	public static String SyncUtils_ERR_Writing;
 

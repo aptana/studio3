@@ -147,6 +147,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		switch (lexeme.getType())
 		{
 			case COLOR:
+			case RGB:
 			{
 				result = parseHexRGB(CSSColors.to6CharHexWithLeadingHash(lexeme.getText()));
 				break;
@@ -315,27 +316,43 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 	 */
 	private RGB parseHexRGB(String token)
 	{
+		RGB result;
+
 		if (token == null)
 		{
-			return new RGB(0, 0, 0);
+			result = new RGB(0, 0, 0);
 		}
+		else if (token.length() == 4)
+		{
+			String s = token.substring(1, 2);
+			int r = Integer.parseInt(s + s, 16);
+			s = token.substring(2, 3);
+			int g = Integer.parseInt(s + s, 16);
+			s = token.substring(3, 4);
+			int b = Integer.parseInt(s + s, 16);
 
-		if (token.length() != 7 && token.length() != 9)
+			result = new RGB(r, g, b);
+		}
+		else if (token.length() == 7 || token.length() == 9)
+		{
+			String s = token.substring(1, 3);
+			int r = Integer.parseInt(s, 16);
+			s = token.substring(3, 5);
+			int g = Integer.parseInt(s, 16);
+			s = token.substring(5, 7);
+			int b = Integer.parseInt(s, 16);
+
+			result = new RGB(r, g, b);
+		}
+		else
 		{
 			String message = MessageFormat.format(Messages.CSSTextHover_Invalid_RGB_Hex_Value, token);
-			
+
 			ThemePlugin.logError(message, null);
 
-			return new RGB(0, 0, 0);
+			result = new RGB(0, 0, 0);
 		}
 
-		String s = token.substring(1, 3);
-		int r = Integer.parseInt(s, 16);
-		s = token.substring(3, 5);
-		int g = Integer.parseInt(s, 16);
-		s = token.substring(5, 7);
-		int b = Integer.parseInt(s, 16);
-
-		return new RGB(r, g, b);
+		return result;
 	}
 }

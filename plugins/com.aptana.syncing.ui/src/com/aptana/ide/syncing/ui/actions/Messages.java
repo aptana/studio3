@@ -17,7 +17,8 @@ public class Messages extends NLS {
 	public static String BaseSyncAction_RetrievingItems;
     public static String BaseSyncAction_Warning_NoCommonParent;
 
-    public static String DownloadAction_MessageTitle;
+    public static String DownloadAction_ERR_FailToDownload;
+	public static String DownloadAction_MessageTitle;
     public static String DownloadAction_PostMessage;
 
     public static String NewSiteAction_LBL_New;
@@ -26,7 +27,8 @@ public class Messages extends NLS {
 	public static String SynchronizeFilesAction_ERR_OpeningSyncDialog;
 	public static String SynchronizeProjectAction_ERR_OpeningSyncDialog;
 
-    public static String UploadAction_MessageTitle;
+    public static String UploadAction_ERR_FailToUpload;
+	public static String UploadAction_MessageTitle;
     public static String UploadAction_PostMessage;
 
     static {

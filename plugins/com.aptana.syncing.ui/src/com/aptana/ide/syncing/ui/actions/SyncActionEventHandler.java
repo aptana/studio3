@@ -83,8 +83,9 @@ class SyncActionEventHandler extends SyncEventHandlerAdapterWithProgressMonitor
 
 			public void run()
 			{
-				MessageDialog md = new MessageDialog(UIUtils.getActiveShell(), CoreStrings.ERROR, null, message,
-						MessageDialog.WARNING, new String[] { CoreStrings.CONTINUE, CoreStrings.CANCEL }, 1);
+				MessageDialog md = new MessageDialog(UIUtils.getActiveShell(), CoreStrings.ERROR + " " + fTaskTitle, //$NON-NLS-1$
+						null, message, MessageDialog.WARNING,
+						new String[] { CoreStrings.CONTINUE, CoreStrings.CANCEL }, 1);
 				fContinue = (md.open() == 0);
 			}
 		});

@@ -209,7 +209,7 @@ public class ProfileManager implements IProfileManager
 	{
 		if (preferenceKeys == null)
 		{
-			preferenceKeys = collectPreferenceKeys(new ArrayList<IScriptFormatterFactory>());
+			preferenceKeys = collectPreferenceKeys(new ArrayList<IScriptFormatterFactory>(), false);
 		}
 		return preferenceKeys;
 	}
@@ -219,10 +219,19 @@ public class ProfileManager implements IProfileManager
 		return new ProfileStore(getProfileVersioner(), loadDefaultSettings());
 	}
 
-	public static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories)
+	/**
+	 * Collects the formatter preferences keys. In case the forceBundleLoading is true, a bundle loading may occur while
+	 * collecting the keys.
+	 * 
+	 * @param factories
+	 * @param forceBundleLoading
+	 * @return The preferences keys
+	 */
+	public static PreferenceKey[] collectPreferenceKeys(List<IScriptFormatterFactory> factories,
+			boolean forceBundleLoading)
 	{
 		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
-		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions();
+		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions(forceBundleLoading);
 		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
 		for (IContributedExtension extension : extensions)
 		{
