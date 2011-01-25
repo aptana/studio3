@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.syncing.ui.views;
 
 import java.text.MessageFormat;
@@ -338,7 +311,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 	private Composite createSitePresentation(Composite parent)
 	{
 		final Composite main = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(5, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.horizontalSpacing = 0;
@@ -361,9 +334,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 				focusedConnection = fSource;
 			}
 		});
-
-		final Sash leftSash = new Sash(main, SWT.VERTICAL);
-		leftSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
 		// transfer arrows
 		final Composite directions = new Composite(main, SWT.NONE);
@@ -390,9 +360,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		fTransferSyncButton.setLayoutData(new GridData(SWT.CENTER, SWT.BEGINNING, true, true));
 		fTransferSyncButton.addSelectionListener(this);
 
-		final Sash rightSash = new Sash(main, SWT.VERTICAL);
-		rightSash.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
-
 		// destination end point
 		fTarget = new ConnectionPointComposite(main, Messages.FTPManagerComposite_LBL_Target, this);
 		fTarget.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -408,62 +375,6 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 			public void focusGained(FocusEvent e)
 			{
 				focusedConnection = fTarget;
-			}
-		});
-		
-		leftSash.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent event)
-			{
-				if (event.detail != SWT.DRAG)
-				{
-					layout();
-				}
-			}
-
-			private void layout()
-			{
-				Rectangle overallBounds = main.getBounds();
-				Rectangle leftSashBounds = leftSash.getBounds();
-				Rectangle middleBounds = directions.getBounds();
-				Rectangle rightSashBounds = rightSash.getBounds();
-
-				fSource.getControl().setBounds(0, 0, leftSashBounds.x, overallBounds.height);
-				int x = leftSashBounds.x + leftSashBounds.width;
-				directions.setBounds(x, 0, middleBounds.width, overallBounds.height);
-				x += middleBounds.width;
-				rightSash.setBounds(x, 0, rightSashBounds.width, overallBounds.height);
-				x += rightSashBounds.width;
-				fTarget.getControl().setBounds(x, 0, overallBounds.width - x, overallBounds.height);
-			}
-		});
-
-		rightSash.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent event)
-			{
-				if (event.detail != SWT.DRAG)
-				{
-					layout();
-				}
-			}
-
-			private void layout()
-			{
-				Rectangle overallBounds = main.getBounds();
-				Rectangle leftSashBounds = leftSash.getBounds();
-				Rectangle middleBounds = directions.getBounds();
-				Rectangle rightSashBounds = rightSash.getBounds();
-
-				int x = rightSashBounds.x + rightSashBounds.width;
-				fTarget.getControl().setBounds(x, 0, overallBounds.width - x, overallBounds.height);
-				x = rightSashBounds.x - middleBounds.width;
-				directions.setBounds(x, 0, middleBounds.width, overallBounds.height);
-				x -= leftSashBounds.width;
-				leftSash.setBounds(x, 0, leftSashBounds.width, overallBounds.height);
-				fSource.getControl().setBounds(0, 0, x, overallBounds.height);
 			}
 		});
 

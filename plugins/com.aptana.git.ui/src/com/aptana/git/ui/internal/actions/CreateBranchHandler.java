@@ -2,6 +2,7 @@ package com.aptana.git.ui.internal.actions;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.window.Window;
 
 import com.aptana.git.core.model.GitRepository;
@@ -33,7 +34,7 @@ public class CreateBranchHandler extends AbstractGitHandler
 			if (theRepo.createBranch(branchName, track, startPoint))
 			{
 				// Do we want to always switch to the newly created branch?
-				theRepo.switchBranch(branchName);
+				theRepo.switchBranch(branchName, new NullProgressMonitor());
 			}
 		}
 		return null;

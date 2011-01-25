@@ -1,12 +1,10 @@
 /**
- * Copyright (c) 2005-2010 Aptana, Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
- * this entire header must remain intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ui.epl;
 
 import org.eclipse.core.runtime.IStatus;
@@ -64,6 +62,22 @@ public class UIEplPlugin extends AbstractUIPlugin
 	public static UIEplPlugin getDefault()
 	{
 		return plugin;
+	}
+
+	public static void log(Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, e.getLocalizedMessage(), e));
+	}
+
+	public static void log(String msg) {
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
+	}
+
+	public static void log(String msg, Throwable e) {
+		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, e));
+	}
+
+	public static void log(IStatus status) {
+		getDefault().getLog().log(status);
 	}
 
 	public static void logError(String msg, Throwable e)

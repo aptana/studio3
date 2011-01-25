@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.contentassist.index;
 
 import java.io.IOException;
@@ -41,70 +14,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON;
-
-import com.aptana.editor.css.contentassist.model.BaseElement;
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.contentassist.model.PseudoClassElement;
 import com.aptana.editor.css.contentassist.model.PseudoElementElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class CSSIndexReader
+public class CSSIndexReader extends IndexReader
 {
 	/**
-	 * CSSIndexReader
-	 */
-	public CSSIndexReader()
-	{
-	}
-
-	/**
-	 * createElementFromKey
+	 * createElement
 	 * 
-	 * @param index
-	 * @param key
+	 * @param element
 	 * @return
-	 * @throws IOException
 	 */
-	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
+	private ElementElement createElement(QueryResult element)
 	{
-		return this.populateElement(index, element, new ElementElement(), 1);
+		return this.populateElement(new ElementElement(), element, 1);
 	}
 
 	/**
-	 * createPropertyFromKey
+	 * createProperty
 	 * 
-	 * @param index
-	 * @param key
+	 * @param property
 	 * @return
-	 * @throws IOException
 	 */
-	private PropertyElement createPropertyFromKey(Index index, QueryResult property) throws IOException
+	private PropertyElement createProperty(QueryResult property)
 	{
-		return this.populateElement(index, property, new PropertyElement(), 1);
+		return this.populateElement(new PropertyElement(), property, 1);
 	}
 
 	/**
-	 * @param index
+	 * createPseudoClass
+	 * 
 	 * @param pseudoClass
 	 * @return
 	 */
-	private PseudoClassElement createPseudoClassFromKey(Index index, QueryResult pseudoClass)
+	private PseudoClassElement createPseudoClass(QueryResult pseudoClass)
 	{
-		return this.populateElement(index, pseudoClass, new PseudoClassElement());
+		return this.populateElement(new PseudoClassElement(), pseudoClass);
 	}
 
 	/**
-	 * @param index
 	 * @param pseudoElement
 	 * @return
 	 */
-	private PseudoElementElement createPseudoElementFromKey(Index index, QueryResult pseudoElement)
+	private PseudoElementElement createPseudoElement(QueryResult pseudoElement)
 	{
-		return this.populateElement(index, pseudoElement, new PseudoElementElement());
+		return this.populateElement(new PseudoElementElement(), pseudoElement);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getDelimiter()
+	 */
+	@Override
+	protected String getDelimiter()
+	{
+		return CSSIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -130,7 +101,34 @@ public class CSSIndexReader
 			{
 				for (QueryResult element : items)
 				{
-					result.add(this.createElementFromKey(index, element));
+					result.add(this.createElement(element));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	public List<ElementElement> getElements(Index index, String... names) throws IOException
+	{
+		List<ElementElement> result = new ArrayList<ElementElement>();
+
+		if (index != null && names != null)
+		{
+			for (String name : names)
+			{
+				List<QueryResult> elements = index.query( //
+					new String[] { CSSIndexConstants.ELEMENT }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
+
+				if (elements != null)
+				{
+					for (QueryResult element : elements)
+					{
+						result.add(this.createElement(element));
+					}
 				}
 			}
 		}
@@ -161,7 +159,7 @@ public class CSSIndexReader
 			{
 				for (QueryResult property : properties)
 				{
-					result.add(this.createPropertyFromKey(index, property));
+					result.add(this.createProperty(property));
 				}
 			}
 		}
@@ -181,7 +179,7 @@ public class CSSIndexReader
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		if (index != null)
+		if (index != null && names != null)
 		{
 			for (String name : names)
 			{
@@ -195,7 +193,7 @@ public class CSSIndexReader
 				{
 					for (QueryResult property : properties)
 					{
-						result.add(this.createPropertyFromKey(index, property));
+						result.add(this.createProperty(property));
 					}
 				}
 			}
@@ -227,7 +225,7 @@ public class CSSIndexReader
 			{
 				for (QueryResult pseudoClass : pseudoClasses)
 				{
-					result.add(this.createPseudoClassFromKey(index, pseudoClass));
+					result.add(this.createPseudoClass(pseudoClass));
 				}
 			}
 		}
@@ -258,12 +256,22 @@ public class CSSIndexReader
 			{
 				for (QueryResult pseudoElement : pseudoElements)
 				{
-					result.add(this.createPseudoElementFromKey(index, pseudoElement));
+					result.add(this.createPseudoElement(pseudoElement));
 				}
 			}
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getSubDelimiter()
+	 */
+	@Override
+	protected String getSubDelimiter()
+	{
+		return CSSIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -275,7 +283,7 @@ public class CSSIndexReader
 	{
 		Map<String, String> result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(category) == false)
 		{
 			String pattern = "*"; //$NON-NLS-1$
 
@@ -303,63 +311,5 @@ public class CSSIndexReader
 		}
 
 		return result;
-	}
-
-	/**
-	 * populateElement
-	 * 
-	 * @param <T>
-	 * @param index
-	 * @param item
-	 * @param element
-	 * @return
-	 */
-	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element)
-	{
-		return this.populateElement(element, item.getWord());
-	}
-	
-	/**
-	 * populateElement
-	 * 
-	 * @param <T>
-	 * @param index
-	 * @param item
-	 * @param element
-	 * @param columnIndex
-	 * @return
-	 */
-	private <T extends BaseElement> T populateElement(Index index, QueryResult item, T element, int columnIndex)
-	{
-		String key = item.getWord();
-		String[] columns = key.split(CSSIndexConstants.DELIMITER);
-
-		return this.populateElement(element, columns[columnIndex]);
-	}
-
-	/**
-	 * populateElement
-	 * 
-	 * @param <T>
-	 * @param element
-	 * @param value
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	private <T extends BaseElement> T populateElement(T element, String value)
-	{
-		Object m = JSON.parse(value);
-
-		if (m instanceof Map)
-		{
-			element.fromJSON((Map) m);
-		}
-
-		for (String document : element.getDocuments())
-		{
-			element.addDocument(document);
-		}
-		
-		return element;
 	}
 }

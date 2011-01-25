@@ -1,0 +1,17 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// maven pom organized by organization.
+// ------------------------------------------------------------------
+
+HttpCore OSGi bundle
+
+
+From: 'Apache Software Foundation' (http://www.apache.org/)
+  - HttpCore (http://hc.apache.org/httpcomponents-core/) org.apache.httpcomponents:httpcore:jar:4.0.1
+    License: Apache License  (http://www.apache.org/licenses/LICENSE-2.0.html)
+  - HttpCore NIO (http://hc.apache.org/httpcomponents-core/) org.apache.httpcomponents:httpcore-nio:jar:4.0.1
+    License: Apache License  (http://www.apache.org/licenses/LICENSE-2.0.html)
+
+
+
+

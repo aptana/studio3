@@ -21,7 +21,7 @@ class Gem::Commands::QueryCommand < Gem::Command
       options[:installed] = value
     end
 
-    add_version_option
+    add_version_option command, "for use with --installed"
 
     add_option('-n', '--name-matches REGEXP',
                'Name of gem(s) to query on matches the',
@@ -161,19 +161,19 @@ class Gem::Commands::QueryCommand < Gem::Command
     end
 
     versions.each do |gem_name, matching_tuples|
-      matching_tuples = matching_tuples.sort_by do |(name, version,_),_|
+      matching_tuples = matching_tuples.sort_by do |(_, version,_),_|
         version
       end.reverse
 
       platforms = Hash.new { |h,version| h[version] = [] }
 
-      matching_tuples.map do |(name, version, platform,_),_|
+      matching_tuples.map do |(_, version, platform,_),_|
         platforms[version] << platform if platform
       end
 
       seen = {}
 
-      matching_tuples.delete_if do |(name, version,_),_|
+      matching_tuples.delete_if do |(_, version,_),_|
         if seen[version] then
           true
         else
@@ -185,8 +185,21 @@ class Gem::Commands::QueryCommand < Gem::Command
       entry = gem_name.dup
 
       if options[:versions] then
-        versions = matching_tuples.map { |(name, version,_),_| version }.uniq
-        entry << " (#{versions.join ', '})"
+        list = if platforms.empty? or options[:details] then
+                 matching_tuples.map { |(_, version,_),_| version }.uniq
+               else
+                 platforms.sort.reverse.map do |version, pls|
+                   if pls == [Gem::Platform::RUBY] then
+                     version
+                   else
+                     ruby = pls.delete Gem::Platform::RUBY
+                     platform_list = [ruby, *pls.sort].compact
+                     "#{version} #{platform_list.join ' '}"
+                   end
+                 end
+               end.join ', '
+
+        entry << " (#{list})"
       end
 
       if options[:details] then

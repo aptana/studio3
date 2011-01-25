@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.peer;
 
 import junit.framework.TestCase;
@@ -169,7 +142,7 @@ public class PeerCharacterCloserTest extends TestCase
 
 			protected char[] getPairs(String scope)
 			{
-				return new char[] { '(', ')', '"', '"'};
+				return new char[] { '(', ')', '"', '"' };
 			}
 
 			@Override
@@ -222,7 +195,7 @@ public class PeerCharacterCloserTest extends TestCase
 			}
 		};
 		viewer.setDocument(document);
-		
+
 		viewer.setSelectedRange(5, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -273,17 +246,12 @@ public class PeerCharacterCloserTest extends TestCase
 		assertEquals("function x()\n" + "{\n" + "    if (false)\n" + "    {}\n" + "\n" + "    if (false)\n" + "    {\n"
 				+ "        // scroll sub-regions\n" + "    }\n" + "};", document.get());
 	}
-	
+
 	public void testStudio3_1213()
 	{
-		setDocument("bundle do |bundle|\n" +
-"  bundle.author = 'Ed Spencer'\n" +
-"  bundle.contact_email_rot_13 = 'null'\n" +
-"  bundle.description =  \"A bundle for ExtJS\"\n" +
-"\n" +
-"  bundle.menu \"ExtJS do |main_menu|\n" +
-"  end\n" +
-"end");
+		setDocument("bundle do |bundle|\n" + "  bundle.author = 'Ed Spencer'\n"
+				+ "  bundle.contact_email_rot_13 = 'null'\n" + "  bundle.description =  \"A bundle for ExtJS\"\n"
+				+ "\n" + "  bundle.menu \"ExtJS do |main_menu|\n" + "  end\n" + "end");
 		viewer.setSelectedRange(154, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
@@ -306,6 +274,59 @@ public class PeerCharacterCloserTest extends TestCase
 		VerifyEvent event = sendEvent('"');
 
 		assertTrue(event.doit); // Don't pair, insert single character!
+	}
+
+	public void testignoresRubyHashesForHTMLTagPairs()
+	{
+		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor and then sent a keypress to it...
+		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n ";
+		document = new Document(src)
+		{
+			public ITypedRegion[] computePartitioning(int offset, int length) throws BadLocationException
+			{
+				return new ITypedRegion[] { 
+						new TypedRegion(0, 3, "__common_start_switch_tag"),
+						new TypedRegion(3, 21, "__rb__dftl_partition_content_type"),
+						new TypedRegion(24, 8, "__rb_string_single"),
+						new TypedRegion(32, 12, "__rb__dftl_partition_content_type"),
+						new TypedRegion(44, 43, "__rb_string_single"),
+						new TypedRegion(87, 1, "__rb__dftl_partition_content_type"),
+						new TypedRegion(88, 2, "__common_end_switch_tag"),
+						new TypedRegion(90, 1, "__html__dftl_partition_content_type") };
+			}
+
+			public String getContentType(int offset) throws BadLocationException
+			{
+				return "__html__dftl_partition_content_type";
+			}
+		};
+		viewer.setDocument(document);
+		viewer.setSelectedRange(src.length() - 1, 0);
+		closer = new PeerCharacterCloser(viewer)
+		{
+
+			protected char[] getPairs(String scope)
+			{
+				return DEFAULT_PAIRS;
+			}
+
+			@Override
+			protected String getScopeAtOffset(IDocument document, int offset) throws BadLocationException
+			{
+				if ((offset >= 0 && offset <= 3) || (offset >= 89 && offset <= 90))
+					return "text.html.ruby source.erb.embedded.html";
+				if ((offset >= 4 && offset <= 24) || (offset >= 33 && offset <= 44) || (offset == 88))
+					return "text.html.ruby source.ruby.rails.embedded.html";
+				if ((offset >= 25 && offset <= 32) || (offset >= 45 && offset <= 87))
+					return "text.html.ruby source.ruby.rails.embedded.html string.quoted.single.ruby";
+				return "text.html.ruby";
+			}
+		};
+		VerifyEvent event = sendEvent('<');
+		// Make sure we pair this!
+		assertFalse("Should have paired the character!", event.doit);
+		assertEquals("<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n<> ",
+				document.get());
 	}
 
 	protected IDocument setDocument(String src)

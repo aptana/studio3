@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.peer;
 
 import java.util.HashMap;
@@ -90,20 +63,19 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private char[] pairs = NO_PAIRS;
+	private boolean autoInsertEnabled = true;
 
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
 
-	PeerCharacterCloser(ITextViewer textViewer)
+	public PeerCharacterCloser(ITextViewer textViewer)
 	{
 		this.textViewer = textViewer;
 	}
 
-	public static PeerCharacterCloser install(ITextViewer textViewer)
+	public void install()
 	{
-		PeerCharacterCloser pairMatcher = new PeerCharacterCloser(textViewer);
-		textViewer.getTextWidget().addVerifyKeyListener(pairMatcher);
-		return pairMatcher;
+		textViewer.getTextWidget().addVerifyKeyListener(this);
 	}
 
 	/**
@@ -268,7 +240,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
-		return yay == null ? NO_PAIRS: yay.getPairs();
+		return yay == null ? NO_PAIRS : yay.getPairs();
 	}
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
@@ -280,66 +252,100 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	{
 		try
 		{
-			// Now we need to do smarter checks, see if rest of doc contains unbalanced set!
-			String before = document.get(0, offset); // don't cheat and trim because we need offsets to match for
-														// comment scope matching
+			String partition = document.getContentType(offset);
+			int index = partition.indexOf('_', 2);
+			String prefix = partition.substring(0, index);
+
+			// Iterate through partitions sharing same prefix, which is a hacky way of doing "same language"
 			int stackLevel = 0;
-			for (int i = 0; i < before.length(); i++)
+			ITypedRegion[] partitions = document.computePartitioning(0, document.getLength());
+			for (ITypedRegion part : partitions)
 			{
+				if (!part.getType().startsWith(prefix))
+				{
+					continue;
+				}
 
-				char c = before.charAt(i);
-				if (c == openingChar && openingChar == closingCharacter)
+				int start = part.getOffset();
+				int end = start + part.getLength();
+				if (offset > start)
 				{
-					if (!ignoreScope(document, i))
+					int beforeEnd = end;
+					// read up until offset
+					if (offset < end)
 					{
-						stackLevel++;
-						stackLevel = stackLevel % 2;
+						beforeEnd = offset;
 					}
-				}
-				else if (c == openingChar)
-				{
-					if (!ignoreScope(document, i))
+					String before = document.get(start, beforeEnd - start);
+					if (before.trim().length() != 0) // skip whitespace only partitions for perf reasons
 					{
-						stackLevel++;
-					}
-				}
-				else if (c == closingCharacter)
-				{
-					if (!ignoreScope(document, i))
-					{
-						stackLevel--;
-					}
-				}
-			}
+						for (int i = 0; i < before.length(); i++)
+						{
 
-			String after = document.get(offset, document.getLength() - offset); // don't cheat and trim because we need
-																				// offsets to match for comment scope
-																				// matching
-			for (int i = 0; i < after.length(); i++)
-			{
-				char c = after.charAt(i);
-				if (c == openingChar && openingChar == closingCharacter)
-				{
-					if (!ignoreScope(document, offset + i))
-					{
-						stackLevel++;
-						stackLevel = stackLevel % 2;
+							char c = before.charAt(i);
+							if (c == openingChar && openingChar == closingCharacter)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel++;
+									stackLevel = stackLevel % 2;
+								}
+							}
+							else if (c == openingChar)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel++;
+								}
+							}
+							else if (c == closingCharacter)
+							{
+								if (!ignoreScope(document, i + start))
+								{
+									stackLevel--;
+								}
+							}
+						}
 					}
 				}
-				else if (c == openingChar)
+				if (offset < end)
 				{
-					if (!ignoreScope(document, offset + i))
+					int startAfter = start;
+					if (offset > start)
 					{
-						stackLevel++;
+						startAfter = offset;
 					}
-				}
-				else if (c == closingCharacter)
-				{
-					if (!ignoreScope(document, offset + i))
+					String after = document.get(startAfter, end - startAfter);
+
+					// offsets to match for comment scope
+					// matching
+					for (int i = 0; i < after.length(); i++)
 					{
-						stackLevel--;
-						if (stackLevel < 0)
-							return true;
+						char c = after.charAt(i);
+						if (c == openingChar && openingChar == closingCharacter)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel++;
+								stackLevel = stackLevel % 2;
+							}
+						}
+						else if (c == openingChar)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel++;
+							}
+						}
+						else if (c == closingCharacter)
+						{
+							if (!ignoreScope(document, i + startAfter))
+							{
+								stackLevel--;
+								if (stackLevel < 0)
+									return true;
+							}
+						}
 					}
 				}
 			}
@@ -380,8 +386,9 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		char c = event.character;
 		int beginning = 0;
 		// Don't check from very beginning of the document! Be smarter/quicker and check from beginning of
-		// partition if we can. 
-		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to single string/comment partition?
+		// partition if we can.
+		// FIXME What type of partitions does this make sense for? We should check across "code" partitions. Limit to
+		// single string/comment partition?
 		if (document instanceof IDocumentExtension3)
 		{
 			try
@@ -401,8 +408,8 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		int index = -1;
 		while ((index = previous.indexOf(c, index + 1)) != -1)
 		{
-//			if (ignoreScope(document, beginning + index))
-//				continue;
+			// if (ignoreScope(document, beginning + index))
+			// continue;
 			open = !open;
 			if (open)
 			{
@@ -491,10 +498,22 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	private boolean isAutoInsertEnabled()
+	/**
+	 * Do we automatically insert matching characters?
+	 * @param autoInsertEnabled
+	 */
+	public boolean isAutoInsertEnabled()
 	{
-		// TODO Set up a pref to turn this on or off
-		return true;
+		return autoInsertEnabled;
+	}
+	
+	/**
+	 * Set the automatic insertion of matching characters on or off
+	 * @param autoInsertEnabled
+	 */
+	public void setAutoInsertEnabled(boolean autoInsertEnabled)
+	{
+		this.autoInsertEnabled = autoInsertEnabled;
 	}
 
 	/**

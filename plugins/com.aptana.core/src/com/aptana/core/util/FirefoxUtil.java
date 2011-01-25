@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.core.util;
 
 import java.io.File;
@@ -43,6 +16,7 @@ import java.io.LineNumberReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -51,6 +25,8 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -64,6 +40,9 @@ import com.aptana.core.CorePlugin;
  */
 public final class FirefoxUtil {
 
+	private static final String VALUE_PATTERN = "^(.[^=]*)=(.*)$"; //$NON-NLS-1$
+	private static final String SECTION_PATTERN = "^\\x5B(.*)\\x5D$"; //$NON-NLS-1$
+	
 	private static final String[] WIN32_PROFILES_LOCATIONS = {
 		"%APPDATA%\\Mozilla\\Firefox\\" //$NON-NLS-1$
 	};
@@ -90,17 +69,17 @@ public final class FirefoxUtil {
 	}
 
 	/**
-	 * findDefaultProfileLocation
+	 * Find location of user's default(current) Firefox profile.
 	 * 
-	 * @return File
+	 * @return IPath
 	 */
-	public static File findDefaultProfileLocation() {
+	public static IPath findDefaultProfileLocation() {
 		String[] locations = (String[]) LOCATIONS.get(Platform.getOS());
 		if (locations != null) {
 			for (int i = 0; i < locations.length; ++i) {
 				String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
 				File dir = new File(location);
-				if (!dir.isDirectory() || !dir.exists()) {
+				if (!dir.isDirectory()) {
 					continue;
 				}
 				CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
@@ -131,9 +110,9 @@ public final class FirefoxUtil {
 
 				for (int j = 0; j < profiles.length; ++j) {
 					File profile = profiles[j];
-					if (profile.exists() && profile.isDirectory()) {
+					if (profile.isDirectory()) {
 						CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
-						return profile;
+						return Path.fromOSString(profile.getAbsolutePath());
 					}
 				}
 			}
@@ -147,7 +126,7 @@ public final class FirefoxUtil {
 	 * @param file
 	 * @return File[]
 	 */
-	private static File[] readProfiles(File dir) {
+	protected static File[] readProfiles(File dir) {
 		List<File> list = new ArrayList<File>();
 		File profilesIni = new File(dir, "profiles.ini"); //$NON-NLS-1$
 		if (profilesIni.exists()) {
@@ -155,10 +134,10 @@ public final class FirefoxUtil {
 			try {
 				r = new LineNumberReader(new FileReader(profilesIni));
 				String line;
-				Map<String, Map<String, String>> sections = new HashMap<String, Map<String, String>>();
+				Map<String, Map<String, String>> sections = new LinkedHashMap<String, Map<String, String>>();
 				Map<String, String> last = null;
-				Pattern sectionPattern = Pattern.compile("^\\x5B(.*)\\x5D$"); //$NON-NLS-1$
-				Pattern valuePattern = Pattern.compile("^(.[^=]*)=(.*)$"); //$NON-NLS-1$
+				Pattern sectionPattern = Pattern.compile(SECTION_PATTERN);
+				Pattern valuePattern = Pattern.compile(VALUE_PATTERN);
 				while ((line = r.readLine()) != null) {
 					Matcher matcher = sectionPattern.matcher(line);
 					if (matcher.find()) {
@@ -207,7 +186,7 @@ public final class FirefoxUtil {
 	}
 
 	/**
-	 * Get extension version
+	 * Get version for the specified Firefox extension ID
 	 * 
 	 * @param extensionID
 	 * @param profileDir

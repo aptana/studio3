@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.preferences;
 
 import org.eclipse.osgi.util.NLS;
@@ -39,6 +12,10 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
+
+	public static String CommonEditorPreferencePage_Default_Editor_Preference_Link;
+
+	public static String CommonEditorPreferencePage_Editor_Preferences;
 
 	public static String TasksPreferencePage_CaseSensitiveLabel;
 	public static String TasksPreferencePage_Description;
@@ -54,6 +31,64 @@ public class Messages extends NLS
 	public static String UserAgentPreferencePage_Select_None;
 	public static String UserAgentPreferencePage_Select_User_Agents;
 
+	public static String EditorsPreferencePage_Close_Matching_Character_Pairs;
+
+	public static String EditorsPreferencePage_Colorize_Matching_Character_Pairs;
+
+	public static String EditorsPreferencePage_Content_Assist;
+
+	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
+
+	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
+
+	
+	/**
+	 * EditorsPreferencePage_EditLink
+	 */
+	public static String EditorsPreferencePage_EditLink;
+
+	/**
+	 * EditorsPreferencePage_Formatting
+	 */
+	public static String EditorsPreferencePage_Formatting;
+	
+	public static String EditorsPreferencePage_HomeEndBehavior;
+
+	public static String EditorsPreferencePage_JumpsStartEnd;
+	
+	/**
+	 * EditorsPreferencePage_MarkOccurrences
+	 */
+	public static String EditorsPreferencePage_MarkOccurrences;
+
+	/**
+	 * EditorsPreferencePage_PreferenceDescription
+	 */
+	public static String EditorsPreferencePage_PreferenceDescription;
+	
+	/**
+	 * EditorsPreferencePage_TabInsertion
+	 */
+	public static String EditorsPreferencePage_TabInsertion;
+	public static String EditorsPreferencePage_ToggleBetween;
+
+	public static String EditorsPreferencePage_Typing;
+	
+	/**
+	 * EditorsPreferencePage_UseSpaces
+	 */
+	public static String EditorsPreferencePage_UseSpaces;
+	
+	/**
+	 * EditorsPreferencePage_UseTabs
+	 */
+	public static String EditorsPreferencePage_UseTabs;
+	
+	/**
+	 * EditorsPreferencePage_GeneralTextEditorPrefLink
+	 */
+	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
+	
 	public static String ValidationPreferencePage_ERR_EmptyExpression;
 	public static String ValidationPreferencePage_Filter_Description;
 	public static String ValidationPreferencePage_Ignore_Message;

@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
@@ -52,6 +25,7 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -74,7 +48,7 @@ import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
-import com.aptana.editor.html.OpenTagCloser;
+import com.aptana.editor.html.HTMLTagUtil;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
@@ -82,14 +56,16 @@ import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
+import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.ServerConfigurationManager;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 {
@@ -384,10 +360,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
+				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : ServerConfigurationManager.getInstance().getServerConfigurations())
+					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault()
+							.getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
 						if (url != null)
@@ -614,7 +592,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!OpenTagCloser.tagClosed(doc, element.getName()))
+						if (!TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -769,12 +747,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private void addOpenTagPropsals(List<ICompletionProposal> proposals, LexemeProvider<HTMLTokenType> lexemeProvider,
-			int offset)
+	private void addOpenTagProposals(LocationType fineLocation, List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		LocationType location = this.getOpenTagLocationType(lexemeProvider, offset);
-
-		switch (location)
+		switch (fineLocation)
 		{
 			case IN_ELEMENT_NAME:
 				proposals.addAll(this.addElementProposals(lexemeProvider, offset));
@@ -800,19 +776,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param offset
 	 * @param result
 	 */
-	private List<ICompletionProposal> addCloseTagProposals(LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	private boolean addUnclosedTagProposals(LocationType fineLocation, List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
-		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		HTMLParseState state = null;
+		boolean addedProposal = false;
 		// First see if there are any unclosed tags, suggest them first
 		Set<String> unclosedElements = getUnclosedTagNames(offset);
 		if (unclosedElements != null && !unclosedElements.isEmpty())
 		{
 			for (String unclosedElement : unclosedElements)
 			{
-
 				ElementElement element = this._queryHelper.getElement(unclosedElement);
-
+				if (element == null)
+				{
+					continue;
+				}
 				if (state == null)
 				{
 					state = new HTMLParseState();
@@ -822,14 +801,25 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				proposals.add(createCloseTagProposal(element, offset));
-			}
-			if (!proposals.isEmpty())
-			{
-				return proposals;
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				addedProposal = true;
 			}
 		}
+		return addedProposal;
+	}
 
+	/**
+	 * addCloseTagProposals
+	 * 
+	 * @param lexemeProvider
+	 * @param offset
+	 * @param result
+	 */
+	private boolean addDefaultCloseTagProposals(LocationType fineLocation, List<ICompletionProposal> proposals,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
+	{
+		HTMLParseState state = null;
+		boolean addedProposal = false;
 		// Looks like no unclosed tags that make sense. Suggest every non-self-closing tag.
 		List<ElementElement> elements = this._queryHelper.getElements();
 		if (elements != null)
@@ -845,22 +835,73 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					continue;
 				}
-				proposals.add(createCloseTagProposal(element, offset));
+				proposals.add(createCloseTagProposal(element, lexemeProvider, offset));
+				addedProposal = true;
 			}
 		}
-		return proposals;
+		return addedProposal;
 	}
 
-	private CommonCompletionProposal createCloseTagProposal(ElementElement element, int offset)
+	private CommonCompletionProposal createCloseTagProposal(ElementElement element,
+			LexemeProvider<HTMLTokenType> lexemeProvider, int offset)
 	{
 		List<String> userAgents = element.getUserAgentNames();
 		Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
-		String replaceString = element.getName();
+		String replaceString = "/" + element.getName(); //$NON-NLS-1$
+		Lexeme<HTMLTokenType> firstLexeme = lexemeProvider.getFirstLexeme(); // Open of tag
+		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
+		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
+
+		int replaceLength = 0;
+
+		// We can be at: |<a, <|a, |</a, </|a, etc.
+		// If our cursor is before the tag in the lexeme list, assume we aren't
+		// modifying the current tag after the cursor, but rather inserting a whole new tag
+		int replaceOffset = offset;
+
+		// In this case, we see our offset is greater than the start of the
+		// list, so we assume we are replacing
+		if (offset > firstLexeme.getStartingOffset())
+		{
+			replaceOffset = firstLexeme.getStartingOffset() + 1;
+			if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
+			{
+				// we'll replace the "/"
+				replaceLength += 1;
+			}
+			if (tagLexeme != null && HTMLTagUtil.isTag(tagLexeme))
+			{
+				replaceLength += tagLexeme.getLength();
+			}
+			// current tag isn't closed, so we will close it for the user
+			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
+			{
+				replaceString += ">"; //$NON-NLS-1$
+			}
+		}
+		else
+		{
+			try
+			{
+				// add the close of the tag, since we're in a situation like <|<a>
+				replaceString += ">"; //$NON-NLS-1$
+				String previous = _document.get(offset - 1, 1);
+				// situation like </|<a>
+				if ("/".equals(previous)) { //$NON-NLS-1$
+					replaceOffset -= 1;
+					replaceLength += 1;
+				}
+			}
+			catch (BadLocationException e)
+			{
+				// safe to ignore
+			}
+		}
 
 		int cursorPosition = replaceString.length();
-		int replaceLength = 0;
-		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, offset, replaceLength,
-				cursorPosition, ELEMENT_ICON, element.getName(), null, element.getDescription());
+
+		CommonCompletionProposal proposal = new CommonCompletionProposal(replaceString, replaceOffset, replaceLength,
+				cursorPosition, ELEMENT_ICON, "/" + element.getName(), null, element.getDescription()); //$NON-NLS-1$
 
 		proposal.setFileLocation(HTMLIndexConstants.CORE);
 		proposal.setUserAgentImages(userAgentIcons);
@@ -879,20 +920,27 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					String src = _document.get(partition.getOffset(), partition.getLength());
 					int lessThanIndex = src.indexOf('<');
+
+					// if '<' index outside current string, skip this partition
 					if (lessThanIndex == -1 || lessThanIndex >= src.length() - 1)
 					{
 						continue;
 					}
-					src = src.substring(lessThanIndex + 1).trim();
-					String[] parts = src.split("\\W"); //$NON-NLS-1$
-					if (parts == null || parts.length == 0)
+
+					// ignore tag containing offset, i.e. if cursor is at '|', <|a>, <a|> will not
+					// include <a> as unclosed tag, but <a>| will.
+					int greaterThanIndex = src.indexOf('>');
+					if (greaterThanIndex == -1)
 					{
 						continue;
 					}
-					String elementName = parts[0].toLowerCase();
-					if (!unclosedElements.contains(elementName) && !OpenTagCloser.tagClosed(_document, elementName))
+
+					// get name of element and see if we are closed elsewhere in the document
+					String tagName = TagUtil.getTagName(src);
+					tagName = tagName.toLowerCase();
+					if (!unclosedElements.contains(tagName) && !TagUtil.tagClosed(_document, tagName))
 					{
-						unclosedElements.add(elementName);
+						unclosedElements.add(tagName);
 					}
 				}
 			}
@@ -985,17 +1033,26 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
 		LocationType location = this.getCoarseLocationType(_document, lexemeProvider, offset);
+		LocationType fineLocation = null;
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
 		switch (location)
 		{
 			case IN_OPEN_TAG:
-				this.addOpenTagPropsals(result, lexemeProvider, offset);
+				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+				this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+				this.addOpenTagProposals(fineLocation, result, lexemeProvider, offset);
 				break;
 
 			case IN_CLOSE_TAG:
-				result.addAll(this.addCloseTagProposals(lexemeProvider, offset));
+				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset); // not actually used in this case,
+																					// but resets _replaceRange
+				boolean added = this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+				if (!added)
+				{
+					this.addDefaultCloseTagProposals(fineLocation, result, lexemeProvider, offset);
+				}
 				break;
 
 			case IN_TEXT:
@@ -1025,6 +1082,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			try
 			{
 				String text = _document.get(this._replaceRange.getStartingOffset(), this._replaceRange.getLength());
+				if (LocationType.IN_CLOSE_TAG.equals(location))
+				{
+					text = "/" + text; // proposals have "/" at the front //$NON-NLS-1$
+				}
 
 				this.setSelectedProposal(text, result);
 			}
@@ -1104,7 +1165,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return new char[] { '<', '\'', '"', '&' };
+		String chars = Platform.getPreferencesService().getString( //
+			HTMLPlugin.PLUGIN_ID, //
+			IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 
 	/*

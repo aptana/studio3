@@ -1,0 +1,28 @@
+==PREFS==
+xml.formatter.line.preserve=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.element=0
+xml.formatter.wrap.comments.length=80
+xml.formatter.wrap.comments=false
+xml.formatter.formatter.indentation.size=4
+xml.formatter.formatter.tabulation.size=4
+xml.formatter.formatter.tabulation.char=space
+==CONTENT==
+<item>
+    <a>
+        Hello
+    </a>
+    <b>
+        <self/>
+    </b>
+</item>
+==FORMATTED==
+<item>
+    <a>
+        Hello
+    </a>
+    <b>
+        <self/>
+    </b>
+</item>

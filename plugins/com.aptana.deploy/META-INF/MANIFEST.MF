@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.ui.secureftp,
  com.aptana.terminal,
  com.aptana.syncing.core,
- com.aptana.syncing.ui
+ com.aptana.syncing.ui,
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy,

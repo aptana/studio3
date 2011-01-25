@@ -17,7 +17,6 @@ public class PullHandler extends AbstractSimpleGitCommandHandler
 		repo.firePullEvent();
 		// Refresh the in-memory index of the repo!
 		refreshRepoIndex(repo);
-		// refreshAffectedProjects(); Handled by GitProjectRefresher
 	}
 
 	protected boolean supportsMultipleRepoOperation()

@@ -295,7 +295,7 @@
       <wizard
             name="%NewWizards.file"
             icon="$nl$/icons/full/etool16/text.png"
-            category="org.eclipse.ui.Basic"
+            category="com.aptana.ui.wizards.category"
             class="com.aptana.editor.common.internal.scripting.NewFileWizard"
             id="com.aptana.ui.wizards.new.file">
          <description>
@@ -305,6 +305,10 @@
                class="org.eclipse.core.resources.IResource">
          </selection>
       </wizard>
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="%category.web.name">
+      </category>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -474,6 +478,13 @@
                id="com.aptana.editor.common.open.in.file.manager">
          </dynamic>
       </menuContribution>
+      <menuContribution
+            locationURI="menu:file?before=new.ext">
+         <menu
+               id="com.aptana.file.template.menu"
+               label="%menu.file.template.label">
+         </menu>
+      </menuContribution>
 	</extension>
 	<extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectorTargets">
@@ -525,9 +536,9 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
-            class="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            id="com.aptana.editor.common.preferences.UserAgentPreferencePage"
-            name="%page.name.0"/>
+            class="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            id="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            name="%page.editors.name"/>
       <page
             category="com.aptana.ui.AptanaPreferencePage"
             class="com.aptana.editor.common.preferences.TasksPreferencePage"

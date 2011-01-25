@@ -1,43 +1,15 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +17,6 @@ import java.util.Set;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
@@ -83,8 +54,6 @@ import com.aptana.parsing.ast.IParseNode;
 
 public class JSNodeTypeInferrer extends JSTreeWalker
 {
-	private static final EnumSet<ContentSelector> MEMBER_CONTENT = EnumSet.allOf(ContentSelector.class);
-	
 	private JSScope _scope;
 	private Index _index;
 	private URI _location;
@@ -135,7 +104,16 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					{
 						for (Type parameterType : param.getTypes())
 						{
-							this.addType(parameterType.getName());
+							String type = parameterType.getName();
+
+							// TODO: Temporary hack for jQuery CA until we resolve
+							// handling of function properties and derived types
+							if ("jQuery".equals(type))
+							{
+								type = "Function<jQuery>:jQuery";
+							}
+
+							this.addType(type);
 							foundType = true;
 						}
 					}
@@ -362,7 +340,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		{
 			IParseNode lhs = node.getLeftHandSide();
 			IParseNode rhs = node.getRightHandSide();
-			
+
 			// NOTE: Iterate down the tree until we find the first non-addition node or the first string
 			while (lhs.getNodeType() == JSNodeTypes.ADD)
 			{
@@ -374,7 +352,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					break;
 				}
 			}
-			
+
 			if (lhs instanceof JSStringNode || rhs instanceof JSStringNode)
 			{
 				type = JSTypeConstants.STRING_TYPE;
@@ -383,7 +361,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			{
 				List<String> lhsTypes = this.getTypes(lhs);
 				List<String> rhsTypes = this.getTypes(rhs);
-	
+
 				if (lhsTypes.contains(JSTypeConstants.STRING_TYPE) || rhsTypes.contains(JSTypeConstants.STRING_TYPE))
 				{
 					type = JSTypeConstants.STRING_TYPE;
@@ -545,8 +523,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : this.getTypes(lhs))
 			{
+				if (JSTypeUtil.isFunctionPrefix(typeName))
+				{
+					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
+				}
+
 				// lookup up rhs name in type and add that value's type here
-				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName, MEMBER_CONTENT);
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 
 				if (property != null)
 				{
@@ -613,7 +596,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		}
 		else
 		{
-			property = this._queryHelper.getGlobal(this._index, name, MEMBER_CONTENT);
+			property = this._queryHelper.getGlobal(this._index, name);
 		}
 
 		if (property != null)

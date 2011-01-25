@@ -112,6 +112,16 @@
       </type>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.html.preferences.HTMLPreferencePage"
+            id="com.aptana.editor.html.preferences.HTMLPreferencePage"
+            name="HTML">
+      </page>
+   </extension>
+
+   <extension
          point="com.aptana.editor.common.validator">
       <language
             name="%validator.language.html.name"

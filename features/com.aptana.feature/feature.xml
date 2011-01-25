@@ -551,7 +551,8 @@
          id="org.mozilla.rhino"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.w3c.css"
@@ -562,6 +563,20 @@
 
    <plugin
          id="org.w3c.tidy"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpcore"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.aptana.editor.xml.formatter"
          download-size="0"
          install-size="0"
          version="0.0.0"

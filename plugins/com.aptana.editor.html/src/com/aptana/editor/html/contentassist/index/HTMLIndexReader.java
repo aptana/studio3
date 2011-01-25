@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist.index;
 
 import java.io.IOException;
@@ -43,105 +16,62 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.mortbay.util.ajax.JSON;
-
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
-import com.aptana.editor.html.contentassist.model.BaseElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
+import com.aptana.index.core.IndexReader;
 import com.aptana.index.core.QueryResult;
 import com.aptana.index.core.SearchPattern;
 
-public class HTMLIndexReader
+public class HTMLIndexReader extends IndexReader
 {
 	/**
-	 * createAttributeFromKey
+	 * createAttribute
 	 * 
-	 * @param key
 	 * @param attribute
+	 * @param key
 	 * @return
-	 * @throws IOException
 	 */
-	private AttributeElement createAttributeFromKey(Index index, QueryResult attribute) throws IOException
+	private AttributeElement createAttribute(QueryResult attribute)
 	{
-		return this.populateElement(index, attribute, new AttributeElement());
+		return this.populateElement(new AttributeElement(), attribute, 1);
 	}
 
 	/**
-	 * createElementFromKey
+	 * createElement
 	 * 
-	 * @param key
 	 * @param element
 	 * @return
-	 * @throws IOException
 	 */
-	private ElementElement createElementFromKey(Index index, QueryResult element) throws IOException
+	private ElementElement createElement(QueryResult element)
 	{
-		return this.populateElement(index, element, new ElementElement());
+		return this.populateElement(new ElementElement(), element, 1);
 	}
 
 	/**
-	 * createEntityFromKey
+	 * createEntity
 	 * 
-	 * @param key
 	 * @param entity
 	 * @return
-	 * @throws IOException
 	 */
-	private EntityElement createEntityFromKey(Index index, QueryResult entity) throws IOException
+	private EntityElement createEntity(QueryResult entity)
 	{
-		return this.populateElement(index, entity, new EntityElement());
+		return this.populateElement(new EntityElement(), entity, 1);
 	}
 
 	/**
-	 * createEventFromKey
+	 * createEvent
 	 * 
-	 * @param key
 	 * @param event
 	 * @return
-	 * @throws IOException
 	 */
-	private EventElement createEventFromKey(Index index, QueryResult event) throws IOException
+	private EventElement createEvent(QueryResult event)
 	{
-		return this.populateElement(index, event, new EventElement());
-	}
-
-	/**
-	 * getAttribute
-	 * 
-	 * @param index
-	 * @param name
-	 * @return
-	 * @throws IOException
-	 */
-	public List<AttributeElement> getAttributes(Index index, String... names) throws IOException
-	{
-		List<AttributeElement> result = new ArrayList<AttributeElement>();
-
-		if (index != null)
-		{
-			for (String name : names)
-			{
-				List<QueryResult> attributes = index.query( //
-					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-					name + CSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
-
-				if (attributes != null)
-				{
-					for (QueryResult attribute : attributes)
-					{
-						result.add(this.createAttributeFromKey(index, attribute));
-					}
-				}
-			}
-		}
-
-		return result;
+		return this.populateElement(new EventElement(), event, 1);
 	}
 
 	/**
@@ -166,7 +96,7 @@ public class HTMLIndexReader
 			{
 				for (QueryResult attribute : attributes)
 				{
-					result.add(this.createAttributeFromKey(index, attribute));
+					result.add(this.createAttribute(attribute));
 				}
 			}
 		}
@@ -175,38 +105,48 @@ public class HTMLIndexReader
 	}
 
 	/**
-	 * getElement
+	 * getAttribute
 	 * 
 	 * @param index
 	 * @param name
 	 * @return
 	 * @throws IOException
 	 */
-	public List<ElementElement> getElements(Index index, String... names) throws IOException
+	public List<AttributeElement> getAttributes(Index index, String... names) throws IOException
 	{
-		List<ElementElement> result = new ArrayList<ElementElement>();
+		List<AttributeElement> result = new ArrayList<AttributeElement>();
 
-		if (index != null)
+		if (index != null && names != null)
 		{
 			for (String name : names)
 			{
-				List<QueryResult> elements = index.query( //
-					new String[] { HTMLIndexConstants.ELEMENT }, //
+				List<QueryResult> attributes = index.query( //
+					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
 					name + CSSIndexConstants.DELIMITER, //
 					SearchPattern.PREFIX_MATCH //
 					);
 
-				if (elements != null)
+				if (attributes != null)
 				{
-					for (QueryResult element : elements)
+					for (QueryResult attribute : attributes)
 					{
-						result.add(this.createElementFromKey(index, element));
+						result.add(this.createAttribute(attribute));
 					}
 				}
 			}
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getDelimiter()
+	 */
+	@Override
+	protected String getDelimiter()
+	{
+		return HTMLIndexConstants.DELIMITER;
 	}
 
 	/**
@@ -231,7 +171,42 @@ public class HTMLIndexReader
 			{
 				for (QueryResult element : elements)
 				{
-					result.add(this.createElementFromKey(index, element));
+					result.add(this.createElement(element));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getElement
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public List<ElementElement> getElements(Index index, String... names) throws IOException
+	{
+		List<ElementElement> result = new ArrayList<ElementElement>();
+
+		if (index != null && names != null)
+		{
+			for (String name : names)
+			{
+				List<QueryResult> elements = index.query( //
+					new String[] { HTMLIndexConstants.ELEMENT }, //
+					name + CSSIndexConstants.DELIMITER, //
+					SearchPattern.PREFIX_MATCH //
+					);
+
+				if (elements != null)
+				{
+					for (QueryResult element : elements)
+					{
+						result.add(this.createElement(element));
+					}
 				}
 			}
 		}
@@ -261,7 +236,7 @@ public class HTMLIndexReader
 			{
 				for (QueryResult entity : entities)
 				{
-					result.add(this.createEntityFromKey(index, entity));
+					result.add(this.createEntity(entity));
 				}
 			}
 		}
@@ -293,8 +268,8 @@ public class HTMLIndexReader
 			{
 				for (QueryResult entity : entities)
 				{
-					result = this.createEntityFromKey(index, entity);
-					
+					result = this.createEntity(entity);
+
 					// there should only be one match
 					break;
 				}
@@ -328,8 +303,8 @@ public class HTMLIndexReader
 			{
 				for (QueryResult event : events)
 				{
-					result = this.createEventFromKey(index, event);
-					
+					result = this.createEvent(event);
+
 					// there should only be one match
 					break;
 				}
@@ -337,6 +312,16 @@ public class HTMLIndexReader
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.index.core.IndexReader#getSubDelimiter()
+	 */
+	@Override
+	protected String getSubDelimiter()
+	{
+		return HTMLIndexConstants.SUB_DELIMITER;
 	}
 
 	/**
@@ -348,7 +333,7 @@ public class HTMLIndexReader
 	{
 		Map<String, String> result = null;
 
-		if (index != null)
+		if (index != null && StringUtil.isEmpty(category) == false)
 		{
 			String pattern = "*"; //$NON-NLS-1$
 
@@ -385,33 +370,5 @@ public class HTMLIndexReader
 		}
 
 		return result;
-	}
-
-	/**
-	 * populateElement
-	 * 
-	 * @param index
-	 * @param attribute
-	 * @param element
-	 */
-	@SuppressWarnings("rawtypes")
-	private <T extends BaseElement> T populateElement(Index index, QueryResult attribute, T element)
-	{
-		String key = attribute.getWord();
-		String[] columns = key.split(HTMLIndexConstants.DELIMITER);
-
-		Object m = JSON.parse(columns[1]);
-
-		if (m instanceof Map)
-		{
-			element.fromJSON((Map) m);
-		}
-
-		for (String document : attribute.getDocuments())
-		{
-			element.addDocument(document);
-		}
-
-		return element;
 	}
 }

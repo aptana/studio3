@@ -1,43 +1,15 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +20,6 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexReader;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -57,8 +28,6 @@ import com.aptana.index.core.IndexManager;
 
 public class JSIndexQueryHelper
 {
-	private static final EnumSet<ContentSelector> PARENT_TYPES = EnumSet.of(ContentSelector.PARENT_TYPES);
-
 	/**
 	 * getIndex
 	 * 
@@ -85,9 +54,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getCoreGlobals(EnumSet<ContentSelector> fields)
+	public List<PropertyElement> getCoreGlobals()
 	{
-		return this.getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE, fields);
+		return this.getMembers(getIndex(), JSTypeConstants.WINDOW_TYPE);
 	}
 
 	/**
@@ -99,13 +68,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected FunctionElement getFunction(Index index, String typeName, String methodName, EnumSet<ContentSelector> fields)
+	protected FunctionElement getFunction(Index index, String typeName, String methodName)
 	{
 		FunctionElement result = null;
 
 		try
 		{
-			result = this._reader.getFunction(index, typeName, methodName, fields);
+			result = this._reader.getFunction(index, typeName, methodName);
 		}
 		catch (IOException e)
 		{
@@ -123,13 +92,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<FunctionElement> getFunctions(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	protected List<FunctionElement> getFunctions(Index index, List<String> typeNames)
 	{
 		List<FunctionElement> result = null;
 
 		try
 		{
-			result = this._reader.getFunctions(index, typeNames, fields);
+			result = this._reader.getFunctions(index, typeNames);
 		}
 		catch (IOException e)
 		{
@@ -147,13 +116,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<FunctionElement> getFunctions(Index index, String typeName, EnumSet<ContentSelector> fields)
+	protected List<FunctionElement> getFunctions(Index index, String typeName)
 	{
 		List<FunctionElement> result = null;
 
 		try
 		{
-			result = this._reader.getFunctions(index, typeName, fields);
+			result = this._reader.getFunctions(index, typeName);
 		}
 		catch (IOException e)
 		{
@@ -171,13 +140,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getGlobal(Index index, String name, EnumSet<ContentSelector> fields)
+	public PropertyElement getGlobal(Index index, String name)
 	{
-		PropertyElement result = this.getMember(index, JSTypeConstants.WINDOW_TYPE, name, fields);
+		PropertyElement result = this.getMember(index, JSTypeConstants.WINDOW_TYPE, name);
 
 		if (result == null)
 		{
-			result = this.getMember(getIndex(), JSTypeConstants.WINDOW_TYPE, name, fields);
+			result = this.getMember(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
 		}
 
 		return result;
@@ -192,13 +161,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected PropertyElement getMember(Index index, String typeName, String memberName, EnumSet<ContentSelector> fields)
+	protected PropertyElement getMember(Index index, String typeName, String memberName)
 	{
-		PropertyElement result = this.getProperty(index, typeName, memberName, fields);
+		PropertyElement result = this.getProperty(index, typeName, memberName);
 
 		if (result == null)
 		{
-			result = this.getFunction(index, typeName, memberName, fields);
+			result = this.getFunction(index, typeName, memberName);
 		}
 
 		return result;
@@ -212,12 +181,12 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	protected List<PropertyElement> getMembers(Index index, List<String> typeNames)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		result.addAll(this.getProperties(index, typeNames, fields));
-		result.addAll(this.getFunctions(index, typeNames, fields));
+		result.addAll(this.getProperties(index, typeNames));
+		result.addAll(this.getFunctions(index, typeNames));
 
 		return result;
 	}
@@ -230,12 +199,12 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
+	protected List<PropertyElement> getMembers(Index index, String typeName)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		result.addAll(this.getProperties(index, typeName, fields));
-		result.addAll(this.getFunctions(index, typeName, fields));
+		result.addAll(this.getProperties(index, typeName));
+		result.addAll(this.getFunctions(index, typeName));
 
 		return result;
 	}
@@ -247,9 +216,9 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getProjectGlobals(Index index, EnumSet<ContentSelector> fields)
+	public List<PropertyElement> getProjectGlobals(Index index)
 	{
-		return this.getMembers(index, JSTypeConstants.WINDOW_TYPE, fields);
+		return this.getMembers(index, JSTypeConstants.WINDOW_TYPE);
 	}
 
 	/**
@@ -260,13 +229,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getProperties(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	protected List<PropertyElement> getProperties(Index index, List<String> typeNames)
 	{
 		List<PropertyElement> result = null;
 
 		try
 		{
-			result = this._reader.getProperties(index, typeNames, fields);
+			result = this._reader.getProperties(index, typeNames);
 		}
 		catch (IOException e)
 		{
@@ -284,13 +253,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected List<PropertyElement> getProperties(Index index, String typeName, EnumSet<ContentSelector> fields)
+	protected List<PropertyElement> getProperties(Index index, String typeName)
 	{
 		List<PropertyElement> result = null;
 
 		try
 		{
-			result = this._reader.getProperties(index, typeName, fields);
+			result = this._reader.getProperties(index, typeName);
 		}
 		catch (IOException e)
 		{
@@ -309,13 +278,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	protected PropertyElement getProperty(Index index, String typeName, String propertyName, EnumSet<ContentSelector> fields)
+	protected PropertyElement getProperty(Index index, String typeName, String propertyName)
 	{
 		PropertyElement result = null;
 
 		try
 		{
-			result = this._reader.getProperty(index, typeName, propertyName, fields);
+			result = this._reader.getProperty(index, typeName, propertyName);
 		}
 		catch (IOException e)
 		{
@@ -333,13 +302,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public TypeElement getType(Index index, String typeName, EnumSet<ContentSelector> fields)
+	public TypeElement getType(Index index, String typeName, boolean indexMembers)
 	{
-		TypeElement result = this._reader.getType(index, typeName, fields);
+		TypeElement result = this._reader.getType(index, typeName, indexMembers);
 
 		if (result == null)
 		{
-			result = this._reader.getType(getIndex(), typeName, fields);
+			result = this._reader.getType(getIndex(), typeName, indexMembers);
 		}
 
 		return result;
@@ -366,7 +335,7 @@ public class JSIndexQueryHelper
 		while (queue.isEmpty() == false)
 		{
 			String name = queue.poll();
-			TypeElement type = this.getType(index, name, PARENT_TYPES);
+			TypeElement type = this.getType(index, name, false);
 
 			if (type != null)
 			{
@@ -397,13 +366,13 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public PropertyElement getTypeMember(Index index, String typeName, String memberName, EnumSet<ContentSelector> fields)
+	public PropertyElement getTypeMember(Index index, String typeName, String memberName)
 	{
-		PropertyElement result = this.getMember(index, typeName, memberName, fields);
+		PropertyElement result = this.getMember(index, typeName, memberName);
 
 		if (result == null)
 		{
-			result = this.getMember(getIndex(), typeName, memberName, fields);
+			result = this.getMember(getIndex(), typeName, memberName);
 		}
 
 		return result;
@@ -417,12 +386,12 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames, EnumSet<ContentSelector> fields)
+	public List<PropertyElement> getTypeMembers(Index index, List<String> typeNames)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		result.addAll(this.getMembers(getIndex(), typeNames, fields));
-		result.addAll(this.getMembers(index, typeNames, fields));
+		result.addAll(this.getMembers(getIndex(), typeNames));
+		result.addAll(this.getMembers(index, typeNames));
 
 		return result;
 	}
@@ -435,12 +404,12 @@ public class JSIndexQueryHelper
 	 * @param fields
 	 * @return
 	 */
-	public List<PropertyElement> getTypeMembers(Index index, String typeName, EnumSet<ContentSelector> fields)
+	public List<PropertyElement> getTypeMembers(Index index, String typeName)
 	{
 		List<PropertyElement> result = new ArrayList<PropertyElement>();
 
-		result.addAll(this.getMembers(getIndex(), typeName, fields));
-		result.addAll(this.getMembers(index, typeName, fields));
+		result.addAll(this.getMembers(getIndex(), typeName));
+		result.addAll(this.getMembers(index, typeName));
 
 		return result;
 	}

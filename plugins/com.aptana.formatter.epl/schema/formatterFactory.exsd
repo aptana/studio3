@@ -101,6 +101,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="requiredActiveBundle" type="string">
+            <annotation>
+               <documentation>
+                  In case provided, the given bundle has to be loaded and active before this factory is allowed to be instantiated. In case it does&apos;nt, the system will not load the formatter.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

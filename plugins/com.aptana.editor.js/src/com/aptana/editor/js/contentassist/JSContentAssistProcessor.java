@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
@@ -62,7 +35,6 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
-import com.aptana.editor.js.contentassist.model.ContentSelector;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -76,6 +48,7 @@ import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
+import com.aptana.editor.js.preferences.IPreferenceConstants;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.lexer.IRange;
@@ -86,23 +59,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 {
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
-
-	private static final EnumSet<ContentSelector> CORE_GLOBAL_SELECTOR = EnumSet.of( //
-		ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION //
-		);
-	private static final EnumSet<ContentSelector> PROJECT_GLOBAL_SELECTOR = EnumSet.of( //
-		ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.DOCUMENTS //
-		);
-	private static final EnumSet<ContentSelector> TYPE_PROPERTY_SELECTOR = EnumSet.of( //
-		ContentSelector.NAME, //
-		ContentSelector.DESCRIPTION, //
-		ContentSelector.DOCUMENTS, //
-		ContentSelector.PARENT_TYPES //
-		);
-
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
@@ -130,7 +86,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addCoreGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> globals = this._indexHelper.getCoreGlobals(CORE_GLOBAL_SELECTOR);
+		List<PropertyElement> globals = this._indexHelper.getCoreGlobals();
 
 		if (globals != null)
 		{
@@ -157,7 +113,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	private void addProjectGlobals(Set<ICompletionProposal> proposals, int offset)
 	{
-		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex(), PROJECT_GLOBAL_SELECTOR);
+		List<PropertyElement> projectGlobals = this._indexHelper.getProjectGlobals(this.getIndex());
 
 		if (projectGlobals != null && projectGlobals.isEmpty() == false)
 		{
@@ -222,7 +178,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
 					}
-					
+
 					if (JSTypeUtil.isFunctionPrefix(type))
 					{
 						String functionType = JSTypeUtil.getFunctionSignatureType(type);
@@ -347,7 +303,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		allTypes.add(0, typeName);
 
 		// add properties and methods
-		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes, TYPE_PROPERTY_SELECTOR);
+		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes);
 
 		typeName = JSModelFormatter.getTypeDisplayName(typeName);
 
@@ -510,7 +466,14 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		return new char[] { '.' };
+		String chars = Platform.getPreferencesService().getString( //
+			JSPlugin.PLUGIN_ID, //
+			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
+
+		return (chars != null) ? chars.toCharArray() : null;
 	}
 	
 	/* (non-Javadoc)

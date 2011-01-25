@@ -10,7 +10,8 @@
                description="%js_code_formatter_description"
                id="com.aptana.editor.js.formatterFactory"
                name="%js_code_formatter"
-               priority="10">
+               priority="10"
+               requiredActiveBundle="com.aptana.editor.js">
          </formatterFactory>
       </engineContribution>
    </extension>

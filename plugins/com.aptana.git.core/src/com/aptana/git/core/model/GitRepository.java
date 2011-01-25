@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.BufferedReader;
@@ -64,7 +37,11 @@ import net.contentobjects.jnotify.JNotifyListener;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -72,6 +49,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.util.IOUtil;
@@ -83,6 +61,27 @@ import com.aptana.git.core.model.GitRef.TYPE;
 
 public class GitRepository
 {
+
+	/**
+	 * Order branches alphabetically, with local branches all appearing before remote ones.
+	 * 
+	 * @author cwilliams
+	 */
+	private static final class BranchNameComparator implements Comparator<String>
+	{
+		public int compare(String o1, String o2)
+		{
+			if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return 1;
+			}
+			if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
+			{
+				return -1;
+			}
+			return o1.compareTo(o2);
+		}
+	}
 
 	/**
 	 * Filename to store ignores of files.
@@ -512,21 +511,7 @@ public class GitRepository
 	 */
 	public Set<String> allBranches()
 	{
-		// Return local branches first!
-		SortedSet<String> localFirst = new TreeSet<String>(new Comparator<String>()
-		{
-
-			public int compare(String o1, String o2)
-			{
-				if (o1.contains("/") && !o2.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return 1;
-				if (o2.contains("/") && !o1.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
-					return -1;
-				return o1.compareTo(o2);
-			}
-		});
-		localFirst.addAll(branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE));
-		return localFirst;
+		return branches(GitRef.TYPE.HEAD, GitRef.TYPE.REMOTE);
 	}
 
 	private Set<String> branches(GitRef.TYPE... types)
@@ -534,7 +519,10 @@ public class GitRepository
 		if (types == null || types.length == 0)
 			return Collections.emptySet();
 		Set<GitRef.TYPE> validTypes = new HashSet<GitRef.TYPE>(Arrays.asList(types));
-		Set<String> allBranches = new HashSet<String>();
+
+		// Sort branches. Make sure local ones always come before remote
+		SortedSet<String> allBranches = new TreeSet<String>(new BranchNameComparator());
+
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
@@ -564,19 +552,123 @@ public class GitRepository
 	 *            the new branch to use as the working branch
 	 * @return true if the switch happened. false otherwise.
 	 */
-	public boolean switchBranch(String branchName)
+	public boolean switchBranch(String branchName, IProgressMonitor monitor)
 	{
 		if (branchName == null)
+		{
 			return false;
-		String oldBranchName = currentBranch.simpleRef().shortName();
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
-				branchName);
-		if (result.keySet().iterator().next().intValue() != 0)
-			return false;
-		_headRef = null;
-		readCurrentBranch();
-		fireBranchChangeEvent(oldBranchName, branchName);
-		return true;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, 4);
+		try
+		{
+			// Before switching branches, check for existence of every open project attached to this repo on the new
+			// branch!
+			// If it doesn't exist, close the project first!
+			// if we fail to switch branches, re-open the ones we auto-closed!
+			final Set<IProject> projectsNotExistingOnNewBranch = getProjectsThatDontExistOnBranch(branchName,
+					sub.newChild(1));
+			// Now close all of the affectedProjects.
+			closeProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
+
+			String oldBranchName = currentBranch.simpleRef().shortName();
+			Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
+					branchName);
+			sub.worked(1);
+			if (result.keySet().iterator().next().intValue() != 0)
+			{
+				openProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
+				return false;
+			}
+			_headRef = null;
+			readCurrentBranch();
+			fireBranchChangeEvent(oldBranchName, branchName);
+			sub.worked(1);
+			return true;
+		}
+		finally
+		{
+			sub.done();
+		}
+	}
+
+	private void openProjects(Set<IProject> projects, IProgressMonitor monitor)
+	{
+		if (projects == null)
+		{
+			return;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, projects.size());
+		for (IProject project : projects)
+		{
+			try
+			{
+				project.open(sub.newChild(1));
+			}
+			catch (CoreException e)
+			{
+				GitPlugin.logError(e);
+			}
+		}
+		sub.done();
+	}
+
+	private void closeProjects(final Set<IProject> projects, IProgressMonitor monitor)
+	{
+		if (projects == null)
+		{
+			return;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, projects.size());
+		for (IProject project : projects)
+		{
+			try
+			{
+				project.close(sub.newChild(1));
+			}
+			catch (CoreException e)
+			{
+				GitPlugin.logError(e);
+			}
+		}
+		sub.done();
+	}
+
+	private Set<IProject> getProjectsThatDontExistOnBranch(final String branchName, IProgressMonitor monitor)
+	{
+		Set<IProject> projectsNotExistingOnNewBranch = new HashSet<IProject>();
+		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
+		{
+			if (!project.isAccessible())
+			{
+				// TODO What if we have a closed project because it doesn't exist here, but it does on the new
+				// branch. Auto-open after switch?
+				continue;
+			}
+			// If the git repo location is the project root, just return that it's ok!
+			if (project.getLocation().equals(workingDirectory()))
+			{
+				continue;
+			}
+
+			// TODO Is there a way to use diff to get the list of projects that don't exist on branch?
+			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
+			if (other != null && other.equals(this))
+			{
+				// Check if the project exists on the other branch!
+				Map<Integer, String> result = GitExecutable
+						.instance()
+						.runInBackground(
+								workingDirectory(),
+								"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
+								branchName
+										+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
+				if (result.keySet().iterator().next().intValue() != 0)
+				{
+					projectsNotExistingOnNewBranch.add(project);
+				}
+			}
+		}
+		return projectsNotExistingOnNewBranch;
 	}
 
 	private void readCurrentBranch()
@@ -793,10 +885,37 @@ public class GitRepository
 	 */
 	public String[] commitsAhead(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return null;
+		}
 		return index().commitsBetween(remote.ref(), GitRef.REFS_HEADS + branchName);
+	}
+
+	/**
+	 * Grabs the remote branch that the passed in local branch is tracking. If tracking is not set up, we'll also try to
+	 * find the "matching" branch on "origin". See http://www.kernel.org/pub/software/scm/git/docs/git-push.html#OPTIONS
+	 * and http://www.kernel.org/pub/software/scm/git/docs/git-push.html#_examples for details on why we're doing this
+	 * (because git does).
+	 * 
+	 * @param localBranchName
+	 * @return
+	 */
+	private GitRef matchingRemoteBranch(String localBranchName)
+	{
+		GitRef remote = remoteTrackingBranch(localBranchName);
+		if (remote != null)
+		{
+			return remote;
+		}
+		String remoteMatchingName = "origin/" + localBranchName; //$NON-NLS-1$
+		// If tracking is not set up, git still checks "origin" remote for matching name
+		if (remoteBranches().contains(remoteMatchingName))
+		{
+			return GitRef.refFromString(GitRef.REFS_REMOTES + remoteMatchingName);
+		}
+		return null;
 	}
 
 	public ChangedFile getChangedFileForResource(IResource resource)
@@ -812,9 +931,11 @@ public class GitRepository
 	 */
 	public String[] commitsBehind(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return null;
+		}
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
@@ -829,9 +950,11 @@ public class GitRepository
 	@SuppressWarnings("nls")
 	public boolean shouldPull(String branchName)
 	{
-		GitRef remote = remoteTrackingBranch(branchName);
+		GitRef remote = matchingRemoteBranch(branchName);
 		if (remote == null)
+		{
 			return false;
+		}
 		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 		if (commits != null && commits.length > 0)
 			return true;
@@ -839,7 +962,9 @@ public class GitRepository
 		boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
 				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
 		if (!performFetches)
+		{
 			return false;
+		}
 
 		// Use git ls-remote remotename remote-branchname
 		// Parse out the sha and compare vs the branch's local sha!
@@ -879,19 +1004,18 @@ public class GitRepository
 	{
 		// Given a local branch name (/refs/head/*), we need to track back to the remote + branch.
 		// TODO Store the config contents and only read it again when last mod changes?
-		File configFile = gitFile("config");
-		String contents = "";
+		File configFile = gitFile("config"); //$NON-NLS-1$
+		String contents = ""; //$NON-NLS-1$
 		try
 		{
 			contents = IOUtil.read(new FileInputStream(configFile));
 		}
 		catch (FileNotFoundException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			GitPlugin.logError(e);
 		}
 
-		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName);
+		int index = contents.indexOf("merge = " + GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
 		if (index == -1)
 		{
 			return null;
@@ -908,16 +1032,16 @@ public class GitRepository
 		}
 		String branchDetails = contents.substring(precedingBracket, trailingBracket);
 		String remoteBranchName = null;
-		String remoteName = "origin";
-		String[] lines = branchDetails.split("\\r?\\n|\\r");
+		String remoteName = "origin"; //$NON-NLS-1$
+		String[] lines = branchDetails.split("\\r?\\n|\\r"); //$NON-NLS-1$
 		for (String line : lines)
 		{
 			line = line.trim();
-			if (line.startsWith("remote = "))
+			if (line.startsWith("remote = ")) //$NON-NLS-1$
 			{
 				remoteName = line.substring(9);
 			}
-			else if (line.startsWith("[branch \""))
+			else if (line.startsWith("[branch \"")) //$NON-NLS-1$
 			{
 				remoteBranchName = line.substring(9, line.length() - 2);
 			}
@@ -953,7 +1077,9 @@ public class GitRepository
 			String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 					"^remote\\." + string + "\\.url"); //$NON-NLS-1$ //$NON-NLS-2$
 			if (output == null || output.trim().length() == 0)
+			{
 				continue;
+			}
 			remoteURLs.add(output.substring(output.indexOf(".url ") + 5)); //$NON-NLS-1$
 		}
 		return remoteURLs;
@@ -973,15 +1099,21 @@ public class GitRepository
 		List<String> args = new ArrayList<String>();
 		args.add("branch"); //$NON-NLS-1$
 		if (track)
+		{
 			args.add("--track"); //$NON-NLS-1$
+		}
 		args.add(branchName);
 		if (startPoint != null && startPoint.trim().length() > 0)
+		{
 			args.add(startPoint);
+		}
 
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
 		if (result.keySet().iterator().next() != 0)
+		{
 			return false;
+		}
 		// Add branch to list in model!
 		addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
 		fireBranchAddedEvent(branchName);
@@ -1011,7 +1143,9 @@ public class GitRepository
 				args.toArray(new String[args.size()]));
 		int exitCode = result.keySet().iterator().next();
 		if (exitCode != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
+		}
 		// Remove branch in model!
 		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
 		fireBranchRemovedEvent(branchName);
@@ -1030,9 +1164,13 @@ public class GitRepository
 		Map<Integer, String> result = GitExecutable.instance()
 				.runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
+		}
 		if (result.keySet().iterator().next() != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
@@ -1042,9 +1180,13 @@ public class GitRepository
 		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath.toOSString());
 		if (result == null)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
+		}
 		if (result.keySet().iterator().next() != 0)
+		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
 	}
@@ -1090,10 +1232,14 @@ public class GitRepository
 		for (GitRevSpecifier revSpec : branches)
 		{
 			if (!revSpec.isSimpleRef())
+			{
 				continue;
+			}
 			GitRef ref = revSpec.simpleRef();
 			if (ref == null || ref.type() == null)
+			{
 				continue;
+			}
 			allRefs.add(ref.shortName());
 		}
 		return allRefs;
@@ -1141,14 +1287,18 @@ public class GitRepository
 	{
 		List<String> shas = new ArrayList<String>();
 		if (!mergeHeadFile().exists())
+		{
 			return shas;
+		}
 		BufferedReader reader = null;
 		try
 		{
 			reader = new BufferedReader(new FileReader(mergeHeadFile()));
 			String sha = null;
 			while ((sha = reader.readLine()) != null)
+			{
 				shas.add(sha);
+			}
 		}
 		catch (Exception e)
 		{
@@ -1157,6 +1307,7 @@ public class GitRepository
 		finally
 		{
 			if (reader != null)
+			{
 				try
 				{
 					reader.close();
@@ -1165,6 +1316,7 @@ public class GitRepository
 				{
 					// ignore
 				}
+			}
 		}
 		return shas;
 	}
@@ -1187,19 +1339,27 @@ public class GitRepository
 	public void firePullEvent()
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		PullEvent e = new PullEvent(this);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.pulled(e);
+		}
 	}
 
 	public void firePushEvent()
 	{
 		if (listeners == null || listeners.isEmpty())
+		{
 			return;
+		}
 		PushEvent e = new PushEvent(this);
 		for (IGitRepositoryListener listener : listeners)
+		{
 			listener.pushed(e);
+		}
 	}
 
 	/**
@@ -1233,7 +1393,9 @@ public class GitRepository
 	public void addListener(IGitRepositoryListener listener)
 	{
 		if (listener == null)
+		{
 			return;
+		}
 
 		if (listeners == null)
 		{
@@ -1248,7 +1410,9 @@ public class GitRepository
 	public void removeListener(IGitRepositoryListener listener)
 	{
 		if (listener == null || listeners == null)
+		{
 			return;
+		}
 		synchronized (listeners)
 		{
 			listeners.remove(listener);

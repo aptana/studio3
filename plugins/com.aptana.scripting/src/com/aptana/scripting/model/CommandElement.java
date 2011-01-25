@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.ByteArrayOutputStream;
@@ -55,9 +28,9 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.SourcePrinter;
-import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
 import com.aptana.scripting.ScriptUtils;
+import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptingEngine;
 
 public class CommandElement extends AbstractBundleElement
@@ -143,7 +116,7 @@ public class CommandElement extends AbstractBundleElement
 	private static final String TO_ENV_METHOD_NAME = "to_env"; //$NON-NLS-1$
 
 	private Map<Platform, InvokeUnion> _invokeUnionMap;
-	private Map<Platform, String[]> _keyBindings;
+	private Map<Platform, List<String>> _keyBindings;
 	private InputType[] _inputTypes;
 	private String _inputPath;
 	private OutputType _outputType;
@@ -346,8 +319,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
-					this.getPath(), OS });
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS,
+					new Object[] { this.getPath(), OS });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -381,7 +354,7 @@ public class CommandElement extends AbstractBundleElement
 	public String[] getKeyBindings()
 	{
 		Platform[] platforms = Platform.getCurrentPlatforms();
-		String[] result = null;
+		List<String> result = null;
 
 		if (this._keyBindings == null)
 		{
@@ -394,7 +367,7 @@ public class CommandElement extends AbstractBundleElement
 			{
 				result = this._keyBindings.get(platform);
 
-				if (result != null && result.length > 0)
+				if (result != null && result.size() > 0)
 				{
 					break;
 				}
@@ -406,7 +379,29 @@ public class CommandElement extends AbstractBundleElement
 			result = this._keyBindings.get(Platform.ALL);
 		}
 
-		return result;
+		return result.toArray(new String[result.size()]);
+	}
+
+	/**
+	 * Used for YAML serialization.
+	 */
+	public Map<Platform, List<String>> getKeyBindingMap()
+	{
+		return this._keyBindings;
+	}
+
+	/**
+	 * Used for YAML deserialization.
+	 */
+	public void setKeyBindingMap(Map<Platform, List<String>> keybindingMap)
+	{
+		if (keybindingMap != null)
+		{
+			for (Map.Entry<Platform, List<String>> entry : keybindingMap.entrySet())
+			{
+				setKeyBindings(entry.getKey().getName(), entry.getValue().toArray(new String[entry.getValue().size()]));
+			}
+		}
 	}
 
 	/**
@@ -482,7 +477,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		return this._runType.getName();
 	}
-	
+
 	/**
 	 * Get the values associated with the specified trigger type
 	 * 
@@ -492,12 +487,12 @@ public class CommandElement extends AbstractBundleElement
 	public String[] getTriggerTypeValues(TriggerType type)
 	{
 		String[] result = NO_TRIGGER_VALUES;
-		
+
 		if (type != null && type != TriggerType.UNDEFINED)
 		{
 			String propertyName = type.getPropertyName();
 			Object value = this.get(propertyName);
-			
+
 			if (value instanceof String[])
 			{
 				result = (String[]) value;
@@ -505,10 +500,10 @@ public class CommandElement extends AbstractBundleElement
 			else if (value instanceof Object[])
 			{
 				Object[] objects = (Object[]) value;
-				
+
 				result = new String[objects.length];
-				
-				for (int i = 0; i < objects.length; i++)	
+
+				for (int i = 0; i < objects.length; i++)
 				{
 					result[i] = objects[i].toString();
 				}
@@ -518,7 +513,7 @@ public class CommandElement extends AbstractBundleElement
 				result = new String[] { value.toString() };
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -660,6 +655,7 @@ public class CommandElement extends AbstractBundleElement
 	 */
 	protected void printBody(SourcePrinter printer)
 	{
+		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
@@ -681,7 +677,7 @@ public class CommandElement extends AbstractBundleElement
 		{
 			printer.printlnWithIndent("keys {").increaseIndent(); //$NON-NLS-1$
 
-			for (Map.Entry<Platform, String[]> entry : this._keyBindings.entrySet())
+			for (Map.Entry<Platform, List<String>> entry : this._keyBindings.entrySet())
 			{
 				printer.printWithIndent(entry.getKey().getName()).print(": "); //$NON-NLS-1$
 
@@ -885,8 +881,8 @@ public class CommandElement extends AbstractBundleElement
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Undefined_Key_Binding, new Object[] { this
-					.getPath() });
+			String message = MessageFormat.format(Messages.CommandElement_Undefined_Key_Binding,
+					new Object[] { this.getPath() });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -906,22 +902,22 @@ public class CommandElement extends AbstractBundleElement
 		{
 			if (this._keyBindings == null)
 			{
-				this._keyBindings = new HashMap<Platform, String[]>();
+				this._keyBindings = new HashMap<Platform, List<String>>();
 			}
-			
+
 			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
 			int i = 0;
-			String[] uppercase = new String[keyBindings.length];
-			for(String binding : keyBindings)
+			List<String> uppercase = new ArrayList<String>(keyBindings.length);
+			for (String binding : keyBindings)
 			{
-				uppercase[i++] = binding.toUpperCase();
+				uppercase.add(binding.toUpperCase());
 			}
 			this._keyBindings.put(bindingOS, uppercase);
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS, new Object[] {
-					this.getPath(), OS });
+			String message = MessageFormat.format(Messages.CommandElement_Unrecognized_OS,
+					new Object[] { this.getPath(), OS });
 
 			ScriptLogger.logWarning(message);
 		}
@@ -1006,7 +1002,7 @@ public class CommandElement extends AbstractBundleElement
 	{
 		this.setTrigger(type, NO_TRIGGER_VALUES);
 	}
-	
+
 	/**
 	 * setTrigger
 	 * 
@@ -1015,11 +1011,11 @@ public class CommandElement extends AbstractBundleElement
 	public void setTrigger(String type, String[] values)
 	{
 		TriggerType triggerType = TriggerType.get(type);
-		
+
 		if (triggerType != TriggerType.UNDEFINED && values != null)
 		{
 			String propertyName = triggerType.getPropertyName();
-			
+
 			this.put(propertyName, values);
 		}
 	}

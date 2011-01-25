@@ -1,37 +1,10 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.core.model;
 
 import java.io.File;
@@ -42,6 +15,10 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -364,6 +341,62 @@ public class GitRepositoryTest extends TestCase
 		assertSwitchBranch("master");
 	}
 
+	public void testSwitchBranchClosesOpenProjectsThatDontExistOnDestinationBranch() throws Throwable
+	{
+		testAddBranch();
+
+		assertEquals("master", fRepo.currentBranch());
+		assertSwitchBranch("my_new_branch");
+
+		GitIndex index = fRepo.index();
+		assertTrue(index.changedFiles().isEmpty());
+
+		// Create a new project on this branch!
+		String projectName = "project_on_branch" + System.currentTimeMillis();
+
+		File projectDir = fRepo.workingDirectory().append(projectName).toFile();
+		projectDir.mkdirs();
+
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject project = workspace.getRoot().getProject(projectName);
+
+		IProjectDescription description = workspace.newProjectDescription(projectName);
+		description.setLocation(fRepo.workingDirectory().append(projectName));
+		project.create(description, new NullProgressMonitor());
+
+		// Commit the project on this branch!
+		index.refresh(new NullProgressMonitor());
+
+		// Now there should be a single file that's been changed!
+		List<ChangedFile> changed = index.changedFiles();
+		assertFalse(changed.isEmpty());
+		assertEquals(1, changed.size());
+
+		// Make sure it's shown as having unstaged changes only and is NEW
+		assertUnstaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		// Stage the new file
+		assertFalse(changed.isEmpty());
+		assertTrue(index.stageFiles(changed));
+		assertStaged(changed.get(0));
+		assertStatus(Status.NEW, changed.get(0));
+
+		index.commit("Initial commit");
+		// No more changed files now...
+		assertTrue(index.changedFiles().isEmpty());
+
+		assertSwitchBranch("master");
+
+		// Assert that the new project is closed!
+		project = workspace.getRoot().getProject(projectName);
+		assertFalse(project.isOpen());
+		
+		// assert that there's no .project file stranded there
+		File dotProject = new File(projectDir, IProjectDescription.DESCRIPTION_FILE_NAME);
+		assertFalse(dotProject.exists());
+	}
+
 	public void testDeleteUnMergedBranch() throws Throwable
 	{
 		testAddBranch();
@@ -521,7 +554,7 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected void assertSwitchBranch(String branchName)
 	{
-		assertTrue(fRepo.switchBranch(branchName));
+		assertTrue(fRepo.switchBranch(branchName, new NullProgressMonitor()));
 		assertEquals(branchName, fRepo.currentBranch());
 	}
 }

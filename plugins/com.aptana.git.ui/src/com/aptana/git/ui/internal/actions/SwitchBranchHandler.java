@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -56,7 +57,7 @@ public class SwitchBranchHandler extends AbstractGitHandler
 
 	public static void switchBranch(final GitRepository repo, final String branchName)
 	{
-		if (!repo.switchBranch(branchName))
+		if (!repo.switchBranch(branchName, new NullProgressMonitor()))
 			return;
 		// Now show a tooltip "toast" for 3 seconds to announce success
 		final Shell shell = UIUtils.getActiveShell();
