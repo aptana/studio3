@@ -144,7 +144,7 @@ public final class SyncUtils {
 				out.close();
 			}
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, "Close output stream failed.", e));
+			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, Messages.SyncUtils_ERR_FailToClose, e));
 		}
 	}
 
