@@ -123,7 +123,8 @@ public abstract class ContributionExtensionManager
 	 */
 	public static boolean isLoadedBundle(String bundle)
 	{
-		return Platform.getBundle(bundle).getState() == Bundle.ACTIVE;
+		Bundle b = Platform.getBundle(bundle);
+		return b != null && b.getState() == Bundle.ACTIVE;
 	}
 
 	public IContributedExtension getSelectedContribution(String contentType)
