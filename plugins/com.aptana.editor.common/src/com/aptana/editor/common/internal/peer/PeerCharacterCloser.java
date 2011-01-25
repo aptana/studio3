@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,13 +57,11 @@ import com.aptana.scripting.model.filters.ScopeFilter;
 public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListener
 {
 
-	private static final char[] NO_PAIRS = new char[0];
-
 	private ITextViewer textViewer;
 	private final String CATEGORY = toString();
 	private IPositionUpdater fUpdater = new ExclusivePositionUpdater(CATEGORY);
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
-	private char[] pairs = NO_PAIRS;
+	private List<Character> pairs = Collections.emptyList();
 	private boolean autoInsertEnabled = true;
 
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
@@ -101,7 +100,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 			String scope = getScopeAtOffset(document, offset);
 			this.pairs = getPairs(scope);
-			if (this.pairs == null || this.pairs.length <= 0 || !isAutoInsertCharacter(event.character))
+			if (this.pairs == null || this.pairs.size() <= 0 || !isAutoInsertCharacter(event.character))
 			{
 				return;
 			}
@@ -220,13 +219,13 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		return false;
 	}
 
-	protected char[] getPairs(String scope)
+	protected List<Character> getPairs(String scope)
 	{
 		ScopeFilter filter = new ScopeFilter(scope);
 		List<SmartTypingPairsElement> pairs = BundleManager.getInstance().getPairs(filter);
 		if (pairs == null || pairs.isEmpty())
 		{
-			return NO_PAIRS;
+			return Collections.emptyList();
 		}
 		Map<IScopeSelector, SmartTypingPairsElement> map = new HashMap<IScopeSelector, SmartTypingPairsElement>();
 		for (SmartTypingPairsElement pe : pairs)
@@ -240,7 +239,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 		}
 		IScopeSelector bestMatch = ScopeSelector.bestMatch(map.keySet(), scope);
 		SmartTypingPairsElement yay = map.get(bestMatch);
-		return yay == null ? NO_PAIRS : yay.getPairs();
+		if (yay == null)
+		{
+			return Collections.emptyList();
+		}
+		return yay.getPairs();
 	}
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
@@ -470,11 +473,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	private char getPeerCharacter(char character)
 	{
-		for (int i = 0; i < pairs.length; i += 2)
+		for (int i = 0; i < pairs.size(); i += 2)
 		{
-			if (pairs[i] == character)
+			if (pairs.get(i).charValue() == character)
 			{
-				return pairs[i + 1];
+				return pairs.get(i + 1);
 			}
 		}
 		return character;
@@ -488,9 +491,9 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	 */
 	private boolean isAutoInsertCharacter(char character)
 	{
-		for (int i = 0; i < pairs.length; i += 2)
+		for (int i = 0; i < pairs.size(); i += 2)
 		{
-			if (pairs[i] == character)
+			if (pairs.get(i).charValue() == character)
 			{
 				return true;
 			}
