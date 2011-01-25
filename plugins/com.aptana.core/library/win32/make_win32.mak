@@ -6,7 +6,7 @@ APPVER=5.0
 
 pgm_ver_str="Core platform support library $(maj_ver).$(min_ver).$(rel_ver) for Windows"
 timestamp_str=__DATE__\" \"__TIME__\" (PST)\"
-copyright = "Copyright (c) 2005-2010 Aptana, Inc.  All rights reserved."
+copyright = "Copyright (c) 2005-2011 Appcelerator, Inc.  All rights reserved."
 
 WS_PREFIX   = win32
 CORE_VERSION = $(maj_ver)_$(min_ver)_$(rel_ver)

@@ -1,0 +1,25 @@
+==PREFS==
+css.formatter.wrap.comments.length=80
+css.formatter.line.after.element=1
+css.formatter.indent.blocks=same.line 
+css.formatter.formatter.indentation.size=4
+css.formatter.line.preserve=1
+css.formatter.formatter.tabulation.size=4
+css.formatter.line.after.declaration=0
+css.formatter.wrap.comments=false
+css.formatter.formatter.tabulation.char=space
+==CONTENT==
+.mobd15 .layer2 {
+    border-bottom: 1px solid #174974 !important;
+    padding: 5px 5pt 5px 5px;
+*height:1%;
+text-align:left;
+}
+==FORMATTED==
+.mobd15 .layer2 {
+    border-bottom: 1px solid #174974 !important;
+    padding: 5px 5pt 5px 5px;
+    *
+    height:1%;
+    text-align:left;
+}

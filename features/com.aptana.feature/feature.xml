@@ -567,7 +567,7 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-   
+
    <plugin
          id="org.apache.httpcomponents.httpcore"
          download-size="0"
@@ -576,7 +576,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.yaml.snakeyaml"
+         id="com.aptana.editor.xml.formatter"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -259,12 +259,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 	{
 		if (directoryPathField.getText().trim().length() == 0)
 		{
-			setErrorMessage("Please select a folder");
+			setErrorMessage(Messages.WizardFolderImportPage_ERR_NoFolderSelected);
 			return false;
 		}
 		else if (!new File(directoryPathField.getText()).exists())
 		{
-			setErrorMessage("The selected folder does not exist");
+			setErrorMessage(Messages.WizardFolderImportPage_ERR_FolderNotExist);
 			return false;
 		}
 		else
@@ -272,12 +272,12 @@ public class WizardFolderImportPage extends WizardPage implements IOverwriteQuer
 			String name = projectNameField.getText().trim();
 			if (name.length() == 0)
 			{
-				setErrorMessage("Please provide a project name");
+				setErrorMessage(Messages.WizardFolderImportPage_ERR_NoProjectName);
 				return false;
 			}
 			if (projectsNames.contains(name))
 			{
-				setErrorMessage("A project with this name already exists");
+				setErrorMessage(Messages.WizardFolderImportPage_ERR_ProjectNameExists);
 				return false;
 			}
 		}

@@ -12,8 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jruby.Ruby;
@@ -23,10 +25,12 @@ import org.jruby.util.KCode;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
+import org.yaml.snakeyaml.constructor.Construct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -142,7 +146,7 @@ public class BundleCacher
 			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
 			writer = new FileWriter(configFile);
 
-			Yaml yaml = createYAML();
+			Yaml yaml = createYAML(be.getBundleDirectory());
 			yaml.dump(be, writer);
 			return true;
 		}
@@ -169,7 +173,7 @@ public class BundleCacher
 
 	public BundleElement load(final File bundleDirectory, List<File> bundleFiles, IProgressMonitor monitor)
 	{
-		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		SubMonitor sub = SubMonitor.convert(monitor, 120);
 		BundleElement be = null;
 		try
 		{
@@ -189,7 +193,7 @@ public class BundleCacher
 			FileReader reader = null;
 			try
 			{
-				Yaml yaml = createYAML();
+				Yaml yaml = createYAML(bundleDirectory);
 				reader = new FileReader(cacheFile);
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
@@ -201,6 +205,7 @@ public class BundleCacher
 				{
 					return null;
 				}
+				fireScriptLoadedEvents(be, sub.newChild(20));
 			}
 			catch (Exception e)
 			{
@@ -228,6 +233,73 @@ public class BundleCacher
 			sub.done();
 		}
 		return be;
+	}
+
+	private void fireScriptLoadedEvents(BundleElement be, IProgressMonitor monitor)
+	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
+		// Fire off the events that normally would get fired
+		Set<File> files = getFiles(be, sub.newChild(30));
+		for (File file : files)
+		{
+			BundleManager.getInstance().fireScriptLoadedEvent(file);
+			sub.worked(100 / files.size());
+		}
+		sub.done();
+	}
+
+	private Set<File> getFiles(BundleElement be, IProgressMonitor monitor)
+	{
+		Set<File> files = new HashSet<File>();
+		if (be == null)
+		{
+			return files;
+		}
+
+		String path = be.getPath();
+		files.add(new File(path));
+
+		List<AbstractBundleElement> children = be.getChildren();
+		if (children == null)
+		{
+			return files;
+		}
+		SubMonitor sub = SubMonitor.convert(monitor, children.size());
+		try
+		{
+			for (AbstractBundleElement abe : be.getChildren())
+			{
+				path = abe.getPath();
+				files.add(new File(path));
+				sub.worked(1);
+				if (abe instanceof MenuElement)
+				{
+					MenuElement menu = (MenuElement) abe;
+					files.addAll(getFiles(menu));
+				}
+			}
+		}
+		finally
+		{
+			sub.done();
+		}
+		return files;
+	}
+
+	private Set<File> getFiles(MenuElement parent)
+	{
+		if (parent == null || !parent.hasChildren())
+		{
+			return Collections.emptySet();
+		}
+		Set<File> files = new HashSet<File>();
+		for (MenuElement child : parent.getChildren())
+		{
+			String path = child.getPath();
+			files.add(new File(path));
+			files.addAll(getFiles(child));
+		}
+		return files;
 	}
 
 	private boolean anyFilesNewer(File cacheFile, List<File> bundleFiles, IProgressMonitor monitor)
@@ -282,7 +354,7 @@ public class BundleCacher
 				if (!new File(path).exists())
 				{
 					ScriptingActivator.logInfo(MessageFormat.format(
-							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path));
+							Messages.BundleCacher_FileReferencedInCacheMissingMsg, path, abe.toString()));
 					return true;
 				}
 				if (abe instanceof MenuElement)
@@ -312,7 +384,7 @@ public class BundleCacher
 			if (!new File(path).exists())
 			{
 				ScriptingActivator.logInfo(MessageFormat.format(Messages.BundleCacher_FileReferencedInCacheMissingMsg,
-						path));
+						path, child.toString()));
 				return true;
 			}
 			return anyFileDeleted(child);
@@ -320,19 +392,39 @@ public class BundleCacher
 		return false;
 	}
 
-	private Yaml createYAML()
+	private Yaml createYAML(File bundleDirectory)
 	{
-		return new Yaml(new RubyRegexpConstructor(), new MyRepresenter());
+		return new Yaml(new RubyRegexpConstructor(bundleDirectory), new MyRepresenter(bundleDirectory));
 	}
 
 	private class MyRepresenter extends Representer
 	{
-		public MyRepresenter()
+		private File bundleDirectory;
+
+		public MyRepresenter(File bundleDirectory)
 		{
+			this.bundleDirectory = bundleDirectory;
 			this.representers.put(RubyRegexp.class, new RepresentRubyRegexp());
 			this.representers.put(ScopeSelector.class, new RepresentScopeSelector());
 			this.addClassTag(LazyCommandElement.class, new Tag(COMMAND_TAG));
 			this.addClassTag(LazyEnvironmentElement.class, new Tag(ENVIRONMENT_TAG));
+		}
+
+		@Override
+		protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue,
+				Tag customTag)
+		{
+			if (javaBean instanceof AbstractElement)
+			{
+				if ("path".equals(property.getName())) //$NON-NLS-1$
+				{
+					String path = (String) propertyValue;
+					IPath relative = Path.fromOSString(path).makeRelativeTo(
+							Path.fromOSString(bundleDirectory.getAbsolutePath()));
+					propertyValue = relative.toOSString();
+				}
+			}
+			return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);
 		}
 
 		@Override
@@ -395,8 +487,11 @@ public class BundleCacher
 	class RubyRegexpConstructor extends Constructor
 	{
 
-		public RubyRegexpConstructor()
+		private File bundleDirectory;
+
+		public RubyRegexpConstructor(File bundleDirectory)
 		{
+			this.bundleDirectory = bundleDirectory;
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(COMMAND_TAG), new ConstructCommandElement());
@@ -438,7 +533,7 @@ public class BundleCacher
 
 		// TODO All these subclasses are pretty much the same. Pass in a Class type to constructor and use reflection to
 		// reduce duplication!
-		private abstract class AbstractBundleElementConstruct extends ConstructMapping
+		private abstract class AbstractBundleElementConstruct extends AbstractConstruct
 		{
 			/**
 			 * Grab the path from the mapping node and grab it's value!
@@ -473,6 +568,15 @@ public class BundleCacher
 						}
 					}
 				}
+				if (path != null)
+				{
+					IPath pathObj = Path.fromOSString(path);
+					if (!pathObj.isAbsolute())
+					{
+						// Prepend the bundle directory.
+						path = bundleDirectory.getAbsolutePath() + File.separator + path;
+					}
+				}
 				return path;
 			}
 		}
@@ -482,8 +586,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(BundleElement.class);
-				BundleElement be = new BundleElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				BundleElement be = new BundleElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -493,8 +600,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(CommandElement.class);
-				CommandElement be = new LazyCommandElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				CommandElement be = new LazyCommandElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -504,8 +614,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(SnippetElement.class);
-				SnippetElement be = new SnippetElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				SnippetElement be = new SnippetElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -515,9 +628,31 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(MenuElement.class);
-				MenuElement be = new MenuElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				MenuElement be = new MenuElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
+				forcePathsOfChildren(be.getChildren());
 				return be;
+			}
+
+			private void forcePathsOfChildren(List<MenuElement> children)
+			{
+				if (children != null)
+				{
+					for (MenuElement child : children)
+					{
+						String childPath = child.getPath();
+						IPath pathObj = Path.fromOSString(childPath);
+						if (!pathObj.isAbsolute())
+						{
+							// Prepend the bundle directory.
+							child.setPath(bundleDirectory.getAbsolutePath() + File.separator + childPath);
+						}
+						forcePathsOfChildren(child.getChildren());
+					}
+				}
 			}
 		}
 
@@ -526,8 +661,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(ProjectTemplateElement.class);
-				ProjectTemplateElement be = new ProjectTemplateElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				ProjectTemplateElement be = new ProjectTemplateElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -537,8 +675,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(EnvironmentElement.class);
-				EnvironmentElement be = new LazyEnvironmentElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				EnvironmentElement be = new LazyEnvironmentElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -548,8 +689,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(TemplateElement.class);
-				TemplateElement be = new TemplateElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				TemplateElement be = new TemplateElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -559,8 +703,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(ContentAssistElement.class);
-				ContentAssistElement be = new ContentAssistElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				ContentAssistElement be = new ContentAssistElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -570,8 +717,11 @@ public class BundleCacher
 			public Object construct(Node node)
 			{
 				node.setType(SmartTypingPairsElement.class);
-				SmartTypingPairsElement be = new SmartTypingPairsElement(getPath(node));
-				construct2ndStep(node, be);
+				String path = getPath(node);
+				SmartTypingPairsElement be = new SmartTypingPairsElement(path);
+				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
+				mappingConstruct.construct2ndStep(node, be);
+				be.setPath(path);
 				return be;
 			}
 		}
@@ -595,7 +745,8 @@ public class BundleCacher
 		@Override
 		public boolean isExecutable()
 		{
-			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can tell better if this is executable on this os!
+			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can
+			// tell better if this is executable on this os!
 			return true;
 		}
 

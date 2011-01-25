@@ -54,7 +54,7 @@ class Gem::Dependency
 
     unless TYPES.include? type
       raise ArgumentError, "Valid types are #{TYPES.inspect}, "
-        + "not #{@type.inspect}"
+        + "not #{type.inspect}"
     end
 
     @name        = name
@@ -67,9 +67,6 @@ class Gem::Dependency
 
     @version_requirements = @requirement
   end
-
-  ##
-  # What does this dependency require?
 
   ##
   # A dependency's hash is the XOR of the hashes of +name+, +type+,
@@ -91,7 +88,7 @@ class Gem::Dependency
     @prerelease || requirement.prerelease?
   end
 
-  def pretty_print(q) # :nodoc:
+  def pretty_print q # :nodoc:
     q.group 1, 'Gem::Dependency.new(', ')' do
       q.pp name
       q.text ','
@@ -105,6 +102,9 @@ class Gem::Dependency
       q.pp type
     end
   end
+
+  ##
+  # What does this dependency require?
 
   def requirement
     return @requirement if defined?(@requirement) and @requirement
@@ -160,7 +160,16 @@ class Gem::Dependency
     __requirement
   end
 
-  alias_method :version_requirement, :version_requirements
+  alias version_requirement version_requirements # :nodoc:
+
+  def version_requirements= requirements # :nodoc:
+    warn "#{Gem.location_of_caller.join ':'}:Warning: " \
+         "Gem::Dependency#version_requirements= is deprecated " \
+         "and will be removed on or after August 2010.  " \
+         "Use Gem::Dependency.new."
+
+    @requirement = Gem::Requirement.create requirements
+  end
 
   def == other # :nodoc:
     Gem::Dependency === other &&
@@ -173,7 +182,7 @@ class Gem::Dependency
   # Dependencies are ordered by name.
 
   def <=> other
-    [@name] <=> [other.name]
+    @name <=> other.name
   end
 
   ##
@@ -184,13 +193,11 @@ class Gem::Dependency
 
   def =~ other
     unless Gem::Dependency === other
-      other = Gem::Dependency.new other.name, other.version rescue return false
+      return unless other.respond_to?(:name) && other.respond_to?(:version)
+      other = Gem::Dependency.new other.name, other.version
     end
 
-    pattern = name
-    pattern = /\A#{Regexp.escape pattern}\Z/ unless Regexp === pattern
-
-    return false unless pattern =~ other.name
+    return false unless name === other.name
 
     reqs = other.requirement.requirements
 
@@ -200,6 +207,20 @@ class Gem::Dependency
     version = reqs.first.last
 
     requirement.satisfied_by? version
+  end
+
+  def match? name, version
+    return false unless self.name === name
+    return true if requirement.none?
+
+    requirement.satisfied_by? Gem::Version.new(version)
+  end
+
+  def matches_spec? spec
+    return false unless name === spec.name
+    return true  if requirement.none?
+
+    requirement.satisfied_by?(spec.version)
   end
 
 end

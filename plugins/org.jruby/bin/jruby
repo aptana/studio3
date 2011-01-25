@@ -1,6 +1,6 @@
 #!/bin/bash
 # -----------------------------------------------------------------------------
-# jruby.sh - Start Script for the JRuby interpreter
+# jruby.bash - Start Script for the JRuby interpreter
 #
 # Environment Variable Prequisites
 #
@@ -20,6 +20,7 @@ case "`uname`" in
 esac
 
 # ----- Verify and Set Required Environment Variables -------------------------
+JAVA_VM=-client
 
 ## resolve links - $0 may be a link to  home
 PRG=$0
@@ -71,21 +72,56 @@ for opt in ${JRUBY_OPTS[@]}; do
             esac
         fi
     done
+    if [ $opt == "-server" ]; then # JRUBY-4204
+        JAVA_VM="-server"
+    fi
 done
 JRUBY_OPTS=${JRUBY_OPTS_TEMP}
 
-if [ -z "$JAVA_HOME" ] ; then
-  JAVA_CMD='java'
-else
-  if $cygwin; then
-    JAVA_HOME=`cygpath -u "$JAVA_HOME"`
+if [ -z "$JAVACMD" ] ; then
+  if [ -z "$JAVA_HOME" ] ; then
+    JAVACMD='java'
+  else
+    if $cygwin; then
+      JAVACMD="`cygpath -u "$JAVA_HOME"`/bin/java"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+    fi
   fi
-  JAVA_CMD="$JAVA_HOME/bin/java"
 fi
+
+if [ -z "$JAVA_MEM" ] ; then
+  JAVA_MEM=-Xmx500m
+fi
+
+if [ -z "$JAVA_STACK" ] ; then
+  JAVA_STACK=-Xss1024k
+fi
+
+# process JAVA_OPTS
+unset JAVA_OPTS_TEMP
+JAVA_OPTS_TEMP=""
+for opt in ${JAVA_OPTS[@]}; do
+  case $opt in
+    -server)
+      JAVA_VM="-server";;
+    -Xmx*)
+      JAVA_MEM=$opt;;
+    -Xms*)
+      JAVA_MEM_MIN=$opt;;
+    -Xss*)
+      JAVA_STACK=$opt;;
+    *)
+      JAVA_OPTS_TEMP="${JAVA_OPTS_TEMP} $opt";;
+  esac
+done
+
+JAVA_OPTS=$JAVA_OPTS_TEMP
+
 
 # If you're seeing odd exceptions, you may have a bad JVM install.
 # Uncomment this and report the version to the JRuby team along with error.
-#$JAVA_CMD -version
+#$JAVACMD -version
 
 JRUBY_SHELL=/bin/sh
 
@@ -145,16 +181,6 @@ if $cygwin; then
 fi
 
 # ----- Execute The Requested Command -----------------------------------------
-
-if [ -z "$JAVA_MEM" ] ; then
-  JAVA_MEM=-Xmx500m
-fi
-
-if [ -z "$JAVA_STACK" ] ; then
-  JAVA_STACK=-Xss1024k
-fi
-
-JAVA_VM=-client
 JAVA_ENCODING=""
 
 declare -a java_args
@@ -164,6 +190,7 @@ java_class=org.jruby.Main
 
 # Split out any -J argument for passing to the JVM.
 # Scanning for args is aborted by '--'.
+set -- $JRUBY_OPTS "$@"
 while [ $# -gt 0 ]
 do
     case "$1" in
@@ -172,14 +199,16 @@ do
         val=${1:2}
         if [ "${val:0:4}" = "-Xmx" ]; then
             JAVA_MEM=$val
+        elif [ "${val:0:4}" = "-Xms" ]; then
+            JAVA_MEM_MIN=$val
         elif [ "${val:0:4}" = "-Xss" ]; then
             JAVA_STACK=$val
         elif [ "${val}" = "" ]; then
-            $JAVA_CMD -help
+            $JAVACMD -help
             echo "(Prepend -J in front of these options when using 'jruby' command)" 
             exit
         elif [ "${val}" = "-X" ]; then
-            $JAVA_CMD -X
+            $JAVACMD -X
             echo "(Prepend -J in front of these options when using 'jruby' command)" 
             exit
         elif [ "${val}" = "-classpath" ]; then
@@ -199,22 +228,17 @@ do
             java_args=("${java_args[@]}" "${1:2}")
         fi
         ;;
+     # Match -Xa.b.c=d to translate to -Da.b.c=d as a java option
+     -X*)
+	val=${1:2}
+	if expr "$val" : '.*[.]' > /dev/null; then
+	  java_args=("${java_args[@]}" "-Djruby.${val}")
+	fi
+	;;
      # Match switches that take an argument
      -C|-e|-I|-S) ruby_args=("${ruby_args[@]}" "$1" "$2"); shift ;;
      # Match same switches with argument stuck together
      -e*|-I*|-S*) ruby_args=("${ruby_args[@]}" "$1" ) ;;
-     # Run with the instrumented profiler: http://jiprof.sourceforge.net/
-     --profile) 
-       PROFILE_ARGS="-javaagent:$JRUBY_HOME/lib/profile.jar -Dprofile.properties=$JRUBY_HOME/lib/profile-ruby.properties"
-       JRUBY_OPTS=("${JRUBY_OPTS[@]}" "-X+C")
-       VERIFY_JRUBY="yes"
-       ;;
-     # Run with the instrumented profiler: http://jiprof.sourceforge.net/
-     --profile-all) 
-       PROFILE_ARGS="-javaagent:$JRUBY_HOME/lib/profile.jar -Dprofile.properties=$JRUBY_HOME/lib/profile-all.properties"
-       JRUBY_OPTS=("${JRUBY_OPTS[@]}" "-X+C")
-       VERIFY_JRUBY="yes"
-       ;;
      # Run with JMX management enabled
      --manage)
         java_args=("${java_args[@]}" "-Dcom.sun.management.jmxremote")
@@ -225,12 +249,13 @@ do
      # Run under JDB
      --jdb)
         if [ -z "$JAVA_HOME" ] ; then
-          JAVA_CMD='jdb'
+          JAVACMD='jdb'
         else
           if $cygwin; then
-            JAVA_HOME=`cygpath -u "$JAVA_HOME"`
+            JAVACMD="`cygpath -u "$JAVA_HOME"`/bin/jdb"
+          else
+            JAVACMD="$JAVA_HOME/bin/jdb"
           fi
-          JAVA_CMD="$JAVA_HOME/bin/jdb"
         fi 
         java_args=("${java_args[@]}" "-sourcepath" "$JRUBY_HOME/lib/ruby/1.8:.")
         JRUBY_OPTS=("${JRUBY_OPTS[@]}" "-X+C") ;;
@@ -273,7 +298,7 @@ ruby_args=("${ruby_args[@]}" "$@")
 # Put the ruby_args back into the position arguments $1, $2 etc
 set -- "${ruby_args[@]}"
 
-JAVA_OPTS="$JAVA_OPTS $JAVA_MEM $JAVA_STACK"
+JAVA_OPTS="$JAVA_OPTS $JAVA_MEM $JAVA_MEM_MIN $JAVA_STACK"
 
 JFFI_BOOT=""
 if [ -d $JRUBY_HOME/lib/native/ ]; then
@@ -308,7 +333,7 @@ fi
 
 if [ "$nailgun_client" != "" ]; then
   if [ -f $JRUBY_HOME/tool/nailgun/ng ]; then
-    exec $JRUBY_HOME/tool/nailgun/ng org.jruby.util.NailMain $JRUBY_OPTS "$@"
+    exec $JRUBY_HOME/tool/nailgun/ng org.jruby.util.NailMain "$@"
   else
     echo "error: ng executable not found; run 'make' in ${JRUBY_HOME}/tool/nailgun"
     exit 1
@@ -319,11 +344,11 @@ if [ "$VERIFY_JRUBY" != "" ]; then
       echo "Running with instrumented profiler"
   fi
 
-  "$JAVA_CMD" $PROFILE_ARGS $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -classpath "$JRUBY_CP$CP_DELIMITER$CP$CP_DELIMITER$CLASSPATH" \
+  "$JAVACMD" $PROFILE_ARGS $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -classpath "$JRUBY_CP$CP_DELIMITER$CP$CP_DELIMITER$CLASSPATH" \
     "-Djruby.home=$JRUBY_HOME" \
     "-Djruby.lib=$JRUBY_HOME/lib" -Djruby.script=jruby \
     "-Djruby.shell=$JRUBY_SHELL" \
-    $java_class $JRUBY_OPTS "$@"
+    $java_class "$@"
 
   # Record the exit status immediately, or it will be overridden.
   JRUBY_STATUS=$?
@@ -342,11 +367,11 @@ if [ "$VERIFY_JRUBY" != "" ]; then
 else
   if $cygwin; then
     # exec doed not work correctly with cygwin bash
-    "$JAVA_CMD" $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -Xbootclasspath/a:"$JRUBY_CP" -classpath "$CP$CP_DELIMITER$CLASSPATH" \
+    "$JAVACMD" $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -Xbootclasspath/a:"$JRUBY_CP" -classpath "$CP$CP_DELIMITER$CLASSPATH" \
       "-Djruby.home=$JRUBY_HOME" \
       "-Djruby.lib=$JRUBY_HOME/lib" -Djruby.script=jruby \
       "-Djruby.shell=$JRUBY_SHELL" \
-      $java_class $JRUBY_OPTS "$@"
+      $java_class "$@"
 
     # Record the exit status immediately, or it will be overridden.
     JRUBY_STATUS=$?
@@ -355,11 +380,11 @@ else
 
     exit $JRUBY_STATUS
   else
-    exec "$JAVA_CMD" $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -Xbootclasspath/a:"$JRUBY_CP" -classpath "$CP$CP_DELIMITER$CLASSPATH" \
+    exec "$JAVACMD" $JAVA_OPTS "$JFFI_OPTS" "${java_args[@]}" -Xbootclasspath/a:"$JRUBY_CP" -classpath "$CP$CP_DELIMITER$CLASSPATH" \
       "-Djruby.home=$JRUBY_HOME" \
       "-Djruby.lib=$JRUBY_HOME/lib" -Djruby.script=jruby \
       "-Djruby.shell=$JRUBY_SHELL" \
-      $java_class $JRUBY_OPTS "$@"
+      $java_class "$@"
   fi
 fi
 fi

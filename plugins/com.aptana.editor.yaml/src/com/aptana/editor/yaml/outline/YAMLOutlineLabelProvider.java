@@ -20,7 +20,7 @@ public class YAMLOutlineLabelProvider extends CommonOutlineLabelProvider
 	private static final String SELECTOR_IMAGE = "icons/selector.png"; //$NON-NLS-1$
 	private static final String STRING_IMAGE = "icons/string.png"; //$NON-NLS-1$
 	private static final String NUMBER_IMAGE = "icons/number.png"; //$NON-NLS-1$
-	// FIXME This numbner detection pattern was stolen from YAMLCodeScanner
+	// FIXME This number detection pattern was stolen from YAMLCodeScanner
 	private final static Pattern p = Pattern
 			.compile("(\\+|-)?((0(x|X|o|O)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)(L|l|UL|ul|u|U|F|f)?"); //$NON-NLS-1$
 

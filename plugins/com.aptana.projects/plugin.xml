@@ -34,10 +34,6 @@
             %wizard.webproject.description
          </description>
       </wizard>
-      <category
-            id="com.aptana.ui.wizards.category"
-            name="%category.web.name">
-      </category>
       <primaryWizard
             id="com.aptana.ui.wizards.NewWebProject">
       </primaryWizard>
@@ -126,7 +122,8 @@
 			<visibleWhen>
                <with
                      variable="activeMenuSelection">
-                  <iterate>
+                  <iterate
+                        ifEmpty="false">
                      <adapt
                            type="com.aptana.ide.ui.io.navigator.FileSystemObject">
                      </adapt>
