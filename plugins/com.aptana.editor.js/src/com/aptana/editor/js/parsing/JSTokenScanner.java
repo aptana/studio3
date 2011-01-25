@@ -154,7 +154,7 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 			wordRule.addWord(operator, createToken(type));
 		}
 		rules.add(wordRule);
-		
+
 		// NOTE: Numbers can start with a period, so we need to check for numbers
 		// before the operator list below, which includes the dot operator
 		rules.add(new JSNumberRule(createToken(JSTokenType.NUMBER)));
@@ -212,7 +212,15 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 	@Override
 	public IToken nextToken()
 	{
-		return fToken = super.nextToken();
+		IToken result = super.nextToken();
+
+		// NOTE: Only save the last token if it is not whitespace
+		if (result.isWhitespace() == false)
+		{
+			fToken = result;
+		}
+
+		return result;
 	}
 
 	/*
