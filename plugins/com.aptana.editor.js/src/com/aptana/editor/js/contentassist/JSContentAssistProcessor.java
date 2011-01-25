@@ -41,6 +41,7 @@ import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -326,6 +327,45 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
+		IParseNode node = this.getActiveASTNode(offset);
+		
+		System.out.println("node(1) = " + node);
+		
+		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		{
+			node = node.getParent();
+		}
+		
+		System.out.println("node(2) = " + node);
+		
+		if (node instanceof JSNode)
+		{
+			if (((JSNode) node).getNodeType() == JSNodeTypes.ARGUMENTS)
+			{
+				JSArgumentsNode args = (JSArgumentsNode) node;
+				int match = -1;
+				
+				for (int i = 0; i < args.getChildCount(); i++)
+				{
+					IParseNode arg = args.getChild(i);
+					
+					if (arg.contains(offset))
+					{
+						match = i;
+					}
+				}
+				
+				if (match == -1)
+				{
+					System.out.println("inside function call, assuming position 0");
+				}
+				else
+				{
+					System.out.println("inside argument " + match);
+				}
+			}
+		}
+		
 		// TODO Auto-generated method stub
 		String text1 = "name";
 		String text2 = "name, event";
