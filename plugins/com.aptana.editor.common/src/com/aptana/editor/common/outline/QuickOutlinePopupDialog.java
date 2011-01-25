@@ -2,12 +2,12 @@ package com.aptana.editor.common.outline;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.dialogs.PopupDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -70,7 +70,7 @@ public class QuickOutlinePopupDialog extends PopupDialog
 	protected Control createDialogArea(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new GridLayout());
+		GridLayoutFactory.fillDefaults().applyTo(composite);
 
 		fPage.createControl(composite);
 
@@ -86,11 +86,7 @@ public class QuickOutlinePopupDialog extends PopupDialog
 		{
 			fPage.revealPosition(offset);
 		}
-
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.widthHint = 320;
-		gd.heightHint = 240;
-		composite.setLayoutData(gd);
+		GridDataFactory.fillDefaults().hint(320, 240).applyTo(composite);
 
 		return composite;
 	}
