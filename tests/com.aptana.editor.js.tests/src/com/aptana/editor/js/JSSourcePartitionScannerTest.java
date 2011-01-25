@@ -34,9 +34,8 @@ public class JSSourcePartitionScannerTest extends TestCase
 		{
 			contentType = IDocument.DEFAULT_CONTENT_TYPE;
 		}
-		
-		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
-				getContentType(code, offset));
+
+		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType, getContentType(code, offset));
 	}
 
 	@Override
@@ -45,7 +44,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 		partitioner = null;
 		super.tearDown();
 	}
-	
+
 	private String getContentType(String content, int offset)
 	{
 		if (partitioner == null)
@@ -53,14 +52,14 @@ public class JSSourcePartitionScannerTest extends TestCase
 			// NOTE: the following is based on SimpleDocumentProvider#connect(Object)
 			IDocument document = new Document(content);
 			IPartitioningConfiguration configuration = JSSourceConfiguration.getDefault();
-			
+
 			partitioner = new FastPartitioner(new JSSourcePartitionScanner(), configuration.getContentTypes());
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
 
 			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, configuration);
 		}
-		
+
 		return partitioner.getContentType(offset);
 	}
 
@@ -91,7 +90,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 1);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 35);
 	}
-	
+
 	public void testSimpleRegexp()
 	{
 		String source = "var regexp = /^ace$/;\n";
@@ -111,7 +110,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 21);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 22);
 	}
-	
+
 	public void testComplexRegexp()
 	{
 		String source =
@@ -141,12 +140,11 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 26);
 		assertContentType(JSSourceConfiguration.JS_SINGLELINE_COMMENT, source, 27);
 	}
-	
-	// NOTE: the following is broken in JS partitioning
+
 	public void testDivisions()
 	{
 		String source = "if ( x / s >= 0) { x = x / 10; }";
-		
+
 		for (int i = 0; i < source.length(); i++)
 		{
 			assertContentType(JSSourceConfiguration.DEFAULT, source, i);
@@ -157,9 +155,9 @@ public class JSSourcePartitionScannerTest extends TestCase
 	{
 
 		String source =
-		//           1          2
+		// 1 2
 		// 01234567890 123456789012
-		  "if (/Mobile\\//.test(){}";
+		"if (/Mobile\\//.test(){}";
 
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 4);
