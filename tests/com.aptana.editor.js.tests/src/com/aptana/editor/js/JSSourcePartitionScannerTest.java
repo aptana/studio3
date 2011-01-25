@@ -11,11 +11,11 @@ import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 
-import com.aptana.editor.common.ExtendedFastPartitioner;
-import com.aptana.editor.common.NullPartitionerSwitchStrategy;
-import com.aptana.editor.common.text.rules.CompositePartitionScanner;
-import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
+import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.IPartitioningConfiguration;
 
 /**
  * @author Chris
@@ -23,13 +23,19 @@ import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
  */
 public class JSSourcePartitionScannerTest extends TestCase
 {
-
-	private ExtendedFastPartitioner partitioner;
+	private IDocumentPartitioner partitioner;
 
 	private void assertContentType(String contentType, String code, int offset)
 	{
-		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType,
-				getContentType(code, offset));
+		// HACK: Not sure how to force the default content type of our Document to
+		// JSSourceConfiguration.DEFAULT, so we map those values to IDocument.DEFAULT_CONTENT_TYPE
+		// as a workaround
+		if (contentType.equals(JSSourceConfiguration.DEFAULT))
+		{
+			contentType = IDocument.DEFAULT_CONTENT_TYPE;
+		}
+
+		assertEquals("Content type doesn't match expectations for: " + code.charAt(offset), contentType, getContentType(code, offset));
 	}
 
 	@Override
@@ -43,16 +49,17 @@ public class JSSourcePartitionScannerTest extends TestCase
 	{
 		if (partitioner == null)
 		{
+			// NOTE: the following is based on SimpleDocumentProvider#connect(Object)
 			IDocument document = new Document(content);
-			CompositePartitionScanner partitionScanner = new CompositePartitionScanner(JSSourceConfiguration
-					.getDefault().createSubPartitionScanner(), new NullSubPartitionScanner(),
-					new NullPartitionerSwitchStrategy());
-			partitioner = new ExtendedFastPartitioner(partitionScanner, JSSourceConfiguration.getDefault()
-					.getContentTypes());
-			partitionScanner.setPartitioner(partitioner);
+			IPartitioningConfiguration configuration = JSSourceConfiguration.getDefault();
+
+			partitioner = new FastPartitioner(new JSSourcePartitionScanner(), configuration.getContentTypes());
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);
+
+			CommonEditorPlugin.getDefault().getDocumentScopeManager().registerConfiguration(document, configuration);
 		}
+
 		return partitioner.getContentType(offset);
 	}
 
@@ -83,7 +90,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 1);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 35);
 	}
-	
+
 	public void testSimpleRegexp()
 	{
 		String source = "var regexp = /^ace$/;\n";
@@ -103,7 +110,7 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 21);
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 22);
 	}
-	
+
 	public void testComplexRegexp()
 	{
 		String source =
@@ -133,25 +140,24 @@ public class JSSourcePartitionScannerTest extends TestCase
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 26);
 		assertContentType(JSSourceConfiguration.JS_SINGLELINE_COMMENT, source, 27);
 	}
-	
-	// NOTE: the following is broken in JS partitioning
-//	public void testDivisions()
-//	{
-//		String source = "if ( x / s >= 0) { x = x / 10; }";
-//		
-//		for (int i = 0; i < source.length(); i++)
-//		{
-//			assertContentType(JSSourceConfiguration.DEFAULT, source, i);
-//		}
-//	}
+
+	public void testDivisions()
+	{
+		String source = "if ( x / s >= 0) { x = x / 10; }";
+
+		for (int i = 0; i < source.length(); i++)
+		{
+			assertContentType(JSSourceConfiguration.DEFAULT, source, i);
+		}
+	}
 
 	public void testEndDoubleSlashRegexp()
 	{
 
 		String source =
-		//           1          2
+		// 1 2
 		// 01234567890 123456789012
-		  "if (/Mobile\\//.test(){}";
+		"if (/Mobile\\//.test(){}";
 
 		assertContentType(JSSourceConfiguration.DEFAULT, source, 0);
 		assertContentType(JSSourceConfiguration.JS_REGEXP, source, 4);

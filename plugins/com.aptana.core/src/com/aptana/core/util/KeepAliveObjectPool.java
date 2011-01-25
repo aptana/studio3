@@ -87,8 +87,12 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 			}
 			else
 			{
-				// keeps the connection alive
-				validate(c);
+				// keeps the connection alive unless it no longer validates
+				if (!validate(c))
+				{
+					unlocked.remove(c);
+					expire(c);
+				}
 			}
 		}
 	}

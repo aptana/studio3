@@ -18,6 +18,14 @@ public class Messages extends NLS
 	public static String CommonOutlinePage_Sorting_LBL;
 	public static String CommonOutlinePage_Sorting_TTP;
 
+	public static String CommonQuickOutlinePage_CollapseAll;
+
+	public static String CommonQuickOutlinePage_ExpandAll;
+
+	public static String CommonQuickOutlinePage_FilterLabel;
+
+	public static String CommonQuickOutlinePage_SortAlphabetically;
+
 	static
 	{
 		// initialize resource bundle

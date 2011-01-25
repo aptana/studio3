@@ -275,7 +275,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static void logError(Exception e)
+	public static void logError(Throwable e)
 	{
 		if (e instanceof CoreException)
 			logError((CoreException) e);
