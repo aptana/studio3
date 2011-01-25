@@ -5,52 +5,62 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.theme.ThemePlugin;
 
-public class QuickOutlinePopupDialog extends PopupDialog implements DisposeListener
+public class QuickOutlinePopupDialog extends PopupDialog
 {
 	/**
-	 * Content outline page.
+	 * Content outline Page.
 	 */
-	private ContentOutlinePage page;
+	private CommonQuickOutlinePage fPage;
 
+	/**
+	 * The active editor that the quick outline is based upon.
+	 */
 	private AbstractThemeableEditor fEditor;
 
 	/**
 	 * QuickOutlinePopupDialog constructor.
 	 * 
 	 * @param parent
-	 *            - parent.
+	 *            - A Shell used as the parent for this dialog.
 	 * @param editor
-	 *            - editor.
-	 * @param infoText
-	 *            - info text.
+	 *            - The active editor we're basing the outline on.
 	 */
-	public QuickOutlinePopupDialog(Shell parent, AbstractThemeableEditor editor, ContentOutlinePage page,
-			String infoText)
+	public QuickOutlinePopupDialog(Shell parent, AbstractThemeableEditor editor)
 	{
-		super(parent, SWT.BORDER | SWT.RESIZE, true, false, false, true, true, null, infoText);
-		this.page = page;
+		super(parent, SWT.BORDER | SWT.RESIZE, true, false, false, true, true, null, null);
+		this.fPage = new CommonQuickOutlinePage(editor);
 		this.fEditor = editor;
-		// FIXME Auto-close when editor closes
+		// FIXME Auto-close when editor closes?
 	}
 
+	/**
+	 * Override to use theme background color.
+	 */
 	@Override
 	protected Color getBackground()
 	{
 		return ThemePlugin.getDefault().getColorManager()
 				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground());
+	}
+
+	/**
+	 * Override to use theme foreground color.
+	 */
+	@Override
+	protected Color getForeground()
+	{
+		return ThemePlugin.getDefault().getColorManager()
+				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground());
 	}
 
 	/**
@@ -61,27 +71,21 @@ public class QuickOutlinePopupDialog extends PopupDialog implements DisposeListe
 	{
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout());
-		if (page instanceof CommonQuickOutlinePage)
-		{
-			((CommonQuickOutlinePage) page).createControl(composite, false);
 
-			ISourceViewer viewer = fEditor.getISourceViewer();
-			int offset = viewer.getTextWidget().getCaretOffset();
-			if (viewer instanceof ITextViewerExtension5)
-			{
-				ITextViewerExtension5 v5 = (ITextViewerExtension5) viewer;
-				offset = v5.widgetOffset2ModelOffset(offset);
-			}
-			if (offset != -1)
-			{
-				((CommonQuickOutlinePage) page).revealPosition(offset);
-			}
-		}
-		else
+		fPage.createControl(composite);
+
+		// Try to select the current item we're on in editor in the outline
+		ISourceViewer viewer = fEditor.getISourceViewer();
+		int offset = viewer.getTextWidget().getCaretOffset();
+		if (viewer instanceof ITextViewerExtension5)
 		{
-			page.createControl(composite);
+			ITextViewerExtension5 v5 = (ITextViewerExtension5) viewer;
+			offset = v5.widgetOffset2ModelOffset(offset);
 		}
-		getShell().addDisposeListener(this);
+		if (offset != -1)
+		{
+			fPage.revealPosition(offset);
+		}
 
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.widthHint = 320;
@@ -97,11 +101,7 @@ public class QuickOutlinePopupDialog extends PopupDialog implements DisposeListe
 	@Override
 	protected Control createTitleControl(Composite parent)
 	{
-		if (page instanceof CommonQuickOutlinePage)
-		{
-			return ((CommonQuickOutlinePage) page).createSearchArea(parent, true);
-		}
-		return super.createTitleControl(parent);
+		return fPage.createSearchArea(parent);
 	}
 
 	/**
@@ -111,10 +111,7 @@ public class QuickOutlinePopupDialog extends PopupDialog implements DisposeListe
 	protected void fillDialogMenu(IMenuManager dialogMenu)
 	{
 		super.fillDialogMenu(dialogMenu);
-		if (page instanceof CommonQuickOutlinePage)
-		{
-			((CommonQuickOutlinePage) page).contributeToQuickOutlineMenu(dialogMenu);
-		}
+		fPage.contributeToQuickOutlineMenu(dialogMenu);
 	}
 
 	/**
@@ -123,16 +120,6 @@ public class QuickOutlinePopupDialog extends PopupDialog implements DisposeListe
 	@Override
 	protected Control getFocusControl()
 	{
-		if (page instanceof CommonQuickOutlinePage)
-		{
-			return ((CommonQuickOutlinePage) page).getSearchBox();
-		}
-		return super.getFocusControl();
-	}
-
-	public void widgetDisposed(DisposeEvent e)
-	{
-		// TODO Auto-generated method stub
-		close();
+		return fPage.getSearchBox();
 	}
 }

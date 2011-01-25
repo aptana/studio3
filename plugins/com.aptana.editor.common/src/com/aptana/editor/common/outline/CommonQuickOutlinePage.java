@@ -42,6 +42,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.ToolBarManager;
@@ -59,6 +60,7 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -70,49 +72,64 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.parsing.ast.IParseNode;
 
 /**
  * @author Paul Colton
  * @author Kevin Sawicki
  * @author Kevin Lindsey
+ * @author Chris Williams
  */
-public class CommonQuickOutlinePage extends ContentOutlinePage
+class CommonQuickOutlinePage extends ContentOutlinePage
 {
 	private static final int FILTER_REFRESH_DELAY = 200;
 	private static final int REFRESH_DELAY = 500;
 
+	/**
+	 * Main container for the page.
+	 */
 	private Composite _composite;
+	/**
+	 * The active editor for this outline.
+	 */
 	private AbstractThemeableEditor _editor;
+	/**
+	 * The filter used to narrow down the {@link #_treeViewer}
+	 */
 	private PatternFilter _filter;
+	/**
+	 * The pattern used to generate the {@link #_filter}
+	 */
 	private String _pattern;
+	/**
+	 * Jobs used to refresh the tree after the filter changes or the document content changes.
+	 */
 	private WorkbenchJob _filterRefreshJob;
 	private WorkbenchJob _delayedRefreshJob;
+	/**
+	 * The actual text field where the filter/search pattern is entered.
+	 */
 	private Text _searchBox;
+	/**
+	 * The Tree that holds the outline.
+	 */
 	private TreeViewer _treeViewer;
+	/**
+	 * Listener for document content changes to trigger {@link #_delayedRefreshJob}.
+	 */
 	private IDocumentListener _documentListener;
-	private IDocument _document;
-
-	private boolean _hide;
-
-	// FIXME Re-enable sort/expand/collapse actions
-	// private ActionContributionItem _sortItem;
-	// private ActionContributionItem _collapseItem;
-	// private ActionContributionItem _expandItem;
-	// private ActionContributionItem _hidePrivateItem;
-	// private ActionContributionItem _splitItem;
-
-	private ActionContributionItem openAction;
 
 	private ToolBarManager _toolbarManager;
 
@@ -156,28 +173,8 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	 */
 	public void createControl(Composite parent)
 	{
-		createControl(parent, true);
-	}
-
-	/**
-	 * Creates page control.
-	 * 
-	 * @param parent
-	 *            - page parent.
-	 * @param createSearchArea
-	 *            - whether to create search area or it would be created separately through calling
-	 *            {@link CommonQuickOutlinePage#createSearchArea(Composite)} by a third party.
-	 */
-	public void createControl(Composite parent, boolean createSearchArea)
-	{
 		// create main container
 		this._composite = createComposite(parent);
-
-		if (createSearchArea)
-		{
-			// create top strip and search area
-			this.createSearchArea(this._composite, false);
-		}
 
 		// create tree view
 		this._treeViewer = this.createTreeViewer(this._composite);
@@ -205,13 +202,11 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
-				// FIXME How come return/enter don't select the element?!
 				gotoSelectedElement();
 			}
 		});
 
 		// apply tree filters
-		// this._treeViewer.addFilter(new UnifiedViewerFilter(this));
 		this._filter = new PatternFilter()
 		{
 			/**
@@ -241,12 +236,6 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 		};
 		this._treeViewer.addFilter(this._filter);
 
-		// add filters
-		// for (BaseFilter filter : this._filters)
-		// {
-		// this._treeViewer.addFilter(filter);
-		// }
-
 		// create filter refresh job
 		this._filterRefreshJob = this.createRefreshJob();
 		this._filterRefreshJob.setSystem(true);
@@ -257,8 +246,11 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 
 		// create document change listener and add to editor
 		this.createDocumentListener();
-		this._document = this._editor.getDocumentProvider().getDocument(this._editor.getEditorInput());
-		this._document.addDocumentListener(this._documentListener);
+		IDocument document = getDocument();
+		if (document != null)
+		{
+			document.addDocumentListener(this._documentListener);
+		}
 
 		// refresh tree
 		this.refresh();
@@ -270,7 +262,7 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	 * @param documentPos
 	 *            - document position.
 	 */
-	public void revealPosition(int documentPos)
+	void revealPosition(int documentPos)
 	{
 		IStructuredContentProvider provider = (IStructuredContentProvider) getTreeViewer().getContentProvider();
 		final Object[] originalElements = provider.getElements(_treeViewer.getInput());
@@ -299,9 +291,6 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 				expandElement(element, treeContentProvider, elements, parents);
 			}
 		}
-
-		// TreePath path = new TreePath(new Object[]{elements.get(0), elements.get(4)});
-		// _treeViewer.setSelection(new TreeSelection(path), true);
 
 		Object bestElement = null;
 		int bestElementStartingOffset = -1;
@@ -412,15 +401,9 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 				// SWT errors may be thrown here and will show as an error box since this is done on the UI thread
 				// Catch everything and log it so that the dialog doesn't annoy the user since they may be typing into
 				// the editor when this code throws errors and will impact them severely
-				catch (Exception e)
+				catch (Throwable e)
 				{
-					// IdeLog.logError(UnifiedEditorsPlugin.getDefault(),
-					// Messages.UnifiedOutlinePage_ErrorRefreshingOutline, e);
-				}
-				catch (Error e)
-				{
-					// IdeLog.logError(UnifiedEditorsPlugin.getDefault(),
-					// Messages.UnifiedOutlinePage_ErrorRefreshingOutline, e);
+					CommonEditorPlugin.logError(e);
 				}
 
 				return Status.OK_STATUS;
@@ -431,30 +414,33 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	/**
 	 * createDocumentListener
 	 */
-	private void createDocumentListener()
+	private synchronized void createDocumentListener()
 	{
-		this._documentListener = new IDocumentListener()
+		if (this._documentListener == null)
 		{
-			/**
-			 * @see org.eclipse.jface.text.IDocumentListener#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
-			 */
-			public void documentAboutToBeChanged(DocumentEvent event)
+			this._documentListener = new IDocumentListener()
 			{
-			}
-
-			/**
-			 * @see org.eclipse.jface.text.IDocumentListener#documentChanged(org.eclipse.jface.text.DocumentEvent)
-			 */
-			public void documentChanged(DocumentEvent event)
-			{
-				// cancel currently running job first, to prevent unnecessary redraw
-				if (_delayedRefreshJob != null)
+				/**
+				 * @see org.eclipse.jface.text.IDocumentListener#documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent)
+				 */
+				public void documentAboutToBeChanged(DocumentEvent event)
 				{
-					_delayedRefreshJob.cancel();
-					_delayedRefreshJob.schedule(REFRESH_DELAY);
 				}
-			}
-		};
+
+				/**
+				 * @see org.eclipse.jface.text.IDocumentListener#documentChanged(org.eclipse.jface.text.DocumentEvent)
+				 */
+				public void documentChanged(DocumentEvent event)
+				{
+					// cancel currently running job first, to prevent unnecessary redraw
+					if (_delayedRefreshJob != null)
+					{
+						_delayedRefreshJob.cancel();
+						_delayedRefreshJob.schedule(REFRESH_DELAY);
+					}
+				}
+			};
+		}
 	}
 
 	/**
@@ -535,11 +521,9 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	 * 
 	 * @param parent
 	 *            - parent
-	 * @param embedded
-	 *            - whether to create embedded search area.
 	 * @return Composite
 	 */
-	public Composite createSearchArea(Composite parent, boolean embedded)
+	Composite createSearchArea(Composite parent)
 	{
 		GridLayout contentAreaLayout = new GridLayout();
 
@@ -580,24 +564,8 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 		result.setLayout(contentAreaLayout);
 		result.setLayoutData(data);
 
-		// create label
-		if (!embedded)
-		{
-			Label searchLabel = new Label(result, SWT.NONE);
-			searchLabel.setText(Messages.CommonQuickOutlinePage_FilterLabel);
-		}
-
 		// create text box
-		int style = 0;
-		if (embedded)
-		{
-			style = SWT.SINGLE | SWT.FOCUSED;
-		}
-		else
-		{
-			style = SWT.SINGLE | SWT.BORDER;
-		}
-		this._searchBox = new Text(result, style);
+		this._searchBox = new Text(result, SWT.SINGLE | SWT.FOCUSED);
 		this._searchBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		this._searchBox.setEditable(true);
 		this._searchBox.addModifyListener(new ModifyListener()
@@ -632,8 +600,6 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 
 		_toolbarManager.update(false);
 		_toolbarManager.getControl().update();
-
-		// this._filters = filters.toArray(new BaseFilter[filters.size()]);
 
 		return result;
 	}
@@ -672,22 +638,19 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 
 					result = item1.equals(item2);
 				}
-				// else if (a instanceof IParseNode && b instanceof IParseNode)
-				// {
-				// if (a == b)
-				// {
-				// result = true;
-				// }
-				// else
-				// {
-				// IParseNode node1 = (IParseNode) a;
-				// IParseNode node2 = (IParseNode) b;
-				// String path1 = node1.getUniquePath();
-				// String path2 = node2.getUniquePath();
-				//
-				// result = path1.equals(path2);
-				// }
-				// }
+				else if (a instanceof IParseNode && b instanceof IParseNode)
+				{
+					if (a == b)
+					{
+						result = true;
+					}
+					else
+					{
+						IParseNode node1 = (IParseNode) a;
+						IParseNode node2 = (IParseNode) b;
+						result = node1.equals(node2);
+					}
+				}
 				else
 				{
 					result = (a == b);
@@ -713,13 +676,40 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	 */
 	public void dispose()
 	{
-		super.dispose();
-
-		if (this._delayedRefreshJob != null && this._editor != null)
+		if (this._documentListener != null)
 		{
-			this._editor.getDocumentProvider().getDocument(this._editor.getEditorInput())
-					.removeDocumentListener(this._documentListener);
+			IDocument document = getDocument();
+			if (document != null)
+			{
+				document.removeDocumentListener(this._documentListener);
+			}
+			this._documentListener = null;
 		}
+
+		if (this._delayedRefreshJob != null)
+		{
+			this._delayedRefreshJob.cancel();
+			this._delayedRefreshJob = null;
+		}
+
+		if (this._filterRefreshJob != null)
+		{
+			this._filterRefreshJob.cancel();
+			this._filterRefreshJob = null;
+		}
+
+		if (this._toolbarManager != null)
+		{
+			this._toolbarManager.dispose();
+			this._toolbarManager = null;
+		}
+
+		super.dispose();
+	}
+
+	private IDocument getDocument()
+	{
+		return this._editor.getDocumentProvider().getDocument(this._editor.getEditorInput());
 	}
 
 	/**
@@ -739,19 +729,9 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	}
 
 	/**
-	 * hidePrivateMembers
-	 * 
-	 * @return boolean
-	 */
-	public boolean hidePrivateMembers()
-	{
-		return this._hide;
-	}
-
-	/**
 	 * refresh
 	 */
-	public void refresh()
+	private void refresh()
 	{
 		if (!_treeViewer.getControl().isDisposed())
 		{
@@ -760,60 +740,65 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	}
 
 	/**
-	 * removeOpenActionIfNeeded
-	 */
-	private void removeOpenActionIfNeeded()
-	{
-		if (this.openAction != null)
-		{
-			_toolbarManager.remove(openAction);
-			openAction = null;
-			_toolbarManager.update(false);
-		}
-	}
-
-	/**
-	 * Contibutes actions to quick outline menu.
+	 * Contributes actions to quick outline menu.
 	 * 
 	 * @param manager
 	 *            - menu manager.
 	 */
-	public void contributeToQuickOutlineMenu(IMenuManager manager)
+	void contributeToQuickOutlineMenu(IMenuManager manager)
 	{
-		// FIXME add actions for sorting/etc
 		// add sort action
-		// SortAction sortAction = new SortAction(this);
-		// IPreferenceStore store = UnifiedEditorsPlugin.getDefault().getPreferenceStore();
-		// boolean sort = store.getBoolean(IPreferenceConstants.SORT_OUTLINE_ALPHABETICALLY);
-		// sortAction.setChecked(sort);
-		// if (sort)
-		// {
-		// getTreeViewer().setSorter(SortAction.SORTER);
-		// }
+		Action sortAction = new Action(Messages.CommonQuickOutlinePage_SortAlphabetically, Action.AS_CHECK_BOX)
+		{
+			public void run()
+			{
+				// Hide tree control during redraw
+				getTreeViewer().getControl().setVisible(false);
+
+				// Set the sorting according to whether this Action is checked/unchecked
+				// TODO Store this persistently across quick outlines per-language?
+				if (this.isChecked())
+				{
+					getTreeViewer().setComparator(new ViewerComparator());
+				}
+				else
+				{
+					getTreeViewer().setComparator(null);
+				}
+
+				// Show the tree control
+				getTreeViewer().getControl().setVisible(true);
+			}
+		};
+		sortAction.setImageDescriptor(CommonEditorPlugin.getImageDescriptor("icons/sort.gif")); //$NON-NLS-1$
+		sortAction.setToolTipText(Messages.CommonQuickOutlinePage_SortAlphabetically);
 		// this._sortItem = new ActionContributionItem(sortAction);
-		// manager.add(this._sortItem);
-		//
-		// // add hide private members action
-		// this._hidePrivateAction = new HidePrivateAction(this);
-		// this._hidePrivateItem = new ActionContributionItem(this._hidePrivateAction);
-		// manager.add(this._hidePrivateItem);
-		//
-		// // add collapse all action
-		// CollapseAction collapseAction = new CollapseAction(this);
-		// this._collapseItem = new ActionContributionItem(collapseAction);
-		// manager.add(this._collapseItem);
-		//
-		// Action expandAction = new Action(Messages.UnifiedOutlinePage_ExpandAll)
-		// {
-		// public void run()
-		// {
-		// getTreeViewer().expandAll();
-		// }
-		// };
-		//        expandAction.setImageDescriptor(UnifiedEditorsPlugin.getImageDescriptor("icons/expandall.gif")); //$NON-NLS-1$
-		// expandAction.setToolTipText(Messages.UnifiedOutlinePage_CollapseAll);
-		// this._expandItem = new ActionContributionItem(expandAction);
-		// manager.add(this._expandItem);
+		manager.add(new ActionContributionItem(sortAction));
+
+		// add Collapse All action
+		Action collapseAction = new Action(Messages.CommonQuickOutlinePage_CollapseAll, Action.AS_PUSH_BUTTON)
+		{
+			public void run()
+			{
+				getTreeViewer().collapseAll();
+			}
+		};
+		collapseAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
+		collapseAction.setToolTipText(Messages.CommonQuickOutlinePage_CollapseAll);
+		manager.add(new ActionContributionItem(collapseAction));
+
+		// Expand All action
+		Action expandAction = new Action(Messages.CommonQuickOutlinePage_ExpandAll)
+		{
+			public void run()
+			{
+				getTreeViewer().expandAll();
+			}
+		};
+		expandAction.setImageDescriptor(CommonEditorPlugin.getImageDescriptor("icons/expandall.gif")); //$NON-NLS-1$
+		expandAction.setToolTipText(Messages.CommonQuickOutlinePage_ExpandAll);
+		manager.add(new ActionContributionItem(expandAction));
 	}
 
 	/**
@@ -827,7 +812,7 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	/**
 	 * Gets searhbox.
 	 */
-	public Control getSearchBox()
+	Control getSearchBox()
 	{
 		return _searchBox;
 	}
@@ -846,16 +831,6 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 		this._filter.setPattern(this._pattern);
 	}
 
-	/**
-	 * togglePrivateMemberVisibility
-	 */
-	public void togglePrivateMemberVisibility()
-	{
-		this._hide = (this._hide == false);
-
-		this.refresh();
-	}
-
 	@Override
 	public ISelection getSelection()
 	{
@@ -869,14 +844,6 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 	private void gotoSelectedElement()
 	{
 		ISelection selection = getSelection();
-
-		if (openAction != null)
-		{
-			_toolbarManager.remove(openAction);
-			_toolbarManager.update(true);
-			_toolbarManager.getControl().getParent().layout(true, true);
-		}
-
 		if (selection instanceof IStructuredSelection)
 		{
 			IStructuredSelection structured = (IStructuredSelection) selection;
@@ -890,22 +857,17 @@ public class CommonQuickOutlinePage extends ContentOutlinePage
 					CommonOutlineItem item = (CommonOutlineItem) element;
 					this._editor.selectAndReveal(item.getStartingOffset(), item.getLength());
 					closeDialog();
-					return;
 				}
 				else if (element instanceof IParseNode)
 				{
 					int position = ((IParseNode) element).getStartingOffset();
 					this._editor.selectAndReveal(position, 0);
 					closeDialog();
-					return;
 				}
-				// removing item from toolbar
-				removeOpenActionIfNeeded();
 				return;
 			}
 		}
 
-		removeOpenActionIfNeeded();
 		this._editor.getISourceViewer().removeRangeIndication();
 	}
 

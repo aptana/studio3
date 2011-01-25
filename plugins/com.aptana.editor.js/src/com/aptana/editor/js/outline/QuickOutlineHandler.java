@@ -8,7 +8,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.QuickOutlinePopupDialog;
-import com.aptana.editor.common.outline.CommonQuickOutlinePage;
 
 public class QuickOutlineHandler extends AbstractHandler
 {
@@ -16,12 +15,12 @@ public class QuickOutlineHandler extends AbstractHandler
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IEditorPart editor = HandlerUtil.getActiveEditor(event);
-		CommonQuickOutlinePage page = new CommonQuickOutlinePage((AbstractThemeableEditor) editor);
-		// FIXME The "info text" is a status field text.
-		QuickOutlinePopupDialog dialog = new QuickOutlinePopupDialog(editor.getSite().getShell(),
-				(AbstractThemeableEditor) editor, page, "!!!!info text!!!!");
-
-		dialog.open();
+		if (editor instanceof AbstractThemeableEditor)
+		{
+			QuickOutlinePopupDialog dialog = new QuickOutlinePopupDialog(editor.getSite().getShell(),
+					(AbstractThemeableEditor) editor);
+			dialog.open();
+		}
 		return null;
 	}
 
