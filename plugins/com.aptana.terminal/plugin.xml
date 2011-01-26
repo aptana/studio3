@@ -143,6 +143,11 @@
             id="com.aptana.terminal.commands.showTerminal"
             name="Show Terminal">
       </command>
+      <command
+            defaultHandler="com.aptana.terminal.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.terminal.commands.openTerminal"
+            name="%command.openTerminal.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">

@@ -10,7 +10,8 @@
                description="%xml_code_formatter_description"
                id="com.aptana.editor.xml.formatterFactory"
                name="%xml_code_formatter"
-               priority="10">
+               priority="10"
+               requiredActiveBundle="com.aptana.editor.xml">
          </formatterFactory>
       </engineContribution>
    </extension>

@@ -69,15 +69,43 @@
             type="text/javascript">
       </language>
       <validator
-            class="com.aptana.editor.js.validator.JSLintValidator"
-            language="text/javascript"
-            name="%validator.jslint.name">
-      </validator>
-      <validator
             class="com.aptana.editor.js.validator.MozillaJsValidator"
             language="text/javascript"
             name="%validator.mozilla.name">
       </validator>
+      <validator
+            class="com.aptana.editor.js.validator.JSLintValidator"
+            language="text/javascript"
+            name="%validator.jslint.name">
+      </validator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#AbstractTextEditorContext?after=additions">
+         <command
+               commandId="com.aptana.editor.js.quick_outline"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.editor.js.outline.QuickOutlineHandler"
+            id="com.aptana.editor.js.quick_outline"
+            name="Quick Outline">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.editor.js.quick_outline"
+            contextId="com.aptana.editor.context"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+O">
+      </key>
    </extension>
 
 </plugin>

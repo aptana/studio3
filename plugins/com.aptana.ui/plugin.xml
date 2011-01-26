@@ -201,7 +201,8 @@
             </dynamic>
             <visibleWhen
                   checkEnabled="false">
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <instanceof
                         value="org.eclipse.core.resources.IResource">
                   </instanceof>
@@ -240,6 +241,13 @@
             </iterate>
          </with>
       </definition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.aptana.ui.wizards.category"
+            name="%category.web.name">
+      </category>
    </extension>
 
 </plugin>

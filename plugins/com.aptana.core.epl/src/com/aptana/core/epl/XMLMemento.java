@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Aptana, Inc - non-UI adoption
+ *     Appcelerator, Inc - non-UI adoption
  *******************************************************************************/
 package com.aptana.core.epl;
 

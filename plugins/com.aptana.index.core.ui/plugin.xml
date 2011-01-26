@@ -48,7 +48,8 @@
                label="%menu.indexing">
             <visibleWhen
                   checkEnabled="false">
-               <iterate>
+               <iterate
+                     ifEmpty="false">
                   <and>
                      <instanceof
                            value="org.eclipse.core.resources.IResource">

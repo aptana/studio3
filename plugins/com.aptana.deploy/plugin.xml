@@ -7,5 +7,33 @@
             class="com.aptana.deploy.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.aptana.deploy.internal.ProjectPropertyTester"
+            id="com.aptana.deploy.projectPropertyTester"
+            namespace="com.aptana.deploy.project"
+            properties="isDeployType"
+            type="org.eclipse.core.resources.IResource">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.deploy.internal.handlers.DeployHandler"
+            id="com.aptana.deploy.commands.deployApp"
+            name="%Deploy.label">
+      </command>
+      <command
+            defaultHandler="com.aptana.deploy.internal.handlers.RunDeployWizardHandler"
+            id="com.aptana.deploy.commands.deploywizard"
+            name="%DeployWizard.label">
+      </command>
+      <command
+            defaultHandler="com.aptana.deploy.internal.handlers.DeploySettingsHandler"
+            id="com.aptana.deploy.commands.ftp.settings"
+            name="%command.deploysettings.name">
+      </command>
+   </extension>
 
 </plugin>

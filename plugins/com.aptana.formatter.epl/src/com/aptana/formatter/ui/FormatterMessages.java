@@ -69,6 +69,7 @@ public class FormatterMessages extends NLS
 	public static String IndentationTabPage_general_group_option_tab_policy_SPACE;
 	public static String IndentationTabPage_general_group_option_tab_policy_TAB;
 	public static String IndentationTabPage_general_group_option_tab_policy_MIXED;
+	public static String IndentationTabPage_general_group_option_tab_policy_EDITOR;
 	public static String IndentationTabPage_general_group_option_tab_size;
 	public static String BracesTabPage_position_option_SAME_LINE;
 	public static String BracesTabPage_position_option_NEW_LINE;

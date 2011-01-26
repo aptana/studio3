@@ -4,10 +4,8 @@
 # See LICENSE.txt for permissions.
 #++
 
-require 'fileutils'
-require 'rbconfig'
-
 require 'rubygems/format'
+require 'rubygems/exceptions'
 require 'rubygems/ext'
 require 'rubygems/require_paths_builder'
 
@@ -91,6 +89,8 @@ class Gem::Installer
   # :wrappers:: Install wrappers if true, symlinks if false.
 
   def initialize(gem, options={})
+    require 'fileutils'
+
     @gem = gem
 
     options = {
@@ -133,7 +133,8 @@ class Gem::Installer
     end
 
     FileUtils.mkdir_p @gem_home
-    raise Gem::FilePermissionError, @gem_home unless File.writable? @gem_home
+    raise Gem::FilePermissionError, @gem_home unless
+      options[:unpack] or File.writable? @gem_home
 
     @spec = @format.spec
 
@@ -165,7 +166,7 @@ class Gem::Installer
       end
 
       if rrgv = @spec.required_rubygems_version then
-        unless rrgv.satisfied_by? Gem::Version.new(Gem::RubyGemsVersion) then
+        unless rrgv.satisfied_by? Gem::Version.new(Gem::VERSION) then
           raise Gem::InstallError,
             "#{@spec.name} requires RubyGems version #{rrgv}. " +
             "Try 'gem update --system' to update RubyGems itself."
@@ -270,7 +271,7 @@ class Gem::Installer
   ##
   # Creates windows .bat files for easy running of commands
 
-  def generate_windows_script(bindir, filename)
+  def generate_windows_script(filename, bindir)
     if Gem.win_platform? then
       script_name = filename + ".bat"
       script_path = File.join bindir, File.basename(script_name)
@@ -295,7 +296,7 @@ class Gem::Installer
 
     @spec.executables.each do |filename|
       filename.untaint
-      bin_path = File.expand_path File.join(@gem_dir, @spec.bindir, filename)
+      bin_path = File.expand_path "#{@spec.bindir}/#{filename}", @gem_dir
       mode = File.stat(bin_path).mode | 0111
       File.chmod mode, bin_path
 
@@ -317,7 +318,7 @@ class Gem::Installer
   def generate_bin_script(filename, bindir)
     bin_script_path = File.join bindir, formatted_program_filename(filename)
 
-    exec_path = File.join @gem_dir, @spec.bindir, filename
+    File.join @gem_dir, @spec.bindir, filename
 
     # HACK some gems don't have #! in their executables, restore 2008/06
     #if File.read(exec_path, 2) == '#!' then
@@ -329,7 +330,7 @@ class Gem::Installer
 
       say bin_script_path if Gem.configuration.really_verbose
 
-      generate_windows_script bindir, filename
+      generate_windows_script filename, bindir
     #else
     #  FileUtils.rm_f bin_script_path
     #  FileUtils.cp exec_path, bin_script_path,
@@ -465,7 +466,7 @@ TEXT
 
         say results.join("\n") if Gem.configuration.really_verbose
 
-      rescue => ex
+      rescue
         results = results.join "\n"
 
         File.open('gem_make.out', 'wb') { |f| f.puts results }
@@ -496,6 +497,8 @@ Results logged to #{File.join(Dir.pwd, 'gem_make.out')}
 
     raise ArgumentError, "format required to extract from" if @format.nil?
 
+    dirs = []
+
     @format.file_entries.each do |entry, file_data|
       path = entry['path'].untaint
 
@@ -513,7 +516,12 @@ Results logged to #{File.join(Dir.pwd, 'gem_make.out')}
       end
 
       FileUtils.rm_rf(path) if File.exists?(path)
-      FileUtils.mkdir_p File.dirname(path)
+
+      dir = File.dirname(path)
+      if !dirs.include?(dir)
+        dirs << dir
+        FileUtils.mkdir_p dir
+      end
 
       File.open(path, "wb") do |out|
         out.write file_data
