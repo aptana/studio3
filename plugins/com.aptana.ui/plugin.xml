@@ -17,23 +17,23 @@
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
          <viewShortcut
-               id="com.aptana.explorer.view">
+               id="org.eclipse.ui.navigator.ProjectExplorer">
          </viewShortcut>
          <view
-               id="org.eclipse.ui.navigator.ProjectExplorer"
+               id="com.aptana.explorer.view"
                minimized="false"
                relationship="stack"
-               relative="com.aptana.explorer.view"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="true">
          </view>
          <viewShortcut
-               id="org.eclipse.ui.navigator.ProjectExplorer">
+               id="com.aptana.explorer.view">
          </viewShortcut>
          <view
                id="com.aptana.ui.io.remoteview"
                minimized="false"
                relationship="stack"
-               relative="com.aptana.explorer.view"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="false">
          </view>
          <viewShortcut
@@ -43,7 +43,7 @@
                id="org.eclipse.ui.views.ContentOutline"
                ratio="0.75"
                relationship="bottom"
-               relative="com.aptana.explorer.view"
+               relative="org.eclipse.ui.navigator.ProjectExplorer"
                visible="true">
          </view>
          <viewShortcut
@@ -53,7 +53,7 @@
                id="com.aptana.terminal.views.terminal"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
-               visible="false">
+               visible="true">
          </view>
          <viewShortcut
                id="com.aptana.terminal.views.terminal">
@@ -67,18 +67,27 @@
                relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
+         <viewShortcut
+               id="org.eclipse.pde.runtime.LogView">
+         </viewShortcut>
          <view
                id="org.eclipse.ui.views.ProblemView"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
-               visible="false">
+               visible="true">
          </view>
+         <viewShortcut
+               id="org.eclipse.ui.views.ProblemView">
+         </viewShortcut>
          <view
                id="org.eclipse.ui.views.TaskList"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
                visible="false">
          </view>
+         <viewShortcut
+               id="org.eclipse.ui.views.TaskList">
+         </viewShortcut>
          <newWizardShortcut
                id="com.aptana.ui.wizards.new.file">
          </newWizardShortcut>
