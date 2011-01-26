@@ -7,18 +7,12 @@
  */
 package com.aptana.editor.js;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.jface.text.BadLocationException;
 
 import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
 public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IJSTokenScanner
 {
-	private static final Pattern DIVISION_START = Pattern.compile("^.*[-+$_a-zA-Z0-9/'\"')\\]]\\s*$"); //$NON-NLS-1$
-	private static final int PREVIEW_LENGTH = 80;
-
 	/**
 	 * JSSourcePartitionScanner
 	 */
@@ -34,27 +28,65 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 	 */
 	public boolean hasDivisionStart()
 	{
+		// start backtracking one character before the current position
+		int offset = fOffset - 1;
 		boolean result = false;
-		int offsetStart = Math.max(0, fOffset - PREVIEW_LENGTH);
-		int offsetEnd = Math.min(offsetStart + PREVIEW_LENGTH, Math.min(fOffset, fDocument.getLength()));
 
-		if (offsetStart < offsetEnd)
+		try
 		{
-			String source = null;
-
-			try
+			while (offset >= 0)
 			{
-				source = fDocument.get(offsetStart, offsetEnd - offsetStart);
+				char c = fDocument.getChar(offset);
 
-				Matcher m = DIVISION_START.matcher(source);
+				// keep backtracking if we hit whitespace
+				if (Character.isWhitespace(c) == false)
+				{
+					// Compare to the set of last characters from the following tokens:
+					// IDENTIFIER, NUMBER, REGEX, STRING, RPAREN, PLUS_PLUS, MINUS_MINUS,
+					// RBRACKET, RCURLY, FALSE, NULL, THIS, TRUE. Note that we make an
+					// exception with PLUS_PLUS and MINUS_MINUS and backtrack one extra
+					// character to differentiate those from PLUS and MINUS, respectively.
+					// We use this same set of tokens in JSTokenScanner.hasDivisionStart.
+					switch (c)
+					{
+						case '$':
+						case '_':
+						case '/':
+						case '\'':
+						case '"':
+						case ')':
+						case ']':
+						case '}':
+							result = true;
+							break;
 
-				result = m.matches();
+						case '-':
+						case '+':
+							char curr = c;
+
+							if (offset > 0)
+							{
+								c = fDocument.getChar(offset - 1);
+
+								result = (c == curr);
+							}
+							break;
+
+						default:
+							result = ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+					}
+
+					break;
+				}
+
+				offset--;
 			}
-			catch (BadLocationException e)
-			{
-			}
+		}
+		catch (BadLocationException e)
+		{
 		}
 
 		return result;
+
 	}
 }

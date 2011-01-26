@@ -7,13 +7,14 @@
  */
 package com.aptana.scripting.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.aptana.core.util.SourcePrinter;
 
 public class SmartTypingPairsElement extends AbstractBundleElement
 {
-	private static final char[] NO_CHARS = new char[0];
-	
-	private char[] _pairs;
+	private List<Character> _pairs;
 
 	/**
 	 * SmartTypingPairsElement
@@ -40,7 +41,7 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public char[] getPairs()
+	public List<Character> getPairs()
 	{
 		return _pairs;
 	}
@@ -59,24 +60,26 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 	}
 
 	/**
-	 * setPairs
+	 * Called by ruble API.
+	 * 
+	 * @param character
+	 */
+	public void addPairCharacter(String character)
+	{
+		if (_pairs == null)
+		{
+			_pairs = new ArrayList<Character>();
+		}
+		_pairs.add(Character.valueOf(character.charAt(0)));
+	}
+
+	/**
+	 * Used for YAML deserialization...
 	 * 
 	 * @param pairs
 	 */
-	public void setPairs(String[] pairs)
+	public void setPairs(List<Character> pairs)
 	{
-		if (pairs != null && pairs.length > 0)
-		{
-			this._pairs = new char[pairs.length];
-			
-			for (int i = 0; i < pairs.length; i++)
-			{
-				this._pairs[i] = pairs[i].charAt(0);
-			}
-		}
-		else
-		{
-			this._pairs = NO_CHARS;
-		}
+		this._pairs = pairs;
 	}
 }
