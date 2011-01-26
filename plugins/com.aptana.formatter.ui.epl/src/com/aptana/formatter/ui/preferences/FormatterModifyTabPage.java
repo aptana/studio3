@@ -358,9 +358,10 @@ public abstract class FormatterModifyTabPage implements IFormatterModifiyTabPage
 	protected void setEditorTabWidth(IPreferenceStore preferenceStore, Text... textWidgets)
 	{
 		int tabWidth = FormatterUtils.getEditorTabWidth(preferenceStore);
+		String tabValue = String.valueOf(tabWidth);
 		for (Text t : textWidgets)
 		{
-			t.setText(String.valueOf(tabWidth));
+			t.setText(tabValue);
 		}
 	}
 }
