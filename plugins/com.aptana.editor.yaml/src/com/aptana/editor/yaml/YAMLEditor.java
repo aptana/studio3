@@ -2,6 +2,7 @@ package com.aptana.editor.yaml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -24,6 +25,10 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				YAMLPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+		setPreferenceStore(store);
+		
 		setSourceViewerConfiguration(new YAMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new YAMLDocumentProvider());
 	}

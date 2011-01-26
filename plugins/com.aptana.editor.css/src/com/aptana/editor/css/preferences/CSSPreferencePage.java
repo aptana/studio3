@@ -5,22 +5,24 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.css.preferences;
 
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.css.CSSPlugin;
 
-public class HTMLPreferencePage extends CommonEditorPreferencePage
+public class CSSPreferencePage extends CommonEditorPreferencePage
 {
+
 	/**
-	 * HTMLPreferencePage
+	 * CSSPreferencePage
 	 */
-	public HTMLPreferencePage()
+
+	public CSSPreferencePage()
 	{
 		super();
-		setDescription(Messages.HTMLPreferencePage_LBL_Description);
-		setPreferenceStore(HTMLPlugin.getDefault().getPreferenceStore());
+		setDescription(Messages.CSSPreferencePage_CSS_Page_Title);
+		setPreferenceStore(CSSPlugin.getDefault().getPreferenceStore());
 	}
 
 	@Override

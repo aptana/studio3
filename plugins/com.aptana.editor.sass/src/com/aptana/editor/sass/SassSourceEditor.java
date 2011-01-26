@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.sass;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.parsing.FileService;
 
@@ -21,6 +25,13 @@ public class SassSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				Activator.getDefault().getPreferenceStore(), getPreferenceStore() });
+		setPreferenceStore(store);
+		
+		// Set default tab size to 2
+		Activator.getDefault().getPreferenceStore().setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, "2");
+		
 		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new SassDocumentProvider());
 	}

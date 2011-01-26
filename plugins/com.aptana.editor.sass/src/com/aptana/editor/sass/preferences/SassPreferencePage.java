@@ -5,26 +5,29 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.sass.preferences;
 
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.sass.Activator;
 
-public class HTMLPreferencePage extends CommonEditorPreferencePage
+public class SassPreferencePage extends CommonEditorPreferencePage
 {
+
 	/**
-	 * HTMLPreferencePage
+	 * SassPreferencePage
 	 */
-	public HTMLPreferencePage()
+
+	public SassPreferencePage()
 	{
 		super();
-		setDescription(Messages.HTMLPreferencePage_LBL_Description);
-		setPreferenceStore(HTMLPlugin.getDefault().getPreferenceStore());
+		setDescription(Messages.SassPreferencePage_SASS_Page_Title);
+		setPreferenceStore(Activator.getDefault().getPreferenceStore());
 	}
 
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
 	}
+
 }

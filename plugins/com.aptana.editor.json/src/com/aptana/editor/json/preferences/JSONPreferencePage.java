@@ -5,26 +5,28 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.json.preferences;
 
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.json.JSONPlugin;
 
-public class HTMLPreferencePage extends CommonEditorPreferencePage
+public class JSONPreferencePage extends CommonEditorPreferencePage
 {
 	/**
-	 * HTMLPreferencePage
+	 * JSONPreferencePage
 	 */
-	public HTMLPreferencePage()
+
+	public JSONPreferencePage()
 	{
 		super();
-		setDescription(Messages.HTMLPreferencePage_LBL_Description);
-		setPreferenceStore(HTMLPlugin.getDefault().getPreferenceStore());
+		setDescription(Messages.JSONPreferencePage_JSON_Page_Title);
+		setPreferenceStore(JSONPlugin.getDefault().getPreferenceStore());
 	}
 
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
 	}
+
 }

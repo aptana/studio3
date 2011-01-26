@@ -7,7 +7,9 @@
  */
 package com.aptana.editor.json;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -53,6 +55,11 @@ public class JSONEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				JSONPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+		setPreferenceStore(store);
+
+		
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new JSONDocumentProvider());
 	}

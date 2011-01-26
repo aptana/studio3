@@ -5,22 +5,24 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.yaml.preferences;
 
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.yaml.YAMLPlugin;
 
-public class HTMLPreferencePage extends CommonEditorPreferencePage
+public class YAMLPreferencePage extends CommonEditorPreferencePage
 {
+
 	/**
-	 * HTMLPreferencePage
+	 * YamlPreferencePage
 	 */
-	public HTMLPreferencePage()
+
+	public YAMLPreferencePage()
 	{
 		super();
-		setDescription(Messages.HTMLPreferencePage_LBL_Description);
-		setPreferenceStore(HTMLPlugin.getDefault().getPreferenceStore());
+		setDescription(Messages.YAMLPreferencePage_YAML_Page_Title);
+		setPreferenceStore(YAMLPlugin.getDefault().getPreferenceStore());
 	}
 
 	@Override

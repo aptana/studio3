@@ -10,6 +10,7 @@ package com.aptana.editor.html.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -27,12 +28,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
-		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "<'\"&");
+		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "<'\"&"); //$NON-NLS-1$
+		prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 4);
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		String[] filtered = new String[] { ".*canvas.*" };
-		prefs.put(IHTMLParserConstants.LANGUAGE + ":"
+		String[] filtered = new String[] { ".*canvas.*" }; //$NON-NLS-1$
+		prefs.put(IHTMLParserConstants.LANGUAGE + ":" //$NON-NLS-1$
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
-				StringUtil.join("####", filtered));
+				StringUtil.join("####", filtered)); //$NON-NLS-1$
 	}
 }
