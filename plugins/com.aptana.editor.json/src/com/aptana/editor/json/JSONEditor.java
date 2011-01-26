@@ -9,9 +9,11 @@ package com.aptana.editor.json;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -20,6 +22,7 @@ import com.aptana.editor.json.outline.JSONOutlineContentProvider;
 import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 import com.aptana.editor.json.parsing.IJSONParserConstants;
 
+@SuppressWarnings("restriction")
 public class JSONEditor extends AbstractThemeableEditor
 {
 	/*
@@ -56,14 +59,14 @@ public class JSONEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				JSONPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+				JSONPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
+				EditorsPlugin.getDefault().getPreferenceStore() });
 		setPreferenceStore(store);
 
-		
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new JSONDocumentProvider());
 	}
-	
+
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{

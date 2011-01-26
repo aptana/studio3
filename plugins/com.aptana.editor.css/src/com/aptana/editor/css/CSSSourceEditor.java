@@ -9,9 +9,11 @@ package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -20,6 +22,7 @@ import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 
+@SuppressWarnings("restriction")
 public class CSSSourceEditor extends AbstractThemeableEditor
 {
 	/*
@@ -46,7 +49,9 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 		super.initializeEditor();
 
 		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				CSSPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+				CSSPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
+				EditorsPlugin.getDefault().getPreferenceStore() });
+
 		setPreferenceStore(store);
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 
