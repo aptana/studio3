@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -25,8 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 public class PeerCharacterCloserTest extends TestCase
 {
 
-	private static final char[] DEFAULT_PAIRS = new char[] { '[', ']', '(', ')', '{', '}', '\'', '\'', '"', '"', '<',
-			'>', '`', '`' };
+	private static List<Character> DEFAULT_PAIRS;
 
 	private PeerCharacterCloser closer;
 	private ITextViewer viewer;
@@ -36,10 +38,25 @@ public class PeerCharacterCloserTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
+		DEFAULT_PAIRS = new ArrayList<Character>();
+		DEFAULT_PAIRS.add('[');
+		DEFAULT_PAIRS.add(']');
+		DEFAULT_PAIRS.add('(');
+		DEFAULT_PAIRS.add(')');
+		DEFAULT_PAIRS.add('{');
+		DEFAULT_PAIRS.add('}');
+		DEFAULT_PAIRS.add('\'');
+		DEFAULT_PAIRS.add('\'');
+		DEFAULT_PAIRS.add('"');
+		DEFAULT_PAIRS.add('"');
+		DEFAULT_PAIRS.add('<');
+		DEFAULT_PAIRS.add('>');
+		DEFAULT_PAIRS.add('`');
+		DEFAULT_PAIRS.add('`');
 		viewer = new TextViewer(new Shell(), SWT.NONE);
 		closer = new PeerCharacterCloser(viewer)
 		{
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}
@@ -111,11 +128,15 @@ public class PeerCharacterCloserTest extends TestCase
 
 	public void testUnpairedClose() throws Exception
 	{
-		final char[] pairs = new char[] { '(', ')', '"', '"' };
 		closer = new PeerCharacterCloser(null)
 		{
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
+				List<Character> pairs = new ArrayList<Character>();
+				pairs.add('(');
+				pairs.add(')');
+				pairs.add('"');
+				pairs.add('"');
 				return pairs;
 			}
 		};
@@ -140,9 +161,14 @@ public class PeerCharacterCloserTest extends TestCase
 		closer = new PeerCharacterCloser(viewer)
 		{
 
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
-				return new char[] { '(', ')', '"', '"' };
+				List<Character> pairs = new ArrayList<Character>();
+				pairs.add('(');
+				pairs.add(')');
+				pairs.add('"');
+				pairs.add('"');
+				return pairs;
 			}
 
 			@Override
@@ -162,7 +188,7 @@ public class PeerCharacterCloserTest extends TestCase
 		viewer.setSelectedRange(0, 0);
 		closer = new PeerCharacterCloser(viewer)
 		{
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}
@@ -200,7 +226,7 @@ public class PeerCharacterCloserTest extends TestCase
 		closer = new PeerCharacterCloser(viewer)
 		{
 
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}
@@ -227,7 +253,7 @@ public class PeerCharacterCloserTest extends TestCase
 		closer = new PeerCharacterCloser(viewer)
 		{
 
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}
@@ -256,7 +282,7 @@ public class PeerCharacterCloserTest extends TestCase
 		closer = new PeerCharacterCloser(viewer)
 		{
 
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}
@@ -278,14 +304,14 @@ public class PeerCharacterCloserTest extends TestCase
 
 	public void testignoresRubyHashesForHTMLTagPairs()
 	{
-		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor and then sent a keypress to it...
+		// FIXME This is pretty ugly here. We should probably have just created a temp file, opened it with our editor
+		// and then sent a keypress to it...
 		String src = "<%= stylesheet_link_tag 'iphone', :media => 'only screen and (max-device-width: 480px)' %>\n ";
 		document = new Document(src)
 		{
 			public ITypedRegion[] computePartitioning(int offset, int length) throws BadLocationException
 			{
-				return new ITypedRegion[] { 
-						new TypedRegion(0, 3, "__common_start_switch_tag"),
+				return new ITypedRegion[] { new TypedRegion(0, 3, "__common_start_switch_tag"),
 						new TypedRegion(3, 21, "__rb__dftl_partition_content_type"),
 						new TypedRegion(24, 8, "__rb_string_single"),
 						new TypedRegion(32, 12, "__rb__dftl_partition_content_type"),
@@ -305,7 +331,7 @@ public class PeerCharacterCloserTest extends TestCase
 		closer = new PeerCharacterCloser(viewer)
 		{
 
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
 				return DEFAULT_PAIRS;
 			}

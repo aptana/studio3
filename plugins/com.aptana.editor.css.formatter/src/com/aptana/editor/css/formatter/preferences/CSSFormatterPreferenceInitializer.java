@@ -29,7 +29,7 @@ public class CSSFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	{
 		IEclipsePreferences pref = new DefaultScope().getNode(CSSFormatterPlugin.PLUGIN_ID);
 
-		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		pref.put(CSSFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		pref.put(CSSFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		pref.put(CSSFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		pref.putBoolean(CSSFormatterConstants.WRAP_COMMENTS, false);

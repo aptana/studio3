@@ -29,7 +29,7 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences store = new DefaultScope().getNode(XMLFormatterPlugin.PLUGIN_ID);
-		store.put(XMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.put(XMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(XMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(XMLFormatterConstants.WRAP_COMMENTS, false);

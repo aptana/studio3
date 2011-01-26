@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.formatter.CSSFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -31,10 +32,11 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 {
 	private static final String CONTROL_STATEMENTS_PREVIEW_NAME = "preview.css"; //$NON-NLS-1$
 	private static final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE,
-			CodeFormatterConstants.TAB };
+			CodeFormatterConstants.TAB, CodeFormatterConstants.EDITOR };
 	private static final String[] TAB_OPTION_NAMES = new String[] {
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
-			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB };
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB,
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_EDITOR };
 
 	public CSSFormatterControlStatementsPage(IFormatterModifyDialog dialog)
 	{
@@ -71,7 +73,7 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 
 			}
 		});
-		new TabOptionHandler(manager, tabOptions, indentationSize);
+		new TabOptionHandler(manager, tabOptions, indentationSize, tabSize);
 	}
 
 	/**
@@ -83,17 +85,21 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 		private IFormatterControlManager manager;
 		private Combo tabOptions;
 		private Text indentationSize;
+		private final Text tabSize;
 
 		/**
 		 * Constructor.
 		 * 
 		 * @param controlManager
+		 * @param tabSize
 		 */
-		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize)
+		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize,
+				Text tabSize)
 		{
 			this.manager = controlManager;
 			this.tabOptions = tabOptions;
 			this.indentationSize = indentationSize;
+			this.tabSize = tabSize;
 			tabOptions.addSelectionListener(this);
 			manager.addInitializeListener(this);
 		}
@@ -108,7 +114,13 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 			if (index >= 0)
 			{
 				final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
-				manager.enableControl(indentationSize, !tabMode);
+				final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(TAB_OPTION_ITEMS[index]);
+				manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+				manager.enableControl(tabSize, !editorSettingsMode);
+				if (editorSettingsMode)
+				{
+					setEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				}
 			}
 		}
 
@@ -116,7 +128,14 @@ public class CSSFormatterControlStatementsPage extends FormatterModifyTabPage
 		{
 			final boolean tabMode = CodeFormatterConstants.TAB.equals(manager
 					.getString(CSSFormatterConstants.FORMATTER_TAB_CHAR));
-			manager.enableControl(indentationSize, !tabMode);
+			final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(manager
+					.getString(CSSFormatterConstants.FORMATTER_TAB_CHAR));
+			manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+			manager.enableControl(tabSize, !editorSettingsMode);
+			if (editorSettingsMode)
+			{
+				setEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+			}
 		}
 	}
 

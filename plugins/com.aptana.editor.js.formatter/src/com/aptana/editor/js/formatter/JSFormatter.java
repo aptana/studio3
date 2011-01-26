@@ -20,9 +20,11 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
@@ -174,9 +176,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (FormatterException e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
-					ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
 		}
 		catch (Exception e)
 		{
@@ -266,6 +268,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	public int getTabSize()
 	{
 		return getInt(JSFormatterConstants.FORMATTER_TAB_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#getEditorSpecificTabWidth()
+	 */
+	public int getEditorSpecificTabWidth()
+	{
+		return FormatterUtils.getEditorTabWidth(JSPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**

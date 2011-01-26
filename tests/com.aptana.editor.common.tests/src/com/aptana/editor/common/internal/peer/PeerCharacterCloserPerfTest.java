@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.common.internal.peer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.test.performance.PerformanceTestCase;
@@ -16,11 +19,15 @@ public class PeerCharacterCloserPerfTest extends PerformanceTestCase
 
 	public void testCheckUnpairedClose() throws Exception
 	{
-		final char[] pairs = new char[] { '(', ')', '"', '"' };
 		PeerCharacterCloser closer = new PeerCharacterCloser(null)
 		{
-			protected char[] getPairs(String scope)
+			protected List<Character> getPairs(String scope)
 			{
+				List<Character> pairs = new ArrayList<Character>();
+				pairs.add('(');
+				pairs.add(')');
+				pairs.add('"');
+				pairs.add('"');
 				return pairs;
 			}
 		};

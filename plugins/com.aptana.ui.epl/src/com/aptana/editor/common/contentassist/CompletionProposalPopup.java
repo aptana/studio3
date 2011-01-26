@@ -418,7 +418,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		fProposalTable.setLocation(0, 0);
 		if (fAdditionalInfoController != null)
 		{
-			fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
+			fAdditionalInfoController.setSizeConstraints(40, 20, true, false);
 		}
 
 		// Custom code: We set margins to 1 so we get a border
@@ -460,7 +460,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				if (fAdditionalInfoController != null)
 				{
 					// reset the cached resize constraints
-					fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
+					fAdditionalInfoController.setSizeConstraints(40, 20, true, false);
 					fAdditionalInfoController.hideInformationControl();
 					fAdditionalInfoController.handleTableSelectionChanged();
 				}
