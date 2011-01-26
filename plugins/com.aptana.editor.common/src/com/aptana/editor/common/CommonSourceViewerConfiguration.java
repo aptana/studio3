@@ -348,7 +348,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false))
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(true))
 				{
 					@Override
 					protected Color getBackground()

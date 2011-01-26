@@ -567,7 +567,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private SearchComposite createSearchComposite(Composite myComposite)
 	{
 		SearchComposite search = new SearchComposite(myComposite, this);
-		search.setSearchOnEnter(true);
+		search.setSearchOnEnter(false);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		search.setInitialText(Messages.SmartSyncDialog_searchText);
 		return search;
