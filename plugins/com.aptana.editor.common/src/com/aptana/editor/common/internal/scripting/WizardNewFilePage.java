@@ -12,6 +12,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.swt.SWT;
@@ -72,12 +73,24 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 		IWizard wizard = getWizard();
 		TemplateSelectionPage templateSelectionPage = (TemplateSelectionPage) wizard
 				.getPage(NewFileWizard.TEMPLATE_PAGE_NAME);
-		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate(), getContainerFullPath().append(getFileName()));
+		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate(),
+				getContainerFullPath().append(getFileName()));
 		if (templateContent != null)
 		{
 			return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
 		}
 		return super.getInitialContents();
+	}
+
+	@Override
+	protected boolean validatePage()
+	{
+		if (ResourcesPlugin.getWorkspace().getRoot().getProjects().length == 0)
+		{
+			setErrorMessage("No project exists in the workspace.");
+			return false;
+		}
+		return super.validatePage();
 	}
 
 	private void collectTemplates()

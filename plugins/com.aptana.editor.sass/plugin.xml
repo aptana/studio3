@@ -26,5 +26,20 @@
             priority="normal">
       </content-type>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.sass.preferences.SassPreferencePage"
+            id="com.aptana.editor.sass.preferences.SassPreferencePage"
+            name="SASS">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.sass.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

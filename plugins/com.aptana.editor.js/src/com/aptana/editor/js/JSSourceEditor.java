@@ -9,6 +9,7 @@ package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
@@ -30,6 +31,10 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				JSPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+		setPreferenceStore(store);
+		
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new JSDocumentProvider());
 	}
