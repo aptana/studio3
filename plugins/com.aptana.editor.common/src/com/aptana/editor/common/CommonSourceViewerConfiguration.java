@@ -178,6 +178,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+		assistant.setContextInformationPopupBackground(getThemeBackground());
+		assistant.setContextInformationPopupForeground(getThemeForeground());
 
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
