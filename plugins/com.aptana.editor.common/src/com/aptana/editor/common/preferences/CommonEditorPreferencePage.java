@@ -203,10 +203,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	protected abstract void createMarkOccurrenceOptions(Composite parent);
 
-	/**
-	 * Get the editor specific preference store
-	 */
-
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
 
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
