@@ -34,6 +34,7 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -59,6 +60,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final Image JS_FUNCTION = JSPlugin.getImage("/icons/js_function.png"); //$NON-NLS-1$
 	private static final Image JS_PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
+	private static final IContextInformation[] NO_CONTEXT_INFO = new IContextInformation[0];
 
 	private JSIndexQueryHelper _indexHelper;
 	private IParseNode _targetNode;
@@ -329,6 +331,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
 		IParseNode node = this.getActiveASTNode(offset);
+		IContextInformation[] result = NO_CONTEXT_INFO;
 
 		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
 		{
@@ -337,19 +340,33 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
 		{
-			// TODO Auto-generated method stub
-			String[] lines = new String[] { //
-			"name(one, two, three, four)", //
-				"one: this is argument 1", //
-				"two: this is the second argument", //
-				"three: yet another argument", //
-				"four: the last one" //
-			};
+			int functionOffset = node.getStartingOffset();
+			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
 
-			return new IContextInformation[] { new JSContextInformation("argument info", StringUtil.join("\n\0", lines), node.getStartingOffset()) };
+			System.out.println(location);
+
+			switch (location)
+			{
+				case IN_VARIABLE_NAME:
+					String name = node.getParent().getFirstChild().getText();
+
+					// grab first type for now
+					FunctionElement function = this._indexHelper.getFunction(JSIndexQueryHelper.getIndex(), "Window", name);
+					List<String> lines = JSModelFormatter.getContextLines(function);
+
+					result = new IContextInformation[] { //
+					new JSContextInformation("argument info", StringUtil.join("\n\0", lines), functionOffset) };
+					break;
+
+				case IN_PROPERTY_NAME:
+					break;
+
+				default:
+					break;
+			}
 		}
 
-		return new IContextInformation[0];
+		return result;
 	}
 
 	/**
@@ -489,8 +506,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
 	 */
 	@Override
