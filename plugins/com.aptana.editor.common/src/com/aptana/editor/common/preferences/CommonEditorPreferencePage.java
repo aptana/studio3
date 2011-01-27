@@ -37,6 +37,7 @@ import com.aptana.ui.preferences.AptanaPreferencePage;
  * The form for configuring the general top-level preferences for this plugin
  */
 
+@SuppressWarnings("restriction")
 public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	/**
@@ -173,11 +174,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			}
 		});
 
-		Composite temp = new Composite(group, SWT.NONE);
-		temp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+		Composite fildEditorGroup = new Composite(group, SWT.NONE);
+		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
-				Messages.CommonEditorPreferencePage_Tab_Size_Label, temp, 5)
+				Messages.CommonEditorPreferencePage_Tab_Size_Label, fildEditorGroup, 5)
 		{
 			@Override
 			protected void doLoadDefault()
@@ -186,10 +187,23 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				if (text != null)
 				{
 					int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
-					text.setText("" + value);//$NON-NLS-1$
+					text.setText(Integer.toString(value));
 				}
 				valueChanged();
 			}
+
+			@Override
+			protected void doLoad()
+			{
+		        Text text = getTextControl();
+		        if (text != null) {
+		            int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+		            text.setText(Integer.toString(value));
+		            oldValue = Integer.toString(value); 
+		        }
+			}
+			
+			
 		};
 		tabSize.setEmptyStringAllowed(false);
 		tabSize.setValidRange(1, 20);
