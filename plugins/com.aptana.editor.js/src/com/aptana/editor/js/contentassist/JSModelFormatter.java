@@ -20,6 +20,7 @@ import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 
@@ -199,6 +200,36 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * @param function
+	 * @return
+	 */
+	public static List<String> getContextLines(FunctionElement function)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (function != null)
+		{
+			StringBuilder buffer = new StringBuilder();
+
+			// line 1: function name with argument names
+			buffer.append(function.getName());
+			buffer.append("(").append(StringUtil.join(", ", function.getParameterNames())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			result.add(buffer.toString());
+
+			// line 2..n: one line for each argument description
+			for (ParameterElement parameter : function.getParameters())
+			{
+				buffer.setLength(0);
+
+				buffer.append(parameter.getName()).append(": ").append(parameter.getDescription()); //$NON-NLS-1$
+				result.add(buffer.toString());
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * formatFunction
 	 * 
 	 * @param function
@@ -285,15 +316,15 @@ public class JSModelFormatter
 	public static Image getImage(PropertyElement property)
 	{
 		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE) : PROPERTY;
-		
+
 		if (property != null)
 		{
 			List<String> types = property.getTypeNames();
-			
+
 			if (types != null && types.size() == 1)
 			{
 				String type = types.get(0);
-				
+
 				if (TYPE_IMAGE_MAP.containsKey(type))
 				{
 					result = TYPE_IMAGE_MAP.get(type);
@@ -308,10 +339,10 @@ public class JSModelFormatter
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getDisplayTypeName
 	 * 
