@@ -10,7 +10,6 @@ package com.aptana.editor.json.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.json.JSONPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
@@ -32,7 +31,6 @@ public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
-		pref.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 4);
 
 	}
 }

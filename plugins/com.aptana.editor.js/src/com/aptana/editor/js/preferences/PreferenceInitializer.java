@@ -10,7 +10,6 @@ package com.aptana.editor.js.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.editor.js.JSPlugin;
 
@@ -33,7 +32,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
 		prefs.put(IPreferenceConstants.JS_ACTIVATION_CHARACTERS, ".");
-		prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 4);
 
 	}
 }

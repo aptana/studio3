@@ -7,9 +7,13 @@
  */
 package com.aptana.editor.sass.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.sass.Activator;
+import com.aptana.editor.sass.SassSourceEditor;
 
 public class SassPreferencePage extends CommonEditorPreferencePage
 {
@@ -30,4 +34,16 @@ public class SassPreferencePage extends CommonEditorPreferencePage
 	{
 	}
 
+	@Override
+	protected IEclipsePreferences getPluginPreferenceStore()
+	{
+		return new InstanceScope().getNode(Activator.PLUGIN_ID);
+	}
+
+	@Override
+	protected IPreferenceStore getChainedEditorPreferenceStore()
+	{
+		return SassSourceEditor.getChainedPreferenceStore();
+	}
+	
 }

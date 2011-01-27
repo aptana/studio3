@@ -7,9 +7,13 @@
  */
 package com.aptana.editor.css.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.CSSSourceEditor;
 
 public class CSSPreferencePage extends CommonEditorPreferencePage
 {
@@ -28,5 +32,18 @@ public class CSSPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
+	}
+
+	@Override
+	protected IPreferenceStore getChainedEditorPreferenceStore()
+	{
+		return CSSSourceEditor.getChainedPreferenceStore();
+	}
+
+	@Override
+	protected IEclipsePreferences getPluginPreferenceStore()
+	{
+		return new InstanceScope().getNode(CSSPlugin.PLUGIN_ID);
+
 	}
 }

@@ -21,6 +21,12 @@ public class Messages extends NLS
 
 	public static String CommonEditorPreferencePage_Text_Editing_Label;
 
+	public static String CommonEditorPreferencePage_UseDefaultOption;
+
+	public static String CommonEditorPreferencePage_UseSpacesOption;
+
+	public static String CommonEditorPreferencePage_UseTabOption;
+
 	public static String TasksPreferencePage_CaseSensitiveLabel;
 	public static String TasksPreferencePage_Description;
 	public static String TasksPreferencePage_EditTagTitle;

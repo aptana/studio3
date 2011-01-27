@@ -48,14 +48,16 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				CSSPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() });
-
-		setPreferenceStore(store);
+		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new CSSSourceViewerConfiguration(getPreferenceStore(), this));
 
 		setDocumentProvider(new CSSDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { CSSPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	/*
