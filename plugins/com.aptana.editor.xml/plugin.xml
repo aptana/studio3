@@ -15,6 +15,9 @@
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.xml">
          </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.xsl">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
@@ -74,6 +77,16 @@
             id="com.aptana.editor.xml.preferences.XMLPreferencePage"
             name="XML">
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xsl"
+            id="com.aptana.contenttype.xsl"
+            name="%content-type.xsl.name"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>
