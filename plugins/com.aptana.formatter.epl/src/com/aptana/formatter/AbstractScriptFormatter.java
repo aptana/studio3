@@ -259,7 +259,7 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			// Since the editor tab-width setting can be changed at any time outside of
 			// the formatter's preferences, we have to retrieve it from the editor's preferences.
 			tabSize = getEditorSpecificTabWidth();
-			if (FormatterUtils.shouldInsertSpacesForTabs())
+			if (isEditorInsertSpacesForTabs())
 			{
 				return new FormatterIndentGenerator(' ', indentSize, tabSize);
 			}

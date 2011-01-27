@@ -23,6 +23,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
@@ -56,6 +57,9 @@ public class HTMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				HTMLPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
+		setPreferenceStore(store);
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
 	}

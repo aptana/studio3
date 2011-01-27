@@ -23,9 +23,12 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -36,6 +39,7 @@ import com.aptana.editor.xml.parsing.IXMLParserConstants;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
 
+@SuppressWarnings("restriction")
 public class XMLEditor extends AbstractThemeableEditor
 {
 
@@ -57,10 +61,15 @@ public class XMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
+				XMLPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
+				EditorsPlugin.getDefault().getPreferenceStore() });
+		setPreferenceStore(store);
+
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
 	}
-	
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -184,7 +193,7 @@ public class XMLEditor extends AbstractThemeableEditor
 			XMLElementNode en = (XMLElementNode) node;
 			if (!en.isSelfClosing())
 			{
-				IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions );
+				IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions);
 				if (match != null)
 				{
 					// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new
@@ -215,7 +224,7 @@ public class XMLEditor extends AbstractThemeableEditor
 		// no new pair, so don't highlight anything
 		fTagPairOccurrences = null;
 	}
-	
+
 	@Override
 	public IFoldingComputer createFoldingComputer(IDocument document)
 	{

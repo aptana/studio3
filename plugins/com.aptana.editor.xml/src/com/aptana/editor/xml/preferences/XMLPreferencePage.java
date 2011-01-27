@@ -5,26 +5,29 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.html.preferences;
+package com.aptana.editor.xml.preferences;
 
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.xml.XMLPlugin;
 
-public class HTMLPreferencePage extends CommonEditorPreferencePage
+public class XMLPreferencePage extends CommonEditorPreferencePage
 {
+
 	/**
-	 * HTMLPreferencePage
+	 * XMLPreferencePage
 	 */
-	public HTMLPreferencePage()
+	
+	public XMLPreferencePage()
 	{
 		super();
-		setDescription(Messages.HTMLPreferencePage_LBL_Description);
-		setPreferenceStore(HTMLPlugin.getDefault().getPreferenceStore());
+		setDescription(Messages.XMLPreferencePage_XML_Page_Title);
+		setPreferenceStore(XMLPlugin.getDefault().getPreferenceStore());
 	}
-
+	
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
 	}
+
 }

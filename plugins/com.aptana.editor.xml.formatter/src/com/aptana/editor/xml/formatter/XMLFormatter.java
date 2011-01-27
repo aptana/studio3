@@ -200,6 +200,15 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		return FormatterUtils.getEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(XMLPlugin.getDefault().getPreferenceStore());
+	}
+
 	/**
 	 * Do the actual formatting of the XML.
 	 * 

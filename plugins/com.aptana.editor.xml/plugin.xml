@@ -66,5 +66,14 @@
             super="com.aptana.editor.common.occurrence">
       </type>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.xml.preferences.XMLPreferencePage"
+            id="com.aptana.editor.xml.preferences.XMLPreferencePage"
+            name="XML">
+      </page>
+   </extension>
 
 </plugin>

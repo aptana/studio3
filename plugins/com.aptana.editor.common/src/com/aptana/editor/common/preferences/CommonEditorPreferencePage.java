@@ -11,6 +11,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -22,6 +23,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
@@ -37,6 +39,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private Composite appearanceComposite;
 	private Composite advancedOptions;
 	private BooleanFieldEditor markOccurences;
+	private IntegerFieldEditor tabSize;
 
 	/**
 	 * EditorsPreferencePage
@@ -74,6 +77,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				PreferencesUtil.createPreferenceDialogOn(Display.getDefault().getActiveShell(), e.text, null, null);
 			}
 		});
+
+		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
 	}
 
 	/**
@@ -101,6 +106,18 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 		else
 			return aOptions;
+	}
+
+	protected void createTextEditingOptions(Composite parent, String groupName)
+	{
+		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
+
+		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
+				Messages.CommonEditorPreferencePage_Tab_Size_Label, group);
+
+		tabSize.setEmptyStringAllowed(false);
+		tabSize.setValidRange(1, 20);
+		addField(tabSize);
 	}
 
 	/**
