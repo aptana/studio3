@@ -8,15 +8,20 @@
 
 package com.aptana.core;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -28,6 +33,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -44,16 +50,21 @@ public final class ShellExecutable {
 	
 	private static final String[] ENV_FILTER = new String[] {
 		"_", //$NON-NLS-1$
-		"TMP" //$NON-NLS-1$
+		"TMP", //$NON-NLS-1$
+		"APP_ICON*", //$NON-NLS-1$
+		"JAVA_MAIN_CLASS*", //$NON-NLS-1$
+		"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$
 	};
 	
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
 	
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
+	private static final String RCFILE = "$os$/.aptanarc"; //$NON-NLS-1$
 	
 	private static boolean initilizing = false;
 	private static IPath shellPath = null;
+	private static IPath shellRCPath = null;
 	private static Map<String, String> shellEnvironment;
 	
 	
@@ -96,6 +107,19 @@ public final class ShellExecutable {
 		return null;
 	}
 	
+	public static IPath getShellRCPath() {
+		if (shellRCPath == null) {
+			URL url = FileLocator.find(CorePlugin.getDefault().getBundle(), Path.fromPortableString(RCFILE), null);
+			if (url != null) {
+				File file = ResourceUtil.resourcePathToFile(url);
+				if (file != null && file.exists()) {
+					shellRCPath = Path.fromOSString(file.getAbsolutePath());
+				}
+			}
+		}
+		return shellRCPath;
+	}
+	
 	private static IPath getPreferenceShellPath() {
 		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
 		if (pref != null && !StringUtil.isEmpty(pref)) {
@@ -130,16 +154,24 @@ public final class ShellExecutable {
 	
 	public synchronized static Map<String, String> getEnvironment() {
 		if (shellEnvironment == null) {
-			shellEnvironment = new HashMap<String, String>();			
-			try {
-				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null)))); //$NON-NLS-1$
-			} catch (Exception e) {
-				CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
-			}
+			shellEnvironment = getEnvironment(null);			
 		}
 		return shellEnvironment;
 	}
-	
+
+	public synchronized static Map<String, String> getEnvironment(IPath workingDirectory) {
+		if (workingDirectory == null && shellEnvironment != null) {
+			return shellEnvironment;
+		}
+		Map<String, String> env = new HashMap<String, String>();
+		try {
+			env.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", workingDirectory, null)))); //$NON-NLS-1$
+		} catch (Exception e) {
+			CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
+		}
+		return env;
+	}
+
 	private static Map<String, String> buildEnvironment(String envp) {
 		Map<String, String> env = new HashMap<String, String>();
 		StringTokenizer tok = new StringTokenizer(envp, "\r\n"); //$NON-NLS-1$
@@ -151,7 +183,16 @@ public final class ShellExecutable {
 			}
 		}
 		for (String var : ENV_FILTER) {
-			env.remove(var);
+			if (var.charAt(var.length()-1) == '*') {
+				String prefix = var.substring(0, var.length()-1);
+				for (Iterator<Entry<String, String>> i =  env.entrySet().iterator(); i.hasNext(); ) {
+					if (i.next().getKey().startsWith(prefix)) {
+						i.remove();
+					}
+				}
+			} else {
+				env.remove(var);
+			}
 		}
 		return env;
 	}
@@ -172,6 +213,17 @@ public final class ShellExecutable {
 		return shellCommand;
 	}
 	
+	private synchronized static Map<String,String> toShellEnvironment(Map<String,String> environment) {
+		if (initilizing) {
+			return environment;
+		}
+		IPath rcPath = getShellRCPath();
+		if (rcPath != null) {
+			environment.put("BASH_ENV", rcPath.toOSString()); //$NON-NLS-1$
+		}
+		return environment;
+	}
+	
 	public static List<String> toShellCommand(String command, String... arguments) throws CoreException {
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
@@ -186,6 +238,7 @@ public final class ShellExecutable {
 		if (environment != null && !environment.isEmpty()) {
 			processBuilder.environment().putAll(environment);
 		}
+		processBuilder.environment().putAll(toShellEnvironment(processBuilder.environment()));
 		return processBuilder.start();
 	}
 
