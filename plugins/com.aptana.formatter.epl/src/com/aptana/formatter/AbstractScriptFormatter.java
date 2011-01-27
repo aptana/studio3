@@ -252,13 +252,14 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	protected IFormatterIndentGenerator createIndentGenerator()
 	{
 		int tabSize = getTabSize();
-		final int indentSize = getIndentSize();
+		int indentSize = getIndentSize();
 		final String indentType = getIndentType();
 		if (CodeFormatterConstants.EDITOR.equals(indentType))
 		{
 			// Since the editor tab-width setting can be changed at any time outside of
 			// the formatter's preferences, we have to retrieve it from the editor's preferences.
 			tabSize = getEditorSpecificTabWidth();
+			indentSize = tabSize;
 			if (isEditorInsertSpacesForTabs())
 			{
 				return new FormatterIndentGenerator(' ', indentSize, tabSize);
