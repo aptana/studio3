@@ -15,7 +15,6 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
 
-@SuppressWarnings("restriction")
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 	@Override
