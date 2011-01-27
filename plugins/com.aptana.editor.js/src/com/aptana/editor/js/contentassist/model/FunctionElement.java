@@ -188,6 +188,23 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
+	 * getParamterNames
+	 * 
+	 * @return
+	 */
+	public List<String> getParameterNames()
+	{
+		List<String> result = new ArrayList<String>();
+
+		for (ParameterElement parameter : this.getParameters())
+		{
+			result.add(parameter.getName());
+		}
+
+		return result;
+	}
+
+	/**
 	 * getParameters
 	 * 
 	 * @return
