@@ -202,6 +202,15 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		return FormatterUtils.getEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(CSSPlugin.getDefault().getPreferenceStore());
+	}
+
 	/**
 	 * Do the actual formatting of the CSS.
 	 * 

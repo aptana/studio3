@@ -251,4 +251,12 @@ public class JSONFormatter extends AbstractScriptFormatter implements IScriptFor
 		return FormatterUtils.getEditorTabWidth(JSONPlugin.getDefault().getPreferenceStore());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(JSONPlugin.getDefault().getPreferenceStore());
+	}
 }
