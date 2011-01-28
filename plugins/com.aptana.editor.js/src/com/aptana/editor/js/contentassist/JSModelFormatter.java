@@ -27,10 +27,8 @@ import com.aptana.editor.js.contentassist.model.SinceElement;
 public class JSModelFormatter
 {
 	private static final Map<String, Image> TYPE_IMAGE_MAP;
-
 	// used for mixed types
 	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
-
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
 
@@ -51,13 +49,14 @@ public class JSModelFormatter
 	}
 
 	/**
-	 * addDefiningFiles
+	 * formatDefiningFiles
 	 * 
-	 * @param buffer
 	 * @param property
+	 * @param projectURI
 	 */
-	private static void addDefiningFiles(StringBuilder buffer, PropertyElement property, URI projectURI)
+	private static String formatDefiningFiles(PropertyElement property, URI projectURI)
 	{
+		StringBuilder buffer = new StringBuilder();
 		List<String> documents = property.getDocuments();
 
 		if (documents != null && documents.isEmpty() == false)
@@ -102,16 +101,18 @@ public class JSModelFormatter
 				buffer.append("- ").append(document); //$NON-NLS-1$
 			}
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addDescription
+	 * formatDescription
 	 * 
-	 * @param buffer
 	 * @param property
 	 */
-	private static void addDescription(StringBuilder buffer, PropertyElement property)
+	private static String formatDescription(PropertyElement property)
 	{
+		StringBuilder buffer = new StringBuilder();
 		String description = property.getDescription();
 
 		if (description != null && description.length() > 0)
@@ -119,16 +120,19 @@ public class JSModelFormatter
 			buffer.append(DOUBLE_NEW_LINE);
 			buffer.append(description);
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addExamples
+	 * formatExamples
 	 * 
-	 * @param buffer
 	 * @param examples
 	 */
-	private static void addExamples(StringBuilder buffer, List<String> examples)
+	private static String formatExamples(List<String> examples)
 	{
+		StringBuilder buffer = new StringBuilder();
+
 		if (examples != null && examples.size() > 0)
 		{
 			buffer.append(DOUBLE_NEW_LINE);
@@ -138,16 +142,18 @@ public class JSModelFormatter
 			// emit list
 			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples));
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addSpecifications
+	 * formatSpecifications
 	 * 
-	 * @param buffer
 	 * @param property
 	 */
-	private static void addSpecifications(StringBuilder buffer, PropertyElement property)
+	private static String formatSpecifications(PropertyElement property)
 	{
+		StringBuilder buffer = new StringBuilder();
 		List<SinceElement> sinceList = property.getSinceList();
 
 		if (sinceList != null && sinceList.isEmpty() == false)
@@ -170,16 +176,19 @@ public class JSModelFormatter
 				buffer.append(NEW_LINE);
 			}
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addTypes
+	 * formatTypes
 	 * 
-	 * @param buffer
 	 * @param types
 	 */
-	private static void addTypes(StringBuilder buffer, List<String> types)
+	private static String formatTypes(List<String> types)
 	{
+		StringBuilder buffer = new StringBuilder();
+
 		buffer.append(" : "); //$NON-NLS-1$
 
 		if (types != null && types.size() > 0)
@@ -197,9 +206,13 @@ public class JSModelFormatter
 		{
 			buffer.append(JSTypeConstants.NO_TYPE);
 		}
+
+		return buffer.toString();
 	}
 
 	/**
+	 * getContextLines
+	 * 
 	 * @param function
 	 * @return
 	 */
@@ -212,8 +225,19 @@ public class JSModelFormatter
 			StringBuilder buffer = new StringBuilder();
 
 			// line 1: function name with argument names
+			List<String> paramNameAndType = new ArrayList<String>();
 			buffer.append(function.getName());
-			buffer.append("(").append(StringUtil.join(", ", function.getParameterNames())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			buffer.append("(");
+
+			for (ParameterElement parameter : function.getParameters())
+			{
+				paramNameAndType.add(parameter.getName() + formatTypes(parameter.getTypes()));
+			}
+
+			buffer.append(StringUtil.join(", ", paramNameAndType));
+			buffer.append(")");
+			buffer.append(formatTypes(function.getReturnTypeNames()));
+
 			result.add(buffer.toString());
 
 			// line 2..n: one line for each argument description
@@ -221,7 +245,8 @@ public class JSModelFormatter
 			{
 				buffer.setLength(0);
 
-				buffer.append(parameter.getName()).append(": ").append(parameter.getDescription()); //$NON-NLS-1$
+				buffer.append("•\t").append(parameter.getName()).append(":\n");
+				buffer.append(" \t").append(parameter.getDescription()); //$NON-NLS-1$
 				result.add(buffer.toString());
 			}
 		}
@@ -243,11 +268,11 @@ public class JSModelFormatter
 		buffer.append(function.getName());
 		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		addTypes(buffer, function.getReturnTypeNames());
-		addDescription(buffer, function);
-		addExamples(buffer, function.getExamples());
-		addDefiningFiles(buffer, function, projectURI);
-		addSpecifications(buffer, function);
+		buffer.append(formatTypes(function.getReturnTypeNames()));
+		buffer.append(formatDescription(function));
+		buffer.append(formatExamples(function.getExamples()));
+		buffer.append(formatDefiningFiles(function, projectURI));
+		buffer.append(formatSpecifications(function));
 
 		return buffer.toString();
 	}
@@ -269,11 +294,11 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(property.getName());
 
-		addTypes(buffer, property.getTypeNames());
-		addDescription(buffer, property);
-		addExamples(buffer, property.getExamples());
-		addDefiningFiles(buffer, property, projectURI);
-		addSpecifications(buffer, property);
+		buffer.append(formatTypes(property.getTypeNames()));
+		buffer.append(formatDescription(property));
+		buffer.append(formatExamples(property.getExamples()));
+		buffer.append(formatDefiningFiles(property, projectURI));
+		buffer.append(formatSpecifications(property));
 
 		return buffer.toString();
 	}
