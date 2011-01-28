@@ -7,53 +7,46 @@
  */
 package com.aptana.editor.json.parsing.lexer;
 
-import java.util.EnumSet;
+import com.aptana.editor.json.parsing.Terminals;
 
 @SuppressWarnings("nls")
 public enum JSONTokenType
 {
-	UNDEFINED(""),	// -1
-	EOF(""),	// 0
-	LCURLY("keyword.operator.json"),	// 1
-	LBRACKET("keyword.operator.json"),	// 2
-	NUMBER("keyword.operator.json"),	// 3
-	TRUE("keyword.operator.json"),	// 4
-	FALSE("keyword.operator.json"),	// 5
-	NULL("keyword.operator.json"),	// 6
-	STRING_DOUBLE("string.quoted.double.json"),	// 7
-	STRING_SINGLE("string.quoted.single.json"),	// 8
-	RCURLY("keyword.operator.json"),	// 9
-	PROPERTY("property.json"),	// 10
-	RBRACKET("keyword.operator.json"),	// 11
-	COMMA("keyword.operator.json"),	// 12
-	COLON("keyword.operator.json"),	// 13
-	
-	COMMENT("comment.json");
+	UNDEFINED("", -1),
+	EOF("", Terminals.EOF),
+	LCURLY("keyword.operator.json", Terminals.LCURLY),
+	LBRACKET("keyword.operator.json", Terminals.LBRACKET),
+	NUMBER("keyword.operator.json", Terminals.NUMBER),
+	TRUE("keyword.operator.json", Terminals.TRUE),
+	FALSE("keyword.operator.json", Terminals.FALSE),
+	NULL("keyword.operator.json", Terminals.NULL),
+	STRING_DOUBLE("string.quoted.double.json", Terminals.STRING_DOUBLE),
+	STRING_SINGLE("string.quoted.single.json", Terminals.STRING_SINGLE),
+	RCURLY("keyword.operator.json", Terminals.RCURLY),
+	PROPERTY("property.json", Terminals.PROPERTY),
+	RBRACKET("keyword.operator.json", Terminals.RBRACKET),
+	COMMA("keyword.operator.json", Terminals.COMMA),
+	COLON("keyword.operator.json", Terminals.COLON),
+
+	COMMENT("comment.json", 14);
 
 	private short _index;
 	private String _scope;
 
 	/**
-	 * static initializer
-	 */
-	static
-	{
-		short index = -1;
-
-		for (JSONTokenType type : EnumSet.allOf(JSONTokenType.class))
-		{
-			type._index = index++;
-		}
-	}
-
-	/**
-	 * BeaverTokenType
+	 * JSONTokenType
 	 * 
 	 * @param scope
 	 */
-	private JSONTokenType(String scope)
+	private JSONTokenType(String scope, short beaverId)
 	{
 		this._scope = scope;
+		this._index = beaverId;
+	}
+
+	private JSONTokenType(String scope, int index)
+	{
+		this(scope, (short) index);
 	}
 
 	/**

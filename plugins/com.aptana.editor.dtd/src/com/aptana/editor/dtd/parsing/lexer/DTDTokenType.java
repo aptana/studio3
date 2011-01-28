@@ -7,55 +7,55 @@
  */
 package com.aptana.editor.dtd.parsing.lexer;
 
-import java.util.EnumSet;
+import com.aptana.editor.dtd.parsing.Terminals;
 
 @SuppressWarnings("nls")
 public enum DTDTokenType
 {
-	UNDEFINED(""), // -1
-	EOF(""), // 0
-	NAME("source.dtd"), // 1
-	GREATER_THAN("source.dtd"), // 2
-	LPAREN("source.dtd"), // 3
-	STRING("keyword.operator.dtd"), // 4
-	RPAREN("source.dtd"), // 5
-	PIPE("source.dtd"), // 6
-	STAR("source.dtd"), // 7
-	ENTITY("keyword.operator.dtd"), // 8
-	ELEMENT("keyword.operator.dtd"), // 9
-	SECTION_START("keyword.operator.dtd"), // 10
-	ATTLIST("keyword.operator.dtd"), // 11
-	NOTATION("keyword.operator.dtd"), // 12
-	PE_REF("entity.reference.parameter.dtd"), // 13
-	PI("source.dtd"), // 14
-	COMMENT("comment.dtd"), // 15
-	PUBLIC("keyword.operator.dtd"), // 16
-	QUESTION("source.dtd"), // 17
-	PLUS("source.dtd"), // 18
-	SYSTEM("keyword.operator.dtd"), // 19
-	LBRACKET("keyword.operator.dtd"), // 20
-	SECTION_END("keyword.operator.dtd"), // 21
-	COMMA("source.dtd"), // 22
-	PCDATA("keyword.operator.dtd"), // 23
-	PERCENT("keyword.operator.dtd"), // 24
-	EMPTY("keyword.operator.dtd"), // 25
-	ANY("keyword.operator.dtd"), // 26
-	INCLUDE("keyword.operator.dtd"), // 27
-	IGNORE("keyword.operator.dtd"), // 28
-	FIXED("keyword.operator.dtd"), // 29
-	NOTATION_TYPE("keyword.operator.dtd"), // 30
-	REQUIRED("keyword.operator.dtd"), // 31
-	IMPLIED("keyword.operator.dtd"), // 32
-	NDATA("keyword.operator.dtd"), // 33
-	CDATA_TYPE("keyword.operator.dtd"), // 34
-	ID_TYPE("keyword.operator.dtd"), // 35
-	IDREF_TYPE("keyword.operator.dtd"), // 36
-	IDREFS_TYPE("keyword.operator.dtd"), // 37
-	ENTITY_TYPE("keyword.operator.dtd"), // 38
-	ENTITIES_TYPE("keyword.operator.dtd"), // 39
-	NMTOKEN_TYPE("keyword.operator.dtd"), // 40
-	NMTOKENS_TYPE("keyword.operator.dtd"), // 41
-	NMTOKEN("keyword.operator.dtd"); // 42
+	UNDEFINED("", -1),
+	EOF("", Terminals.EOF),
+	NAME("source.dtd", Terminals.NAME),
+	GREATER_THAN("source.dtd", Terminals.GREATER_THAN),
+	LPAREN("source.dtd", Terminals.LPAREN),
+	STRING("keyword.operator.dtd", Terminals.STRING),
+	RPAREN("source.dtd", Terminals.RPAREN),
+	PIPE("source.dtd", Terminals.PIPE),
+	STAR("source.dtd", Terminals.STAR),
+	ENTITY("keyword.operator.dtd", Terminals.ENTITY),
+	ELEMENT("keyword.operator.dtd", Terminals.ELEMENT),
+	SECTION_START("keyword.operator.dtd", Terminals.SECTION_START),
+	ATTLIST("keyword.operator.dtd", Terminals.ATTLIST),
+	NOTATION("keyword.operator.dtd", Terminals.NOTATION),
+	PE_REF("entity.reference.parameter.dtd", Terminals.PE_REF),
+	PI("source.dtd", Terminals.PI),
+	COMMENT("comment.dtd", Terminals.COMMENT),
+	PUBLIC("keyword.operator.dtd", Terminals.PUBLIC),
+	QUESTION("source.dtd", Terminals.QUESTION),
+	PLUS("source.dtd", Terminals.PLUS),
+	SYSTEM("keyword.operator.dtd", Terminals.SYSTEM),
+	LBRACKET("keyword.operator.dtd", Terminals.LBRACKET),
+	SECTION_END("keyword.operator.dtd", Terminals.SECTION_END),
+	COMMA("source.dtd", Terminals.COMMA),
+	PCDATA("keyword.operator.dtd", Terminals.PCDATA),
+	PERCENT("keyword.operator.dtd", Terminals.PERCENT),
+	EMPTY("keyword.operator.dtd", Terminals.EMPTY),
+	ANY("keyword.operator.dtd", Terminals.ANY),
+	INCLUDE("keyword.operator.dtd", Terminals.INCLUDE),
+	IGNORE("keyword.operator.dtd", Terminals.IGNORE),
+	FIXED("keyword.operator.dtd", Terminals.FIXED),
+	NOTATION_TYPE("keyword.operator.dtd", Terminals.NOTATION_TYPE),
+	REQUIRED("keyword.operator.dtd", Terminals.REQUIRED),
+	IMPLIED("keyword.operator.dtd", Terminals.IMPLIED),
+	NDATA("keyword.operator.dtd", Terminals.NDATA),
+	CDATA_TYPE("keyword.operator.dtd", Terminals.CDATA_TYPE),
+	ID_TYPE("keyword.operator.dtd", Terminals.ID_TYPE),
+	IDREF_TYPE("keyword.operator.dtd", Terminals.IDREF_TYPE),
+	IDREFS_TYPE("keyword.operator.dtd", Terminals.IDREFS_TYPE),
+	ENTITY_TYPE("keyword.operator.dtd", Terminals.ENTITY_TYPE),
+	ENTITIES_TYPE("keyword.operator.dtd", Terminals.ENTITIES_TYPE),
+	NMTOKEN_TYPE("keyword.operator.dtd", Terminals.NMTOKEN_TYPE),
+	NMTOKENS_TYPE("keyword.operator.dtd", Terminals.NMTOKENS_TYPE),
+	NMTOKEN("keyword.operator.dtd", Terminals.NMTOKEN);
 
 	// ENTITY_REF("source.dtd"),
 
@@ -67,26 +67,19 @@ public enum DTDTokenType
 	private String _scope;
 
 	/**
-	 * static initializer
-	 */
-	static
-	{
-		short index = -1;
-
-		for (DTDTokenType type : EnumSet.allOf(DTDTokenType.class))
-		{
-			type._index = index++;
-		}
-	}
-
-	/**
 	 * DTDTokenType
 	 * 
 	 * @param scope
 	 */
-	private DTDTokenType(String scope)
+	private DTDTokenType(String scope, short beaverId)
 	{
 		this._scope = scope;
+		this._index = beaverId;
+	}
+
+	private DTDTokenType(String scope, int index)
+	{
+		this(scope, (short) index);
 	}
 
 	/**
