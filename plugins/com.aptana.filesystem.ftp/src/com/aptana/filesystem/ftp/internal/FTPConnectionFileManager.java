@@ -1075,6 +1075,9 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		FTPReply reply = ftpClient.sendCommand("STAT "+dirname); //$NON-NLS-1$
 		ftpClient.validateReply(reply, validCodes);
 		String[] data = reply.getReplyData();
+		if (data == null) {
+			return null;
+		}
 		for (int i = 0; i < data.length; ++i) {
 			data[i] = data[i].trim();
 		}

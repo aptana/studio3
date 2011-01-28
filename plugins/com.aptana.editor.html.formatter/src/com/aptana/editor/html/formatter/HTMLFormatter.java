@@ -210,6 +210,15 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		return FormatterUtils.getEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(HTMLPlugin.getDefault().getPreferenceStore());
+	}
+
 	/**
 	 * Do the actual formatting of the HTML.
 	 * 

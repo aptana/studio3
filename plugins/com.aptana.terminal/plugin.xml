@@ -58,12 +58,12 @@
             path="scripting">
       </loadPath>
    </extension>
-   <extension
+   <!--<extension
          point="org.eclipse.ui.startup">
       <startup
             class="com.aptana.terminal.EarlyStartup">
       </startup>
-   </extension>
+   </extension>-->
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer

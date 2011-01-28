@@ -86,6 +86,13 @@ public interface IScriptFormatter
 	int getEditorSpecificTabWidth();
 
 	/**
+	 * Returns the 'insert spaces for tabs' setting defined in the editor's specific preference page.
+	 * 
+	 * @return The 'insert spaces for tabs' boolean value.
+	 */
+	boolean isEditorInsertSpacesForTabs();
+
+	/**
 	 * Returns the indentation type, as defined in the formatter preferences.
 	 * 
 	 * @return The indentation type - One of {@link com.aptana.formatter.ui.CodeFormatterConstants#TAB},

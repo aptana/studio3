@@ -279,6 +279,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		return FormatterUtils.getEditorTabWidth(JSPlugin.getDefault().getPreferenceStore());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(JSPlugin.getDefault().getPreferenceStore());
+	}
+
 	/**
 	 * Do the actual formatting of the JavaScript.
 	 * 
