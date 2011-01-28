@@ -31,6 +31,7 @@ public class JSModelFormatter
 	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+	private static final char BULLET = '\u2022';
 
 	/**
 	 * static initializer
@@ -259,7 +260,7 @@ public class JSModelFormatter
 			{
 				buffer.setLength(0);
 
-				buffer.append("•\t").append(parameter.getName()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				buffer.append(BULLET).append("\t").append(parameter.getName()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				buffer.append(" \t").append(parameter.getDescription()); //$NON-NLS-1$
 				result.add(buffer.toString());
 			}
