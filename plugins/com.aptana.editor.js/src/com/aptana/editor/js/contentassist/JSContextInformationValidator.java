@@ -183,7 +183,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	 */
 	public boolean isContextInformationValid(int offset)
 	{
-		return this.getArgumentIndex(offset) != -1;
+		return (offset > this._startingOffset && this.getArgumentIndex(offset) >= 0);
 	}
 
 	/*
