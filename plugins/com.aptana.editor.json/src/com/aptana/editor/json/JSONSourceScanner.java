@@ -54,6 +54,7 @@ public class JSONSourceScanner extends RuleBasedScanner
 		rules.add(new EndOfLineRule("//", createToken(JSONTokenType.COMMENT)));
 		rules.add(new MultiLineRule("/*", "*/", createToken(JSONTokenType.COMMENT)));
 
+		// NOTE: This case is covered during partitioning, but we need this for the parser
 		rules.add( //
 			new JSONPropertyRule( //
 				createToken(JSONTokenType.STRING_SINGLE), //

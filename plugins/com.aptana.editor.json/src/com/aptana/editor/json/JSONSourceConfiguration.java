@@ -24,24 +24,35 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
+import com.aptana.editor.json.parsing.lexer.JSONTokenType;
+import com.aptana.editor.json.text.rules.JSONPropertyRule;
 
 public class JSONSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 	public static final String PREFIX = "__json__"; //$NON-NLS-1$
 	public static final String DEFAULT = "__json" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public static final String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
+	public static final String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
 
-	// TODO: add other content types
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, STRING_DOUBLE, STRING_SINGLE, PROPERTY };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSONConstants.CONTENT_TYPE_JSON } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { };
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
+		new JSONPropertyRule( //
+			new Token(STRING_SINGLE), //
+			new Token(STRING_DOUBLE), //
+			new Token(PROPERTY) //
+		) //
+	};
 	private JSONSourceScanner beaverScanner;
 
 	private static JSONSourceConfiguration instance;
 
-	private JSONSourceConfiguration() {
+	private JSONSourceConfiguration()
+	{
 	}
-	
+
 	/**
 	 * getDefault
 	 * 
@@ -54,6 +65,9 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IJSONConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(PROPERTY), new QualifiedContentType(JSONTokenType.PROPERTY.getScope()));
+			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(JSONTokenType.STRING_DOUBLE.getScope()));
+			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(JSONTokenType.STRING_SINGLE.getScope()));
 
 			instance = new JSONSourceConfiguration();
 		}
@@ -152,5 +166,17 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
+		
+		ThemeingDamagerRepairer p = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.PROPERTY.getScope()));
+		reconciler.setDamager(p, PROPERTY);
+		reconciler.setRepairer(p, PROPERTY);
+		
+		ThemeingDamagerRepairer dqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_DOUBLE.getScope()));
+		reconciler.setDamager(dqs, STRING_DOUBLE);
+		reconciler.setRepairer(dqs, STRING_DOUBLE);
+		
+		ThemeingDamagerRepairer sqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_SINGLE.getScope()));
+		reconciler.setDamager(sqs, STRING_SINGLE);
+		reconciler.setRepairer(sqs, STRING_SINGLE);
 	}
 }

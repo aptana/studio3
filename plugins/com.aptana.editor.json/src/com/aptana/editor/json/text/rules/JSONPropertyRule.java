@@ -8,6 +8,7 @@
 package com.aptana.editor.json.text.rules;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.SingleLineRule;
@@ -16,11 +17,12 @@ import org.eclipse.jface.text.rules.Token;
 /**
  * JSONPropertyRule
  */
-public class JSONPropertyRule implements IRule
+public class JSONPropertyRule implements IPredicateRule
 {
 	private IRule _singleQuotedRule;
 	private IRule _doubleQuotedRule;
 	private IToken _token;
+	private IToken _successToken;
 
 	/**
 	 * JSONPropertyRule
@@ -34,6 +36,7 @@ public class JSONPropertyRule implements IRule
 		this._singleQuotedRule = new SingleLineRule("'", "'", singleQuotedToken, '\\');
 		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken, '\\');
 		this._token = token;
+		this._successToken = Token.UNDEFINED;
 	}
 
 	/*
@@ -76,6 +79,25 @@ public class JSONPropertyRule implements IRule
 			}
 		}
 
-		return token;
+		return this._successToken = token;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IPredicateRule#evaluate(org.eclipse.jface.text.rules.ICharacterScanner,
+	 * boolean)
+	 */
+	public IToken evaluate(ICharacterScanner scanner, boolean resume)
+	{
+		return evaluate(scanner);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.rules.IPredicateRule#getSuccessToken()
+	 */
+	public IToken getSuccessToken()
+	{
+		return this._successToken;
 	}
 }
