@@ -102,6 +102,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 			{
 				case ' ':
 				case '\t':
+				case '\r':
 				case '\n':
 				case '{':
 				case '[':
