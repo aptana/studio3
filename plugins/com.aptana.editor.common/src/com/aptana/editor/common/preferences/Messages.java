@@ -51,11 +51,6 @@ public class Messages extends NLS
 
 	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
 
-	
-	/**
-	 * EditorsPreferencePage_EditLink
-	 */
-	public static String EditorsPreferencePage_EditLink;
 
 	/**
 	 * EditorsPreferencePage_Formatting
@@ -76,23 +71,10 @@ public class Messages extends NLS
 	 */
 	public static String EditorsPreferencePage_PreferenceDescription;
 	
-	/**
-	 * EditorsPreferencePage_TabInsertion
-	 */
-	public static String EditorsPreferencePage_TabInsertion;
 	public static String EditorsPreferencePage_ToggleBetween;
 
 	public static String EditorsPreferencePage_Typing;
 	
-	/**
-	 * EditorsPreferencePage_UseSpaces
-	 */
-	public static String EditorsPreferencePage_UseSpaces;
-	
-	/**
-	 * EditorsPreferencePage_UseTabs
-	 */
-	public static String EditorsPreferencePage_UseTabs;
 	
 	/**
 	 * EditorsPreferencePage_GeneralTextEditorPrefLink
