@@ -539,11 +539,18 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		// Only paint the part of lineRect that is contained in rect!
-		Rectangle intersection = lineRect.intersection(rect);
+		int previousAlpha = e.gc.getAlpha();
+		Color previousBG = e.gc.getBackground();
+		
 		e.gc.setAlpha(lineHighlight.getAlpha());
 		e.gc.setBackground(getColorManager().getColor(lineHighlight.toRGB()));
-		e.gc.fillRectangle(intersection);
+		// Only paint the part of lineRect that is contained in rect!
+		e.gc.fillRectangle(lineRect.intersection(rect));
+		
+		// BUGFIX: need to set alpha and background color back to what they were before or it breaks 
+		// the painting of pair matching!
+		e.gc.setAlpha(previousAlpha);
+		e.gc.setBackground(previousBG);
 	}
 
 	protected Color getThemeBG()

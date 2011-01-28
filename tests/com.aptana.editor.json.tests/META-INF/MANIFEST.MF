@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JSON Editor Tests
 Bundle-SymbolicName: com.aptana.editor.json.tests
 Bundle-Version: 3.0.0.qualifier
-Bundle-Vendor: Aptana, Inc.
+Bundle-Vendor: Aptana
 Fragment-Host: com.aptana.editor.json
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.junit;bundle-version="3.8.0",
