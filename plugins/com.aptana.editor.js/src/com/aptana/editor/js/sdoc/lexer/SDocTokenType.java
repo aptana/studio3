@@ -7,74 +7,71 @@
  */
 package com.aptana.editor.js.sdoc.lexer;
 
-import java.util.EnumSet;
+import com.aptana.editor.js.sdoc.parsing.Terminals;
 
 public enum SDocTokenType
 {
-	UNDEFINED,			// -1
-	
-	EOF,				// 0
-	IDENTIFIER,			// 1
-	RCURLY,				// 2
-	LCURLY,				// 3
-	RBRACKET,			// 4
-	LBRACKET,			// 5
-	COLON,				// 6
-	TEXT,				// 7
-	POUND,				// 8
-	ERROR,				// 9
-	FUNCTION,			// 10
-	ARRAY,				// 11
-	CLASS,				// 12
-	COMMA,				// 13
-	PIPE,				// 14
-	RPAREN,				// 15
-	LPAREN,				// 16
-	CLASS_DESCRIPTION,	// 17
-	EXCEPTION,			// 18
-	EXTENDS,			// 19
-	NAMESPACE,			// 20
-	PARAM,				// 21
-	PROPERTY,			// 22
-	RETURN,				// 23
-	TYPE,				// 24
-	ADVANCED,			// 25
-	ALIAS,				// 26
-	AUTHOR,				// 27
-	CONSTRUCTOR,		// 28
-	EXAMPLE,			// 29
-	INTERNAL,			// 30
-	METHOD,				// 31
-	OVERVIEW,			// 32
-	PRIVATE,			// 33
-	SEE,				// 34
-	UNKNOWN,			// 35
-	END_DOCUMENTATION,	// 36
-	ARROW,				// 37
-	LESS_THAN,			// 38
-	GREATER_THAN,		// 39
-	ELLIPSIS,			// 40
-	START_DOCUMENTATION,// 41
-	
-	WHITESPACE,			// 42
-	TYPES,				// 43
-	VALUE;				// 44
-	
+	UNDEFINED(-1),
+
+	EOF(Terminals.EOF),
+	IDENTIFIER(Terminals.IDENTIFIER),
+	RCURLY(Terminals.RCURLY),
+	LCURLY(Terminals.LCURLY),
+	RBRACKET(Terminals.RBRACKET),
+	LBRACKET(Terminals.LBRACKET),
+	COLON(Terminals.COLON),
+	TEXT(Terminals.TEXT),
+	POUND(Terminals.POUND),
+	ERROR(Terminals.ERROR),
+	FUNCTION(Terminals.FUNCTION),
+	ARRAY(Terminals.ARRAY),
+	CLASS(Terminals.CLASS),
+	COMMA(Terminals.COMMA),
+	PIPE(Terminals.PIPE),
+	RPAREN(Terminals.RPAREN),
+	LPAREN(Terminals.LPAREN),
+	CLASS_DESCRIPTION(Terminals.CLASS_DESCRIPTION),
+	EXCEPTION(Terminals.EXCEPTION),
+	EXTENDS(Terminals.EXTENDS),
+	NAMESPACE(Terminals.NAMESPACE),
+	PARAM(Terminals.PARAM),
+	PROPERTY(Terminals.PROPERTY),
+	RETURN(Terminals.RETURN),
+	TYPE(Terminals.TYPE),
+	ADVANCED(Terminals.ADVANCED),
+	ALIAS(Terminals.ALIAS),
+	AUTHOR(Terminals.AUTHOR),
+	CONSTRUCTOR(Terminals.CONSTRUCTOR),
+	EXAMPLE(Terminals.EXAMPLE),
+	INTERNAL(Terminals.INTERNAL),
+	METHOD(Terminals.METHOD),
+	OVERVIEW(Terminals.OVERVIEW),
+	PRIVATE(Terminals.PRIVATE),
+	SEE(Terminals.SEE),
+	UNKNOWN(Terminals.UNKNOWN),
+	END_DOCUMENTATION(Terminals.END_DOCUMENTATION),
+	ARROW(Terminals.ARROW),
+	LESS_THAN(Terminals.LESS_THAN),
+	GREATER_THAN(Terminals.GREATER_THAN),
+	ELLIPSIS(Terminals.ELLIPSIS),
+	START_DOCUMENTATION(Terminals.START_DOCUMENTATION),
+
+	WHITESPACE(42),
+	TYPES(43),
+	VALUE(44);
+
 	private short _index;
 
-	/**
-	 * static initializer
-	 */
-	static
+	private SDocTokenType(short beaverId)
 	{
-		short index = -1;
-		
-		for (SDocTokenType type : EnumSet.allOf(SDocTokenType.class))
-		{
-			type._index = index++;
-		}
+		this._index = beaverId;
 	}
-	
+
+	private SDocTokenType(int index)
+	{
+		this((short) index);
+	}
+
 	/**
 	 * getIndex
 	 * 
