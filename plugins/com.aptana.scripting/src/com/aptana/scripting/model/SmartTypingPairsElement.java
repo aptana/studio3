@@ -56,7 +56,12 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 		// output path, scope and pairs
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
-		printer.printWithIndent("pairs: ").println(this.getPairs().toString()); //$NON-NLS-1$
+		String pairsValue = "null"; //$NON-NLS-1$
+		if (this.getPairs() != null)
+		{
+			pairsValue = this.getPairs().toString();
+		}
+		printer.printWithIndent("pairs: ").println(pairsValue); //$NON-NLS-1$
 	}
 
 	/**
