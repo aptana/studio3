@@ -9,9 +9,11 @@ package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
@@ -20,6 +22,7 @@ import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 
+@SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
 {
 	/*
@@ -31,12 +34,16 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				JSPlugin.getDefault().getPreferenceStore(), getPreferenceStore() });
-		setPreferenceStore(store);
-		
+		setPreferenceStore(getChainedPrefereceStore());
+
 		setSourceViewerConfiguration(new JSSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new JSDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPrefereceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { JSPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	/*

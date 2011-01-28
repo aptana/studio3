@@ -7,9 +7,13 @@
  */
 package com.aptana.editor.js.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSSourceEditor;
 
 public class JSPreferencePage extends CommonEditorPreferencePage
 {
@@ -28,6 +32,18 @@ public class JSPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
+	}
+
+	@Override
+	protected IEclipsePreferences getPluginPreferenceStore()
+	{
+		return new InstanceScope().getNode(JSPlugin.PLUGIN_ID);
+	}
+
+	@Override
+	protected IPreferenceStore getChainedEditorPreferenceStore()
+	{
+		return JSSourceEditor.getChainedPrefereceStore();
 	}
 
 }

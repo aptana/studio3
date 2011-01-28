@@ -58,13 +58,16 @@ public class JSONEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				JSONPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() });
-		setPreferenceStore(store);
+		setPreferenceStore(getChainedPreferenceStore());
 
 		this.setSourceViewerConfiguration(new JSONSourceViewerConfiguration(this.getPreferenceStore(), this));
 		this.setDocumentProvider(new JSONDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { JSONPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	@Override

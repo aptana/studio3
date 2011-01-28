@@ -61,13 +61,16 @@ public class XMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				XMLPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() });
-		setPreferenceStore(store);
+		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { XMLPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	@Override

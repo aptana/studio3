@@ -27,13 +27,16 @@ public class SassSourceEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				Activator.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() });
-		setPreferenceStore(store);
+		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new SassSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new SassDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { Activator.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	/*

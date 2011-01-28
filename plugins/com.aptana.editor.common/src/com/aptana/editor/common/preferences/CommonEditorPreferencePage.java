@@ -7,19 +7,25 @@
  */
 package com.aptana.editor.common.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
@@ -31,6 +37,7 @@ import com.aptana.ui.preferences.AptanaPreferencePage;
  * The form for configuring the general top-level preferences for this plugin
  */
 
+@SuppressWarnings("restriction")
 public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	/**
@@ -40,6 +47,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private Composite advancedOptions;
 	private BooleanFieldEditor markOccurences;
 	private IntegerFieldEditor tabSize;
+	private Combo tabSpaceCombo;
+	private IPreferenceStore originalPref;
 
 	/**
 	 * EditorsPreferencePage
@@ -56,12 +65,15 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 */
 	public void createFieldEditors()
 	{
+		originalPref = getPreferenceStore();
+		setPreferenceStore(getChainedEditorPreferenceStore());
 		appearanceComposite = getFieldEditorParent();
 		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_Formatting);
 
 		markOccurences = new BooleanFieldEditor(IPreferenceConstants.EDITOR_MARK_OCCURRENCES,
 				Messages.EditorsPreferencePage_MarkOccurrences, group);
+
 		addField(markOccurences);
 
 		// Perhaps need expand/collapse arrows
@@ -79,6 +91,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		});
 
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
+		setPreferenceStore(originalPref);
 	}
 
 	/**
@@ -111,10 +124,87 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void createTextEditingOptions(Composite parent, String groupName)
 	{
 		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
+		group.setLayout(new GridLayout(2, false));
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		tabSpaceCombo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseSpacesOption);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseTabOption);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		tabSpaceCombo.setLayoutData(GridDataFactory.fillDefaults().create());
+
+		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		{
+			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		}
+		else
+		{
+			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
+			else
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
+		}
+
+		tabSpaceCombo.addSelectionListener(new SelectionListener()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				Object source = e.getSource();
+				if (source == tabSpaceCombo)
+				{
+					IEclipsePreferences store = getPluginPreferenceStore();
+
+					if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
+					{
+						store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+					}
+					else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
+					{
+						store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+					}
+					else
+					{
+						store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+					}
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+			}
+		});
+
+		Composite fildEditorGroup = new Composite(group, SWT.NONE);
+		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
-				Messages.CommonEditorPreferencePage_Tab_Size_Label, group);
+				Messages.CommonEditorPreferencePage_Tab_Size_Label, fildEditorGroup, 5)
+		{
+			@Override
+			protected void doLoadDefault()
+			{
+				Text text = getTextControl();
+				if (text != null)
+				{
+					int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+					text.setText(Integer.toString(value));
+				}
+				valueChanged();
+			}
 
+			@Override
+			protected void doLoad()
+			{
+		        Text text = getTextControl();
+		        if (text != null) {
+		            int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+		            text.setText(Integer.toString(value));
+		            oldValue = Integer.toString(value); 
+		        }
+			}
+			
+			
+		};
 		tabSize.setEmptyStringAllowed(false);
 		tabSize.setValidRange(1, 20);
 		addField(tabSize);
@@ -126,6 +216,10 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * @param parent
 	 */
 	protected abstract void createMarkOccurrenceOptions(Composite parent);
+
+	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
+
+	protected abstract IEclipsePreferences getPluginPreferenceStore();
 
 	/**
 	 * Listens for changes in showing/hiding advanced options
@@ -169,4 +263,15 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			toggleAdvancedOccurrenceSection(markOccurrences);
 		}
 	}
+
+	@Override
+	protected void performDefaults()
+	{
+		IEclipsePreferences store = getPluginPreferenceStore();
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		super.performDefaults();
+		tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+	}
+
 }

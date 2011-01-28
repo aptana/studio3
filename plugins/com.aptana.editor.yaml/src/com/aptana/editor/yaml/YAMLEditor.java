@@ -28,13 +28,16 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
-		ChainedPreferenceStore store = new ChainedPreferenceStore(new IPreferenceStore[] {
-				YAMLPlugin.getDefault().getPreferenceStore(), CommonEditorPlugin.getDefault().getPreferenceStore(),
-				EditorsPlugin.getDefault().getPreferenceStore() });
-		setPreferenceStore(store);
+		setPreferenceStore(getChainedPreferenceStore());
 
 		setSourceViewerConfiguration(new YAMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new YAMLDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { YAMLPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	/*
