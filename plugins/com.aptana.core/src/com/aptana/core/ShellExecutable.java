@@ -13,10 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -45,10 +43,7 @@ public final class ShellExecutable
 	};
 
 	private static final String[] ENV_FILTER = new String[] { "_", //$NON-NLS-1$
-			"TMP", //$NON-NLS-1$
-			"APP_ICON*", //$NON-NLS-1$
-			"JAVA_MAIN_CLASS*", //$NON-NLS-1$
-			"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$
+			"TMP" //$NON-NLS-1$
 	};
 
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
@@ -230,21 +225,7 @@ public final class ShellExecutable
 		}
 		for (String var : ENV_FILTER)
 		{
-			if (var.charAt(var.length() - 1) == '*')
-			{
-				String prefix = var.substring(0, var.length() - 1);
-				for (Iterator<Entry<String, String>> i = env.entrySet().iterator(); i.hasNext();)
-				{
-					if (i.next().getKey().startsWith(prefix))
-					{
-						i.remove();
-					}
-				}
-			}
-			else
-			{
-				env.remove(var);
-			}
+			env.remove(var);
 		}
 		return env;
 	}
