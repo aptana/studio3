@@ -211,6 +211,33 @@ public class JSModelFormatter
 	}
 
 	/**
+	 * getContextInfo
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getContextInfo(FunctionElement function)
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		// function name with argument names
+		List<String> paramNameAndType = new ArrayList<String>();
+		buffer.append(function.getName());
+		buffer.append("("); //$NON-NLS-1$
+
+		for (ParameterElement parameter : function.getParameters())
+		{
+			paramNameAndType.add(parameter.getName() + formatTypes(parameter.getTypes()));
+		}
+
+		buffer.append(StringUtil.join(", ", paramNameAndType)); //$NON-NLS-1$
+		buffer.append(")"); //$NON-NLS-1$
+		buffer.append(formatTypes(function.getReturnTypeNames()));
+
+		return buffer.toString();
+	}
+
+	/**
 	 * getContextLines
 	 * 
 	 * @param function
@@ -225,27 +252,14 @@ public class JSModelFormatter
 			StringBuilder buffer = new StringBuilder();
 
 			// line 1: function name with argument names
-			List<String> paramNameAndType = new ArrayList<String>();
-			buffer.append(function.getName());
-			buffer.append("(");
-
-			for (ParameterElement parameter : function.getParameters())
-			{
-				paramNameAndType.add(parameter.getName() + formatTypes(parameter.getTypes()));
-			}
-
-			buffer.append(StringUtil.join(", ", paramNameAndType));
-			buffer.append(")");
-			buffer.append(formatTypes(function.getReturnTypeNames()));
-
-			result.add(buffer.toString());
+			result.add(getContextInfo(function));
 
 			// line 2..n: one line for each argument description
 			for (ParameterElement parameter : function.getParameters())
 			{
 				buffer.setLength(0);
 
-				buffer.append("•\t").append(parameter.getName()).append(":\n");
+				buffer.append("•\t").append(parameter.getName()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				buffer.append(" \t").append(parameter.getDescription()); //$NON-NLS-1$
 				result.add(buffer.toString());
 			}
