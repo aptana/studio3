@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.core;
 
@@ -51,6 +51,7 @@ public final class ShellExecutable {
 	private static final String[] ENV_FILTER = new String[] {
 		"_", //$NON-NLS-1$
 		"TMP", //$NON-NLS-1$
+		"BASH_ENV", //$NON-NLS-1$
 		"APP_ICON*", //$NON-NLS-1$
 		"JAVA_MAIN_CLASS*", //$NON-NLS-1$
 		"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$
