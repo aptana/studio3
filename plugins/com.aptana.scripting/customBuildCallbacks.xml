@@ -56,7 +56,7 @@
 	</target>
 
 	<target name="clone-bundle">
-		<delete dir="${bundle.dir.name}" failonerror="false"/>
+		<delete dir="${bundle.dir.name}" failonerror="true"/>
 		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}"></echo>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
