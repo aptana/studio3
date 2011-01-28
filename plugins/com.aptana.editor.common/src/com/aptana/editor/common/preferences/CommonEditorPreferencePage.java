@@ -29,8 +29,11 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
@@ -195,15 +198,41 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			@Override
 			protected void doLoad()
 			{
-		        Text text = getTextControl();
-		        if (text != null) {
-		            int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
-		            text.setText(Integer.toString(value));
-		            oldValue = Integer.toString(value); 
-		        }
+				Text text = getTextControl();
+				if (text != null)
+				{
+					int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+					text.setText(Integer.toString(value));
+					oldValue = Integer.toString(value);
+				}
 			}
-			
-			
+
+			@Override
+			protected void doStore()
+			{
+				Text text = getTextControl();
+				if (text != null)
+				{
+					Integer i = new Integer(text.getText());
+					int globalEditorValue = new ChainedPreferenceStore(new IPreferenceStore[] {
+							CommonEditorPlugin.getDefault().getPreferenceStore(),
+							EditorsPlugin.getDefault().getPreferenceStore() })
+							.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+					
+					if (i.intValue() == globalEditorValue)
+					{
+						// Remove preference from plugin preference store if it is the same as either common editor value or global editor value
+						getPluginPreferenceStore().remove(
+								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+					}
+					else
+					{
+						getPreferenceStore().setValue(getPreferenceName(), i.intValue());
+					}
+				}
+
+			}
+
 		};
 		tabSize.setEmptyStringAllowed(false);
 		tabSize.setValidRange(1, 20);
