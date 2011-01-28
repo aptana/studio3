@@ -169,7 +169,9 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 		try {
 			return super.createContents(parent);
 		} finally {
-			ftpComposite.validate();
+			if (ftpComposite != null) {
+				ftpComposite.validate();
+			}
 		}
 	}
 	
