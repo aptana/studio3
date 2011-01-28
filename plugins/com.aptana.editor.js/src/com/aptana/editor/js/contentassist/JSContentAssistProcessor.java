@@ -358,7 +358,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			String info = JSModelFormatter.getContextInfo((FunctionElement) function);
 			List<String> lines = JSModelFormatter.getContextLines((FunctionElement) function);
 
-			result = new JSContextInformation(info, StringUtil.join("\n\0", lines), startingOffset); //$NON-NLS-1$
+			result = new JSContextInformation(info, StringUtil.join("\n\ufeff", lines), startingOffset); //$NON-NLS-1$
 		}
 
 		return result;
