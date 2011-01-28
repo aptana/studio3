@@ -33,6 +33,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Represent;
 import org.yaml.snakeyaml.representer.Representer;
@@ -394,7 +395,7 @@ public class BundleCacher
 
 	private Yaml createYAML(File bundleDirectory)
 	{
-		return new Yaml(new RubyRegexpConstructor(bundleDirectory), new MyRepresenter(bundleDirectory));
+		return new Yaml(new BundleElementsContructor(bundleDirectory), new MyRepresenter(bundleDirectory));
 	}
 
 	private class MyRepresenter extends Representer
@@ -484,12 +485,12 @@ public class BundleCacher
 		}
 	}
 
-	class RubyRegexpConstructor extends Constructor
+	class BundleElementsContructor extends Constructor
 	{
 
 		private File bundleDirectory;
 
-		public RubyRegexpConstructor(File bundleDirectory)
+		public BundleElementsContructor(File bundleDirectory)
 		{
 			this.bundleDirectory = bundleDirectory;
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
@@ -719,9 +720,32 @@ public class BundleCacher
 				node.setType(SmartTypingPairsElement.class);
 				String path = getPath(node);
 				SmartTypingPairsElement be = new SmartTypingPairsElement(path);
-				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
-				mappingConstruct.construct2ndStep(node, be);
-				be.setPath(path);
+				MappingNode mapNode = (MappingNode) node;
+				List<NodeTuple> tuples = mapNode.getValue();
+				for (NodeTuple tuple : tuples)
+				{
+					ScalarNode keyNode = (ScalarNode) tuple.getKeyNode();
+					String key = keyNode.getValue();
+					// "pairs", "scope"
+					if ("pairs".equals(key))
+					{
+						SequenceNode pairsValueNode = (SequenceNode) tuple.getValueNode();
+						List<Character> pairs = new ArrayList<Character>();
+						List<Node> pairsValues = pairsValueNode.getValue();
+						for (Node pairValue : pairsValues)
+						{
+							ScalarNode blah = (ScalarNode) pairValue;
+							String pairCharacter = blah.getValue();
+							pairs.add(Character.valueOf(pairCharacter.charAt(0)));
+						}
+						be.setPairs(pairs);
+					}
+					else if ("scope".equals(key))
+					{
+						ScalarNode scopeValueNode = (ScalarNode) tuple.getValueNode();
+						be.setScope(scopeValueNode.getValue());
+					}
+				}
 				return be;
 			}
 		}

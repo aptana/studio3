@@ -61,7 +61,7 @@ public class CommitFileRevision extends FileRevision
 
 			public String getName()
 			{
-				return getName();
+				return CommitFileRevision.this.getName();
 			}
 
 			public IPath getFullPath()
