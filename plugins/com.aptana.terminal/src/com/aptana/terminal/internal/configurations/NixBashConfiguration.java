@@ -8,18 +8,14 @@
 
 package com.aptana.terminal.internal.configurations;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.util.ResourceUtil;
-import com.aptana.terminal.Activator;
+import com.aptana.core.ShellExecutable;
 
 /**
  * @author Max Stepanov
@@ -28,7 +24,6 @@ import com.aptana.terminal.Activator;
 public class NixBashConfiguration extends AbstractProcessConfiguration {
 
 	private static final String EXECUTABLE = "$os$/redtty"; //$NON-NLS-1$
-	private static final String RCFILE = "$os$/.aptanarc"; //$NON-NLS-1$
 	
 	@Override
 	protected IPath getExecutablePath() {
@@ -43,7 +38,7 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		list.add(getExecutable().getAbsolutePath());
 		list.add("/bin/bash"); //$NON-NLS-1$
 		// newline is a delimiter in redtty
-		list.add("bash\n--rcfile\n"+getRCFile().getAbsolutePath()+"\n-i"); //$NON-NLS-1$ //$NON-NLS-2$
+		list.add("bash\n--rcfile\n"+ShellExecutable.getShellRCPath().toOSString()+"\n-i"); //$NON-NLS-1$ //$NON-NLS-2$
 		list.add("120x40"); //$NON-NLS-1$
 		return list;
 	}
@@ -56,11 +51,6 @@ public class NixBashConfiguration extends AbstractProcessConfiguration {
 		Map<String, String> env = super.getEnvironment();
 		env.put("TERM", "xterm-color"); //$NON-NLS-1$ //$NON-NLS-2$
 		return env;
-	}
-
-	private File getRCFile() {
-		URL url = FileLocator.find(Activator.getDefault().getBundle(), Path.fromPortableString(RCFILE), null);
-		return ResourceUtil.resourcePathToFile(url);
 	}
 
 }
