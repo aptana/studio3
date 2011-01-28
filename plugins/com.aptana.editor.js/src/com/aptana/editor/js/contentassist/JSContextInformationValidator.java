@@ -89,7 +89,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
 
 			// no need to keep backing up beyond where we started
-			if (lexeme.getStartingOffset() < this._startingOffset)
+			if (lexeme.getStartingOffset() == this._startingOffset)
 			{
 				if (parenCount > 0)
 				{
