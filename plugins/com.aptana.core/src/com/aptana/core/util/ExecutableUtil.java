@@ -41,12 +41,7 @@ public final class ExecutableUtil
 	 */
 	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations)
 	{
-		return find(executableName, appendExtension, searchLocations, (FileFilter) null);
-	}
-
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations, IPath workingDirectory)
-	{
-		return find(executableName, appendExtension, searchLocations, null, workingDirectory);
+		return find(executableName, appendExtension, searchLocations, null);
 	}
 
 	/**
@@ -62,24 +57,7 @@ public final class ExecutableUtil
 	 */
 	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations, FileFilter filter)
 	{
-		return find(executableName, appendExtension, searchLocations, filter, null);
-	}
-
-	/**
-	 * @param executableName
-	 *            name of the binary.
-	 * @param appendExtension
-	 *            ".exe" is appended for windows when searching the PATH.
-	 * @param searchLocations
-	 *            Common locations to search.
-	 * @param filter
-	 * 			File filter
-	 * @param workingDirectory
-	 * @return
-	 */
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations, FileFilter filter, IPath workingDirectory)
-	{
-		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
+		Map<String, String> env = ShellExecutable.getEnvironment();
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String[] paths;
@@ -108,7 +86,7 @@ public final class ExecutableUtil
 		else
 		{
 			// No explicit path. Try it with "which"
-			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", workingDirectory, env, executableName); //$NON-NLS-1$
+			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", null, env, executableName); //$NON-NLS-1$
 			if (whichResult != null && whichResult.trim().length() > 0)
 			{
 				IPath whichPath = Path.fromOSString(whichResult.trim());

@@ -15,4 +15,3 @@ if [[ "$HOME" != `pwd` ]] ; then
 fi
 
 [[ -f ~/.aptanarc ]] && . ~/.aptanarc
-
