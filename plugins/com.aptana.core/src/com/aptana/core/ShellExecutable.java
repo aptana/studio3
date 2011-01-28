@@ -51,6 +51,7 @@ public final class ShellExecutable {
 	private static final String[] ENV_FILTER = new String[] {
 		"_", //$NON-NLS-1$
 		"TMP", //$NON-NLS-1$
+		"BASH_ENV", //$NON-NLS-1$
 		"APP_ICON*", //$NON-NLS-1$
 		"JAVA_MAIN_CLASS*", //$NON-NLS-1$
 		"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$

@@ -1,3 +1,4 @@
+unset BASH_ENV
 
 if [ -f /etc/profile ] ; then . /etc/profile; fi
 
