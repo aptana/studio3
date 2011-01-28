@@ -27,8 +27,7 @@ import com.aptana.core.ShellExecutable;
 public final class ExecutableUtil
 {
 
-	private ExecutableUtil()
-	{
+	private ExecutableUtil() {
 	}
 
 	/**
@@ -42,13 +41,7 @@ public final class ExecutableUtil
 	 */
 	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations)
 	{
-		return find(executableName, appendExtension, searchLocations, null, null);
-	}
-
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
-			IPath workingDir)
-	{
-		return find(executableName, appendExtension, searchLocations, null, workingDir);
+		return find(executableName, appendExtension, searchLocations, null);
 	}
 
 	/**
@@ -59,35 +52,23 @@ public final class ExecutableUtil
 	 * @param searchLocations
 	 *            Common locations to search.
 	 * @param filter
-	 *            File filter
+	 * 			File filter
 	 * @return
 	 */
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
-			FileFilter filter)
+	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations, FileFilter filter)
 	{
-		return find(executableName, appendExtension, searchLocations, filter, null);
-	}
-
-	public static IPath find(String executableName, boolean appendExtension, List<IPath> searchLocations,
-			FileFilter filter, IPath workingDirectory)
-	{
-		Map<String, String> env = ShellExecutable.getEnvironment(workingDirectory);
+		Map<String, String> env = ShellExecutable.getEnvironment();
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			// FIXME What about the working dir/RVM modifying the PATH? Can we grab PATH by executing a command in the
-			// working dir?
 			String[] paths;
 			if (env != null && env.containsKey("PATH")) { //$NON-NLS-1$
 				paths = env.get("PATH").split(ShellExecutable.PATH_SEPARATOR); //$NON-NLS-1$
-				for (int i = 0; i < paths.length; ++i)
-				{
+				for( int i = 0; i < paths.length; ++i) {
 					if (paths[i].matches("^/(.)/.*")) { //$NON-NLS-1$
 						paths[i] = paths[i].replaceFirst("^/(.)/", "$1:/"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
-			}
-			else
-			{
+			} else {
 				String pathENV = System.getenv("PATH"); //$NON-NLS-1$
 				paths = pathENV.split(File.pathSeparator);
 			}
@@ -104,7 +85,8 @@ public final class ExecutableUtil
 		}
 		else
 		{
-			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", workingDirectory, env, executableName); //$NON-NLS-1$
+			// No explicit path. Try it with "which"
+			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", null, env, executableName); //$NON-NLS-1$
 			if (whichResult != null && whichResult.trim().length() > 0)
 			{
 				IPath whichPath = Path.fromOSString(whichResult.trim());
@@ -162,7 +144,7 @@ public final class ExecutableUtil
 		{
 			return false;
 		}
-
+		
 		// OK, file exists
 		try
 		{
@@ -183,6 +165,6 @@ public final class ExecutableUtil
 			return true;
 		}
 		IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
-		return fileStore.fetchInfo().getAttribute(EFS.ATTRIBUTE_EXECUTABLE);
+	    return fileStore.fetchInfo().getAttribute(EFS.ATTRIBUTE_EXECUTABLE);
 	}
 }
