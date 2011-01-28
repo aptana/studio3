@@ -162,7 +162,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		createUserAgentCategoryArea(caGroup);
 		createUserAgentButtons(caGroup);
 
-		createTextEditorLink(appearanceComposite);
+		createTabInsertionEditors(appearanceComposite);
 	}
 
 	/**
@@ -224,8 +224,59 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		setButtonLayoutData(disableAll);
 	}
 
-	private void createTextEditorLink(Composite appearanceComposite)
+	private void createTabInsertionEditors(Composite appearanceComposite)
 	{
+		Composite wsGroup = AptanaPreferencePage.createGroup(appearanceComposite,
+				Messages.EditorsPreferencePage_TabInsertion);
+		Composite wsComp = new Composite(wsGroup, SWT.NONE);
+		wsComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).create());
+		wsComp.setLayoutData(GridDataFactory.fillDefaults().create());
+
+		tabs = new Button(wsComp, SWT.RADIO);
+		Composite spaceComp = new Composite(wsComp, SWT.NONE);
+		spaceComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).equalWidth(false).create());
+		spaceComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		spaces = new Button(spaceComp, SWT.RADIO);
+		final Link currentTabSize = new Link(spaceComp, SWT.NONE);
+		int size = editorPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		spaces.setText(StringUtil.format(Messages.EditorsPreferencePage_UseSpaces, size));
+		tabs.setText(Messages.EditorsPreferencePage_UseTabs);
+		editorPreferenceStore.addPropertyChangeListener(prefListener);
+		currentTabSize.setText(Messages.EditorsPreferencePage_EditLink);
+		currentTabSize.addSelectionListener(new SelectionAdapter()
+		{
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				((IWorkbenchPreferenceContainer) getContainer()).openPage(
+						GENERAL_TEXT_EDITOR_PREF_ID, null);
+			}
+
+		});
+		boolean useSpaces = editorPreferenceStore
+				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		spaces.setSelection(useSpaces);
+		tabs.setSelection(!useSpaces);
+		tabs.addSelectionListener(new SelectionAdapter()
+		{
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				spaces.setSelection(!tabs.getSelection());
+			}
+
+		});
+		spaces.addSelectionListener(new SelectionAdapter()
+		{
+
+			public void widgetSelected(SelectionEvent e)
+			{
+				tabs.setSelection(!spaces.getSelection());
+			}
+
+		});
+		
 		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
 		Link link = new Link(appearanceComposite, SWT.NONE);
 		link.setText(Messages.EditorsPreferencePage_GeneralTextEditorPrefLink);
