@@ -108,9 +108,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 							// TODO: Temporary hack for jQuery CA until we resolve
 							// handling of function properties and derived types
-							if ("jQuery".equals(type))
+							if ("jQuery".equals(type)) //$NON-NLS-1$
 							{
-								type = "Function<jQuery>:jQuery";
+								type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
 							}
 
 							this.addType(type);

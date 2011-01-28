@@ -28,5 +28,5 @@ public interface IPreferenceConstants
 	 * The value is a string where each character in the string will be used as an auto-activation character in
 	 * CSSContentAssistProcessor
 	 */
-	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS";
+	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
 }

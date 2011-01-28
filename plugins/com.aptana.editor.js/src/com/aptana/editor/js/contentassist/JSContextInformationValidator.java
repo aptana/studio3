@@ -197,7 +197,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 
 		// grab presentation text and split into separate lines
 		String info = this._contextInformation.getInformationDisplayString();
-		String[] lines = info.split("\0");
+		String[] lines = info.split("\0"); //$NON-NLS-1$
 
 		// determine which argument we are within
 		int argIndex = this.getArgumentIndex(offset);
