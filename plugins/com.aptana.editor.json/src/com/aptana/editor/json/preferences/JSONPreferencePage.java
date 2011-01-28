@@ -7,8 +7,12 @@
  */
 package com.aptana.editor.json.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
+import com.aptana.editor.json.JSONEditor;
 import com.aptana.editor.json.JSONPlugin;
 
 public class JSONPreferencePage extends CommonEditorPreferencePage
@@ -27,6 +31,18 @@ public class JSONPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
+	}
+
+	@Override
+	protected IEclipsePreferences getPluginPreferenceStore()
+	{
+		return new InstanceScope().getNode(JSONPlugin.PLUGIN_ID);
+	}
+
+	@Override
+	protected IPreferenceStore getChainedEditorPreferenceStore()
+	{
+		return JSONEditor.getChainedPreferenceStore();
 	}
 
 }
