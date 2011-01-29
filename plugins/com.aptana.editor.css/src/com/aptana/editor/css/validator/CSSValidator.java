@@ -251,6 +251,7 @@ public class CSSValidator implements IValidator
 				message = MessageFormat.format("{0} : {1} for {2}", errorsubtype, skippedstring, property); //$NON-NLS-1$
 			}
 			message = StringEscapeUtils.unescapeHtml(message);
+			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE) && !containsCSS3Property(message))
 			{
