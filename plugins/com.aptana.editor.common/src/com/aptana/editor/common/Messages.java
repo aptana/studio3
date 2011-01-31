@@ -19,6 +19,7 @@ public class Messages extends NLS
 	
 	public static String AbstractThemeableEditor_CursorPositionLabel;
 	public static String FileService_FailedToParse;
+	public static String Folding_GroupName;
 	static
 	{
 		// initialize resource bundle

@@ -7,11 +7,14 @@
  */
 package com.aptana.editor.common.actions;
 
+import java.util.ResourceBundle;
+
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.actions.messages"; //$NON-NLS-1$
+	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	public static String AbstractToggleLinkingAction_Description;
 	public static String AbstractToggleLinkingAction_LBL;
@@ -21,6 +24,11 @@ public class Messages extends NLS
 	{
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	public static ResourceBundle getResourceBundle()
+	{
+		return RESOURCE_BUNDLE;
 	}
 
 	private Messages()
