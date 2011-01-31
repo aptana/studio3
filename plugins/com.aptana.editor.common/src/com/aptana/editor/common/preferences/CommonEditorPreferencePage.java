@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -127,8 +128,12 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected void createTextEditingOptions(Composite parent, String groupName)
 	{
 		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(3, false));
 		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		Label label = new Label(group, SWT.NONE);
+		label.setText(Messages.CommonEditorPreferencePage_LBL_TabPolicy);
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
 
 		tabSpaceCombo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseSpacesOption);
@@ -218,10 +223,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 							CommonEditorPlugin.getDefault().getPreferenceStore(),
 							EditorsPlugin.getDefault().getPreferenceStore() })
 							.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-					
+
 					if (i.intValue() == globalEditorValue)
 					{
-						// Remove preference from plugin preference store if it is the same as either common editor value or global editor value
+						// Remove preference from plugin preference store if it is the same as either common editor
+						// value or global editor value
 						getPluginPreferenceStore().remove(
 								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 					}

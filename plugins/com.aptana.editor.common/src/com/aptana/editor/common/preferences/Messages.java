@@ -15,6 +15,8 @@ public class Messages extends NLS
 
 	public static String CommonEditorPreferencePage_Default_Editor_Preference_Link;
 	public static String CommonEditorPreferencePage_Editor_Preferences;
+
+	public static String CommonEditorPreferencePage_LBL_TabPolicy;
 	public static String CommonEditorPreferencePage_Tab_Size_Label;
 	public static String CommonEditorPreferencePage_Text_Editing_Label;
 	public static String CommonEditorPreferencePage_UseDefaultOption;
@@ -49,7 +51,7 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_ToggleBetween;
 	public static String EditorsPreferencePage_Typing;
 	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
-	
+
 	public static String ValidationPreferencePage_ERR_EmptyExpression;
 	public static String ValidationPreferencePage_Filter_Description;
 	public static String ValidationPreferencePage_Ignore_Message;
