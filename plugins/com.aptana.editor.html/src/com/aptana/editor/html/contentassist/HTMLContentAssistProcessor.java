@@ -856,7 +856,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
-		int replaceLength = replaceString.length() - 1;
+		int replaceLength = 0;
+		if (tagLexeme != null)
+		{
+			replaceLength += tagLexeme.getLength();
+		}
 
 		// We can be at: |<a, <|a, |</a, </|a, etc.
 		// If our cursor is before the tag in the lexeme list, assume we aren't

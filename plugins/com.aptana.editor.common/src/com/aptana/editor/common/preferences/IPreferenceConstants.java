@@ -18,6 +18,11 @@ public interface IPreferenceConstants
 	public static final String CONTENT_ASSIST_AUTO_ACTIVATION = "CONTENT_ASSIST_AUTO_ACTIVATION"; //$NON-NLS-1$
 
 	/**
+	 * Do we auto-insert single proposals for content assist?
+	 */
+	public static final String CONTENT_ASSIST_AUTO_INSERT = "CONTENT_ASSIST_AUTO_INSERT"; //$NON-NLS-1$
+
+	/**
 	 * The delay before which we show code assist
 	 */
 	public static final String CONTENT_ASSIST_DELAY = "CONTENT_ASSIST_DELAY"; //$NON-NLS-1$
@@ -57,7 +62,7 @@ public interface IPreferenceConstants
 	 * The preference key for determining if task tags should be treated in a case-sensitive manner when detecting them.
 	 */
 	public static final String TASK_TAGS_CASE_SENSITIVE = CommonEditorPlugin.PLUGIN_ID + ".taskTagsCaseSensitive"; //$NON-NLS-1$
-	
+
 	/**
 	 * Enable highlighting of occurrences of selected text
 	 */

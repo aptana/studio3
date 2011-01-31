@@ -120,6 +120,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_Content_Assist);
 
+		addField(new BooleanFieldEditor(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Insert, caGroup));
 		addField(new RadioGroupFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, 3, new String[][] {
 						{ "On", Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) }, //$NON-NLS-1$

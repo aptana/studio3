@@ -166,6 +166,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		if (fPreferenceStore != null)
 		{
 			setAutoActivationOptions(assistant);
+			// Auto-insert single proposals
+			boolean autoInsert = fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT);
+			assistant.enableAutoInsert(autoInsert);
 		}
 
 		fAutoActivationListener = new IPreferenceChangeListener()
