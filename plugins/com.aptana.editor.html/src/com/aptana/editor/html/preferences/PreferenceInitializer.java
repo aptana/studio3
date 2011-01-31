@@ -19,7 +19,6 @@ import com.aptana.editor.html.parsing.IHTMLParserConstants;
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 
-	@SuppressWarnings("nls")
 	@Override
 	public void initializeDefaultPreferences()
 	{
@@ -28,6 +27,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
 		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "<'\"&"); //$NON-NLS-1$
+		prefs.putBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA, true);
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
 		String[] filtered = new String[] { ".*canvas.*" }; //$NON-NLS-1$

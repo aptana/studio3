@@ -6,6 +6,7 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.swt.events.VerifyEvent;
 
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.editor.xml.OpenTagCloser;
 
 public class HTMLOpenTagCloser extends OpenTagCloser
@@ -35,5 +36,11 @@ public class HTMLOpenTagCloser extends OpenTagCloser
 			}
 		}
 		return false;
+	}
+
+	@Override
+	protected boolean isAutoInsertEnabled()
+	{
+		return HTMLPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA);
 	}
 }

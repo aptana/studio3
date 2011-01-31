@@ -547,6 +547,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 
+			// If user doesn't want tags closed for them, then don't do it!
+			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
+					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA);
+
 			HTMLParseState state = null;
 			for (ElementElement element : elements)
 			{
@@ -592,7 +596,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!TagUtil.tagClosed(doc, element.getName()))
+						if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -852,7 +856,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> tagLexeme = lexemeProvider.getLexeme(1); // Tag name
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
-		int replaceLength = 0;
+		int replaceLength = replaceString.length() - 1;
 
 		// We can be at: |<a, <|a, |</a, </|a, etc.
 		// If our cursor is before the tag in the lexeme list, assume we aren't
@@ -874,7 +878,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength += tagLexeme.getLength();
 			}
 			// current tag isn't closed, so we will close it for the user
-			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
+			if (closeLexeme == null || !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
 			{
 				replaceString += ">"; //$NON-NLS-1$
 			}
@@ -1166,11 +1170,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			HTMLPlugin.PLUGIN_ID, //
-			IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				HTMLPlugin.PLUGIN_ID, //
+				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}

@@ -9,11 +9,15 @@ package com.aptana.editor.html.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
+
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.html.HTMLEditor;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.ui.preferences.AptanaPreferencePage;
 
 public class HTMLPreferencePage extends CommonEditorPreferencePage
 {
@@ -30,6 +34,19 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
+	}
+
+	@Override
+	protected void createFieldEditors()
+	{
+		super.createFieldEditors();
+
+		Composite group = AptanaPreferencePage.createGroup(getFieldEditorParent(),
+				Messages.HTMLPreferencePage_ContentAssistLabel);
+		FieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA,
+				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, group);
+
+		addField(closingTag);
 	}
 
 	@Override

@@ -14,6 +14,8 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.editor.html.preferences.messages"; //$NON-NLS-1$
 
+	public static String HTMLPreferencePage_AutoInsertCloseTagLabel;
+	public static String HTMLPreferencePage_ContentAssistLabel;
 	public static String HTMLPreferencePage_LBL_Description;
 
 	static
