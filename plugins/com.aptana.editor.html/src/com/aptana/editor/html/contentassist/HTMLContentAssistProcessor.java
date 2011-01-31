@@ -549,7 +549,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 			// If user doesn't want tags closed for them, then don't do it!
 			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
-					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA);
+					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS);
 
 			HTMLParseState state = null;
 			for (ElementElement element : elements)

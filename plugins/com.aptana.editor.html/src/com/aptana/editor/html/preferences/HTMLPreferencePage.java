@@ -43,7 +43,7 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 
 		Composite group = AptanaPreferencePage.createGroup(getFieldEditorParent(),
 				Messages.HTMLPreferencePage_ContentAssistLabel);
-		FieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAGS_IN_CA,
+		FieldEditor closingTag = new BooleanFieldEditor(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS,
 				Messages.HTMLPreferencePage_AutoInsertCloseTagLabel, group);
 
 		addField(closingTag);
