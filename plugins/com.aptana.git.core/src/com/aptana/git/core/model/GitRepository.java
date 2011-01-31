@@ -1456,7 +1456,7 @@ public class GitRepository
 			}
 			else
 			{
-				return IOUtil.read(new FileInputStream(sha1File));
+				return IOUtil.read(new FileInputStream(sha1File)).trim();
 			}
 		}
 		catch (FileNotFoundException e)
