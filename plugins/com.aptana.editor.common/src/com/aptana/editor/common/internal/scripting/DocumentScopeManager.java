@@ -117,6 +117,10 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	 */
 	public String getScopeAtOffset(ITextViewer viewer, int offset) throws BadLocationException
 	{
+		if (viewer == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
 		IDocument document = viewer.getDocument();
 		String partitionFragment = getPartitionScopeFragmentsAtOffset(document, offset);
 		String tokenPortion = getTokenScopeFragments(viewer, document, offset);

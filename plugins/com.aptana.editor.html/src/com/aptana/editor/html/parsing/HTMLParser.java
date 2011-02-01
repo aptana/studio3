@@ -9,7 +9,9 @@ package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
@@ -50,6 +52,39 @@ public class HTMLParser implements IParser
 			"text/ecmascript", "text/jscript" };
 	@SuppressWarnings("nls")
 	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
+
+	@SuppressWarnings("nls")
+	private static final String[] CSS_VALID_ATTR = { "style" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_ATTR = { "onabort", "onactivate", "onafterprint", "onafterupdate",
+			"onbeforeactivate", "onbeforecopy", "onbeforecut", "onbeforedeactivate", "onbeforeeditfocus",
+			"onbeforepaste", "onbeforeprint", "onbeforeunload", "onbeforeupdate", "onblur", "onbounce", "oncellchange",
+			"onchange", "onclick", "oncontextmenu", "oncontrolselect", "oncopy", "oncut", "ondataavailable",
+			"ondatasetchanged", "ondatasetcomplete", "ondblclick", "ondeactivate", "ondrag", "ondragend",
+			"ondragenter", "ondragleave", "ondragover", "ondrop", "onerror", "onerrorupdate", "onfilterchange",
+			"onfinish", "onfocus", "onfocusin", "onfocusout", "onhelp", "onkeydown", "onkeypress", "onkeyup",
+			"onlayoutcomplete", "onload", "onlosecapture", "onmousedown", "onmouseenter", "onmouseleave",
+			"onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmousewheel", "onmove", "onmoveend",
+			"onmovestart", "onpaste", "onpropertychange", "onreadystatechange", "onreset", "onresize", "onresizeend",
+			"onresizestart", "onrowenter", "onrowexit", "onrowsdelete", "onrowsinserted", "onscroll", "onselect",
+			"onselectstart", "onstart", "onsubmit", "ontimeerror", "onunload" };
+
+	private static Set<String> cssAttributes = new HashSet<String>();
+	static
+	{
+		for (String attribute : CSS_VALID_ATTR)
+		{
+			cssAttributes.add(attribute);
+		}
+	}
+	private static Set<String> jsAttributes = new HashSet<String>();
+	static
+	{
+		for (String attribute : JS_VALID_ATTR)
+		{
+			jsAttributes.add(attribute);
+		}
+	}
 
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
@@ -394,6 +429,17 @@ public class HTMLParser implements IParser
 						}
 					}
 				}
+				// checks if we need to process the value as JS
+				else if (isJSAttribute(name))
+				{
+					IParseNode node = ParserPoolFactory.parse(IJSParserConstants.LANGUAGE, value);
+					IParseNode[] children = node.getChildren();
+					for (IParseNode child : children)
+					{
+						addOffset(child, tagSymbol.getStart() + start + 1);
+						element.addJSAttributeNode(child);
+					}
+				}
 			}
 		}
 	}
@@ -462,7 +508,12 @@ public class HTMLParser implements IParser
 
 	private static boolean isCSSAttribute(String name)
 	{
-		return name.equals("style"); //$NON-NLS-1$
+		return cssAttributes.contains(name.toLowerCase());
+	}
+
+	private static boolean isJSAttribute(String name)
+	{
+		return jsAttributes.contains(name.toLowerCase());
 	}
 
 	private static boolean isJavaScript(HTMLElementNode node)
