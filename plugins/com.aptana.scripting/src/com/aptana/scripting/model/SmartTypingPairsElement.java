@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.util.ArrayList;
@@ -56,7 +56,12 @@ public class SmartTypingPairsElement extends AbstractBundleElement
 		// output path, scope and pairs
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
-		printer.printWithIndent("pairs: ").println(this.getPairs().toString()); //$NON-NLS-1$
+		String pairsValue = "null"; //$NON-NLS-1$
+		if (this.getPairs() != null)
+		{
+			pairsValue = this.getPairs().toString();
+		}
+		printer.printWithIndent("pairs: ").println(pairsValue); //$NON-NLS-1$
 	}
 
 	/**

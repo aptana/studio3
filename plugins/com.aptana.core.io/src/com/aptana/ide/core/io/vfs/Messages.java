@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.core.io.vfs;
 
 import org.eclipse.osgi.util.NLS;
@@ -33,6 +33,8 @@ public class Messages extends NLS // NO_UCD
 	public static String BaseConnectionFileManager_opening_file;
 	public static String BaseConnectionFileManager_parent_doesnt_exist;
 	public static String BaseConnectionFileManager_parent_is_not_directory;
+
+	public static String BaseConnectionFileManager_PermissionDenied0;
 	public static String BaseConnectionFileManager_putting_changes;
 
 	static

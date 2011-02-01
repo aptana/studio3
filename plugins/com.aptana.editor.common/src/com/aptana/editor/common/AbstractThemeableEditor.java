@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -52,6 +54,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
@@ -59,6 +62,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.aptana.core.resources.AbstractUniformResource;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
+import com.aptana.editor.common.actions.FoldingActionsGroup;
 import com.aptana.editor.common.extensions.FindBarEditorExtension;
 import com.aptana.editor.common.extensions.IThemeableEditor;
 import com.aptana.editor.common.extensions.ThemeableEditorExtension;
@@ -172,6 +176,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private IPropertyChangeListener fThemeListener;
 
 	private PeerCharacterCloser fPeerCharacterCloser;
+
+	private FoldingActionsGroup foldingActionsGroup;
 
 	/**
 	 * AbstractThemeableEditor
@@ -406,7 +412,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
 							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
 									IResource.class);
-							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+							context
+									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
+											.getId());
 							IProject project = (file != null) ? file.getProject() : null;
 							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
 							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
@@ -683,6 +691,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		setAction(ICommonConstants.FORMATTER_ACTION_ID, action);
 		markAsStateDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+
+		// Folding setup
+		foldingActionsGroup = new FoldingActionsGroup(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @seeorg.eclipse.ui.texteditor.AbstractDecoratedTextEditor#rulerContextMenuAboutToShow(org.eclipse.jface.action.
+	 * IMenuManager)
+	 */
+	@Override
+	protected void rulerContextMenuAboutToShow(IMenuManager menu)
+	{
+		super.rulerContextMenuAboutToShow(menu);
+		IMenuManager foldingMenu = new MenuManager(Messages.Folding_GroupName, "folding"); //$NON-NLS-1$
+		menu.appendToGroup(ITextEditorActionConstants.GROUP_RULERS, foldingMenu);
+		getFoldingActionsGroup().fillMenu(foldingMenu);
 	}
 
 	synchronized ICommandElementsProvider getCommandElementsProvider()
@@ -770,6 +795,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			CommonEditorPlugin.logError(e);
 		}
 		return null;
+	}
+
+	/**
+	 * Returns the folding actions group for the editor.
+	 * 
+	 * @return The {@link FoldingActionsGroup} for this editor.
+	 */
+	protected FoldingActionsGroup getFoldingActionsGroup()
+	{
+		return foldingActionsGroup;
 	}
 
 	private boolean isLinkedWithEditor()

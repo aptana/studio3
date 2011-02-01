@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.util.HashSet;
@@ -166,6 +166,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		if (fPreferenceStore != null)
 		{
 			setAutoActivationOptions(assistant);
+			// Auto-insert single proposals
+			boolean autoInsert = fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT);
+			assistant.enableAutoInsert(autoInsert);
 		}
 
 		fAutoActivationListener = new IPreferenceChangeListener()
@@ -178,6 +181,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+		assistant.setContextInformationPopupBackground(getThemeBackground());
+		assistant.setContextInformationPopupForeground(getThemeForeground());
 
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{

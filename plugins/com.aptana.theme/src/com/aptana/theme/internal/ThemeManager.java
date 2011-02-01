@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.internal;
 
 import java.io.ByteArrayInputStream;
@@ -30,10 +30,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -213,6 +216,27 @@ public class ThemeManager implements IThemeManager
 		catch (BackingStoreException e)
 		{
 			ThemePlugin.logError(e);
+		}
+
+		// Force font
+		Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
+				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
+		String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+		for (String fontId : fontIds)
+		{
+			// Only set new values if they're different from existing!
+			Font existing = JFaceResources.getFont(fontId);
+			String existingString = ""; //$NON-NLS-1$
+			if (!existing.isDisposed())
+			{
+				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+			}
+			if (!existingString.equals(fdString))
+			{
+				// put in registry...
+				JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
+			}
 		}
 	}
 

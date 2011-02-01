@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.preferences;
 
 import java.util.ArrayList;
@@ -16,8 +16,6 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -35,9 +33,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -50,16 +46,13 @@ import com.aptana.ui.preferences.AptanaPreferencePage;
  * The form for configuring the general top-level preferences for this plugin
  */
 
-@SuppressWarnings("restriction")
 public class EditorsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	private Button spaces;
-	private Button tabs;
-	private IPreferenceStore editorPreferenceStore;
+
 	private IPreferenceStore eplPreferenceStore;
 	private CheckboxTableViewer categoryViewer;
 	private String GENERAL_TEXT_EDITOR_PREF_ID = "org.eclipse.ui.preferencePages.GeneralTextEditor"; //$NON-NLS-1$
-	
+
 	/**
 	 * CategoryLabelProvider
 	 * 
@@ -91,36 +84,12 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		}
 	}
 
-	private IPropertyChangeListener prefListener = new IPropertyChangeListener()
-	{
-
-		public void propertyChange(PropertyChangeEvent event)
-		{
-			if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH.equals(event.getProperty())
-					&& spaces != null && !spaces.isDisposed())
-			{
-				spaces.setText(StringUtil.format(Messages.EditorsPreferencePage_UseSpaces, event.getNewValue()));
-			}
-
-			if (AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS.equals(event.getProperty())
-					&& spaces != null && !spaces.isDisposed() && tabs != null && !tabs.isDisposed())
-			{
-				Boolean val = (Boolean) event.getNewValue();
-				spaces.setSelection(val);
-				tabs.setSelection(!val);
-			}
-
-		}
-
-	};
-
 	/**
 	 * EditorsPreferencePage
 	 */
 	public EditorsPreferencePage()
 	{
 		super(GRID);
-		editorPreferenceStore = EditorsPlugin.getDefault().getPreferenceStore();
 		eplPreferenceStore = UIEplPlugin.getDefault().getPreferenceStore();
 		setPreferenceStore(CommonEditorPlugin.getDefault().getPreferenceStore());
 		setDescription(Messages.EditorsPreferencePage_PreferenceDescription);
@@ -151,6 +120,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		Composite caGroup = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_Content_Assist);
 
+		addField(new BooleanFieldEditor(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Insert, caGroup));
 		addField(new RadioGroupFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, 3, new String[][] {
 						{ "On", Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) }, //$NON-NLS-1$
@@ -162,7 +133,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		createUserAgentCategoryArea(caGroup);
 		createUserAgentButtons(caGroup);
 
-		createTabInsertionEditors(appearanceComposite);
+		createTextEditorLink(appearanceComposite);
 	}
 
 	/**
@@ -224,58 +195,8 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 		setButtonLayoutData(disableAll);
 	}
 
-	private void createTabInsertionEditors(Composite appearanceComposite)
+	private void createTextEditorLink(Composite appearanceComposite)
 	{
-		Composite wsGroup = AptanaPreferencePage.createGroup(appearanceComposite,
-				Messages.EditorsPreferencePage_TabInsertion);
-		Composite wsComp = new Composite(wsGroup, SWT.NONE);
-		wsComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).create());
-		wsComp.setLayoutData(GridDataFactory.fillDefaults().create());
-
-		tabs = new Button(wsComp, SWT.RADIO);
-		Composite spaceComp = new Composite(wsComp, SWT.NONE);
-		spaceComp.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).equalWidth(false).create());
-		spaceComp.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
-
-		spaces = new Button(spaceComp, SWT.RADIO);
-		final Link currentTabSize = new Link(spaceComp, SWT.NONE);
-		int size = editorPreferenceStore.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-		spaces.setText(StringUtil.format(Messages.EditorsPreferencePage_UseSpaces, size));
-		tabs.setText(Messages.EditorsPreferencePage_UseTabs);
-		editorPreferenceStore.addPropertyChangeListener(prefListener);
-		currentTabSize.setText(Messages.EditorsPreferencePage_EditLink);
-		currentTabSize.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent e)
-			{
-				((IWorkbenchPreferenceContainer) getContainer()).openPage(
-						GENERAL_TEXT_EDITOR_PREF_ID, null);
-			}
-
-		});
-		boolean useSpaces = editorPreferenceStore
-				.getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-		spaces.setSelection(useSpaces);
-		tabs.setSelection(!useSpaces);
-		tabs.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent e)
-			{
-				spaces.setSelection(!tabs.getSelection());
-			}
-
-		});
-		spaces.addSelectionListener(new SelectionAdapter()
-		{
-
-			public void widgetSelected(SelectionEvent e)
-			{
-				tabs.setSelection(!spaces.getSelection());
-			}
-
-		});
 
 		// Link to general text editor prefs from Eclipse - they can set tabs/spaces/whitespace drawing, etc
 		Link link = new Link(appearanceComposite, SWT.NONE);
@@ -285,8 +206,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 			public void widgetSelected(SelectionEvent e)
 			{
-				((IWorkbenchPreferenceContainer) getContainer()).openPage(
-						GENERAL_TEXT_EDITOR_PREF_ID, null);
+				((IWorkbenchPreferenceContainer) getContainer()).openPage(GENERAL_TEXT_EDITOR_PREF_ID, null);
 			}
 
 		});
@@ -300,28 +220,12 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	}
 
 	/**
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#dispose()
-	 */
-	public void dispose()
-	{
-		editorPreferenceStore.removePropertyChangeListener(prefListener);
-		super.dispose();
-	}
-
-	/**
 	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performDefaults()
 	 */
 	protected void performDefaults()
 	{
-		boolean useSpaces = editorPreferenceStore
-				.getDefaultBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-		spaces.setSelection(useSpaces);
-		tabs.setSelection(!useSpaces);
-
 		categoryViewer.setCheckedElements(UserAgentManager.getInstance().getDefaultActiveUserAgents());
-
 		super.performDefaults();
-
 	}
 
 	/**
@@ -329,15 +233,13 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	 */
 	public boolean performOk()
 	{
-		editorPreferenceStore.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS,
-				spaces.getSelection());
 
 		List<String> al = new ArrayList<String>();
 		Object[] elements = categoryViewer.getCheckedElements();
 
 		for (Object i : elements)
 		{
-			UserAgentManager.UserAgent userAgent = (UserAgentManager.UserAgent)i;
+			UserAgentManager.UserAgent userAgent = (UserAgentManager.UserAgent) i;
 			al.add(userAgent.ID);
 		}
 

@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
@@ -547,6 +547,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 
+			// If user doesn't want tags closed for them, then don't do it!
+			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
+					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS);
+
 			HTMLParseState state = null;
 			for (ElementElement element : elements)
 			{
@@ -592,7 +596,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!TagUtil.tagClosed(doc, element.getName()))
+						if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -853,6 +857,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
 		int replaceLength = 0;
+		if (tagLexeme != null)
+		{
+			replaceLength += tagLexeme.getLength();
+		}
 
 		// We can be at: |<a, <|a, |</a, </|a, etc.
 		// If our cursor is before the tag in the lexeme list, assume we aren't
@@ -874,7 +882,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength += tagLexeme.getLength();
 			}
 			// current tag isn't closed, so we will close it for the user
-			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
+			if (closeLexeme == null || !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
 			{
 				replaceString += ">"; //$NON-NLS-1$
 			}
@@ -1166,11 +1174,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			HTMLPlugin.PLUGIN_ID, //
-			IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				HTMLPlugin.PLUGIN_ID, //
+				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
