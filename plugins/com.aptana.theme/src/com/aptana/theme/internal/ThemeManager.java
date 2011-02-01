@@ -143,15 +143,15 @@ public class ThemeManager implements IThemeManager
 		// TODO Move this stuff over to theme change listeners in the XML/HTML/Ruby editor plugins?
 		prefs.putBoolean("xmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
 		prefs.putBoolean("xmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("xmlTagPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
+		prefs.put("xmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
 		prefs.put("xmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
 		prefs.putBoolean("htmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
 		prefs.putBoolean("htmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
+		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
 		prefs.put("htmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
 		prefs.putBoolean("rubyBlockPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
 		prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getCaret())); //$NON-NLS-1$
+		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
 		prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
 		try
 		{
