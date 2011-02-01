@@ -9,7 +9,9 @@ package com.aptana.editor.html.parsing;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
@@ -66,6 +68,23 @@ public class HTMLParser implements IParser
 			"onmovestart", "onpaste", "onpropertychange", "onreadystatechange", "onreset", "onresize", "onresizeend",
 			"onresizestart", "onrowenter", "onrowexit", "onrowsdelete", "onrowsinserted", "onscroll", "onselect",
 			"onselectstart", "onstart", "onsubmit", "ontimeerror", "onunload" };
+
+	private static Set<String> cssAttributes = new HashSet<String>();
+	static
+	{
+		for (String attribute : CSS_VALID_ATTR)
+		{
+			cssAttributes.add(attribute);
+		}
+	}
+	private static Set<String> jsAttributes = new HashSet<String>();
+	static
+	{
+		for (String attribute : JS_VALID_ATTR)
+		{
+			jsAttributes.add(attribute);
+		}
+	}
 
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
@@ -489,28 +508,12 @@ public class HTMLParser implements IParser
 
 	private static boolean isCSSAttribute(String name)
 	{
-		String lowercaseName = name.toLowerCase();
-		for (String attribute : CSS_VALID_ATTR)
-		{
-			if (attribute.equals(lowercaseName))
-			{
-				return true;
-			}
-		}
-		return false;
+		return cssAttributes.contains(name.toLowerCase());
 	}
 
 	private static boolean isJSAttribute(String name)
 	{
-		String lowercaseName = name.toLowerCase();
-		for (String attribute : JS_VALID_ATTR)
-		{
-			if (attribute.equals(lowercaseName))
-			{
-				return true;
-			}
-		}
-		return false;
+		return jsAttributes.contains(name.toLowerCase());
 	}
 
 	private static boolean isJavaScript(HTMLElementNode node)
