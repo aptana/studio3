@@ -179,7 +179,7 @@ public class FindBarActions
 									FindBarPlugin.getDefault().getLog().log(s);
 								}
 
-								break;
+								return;
 							}
 						}
 					}
