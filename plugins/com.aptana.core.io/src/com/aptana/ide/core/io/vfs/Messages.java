@@ -33,6 +33,8 @@ public class Messages extends NLS // NO_UCD
 	public static String BaseConnectionFileManager_opening_file;
 	public static String BaseConnectionFileManager_parent_doesnt_exist;
 	public static String BaseConnectionFileManager_parent_is_not_directory;
+
+	public static String BaseConnectionFileManager_PermissionDenied0;
 	public static String BaseConnectionFileManager_putting_changes;
 
 	static
