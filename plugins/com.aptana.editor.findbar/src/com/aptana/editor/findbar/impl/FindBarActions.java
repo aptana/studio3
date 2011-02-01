@@ -25,16 +25,18 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerActivation;
@@ -45,12 +47,10 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.editor.findbar.FindBarPlugin;
 
 /**
- * Helper to manage the activation of actions.
- * 
- * When some control of the find bar receives the focus, the binding service is disabled so that we no longer have
- * the default actions from the text editor, while handling internally the actions we want so that the actions
- * related to the find bar still get executed. When focus is lost, the find bar actions get disabled and the
- * binding service is restored again.
+ * Helper to manage the activation of actions. When some control of the find bar receives the focus, the binding service
+ * is disabled so that we no longer have the default actions from the text editor, while handling internally the actions
+ * we want so that the actions related to the find bar still get executed. When focus is lost, the find bar actions get
+ * disabled and the binding service is restored again.
  * 
  * @author Fabio Zadrozny
  */
@@ -59,16 +59,16 @@ public class FindBarActions
 
 	private boolean fActivated;
 	private IContextActivation findBarContextActivation;
-	
+
 	private final Map<String, AbstractHandler> fCommandToHandler = new HashMap<String, AbstractHandler>();
 	private final List<IHandlerActivation> fHandlerActivations = new ArrayList<IHandlerActivation>();
 
 	private final IBindingManagerListener fClearCommandToBindingOnChangesListener = new IBindingManagerListener()
 	{
-		
+
 		public void bindingManagerChanged(BindingManagerEvent event)
 		{
-			if(event.isActiveBindingsChanged())
+			if (event.isActiveBindingsChanged())
 			{
 				fCommandToBinding = null;
 			}
@@ -81,35 +81,35 @@ public class FindBarActions
 	private HashMap<String, List<TriggerSequence>> fCommandToBinding;
 	private ITextEditor textEditor;
 	private WeakReference<FindBarDecorator> findBarDecorator;
-	
+
 	public FindBarActions(ITextEditor textEditor, FindBarDecorator findBarDecorator)
 	{
 		this.textEditor = textEditor;
-		//Don't create cycles...
+		// Don't create cycles...
 		this.findBarDecorator = new WeakReference<FindBarDecorator>(findBarDecorator);
-		
+
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.hide", new HideFindBarHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusFind", new FocusFindFindBarHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
-		
-		//Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
-		//even if the editor does not have focus.
+
+		// Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
+		// even if the editor does not have focus.
 		fCommandToHandler.put("org.eclipse.ui.edit.undo", null); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.redo", null); //$NON-NLS-1$
 	}
 
-
 	/**
-	 * Focus listener that adds itself as a key adapter to a given control so that given some key sequence
-	 * we activate the commands related to the find bar.
+	 * Focus listener that adds itself as a key adapter to a given control so that given some key sequence we activate
+	 * the commands related to the find bar.
 	 */
-	private class FindBarControlFocusListener extends KeyAdapter implements FocusListener, KeyListener
+	private class FindBarControlFocusListener implements FocusListener, Listener
 	{
 
 		private Control control;
 		private boolean listening = false;
+		private Display display;
 
 		public FindBarControlFocusListener(Control control)
 		{
@@ -123,8 +123,9 @@ public class FindBarActions
 				return;
 			}
 			listening = false;
-			this.control.removeKeyListener(this);
 			setFindBarContextActive(false);
+			display.removeFilter(SWT.KeyDown, this);
+			display.removeFilter(SWT.Traverse, this);
 		}
 
 		public void focusGained(FocusEvent e)
@@ -134,29 +135,69 @@ public class FindBarActions
 				return;
 			}
 			listening = true;
-			this.control.addKeyListener(this);
+			display = PlatformUI.getWorkbench().getDisplay();
+			display.addFilter(SWT.KeyDown, this);
+			display.addFilter(SWT.Traverse, this);
+
 			setFindBarContextActive(true);
 		}
 
 		/**
-		 * Matches key events against the keybindings for the find bar actions.
-		 * 
-		 * There is one issue here:
-		 * If the user actually had a binding defined with Alt+Something, it doesn't work because
-		 * the accelerators end up having preference over the event (which means we are unable to work
-		 * with keybindings with Alt+Something) if there's an accelerator defined in the menus for it.
-		 * 
-		 * An attempt to fix this was adding a listener to the display, but it didn't work either (after
-		 * an Alt, the events never got to the proper place)
+		 * Modeled as com.aptana.scripting.keybindings.internal.KeybindingsManager, which handles not only the KeyDown,
+		 * but also the Traverse event so that it can consume events that would end up being treated in the mnemonics
+		 * before actually issuing a KeyDown event.
 		 */
-		public void keyPressed(KeyEvent e)
+		public void handleEvent(Event event)
 		{
-			if(fCommandToBinding == null)
+
+			// If this is not a keyboard event, then there are no key strokes. This can happen if we are listening to
+			// focus traversal events.
+			if ((event.stateMask == 0) && (event.keyCode == 0) && (event.character == 0))
 			{
-				//May be changed to null if the list of bindings change.
+				return;
+			}
+
+			// We only want to handle events in the control that got the focus (the traverse will happen first at it,
+			// so, if it can't consume this event, there's no point in checking bindings after that).
+			if (event.widget != control)
+			{
+				return;
+			}
+			boolean consumed = processEvent(event.keyCode, event.stateMask);
+			if (consumed)
+			{
+				consumeEvent(event);
+			}
+		}
+
+		private void consumeEvent(Event event)
+		{
+			switch (event.type)
+			{
+				case SWT.KeyDown:
+					event.doit = false;
+					break;
+				case SWT.Traverse:
+					event.detail = SWT.TRAVERSE_NONE;
+					event.doit = true;
+					break;
+				default:
+			}
+			event.type = SWT.NONE;
+		}
+
+		/**
+		 * Matches key events against the keybindings for the find bar actions.
+		 */
+		private boolean processEvent(int keyCode, int stateMask)
+		{
+			boolean consumed = false;
+			if (fCommandToBinding == null)
+			{
+				// May be changed to null if the list of bindings change.
 				updateCommandToBinding();
 			}
-			
+
 			HashMap<String, List<TriggerSequence>> commandToBinding = FindBarActions.this.fCommandToBinding;
 			if (commandToBinding != null)
 			{
@@ -169,9 +210,9 @@ public class FindBarActions
 						if (seq instanceof KeySequence)
 						{
 							KeySequence keySequence = (KeySequence) seq;
-							if (KeyBindingHelper.matchesKeybinding(e.keyCode, e.stateMask, keySequence))
+							if (KeyBindingHelper.matchesKeybinding(keyCode, stateMask, keySequence))
 							{
-								e.doit = false;
+								consumed = true;
 								IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(
 										IHandlerService.class);
 								try
@@ -180,8 +221,8 @@ public class FindBarActions
 								}
 								catch (NotEnabledException e1)
 								{
-									//Ignore it in this case (i.e.: undo will only be enabled if there's something
-									//to be undone).
+									// Ignore it in this case (i.e.: undo will only be enabled if there's something
+									// to be undone).
 								}
 								catch (Exception e1)
 								{
@@ -190,13 +231,15 @@ public class FindBarActions
 									FindBarPlugin.getDefault().getLog().log(s);
 								}
 
-								return;
+								return consumed;
 							}
 						}
 					}
 				}
 			}
+			return consumed;
 		}
+
 	}
 
 	private class HideFindBarHandler extends AbstractHandler
@@ -204,7 +247,8 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if(dec != null){
+			if (dec != null)
+			{
 				dec.hideFindBar();
 			}
 			return null;
@@ -216,7 +260,8 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if(dec != null){
+			if (dec != null)
+			{
 				dec.findPrevious();
 			}
 			return null;
@@ -228,7 +273,8 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if(dec != null){
+			if (dec != null)
+			{
 				dec.findNext();
 			}
 			return null;
@@ -240,7 +286,8 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if(dec != null){
+			if (dec != null)
+			{
 				dec.combo.setFocus();
 				dec.combo.setSelection(new Point(0, dec.combo.getText().length()));
 			}
@@ -253,13 +300,13 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if(dec != null){
+			if (dec != null)
+			{
 				dec.comboReplace.setFocus();
 			}
 			return null;
 		}
 	}
-
 
 	private void setFindBarContextActive(boolean activate)
 	{
@@ -271,19 +318,20 @@ public class FindBarActions
 
 		if (activate)
 		{
-			
-			//These will be the only active commands (note that they may have multiple keybindings
-			//defined in plugin.xml)
+
+			// These will be the only active commands (note that they may have multiple keybindings
+			// defined in plugin.xml)
 			for (Map.Entry<String, AbstractHandler> entry : fCommandToHandler.entrySet())
 			{
 				AbstractHandler handler = entry.getValue();
-				if(handler != null){
+				if (handler != null)
+				{
 					fHandlerActivations.add(handlerService.activateHandler(entry.getKey(), handler));
 				}
 			}
 
-			//Yes, no longer execute anything from the binding service (we'll do our own handling so that the commands
-			//we need still get executed).
+			// Yes, no longer execute anything from the binding service (we'll do our own handling so that the commands
+			// we need still get executed).
 			service.setKeyFilterEnabled(false);
 
 			service.addBindingManagerListener(fClearCommandToBindingOnChangesListener);
@@ -359,7 +407,8 @@ public class FindBarActions
 			public void focusGained(FocusEvent e)
 			{
 				Combo c = weakCombo.get();
-				if(c != null){
+				if (c != null)
+				{
 					c.setForeground(null);
 				}
 				super.focusGained(e);

@@ -63,7 +63,7 @@
             commandId="org.eclipse.ui.edit.findbar.findPrevious"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+P">
+            sequence="M2+ENTER">
       </key>
       
       <!-- Find Next -->
@@ -83,7 +83,7 @@
             commandId="org.eclipse.ui.edit.findbar.findNext"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+N">
+            sequence="M3+N">
       </key>
       <key
             commandId="org.eclipse.ui.edit.findbar.findNext"
@@ -99,12 +99,18 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
       </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.focusFind"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+F">
+      </key>
       <!-- Focus the replace combo -->      
       <key
             commandId="org.eclipse.ui.edit.findbar.focusReplace"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+E">
+            sequence="M3+E">
       </key>
    </extension>
    
