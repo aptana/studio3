@@ -73,6 +73,10 @@ public class KeyBindingHelper
 		KeySequence keySequence = (KeySequence) seq;
 		KeyStroke[] keyStrokes = keySequence.getKeyStrokes();
 
+		if(keyStrokes.length > 1)
+		{
+			return false; //Only handling one step binding... the code below does not support things as "CTRL+X R" for redo.
+		}
 		for (KeyStroke keyStroke : keyStrokes)
 		{
 			if (keyStroke.getNaturalKey() == keyCode && keyStroke.getModifierKeys() == stateMask)

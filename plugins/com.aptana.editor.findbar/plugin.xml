@@ -59,6 +59,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+K">
       </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findPrevious"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+P">
+      </key>
       
       <!-- Find Next -->
       <key
@@ -72,6 +78,18 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findNext"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+N">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findNext"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F3">
       </key>
 
       <!-- Focus the find combo -->      

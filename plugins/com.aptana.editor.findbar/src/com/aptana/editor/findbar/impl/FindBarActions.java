@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -92,6 +93,11 @@ public class FindBarActions
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusFind", new FocusFindFindBarHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
+		
+		//Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
+		//even if the editor does not have focus.
+		fCommandToHandler.put("org.eclipse.ui.edit.undo", null); //$NON-NLS-1$
+		fCommandToHandler.put("org.eclipse.ui.edit.redo", null); //$NON-NLS-1$
 	}
 
 
@@ -171,6 +177,11 @@ public class FindBarActions
 								try
 								{
 									handlerService.executeCommand(entry.getKey(), null);
+								}
+								catch (NotEnabledException e1)
+								{
+									//Ignore it in this case (i.e.: undo will only be enabled if there's something
+									//to be undone).
 								}
 								catch (Exception e1)
 								{
@@ -265,7 +276,10 @@ public class FindBarActions
 			//defined in plugin.xml)
 			for (Map.Entry<String, AbstractHandler> entry : fCommandToHandler.entrySet())
 			{
-				fHandlerActivations.add(handlerService.activateHandler(entry.getKey(), entry.getValue()));
+				AbstractHandler handler = entry.getValue();
+				if(handler != null){
+					fHandlerActivations.add(handlerService.activateHandler(entry.getKey(), handler));
+				}
 			}
 
 			//Yes, no longer execute anything from the binding service (we'll do our own handling so that the commands
@@ -299,10 +313,6 @@ public class FindBarActions
 
 		IWorkbenchPartSite site = textEditor.getSite();
 		IBindingService service = (IBindingService) site.getService(IBindingService.class);
-		//Note that we cache the commands and bindings we accept at this point. This may be a problem if the user
-		//actually changes those bindings... in which case, the find will have to be closed and opened again for
-		//the bindings to work properly -- this is a minor issue and won't be handled right now... unless someone 
-		//complains about it ;-)
 		Binding[] bindings = service.getBindings();
 
 		for (Map.Entry<String, AbstractHandler> entry : fCommandToHandler.entrySet())
