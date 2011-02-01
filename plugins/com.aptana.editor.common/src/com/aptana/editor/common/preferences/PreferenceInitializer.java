@@ -31,8 +31,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.put(IPreferenceConstants.TASK_TAG_PRIORITIES, "NORMAL,HIGH,NORMAL"); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
 
-		prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
-		prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
 		prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
 
 		// mark occurrences

@@ -33,6 +33,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
@@ -153,6 +154,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
 		}
 
+		final Composite fildEditorGroup = new Composite(group, SWT.NONE);
+		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
 		tabSpaceCombo.addSelectionListener(new SelectionListener()
 		{
 			public void widgetSelected(SelectionEvent e)
@@ -160,20 +164,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				Object source = e.getSource();
 				if (source == tabSpaceCombo)
 				{
-					IEclipsePreferences store = getPluginPreferenceStore();
-
-					if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
-					{
-						store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
-					}
-					else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
-					{
-						store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
-					}
-					else
-					{
-						store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
-					}
+					tabSize.setEnabled(!tabSpaceCombo.getText().equals(
+							Messages.CommonEditorPreferencePage_UseDefaultOption), fildEditorGroup);
 				}
 			}
 
@@ -181,9 +173,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			{
 			}
 		});
-
-		Composite fildEditorGroup = new Composite(group, SWT.NONE);
-		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
 
 		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
 				Messages.CommonEditorPreferencePage_Tab_Size_Label, fildEditorGroup, 5)
@@ -198,6 +187,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 					text.setText(Integer.toString(value));
 				}
 				valueChanged();
+				setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
+						fildEditorGroup);
 			}
 
 			@Override
@@ -215,6 +206,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			@Override
 			protected void doStore()
 			{
+				// This is called only when Apply or OK are clicked on the dialog, so we are OK to store to the
+				// preferences here.
 				Text text = getTextControl();
 				if (text != null)
 				{
@@ -224,10 +217,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 							EditorsPlugin.getDefault().getPreferenceStore() })
 							.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 
-					if (i.intValue() == globalEditorValue)
+					if (i.intValue() == globalEditorValue
+							|| tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption))
 					{
-						// Remove preference from plugin preference store if it is the same as either common editor
-						// value or global editor value
+						// Remove preference from plugin preference store if it has the same value as the global editor
+						// value, or if the tab-policy is set to use the global settings.
 						getPluginPreferenceStore().remove(
 								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
 					}
@@ -242,6 +236,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		};
 		tabSize.setEmptyStringAllowed(false);
 		tabSize.setValidRange(1, 20);
+		tabSize.setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
+				fildEditorGroup);
 		addField(tabSize);
 	}
 
@@ -299,14 +295,50 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		}
 	}
 
+	public boolean performOk()
+	{
+		IEclipsePreferences store = getPluginPreferenceStore();
+
+		if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
+		{
+			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+		}
+		else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
+		{
+			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+		}
+		else
+		{
+			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		}
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return super.performOk();
+	}
+
 	@Override
 	protected void performDefaults()
 	{
+		super.performDefaults();
 		IEclipsePreferences store = getPluginPreferenceStore();
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-		super.performDefaults();
 		tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
 	}
 
 }

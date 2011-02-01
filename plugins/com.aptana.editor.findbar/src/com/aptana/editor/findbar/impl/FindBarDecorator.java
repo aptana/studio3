@@ -12,26 +12,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IFindReplaceTarget;
-import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,8 +48,6 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -59,7 +55,13 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 
+/**
+ * Main control of the find bar.
+ *
+ * @author Fabio Zadrozny
+ */
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
 
@@ -77,14 +79,16 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private final ITextEditor textEditor;
 	private ISourceViewer sourceViewer;
-	private final IEditorStatusLine statusLineManager;
+	final IEditorStatusLine statusLineManager;
 	private final String PREFERENCE_NAME_FIND = "FIND_BAR_DECORATOR_FIND_ENTRIES"; //$NON-NLS-1$
 	private final String PREFERENCE_NAME_REPLACE = "FIND_BAR_DECORATOR_REPLACE_ENTRIES"; //$NON-NLS-1$
+	private IAction fOriginalFindBarAction;
 
 	public FindBarDecorator(ITextEditor textEditor)
 	{
 		this.textEditor = textEditor;
 		this.statusLineManager = (IEditorStatusLine) textEditor.getAdapter(IEditorStatusLine.class);
+		findBarActions = new FindBarActions(textEditor, this);
 	}
 
 	public Composite createFindBarComposite(Composite parent)
@@ -104,6 +108,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	public void createFindBar(ISourceViewer sourceViewer)
 	{
 		this.sourceViewer = sourceViewer;
+		findBarFinder = new FindBarFinder(textEditor, sourceViewer, this);
 		findBar = new Composite(composite, SWT.BORDER);
 		findBarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		findBarGridData.exclude = true;
@@ -125,7 +130,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		combo = createCombo(PREFERENCE_NAME_FIND);
 
 		comboReplace = createCombo(PREFERENCE_NAME_REPLACE);
-		combos = new Combo[] { combo, comboReplace };
 
 		previous = createButton(PREVIOUS, false);
 		next = createButton(NEXT, false);
@@ -232,19 +236,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 */
 	private void setDefaultFocusListener(Button button)
 	{
-		final FocusListener defaultFocusListener = new FocusListener()
-		{
-			public void focusLost(FocusEvent e)
-			{
-				findBarContext(false);
-			}
-
-			public void focusGained(FocusEvent e)
-			{
-				findBarContext(true);
-			}
-		};
-		button.addFocusListener(defaultFocusListener);
+		button.addFocusListener(findBarActions.createFocusListener(button));
 	}
 
 	/**
@@ -264,19 +256,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		combo.setItems(list.toArray(new String[list.size()]));
 		combo.select(0);
 
-		combo.addFocusListener(new FocusListener()
-		{
-			public void focusLost(FocusEvent e)
-			{
-				findBarContext(false);
-			}
-
-			public void focusGained(FocusEvent e)
-			{
-				combo.setForeground(null);
-				findBarContext(true);
-			}
-		});
+		combo.addFocusListener(findBarActions.createFocusListener(combo));
 		return combo;
 	}
 
@@ -305,25 +285,58 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		return !findBarGridData.exclude;
 	}
 
+	
+	private final UpdateFindBarActionOnPropertyChange fFindBarActionOnPropertyChange = new UpdateFindBarActionOnPropertyChange();
+
+	private final class UpdateFindBarActionOnPropertyChange implements IPropertyChangeListener
+	{
+		public void propertyChange(PropertyChangeEvent event)
+		{
+			if (event.getProperty().equals(IPreferencesConstants.USE_CUSTOM_FIND_BAR))
+			{
+				updateFindBarAction();
+			}
+		}
+	}
+
+	
+	/**
+	 * Updates the find bar given the preferences (and registers a listener to update it whenever needed).
+	 */
 	public void installActions()
 	{
-		textEditor.setAction(ITextEditorActionConstants.FIND, new ShowFindBarAction(textEditor));
+		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+		preferenceStore.addPropertyChangeListener(fFindBarActionOnPropertyChange);
+		fOriginalFindBarAction = textEditor.getAction(ITextEditorActionConstants.FIND);
+		updateFindBarAction();
+	}
 
-		// Activate handlers
-		IHandlerService handlerService = (IHandlerService) textEditor.getSite().getService(IHandlerService.class);
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.hide", new HideFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.cut", new CutFromFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.copy", new CopyFromFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.paste", new PasteInFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.selectall", new SelectAllFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.home", new HomeFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.end", new EndFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.selectHome", new SelectHomeFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.selectEnd", new SelectEndFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.focusFind", new FocusFindFindBarHandler()); //$NON-NLS-1$
-		handlerService.activateHandler("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
+	
+	/**
+	 * Updates the find bar action (sets it as the Aptana find bar or restores the original one).
+	 */
+	private void updateFindBarAction()
+	{
+		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+		boolean useCustomFindBar = preferenceStore.getBoolean(IPreferencesConstants.USE_CUSTOM_FIND_BAR);
+		if (useCustomFindBar)
+		{
+			// Replaces the actual find with our find.
+			textEditor.setAction(ITextEditorActionConstants.FIND, new ShowFindBarAction(textEditor));
+		}
+		else
+		{
+			// Restore the original find action.
+			textEditor.setAction(ITextEditorActionConstants.FIND, fOriginalFindBarAction);
+		}
+
+	}
+
+	public void dispose()
+	{
+		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+		preferenceStore.removePropertyChangeListener(fFindBarActionOnPropertyChange);
+		fOriginalFindBarAction = null;
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e)
@@ -352,13 +365,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		else if (source == caseSensitive || source == wholeWord)
 		{
 			setFindText(combo.getText());
-			find(true, true);
+			findBarFinder.find(true, true);
 			showCountTotal();
 		}
 		else if (source == regularExpression)
 		{
 			setFindText(combo.getText());
-			find(true, true);
+			findBarFinder.find(true, true);
 			showCountTotal();
 		}
 		else if (source == countTotal)
@@ -386,7 +399,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			catch (IllegalStateException e1)
 			{
-				if (find(true, true, true, false, true))
+				if (findBarFinder.find(true, true, true, false, true))
 				{
 					try
 					{
@@ -410,7 +423,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			if (source == replaceFind)
 			{
-				find(true);
+				findBarFinder.find(true);
 			}
 			else
 			{
@@ -457,13 +470,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Composite findBar;
 	private GridData findBarGridData;
 
-	private Combo combo;
-	private Combo comboReplace;
-	private Combo[] combos;
-	private ToolItem caseSensitive;
+	/* default */Combo combo;
+	/* default */Combo comboReplace;
+	ToolItem caseSensitive;
 	private ToolItem wholeWord;
-	private ToolItem regularExpression;
-	private int incrementalOffset = -1;
+	ToolItem regularExpression;
 	private Button close;
 	private Button next;
 	private Button previous;
@@ -474,10 +485,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Button replaceAll;
 	private Label count;
 	private Button showFindReplaceDialog;
-	private boolean fActivated;
 	private Control[] disableWhenHidden;
 
-	private IContextActivation findBarContextActivation;
+	private FindBarActions findBarActions;
+	private FindBarFinder findBarFinder;
 
 	private static final String EMPTY = ""; //$NON-NLS-1$
 
@@ -508,186 +519,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			else
 			{
-				find(true, true, wrap);
+				findBarFinder.find(true, true, wrap);
 			}
 			showCountTotal();
 		}
 	};
-
-	private class HideFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			hideFindBar();
-			return null;
-		}
-	}
-
-	private class FindPreviousHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			findPrevious();
-			return null;
-		}
-	}
-
-	private class FindNextHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			findNext();
-			return null;
-		}
-	}
-
-	private class CutFromFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.cut();
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class CopyFromFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.copy();
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class PasteInFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.paste();
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class SelectAllFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.setSelection(new Point(0, combo.getText().length()));
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class HomeFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.setSelection(new Point(0, 0));
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class EndFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					c.setSelection(new Point(combo.getText().length(), combo.getText().length()));
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class SelectHomeFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					Point selection = c.getSelection();
-					c.setSelection(new Point(0, selection.x));
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class SelectEndFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			for (Combo c : combos)
-			{
-				if (c.isFocusControl())
-				{
-					Point selection = c.getSelection();
-					c.setSelection(new Point(selection.x, combo.getText().length()));
-					break;
-				}
-			}
-			return null;
-		}
-	}
-
-	private class FocusFindFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			combo.setFocus();
-			return null;
-		}
-	}
-
-	private class FocusReplaceFindBarHandler extends AbstractHandler
-	{
-		public Object execute(ExecutionEvent event) throws ExecutionException
-		{
-			comboReplace.setFocus();
-			return null;
-		}
-	}
 
 	private void adjustEnablement()
 	{
@@ -698,28 +534,32 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		wholeWord.setEnabled(!EMPTY.equals(text) && !regularExpression.getSelection() && isWord(text));
 	}
 
-	private void hideFindBar()
+	/* default */void hideFindBar()
 	{
 		if (findBarGridData.exclude == false)
 		{
 			findBarGridData.exclude = true;
 			composite.layout();
-			incrementalOffset = -1;
+			findBarFinder.resetIncrementalOffset();
 			combo.removeModifyListener(modifyListener);
 			statusLineManager.setMessage(false, EMPTY, null);
 		}
 		textEditor.setFocus();
-		if(disableWhenHidden != null){
-			for(Control w:disableWhenHidden){
+		if (disableWhenHidden != null)
+		{
+			for (Control w : disableWhenHidden)
+			{
 				w.setEnabled(false);
 			}
 		}
 	}
 
-	private void showFindBar()
+	/* default */void showFindBar()
 	{
-		if(disableWhenHidden != null){
-			for(Control w:disableWhenHidden){
+		if (disableWhenHidden != null)
+		{
+			for (Control w : disableWhenHidden)
+			{
 				w.setEnabled(true);
 			}
 		}
@@ -730,7 +570,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			findBarGridData.exclude = false;
 			composite.layout();
 		}
-		if (!fActivated)
+		if (!findBarActions.isActivated())
 		{
 			// Only change the text if it is not activated (otherwise it means it was
 			// already activated and the user was in another control in the find bar and used Ctrl+F, in which case we
@@ -762,171 +602,23 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		if (!comboHasFocus)
 		{
 			combo.setFocus();
-			incrementalOffset = -1;
+			findBarFinder.resetIncrementalOffset();
 		}
 	}
 
-	private void findPrevious()
+	/* default */void findPrevious()
 	{
-		find(false);
+		findBarFinder.find(false);
 		setFindText(combo.getText());
 	}
 
-	private void findNext()
+	/* default */void findNext()
 	{
-		find(true);
+		findBarFinder.find(true);
 		setFindText(combo.getText());
 	}
 
-	private void find(boolean forward)
-	{
-		find(forward, false);
-	}
-
-	private void find(boolean forward, boolean incremental)
-	{
-		find(forward, incremental, true);
-	}
-
-	private void find(boolean forward, boolean incremental, boolean wrap)
-	{
-		find(forward, incremental, wrap, false, false);
-	}
-
-	private boolean find(boolean forward, boolean incremental, boolean wrap, boolean wrapping,
-			boolean initialSearchBeforeReplace)
-	{
-		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
-		if (findReplaceTarget != null)
-		{
-			try
-			{
-				if (findReplaceTarget instanceof IFindReplaceTargetExtension)
-				{
-					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
-					findReplaceTargetExtension.beginSession();
-				}
-				String findText = combo.getText();
-				StyledText textWidget = sourceViewer.getTextWidget();
-				int offset = textWidget.getCaretOffset();
-				Point selection = textWidget.getSelection();
-				if (wrapping)
-				{
-					if (forward)
-					{
-						offset = 0;
-					}
-					else
-					{
-						offset = sourceViewer.getDocument().getLength() - 1;
-					}
-				}
-				else
-				{
-					if (forward)
-					{
-						if (incremental)
-						{
-							if (incrementalOffset == -1)
-							{
-								incrementalOffset = offset;
-							}
-							else
-							{
-								offset = incrementalOffset;
-							}
-						}
-						else
-						{
-							incrementalOffset = selection.x;
-						}
-					}
-					else
-					{
-						incrementalOffset = selection.x;
-						if (selection.x != offset)
-						{
-							offset = selection.x;
-						}
-					}
-				}
-				int newOffset = -1;
-				if (initialSearchBeforeReplace)
-				{
-					String selectionText = textWidget.getSelectionText();
-					if (selectionText.equals(combo.getText()))
-					{
-						offset -= (selection.y - selection.x);
-					}
-					else
-					{
-						return false;
-					}
-				}
-				if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
-				{
-					try
-					{
-						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget)
-								.findAndSelect(offset, findText, forward, caseSensitive.getSelection(), getWholeWord(),
-										regularExpression.getSelection());
-					}
-					catch (PatternSyntaxException e)
-					{
-						statusLineManager.setMessage(true, e.getMessage(), null);
-						return false;
-					}
-				}
-				else
-				{
-					newOffset = findReplaceTarget.findAndSelect(offset, findText, forward,
-							caseSensitive.getSelection(), getWholeWord());
-				}
-
-				if (newOffset != -1)
-				{
-					combo.setForeground(null);
-					if (!forward)
-					{
-						selection = textWidget.getSelection();
-						incrementalOffset = selection.x;
-					}
-					if (wrapping)
-					{
-						statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_Wrapped, null);
-					}
-					else
-					{
-						statusLineManager.setMessage(false, EMPTY, null);
-					}
-				}
-				else
-				{
-					if (wrap)
-					{
-						if (!wrapping)
-						{
-							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
-						}
-					}
-					combo.setForeground(combo.getDisplay().getSystemColor(SWT.COLOR_RED));
-					textWidget.getDisplay().beep();
-					statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
-				}
-			}
-			finally
-			{
-				if (findReplaceTarget instanceof IFindReplaceTargetExtension)
-				{
-					IFindReplaceTargetExtension findReplaceTargetExtension = (IFindReplaceTargetExtension) findReplaceTarget;
-					findReplaceTargetExtension.endSession();
-				}
-			}
-		}
-		return true;
-	}
-
-	private boolean getWholeWord()
+	boolean getWholeWord()
 	{
 		return wholeWord.getEnabled() && wholeWord.getSelection() && !regularExpression.getSelection();
 	}
@@ -1050,25 +742,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			catch (NotHandledException e1)
 			{
-			}
-		}
-	}
-
-	private void findBarContext(boolean activate)
-	{
-		fActivated = activate;
-		IWorkbenchPartSite site = textEditor.getSite();
-		IContextService contextService = (IContextService) site.getService(IContextService.class);
-		if (activate)
-		{
-			findBarContextActivation = contextService.activateContext("org.eclipse.ui.textEditorScope.findbar"); //$NON-NLS-1$
-		}
-		else
-		{
-			if (findBarContextActivation != null)
-			{
-				contextService.deactivateContext(findBarContextActivation);
-				findBarContextActivation = null;
 			}
 		}
 	}

@@ -37,12 +37,12 @@ public class CompareWithRevisionHandler extends AbstractCompareRevisionHandler
 	protected Object doExecute(ExecutionEvent event) throws ExecutionException
 	{
 		Collection<IResource> resources = getSelectedResources();
-		if (resources == null || resources.size() != 1)
+		if (resources == null || resources.isEmpty())
 		{
 			return null;
 		}
 		IResource resource = resources.iterator().next();
-		if (resource.getType() != IResource.FILE)
+		if (resource == null || resource.getType() != IResource.FILE)
 		{
 			return null;
 		}

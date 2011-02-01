@@ -31,6 +31,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorExtension;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import com.aptana.editor.common.actions.FoldingActionsGroup;
 
 /**
  * This provides the action contributions for Aptana Editors.
@@ -78,6 +79,14 @@ public class CommonTextEditorActionContributor extends TextEditorActionContribut
 				inputPositionStatsContributionItem.setActionHandler(getAction(textEditor, ITextEditorActionConstants.GOTO_LINE));
 				ITextEditorExtension extension= (ITextEditorExtension) textEditor;
 				extension.setStatusField(inputPositionStatsContributionItem, ITextEditorActionConstants.STATUS_CATEGORY_INPUT_POSITION);
+			}
+			if (part instanceof AbstractThemeableEditor)
+			{
+				FoldingActionsGroup foldingActions = ((AbstractThemeableEditor) part).getFoldingActionsGroup();
+				if (foldingActions != null)
+				{
+					foldingActions.updateActionBars();
+				}
 			}
 		}
 	}
