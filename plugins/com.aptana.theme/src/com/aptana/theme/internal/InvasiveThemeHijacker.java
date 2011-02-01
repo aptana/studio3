@@ -25,6 +25,7 @@ import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
@@ -39,6 +40,7 @@ import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -630,7 +632,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Override pair matching colors
-		prefs.put("matchingBracketsColor", StringConverter.asString(theme.getCharacterPairColor())); //$NON-NLS-1$
+		if (!revertToDefaults)
+		{
+			// FIXME Revert back to default value if revertToDefaults!
+			prefs.put("matchingBracketsColor", StringConverter.asString(theme.getCharacterPairColor())); //$NON-NLS-1$
+		}
 
 		try
 		{
@@ -639,6 +645,18 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		catch (BackingStoreException e)
 		{
 			ThemePlugin.logError(e);
+		}
+
+		// Override JDT editor font
+		if (!revertToDefaults)
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
+		}
+		else
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
 		}
 	}
 
