@@ -51,6 +51,22 @@ public class HTMLParser implements IParser
 	@SuppressWarnings("nls")
 	private static final String[] JS_VALID_LANG_ATTR = new String[] { "JavaScript" };
 
+	@SuppressWarnings("nls")
+	private static final String[] CSS_VALID_ATTR = { "style" };
+	@SuppressWarnings("nls")
+	private static final String[] JS_VALID_ATTR = { "onabort", "onactivate", "onafterprint", "onafterupdate",
+			"onbeforeactivate", "onbeforecopy", "onbeforecut", "onbeforedeactivate", "onbeforeeditfocus",
+			"onbeforepaste", "onbeforeprint", "onbeforeunload", "onbeforeupdate", "onblur", "onbounce", "oncellchange",
+			"onchange", "onclick", "oncontextmenu", "oncontrolselect", "oncopy", "oncut", "ondataavailable",
+			"ondatasetchanged", "ondatasetcomplete", "ondblclick", "ondeactivate", "ondrag", "ondragend",
+			"ondragenter", "ondragleave", "ondragover", "ondrop", "onerror", "onerrorupdate", "onfilterchange",
+			"onfinish", "onfocus", "onfocusin", "onfocusout", "onhelp", "onkeydown", "onkeypress", "onkeyup",
+			"onlayoutcomplete", "onload", "onlosecapture", "onmousedown", "onmouseenter", "onmouseleave",
+			"onmousemove", "onmouseout", "onmouseover", "onmouseup", "onmousewheel", "onmove", "onmoveend",
+			"onmovestart", "onpaste", "onpropertychange", "onreadystatechange", "onreset", "onresize", "onresizeend",
+			"onresizestart", "onrowenter", "onrowexit", "onrowsdelete", "onrowsinserted", "onscroll", "onselect",
+			"onselectstart", "onstart", "onsubmit", "ontimeerror", "onunload" };
+
 	private HTMLParserScanner fScanner;
 	private HTMLParseState fParseState;
 	private Stack<IParseNode> fElementStack;
@@ -394,6 +410,17 @@ public class HTMLParser implements IParser
 						}
 					}
 				}
+				// checks if we need to process the value as JS
+				else if (isJSAttribute(name))
+				{
+					IParseNode node = ParserPoolFactory.parse(IJSParserConstants.LANGUAGE, value);
+					IParseNode[] children = node.getChildren();
+					for (IParseNode child : children)
+					{
+						addOffset(child, tagSymbol.getStart() + start + 1);
+						element.addJSAttributeNode(child);
+					}
+				}
 			}
 		}
 	}
@@ -462,7 +489,28 @@ public class HTMLParser implements IParser
 
 	private static boolean isCSSAttribute(String name)
 	{
-		return name.equals("style"); //$NON-NLS-1$
+		String lowercaseName = name.toLowerCase();
+		for (String attribute : CSS_VALID_ATTR)
+		{
+			if (attribute.equals(lowercaseName))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isJSAttribute(String name)
+	{
+		String lowercaseName = name.toLowerCase();
+		for (String attribute : JS_VALID_ATTR)
+		{
+			if (attribute.equals(lowercaseName))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean isJavaScript(HTMLElementNode node)

@@ -30,6 +30,7 @@ public class HTMLElementNode extends HTMLNode
 	private INameNode fEndNode;
 	private Map<String, String> fAttributes;
 	private List<IParseNode> fCSSStyleNodes;
+	private List<IParseNode> fJSAttributeNodes;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
@@ -61,6 +62,7 @@ public class HTMLElementNode extends HTMLNode
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, String>();
 		fCSSStyleNodes = new ArrayList<IParseNode>();
+		fJSAttributeNodes = new ArrayList<IParseNode>();
 	}
 
 	@Override
@@ -75,6 +77,11 @@ public class HTMLElementNode extends HTMLNode
 	public void addCSSStyleNode(IParseNode node)
 	{
 		fCSSStyleNodes.add(node);
+	}
+
+	public void addJSAttributeNode(IParseNode node)
+	{
+		fJSAttributeNodes.add(node);
 	}
 
 	public String getName()
@@ -137,6 +144,11 @@ public class HTMLElementNode extends HTMLNode
 	public IParseNode[] getCSSStyleNodes()
 	{
 		return fCSSStyleNodes.toArray(new IParseNode[fCSSStyleNodes.size()]);
+	}
+
+	public IParseNode[] getJSAttributeNodes()
+	{
+		return fJSAttributeNodes.toArray(new IParseNode[fJSAttributeNodes.size()]);
 	}
 
 	@Override
