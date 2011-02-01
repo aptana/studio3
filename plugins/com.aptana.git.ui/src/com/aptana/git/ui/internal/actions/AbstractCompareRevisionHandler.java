@@ -13,26 +13,32 @@ abstract class AbstractCompareRevisionHandler extends AbstractGitHandler
 	protected boolean calculateEnabled()
 	{
 		Collection<IResource> resources = getSelectedResources();
-		if (resources == null || resources.size() != 1)
+		if (resources == null || resources.isEmpty())
 		{
 			return false;
 		}
-		IResource blah = resources.iterator().next();
-		if (blah.getType() != IResource.FILE)
+		for (IResource blah : resources)
 		{
-			return false;
+			if (blah == null || blah.getType() != IResource.FILE)
+			{
+				continue;
+			}
+			GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
+			if (repo == null)
+			{
+				continue;
+			}
+			ChangedFile file = repo.getChangedFileForResource(blah);
+			if (file == null)
+			{
+				continue;
+			}
+			if (file.hasStagedChanges() || file.hasUnstagedChanges() || file.hasUnmergedChanges())
+			{
+				return true;
+			}
 		}
-		GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
-		if (repo == null)
-		{
-			return false;
-		}
-		ChangedFile file = repo.getChangedFileForResource(blah);
-		if (file == null)
-		{
-			return false;
-		}
-		return file.hasStagedChanges() || file.hasUnstagedChanges() || file.hasUnmergedChanges();
+		return false;
 	}
 
 }
