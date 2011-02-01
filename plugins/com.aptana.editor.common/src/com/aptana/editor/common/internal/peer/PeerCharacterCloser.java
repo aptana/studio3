@@ -248,6 +248,10 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
 	{
+		if (textViewer == null)
+		{
+			return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+		}
 		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(textViewer, offset);
 	}
 
