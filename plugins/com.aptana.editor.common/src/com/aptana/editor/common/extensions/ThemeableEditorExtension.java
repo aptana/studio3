@@ -256,7 +256,7 @@ public class ThemeableEditorExtension
 			return;
 
 		// Set the character pair matching color to this
-		setCharacterPairColor(caretColor);
+		setCharacterPairColor(getThemeManager().getCurrentTheme().getCharacterPairColor());
 
 		// This is an ugly hack. Setting a black image doesn't work for some reason, but setting no image will cause it
 		// to be black.

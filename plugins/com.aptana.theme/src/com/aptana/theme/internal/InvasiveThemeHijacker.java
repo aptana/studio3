@@ -629,6 +629,9 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
+		// Override pair matching colors
+		prefs.put("matchingBracketsColor", StringConverter.asString(theme.getCharacterPairColor())); //$NON-NLS-1$
+
 		try
 		{
 			prefs.flush();
