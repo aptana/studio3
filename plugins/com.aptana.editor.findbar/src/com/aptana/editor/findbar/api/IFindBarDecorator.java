@@ -14,43 +14,44 @@ import org.eclipse.swt.widgets.Composite;
  * This is the interface for Find Bar decorator.
  * 
  * @see FindBarDecoratorFactory
- * 
  * @author schitale
- *
+ * @author Fabio Zadrozny
  */
-public interface IFindBarDecorator {
-	
+public interface IFindBarDecorator
+{
+
 	/**
 	 * This should be called from <code>createPartControl(Composite parent)<code>.
 	 * 
 	 * <pre>
 	 * public void createPartControl(Composite parent) {
-     *     Composite findBarComposite = getfindBarDecorator().createFindBarComposite(parent, getStatusLineManager());
-     *     super.createPartControl(findBarComposite);
-     *     ...
-     * }
-     * </pre>
-     * 
-	 * @param parent The parent composite
+	 *     Composite findBarComposite = getfindBarDecorator().createFindBarComposite(parent, getStatusLineManager());
+	 *     super.createPartControl(findBarComposite);
+	 *     ...
+	 * }
+	 * </pre>
+	 * 
+	 * @param parent
+	 *            The parent composite
 	 * @return The composite configured for parenting Find Bar
 	 */
 	Composite createFindBarComposite(Composite parent);
-	
+
 	/**
 	 * This creates the Find Bar.
 	 * 
-	 * @param sourceViewer 
+	 * @param sourceViewer
 	 */
 	void createFindBar(ISourceViewer sourceViewer);
-	
+
 	/**
 	 * Install actions.
-	 * 
 	 */
 	void installActions();
-	
+
 	/**
 	 * Return the visibility state of Find Bar.
+	 * 
 	 * @return true if Find Bar is visible else false
 	 */
 	boolean isVisible();
@@ -59,4 +60,9 @@ public interface IFindBarDecorator {
 	 * Shows/Hide Find Bar.
 	 */
 	void setVisible(boolean visible);
+
+	/**
+	 * Disposes of the find bar.
+	 */
+	void dispose();
 }
