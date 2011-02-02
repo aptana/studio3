@@ -103,12 +103,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * getAbstractThemeableEditor
 	 * 
+	 * @deprecated Use {@link #getEditor()}
 	 * @return
 	 */
 	protected AbstractThemeableEditor getAbstractThemeableEditor()
 	{
-		// FIXME Merge with #getEditor()!
-		return fTextEditor;
+		return getEditor();
 	}
 
 	/*
@@ -233,7 +233,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
+		return new CommonContentAssistProcessor(getEditor());
 	}
 
 	/**
