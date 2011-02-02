@@ -32,5 +32,5 @@ public interface ICommonContentAssistProcessor
 	 * @param offset
 	 * @return
 	 */
-	boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset);
+	boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset);
 }

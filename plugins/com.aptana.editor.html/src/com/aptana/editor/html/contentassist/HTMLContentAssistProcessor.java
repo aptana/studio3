@@ -1186,6 +1186,31 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
+	@Override
+	public char[] getContextInformationAutoActivationCharacters()
+	{
+		String chars = Platform.getPreferencesService().getString( //
+				HTMLPlugin.PLUGIN_ID, //
+				IPreferenceContants.HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
+
+		return (chars != null) ? chars.toCharArray() : null;
+	}
+
+//	/**
+//	 * @see com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistProcessor#getCompletionProposalIdleActivationTokens()
+//	 */
+//	public int[] getCompletionProposalIdleActivationTokens()
+//	{
+//		return new int[] { HTMLTokenType.TAG_START, HTMLTokenType.TAG_END, HTMLTokenType.NAME };
+//	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationValidator()
 	 */
 	@Override
@@ -1280,7 +1305,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
 										String src = document.get(previousPartition.getOffset(),
 												previousPartition.getLength()).trim();
-										if (src.charAt(src.length() - 1) == '>')
+										if (src.length() > 0 && src.charAt(src.length() - 1) == '>')
 										{
 											result = LocationType.IN_TEXT;
 										}
@@ -1533,28 +1558,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
-	{
-		return false;
-//		if(keyCode == SWT.ESC) {
-//			return false;
-//		}
-//		
-//		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-//		Lexeme<HTMLTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-//		if(lexeme != null) {
-//			System.out.println(lexeme.toString());
-//			System.out.println(offset);
-//		}
-//		if(lexeme != null) {
-//			HTMLTokenType type = lexeme.getType();
-//			return type != HTMLTokenType.DOUBLE_QUOTED_STRING; // && type != HTMLTokenType.TAG_END && type != HTMLTokenType.TAG_SELF_CLOSE;
-//		}
-//		else {
-//			return false;
-//		}
-		//return ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#' || c == '.';
+	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	{		
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<HTMLTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		if(lexeme != null) {
+			System.out.println("Identifier lexeme: " + lexeme.toString());
+			System.out.println("Identifier offset: " + offset);
+		}
+
+		// first step is to determine if we're inside an open tag, close tag, text, etc.
+		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
+		System.out.println("Identifier Coarse: " + location);
+
+		switch (location)
+		{
+			case IN_OPEN_TAG:
+				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
+				if(c == ' ' || c == '\t') {	
+					return true;
+				}
+				else
+				{
+					// If that's not the case, check if we are actually typing the attribute name
+					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+					if(fineLocation == LocationType.IN_ATTRIBUTE_NAME) {
+						return true;
+					}
+					return false;
+				}
+				
+			case IN_CLOSE_TAG:
+			default:
+				return false;
+		}
 	}
 }

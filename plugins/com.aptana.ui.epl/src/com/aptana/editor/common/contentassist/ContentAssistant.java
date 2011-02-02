@@ -1359,6 +1359,18 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 */
 	private boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
 	{
+		if(keyCode == SWT.ESC || (keyCode & SWT.KEYCODE_BIT) != 0) {
+			return false;
+		}
+
+		IContentAssistProcessor processor = getProcessor(fContentAssistSubjectControlAdapter, offset);
+		if(processor instanceof ICommonContentAssistProcessor) {
+			boolean valid = ((ICommonContentAssistProcessor)processor).isValidAssistLocation(c, keyCode, document, offset);
+			if(valid) {
+				return true;
+			}
+		}
+
 		return false;
 //		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
 //		
@@ -1367,7 +1379,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 //			Entry<String,IContentAssistProcessor> entry = iter.next();
 //			IContentAssistProcessor processor = entry.getValue();
 //			if(processor instanceof ICommonContentAssistProcessor) {
-//				boolean valid = ((ICommonContentAssistProcessor)processor).isValidIdentifier(c, keyCode, document, offset);
+//				boolean valid = ((ICommonContentAssistProcessor)processor).isValidAssistLocation(c, keyCode, document, offset);
 //				if(valid) {
 //					return true;
 //				}
@@ -1378,9 +1390,9 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 
 //		if (fProcessors == null)
 //		{
-//			return ""; //$NON-NLS-1$
+//			return false; //$NON-NLS-1$
 //		}
-//
+
 //		StringBuffer buf = new StringBuffer(5);
 //		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
 //		

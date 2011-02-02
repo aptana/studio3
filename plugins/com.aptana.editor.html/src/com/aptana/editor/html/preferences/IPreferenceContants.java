@@ -24,6 +24,12 @@ public interface IPreferenceContants
 	String HTML_ACTIVATION_CHARACTERS = "HTML_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
 
 	/**
+	 * The value is a string where each character in the string will be used as an auto-activation character in
+	 * HTMLContentAssistProcessor for context info
+	 */
+	String HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS = "HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
+
+	/**
 	 * The preference key used to set the option for when we want close tags auto inserted using Content Assist, or HTMLOpenTagCloser.
 	 */
 	String HTML_AUTO_CLOSE_TAG_PAIRS = "HTML_AUTO_CLOSE_TAG_PAIRS"; //$NON-NLS-1$

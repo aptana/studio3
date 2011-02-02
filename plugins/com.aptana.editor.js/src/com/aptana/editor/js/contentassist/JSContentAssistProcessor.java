@@ -23,6 +23,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.core.util.StringUtil;
@@ -907,9 +908,9 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean isValidIdentifier(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
@@ -922,7 +923,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		else {
 			return false;
 		}
-		// return ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '$';
 	}
 
 }
