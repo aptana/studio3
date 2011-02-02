@@ -1,0 +1,330 @@
+==PREFS==
+xml.formatter.line.preserve=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.non.xml=1
+xml.formatter.line.after.element=0
+xml.formatter.wrap.comments.length=80
+xml.formatter.wrap.comments=false
+xml.formatter.formatter.indentation.size=4
+xml.formatter.formatter.tabulation.size=4
+xml.formatter.formatter.tabulation.char=space
+==CONTENT==
+<?xml version="1.0"?>
+   <!DOCTYPE QUESTIONS SYSTEM "SATML.dtd">
+   <QUESTIONS>
+   <MATCHQUESTION RIGHT_COLUMN_TYPE="short">
+   <TITLE>Multiplication</TITLE>
+   <CREATOR>
+   <FNAME>Arne</FNAME>
+   <MINITIAL>B</MINITIAL>
+   <LNAME>Carne</LNAME>
+   </CREATOR>
+   <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+   <CATEGORY>Mathematics</CATEGORY>
+   <LEVEL AGE="12" SKILL="5"/>
+   <STATEMENT>Match the question with the answer.</STATEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>4*2</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>8</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>3*8</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>24</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>4*5</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>20</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   </MATCHQUESTION>
+   <MATCHQUESTION RIGHT_COLUMN_TYPE="short">
+   <TITLE>Disney Characters</TITLE>
+   <CREATOR>
+   <FNAME>Borje</FNAME>
+   <LNAME>Brus</LNAME>
+   </CREATOR>
+   <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+   <CATEGORY>Comics</CATEGORY>
+   <LEVEL AGE="11" SKILL="4"/>
+   <STATEMENT>Match each disney character with his/her last
+   name.</STATEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>Donald</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>Duck</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>Mortimer</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>Goose</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   <MATCHELEMENT>
+   <LEFTCOLUMNMATCH>Mickey</LEFTCOLUMNMATCH>
+   <RIGHTCOLUMNMATCH>Mouse</RIGHTCOLUMNMATCH>
+   </MATCHELEMENT>
+   </MATCHQUESTION>
+   <SAQUESTION NUMBER_OF_ANSWER_BOXES="2">
+   <TITLE>Water Molecules</TITLE>
+   <CREATOR>
+   <FNAME>John</FNAME>
+   <MINITIAL>F</MINITIAL>
+   <LNAME>Kennedy</LNAME>
+   </CREATOR>
+   <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+   <CATEGORY>Chemistry</CATEGORY>
+   <STATEMENT>What two elements does a water molecule
+   contain?</STATEMENT>
+   <SAANSWER CORRECTNESS="50" ALLOW_TO_ANS_IN_BOX="all">
+   <ANSWERTEXT>hydrogen</ANSWERTEXT>
+   <FEEDBACK>Yupp, two of them</FEEDBACK>
+   </SAANSWER>
+   <SAANSWER CORRECTNESS="50" ALLOW_TO_ANS_IN_BOX="all">
+   <ANSWERTEXT>oxygen</ANSWERTEXT>
+   <FEEDBACK>Yupp, one</FEEDBACK>
+   </SAANSWER>
+   </SAQUESTION>
+   <CQUESTION FORMAT="text">
+   <TITLE>Multiplication</TITLE>
+   <CREATOR>
+   <FNAME>Elin</FNAME>
+   <MINITIAL>T</MINITIAL>
+   <LNAME>Ferrandez</LNAME>
+   </CREATOR>
+   <PDATE DAY="28" MONTH="dec" YEAR="1992"/>
+   <CATEGORY>Mathematics</CATEGORY>
+   <LEVEL AGE="11" SKILL="2"/>
+   <VERSION>01</VERSION>
+   <STATEMENT>If Oscar walks {x} miles/hour and he walked for {y}
+   hours, how many miles did he walk?</STATEMENT>
+   <FORMULA>x * y</FORMULA>
+   <VARIABLE NAME="x" MIN="5" MAX="8" DEC="2"/>
+   <VARIABLE NAME="y" MIN="1" MAX="5" DEC="0"/>
+   <CANSWER FORMAT="decimals" VALUE="2" TOLERANCE="5"
+   TOLERANCE_TYPE="percent"/>
+   <UNIT NAME="miles" IMPORTANCE="5" UNIT_SPACE="no" UNIT_CASE="no"/>
+   </CQUESTION>
+   <MCQUESTION>
+   <TITLE>HTML</TITLE>
+   <CREATOR>
+   <FNAME>Paul</FNAME>
+   <MINITIAL>Y</MINITIAL>
+   <LNAME>Huang</LNAME>
+   </CREATOR>
+   <PDATE DAY="1" MONTH="jan" YEAR="1998"/>
+   <CATEGORY>HTML</CATEGORY>
+   <STATEMENT>The two components of a HTML document are:</STATEMENT>
+   <MCANSWER CORRECTNESS="0">Title and Text</MCANSWER>
+   <MCANSWER CORRECTNESS="100">Body and Header</MCANSWER>
+   <MCANSWER CORRECTNESS="0">Meta and Paragraph</MCANSWER>
+   <MCANSWER CORRECTNESS="0">Title and Body</MCANSWER>
+   </MCQUESTION>
+   </QUESTIONS>
+
+==FORMATTED==
+<?xml version="1.0"?>
+<!DOCTYPE QUESTIONS SYSTEM "SATML.dtd">
+<QUESTIONS>
+    <MATCHQUESTION RIGHT_COLUMN_TYPE="short">
+        <TITLE>
+            Multiplication
+        </TITLE>
+        <CREATOR>
+            <FNAME>
+                Arne
+            </FNAME>
+            <MINITIAL>
+                B
+            </MINITIAL>
+            <LNAME>
+                Carne
+            </LNAME>
+        </CREATOR>
+        <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+        <CATEGORY>
+            Mathematics
+        </CATEGORY>
+        <LEVEL AGE="12" SKILL="5"/>
+        <STATEMENT>
+            Match the question with the answer.
+        </STATEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                4*2
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                8
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                3*8
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                24
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                4*5
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                20
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+    </MATCHQUESTION>
+    <MATCHQUESTION RIGHT_COLUMN_TYPE="short">
+        <TITLE>
+            Disney Characters
+        </TITLE>
+        <CREATOR>
+            <FNAME>
+                Borje
+            </FNAME>
+            <LNAME>
+                Brus
+            </LNAME>
+        </CREATOR>
+        <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+        <CATEGORY>
+            Comics
+        </CATEGORY>
+        <LEVEL AGE="11" SKILL="4"/>
+        <STATEMENT>
+            Match each disney character with his/her last
+            name.
+        </STATEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                Donald
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                Duck
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                Mortimer
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                Goose
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+        <MATCHELEMENT>
+            <LEFTCOLUMNMATCH>
+                Mickey
+            </LEFTCOLUMNMATCH>
+            <RIGHTCOLUMNMATCH>
+                Mouse
+            </RIGHTCOLUMNMATCH>
+        </MATCHELEMENT>
+    </MATCHQUESTION>
+    <SAQUESTION NUMBER_OF_ANSWER_BOXES="2">
+        <TITLE>
+            Water Molecules
+        </TITLE>
+        <CREATOR>
+            <FNAME>
+                John
+            </FNAME>
+            <MINITIAL>
+                F
+            </MINITIAL>
+            <LNAME>
+                Kennedy
+            </LNAME>
+        </CREATOR>
+        <PDATE DAY="02" MONTH="feb" YEAR="1998"/>
+        <CATEGORY>
+            Chemistry
+        </CATEGORY>
+        <STATEMENT>
+            What two elements does a water molecule
+            contain?
+        </STATEMENT>
+        <SAANSWER CORRECTNESS="50" ALLOW_TO_ANS_IN_BOX="all">
+            <ANSWERTEXT>
+                hydrogen
+            </ANSWERTEXT>
+            <FEEDBACK>
+                Yupp, two of them
+            </FEEDBACK>
+        </SAANSWER>
+        <SAANSWER CORRECTNESS="50" ALLOW_TO_ANS_IN_BOX="all">
+            <ANSWERTEXT>
+                oxygen
+            </ANSWERTEXT>
+            <FEEDBACK>
+                Yupp, one
+            </FEEDBACK>
+        </SAANSWER>
+    </SAQUESTION>
+    <CQUESTION FORMAT="text">
+        <TITLE>
+            Multiplication
+        </TITLE>
+        <CREATOR>
+            <FNAME>
+                Elin
+            </FNAME>
+            <MINITIAL>
+                T
+            </MINITIAL>
+            <LNAME>
+                Ferrandez
+            </LNAME>
+        </CREATOR>
+        <PDATE DAY="28" MONTH="dec" YEAR="1992"/>
+        <CATEGORY>
+            Mathematics
+        </CATEGORY>
+        <LEVEL AGE="11" SKILL="2"/>
+        <VERSION>
+            01
+        </VERSION>
+        <STATEMENT>
+            If Oscar walks {x} miles/hour and he walked for {y}
+            hours, how many miles did he walk?
+        </STATEMENT>
+        <FORMULA>
+            x * y
+        </FORMULA>
+        <VARIABLE NAME="x" MIN="5" MAX="8" DEC="2"/>
+        <VARIABLE NAME="y" MIN="1" MAX="5" DEC="0"/>
+        <CANSWER FORMAT="decimals" VALUE="2" TOLERANCE="5"
+        TOLERANCE_TYPE="percent"/>
+        <UNIT NAME="miles" IMPORTANCE="5" UNIT_SPACE="no" UNIT_CASE="no"/>
+    </CQUESTION>
+    <MCQUESTION>
+        <TITLE>
+            HTML
+        </TITLE>
+        <CREATOR>
+            <FNAME>
+                Paul
+            </FNAME>
+            <MINITIAL>
+                Y
+            </MINITIAL>
+            <LNAME>
+                Huang
+            </LNAME>
+        </CREATOR>
+        <PDATE DAY="1" MONTH="jan" YEAR="1998"/>
+        <CATEGORY>
+            HTML
+        </CATEGORY>
+        <STATEMENT>
+            The two components of a HTML document are:
+        </STATEMENT>
+        <MCANSWER CORRECTNESS="0">
+            Title and Text
+        </MCANSWER>
+        <MCANSWER CORRECTNESS="100">
+            Body and Header
+        </MCANSWER>
+        <MCANSWER CORRECTNESS="0">
+            Meta and Paragraph
+        </MCANSWER>
+        <MCANSWER CORRECTNESS="0">
+            Title and Body
+        </MCANSWER>
+    </MCQUESTION>
+</QUESTIONS>
+

@@ -3,7 +3,7 @@ module Ruble
     def initialize(scope, path, pairs)
       super("smart_typing_pairs-#{java.util.UUID.randomUUID().toString()}", path)
 
-      @jobj.setPairs(pairs)
+      pairs.each {|p| @jobj.addPairCharacter(p) }
       @jobj.setScope(scope)
     end
 

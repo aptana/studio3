@@ -1,11 +1,9 @@
 /**
- * Copyright (c) 2005-2010 Aptana, Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
- * this entire header must remain intact.
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ui.wizards;
 
@@ -25,12 +23,13 @@ public final class Messages extends NLS
 		// Do not instantiate
 	}
 
+	public static String WizardFolderImportPage_ERR_FolderNotExist;
+	public static String WizardFolderImportPage_ERR_NoFolderSelected;
+	public static String WizardFolderImportPage_ERR_NoProjectName;
+	public static String WizardFolderImportPage_ERR_ProjectNameExists;
 	public static String WizardFolderImportPage_ExistingFolderAsNewProject;
-
 	public static String WizardFolderImportPage_SelectFolder;
-
 	public static String WizardFolderImportPage_ProjectName;
-
 	public static String WizardFolderImportPage_ErrorInitializingFolderImportWizard;
 
 	static

@@ -1,10 +1,61 @@
+#
+# Copyright (C) 2008, 2009 Wayne Meissner
+# Copyright (C) 2008, 2009 Andrea Fazzi
+# Copyright (C) 2008, 2009 Luc Heinrich
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of the Evan Phoenix nor the names of its contributors
+#   may be used to endorse or promote products derived from this software
+#   without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+require 'ffi/platform'
+require 'ffi/struct_layout_builder'
+
 module FFI
+
+  class StructLayout
+
+    def offsets
+      members.map { |m| [ m, self[m].offset ] }
+    end
+
+    def offset_of(field_name)
+      self[field_name].offset
+    end
+
+    # Enum is implemented in java
+
+    # InnerStruct is implemented in java
+    
+  end
+
+  
   class Struct
 
     def size
       self.class.size
     end
-    
+
     def alignment
       self.class.alignment
     end
@@ -65,18 +116,47 @@ module FFI
     end
 
     def self.in
-      :buffer_in
+      ptr(:in)
     end
 
     def self.out
-      :buffer_out
+      ptr(:out)
+    end
+
+    def self.ptr(flags = :inout)
+      @ref_data_type ||= Type::Mapped.new(StructByReference.new(self))
+    end
+
+    def self.val
+      @val_data_type ||= StructByValue.new(self)
     end
 
     def self.by_value
-      ::FFI::StructByValue.new(self)
+      self.val
     end
 
-    
+    def self.by_ref(flags = :inout)
+      self.ptr(flags)
+    end
+
+    class ManagedStructConverter < StructByReference
+
+      def initialize(struct_class)
+        super(struct_class)
+
+        raise NoMethodError, "release() not implemented for class #{struct_class}" unless struct_class.respond_to? :release
+        @method = struct_class.method(:release)
+      end
+
+      def from_native(ptr, ctx)
+        struct_class.new(AutoPointer.new(ptr, @method))
+      end
+    end
+
+    def self.auto_ptr
+      @managed_type ||= Type::Mapped.new(ManagedStructConverter.new(self))
+    end
+
 
     class << self
       public
@@ -84,8 +164,12 @@ module FFI
       def layout(*spec)
         return @layout if spec.size == 0
 
-        builder = FFI::StructLayoutBuilder.new
+        builder = StructLayoutBuilder.new
         builder.union = self < Union
+        builder.packed = @packed if defined?(@packed)
+        builder.alignment = @min_alignment if defined?(@min_alignment)
+        builder.byte_order = @byte_order
+
         if spec[0].kind_of?(Hash)
           hash_layout(builder, spec)
         else
@@ -93,7 +177,7 @@ module FFI
         end
         builder.size = @size if defined?(@size) && @size > builder.size
         cspec = builder.build
-        @layout = cspec unless self == FFI::Struct
+        @layout = cspec unless self == Struct
         @size = cspec.size
         return cspec
       end
@@ -106,7 +190,20 @@ module FFI
         FFI::CallbackInfo.new(find_type(ret, mod), params.map { |e| find_type(e, mod) })
       end
 
+      def packed(packed = 1)
+        @packed = packed
+      end
+      alias :pack :packed
       
+      def aligned(alignment = 1)
+        @min_alignment = alignment
+      end
+      alias :align :aligned
+
+      def byte_order(order = :native)
+        @byte_order = order
+      end
+
       def enclosing_module
         begin
           mod = self.name.split("::")[0..-2].inject(Object) { |obj, c| obj.const_get(c) }
@@ -116,35 +213,38 @@ module FFI
         end
       end
 
-      def find_type(type, mod = nil)
-        if type.kind_of?(Class) && type < FFI::Struct
+
+      def find_field_type(type, mod = enclosing_module)
+        if type.kind_of?(Class) && type < Struct
           FFI::Type::Struct.new(type)
-        elsif type.is_a?(::Array)
+
+        elsif type.kind_of?(Class) && type < FFI::StructLayout::Field
           type
-        elsif mod
+
+        elsif type.kind_of?(::Array)
+          FFI::Type::Array.new(find_field_type(type[0]), type[1])
+
+        else
+          find_type(type, mod)
+        end
+      end
+
+      def find_type(type, mod = enclosing_module)
+        if mod
           mod.find_type(type)
         end || FFI.find_type(type)
       end
 
-      
       private
 
       def hash_layout(builder, spec)
         raise "Ruby version not supported" if RUBY_VERSION =~ /1.8.*/ && !(RUBY_PLATFORM =~ /java/)
-        mod = enclosing_module
-        spec[0].each do |name,type|
-          if type.kind_of?(Class) && type < Struct
-            builder.add_struct(name, type)
-          elsif type.kind_of?(::Array)
-            builder.add_array(name, find_type(type[0], mod), type[1])
-          else
-            builder.add_field(name, find_type(type, mod))
+        spec[0].each do |name, type|
+          builder.add name, find_field_type(type), nil
           end
         end
-      end
 
       def array_layout(builder, spec)
-        mod = enclosing_module
         i = 0
         while i < spec.size
           name, type = spec[i, 2]
@@ -157,54 +257,10 @@ module FFI
           else
             offset = nil
           end
-          if type.kind_of?(Class) && type < Struct
-            builder.add_struct(name, type, offset)
-          elsif type.kind_of?(::Array)
-            builder.add_array(name, find_type(type[0], mod), type[1], offset)
-          else
-            builder.add_field(name, find_type(type, mod), offset)
+
+          builder.add name, find_field_type(type), offset
           end
         end
       end
-
-      #
-      # FIXME This is here for backwards compat with rbx.  No idea if it
-      # even works anymore, but left here for now.
-      #
-      protected
-      def config(base, *fields)
-        config = FFI::Config::CONFIG
-
-        builder = FFI::StructLayoutBuilder.new
-
-        fields.each do |field|
-          offset = config["#{base}.#{field}.offset"]
-          size   = config["#{base}.#{field}.size"]
-          type   = config["#{base}.#{field}.type"]
-          type   = type ? type.to_sym : FFI.size_to_type(size)
-
-          code = FFI.find_type type
-          if (code == NativeType::CHAR_ARRAY)
-            builder.add_char_array(field.to_s, size, offset)
-          else
-            builder.add_field(field.to_s, code, offset)
-          end
-        end
-        size = config["#{base}.sizeof"]
-        builder.size = size if size > builder.size
-        cspec = builder.build
-
-        @layout = cspec
-        @size = cspec.size
-
-        return cspec
-      end      
     end
   end
-
-
-  class Union < Struct
-    # Nothing to do here
-  end
-  
-end

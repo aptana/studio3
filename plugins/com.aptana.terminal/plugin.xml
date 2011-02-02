@@ -58,12 +58,12 @@
             path="scripting">
       </loadPath>
    </extension>
-   <extension
+   <!--<extension
          point="org.eclipse.ui.startup">
       <startup
             class="com.aptana.terminal.EarlyStartup">
       </startup>
-   </extension>
+   </extension>-->
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
@@ -142,6 +142,11 @@
             description="Show Terminal view"
             id="com.aptana.terminal.commands.showTerminal"
             name="Show Terminal">
+      </command>
+      <command
+            defaultHandler="com.aptana.terminal.internal.handlers.OpenTerminalHandler"
+            id="com.aptana.terminal.commands.openTerminal"
+            name="%command.openTerminal.name">
       </command>
    </extension>
    <extension

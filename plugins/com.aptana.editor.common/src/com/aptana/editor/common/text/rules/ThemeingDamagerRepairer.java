@@ -1,40 +1,14 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
@@ -50,6 +24,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 
 	private TextAttribute lastAttribute;
 	private String scope;
+	private IRegion fLastLine;
+	private int fCountForLine;
 
 	public ThemeingDamagerRepairer(ITokenScanner scanner)
 	{
@@ -61,6 +37,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 	{
 		try
 		{
+			fLastLine = null;
+			fCountForLine = 0;
 			int offset = region.getOffset();
 			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
 		}
@@ -72,6 +50,8 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			super.createPresentation(presentation, region);
 			scope = null;
+			fLastLine = null;
+			fCountForLine = 0;
 		}
 	}
 
@@ -112,5 +92,44 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		lastAttribute = super.getTokenTextAttribute(token);
 		return lastAttribute;
+	}
+
+	@Override
+	protected void addRange(TextPresentation presentation, int offset, int length, TextAttribute attr)
+	{
+		try
+		{
+			// first time, grab line info
+			if (fLastLine == null)
+			{
+				fLastLine = fDocument.getLineInformationOfOffset(offset);
+				fCountForLine = 1;
+			}
+			else
+			{
+				// is this still on the same line?
+				if (offset > (fLastLine.getOffset() + fLastLine.getLength()))
+				{
+					// it's a new line, reset counter, update line region
+					fCountForLine = 0;
+					fLastLine = fDocument.getLineInformationOfOffset(offset);
+				}
+				else
+				{
+					// same line, update counter
+					fCountForLine++;
+					if (fCountForLine > 200)
+					{
+						// only record 200 styles per line!
+						return;
+					}
+				}
+			}
+		}
+		catch (BadLocationException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		super.addRange(presentation, offset, length, attr);
 	}
 }

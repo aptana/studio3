@@ -27,28 +27,30 @@ public class CompareWithHEADHandler extends AbstractCompareRevisionHandler
 	{
 		// TODO Allow params so user can set the SHA/branch to compare with!
 		Collection<IResource> resources = getSelectedResources();
-		if (resources == null || resources.size() != 1)
+		if (resources == null || resources.isEmpty())
 		{
 			return null;
 		}
-		IResource blah = resources.iterator().next();
-		if (blah.getType() != IResource.FILE)
+		for (IResource blah : resources)
 		{
-			return null;
+			if (blah.getType() != IResource.FILE)
+			{
+				continue;
+			}
+			GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
+			if (repo == null)
+			{
+				continue;
+			}
+			String name = repo.getChangedFileForResource(blah).getPath();
+			IFile file = (IFile) blah;
+			ITypedElement base = SaveableCompareEditorInput.createFileElement(file);
+			final IFileRevision nextFile = GitPlugin.revisionForCommit(
+					new GitCommit(repo, "HEAD"), Path.fromOSString(name)); //$NON-NLS-1$
+			final ITypedElement next = new FileRevisionTypedElement(nextFile);
+			final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
+			CompareUI.openCompareEditor(in);
 		}
-		GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
-		if (repo == null)
-		{
-			return null;
-		}
-		String name = repo.getChangedFileForResource(blah).getPath();
-		IFile file = (IFile) blah;
-		ITypedElement base = SaveableCompareEditorInput.createFileElement(file);
-		final IFileRevision nextFile = GitPlugin
-				.revisionForCommit(new GitCommit(repo, "HEAD"), Path.fromOSString(name)); //$NON-NLS-1$
-		final ITypedElement next = new FileRevisionTypedElement(nextFile);
-		final GitCompareFileRevisionEditorInput in = new GitCompareFileRevisionEditorInput(base, next, null);
-		CompareUI.openCompareEditor(in);
 		return null;
 	}
 }

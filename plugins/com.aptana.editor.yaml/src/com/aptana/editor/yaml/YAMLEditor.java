@@ -1,14 +1,21 @@
 package com.aptana.editor.yaml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.yaml.internal.text.YAMLFoldingComputer;
 import com.aptana.editor.yaml.outline.YAMLOutlineContentProvider;
 import com.aptana.editor.yaml.outline.YAMLOutlineLabelProvider;
 import com.aptana.editor.yaml.parsing.IYAMLParserConstants;
 
+@SuppressWarnings("restriction")
 public class YAMLEditor extends AbstractThemeableEditor
 {
 
@@ -21,8 +28,16 @@ public class YAMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		setPreferenceStore(getChainedPreferenceStore());
+
 		setSourceViewerConfiguration(new YAMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new YAMLDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { YAMLPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	/*
@@ -57,6 +72,12 @@ public class YAMLEditor extends AbstractThemeableEditor
 	protected IPreferenceStore getOutlinePreferenceStore()
 	{
 		return YAMLPlugin.getDefault().getPreferenceStore();
+	}
+
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new YAMLFoldingComputer(this, document);
 	}
 
 }

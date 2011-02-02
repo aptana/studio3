@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 
@@ -37,18 +10,23 @@ package com.aptana.ui.util;
 
 import java.net.URI;
 
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -57,6 +35,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.services.IEvaluationService;
 
 import com.aptana.ui.UIPlugin;
 
@@ -167,6 +146,26 @@ public final class UIUtils
 		if (input instanceof IPathEditorInput)
 		{
 			return URIUtil.toURI(((IPathEditorInput) input).getPath());
+		}
+		return null;
+	}
+
+	public static IProject getSelectedProject()
+	{
+		IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getService(
+				IEvaluationService.class);
+		if (evaluationService != null)
+		{
+			IEvaluationContext currentState = evaluationService.getCurrentState();
+			Object variable = currentState.getVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME);
+			if (variable instanceof IStructuredSelection)
+			{
+				Object selectedObject = ((IStructuredSelection) variable).getFirstElement();
+				if (selectedObject instanceof IResource)
+				{
+					return ((IResource) selectedObject).getProject();
+				}
+			}
 		}
 		return null;
 	}

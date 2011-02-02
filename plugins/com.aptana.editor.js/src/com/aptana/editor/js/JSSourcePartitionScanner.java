@@ -1,41 +1,11 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.js;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 
@@ -43,9 +13,6 @@ import com.aptana.editor.common.text.rules.SourceConfigurationPartitionScanner;
 
 public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanner implements IJSTokenScanner
 {
-	private static final Pattern DIVISION_START = Pattern.compile("^.*[-+$_a-zA-Z0-9/'\"')\\]]\\s*$"); //$NON-NLS-1$
-	private static final int PREVIEW_LENGTH = 80;
-
 	/**
 	 * JSSourcePartitionScanner
 	 */
@@ -61,27 +28,65 @@ public class JSSourcePartitionScanner extends SourceConfigurationPartitionScanne
 	 */
 	public boolean hasDivisionStart()
 	{
+		// start backtracking one character before the current position
+		int offset = fOffset - 1;
 		boolean result = false;
-		int offsetStart = Math.max(0, fOffset - PREVIEW_LENGTH);
-		int offsetEnd = Math.min(offsetStart + PREVIEW_LENGTH, Math.min(fOffset, fDocument.getLength()));
 
-		if (offsetStart < offsetEnd)
+		try
 		{
-			String source = null;
-
-			try
+			while (offset >= 0)
 			{
-				source = fDocument.get(offsetStart, offsetEnd - offsetStart);
+				char c = fDocument.getChar(offset);
 
-				Matcher m = DIVISION_START.matcher(source);
+				// keep backtracking if we hit whitespace
+				if (Character.isWhitespace(c) == false)
+				{
+					// Compare to the set of last characters from the following tokens:
+					// IDENTIFIER, NUMBER, REGEX, STRING, RPAREN, PLUS_PLUS, MINUS_MINUS,
+					// RBRACKET, RCURLY, FALSE, NULL, THIS, TRUE. Note that we make an
+					// exception with PLUS_PLUS and MINUS_MINUS and backtrack one extra
+					// character to differentiate those from PLUS and MINUS, respectively.
+					// We use this same set of tokens in JSTokenScanner.hasDivisionStart.
+					switch (c)
+					{
+						case '$':
+						case '_':
+						case '/':
+						case '\'':
+						case '"':
+						case ')':
+						case ']':
+						case '}':
+							result = true;
+							break;
 
-				result = m.matches();
+						case '-':
+						case '+':
+							char curr = c;
+
+							if (offset > 0)
+							{
+								c = fDocument.getChar(offset - 1);
+
+								result = (c == curr);
+							}
+							break;
+
+						default:
+							result = ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+					}
+
+					break;
+				}
+
+				offset--;
 			}
-			catch (BadLocationException e)
-			{
-			}
+		}
+		catch (BadLocationException e)
+		{
 		}
 
 		return result;
+
 	}
 }

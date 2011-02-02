@@ -46,6 +46,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.editor.dtd,
  com.aptana.editor.yaml;bundle-version="3.0.0",
  com.aptana.editor.idl;bundle-version="3.0.0",
- com.aptana.editor.css.formatter;bundle-version="3.0.0"
+ com.aptana.editor.css.formatter;bundle-version="3.0.0",
+ com.aptana.editor.json;bundle-version="3.0.0",
+ com.aptana.editor.xml.formatter;bundle-version="3.0.0",
+ com.aptana.editor.html.formatter;bundle-version="3.0.0",
+ com.aptana.editor.js.formatter;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.theme.internal;
@@ -52,6 +25,7 @@ import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
@@ -66,6 +40,7 @@ import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -196,29 +171,28 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		return Status.OK_STATUS;
 	}
 
-	@SuppressWarnings("nls")
 	private void applyThemeToConsole(Theme currentTheme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui");
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.debug.ui"); //$NON-NLS-1$
 		if (revertToDefaults)
 		{
-			prefs.remove("org.eclipse.debug.ui.errorColor");
-			prefs.remove("org.eclipse.debug.ui.outColor");
-			prefs.remove("org.eclipse.debug.ui.inColor");
-			prefs.remove("org.eclipse.debug.ui.consoleBackground");
-			prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND");
+			prefs.remove("org.eclipse.debug.ui.errorColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.debug.ui.outColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.debug.ui.inColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.debug.ui.consoleBackground"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND"); //$NON-NLS-1$
 		}
 		else
 		{
-			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80,
+			setColor(prefs, "org.eclipse.debug.ui.errorColor", currentTheme, ConsoleThemer.CONSOLE_ERROR, new RGB(0x80, //$NON-NLS-1$
 					0, 0));
-			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT,
+			setColor(prefs, "org.eclipse.debug.ui.outColor", currentTheme, ConsoleThemer.CONSOLE_OUTPUT, //$NON-NLS-1$
 					currentTheme.getForeground());
-			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT,
+			setColor(prefs, "org.eclipse.debug.ui.inColor", currentTheme, ConsoleThemer.CONSOLE_INPUT, //$NON-NLS-1$
 					currentTheme.getForeground());
-			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground()));
-			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND",
-					StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable")));
+			prefs.put("org.eclipse.debug.ui.consoleBackground", StringConverter.asString(currentTheme.getBackground())); //$NON-NLS-1$
+			prefs.put("org.eclipse.debug.ui.PREF_CHANGED_VALUE_BACKGROUND", //$NON-NLS-1$
+					StringConverter.asString(currentTheme.getBackgroundAsRGB("markup.changed.variable"))); //$NON-NLS-1$
 		}
 		if (monitor.isCanceled())
 		{
@@ -269,7 +243,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@SuppressWarnings({ "nls" })
 	protected void hijackView(final IViewPart view, final boolean revertToDefaults)
 	{
 		if (view == null)
@@ -283,12 +256,12 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else if (view instanceof ExtendedMarkersView) // Problems, Tasks, Bookmarks
 		{
-			if (new Version(EclipseUtil.getPluginVersion("org.eclipse.ui.ide"))
-					.compareTo(Version.parseVersion("3.6.0")) >= 0)
+			if (new Version(EclipseUtil.getPluginVersion("org.eclipse.ui.ide")) //$NON-NLS-1$
+					.compareTo(Version.parseVersion("3.6.0")) >= 0) //$NON-NLS-1$
 			{
 				try
 				{
-					Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer");
+					Method m = ExtendedMarkersView.class.getDeclaredMethod("getViewer"); //$NON-NLS-1$
 					m.setAccessible(true);
 					TreeViewer treeViewer = (TreeViewer) m.invoke(view);
 					hookTheme(treeViewer, revertToDefaults);
@@ -305,7 +278,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			try
 			{
 				// FIXME This isn't coloring anything right now
-				Method m = ProgressView.class.getDeclaredMethod("getViewer");
+				Method m = ProgressView.class.getDeclaredMethod("getViewer"); //$NON-NLS-1$
 				m.setAccessible(true);
 				Viewer treeViewer = (Viewer) m.invoke(view);
 				hookTheme(treeViewer, revertToDefaults);
@@ -321,7 +294,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			ContentOutline outline = (ContentOutline) view;
 			IPage page = outline.getCurrentPage();
 			String name = page.getClass().getName();
-			if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage"))
+			if (name.endsWith("CommonOutlinePage") || name.endsWith("PyOutlinePage")) //$NON-NLS-1$ //$NON-NLS-2$
 				return; // we already handle our own outlines
 			Control control = page.getControl();
 			if (control instanceof PageBook)
@@ -384,16 +357,16 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			hijackConsole(view);
 			return;
 		}
-		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView"))
+		else if (view.getClass().getName().equals("org.eclipse.search2.internal.ui.SearchView")) //$NON-NLS-1$
 		{
 			hijackSearchView(view, revertToDefaults);
 			return;
 		}
-		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer"))
+		else if (view.getClass().getName().equals("org.eclipse.ui.navigator.resources.ProjectExplorer")) //$NON-NLS-1$
 		{
 			try
 			{
-				Method m = view.getClass().getMethod("getCommonViewer");
+				Method m = view.getClass().getMethod("getCommonViewer"); //$NON-NLS-1$
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
 				hookTheme(treeViewer, revertToDefaults);
 			}
@@ -403,11 +376,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			}
 			return;
 		}
-		else if (view.getClass().getName().equals("org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart"))
+		else if (view.getClass().getName().equals("org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart")) //$NON-NLS-1$
 		{
 			try
 			{
-				Method m = view.getClass().getMethod("getTreeViewer");
+				Method m = view.getClass().getMethod("getTreeViewer"); //$NON-NLS-1$
 				TreeViewer treeViewer = (TreeViewer) m.invoke(view);
 				hookTheme(treeViewer, revertToDefaults);
 			}
@@ -417,14 +390,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			}
 			return;
 		}
-		else if (view.getClass().getName().endsWith("CallHierarchyViewPart"))
+		else if (view.getClass().getName().endsWith("CallHierarchyViewPart")) //$NON-NLS-1$
 		{
 			hijackCallHierarchy(view, revertToDefaults);
 			return;
 		}
 	}
 
-	@SuppressWarnings("nls")
 	protected void hijackSearchView(final IViewPart view, final boolean revertToDefaults)
 	{
 		PageBookView outline = (PageBookView) view;
@@ -437,7 +409,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				try
 				{
 					AbstractTextSearchViewPage blah = (AbstractTextSearchViewPage) page;
-					Method m = blah.getClass().getDeclaredMethod("getViewer");
+					Method m = blah.getClass().getDeclaredMethod("getViewer"); //$NON-NLS-1$
 					m.setAccessible(true);
 					Viewer v = (Viewer) m.invoke(blah);
 					hookTheme(v, revertToDefaults);
@@ -449,7 +421,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			}
 			else
 			{
-				if (page.getClass().getName().endsWith("EmptySearchView"))
+				if (page.getClass().getName().endsWith("EmptySearchView")) //$NON-NLS-1$
 				{
 					// Have to explicitly hook to child label too, since it's bg is set to non-null value
 					Composite comp = (Composite) page.getControl();
@@ -498,16 +470,15 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@SuppressWarnings("nls")
 	protected void hijackCallHierarchy(final IViewPart view, final boolean revertToDefaults)
 	{
 		try
 		{
-			Field f = view.getClass().getDeclaredField("fPagebook");
+			Field f = view.getClass().getDeclaredField("fPagebook"); //$NON-NLS-1$
 			f.setAccessible(true);
 			PageBook pageBook = (PageBook) f.get(view);
 
-			f = pageBook.getClass().getDeclaredField("currentPage");
+			f = pageBook.getClass().getDeclaredField("currentPage"); //$NON-NLS-1$
 			f.setAccessible(true);
 			Control control = (Control) f.get(pageBook);
 			if (control instanceof Label)
@@ -516,11 +487,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 				return;
 			}
 
-			Method m = view.getClass().getMethod("getViewer");
+			Method m = view.getClass().getMethod("getViewer"); //$NON-NLS-1$
 			TreeViewer treeViewer = (TreeViewer) m.invoke(view);
 			hookTheme(treeViewer, revertToDefaults);
 
-			m = view.getClass().getDeclaredMethod("getLocationViewer");
+			m = view.getClass().getDeclaredMethod("getLocationViewer"); //$NON-NLS-1$
 			if (m != null)
 			{
 				m.setAccessible(true);
@@ -568,17 +539,16 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 
-	@SuppressWarnings("nls")
 	protected void applyThemeToJDTEditor(Theme theme, boolean revertToDefaults, IProgressMonitor monitor)
 	{
 		// Set prefs for all editors
-		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+		setHyperlinkValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 		setHyperlinkValues(theme, new InstanceScope().getNode(ThemePlugin.PLUGIN_ID), revertToDefaults);
 
-		setGitAndMercurialValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults);
+		setGitAndMercurialValues(theme, new InstanceScope().getNode("org.eclipse.ui.workbench"), revertToDefaults); //$NON-NLS-1$
 
-		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults);
-		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults);
+		setGeneralEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.texteditor"), revertToDefaults); //$NON-NLS-1$
+		setEditorValues(theme, new InstanceScope().getNode("org.eclipse.ui.editors"), revertToDefaults); //$NON-NLS-1$
 
 		if (monitor.isCanceled())
 		{
@@ -586,7 +556,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 
 		// PDE
-		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui");
+		IEclipsePreferences pdePrefs = new InstanceScope().getNode("org.eclipse.pde.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, pdePrefs, revertToDefaults);
 		setPDEEditorValues(theme, pdePrefs, revertToDefaults);
 
@@ -596,7 +566,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 
 		// Ant
-		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui");
+		IEclipsePreferences antPrefs = new InstanceScope().getNode("org.eclipse.ant.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, antPrefs, revertToDefaults);
 		setAntEditorValues(theme, antPrefs, revertToDefaults);
 
@@ -606,60 +576,67 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 
 		// Now set for JDT...
-		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
+		IEclipsePreferences prefs = new InstanceScope().getNode("org.eclipse.jdt.ui"); //$NON-NLS-1$
 		setGeneralEditorValues(theme, prefs, revertToDefaults);
 
 		// Set prefs for JDT so it's various tokens get colors that match up to our theme!
 		// prefs = new InstanceScope().getNode("org.eclipse.jdt.ui");
-		setToken(prefs, theme, "string.quoted.double.java", "java_string", revertToDefaults);
-		setToken(prefs, theme, "source.java", "java_default", revertToDefaults);
-		setToken(prefs, theme, "keyword", "java_keyword", revertToDefaults);
-		setToken(prefs, theme, "keyword.operator", "java_operator", revertToDefaults);
-		setToken(prefs, theme, "keyword.control.java", "java_keyword_return", revertToDefaults);
-		setToken(prefs, theme, "comment.line.double-slash.java", "java_single_line_comment", revertToDefaults);
-		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults);
-		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket", revertToDefaults);
+		setToken(prefs, theme, "string.quoted.double.java", "java_string", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "source.java", "java_default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword", "java_keyword", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword.operator", "java_operator", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "keyword.control.java", "java_keyword_return", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.line.double-slash.java", "java_single_line_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.block", "java_multi_line_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "punctuation.bracket.java", "java_bracket", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		// Javadoc
 		//String TASK_TAG= "java_comment_task_tag"; //$NON-NLS-1$
-		setToken(prefs, theme, "keyword.other.documentation.java", "java_doc_keyword", revertToDefaults);
-		setToken(prefs, theme, "entity.name.tag.inline.any.html", "java_doc_tag", revertToDefaults);
-		setToken(prefs, theme, "markup.underline.link.javadoc", "java_doc_link", revertToDefaults);
-		setToken(prefs, theme, "comment.block.documentation.javadoc", "java_doc_default", revertToDefaults);
+		setToken(prefs, theme, "keyword.other.documentation.java", "java_doc_keyword", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "entity.name.tag.inline.any.html", "java_doc_tag", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "markup.underline.link.javadoc", "java_doc_link", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.block.documentation.javadoc", "java_doc_default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// deprecated
 		// setToken(prefs, theme, "entity.name.function.java", "java_method_name", revertToDefaults);
-		setToken(prefs, theme, "entity.name.type.class.java", "java_type", revertToDefaults);
-		setToken(prefs, theme, "storage.type.annotation.java", "java_annotation", revertToDefaults);
+		setToken(prefs, theme, "entity.name.type.class.java", "java_type", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "storage.type.annotation.java", "java_annotation", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Semantic
-		setSemanticToken(prefs, theme, "entity.name.type.class.java", "class", revertToDefaults);
-		setSemanticToken(prefs, theme, "entity.name.type.enum.java", "enum", revertToDefaults);
-		setSemanticToken(prefs, theme, "entity.name.type.interface.java", "interface", revertToDefaults);
-		setSemanticToken(prefs, theme, "constant.numeric.java", "number", revertToDefaults);
-		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults);
-		setSemanticToken(prefs, theme, "constant.other.java", "staticField", revertToDefaults);
-		setSemanticToken(prefs, theme, "constant.other.java", "staticFinalField", revertToDefaults);
-		setSemanticToken(prefs, theme, "entity.name.function.java", "methodDeclarationName", revertToDefaults);
-		setSemanticToken(prefs, theme, "invalid.deprecated.java", "deprecatedMember", revertToDefaults);
-		setSemanticToken(prefs, theme, "storage.type.annotation.java", "annotation", revertToDefaults);
-		setSemanticToken(prefs, theme, "constant.other.key.java", "annotationElementReference", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "localVariable", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "field", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "staticMethodInvocation", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "inheritedMethodInvocation", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "abstractMethodInvocation", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "localVariableDeclaration", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "method", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "typeParameter", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults);
-		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults);
+		setSemanticToken(prefs, theme, "entity.name.type.class.java", "class", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "entity.name.type.enum.java", "enum", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "entity.name.type.interface.java", "interface", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "constant.numeric.java", "number", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "variable.parameter.java", "parameterVariable", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "constant.other.java", "staticField", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "constant.other.java", "staticFinalField", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "entity.name.function.java", "methodDeclarationName", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "invalid.deprecated.java", "deprecatedMember", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "storage.type.annotation.java", "annotation", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "constant.other.key.java", "annotationElementReference", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "localVariable", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "field", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "staticMethodInvocation", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "inheritedMethodInvocation", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "abstractMethodInvocation", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "localVariableDeclaration", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "method", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "typeParameter", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "autoboxing", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setSemanticToken(prefs, theme, "source.java", "typeArgument", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Java *.properties files
-		setToken(prefs, theme, "keyword.other.java-props", "pf_coloring_key", revertToDefaults);
-		setToken(prefs, theme, "comment.line.number-sign.java-props", "pf_coloring_comment", revertToDefaults);
-		setToken(prefs, theme, "string.java-props", "pf_coloring_value", revertToDefaults);
-		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults);
-		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults);
+		setToken(prefs, theme, "keyword.other.java-props", "pf_coloring_key", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "comment.line.number-sign.java-props", "pf_coloring_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "string.java-props", "pf_coloring_value", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// Override pair matching colors
+		if (!revertToDefaults)
+		{
+			// FIXME Revert back to default value if revertToDefaults!
+			prefs.put("matchingBracketsColor", StringConverter.asString(theme.getCharacterPairColor())); //$NON-NLS-1$
+		}
 
 		try
 		{
@@ -668,6 +645,18 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		catch (BackingStoreException e)
 		{
 			ThemePlugin.logError(e);
+		}
+
+		// Override JDT editor font
+		if (!revertToDefaults)
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
+		}
+		else
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
 		}
 	}
 
@@ -678,30 +667,30 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		if (revertToDefaults)
 		{
 			// EGit colors
-			prefs.remove("org.eclipse.egit.ui.UncommittedChangeBackgroundColor");
-			prefs.remove("org.eclipse.egit.ui.UncommittedChangeForegroundColor");
+			prefs.remove("org.eclipse.egit.ui.UncommittedChangeBackgroundColor"); //$NON-NLS-1$
+			prefs.remove("org.eclipse.egit.ui.UncommittedChangeForegroundColor"); //$NON-NLS-1$
 
 			// Mercurial colors
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor"); //$NON-NLS-1$
 
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor");
-			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor");
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor"); //$NON-NLS-1$
+			prefs.remove("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor"); //$NON-NLS-1$
 
 		}
 		else
@@ -716,85 +705,84 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 
 			// EGit colors
 			// TODO do we walso need to override font?
-			prefs.put("org.eclipse.egit.ui.UncommittedChangeForegroundColor",
+			prefs.put("org.eclipse.egit.ui.UncommittedChangeForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(addedFile.getForeground().getRGB()));
-			prefs.put("org.eclipse.egit.ui.UncommittedChangeBackgroundColor",
+			prefs.put("org.eclipse.egit.ui.UncommittedChangeBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(addedFile.getBackground().getRGB()));
 
 			// Mercurial colors
 			// TODO Do we also need to override fonts?
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(addedFile.getForeground().getRGB()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.addedBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(addedFile.getBackground().getRGB()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(changedFile.getForeground().getRGB()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.changedBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(changedFile.getBackground().getRGB()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(deletedFile.getForeground().getRGB()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.deletedBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(deletedFile.getBackground().getRGB()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(deletedFile.getForeground().getRGB()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.removedBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(deletedFile.getBackground().getRGB()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(theme.getForeground()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.unknownBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(theme.getBackground()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(conflictFile.getForeground().getRGB()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.conflictBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(conflictFile.getBackground().getRGB()));
 
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredForegroundColor", //$NON-NLS-1$
 					StringConverter.asString(theme.getForeground()));
-			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor",
+			prefs.put("com.vectrace.mercurialeclipse.ui.colorsandfonts.IgnoredBackgroundColor", //$NON-NLS-1$
 					StringConverter.asString(theme.getBackground()));
 		}
 	}
 
-	@SuppressWarnings("nls")
 	protected void setPDEEditorValues(Theme theme, IEclipsePreferences pdePrefs, boolean revertToDefaults)
 	{
 		if (pdePrefs == null)
 			return;
 		if (revertToDefaults)
 		{
-			pdePrefs.remove("editor.color.xml_comment");
-			pdePrefs.remove("editor.color.instr");
-			pdePrefs.remove("editor.color.string");
-			pdePrefs.remove("editor.color.externalized_string");
-			pdePrefs.remove("editor.color.default");
-			pdePrefs.remove("editor.color.tag");
-			pdePrefs.remove("editor.color.header_key");
-			pdePrefs.remove("editor.color.header_value");
-			pdePrefs.remove("editor.color.header_assignment");
-			pdePrefs.remove("editor.color.header_osgi");
-			pdePrefs.remove("editor.color.header_attributes");
+			pdePrefs.remove("editor.color.xml_comment"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.instr"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.string"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.externalized_string"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.default"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.tag"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.header_key"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.header_value"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.header_assignment"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.header_osgi"); //$NON-NLS-1$
+			pdePrefs.remove("editor.color.header_attributes"); //$NON-NLS-1$
 		}
 		else
 		{
 			// plugin.xml
-			setToken(pdePrefs, theme, "comment.block.xml", "editor.color.xml_comment", revertToDefaults);
-			setToken(pdePrefs, theme, "meta.tag.preprocessor.xml", "editor.color.instr", revertToDefaults);
-			setToken(pdePrefs, theme, "string.quoted.double.xml", "editor.color.string", revertToDefaults);
-			setToken(pdePrefs, theme, "string.interpolated.xml", "editor.color.externalized_string", revertToDefaults);
-			setToken(pdePrefs, theme, "text.xml", "editor.color.default", revertToDefaults);
-			setToken(pdePrefs, theme, "entity.name.tag.xml", "editor.color.tag", revertToDefaults);
+			setToken(pdePrefs, theme, "comment.block.xml", "editor.color.xml_comment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "meta.tag.preprocessor.xml", "editor.color.instr", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "string.quoted.double.xml", "editor.color.string", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "string.interpolated.xml", "editor.color.externalized_string", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "text.xml", "editor.color.default", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "entity.name.tag.xml", "editor.color.tag", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 			// manifest.mf
-			setToken(pdePrefs, theme, "keyword.other.manifest", "editor.color.header_key", revertToDefaults);
-			setToken(pdePrefs, theme, "source.manifest", "editor.color.header_value", revertToDefaults);
-			setToken(pdePrefs, theme, "punctuation.separator.key-value.manifest", "editor.color.header_assignment",
+			setToken(pdePrefs, theme, "keyword.other.manifest", "editor.color.header_key", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "source.manifest", "editor.color.header_value", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "punctuation.separator.key-value.manifest", "editor.color.header_assignment", //$NON-NLS-1$ //$NON-NLS-2$
 					revertToDefaults);
-			setToken(pdePrefs, theme, "keyword.other.manifest.osgi", "editor.color.header_osgi", revertToDefaults);
-			setToken(pdePrefs, theme, "string.manifest", "editor.color.header_attributes", revertToDefaults);
+			setToken(pdePrefs, theme, "keyword.other.manifest.osgi", "editor.color.header_osgi", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
+			setToken(pdePrefs, theme, "string.manifest", "editor.color.header_attributes", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		try
 		{
@@ -886,11 +874,15 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, true);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, true);
-			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);			
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, true);
-			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);			
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, true);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
+
+			// FIXME Revert back to default current line color...
+			// prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+			// StringConverter.asString(theme.getLineHighlightAgainstBG()));
 		}
 		else
 		{
@@ -899,9 +891,14 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, false);
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND, StringConverter.asString(theme.getSelectionAgainstBG()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND,
+					StringConverter.asString(theme.getSelectionAgainstBG()));
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme.getForeground()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+					StringConverter.asString(theme.getForeground()));
+
+			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+					StringConverter.asString(theme.getLineHighlightAgainstBG()));
 
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
@@ -956,53 +953,51 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 	}
 
-	@SuppressWarnings("nls")
 	protected void setToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken,
 			boolean revertToDefaults)
 	{
 		if (revertToDefaults)
 		{
 			prefs.remove(jdtToken);
-			prefs.remove(jdtToken + "_bold");
-			prefs.remove(jdtToken + "_italic");
-			prefs.remove(jdtToken + "_underline");
-			prefs.remove(jdtToken + "_strikethrough");
+			prefs.remove(jdtToken + "_bold"); //$NON-NLS-1$
+			prefs.remove(jdtToken + "_italic"); //$NON-NLS-1$
+			prefs.remove(jdtToken + "_underline"); //$NON-NLS-1$
+			prefs.remove(jdtToken + "_strikethrough"); //$NON-NLS-1$
 		}
 		else
 		{
 			TextAttribute attr = theme.getTextAttribute(ourTokenType);
 			prefs.put(jdtToken, StringConverter.asString(attr.getForeground().getRGB()));
-			prefs.putBoolean(jdtToken + "_bold", (attr.getStyle() & SWT.BOLD) != 0);
-			prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0);
-			prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
-			prefs.putBoolean(jdtToken + "_strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
+			prefs.putBoolean(jdtToken + "_bold", (attr.getStyle() & SWT.BOLD) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + "_italic", (attr.getStyle() & SWT.ITALIC) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + "_underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + "_strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0); //$NON-NLS-1$
 		}
 	}
 
-	@SuppressWarnings("nls")
 	protected void setSemanticToken(IEclipsePreferences prefs, Theme theme, String ourTokenType, String jdtToken,
 			boolean revertToDefaults)
 	{
-		String prefix = "semanticHighlighting.";
+		String prefix = "semanticHighlighting."; //$NON-NLS-1$
 		jdtToken = prefix + jdtToken;
 		if (revertToDefaults)
 		{
-			prefs.remove(jdtToken + ".color");
-			prefs.remove(jdtToken + ".bold");
-			prefs.remove(jdtToken + ".italic");
-			prefs.remove(jdtToken + ".underline");
-			prefs.remove(jdtToken + ".strikethrough");
-			prefs.remove(jdtToken + ".enabled");
+			prefs.remove(jdtToken + ".color"); //$NON-NLS-1$
+			prefs.remove(jdtToken + ".bold"); //$NON-NLS-1$
+			prefs.remove(jdtToken + ".italic"); //$NON-NLS-1$
+			prefs.remove(jdtToken + ".underline"); //$NON-NLS-1$
+			prefs.remove(jdtToken + ".strikethrough"); //$NON-NLS-1$
+			prefs.remove(jdtToken + ".enabled"); //$NON-NLS-1$
 		}
 		else
 		{
 			TextAttribute attr = theme.getTextAttribute(ourTokenType);
-			prefs.put(jdtToken + ".color", StringConverter.asString(attr.getForeground().getRGB()));
-			prefs.putBoolean(jdtToken + ".bold", (attr.getStyle() & SWT.BOLD) != 0);
-			prefs.putBoolean(jdtToken + ".italic", (attr.getStyle() & SWT.ITALIC) != 0);
-			prefs.putBoolean(jdtToken + ".underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0);
-			prefs.putBoolean(jdtToken + ".strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0);
-			prefs.putBoolean(jdtToken + ".enabled", true);
+			prefs.put(jdtToken + ".color", StringConverter.asString(attr.getForeground().getRGB())); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + ".bold", (attr.getStyle() & SWT.BOLD) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + ".italic", (attr.getStyle() & SWT.ITALIC) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + ".underline", (attr.getStyle() & TextAttribute.UNDERLINE) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + ".strikethrough", (attr.getStyle() & TextAttribute.STRIKETHROUGH) != 0); //$NON-NLS-1$
+			prefs.putBoolean(jdtToken + ".enabled", true); //$NON-NLS-1$
 		}
 	}
 

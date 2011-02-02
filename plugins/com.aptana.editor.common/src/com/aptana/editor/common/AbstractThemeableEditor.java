@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common;
@@ -46,8 +19,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.TextViewer;
@@ -78,6 +54,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
@@ -85,6 +62,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.aptana.core.resources.AbstractUniformResource;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
+import com.aptana.editor.common.actions.FoldingActionsGroup;
 import com.aptana.editor.common.extensions.FindBarEditorExtension;
 import com.aptana.editor.common.extensions.IThemeableEditor;
 import com.aptana.editor.common.extensions.ThemeableEditorExtension;
@@ -97,6 +75,8 @@ import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.scripting.snippets.ExpandSnippetVerifyKeyListener;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.common.text.reconciler.RubyRegexpFolder;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.formatter.preferences.PreferencesLookupDelegate;
@@ -196,6 +176,8 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	private IPropertyChangeListener fThemeListener;
 
 	private PeerCharacterCloser fPeerCharacterCloser;
+
+	private FoldingActionsGroup foldingActionsGroup;
 
 	/**
 	 * AbstractThemeableEditor
@@ -409,7 +391,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 				{
 					QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager()
 							.getContentType(getDocument(), 0);
-					if (contentType.getPartCount() > 0)
+					if (contentType != null && contentType.getPartCount() > 0)
 					{
 						String mainContentType = contentType.getParts()[0];
 						// We need to make sure that in case the given content type is actually a nested language in
@@ -430,7 +412,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 							AbstractThemeableEditor abstractThemeableEditor = AbstractThemeableEditor.this;
 							IResource file = (IResource) abstractThemeableEditor.getEditorInput().getAdapter(
 									IResource.class);
-							context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+							context
+									.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory
+											.getId());
 							IProject project = (file != null) ? file.getProject() : null;
 							Map preferences = factory.retrievePreferences(new PreferencesLookupDelegate(project));
 							context.setProperty(FormattingContextProperties.CONTEXT_PREFERENCES, preferences);
@@ -707,6 +691,23 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		setAction(ICommonConstants.FORMATTER_ACTION_ID, action);
 		markAsStateDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
 		markAsSelectionDependentAction(ICommonConstants.FORMATTER_ACTION_ID, true);
+
+		// Folding setup
+		foldingActionsGroup = new FoldingActionsGroup(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @seeorg.eclipse.ui.texteditor.AbstractDecoratedTextEditor#rulerContextMenuAboutToShow(org.eclipse.jface.action.
+	 * IMenuManager)
+	 */
+	@Override
+	protected void rulerContextMenuAboutToShow(IMenuManager menu)
+	{
+		super.rulerContextMenuAboutToShow(menu);
+		IMenuManager foldingMenu = new MenuManager(Messages.Folding_GroupName, "folding"); //$NON-NLS-1$
+		menu.appendToGroup(ITextEditorActionConstants.GROUP_RULERS, foldingMenu);
+		getFoldingActionsGroup().fillMenu(foldingMenu);
 	}
 
 	synchronized ICommandElementsProvider getCommandElementsProvider()
@@ -796,6 +797,16 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		return null;
 	}
 
+	/**
+	 * Returns the folding actions group for the editor.
+	 * 
+	 * @return The {@link FoldingActionsGroup} for this editor.
+	 */
+	protected FoldingActionsGroup getFoldingActionsGroup()
+	{
+		return foldingActionsGroup;
+	}
+
 	private boolean isLinkedWithEditor()
 	{
 		return getOutlinePreferenceStore().getBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR);
@@ -858,5 +869,17 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 	{
 		IPreferenceStore store = getPreferenceStore();
 		return store != null && store.getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
+	}
+
+	/**
+	 * Create the implementation of the folding computer. Default is to use regexp defined in bundle/ruble for this
+	 * language. Can be overridden on a per-editor basis.
+	 * 
+	 * @param document
+	 * @return
+	 */
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new RubyRegexpFolder(this, document);
 	}
 }

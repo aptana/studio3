@@ -22,7 +22,7 @@ BEGIN
             VALUE "FileDescription", "Core platform support library\0"
             VALUE "FileVersion", CORE_FILE_VERSION
             VALUE "InternalName", "core\0"
-            VALUE "LegalCopyright", "Copyright (c) 2005-2010 Aptana, Inc.  All Rights Reserved.\0"
+            VALUE "LegalCopyright", "Copyright (c) 2005-2011 Appcelerator, Inc.  All Rights Reserved.\0"
             VALUE "OriginalFilename", CORE_ORG_FILENAME
             VALUE "ProductName", "Aptana Studio\0"
             VALUE "ProductVersion", PRODUCT_VERSION

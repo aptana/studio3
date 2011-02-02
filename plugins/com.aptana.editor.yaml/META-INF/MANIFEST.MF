@@ -10,9 +10,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  com.aptana.editor.common,
- org.yaml.snakeyaml,
  org.eclipse.ui.views,
- com.aptana.parsing
+ com.aptana.parsing,
+ org.jruby;bundle-version="1.6.0",
+ com.aptana.ui;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

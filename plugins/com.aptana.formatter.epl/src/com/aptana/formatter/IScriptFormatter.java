@@ -28,8 +28,8 @@ public interface IScriptFormatter
 	 * 
 	 * @param document
 	 * @param offset
-	 * @param context 
-	 * @param isSelection 
+	 * @param context
+	 * @param isSelection
 	 * @return
 	 */
 	int detectIndentationLevel(IDocument document, int offset, boolean isSelection, IFormattingContext context);
@@ -49,9 +49,10 @@ public interface IScriptFormatter
 	 *            the length of the region to format
 	 * @param indentationLevel
 	 *            the additional indent level
-	 * @param context 
+	 * @param context
 	 */
-	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection, IFormattingContext context) throws FormatterException;
+	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
+			IFormattingContext context) throws FormatterException;
 
 	void setIsSlave(boolean isSlave);
 
@@ -78,11 +79,26 @@ public interface IScriptFormatter
 	int getTabSize();
 
 	/**
+	 * Returns the tab width, as defined in the editor's specific preference page.
+	 * 
+	 * @return The tab width.
+	 */
+	int getEditorSpecificTabWidth();
+
+	/**
+	 * Returns the 'insert spaces for tabs' setting defined in the editor's specific preference page.
+	 * 
+	 * @return The 'insert spaces for tabs' boolean value.
+	 */
+	boolean isEditorInsertSpacesForTabs();
+
+	/**
 	 * Returns the indentation type, as defined in the formatter preferences.
 	 * 
 	 * @return The indentation type - One of {@link com.aptana.formatter.ui.CodeFormatterConstants#TAB},
-	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#SPACE} or
-	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#MIXED}
+	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#SPACE},
+	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#MIXED} or
+	 *         {@link com.aptana.formatter.ui.CodeFormatterConstants#EDITOR}
 	 */
 	String getIndentType();
 }

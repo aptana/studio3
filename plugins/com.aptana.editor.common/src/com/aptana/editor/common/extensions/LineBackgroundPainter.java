@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common.extensions;
@@ -154,6 +127,19 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		if (updateHighlightLine())
 		{
 			// clear last line
+			// Fix the background colors for tokens that didn't have the same as line!
+			if (isOpaque() && !fLastLine.isDeleted() && fViewer instanceof ITextViewerExtension2)
+			{
+				ITextViewerExtension2 ext = (ITextViewerExtension2) fViewer;
+				try
+				{
+					ext.invalidateTextPresentation(fLastLine.getOffset(), fLastLine.getLength());
+				}
+				catch (Exception e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
 			drawHighlightLine(fLastLine);
 			// draw new line
 			drawHighlightLine(fCurrentLine);
@@ -283,16 +269,6 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
-		if (lineHighlight.isFullyOpaque())
-		{
-			if (fViewer instanceof ITextViewerExtension2)
-			{
-				ITextViewerExtension2 ext = (ITextViewerExtension2) fViewer;
-				ext.invalidateTextPresentation(position.getOffset(), position.getLength());
-			}
-			return;
-		}
 		Rectangle rect = getLineRectangle(position);
 		if (rect == null)
 		{
@@ -378,10 +354,14 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			final IRegion lineRegion = document.getLineInformation(line);
 
 			// Handle fully opaque line highlight here. A modified approach from CursorLinePainter.
-			if (shouldDrawCurrentLine(line))
+			if (isOpaque())
 			{
-				drawCurrentLine(event, lineRegion);
-				return;
+				if (isCurrentLine(line))
+				{
+					// draw current line
+					drawCurrentLine(event, lineRegion);
+					return;
+				}
 			}
 
 			// Not drawing an opaque line highlight, so we need to do our normal line coloring here.
@@ -389,17 +369,28 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			String endOfLineScope = getScopeManager().getScopeAtOffset(document, lineRegion.getLength() + offset);
 			String commonPrefix = getScope(document, line, endOfLineScope);
 			TextAttribute at = getCurrentTheme().getTextAttribute(commonPrefix);
-			// If the background is null or matches the theme BG, we should just return early!
-			if (at.getBackground() == null || at.getBackground().equals(getThemeBG()))
+
+			// if we have no color we need to extend to end of line, but this used to be the highlight line, force the
+			// theme bg color
+			if (at.getBackground() == null && isOpaque() && fLastLine.includes(offset))
 			{
-				return;
+				event.lineBackground = getColorManager().getColor(getCurrentTheme().getBackground());
 			}
-			event.lineBackground = at.getBackground();
+			else
+			{
+				event.lineBackground = at.getBackground();
+			}
 		}
 		catch (BadLocationException e)
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	private boolean isOpaque()
+	{
+		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
+		return lineHighlight.isFullyOpaque();
 	}
 
 	private void drawCurrentLine(LineBackgroundEvent event, final IRegion lineRegion)
@@ -471,32 +462,8 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 		return ThemePlugin.getDefault().getColorManager();
 	}
 
-	/**
-	 * Must have no selection, caret must be on the line, be fully opaque
-	 * 
-	 * @param line
-	 * @return
-	 */
-	private boolean shouldDrawCurrentLine(int line)
+	protected boolean isCurrentLine(int line)
 	{
-		// Don't draw if highlight current line is turned off
-		if (!fEnabled)
-		{
-			return false;
-		}
-
-		// If there's a selection we "turn off" line highlight.
-		// Note: disabled this as the line was still being highlighted and opaque backgrounds had a strange behaviour.  
-        //Point selection = fViewer.getTextWidget().getSelectionRange();
-        //if (selection.y != 0)
-        //    return false;
-
-		// If there's transparency, we handle/color that in a different way, in #paintControl.
-		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
-		if (!lineHighlight.isFullyOpaque())
-			return false;
-
-		// Now we make sure that this really is the current line.
 		try
 		{
 			int lineNumber = fViewer.getDocument().getLineOfOffset(getModelCaret());
@@ -572,11 +539,18 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 			return;
 		}
 
-		// Only paint the part of lineRect that is contained in rect!
-		Rectangle intersection = lineRect.intersection(rect);
+		int previousAlpha = e.gc.getAlpha();
+		Color previousBG = e.gc.getBackground();
+		
 		e.gc.setAlpha(lineHighlight.getAlpha());
 		e.gc.setBackground(getColorManager().getColor(lineHighlight.toRGB()));
-		e.gc.fillRectangle(intersection);
+		// Only paint the part of lineRect that is contained in rect!
+		e.gc.fillRectangle(lineRect.intersection(rect));
+		
+		// BUGFIX: need to set alpha and background color back to what they were before or it breaks 
+		// the painting of pair matching!
+		e.gc.setAlpha(previousAlpha);
+		e.gc.setBackground(previousBG);
 	}
 
 	protected Color getThemeBG()

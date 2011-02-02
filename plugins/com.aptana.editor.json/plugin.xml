@@ -53,5 +53,14 @@
          </formatterFactory>
       </engineContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.json.preferences.JSONPreferencePage"
+            id="com.aptana.editor.json.preferences.JSONPreferencePage"
+            name="JSON">
+      </page>
+   </extension>
 
 </plugin>

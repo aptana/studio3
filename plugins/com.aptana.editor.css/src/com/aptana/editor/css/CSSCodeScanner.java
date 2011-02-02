@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.css;
@@ -125,13 +98,15 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
 			"background-color", "background-image", "background-origin", "background-position-x",
 			"background-position-y", "background-position", "background-repeat", "background-size", "background",
-			"border-bottom-color", "border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse",
+			"border-bottom-color", "border-bottom-left-radius", "border-bottom-right-radius", 
+			"border-bottom-style", "border-bottom-width", "border-bottom", "border-collapse",
 			"border-color", "border-image-source", "border-image-slice", "border-image-width", "border-image-outset",
 			"border-image-repeat", "border-image", "border-left-color", "border-left-style", "border-left-width",
 			"border-left", "border-radius", "border-right-color", "border-right-style", "border-right-width",
-			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-style",
-			"border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break", "box-shadow",
-			"caption-side", "clear", "clip", "color", "content", "counter-increment", "counter-reset", "cue-after",
+			"border-right", "border-spacing", "border-style", "border-top-color", "border-top-left-radius", "border-top-right-radius", 
+			"border-top-style", "border-top-width", "border-top", "border-width", "border", "bottom", "box-decoration-break", "box-shadow",
+			"caption-side", "clear", "clip", "column-count", "column-gap", "column-rule", "column-width", "color", 
+			"content", "counter-increment", "counter-reset", "cue-after",
 			"cue-before", "cue", "cursor", "direction", "display", "elevation", "empty-cells", "float", "font-family",
 			"font-size-adjust", "font-size", "font-stretch", "font-style", "font-variant", "font-weight", "font",
 			"height", "left", "letter-spacing", "line-height", "list-style-image", "list-style-position",
