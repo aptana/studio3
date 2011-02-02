@@ -48,6 +48,11 @@
             id="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
             name="%ToggleRegexpMatching.command.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.searchInOpenFiles"
+            name="%SearchInOpenFiles.command.name">
+      </command>
    </extension>
    
    <extension
@@ -147,6 +152,13 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+X">
+      </key>
+      <!-- Search in open files -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.searchInOpenFiles"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+S">
       </key>
    </extension>
    

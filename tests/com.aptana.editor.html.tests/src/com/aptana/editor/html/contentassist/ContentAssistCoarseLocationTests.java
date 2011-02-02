@@ -191,4 +191,21 @@ public class ContentAssistCoarseLocationTests extends LocationTestCase
 	{
 		this.tagTests("</body>", LocationType.IN_CLOSE_TAG);
 	}
+	
+	/**
+	 * testText
+	 */
+	public void testText()
+	{
+		String source = "<div>   </div>";
+		
+		this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, 4),
+			new LocationTypeRange(LocationType.IN_TEXT, 5, 8),
+			new LocationTypeRange(LocationType.IN_CLOSE_TAG, 9, 13),
+			new LocationTypeRange(LocationType.IN_TEXT, 14)
+		);
+	}
 }
