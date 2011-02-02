@@ -858,7 +858,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
 		int replaceLength = 0;
-		if (tagLexeme != null)
+		if (tagLexeme != null && tagLexeme.contains(offset))
 		{
 			replaceLength += tagLexeme.getLength();
 		}
@@ -1305,7 +1305,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
 										String src = document.get(previousPartition.getOffset(),
 												previousPartition.getLength()).trim();
-										if (src.length() > 0 && src.charAt(src.length() - 1) == '>')
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>')
 										{
 											result = LocationType.IN_TEXT;
 										}
@@ -1567,7 +1567,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		if(lexeme != null) {
 			System.out.println("Identifier lexeme: " + lexeme.toString());
 			System.out.println("Identifier offset: " + offset);
-		}
+}
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
 		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);

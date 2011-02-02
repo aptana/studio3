@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.findbar;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -67,5 +69,12 @@ public class FindBarPlugin extends AbstractUIPlugin {
 			}
 		}
 		return getDefault().getImageRegistry().get(string);
+	}
+
+	public static void log(Throwable e)
+	{
+		Status s = new Status(IStatus.ERROR, FindBarPlugin.PLUGIN_ID, IStatus.ERROR,
+				e.getMessage(), e);
+		FindBarPlugin.getDefault().getLog().log(s);
 	}
 }
