@@ -35,7 +35,6 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -1201,13 +1200,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		return (chars != null) ? chars.toCharArray() : null;
 	}
 
-//	/**
-//	 * @see com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistProcessor#getCompletionProposalIdleActivationTokens()
-//	 */
-//	public int[] getCompletionProposalIdleActivationTokens()
-//	{
-//		return new int[] { HTMLTokenType.TAG_START, HTMLTokenType.TAG_END, HTMLTokenType.NAME };
-//	}
+	// /**
+	// * @see
+	// com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistProcessor#getCompletionProposalIdleActivationTokens()
+	// */
+	// public int[] getCompletionProposalIdleActivationTokens()
+	// {
+	// return new int[] { HTMLTokenType.TAG_START, HTMLTokenType.TAG_END, HTMLTokenType.NAME };
+	// }
 
 	/*
 	 * (non-Javadoc)
@@ -1540,19 +1540,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
 	 */
 	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
-	{		
+	{
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<HTMLTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		if(lexeme != null) {
+		if (lexeme != null)
+		{
 			System.out.println("Identifier lexeme: " + lexeme.toString());
 			System.out.println("Identifier offset: " + offset);
-}
+		}
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
 		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
@@ -1562,19 +1564,21 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			case IN_OPEN_TAG:
 				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
-				if(c == ' ' || c == '\t') {	
+				if (c == ' ' || c == '\t')
+				{
 					return true;
 				}
 				else
 				{
 					// If that's not the case, check if we are actually typing the attribute name
 					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-					if(fineLocation == LocationType.IN_ATTRIBUTE_NAME) {
+					if (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
+					{
 						return true;
 					}
 					return false;
 				}
-				
+
 			case IN_CLOSE_TAG:
 			default:
 				return false;

@@ -22,7 +22,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
@@ -630,11 +629,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			CSSPlugin.PLUGIN_ID, //
-			IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				CSSPlugin.PLUGIN_ID, //
+				IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -1102,22 +1101,26 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
 	 */
 	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		if(lexeme != null) {
+		if (lexeme != null)
+		{
 			System.out.println(lexeme.toString());
 		}
-		if(lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON)) {
+		if (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON))
+		{
 			return true;
 		}
-		else {
+		else
+		{
 			return false;
 		}
 	}
