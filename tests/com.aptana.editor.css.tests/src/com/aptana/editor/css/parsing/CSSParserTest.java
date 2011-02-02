@@ -394,7 +394,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageFunctionDeclaration() throws Exception
 	{
-		parseTest("@page {testing: rgb (10,20,30);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: rgb(10,20,30);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -424,7 +424,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiSlashDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc/123/rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc/123/rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -444,7 +444,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiCommaDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc,123,rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc,123,rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -464,7 +464,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiSpaceDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc 123 rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc 123 rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
