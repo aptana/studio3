@@ -811,13 +811,16 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink"); //$NON-NLS-1$
 			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink"); //$NON-NLS-1$
 
 			prefs.put(JFacePreferences.HYPERLINK_COLOR,
-					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+			JFaceResources.getColorRegistry().put(JFacePreferences.HYPERLINK_COLOR,
+					editorHyperlink.getForeground().getRGB());
 			prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
-					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+			JFaceResources.getColorRegistry().put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
+					editorHyperlink.getForeground().getRGB());
 			prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
 			prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR,
 					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
