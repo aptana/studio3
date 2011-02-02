@@ -316,6 +316,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			{
 				return;
 			}
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			if(!preferenceStore.getBoolean(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR))
+			{
+				return;
+			}
+
 			combo.setForeground(null);
 			boolean wrap = true;
 			String text = combo.getText();
