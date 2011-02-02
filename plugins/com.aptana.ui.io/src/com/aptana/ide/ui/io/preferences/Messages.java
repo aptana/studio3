@@ -17,6 +17,8 @@ public final class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.preferences.messages";//$NON-NLS-1$
 
+	public static String CloakingPreferencePage_LBL_Description;
+
 	public static String FTPPreferencePage_LBL_ReopenRemote;
 
 	public static String PermissionsGroup_All;
