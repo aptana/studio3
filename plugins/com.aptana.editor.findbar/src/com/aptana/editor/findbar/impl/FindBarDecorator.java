@@ -74,7 +74,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private static final String NEXT = "icons/next.png"; //$NON-NLS-1$
 	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
 	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
-	private static final String SERCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
+	private static final String SEARCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE = "icons/casesensitive.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE_DISABLED = "icons/casesensitive_disabled.png"; //$NON-NLS-1$
 	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
@@ -197,7 +197,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		Label streach = new Label(findBar, SWT.NONE);
 		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		
-		searchInOpenFiles = createButton(SERCH_OPEN_FILES, true);
+		searchInOpenFiles = createButton(SEARCH_OPEN_FILES, true);
 		searchInOpenFiles.setToolTipText(Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles);
 
 		showFindReplaceDialog = createButton(FINDREPLACE, true);
