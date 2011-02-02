@@ -28,6 +28,8 @@ public class Messages extends NLS {
 	public static String FindBarDecorator_MSG_ReadOnly;
 	public static String FindBarDecorator_MSG_Replaced;
 	public static String FindBarDecorator_MSG_ReplaceNeedsFind;
+	public static String FindBarActions_TOOLTIP_FocusReplaceCombo;
+	public static String FindBarActions_TOOLTIP_FocusFindCombo;
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
