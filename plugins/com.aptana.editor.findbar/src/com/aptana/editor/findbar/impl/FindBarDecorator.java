@@ -18,6 +18,7 @@ import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IFindReplaceTarget;
@@ -30,6 +31,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -59,7 +62,7 @@ import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 
 /**
  * Main control of the find bar.
- *
+ * 
  * @author Fabio Zadrozny
  */
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
@@ -285,8 +288,97 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		return !findBarGridData.exclude;
 	}
 
-	
 	private final UpdateFindBarActionOnPropertyChange fFindBarActionOnPropertyChange = new UpdateFindBarActionOnPropertyChange();
+
+	/**
+	 * Do searches when we're modifying the text in the combo -- i.e.: incremental search.
+	 */
+	private final class SearchOnTextChangedModifyListener implements ModifyListener, KeyListener
+	{
+		private String lastText = EMPTY;
+
+		/**
+		 * Used for external clients to ask to start/stop ignoring under certain circumstances through
+		 * startIgnore/endIgnore.
+		 */
+		private int ignore;
+
+		/**
+		 * Used internally to know if we should actually do the search -- because we only want to do searches if we're
+		 * within a key event (i.e. not scrolling with the mouse) and that key is not something that'll act in the combo
+		 * to change the text to a different text (as up/down)
+		 */
+		private boolean searchOnModifyText;
+
+		public void modifyText(ModifyEvent e)
+		{
+			if (ignore > 0 || !searchOnModifyText)
+			{
+				return;
+			}
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			if(!preferenceStore.getBoolean(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR))
+			{
+				return;
+			}
+
+			combo.setForeground(null);
+			boolean wrap = true;
+			String text = combo.getText();
+			if (lastText.startsWith(text))
+			{
+				wrap = false;
+			}
+			lastText = text;
+			adjustEnablement();
+			if (EMPTY.equals(text))
+			{
+				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
+				ISelection selection = selectionProvider.getSelection();
+				if (selection instanceof TextSelection)
+				{
+					ITextSelection textSelection = (ITextSelection) selection;
+					selectionProvider.setSelection(new TextSelection(textSelection.getOffset(), 0));
+				}
+			}
+			else
+			{
+				findBarFinder.find(true, true, wrap);
+			}
+			showCountTotal();
+		}
+
+		public void startIgnore()
+		{
+			this.ignore += 1;
+		}
+
+		public void endIgnore()
+		{
+			Assert.isTrue(ignore > 0);
+			this.ignore -= 1;
+		}
+
+		public void keyPressed(KeyEvent e)
+		{
+			switch(e.keyCode)
+			{
+				case SWT.ARROW_UP:
+				case SWT.ARROW_DOWN:
+				case SWT.PAGE_UP:
+				case SWT.PAGE_DOWN:
+					searchOnModifyText = false;
+					break;
+				default:
+					searchOnModifyText = true;
+			}
+		}
+
+		public void keyReleased(KeyEvent e)
+		{
+			searchOnModifyText = false;
+		}
+	}
 
 	private final class UpdateFindBarActionOnPropertyChange implements IPropertyChangeListener
 	{
@@ -299,7 +391,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 	}
 
-	
 	/**
 	 * Updates the find bar given the preferences (and registers a listener to update it whenever needed).
 	 */
@@ -311,7 +402,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		updateFindBarAction();
 	}
 
-	
 	/**
 	 * Updates the find bar action (sets it as the Aptana find bar or restores the original one).
 	 */
@@ -492,38 +582,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private static final String EMPTY = ""; //$NON-NLS-1$
 
-	private ModifyListener modifyListener = new ModifyListener()
-	{
-		private String lastText = EMPTY;
-
-		public void modifyText(ModifyEvent e)
-		{
-			combo.setForeground(null);
-			boolean wrap = true;
-			String text = combo.getText();
-			if (lastText.startsWith(text))
-			{
-				wrap = false;
-			}
-			lastText = text;
-			adjustEnablement();
-			if (EMPTY.equals(text))
-			{
-				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
-				ISelection selection = selectionProvider.getSelection();
-				if (selection instanceof TextSelection)
-				{
-					ITextSelection textSelection = (ITextSelection) selection;
-					selectionProvider.setSelection(new TextSelection(textSelection.getOffset(), 0));
-				}
-			}
-			else
-			{
-				findBarFinder.find(true, true, wrap);
-			}
-			showCountTotal();
-		}
-	};
+	private SearchOnTextChangedModifyListener modifyListener = new SearchOnTextChangedModifyListener();
 
 	private void adjustEnablement()
 	{
@@ -541,7 +600,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			findBarGridData.exclude = true;
 			composite.layout();
 			findBarFinder.resetIncrementalOffset();
-			combo.removeModifyListener(modifyListener);
+			removeComboSearchOnTextChangeListener();
 			statusLineManager.setMessage(false, EMPTY, null);
 		}
 		textEditor.setFocus();
@@ -552,6 +611,18 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				w.setEnabled(false);
 			}
 		}
+	}
+
+	public void addComboSearchOnTextChangeListener()
+	{
+		combo.addKeyListener(modifyListener);
+		combo.addModifyListener(modifyListener);
+	}
+
+	public void removeComboSearchOnTextChangeListener()
+	{
+		combo.removeKeyListener(modifyListener);
+		combo.removeModifyListener(modifyListener);
 	}
 
 	/* default */void showFindBar()
@@ -593,7 +664,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			{
 				public void run()
 				{
-					combo.addModifyListener(modifyListener);
+					addComboSearchOnTextChangeListener();
 				}
 			});
 		}
@@ -646,7 +717,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			if (removeAddListener)
 			{
-				combo.removeModifyListener(modifyListener);
+				modifyListener.startIgnore();
 			}
 			combo.setItems(items.toArray(new String[0]));
 			combo.select(0);
@@ -655,7 +726,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			if (removeAddListener)
 			{
-				combo.addModifyListener(modifyListener);
+				modifyListener.endIgnore();
 			}
 		}
 	}
@@ -765,4 +836,5 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		return true;
 	}
+
 }
