@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -56,6 +57,12 @@ import com.aptana.editor.findbar.FindBarPlugin;
  */
 public class FindBarActions
 {
+
+	private static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace";
+	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind";
+	public static final String TOGGLE_CASE_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleCaseMatching";
+	public static final String TOGGLE_REGEXP_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleRegexpMatching";
+	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching";
 
 	private boolean fActivated;
 	private IContextActivation findBarContextActivation;
@@ -91,8 +98,11 @@ public class FindBarActions
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.hide", new HideFindBarHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.findPrevious", new FindPreviousHandler()); //$NON-NLS-1$
 		fCommandToHandler.put("org.eclipse.ui.edit.findbar.findNext", new FindNextHandler()); //$NON-NLS-1$
-		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusFind", new FocusFindFindBarHandler()); //$NON-NLS-1$
-		fCommandToHandler.put("org.eclipse.ui.edit.findbar.focusReplace", new FocusReplaceFindBarHandler()); //$NON-NLS-1$
+		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler()); //$NON-NLS-1$
+		fCommandToHandler.put(FOCUS_REPLACE_COMMAND_ID, new FocusReplaceFindBarHandler()); //$NON-NLS-1$
+		fCommandToHandler.put(TOGGLE_CASE_MATCHING_COMMAND_ID, new ToggleCaseFindBarHandler()); //$NON-NLS-1$
+		fCommandToHandler.put(TOGGLE_WORD_MATCHING_COMMAND_ID, new ToggleWordFindBarHandler()); //$NON-NLS-1$
+		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler()); //$NON-NLS-1$
 
 		// Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
 		// even if the editor does not have focus.
@@ -110,6 +120,7 @@ public class FindBarActions
 		private Control control;
 		private boolean listening = false;
 		private Display display;
+		private boolean firstActivation = true;
 
 		public FindBarControlFocusListener(Control control)
 		{
@@ -133,6 +144,13 @@ public class FindBarActions
 			if (listening)
 			{
 				return;
+			}
+			if (firstActivation)
+			{
+				firstActivation = false;
+				//On the first activation we update the commands to bindings because we want its side-effect
+				//which is updating the tooltips to match the command.
+				updateCommandToBinding();
 			}
 			listening = true;
 			display = PlatformUI.getWorkbench().getDisplay();
@@ -303,6 +321,46 @@ public class FindBarActions
 			if (dec != null)
 			{
 				dec.comboReplace.setFocus();
+				dec.comboReplace.setSelection(new Point(0, dec.comboReplace.getText().length()));
+			}
+			return null;
+		}
+	}
+
+	private class ToggleCaseFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.caseSensitive.setSelection(!dec.caseSensitive.getSelection());
+			}
+			return null;
+		}
+	}
+
+	private class ToggleWordFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.wholeWord.setSelection(!dec.wholeWord.getSelection());
+			}
+			return null;
+		}
+	}
+
+	private class ToggleRegexpFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.regularExpression.setSelection(!dec.regularExpression.getSelection());
 			}
 			return null;
 		}
@@ -357,6 +415,50 @@ public class FindBarActions
 	 */
 	public void updateCommandToBinding()
 	{
+		fCommandToBinding = getCommandToBindings();
+		FindBarDecorator dec = findBarDecorator.get();
+		if (dec != null)
+		{
+			//Whenever we get the bindings, update the tooltips accordingly.
+			updateTooltip(TOGGLE_WORD_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_WholeWord, dec.wholeWord);
+			updateTooltip(TOGGLE_CASE_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_CaseSensitive,
+					dec.caseSensitive);
+			updateTooltip(TOGGLE_REGEXP_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_RegularExpression,
+					dec.regularExpression);
+			
+			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
+			if (bindings != null && bindings.size() > 0)
+			{
+				dec.comboReplace.setToolTipText("Focus replace combo: "+bindings.get(0));
+			}
+			
+			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
+			if (bindings != null && bindings.size() > 0)
+			{
+				dec.combo.setToolTipText("Focus find combo: "+bindings.get(0));
+			}
+		}
+
+	}
+
+	private void updateTooltip(String commandId, String tooltip, ToolItem item)
+	{
+		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
+		if (bindings != null && bindings.size() > 0)
+		{
+			item.setToolTipText(tooltip + " (" + bindings.get(0) + ")");
+		}
+		else
+		{
+			item.setToolTipText(tooltip);
+		}
+	}
+
+	/**
+	 * @return a map with the commands -> bindings available.
+	 */
+	public HashMap<String, List<TriggerSequence>> getCommandToBindings()
+	{
 		HashMap<String, List<TriggerSequence>> commandToBinding = new HashMap<String, List<TriggerSequence>>();
 
 		IWorkbenchPartSite site = textEditor.getSite();
@@ -380,7 +482,7 @@ public class FindBarActions
 			}
 
 		}
-		fCommandToBinding = commandToBinding;
+		return commandToBinding;
 	}
 
 	public boolean isActivated()

@@ -473,7 +473,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/* default */Combo combo;
 	/* default */Combo comboReplace;
 	ToolItem caseSensitive;
-	private ToolItem wholeWord;
+	ToolItem wholeWord;
 	ToolItem regularExpression;
 	private Button close;
 	private Button next;

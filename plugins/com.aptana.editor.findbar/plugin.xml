@@ -33,6 +33,21 @@
             id="org.eclipse.ui.edit.findbar.focusReplace"
             name="%FocusReplace.command.name">
       </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleCaseMatching"
+            name="%ToggleCaseMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleWordMatching"
+            name="%ToggleWordMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
+            name="%ToggleRegexpMatching.command.name">
+      </command>
    </extension>
    
    <extension
@@ -111,6 +126,27 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+E">
+      </key>
+      <!-- Toggle case matching -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleCaseMatching"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+C">
+      </key>
+      <!-- Toggle word matching -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleWordMatching"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+W">
+      </key>
+      <!-- Toggle regexp matching -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+X">
       </key>
    </extension>
    
