@@ -660,7 +660,7 @@ public class FilteringProjectView extends GitProjectView
 							public void run()
 							{
 								if (getCommonViewer() != null && getCommonViewer().getTree() != null
-										&& getCommonViewer().getTree().isDisposed())
+										&& !getCommonViewer().getTree().isDisposed())
 								{
 									getCommonViewer().refresh();
 								}
