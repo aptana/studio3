@@ -18,8 +18,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
@@ -63,6 +61,7 @@ public class FindBarActions
 	public static final String TOGGLE_CASE_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleCaseMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_REGEXP_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleRegexpMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching"; //$NON-NLS-1$
+	public static final String SEARCH_IN_OPEN_FILES_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInOpenFiles"; //$NON-NLS-1$
 
 	private boolean fActivated;
 	private IContextActivation findBarContextActivation;
@@ -103,6 +102,7 @@ public class FindBarActions
 		fCommandToHandler.put(TOGGLE_CASE_MATCHING_COMMAND_ID, new ToggleCaseFindBarHandler());
 		fCommandToHandler.put(TOGGLE_WORD_MATCHING_COMMAND_ID, new ToggleWordFindBarHandler());
 		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler());
+		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new SearchInOpenFilesFindBarHandler());
 
 		// Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
 		// even if the editor does not have focus.
@@ -148,8 +148,8 @@ public class FindBarActions
 			if (firstActivation)
 			{
 				firstActivation = false;
-				//On the first activation we update the commands to bindings because we want its side-effect
-				//which is updating the tooltips to match the command.
+				// On the first activation we update the commands to bindings because we want its side-effect
+				// which is updating the tooltips to match the command.
 				updateCommandToBinding();
 			}
 			listening = true;
@@ -244,9 +244,7 @@ public class FindBarActions
 								}
 								catch (Exception e1)
 								{
-									Status s = new Status(IStatus.ERROR, FindBarPlugin.PLUGIN_ID, IStatus.ERROR,
-											e1.getMessage(), e1);
-									FindBarPlugin.getDefault().getLog().log(s);
+									FindBarPlugin.log(e1);
 								}
 
 								return consumed;
@@ -366,6 +364,19 @@ public class FindBarActions
 		}
 	}
 
+	private class SearchInOpenFilesFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.searchInOpenFiles();
+			}
+			return null;
+		}
+	}
+
 	private void setFindBarContextActive(boolean activate)
 	{
 		fActivated = activate;
@@ -419,26 +430,41 @@ public class FindBarActions
 		FindBarDecorator dec = findBarDecorator.get();
 		if (dec != null)
 		{
-			//Whenever we get the bindings, update the tooltips accordingly.
+			// Whenever we get the bindings, update the tooltips accordingly.
+			updateTooltip(SEARCH_IN_OPEN_FILES_COMMAND_ID, Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles,
+					dec.searchInOpenFiles);
 			updateTooltip(TOGGLE_WORD_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_WholeWord, dec.wholeWord);
 			updateTooltip(TOGGLE_CASE_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_CaseSensitive,
 					dec.caseSensitive);
 			updateTooltip(TOGGLE_REGEXP_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_RegularExpression,
 					dec.regularExpression);
-			
+
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (bindings != null && bindings.size() > 0)
 			{
-				dec.comboReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo+bindings.get(0));
+				dec.comboReplace.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusReplaceCombo + bindings.get(0));
 			}
-			
+
 			bindings = fCommandToBinding.get(FOCUS_FIND_COMMAND_ID);
 			if (bindings != null && bindings.size() > 0)
 			{
-				dec.combo.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo+bindings.get(0));
+				dec.combo.setToolTipText(Messages.FindBarActions_TOOLTIP_FocusFindCombo + bindings.get(0));
 			}
 		}
 
+	}
+
+	private void updateTooltip(String commandId, String tooltip, Button button)
+	{
+		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
+		if (bindings != null && bindings.size() > 0)
+		{
+			button.setToolTipText(tooltip + " (" + bindings.get(0) + ")"); //$NON-NLS-1$
+		}
+		else
+		{
+			button.setToolTipText(tooltip);
+		}
 	}
 
 	private void updateTooltip(String commandId, String tooltip, ToolItem item)
@@ -446,7 +472,7 @@ public class FindBarActions
 		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
 		if (bindings != null && bindings.size() > 0)
 		{
-			item.setToolTipText(tooltip + " (" + bindings.get(0) + ")");
+			item.setToolTipText(tooltip + " (" + bindings.get(0) + ")"); //$NON-NLS-1$
 		}
 		else
 		{
