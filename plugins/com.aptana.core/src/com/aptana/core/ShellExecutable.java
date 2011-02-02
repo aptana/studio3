@@ -1,49 +1,27 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 
 package com.aptana.core;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -55,6 +33,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 
 /**
@@ -71,16 +50,22 @@ public final class ShellExecutable {
 	
 	private static final String[] ENV_FILTER = new String[] {
 		"_", //$NON-NLS-1$
-		"TMP" //$NON-NLS-1$
+		"TMP", //$NON-NLS-1$
+		"BASH_ENV", //$NON-NLS-1$
+		"APP_ICON*", //$NON-NLS-1$
+		"JAVA_MAIN_CLASS*", //$NON-NLS-1$
+		"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$
 	};
 	
 	public static final String PATH_SEPARATOR = ":"; //$NON-NLS-1$
 	
 	private static final String SH_EXE = "sh.exe"; //$NON-NLS-1$
 	private static final String BASH = "bash"; //$NON-NLS-1$
+	private static final String RCFILE = "$os$/.aptanarc"; //$NON-NLS-1$
 	
 	private static boolean initilizing = false;
 	private static IPath shellPath = null;
+	private static IPath shellRCPath = null;
 	private static Map<String, String> shellEnvironment;
 	
 	
@@ -123,6 +108,19 @@ public final class ShellExecutable {
 		return null;
 	}
 	
+	public static IPath getShellRCPath() {
+		if (shellRCPath == null) {
+			URL url = FileLocator.find(CorePlugin.getDefault().getBundle(), Path.fromPortableString(RCFILE), null);
+			if (url != null) {
+				File file = ResourceUtil.resourcePathToFile(url);
+				if (file != null && file.exists()) {
+					shellRCPath = Path.fromOSString(file.getAbsolutePath());
+				}
+			}
+		}
+		return shellRCPath;
+	}
+	
 	private static IPath getPreferenceShellPath() {
 		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, null);
 		if (pref != null && !StringUtil.isEmpty(pref)) {
@@ -157,16 +155,24 @@ public final class ShellExecutable {
 	
 	public synchronized static Map<String, String> getEnvironment() {
 		if (shellEnvironment == null) {
-			shellEnvironment = new HashMap<String, String>();			
-			try {
-				shellEnvironment.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", null, null)))); //$NON-NLS-1$
-			} catch (Exception e) {
-				CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
-			}
+			shellEnvironment = getEnvironment(null);			
 		}
 		return shellEnvironment;
 	}
-	
+
+	public synchronized static Map<String, String> getEnvironment(IPath workingDirectory) {
+		if (workingDirectory == null && shellEnvironment != null) {
+			return shellEnvironment;
+		}
+		Map<String, String> env = new HashMap<String, String>();
+		try {
+			env.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", workingDirectory, null)))); //$NON-NLS-1$
+		} catch (Exception e) {
+			CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
+		}
+		return env;
+	}
+
 	private static Map<String, String> buildEnvironment(String envp) {
 		Map<String, String> env = new HashMap<String, String>();
 		StringTokenizer tok = new StringTokenizer(envp, "\r\n"); //$NON-NLS-1$
@@ -178,7 +184,16 @@ public final class ShellExecutable {
 			}
 		}
 		for (String var : ENV_FILTER) {
-			env.remove(var);
+			if (var.charAt(var.length()-1) == '*') {
+				String prefix = var.substring(0, var.length()-1);
+				for (Iterator<Entry<String, String>> i =  env.entrySet().iterator(); i.hasNext(); ) {
+					if (i.next().getKey().startsWith(prefix)) {
+						i.remove();
+					}
+				}
+			} else {
+				env.remove(var);
+			}
 		}
 		return env;
 	}
@@ -199,6 +214,17 @@ public final class ShellExecutable {
 		return shellCommand;
 	}
 	
+	private synchronized static Map<String,String> toShellEnvironment(Map<String,String> environment) {
+		if (initilizing) {
+			return environment;
+		}
+		IPath rcPath = getShellRCPath();
+		if (rcPath != null) {
+			environment.put("BASH_ENV", rcPath.toOSString()); //$NON-NLS-1$
+		}
+		return environment;
+	}
+	
 	public static List<String> toShellCommand(String command, String... arguments) throws CoreException {
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
@@ -213,6 +239,7 @@ public final class ShellExecutable {
 		if (environment != null && !environment.isEmpty()) {
 			processBuilder.environment().putAll(environment);
 		}
+		processBuilder.environment().putAll(toShellEnvironment(processBuilder.environment()));
 		return processBuilder.start();
 	}
 

@@ -17,6 +17,7 @@ public class Messages extends NLS
 	public static String JSONFormatterModifyDialog_braces_;
 	public static String JSONFormatterModifyDialog_indentation_page_tab_name;
 	public static String JSONFormatterModifyDialog_JSON_formater_title;
+	public static String JSONPreferencePage_JSON_Page_Title;
 	static
 	{
 		// initialize resource bundle

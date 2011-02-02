@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.xml;
@@ -50,17 +23,23 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
+import com.aptana.editor.common.text.reconciler.IFoldingComputer;
+import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
 import com.aptana.editor.xml.parsing.IXMLParserConstants;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
 
+@SuppressWarnings("restriction")
 public class XMLEditor extends AbstractThemeableEditor
 {
 
@@ -82,10 +61,18 @@ public class XMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		setPreferenceStore(getChainedPreferenceStore());
+
 		setSourceViewerConfiguration(new XMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new XMLDocumentProvider());
 	}
-	
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { XMLPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
+	}
+
 	@Override
 	public void createPartControl(Composite parent)
 	{
@@ -209,7 +196,7 @@ public class XMLEditor extends AbstractThemeableEditor
 			XMLElementNode en = (XMLElementNode) node;
 			if (!en.isSelfClosing())
 			{
-				IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions );
+				IRegion match = TagUtil.findMatchingTag(document, offset, tagPartitions);
 				if (match != null)
 				{
 					// TODO Compare versus last positions, if they're the same don't wipe out the old ones and add new
@@ -239,5 +226,11 @@ public class XMLEditor extends AbstractThemeableEditor
 		}
 		// no new pair, so don't highlight anything
 		fTagPairOccurrences = null;
+	}
+
+	@Override
+	public IFoldingComputer createFoldingComputer(IDocument document)
+	{
+		return new XMLFoldingComputer(this, document);
 	}
 }

@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.js.contentassist;
@@ -47,18 +20,18 @@ import com.aptana.core.util.URIUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 
 public class JSModelFormatter
 {
 	private static final Map<String, Image> TYPE_IMAGE_MAP;
-
 	// used for mixed types
 	private static final Image PROPERTY = JSPlugin.getImage("/icons/js_property.png"); //$NON-NLS-1$
-
 	private static final String NEW_LINE = "<br>"; //$NON-NLS-1$
 	private static final String DOUBLE_NEW_LINE = NEW_LINE + NEW_LINE;
+	private static final char BULLET = '\u2022';
 
 	/**
 	 * static initializer
@@ -77,13 +50,14 @@ public class JSModelFormatter
 	}
 
 	/**
-	 * addDefiningFiles
+	 * formatDefiningFiles
 	 * 
-	 * @param buffer
 	 * @param property
+	 * @param projectURI
 	 */
-	private static void addDefiningFiles(StringBuilder buffer, PropertyElement property, URI projectURI)
+	private static String formatDefiningFiles(PropertyElement property, URI projectURI)
 	{
+		StringBuilder buffer = new StringBuilder();
 		List<String> documents = property.getDocuments();
 
 		if (documents != null && documents.isEmpty() == false)
@@ -128,16 +102,18 @@ public class JSModelFormatter
 				buffer.append("- ").append(document); //$NON-NLS-1$
 			}
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addDescription
+	 * formatDescription
 	 * 
-	 * @param buffer
 	 * @param property
 	 */
-	private static void addDescription(StringBuilder buffer, PropertyElement property)
+	private static String formatDescription(PropertyElement property)
 	{
+		StringBuilder buffer = new StringBuilder();
 		String description = property.getDescription();
 
 		if (description != null && description.length() > 0)
@@ -145,16 +121,19 @@ public class JSModelFormatter
 			buffer.append(DOUBLE_NEW_LINE);
 			buffer.append(description);
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addExamples
+	 * formatExamples
 	 * 
-	 * @param buffer
 	 * @param examples
 	 */
-	private static void addExamples(StringBuilder buffer, List<String> examples)
+	private static String formatExamples(List<String> examples)
 	{
+		StringBuilder buffer = new StringBuilder();
+
 		if (examples != null && examples.size() > 0)
 		{
 			buffer.append(DOUBLE_NEW_LINE);
@@ -164,16 +143,18 @@ public class JSModelFormatter
 			// emit list
 			buffer.append(StringUtil.join(DOUBLE_NEW_LINE, examples));
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addSpecifications
+	 * formatSpecifications
 	 * 
-	 * @param buffer
 	 * @param property
 	 */
-	private static void addSpecifications(StringBuilder buffer, PropertyElement property)
+	private static String formatSpecifications(PropertyElement property)
 	{
+		StringBuilder buffer = new StringBuilder();
 		List<SinceElement> sinceList = property.getSinceList();
 
 		if (sinceList != null && sinceList.isEmpty() == false)
@@ -196,16 +177,19 @@ public class JSModelFormatter
 				buffer.append(NEW_LINE);
 			}
 		}
+
+		return buffer.toString();
 	}
 
 	/**
-	 * addTypes
+	 * formatTypes
 	 * 
-	 * @param buffer
 	 * @param types
 	 */
-	private static void addTypes(StringBuilder buffer, List<String> types)
+	private static String formatTypes(List<String> types)
 	{
+		StringBuilder buffer = new StringBuilder();
+
 		buffer.append(" : "); //$NON-NLS-1$
 
 		if (types != null && types.size() > 0)
@@ -223,6 +207,66 @@ public class JSModelFormatter
 		{
 			buffer.append(JSTypeConstants.NO_TYPE);
 		}
+
+		return buffer.toString();
+	}
+
+	/**
+	 * getContextInfo
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static String getContextInfo(FunctionElement function)
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		// function name with argument names
+		List<String> paramNameAndType = new ArrayList<String>();
+		buffer.append(function.getName());
+		buffer.append("("); //$NON-NLS-1$
+
+		for (ParameterElement parameter : function.getParameters())
+		{
+			paramNameAndType.add(parameter.getName() + formatTypes(parameter.getTypes()));
+		}
+
+		buffer.append(StringUtil.join(", ", paramNameAndType)); //$NON-NLS-1$
+		buffer.append(")"); //$NON-NLS-1$
+		buffer.append(formatTypes(function.getReturnTypeNames()));
+
+		return buffer.toString();
+	}
+
+	/**
+	 * getContextLines
+	 * 
+	 * @param function
+	 * @return
+	 */
+	public static List<String> getContextLines(FunctionElement function)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (function != null)
+		{
+			StringBuilder buffer = new StringBuilder();
+
+			// line 1: function name with argument names
+			result.add(getContextInfo(function));
+
+			// line 2..n: one line for each argument description
+			for (ParameterElement parameter : function.getParameters())
+			{
+				buffer.setLength(0);
+
+				buffer.append(BULLET).append("\t").append(parameter.getName()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				buffer.append(" \t").append(parameter.getDescription()); //$NON-NLS-1$
+				result.add(buffer.toString());
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -239,11 +283,11 @@ public class JSModelFormatter
 		buffer.append(function.getName());
 		buffer.append("(").append(StringUtil.join(", ", function.getParameterTypes())).append(")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		addTypes(buffer, function.getReturnTypeNames());
-		addDescription(buffer, function);
-		addExamples(buffer, function.getExamples());
-		addDefiningFiles(buffer, function, projectURI);
-		addSpecifications(buffer, function);
+		buffer.append(formatTypes(function.getReturnTypeNames()));
+		buffer.append(formatDescription(function));
+		buffer.append(formatExamples(function.getExamples()));
+		buffer.append(formatDefiningFiles(function, projectURI));
+		buffer.append(formatSpecifications(function));
 
 		return buffer.toString();
 	}
@@ -265,11 +309,11 @@ public class JSModelFormatter
 		StringBuilder buffer = new StringBuilder();
 		buffer.append(property.getName());
 
-		addTypes(buffer, property.getTypeNames());
-		addDescription(buffer, property);
-		addExamples(buffer, property.getExamples());
-		addDefiningFiles(buffer, property, projectURI);
-		addSpecifications(buffer, property);
+		buffer.append(formatTypes(property.getTypeNames()));
+		buffer.append(formatDescription(property));
+		buffer.append(formatExamples(property.getExamples()));
+		buffer.append(formatDefiningFiles(property, projectURI));
+		buffer.append(formatSpecifications(property));
 
 		return buffer.toString();
 	}
@@ -312,15 +356,15 @@ public class JSModelFormatter
 	public static Image getImage(PropertyElement property)
 	{
 		Image result = (property instanceof FunctionElement) ? TYPE_IMAGE_MAP.get(JSTypeConstants.FUNCTION_TYPE) : PROPERTY;
-		
+
 		if (property != null)
 		{
 			List<String> types = property.getTypeNames();
-			
+
 			if (types != null && types.size() == 1)
 			{
 				String type = types.get(0);
-				
+
 				if (TYPE_IMAGE_MAP.containsKey(type))
 				{
 					result = TYPE_IMAGE_MAP.get(type);
@@ -335,10 +379,10 @@ public class JSModelFormatter
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * getDisplayTypeName
 	 * 

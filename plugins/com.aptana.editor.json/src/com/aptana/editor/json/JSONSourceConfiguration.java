@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.json;
@@ -51,24 +24,35 @@ import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.common.text.rules.ThemeingDamagerRepairer;
+import com.aptana.editor.json.parsing.lexer.JSONTokenType;
+import com.aptana.editor.json.text.rules.JSONPropertyRule;
 
 public class JSONSourceConfiguration implements IPartitioningConfiguration, ISourceViewerConfiguration
 {
 	public static final String PREFIX = "__json__"; //$NON-NLS-1$
 	public static final String DEFAULT = "__json" + IDocument.DEFAULT_CONTENT_TYPE; //$NON-NLS-1$
+	public static final String STRING_DOUBLE = PREFIX + "string_double"; //$NON-NLS-1$
+	public static final String STRING_SINGLE = PREFIX + "string_single"; //$NON-NLS-1$
+	public static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
 
-	// TODO: add other content types
-	public static final String[] CONTENT_TYPES = new String[] { DEFAULT };
+	public static final String[] CONTENT_TYPES = new String[] { DEFAULT, STRING_DOUBLE, STRING_SINGLE, PROPERTY };
 	private static final String[][] TOP_CONTENT_TYPES = new String[][] { { IJSONConstants.CONTENT_TYPE_JSON } };
 
-	private IPredicateRule[] partitioningRules = new IPredicateRule[] { };
+	private IPredicateRule[] partitioningRules = new IPredicateRule[] { //
+		new JSONPropertyRule( //
+			new Token(STRING_SINGLE), //
+			new Token(STRING_DOUBLE), //
+			new Token(PROPERTY) //
+		) //
+	};
 	private JSONSourceScanner beaverScanner;
 
 	private static JSONSourceConfiguration instance;
 
-	private JSONSourceConfiguration() {
+	private JSONSourceConfiguration()
+	{
 	}
-	
+
 	/**
 	 * getDefault
 	 * 
@@ -81,6 +65,9 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 			IContentTypeTranslator c = CommonEditorPlugin.getDefault().getContentTypeTranslator();
 
 			c.addTranslation(new QualifiedContentType(IJSONConstants.CONTENT_TYPE_JSON), new QualifiedContentType("source.json")); //$NON-NLS-1$
+			c.addTranslation(new QualifiedContentType(PROPERTY), new QualifiedContentType(JSONTokenType.PROPERTY.getScope()));
+			c.addTranslation(new QualifiedContentType(STRING_DOUBLE), new QualifiedContentType(JSONTokenType.STRING_DOUBLE.getScope()));
+			c.addTranslation(new QualifiedContentType(STRING_SINGLE), new QualifiedContentType(JSONTokenType.STRING_SINGLE.getScope()));
 
 			instance = new JSONSourceConfiguration();
 		}
@@ -179,5 +166,17 @@ public class JSONSourceConfiguration implements IPartitioningConfiguration, ISou
 
 		reconciler.setDamager(dr, DEFAULT);
 		reconciler.setRepairer(dr, DEFAULT);
+		
+		ThemeingDamagerRepairer p = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.PROPERTY.getScope()));
+		reconciler.setDamager(p, PROPERTY);
+		reconciler.setRepairer(p, PROPERTY);
+		
+		ThemeingDamagerRepairer dqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_DOUBLE.getScope()));
+		reconciler.setDamager(dqs, STRING_DOUBLE);
+		reconciler.setRepairer(dqs, STRING_DOUBLE);
+		
+		ThemeingDamagerRepairer sqs = new ThemeingDamagerRepairer(new JSONEscapeSequenceScanner(JSONTokenType.STRING_SINGLE.getScope()));
+		reconciler.setDamager(sqs, STRING_SINGLE);
+		reconciler.setRepairer(sqs, STRING_SINGLE);
 	}
 }

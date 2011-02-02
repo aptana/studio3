@@ -12,7 +12,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.team.ui,
- org.eclipse.ui.externaltools,
  org.eclipse.jface.text,
  org.eclipse.compare,
  org.eclipse.ui.browser,
@@ -22,7 +21,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.git.core,
  com.aptana.theme,
  com.aptana.console,
- com.aptana.ui
+ com.aptana.ui,
+ org.eclipse.ui.externaltools
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

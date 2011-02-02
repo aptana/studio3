@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: com.aptana.editor.html.formatter.tests
+Bundle-Version: 3.0.0.qualifier
+Bundle-Vendor: %providerName
+Fragment-Host: com.aptana.editor.html.formatter;bundle-version="3.0.0"
+Require-Bundle: org.junit,
+ com.aptana.formatter.epl
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Import-Package: com.aptana.formatter,
+ junit.framework
+Export-Package: com.aptana.editor.html.formatter.tests

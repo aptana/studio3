@@ -27166,7 +27166,7 @@ li {
         <value name="child" description="Voice of a child."/>
       </values>
     </property>
-    <property name="voice-ptich" type="String">
+    <property name="voice-pitch" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
       </availability>
@@ -27187,7 +27187,7 @@ li {
         <value name="x-high" description="Sets voice pitch to x-high."/>
       </values>
     </property>
-    <property name="voice-ptich-range" type="String">
+    <property name="voice-pitch-range" type="String">
       <availability>
         <specification name="W3C" version="CSS3"/>
       </availability>

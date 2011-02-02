@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 
@@ -60,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 
 /**
@@ -177,6 +151,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					}
 				} catch (FileNotFoundException e) {
 					return new IExtendedFileInfo[0];
+				} catch (PermissionDeniedException e) {
+					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
+							MessageFormat.format(Messages.BaseConnectionFileManager_PermissionDenied0, path.toPortableString()), e));
 				} finally {
 					setLastOperationTime();
 				}
@@ -427,8 +404,8 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	
 	// all methods here accept absolute path
 	protected abstract void changeCurrentDir(IPath path) throws Exception, IOException, CoreException;
-	protected abstract ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
-	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
+	protected abstract ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
+	protected abstract ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract OutputStream writeFile(IPath path, boolean useTemporary, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
@@ -454,6 +431,9 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			fileInfo = new ExtendedFileInfo(path.segmentCount() > 0 ? path.lastSegment() : Path.ROOT.toPortableString());
 			fileInfo.setExists(false);
 			return fileInfo;
+		} catch (PermissionDeniedException e) {
+			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.BaseConnectionFileManager_PermissionDenied0, basePath.append(path).toPortableString()), e));
 		}
 		if (path.segmentCount() == 0) {
 			fileInfo.setName(Path.ROOT.toPortableString());
@@ -474,6 +454,8 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					fileInfo.setOwner(targetFileInfo.getOwner());
 					fileInfo.setGroup(targetFileInfo.getGroup());
 					fileInfo.setPermissions(targetFileInfo.getPermissions());
+				} else {
+					throw new FileNotFoundException();
 				}
 			} catch (FileNotFoundException e) {
 				try {
@@ -507,7 +489,12 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ExtendedFileInfo targetFileInfo = getCachedFileInfo(targetPath);
 			if (targetFileInfo == null) {
 				Policy.checkCanceled(monitor);
-				targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
+				try {
+					targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
+				} catch (PermissionDeniedException e) {
+					// permission denied is like file not found for the case of symlink resolving
+					throw new FileNotFoundException(targetPath.toPortableString());
+				}
 			}
 			cache(targetPath, targetFileInfo);
 			if (targetFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK)) {

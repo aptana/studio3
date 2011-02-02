@@ -11,9 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  com.aptana.filewatcher,
  com.aptana.core,
- org.jruby,
- com.aptana.plist,
- org.yaml.snakeyaml;bundle-version="1.1.7"
+ org.jruby;bundle-version="1.6.0",
+ com.aptana.plist
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

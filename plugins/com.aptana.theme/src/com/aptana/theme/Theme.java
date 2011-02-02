@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.theme;
@@ -399,36 +372,93 @@ public class Theme
 		return new TextAttribute(fg, bg, attr.getStyle());
 	}
 
+	/**
+	 * The background color to use for the editor and any themed views.
+	 * 
+	 * @return
+	 */
 	public RGB getBackground()
 	{
 		return defaultBG;
 	}
 
+	/**
+	 * Return the RGBa values for the selection color bg.
+	 * 
+	 * @return
+	 */
 	public RGBa getSelection()
 	{
 		return selection;
 	}
 
+	/**
+	 * The foreground color for editor text and any themed views.
+	 * 
+	 * @return
+	 */
 	public RGB getForeground()
 	{
 		return defaultFG;
 	}
 
+	/**
+	 * Color to be used to highlight the current line in the editor.
+	 * 
+	 * @return
+	 */
 	public RGBa getLineHighlight()
 	{
 		return lineHighlight;
 	}
 
+	/**
+	 * Color used for the caret/cursor in the text editor.
+	 * 
+	 * @return
+	 */
 	public RGB getCaret()
 	{
 		return caret;
 	}
 
+	/**
+	 * Color that should be used to highlight character pairs.
+	 * 
+	 * @return
+	 */
+	public RGB getCharacterPairColor()
+	{
+		return alphaBlend(defaultBG, getCaret(), 128);
+	}
+
+	/**
+	 * Color that should be used for occurrence indications (i.e. html/xml tag pairs). Same as
+	 * {@link #getCharacterPairColor()} for now.
+	 * 
+	 * @return
+	 */
+	public RGB getOccurenceHighlightColor()
+	{
+		return getCharacterPairColor();
+	}
+
+	/**
+	 * The unique name for this theme.
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * The Map from scope selectors (as strings) to the FG/BG/Font styles (TextAttributes) that should be applied for
+	 * them. Clients should never need to use this, this is meant for the preference page and testing!
+	 * 
+	 * @return
+	 */
 	public Map<String, TextAttribute> getTokens()
 	{
 		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
@@ -463,6 +493,11 @@ public class Theme
 		save();
 	}
 
+	/**
+	 * A Java Properties file serialization of this theme.
+	 * 
+	 * @return
+	 */
 	public Properties toProps()
 	{
 		Properties props = new Properties();
@@ -802,6 +837,12 @@ public class Theme
 		return bg.getRGB();
 	}
 
+	/**
+	 * Based on the selection color. If the selection color is found to be "dark", we lighten it some, otherwise we
+	 * darken it some.
+	 * 
+	 * @return
+	 */
 	public RGB getSearchResultColor()
 	{
 		if (searchResultBG == null)

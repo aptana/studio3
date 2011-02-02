@@ -1,61 +1,48 @@
 /**
- * This file Copyright (c) 2005-2010 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.editor.common.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
+import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.ui.preferences.AptanaPreferencePage;
 
 /**
  * The form for configuring the general top-level preferences for this plugin
  */
 
+@SuppressWarnings("restriction")
 public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	/**
@@ -64,6 +51,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	private Composite appearanceComposite;
 	private Composite advancedOptions;
 	private BooleanFieldEditor markOccurences;
+	private IntegerFieldEditor tabSize;
+	private Combo tabSpaceCombo;
+	private IPreferenceStore originalPref;
 
 	/**
 	 * EditorsPreferencePage
@@ -78,14 +68,17 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * Creates the field editors. Field editors are abstractions of the common GUI blocks needed to manipulate various
 	 * types of preferences. Each field editor knows how to save and restore itself.
 	 */
-	public void createFieldEditors()
+	protected void createFieldEditors()
 	{
+		originalPref = getPreferenceStore();
+		setPreferenceStore(getChainedEditorPreferenceStore());
 		appearanceComposite = getFieldEditorParent();
 		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
 				Messages.EditorsPreferencePage_Formatting);
 
 		markOccurences = new BooleanFieldEditor(IPreferenceConstants.EDITOR_MARK_OCCURRENCES,
 				Messages.EditorsPreferencePage_MarkOccurrences, group);
+
 		addField(markOccurences);
 
 		// Perhaps need expand/collapse arrows
@@ -101,6 +94,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				PreferencesUtil.createPreferenceDialogOn(Display.getDefault().getActiveShell(), e.text, null, null);
 			}
 		});
+
+		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
+		setPreferenceStore(originalPref);
 	}
 
 	/**
@@ -130,12 +126,131 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			return aOptions;
 	}
 
+	protected void createTextEditingOptions(Composite parent, String groupName)
+	{
+		Composite group = AptanaPreferencePage.createGroup(parent, groupName);
+		group.setLayout(new GridLayout(3, false));
+		group.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		Label label = new Label(group, SWT.NONE);
+		label.setText(Messages.CommonEditorPreferencePage_LBL_TabPolicy);
+		label.setLayoutData(GridDataFactory.swtDefaults().create());
+
+		tabSpaceCombo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseSpacesOption);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseTabOption);
+		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		tabSpaceCombo.setLayoutData(GridDataFactory.fillDefaults().create());
+
+		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		{
+			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		}
+		else
+		{
+			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
+			else
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
+		}
+
+		final Composite fildEditorGroup = new Composite(group, SWT.NONE);
+		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		tabSpaceCombo.addSelectionListener(new SelectionListener()
+		{
+			public void widgetSelected(SelectionEvent e)
+			{
+				Object source = e.getSource();
+				if (source == tabSpaceCombo)
+				{
+					tabSize.setEnabled(!tabSpaceCombo.getText().equals(
+							Messages.CommonEditorPreferencePage_UseDefaultOption), fildEditorGroup);
+				}
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+			}
+		});
+
+		tabSize = new IntegerFieldEditor(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH,
+				Messages.CommonEditorPreferencePage_Tab_Size_Label, fildEditorGroup, 5)
+		{
+			@Override
+			protected void doLoadDefault()
+			{
+				Text text = getTextControl();
+				if (text != null)
+				{
+					int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+					text.setText(Integer.toString(value));
+				}
+				valueChanged();
+				setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
+						fildEditorGroup);
+			}
+
+			@Override
+			protected void doLoad()
+			{
+				Text text = getTextControl();
+				if (text != null)
+				{
+					int value = getChainedEditorPreferenceStore().getInt(getPreferenceName());
+					text.setText(Integer.toString(value));
+					oldValue = Integer.toString(value);
+				}
+			}
+
+			@Override
+			protected void doStore()
+			{
+				// This is called only when Apply or OK are clicked on the dialog, so we are OK to store to the
+				// preferences here.
+				Text text = getTextControl();
+				if (text != null)
+				{
+					Integer i = new Integer(text.getText());
+					int globalEditorValue = new ChainedPreferenceStore(new IPreferenceStore[] {
+							CommonEditorPlugin.getDefault().getPreferenceStore(),
+							EditorsPlugin.getDefault().getPreferenceStore() })
+							.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+
+					if (i.intValue() == globalEditorValue
+							|| tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption))
+					{
+						// Remove preference from plugin preference store if it has the same value as the global editor
+						// value, or if the tab-policy is set to use the global settings.
+						getPluginPreferenceStore().remove(
+								AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+					}
+					else
+					{
+						getPreferenceStore().setValue(getPreferenceName(), i.intValue());
+					}
+				}
+
+			}
+
+		};
+		tabSize.setEmptyStringAllowed(false);
+		tabSize.setValidRange(1, 20);
+		tabSize.setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
+				fildEditorGroup);
+		addField(tabSize);
+	}
+
 	/**
 	 * Create any extra "Mark Occurrence" options if necessary.
 	 * 
 	 * @param parent
 	 */
 	protected abstract void createMarkOccurrenceOptions(Composite parent);
+
+	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
+
+	protected abstract IEclipsePreferences getPluginPreferenceStore();
 
 	/**
 	 * Listens for changes in showing/hiding advanced options
@@ -179,4 +294,51 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 			toggleAdvancedOccurrenceSection(markOccurrences);
 		}
 	}
+
+	public boolean performOk()
+	{
+		IEclipsePreferences store = getPluginPreferenceStore();
+
+		if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseSpacesOption))
+		{
+			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+		}
+		else if (tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseTabOption))
+		{
+			store.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+		}
+		else
+		{
+			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+			store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		}
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+		return super.performOk();
+	}
+
+	@Override
+	protected void performDefaults()
+	{
+		super.performDefaults();
+		IEclipsePreferences store = getPluginPreferenceStore();
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		try
+		{
+			store.flush();
+		}
+		catch (BackingStoreException e)
+		{
+			CommonEditorPlugin.logError(e);
+		}
+	}
+
 }

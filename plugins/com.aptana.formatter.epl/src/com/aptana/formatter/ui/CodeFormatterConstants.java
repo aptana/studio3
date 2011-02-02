@@ -56,6 +56,15 @@ public class CodeFormatterConstants
 	 * @see #FORMATTER_TAB_CHAR
 	 */
 	public static final String MIXED = "mixed"; //$NON-NLS-1$
+	
+	/**
+	 * <pre>
+	 * FORMATTER / Possible value for the option FORMATTER_TAB_CHAR (tab char by editor's setting)
+	 * </pre>
+	 * 
+	 * @see #FORMATTER_TAB_CHAR
+	 */
+	public static final String EDITOR = "editor"; //$NON-NLS-1$
 
 	/**
 	 * <pre>

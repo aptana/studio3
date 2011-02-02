@@ -1,0 +1,46 @@
+==PREFS==
+css.formatter.wrap.comments.length=80
+css.formatter.line.after.element=1
+css.formatter.indent.blocks=same.line 
+css.formatter.formatter.indentation.size=4
+css.formatter.line.preserve=1
+css.formatter.formatter.tabulation.size=4
+css.formatter.line.after.declaration=0
+css.formatter.wrap.comments=false
+css.formatter.formatter.tabulation.char=space
+==CONTENT==
+table th {
+ background-color: silver;
+}
+
+@media print {
+.class1 {
+ display:none;
+}
+
+.class2 {
+   display: none;
+}
+
+h1 {
+    display: block;
+    }
+}
+
+==FORMATTED==
+table th {
+    background-color: silver;
+}
+
+@media print {
+    .class1 {
+        display:none;
+    }
+    .class2 {
+        display: none;
+    }
+    h1 {
+        display: block;
+    }
+}
+
