@@ -118,7 +118,12 @@ public class CloakingUtils {
         return result;
     }
 
-    private static String[] getCloakedFileTypes() {
+    public static String[] getDefaultCloakedFileTypes()
+    {
+    	return PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS.split(";"); //$NON-NLS-1$
+    }
+
+    public static String[] getCloakedFileTypes() {
         String extensions = Platform.getPreferencesService().getString(CoreIOPlugin.PLUGIN_ID,
                 IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS,
                 PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS, null);
@@ -128,7 +133,7 @@ public class CloakingUtils {
         return extensions.split(";"); //$NON-NLS-1$
     }
 
-    private static void setCloakedFileTypes(String[] filetypes) {
+    public static void setCloakedFileTypes(String[] filetypes) {
         String value = StringUtil.join(";", filetypes); //$NON-NLS-1$
         IEclipsePreferences prefs = (new InstanceScope()).getNode(CoreIOPlugin.PLUGIN_ID);
         prefs.put(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS, value);

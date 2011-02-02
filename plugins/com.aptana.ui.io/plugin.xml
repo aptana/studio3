@@ -661,6 +661,12 @@
             id="com.aptana.ui.io.preferences.PermissionPreferencePage"
             name="%PreferencePage.permissions.label">
       </page>
+      <page
+            category="com.aptana.ui.io.preferences.FTPPreferencePage"
+            class="com.aptana.ide.ui.io.preferences.CloakingPreferencePage"
+            id="com.aptana.ui.io.preferences.cloakingPreferencePage"
+            name="%page.cloaking.name">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.linkHelper">
