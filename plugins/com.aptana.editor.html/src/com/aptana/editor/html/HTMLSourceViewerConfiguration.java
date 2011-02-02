@@ -88,9 +88,7 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
-
-		return getContentAssistProcessor(contentType, editor);
+		return getContentAssistProcessor(contentType, this.getEditor());
 	}
 
 	/*

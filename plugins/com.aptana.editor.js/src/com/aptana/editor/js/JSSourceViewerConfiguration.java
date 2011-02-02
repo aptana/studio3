@@ -43,7 +43,7 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || JSSourceConfiguration.DEFAULT.equals(contentType))
 		{
-			result = new JSContentAssistProcessor(getAbstractThemeableEditor());
+			result = new JSContentAssistProcessor(getEditor());
 		}
 
 		return result;

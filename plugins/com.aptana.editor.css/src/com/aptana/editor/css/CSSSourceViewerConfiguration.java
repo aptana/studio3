@@ -45,7 +45,7 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 
 		if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType) || CSSSourceConfiguration.DEFAULT.equals(contentType))
 		{
-			result = new CSSContentAssistProcessor(getAbstractThemeableEditor());
+			result = new CSSContentAssistProcessor(getEditor());
 		}
 
 		return result;

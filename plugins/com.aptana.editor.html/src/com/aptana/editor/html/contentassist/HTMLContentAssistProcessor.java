@@ -857,7 +857,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
 		int replaceLength = 0;
-		if (tagLexeme != null)
+		if (tagLexeme != null && tagLexeme.contains(offset))
 		{
 			replaceLength += tagLexeme.getLength();
 		}
