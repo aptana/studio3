@@ -1257,67 +1257,6 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	}
 
 	/**
-	 * Computes the sorted set of all proposal activation trigger characters.
-	 * 
-	 * @return the sorted set of all proposal activation trigger characters
-	 * @since 3.1
-	 */
-	private String computeCompletionProposalAutoActivationTriggers()
-	{
-		if (fProcessors == null)
-		{
-			return ""; //$NON-NLS-1$
-		}
-
-		StringBuffer buf = new StringBuffer(5);
-		Iterator<Entry<String, IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
-
-		while (iter.hasNext())
-		{
-			Entry<String, IContentAssistProcessor> entry = iter.next();
-			IContentAssistProcessor processor = entry.getValue();
-			char[] triggers = processor.getCompletionProposalAutoActivationCharacters();
-			if (triggers != null)
-			{
-				buf.append(triggers);
-			}
-		}
-
-		return buf.toString();
-	}
-
-	/**
-	 * Computes the sorted set of all context info activation trigger characters.
-	 * 
-	 * @return the sorted set of all context info activation trigger characters
-	 * @since 3.1
-	 */
-	private String computeContextInformationAutoActivationTriggers()
-	{
-		if (fProcessors == null)
-		{
-			return ""; //$NON-NLS-1$
-		}
-
-		StringBuffer buf = new StringBuffer(5);
-		Iterator<Entry<String, IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
-
-		while (iter.hasNext())
-		{
-			Entry<String, IContentAssistProcessor> entry = iter.next();
-			IContentAssistProcessor processor = entry.getValue();
-			char[] triggers = processor.getContextInformationAutoActivationCharacters();
-
-			if (triggers != null)
-			{
-				buf.append(triggers);
-			}
-		}
-
-		return buf.toString();
-	}
-
-	/**
 	 * Computes the sorted set of all auto activation trigger characters.
 	 * 
 	 * @return the sorted set of all auto activation trigger characters
