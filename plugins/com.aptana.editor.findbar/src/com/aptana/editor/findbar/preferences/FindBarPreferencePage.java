@@ -36,6 +36,10 @@ public final class FindBarPreferencePage extends FieldEditorPreferencePage imple
         //Users can choose whether they want to use Aptana's find bar or the default find bar.
 		addField(new BooleanFieldEditor(IPreferencesConstants.USE_CUSTOM_FIND_BAR,
 				Messages.FindBarPreferencesPage_AskUseCustomFindBar, p));
+		
+		//Users can choose whether to do incremental searches or not.
+		addField(new BooleanFieldEditor(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR,
+				Messages.FindBarPreferencesPage_AskIncrementalSearchesOnFindBar, p));
 	}
 
 }
