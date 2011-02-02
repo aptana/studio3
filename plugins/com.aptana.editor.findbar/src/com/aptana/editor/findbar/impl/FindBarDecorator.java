@@ -20,6 +20,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
@@ -73,6 +74,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private static final String NEXT = "icons/next.png"; //$NON-NLS-1$
 	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
 	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
+	private static final String SERCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE = "icons/casesensitive.png"; //$NON-NLS-1$
 	private static final String CASE_SENSITIVE_DISABLED = "icons/casesensitive_disabled.png"; //$NON-NLS-1$
 	private static final String REGEX = "icons/regex.png"; //$NON-NLS-1$
@@ -194,12 +196,15 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		Label streach = new Label(findBar, SWT.NONE);
 		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		
+		searchInOpenFiles = createButton(SERCH_OPEN_FILES, true);
+		searchInOpenFiles.setToolTipText(Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles);
 
 		showFindReplaceDialog = createButton(FINDREPLACE, true);
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog);
-
+		
 		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, next, previous, countTotal,
-				findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, };
+				findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, searchInOpenFiles};
 	}
 
 	/**
@@ -544,6 +549,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				statusLineManager.setMessage(true, e1.getMessage(), null);
 			}
 		}
+		else if (source == searchInOpenFiles)
+		{
+			searchInOpenFiles();
+		}
 		else if (source == showFindReplaceDialog)
 		{
 			showFindReplaceDialog();
@@ -575,6 +584,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Button replaceAll;
 	private Label count;
 	private Button showFindReplaceDialog;
+	Button searchInOpenFiles;
 	private Control[] disableWhenHidden;
 
 	private FindBarActions findBarActions;
@@ -783,6 +793,25 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			count.setText(String.valueOf(total));
 		}
 	}
+	
+	
+	void searchInOpenFiles()
+	{
+		String searchText = combo.getText();
+		if(searchText.length() >= 0){
+			boolean isWholeWord = wholeWord.getSelection();
+			boolean isRegEx = regularExpression.getSelection();
+			boolean isCaseSensitive = caseSensitive.getSelection();
+			if(isWholeWord && !isRegEx && isWord(searchText)){
+				isRegEx = true;
+				searchText = "\\b"+searchText+"\\b";
+			}
+
+			IStatusLineManager statusLineManager = (IStatusLineManager) textEditor.getAdapter(IStatusLineManager.class);
+			FindInOpenDocuments.findInOpenDocuments(searchText, isCaseSensitive, isWholeWord, isRegEx, statusLineManager);
+		}
+
+	}
 
 	private void showFindReplaceDialog()
 	{
@@ -824,7 +853,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 *            the string to check
 	 * @return <code>true</code> if the given string is a word
 	 */
-	private boolean isWord(String str)
+	boolean isWord(String str)
 	{
 		if (str == null || str.length() == 0)
 			return false;
