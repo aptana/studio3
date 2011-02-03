@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.contentassist.IContentAssistSubjectControl;
+import org.eclipse.jface.internal.text.InformationControlReplacer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
@@ -27,6 +28,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.IEditingSupport;
 import org.eclipse.jface.text.IEditingSupportRegistry;
+import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.IRewriteTarget;
 import org.eclipse.jface.text.ITextViewer;
@@ -74,6 +76,7 @@ import com.aptana.ui.epl.UIEplPlugin;
  * 
  * @see org.eclipse.jface.text.contentassist.ICompletionProposal
  */
+@SuppressWarnings("restriction")
 public class CompletionProposalPopup implements IContentAssistListener
 {
 	
@@ -369,6 +372,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 			c= getForegroundColor(control);
 			fProposalTable.setForeground(c);
+			fPopupCloser.install(fContentAssistant, fProposalTable, fAdditionalInfoController);
 			return;
 		}		
 		
@@ -418,7 +422,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		fProposalTable.setLocation(0, 0);
 		if (fAdditionalInfoController != null)
 		{
-			fAdditionalInfoController.setSizeConstraints(40, 20, true, false);
+			fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
 		}
 
 		// Custom code: We set margins to 1 so we get a border
@@ -460,7 +464,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				if (fAdditionalInfoController != null)
 				{
 					// reset the cached resize constraints
-					fAdditionalInfoController.setSizeConstraints(40, 20, true, false);
+					fAdditionalInfoController.setSizeConstraints(40, 10, true, false);
 					fAdditionalInfoController.hideInformationControl();
 					fAdditionalInfoController.handleTableSelectionChanged();
 				}
@@ -526,7 +530,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			}
 		});
 
-		fPopupCloser.install(fContentAssistant, fProposalTable);
+		fPopupCloser.install(fContentAssistant, fProposalTable, fAdditionalInfoController);
 
 		final IPropertyChangeListener propListener = new IPropertyChangeListener()
 		{
@@ -561,7 +565,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 		fProposalTable.setHeaderVisible(false);
 		
-//		addCommandSupport(fProposalTable);
+		// addCommandSupport(fProposalTable);
 	}
 	
 	/**
@@ -841,7 +845,27 @@ public class CompletionProposalPopup implements IContentAssistListener
 	{
 		if (Helper.okToUse(fProposalShell))
 		{
-			return (fProposalShell.isFocusControl() || fProposalTable.isFocusControl());
+			if ((fProposalShell.isFocusControl() || fProposalTable.isFocusControl()))
+				return true;
+			/*
+			 * We have to delegate this query to the additional info controller as well, since the content assistant is
+			 * the widget token owner and its closer does not know that the additional info control can now also take
+			 * focus.
+			 */
+			if (fAdditionalInfoController != null)
+			{
+				IInformationControl informationControl = fAdditionalInfoController.getCurrentInformationControl2();
+				if (informationControl != null && informationControl.isFocusControl())
+					return true;
+				InformationControlReplacer replacer = fAdditionalInfoController.getInternalAccessor()
+						.getInformationControlReplacer();
+				if (replacer != null)
+				{
+					informationControl = replacer.getCurrentInformationControl2();
+					if (informationControl != null && informationControl.isFocusControl())
+						return true;
+				}
+			}
 		}
 
 		return false;
