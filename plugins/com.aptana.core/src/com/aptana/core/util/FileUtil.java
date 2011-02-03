@@ -7,6 +7,10 @@
  */
 package com.aptana.core.util;
 
+import java.io.File;
+
+import org.eclipse.core.runtime.Path;
+
 public class FileUtil
 {
 	/**
@@ -16,6 +20,11 @@ public class FileUtil
 
 	private FileUtil()
 	{
+	}
+
+	public static boolean isDirectoryAccessible(File directory)
+	{
+		return ExecutableUtil.isExecutable(Path.fromOSString(directory.getAbsolutePath()));
 	}
 
 	/**
