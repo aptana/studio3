@@ -201,7 +201,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	private boolean isModifierKey(int keyCode)
 	{
-		// TODO Ignore if it's not in the superset of character pairs!
+		// TODO Add more non alphanumeric keys we should skip!
 		switch (keyCode)
 		{
 			case SWT.SHIFT:
@@ -214,6 +214,10 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			case SWT.CTRL:
 			case SWT.COMMAND:
 			case SWT.ALT:
+			case SWT.ARROW_DOWN:
+			case SWT.ARROW_LEFT:
+			case SWT.ARROW_RIGHT:
+			case SWT.ARROW_UP:
 				return true;
 		}
 		return false;
