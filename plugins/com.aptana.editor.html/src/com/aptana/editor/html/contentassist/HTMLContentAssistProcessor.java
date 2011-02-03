@@ -1173,12 +1173,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		String chars = Platform.getPreferencesService().getString( //
-				HTMLPlugin.PLUGIN_ID, //
-				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+		String chars = Platform.getPreferencesService().getString(
+				HTMLPlugin.PLUGIN_ID,
+				IPreferenceContants.HTML_ACTIVATION_CHARACTERS,
 				"", //$NON-NLS-1$
-				null //
-				);
+				null);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -1190,24 +1189,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getContextInformationAutoActivationCharacters()
 	{
-		String chars = Platform.getPreferencesService().getString( //
-				HTMLPlugin.PLUGIN_ID, //
-				IPreferenceContants.HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS, //
+		String chars = Platform.getPreferencesService().getString(
+				HTMLPlugin.PLUGIN_ID,
+				IPreferenceContants.HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS,
 				"", //$NON-NLS-1$
-				null //
-				);
+				null);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
-
-	// /**
-	// * @see
-	// com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistProcessor#getCompletionProposalIdleActivationTokens()
-	// */
-	// public int[] getCompletionProposalIdleActivationTokens()
-	// {
-	// return new int[] { HTMLTokenType.TAG_START, HTMLTokenType.TAG_END, HTMLTokenType.NAME };
-	// }
 
 	/*
 	 * (non-Javadoc)

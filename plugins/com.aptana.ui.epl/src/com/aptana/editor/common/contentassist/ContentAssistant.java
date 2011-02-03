@@ -446,26 +446,6 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 					{
 						public void run()
 						{
-							// if (fViewer == null || editor == null)
-							// {
-							// return;
-							// }
-							// StyledText styledText = fViewer.getTextWidget();
-							// EditorFileContext context = editor.getFileContext();
-							// IUnifiedEditorContributor baseContrib = editor.getBaseContributor();
-							// if (context == null || baseContrib == null)
-							// {
-							// return;
-							// }
-							// ITypedRegion reg = context.getPartitionAtOffset(styledText.getCaretOffset());
-							// if (reg == null)
-							// {
-							// return;
-							// }
-							// final String contentType = reg.getType();
-							// IUnifiedEditorContributor contributor = baseContrib.findChildContributor(contentType);
-							// if (contributor != null && contributor.isAutoActivateContentAssist())
-							// {
 							Control c = d.getFocusControl();
 							if (c == null)
 							{
