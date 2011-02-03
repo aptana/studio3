@@ -34,6 +34,12 @@ public class HTMLTidyValidator implements IValidator
 	private static final Pattern PATTERN = Pattern
 			.compile("\\s*line\\s+(\\d+)\\s*column\\s+(\\d+)\\s*-\\s*(Warning|Error):\\s*(.+)$"); //$NON-NLS-1$
 
+	@SuppressWarnings("nls")
+	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
+			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
+			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "ruby>", "section>", "source>",
+			"summary>", "time>", "video>", "wbr>" };
+
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
 		String report = parseWithTidy(source);
@@ -106,7 +112,8 @@ public class HTMLTidyValidator implements IValidator
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
 
-			if (message != null && !manager.isIgnored(message, IHTMLParserConstants.LANGUAGE))
+			if (message != null && !manager.isIgnored(message, IHTMLParserConstants.LANGUAGE)
+					&& !containsHTML5Element(message))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
@@ -130,5 +137,17 @@ public class HTMLTidyValidator implements IValidator
 		message = message.replaceFirst("inserting", "should insert"); //$NON-NLS-1$ //$NON-NLS-2$
 		message = message.replaceFirst("trimming", "should trim"); //$NON-NLS-1$ //$NON-NLS-2$
 		return message;
+	}
+
+	private static boolean containsHTML5Element(String message)
+	{
+		for (String element : HTML5_ELEMENTS)
+		{
+			if (message.indexOf(element) > -1)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }
