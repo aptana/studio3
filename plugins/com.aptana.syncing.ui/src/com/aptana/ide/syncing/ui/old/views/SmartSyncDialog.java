@@ -77,7 +77,6 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -86,6 +85,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
+import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
