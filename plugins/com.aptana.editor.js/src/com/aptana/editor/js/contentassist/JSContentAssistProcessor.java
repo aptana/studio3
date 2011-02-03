@@ -919,18 +919,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		if (lexeme != null)
-		{
-			System.out.println(lexeme.toString());
-		}
-		if (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER);
 	}
 
 }

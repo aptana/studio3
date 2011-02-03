@@ -1184,22 +1184,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
-	 */
-	@Override
-	public char[] getContextInformationAutoActivationCharacters()
-	{
-		String chars = Platform.getPreferencesService().getString(
-				HTMLPlugin.PLUGIN_ID,
-				IPreferenceContants.HTML_CONTEXT_INFO_ACTIVATION_CHARACTERS,
-				"", //$NON-NLS-1$
-				null);
-
-		return (chars != null) ? chars.toCharArray() : null;
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationValidator()
 	 */
 	@Override
@@ -1538,16 +1522,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		Lexeme<HTMLTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		if (lexeme != null)
-		{
-			System.out.println("Identifier lexeme: " + lexeme.toString());
-			System.out.println("Identifier offset: " + offset);
-		}
 
 		// first step is to determine if we're inside an open tag, close tag, text, etc.
 		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
-		System.out.println("Identifier Coarse: " + location);
 
 		switch (location)
 		{
@@ -1561,11 +1538,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					// If that's not the case, check if we are actually typing the attribute name
 					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-					if (fineLocation == LocationType.IN_ATTRIBUTE_NAME)
-					{
-						return true;
-					}
-					return false;
+					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
 				}
 
 			case IN_CLOSE_TAG:

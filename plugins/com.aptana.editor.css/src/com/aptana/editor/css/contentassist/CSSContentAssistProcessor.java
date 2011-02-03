@@ -1111,17 +1111,6 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		if (lexeme != null)
-		{
-			System.out.println(lexeme.toString());
-		}
-		if (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON));
 	}
 }
