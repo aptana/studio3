@@ -38,7 +38,6 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
-	private static boolean[] reconcileLock = new boolean[] { false };
 
 	/**
 	 * Store the filename for the document so we can dynamically look up the scope later.
