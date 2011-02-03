@@ -1514,4 +1514,35 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+
+		// first step is to determine if we're inside an open tag, close tag, text, etc.
+		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
+
+		switch (location)
+		{
+			case IN_OPEN_TAG:
+				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
+				if (c == ' ' || c == '\t')
+				{
+					return true;
+				}
+				else
+				{
+					// If that's not the case, check if we are actually typing the attribute name
+					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
+				}
+			default:
+				return false;
+		}
+	}
 }

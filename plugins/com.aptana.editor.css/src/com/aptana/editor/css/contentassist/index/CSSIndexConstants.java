@@ -9,10 +9,10 @@ package com.aptana.editor.css.contentassist.index;
 
 public interface CSSIndexConstants
 {
-	// the content format version of the JS index files
+	// the content format version of the CSS index files
 	// 0.1 - Initial version
 	// 0.11 - Using JSON for element and property content assist model elements
-	public static final double INDEX_VERSION = 0.1;
+	public static final double INDEX_VERSION = 0.11;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
