@@ -1288,15 +1288,13 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		IContentAssistProcessor processor = getProcessor(fContentAssistSubjectControlAdapter, offset);
 		if (processor instanceof ICommonContentAssistProcessor)
 		{
-			boolean valid = ((ICommonContentAssistProcessor) processor).isValidAssistLocation(c, keyCode, document,
+			return ((ICommonContentAssistProcessor) processor).isValidAssistLocation(c, keyCode, document,
 					offset);
-			if (valid)
-			{
-				return true;
-			}
 		}
-
-		return false;
+		else
+		{
+			return false;
+		}
 	}
 
 	/**

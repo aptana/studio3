@@ -1173,11 +1173,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
-		String chars = Platform.getPreferencesService().getString(
-				HTMLPlugin.PLUGIN_ID,
-				IPreferenceContants.HTML_ACTIVATION_CHARACTERS,
+		String chars = Platform.getPreferencesService().getString( //
+				HTMLPlugin.PLUGIN_ID, //
+				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
 				"", //$NON-NLS-1$
-				null);
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
