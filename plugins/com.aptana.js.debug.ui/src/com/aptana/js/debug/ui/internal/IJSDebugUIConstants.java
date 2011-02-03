@@ -34,7 +34,7 @@
  */
 package com.aptana.js.debug.ui.internal;
 
-import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * Debug UI constants
@@ -45,32 +45,32 @@ public interface IJSDebugUIConstants {
 	/**
 	 * PLUGIN_ID
 	 */
-	String PLUGIN_ID = DebugUiPlugin.PLUGIN_ID;
+	String PREFIX = JSDebugUIPlugin.PLUGIN_ID;
 
 	/**
 	 * PREF_INSTALL_DEBUGGER
 	 */
-	String PREF_INSTALL_DEBUGGER = PLUGIN_ID + ".install_debugger"; //$NON-NLS-1$
+	String PREF_INSTALL_DEBUGGER = PREFIX + ".install_debugger"; //$NON-NLS-1$
 
 	/**
 	 * PREF_SKIP_FIREFOX_CHECK
 	 */
-	String PREF_SKIP_FIREFOX_CHECK = PLUGIN_ID + ".skip_firefox_check"; //$NON-NLS-1$
+	String PREF_SKIP_FIREFOX_CHECK = PREFIX + ".skip_firefox_check"; //$NON-NLS-1$
 
 	/**
 	 * PREF_CONFIRM_EXIT_DEBUGGER
 	 */
-	String PREF_CONFIRM_EXIT_DEBUGGER = PLUGIN_ID + ".confirm_exit_debugger"; //$NON-NLS-1$
+	String PREF_CONFIRM_EXIT_DEBUGGER = PREFIX + ".confirm_exit_debugger"; //$NON-NLS-1$
 
 	/**
 	 * PREF_SHOW_CONSTANTS
 	 */
-	String PREF_SHOW_CONSTANTS = PLUGIN_ID + ".show_constants"; //$NON-NLS-1$
+	String PREF_SHOW_CONSTANTS = PREFIX + ".show_constants"; //$NON-NLS-1$
 
 	/**
 	 * PREF_SHOW_DETAILS
 	 */
-	String PREF_SHOW_DETAILS = PLUGIN_ID + ".show_details"; //$NON-NLS-1$
+	String PREF_SHOW_DETAILS = PREFIX + ".show_details"; //$NON-NLS-1$
 
 	/**
 	 * "Show detail" preference values.

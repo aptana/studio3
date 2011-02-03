@@ -39,9 +39,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -66,7 +66,7 @@ public class NewWatchpointAction extends ObjectActionDelegate {
 				refreshCurrentSelection();
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 			return;
 		}
 	}

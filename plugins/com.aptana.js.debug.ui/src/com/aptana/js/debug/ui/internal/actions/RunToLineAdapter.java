@@ -63,6 +63,7 @@ import com.aptana.core.resources.IUniformResource;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.debug.ui.DebugUiPlugin;
 
 /**
@@ -129,7 +130,7 @@ public class RunToLineAdapter implements IRunToLineTarget {
 				}
 			}
 		}
-		throw new CoreException(new Status(IStatus.ERROR, DebugUiPlugin.PLUGIN_ID, IStatus.OK,
+		throw new CoreException(new Status(IStatus.ERROR, JSDebugUIPlugin.PLUGIN_ID, IStatus.OK,
 				errorMessage, null));
 	}
 

@@ -77,8 +77,8 @@ import org.eclipse.swt.widgets.TableColumn;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugOptionsManager;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.dialogs.HttpServerPathDialog;
 
 /**
@@ -367,7 +367,7 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab {
 			fListViewer.setInput(elements);
 			refreshViewer();
 		} catch (CoreException e) {
-			DebugUiPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
 		}
 	}
 
@@ -399,7 +399,7 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab {
 	 */
 	public Image getImage() {
 		if (image == null) {
-			image = DebugUiPlugin.getImageDescriptor("icons/full/obj16/launch-tree.gif").createImage(); //$NON-NLS-1$
+			image = JSDebugUIPlugin.getImageDescriptor("icons/full/obj16/launch-tree.gif").createImage(); //$NON-NLS-1$
 		}
 		return image;
 	}

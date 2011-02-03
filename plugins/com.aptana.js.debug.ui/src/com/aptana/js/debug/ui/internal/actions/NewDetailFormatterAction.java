@@ -45,6 +45,7 @@ import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.dialogs.DetailFormatterDialog;
 
 /**
@@ -68,7 +69,7 @@ public class NewDetailFormatterAction extends ObjectActionDelegate {
 				return;
 			}
 		} catch (DebugException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 			return;
 		}
 		DebugOptionsManager detailFormattersManager = JSDebugPlugin.getDefault().getDebugOptionsManager();

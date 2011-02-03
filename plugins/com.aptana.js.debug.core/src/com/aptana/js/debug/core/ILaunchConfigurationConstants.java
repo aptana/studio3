@@ -41,7 +41,7 @@ public interface ILaunchConfigurationConstants {
 	/**
 	 * ID_JS_APPLICATION
 	 */
-	String ID_JS_APPLICATION = "com.aptana.debug.core.jsLaunchConfigurationType"; //$NON-NLS-1$
+	String ID_JS_APPLICATION = "com.aptana.js.debug.core.webbrowserLaunchConfigurationType"; //$NON-NLS-1$
 
 	/**
 	 * CONFIGURATION_SERVER_TYPE

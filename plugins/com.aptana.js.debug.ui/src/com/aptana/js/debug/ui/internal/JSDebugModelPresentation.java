@@ -67,7 +67,6 @@ import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.util.DebugUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.debug.ui.SourceDisplayUtil;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
@@ -80,6 +79,7 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.ISourceLink;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -123,7 +123,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return null;
 	}
@@ -148,7 +148,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				return DebugUIImages.get(DebugUIImages.IMG_OBJS_INSPECT);
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return super.getImage(element);
 	}
@@ -343,7 +343,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return flags;
 	}
@@ -412,7 +412,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 		try {
 			details = value.getValueString();
 		} catch (DebugException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		listener.detailComputed(value, details);
 	}
@@ -552,7 +552,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			try {
 				details = target.computeValueDetails(value);
 			} catch (DebugException e) {
-				DebugUiPlugin.log(e);
+				JSDebugUIPlugin.log(e);
 			}
 			listener.detailComputed(value, details);
 			return Status.OK_STATUS;

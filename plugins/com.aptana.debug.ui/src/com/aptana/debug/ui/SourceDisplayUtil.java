@@ -44,7 +44,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.internal.ui.sourcelookup.SourceLookupManager;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -67,6 +66,7 @@ import com.aptana.debug.ui.internal.UniformResourceStorageEditorInput;
 /**
  * @author Max Stepanov
  */
+@SuppressWarnings("restriction")
 public final class SourceDisplayUtil {
 	
 	private SourceDisplayUtil() {

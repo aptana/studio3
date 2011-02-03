@@ -71,10 +71,10 @@ import org.eclipse.ui.progress.UIJob;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.PopupSchedulingRule;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
@@ -249,7 +249,7 @@ public class Startup implements IStartup {
 					ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, StringUtil.EMPTY))) {
 				String browserPath = null;
 				if (nature.equals(JSLaunchConfigurationHelper.FIREFOX)) {
-					IPreferenceStore store = DebugUiPlugin.getDefault().getPreferenceStore();
+					IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
 					String pref = store
 							.getString(com.aptana.js.debug.ui.internal.IJSDebugUIConstants.PREF_SKIP_FIREFOX_CHECK);
 					if (pref == null || !pref.equals(MessageDialogWithToggle.ALWAYS)) {
@@ -270,7 +270,7 @@ public class Startup implements IStartup {
 			}
 			return wc.doSave();
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return null;
 	}
@@ -299,7 +299,7 @@ public class Startup implements IStartup {
 								download ? Messages.Startup_Download : Messages.Startup_CheckAgain }, 0,
 						Messages.Startup_DontAskAgain, false);
 				md.setPrefKey(com.aptana.js.debug.ui.internal.IJSDebugUIConstants.PREF_SKIP_FIREFOX_CHECK);
-				md.setPrefStore(DebugUiPlugin.getDefault().getPreferenceStore());
+				md.setPrefStore(JSDebugUIPlugin.getDefault().getPreferenceStore());
 
 				int returnCode = md.open();
 				switch (returnCode) {

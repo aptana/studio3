@@ -159,7 +159,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 	 * showExpressionsView
 	 */
 	protected void showExpressionsView() {
-		IWorkbenchPage page = DebugUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = DebugUiPlugin.getActiveWorkbenchWindow().getActivePage();
 		IViewPart part = page.findView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 		if (part == null) {
 			try {

@@ -46,7 +46,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
-import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -238,7 +238,7 @@ public final class DebugUIImages {
 	 */
 	private static void declareRegistryImage(String key, String path) {
 		ImageDescriptor desc = ImageDescriptor.getMissingImageDescriptor();
-		Bundle bundle = Platform.getBundle(DebugUiPlugin.PLUGIN_ID);
+		Bundle bundle = Platform.getBundle(JSDebugUIPlugin.PLUGIN_ID);
 		URL url = null;
 		if (bundle != null) {
 			url = FileLocator.find(bundle, new Path(path), null);

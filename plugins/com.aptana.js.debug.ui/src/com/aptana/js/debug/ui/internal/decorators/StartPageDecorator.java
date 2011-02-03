@@ -46,7 +46,7 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
-import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.StartPageManager;
 
 /**
@@ -57,7 +57,7 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 	private static final ImageDescriptor START_PAGE;
 
 	static {
-		START_PAGE = DebugUiPlugin.getImageDescriptor("icons/full/ovr16/start_page_ovr.gif"); //$NON-NLS-1$
+		START_PAGE = JSDebugUIPlugin.getImageDescriptor("icons/full/ovr16/start_page_ovr.gif"); //$NON-NLS-1$
 	}
 
 	private ListenerList listeners = new ListenerList();

@@ -67,7 +67,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
-import com.aptana.debug.core.internal.LocalResourceMapper;
+import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;

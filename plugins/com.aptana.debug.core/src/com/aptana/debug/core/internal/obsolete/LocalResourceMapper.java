@@ -32,7 +32,7 @@
  * 
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.debug.core.internal;
+package com.aptana.debug.core.internal.obsolete;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -45,6 +45,7 @@ import java.util.List;
 
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.debug.core.internal.Util;
 
 /**
  * @author Max Stepanov

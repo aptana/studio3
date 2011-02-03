@@ -52,9 +52,9 @@ import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.launchConfigurations.LaunchHistory;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -107,7 +107,7 @@ public final class StartPageManager {
 				launchConfigurationAddedInternal(configs[i]);
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 	}
 
@@ -162,7 +162,7 @@ public final class StartPageManager {
 			try {
 				updateLaunchConfiguration(config, resource);
 			} catch (CoreException e) {
-				DebugUiPlugin.log(e);
+				JSDebugUIPlugin.log(e);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 	}
 
@@ -205,7 +205,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return createConfiguration("Default"); //$NON-NLS-1$
 	}
@@ -218,7 +218,7 @@ public final class StartPageManager {
 			JSLaunchConfigurationHelper.setDefaults(wc, null);
 			config = wc.doSave();
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return config;
 	}
@@ -248,7 +248,7 @@ public final class StartPageManager {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log("Could not access launch configuration", e); //$NON-NLS-1$
+			JSDebugUIPlugin.log("Could not access launch configuration", e); //$NON-NLS-1$
 		}
 	}
 

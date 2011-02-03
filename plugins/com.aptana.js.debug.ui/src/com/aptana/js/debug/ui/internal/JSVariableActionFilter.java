@@ -40,10 +40,10 @@ import java.util.Set;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.ui.IActionFilter;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -85,7 +85,7 @@ public class JSVariableActionFilter implements IActionFilter {
 				}
 			}
 		} catch (DebugException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return false;
 	}

@@ -52,9 +52,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -136,7 +136,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return createConfiguration(current ? null : path);
 	}
@@ -163,7 +163,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 			}
 			config = wc.doSave();
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		return config;
 	}

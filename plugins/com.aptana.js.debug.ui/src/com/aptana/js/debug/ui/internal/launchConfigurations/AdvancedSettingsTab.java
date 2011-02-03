@@ -47,9 +47,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -97,7 +97,7 @@ public class AdvancedSettingsTab extends AbstractLaunchConfigurationTab {
 			advancedRunEnabled.setSelection(configuration.getAttribute(
 					ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false));
 		} catch (CoreException e) {
-			DebugUiPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
 		}
 	}
 
@@ -121,7 +121,7 @@ public class AdvancedSettingsTab extends AbstractLaunchConfigurationTab {
 	 */
 	public Image getImage() {
 		if (image == null) {
-			image = DebugUiPlugin.getImageDescriptor("icons/full/obj16/launch-rundebug.gif").createImage(); //$NON-NLS-1$
+			image = JSDebugUIPlugin.getImageDescriptor("icons/full/obj16/launch-rundebug.gif").createImage(); //$NON-NLS-1$
 		}
 		return image;
 	}

@@ -52,8 +52,8 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.IUpdate;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.IJSDebugConstants;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -87,7 +87,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 						return jBreakpoint;
 					}
 				} catch (CoreException ce) {
-					DebugUiPlugin.log(ce);
+					JSDebugUIPlugin.log(ce);
 					continue;
 				}
 			}

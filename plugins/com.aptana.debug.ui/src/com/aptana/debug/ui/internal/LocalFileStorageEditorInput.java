@@ -45,6 +45,7 @@ import org.eclipse.ui.editors.text.ILocationProvider;
  * @author Max Stepanov
  */
 public class LocalFileStorageEditorInput extends StorageEditorInput implements IPathEditorInput, ILocationProvider {
+
 	/**
 	 * Constructs an editor input for the given storage
 	 * 
@@ -54,7 +55,7 @@ public class LocalFileStorageEditorInput extends StorageEditorInput implements I
 		super(storage);
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#exists()
 	 */
 	public boolean exists() {
@@ -67,7 +68,7 @@ public class LocalFileStorageEditorInput extends StorageEditorInput implements I
 		return false;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IPathEditorInput#getPath()
 	 */
 	public IPath getPath() {
@@ -80,7 +81,7 @@ public class LocalFileStorageEditorInput extends StorageEditorInput implements I
 		return null;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
@@ -91,7 +92,7 @@ public class LocalFileStorageEditorInput extends StorageEditorInput implements I
 		return super.getAdapter(adapter);
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.editors.text.ILocationProvider#getPath(java.lang.Object)
 	 */
 	public IPath getPath(Object element) {

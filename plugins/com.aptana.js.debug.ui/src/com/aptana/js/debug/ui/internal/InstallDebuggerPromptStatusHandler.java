@@ -49,6 +49,7 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
@@ -121,7 +122,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 				WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 			}
 		}
-		IPreferenceStore store = DebugUiPlugin.getDefault().getPreferenceStore();
+		IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
 
 		String pref = store.getString(IJSDebugUIConstants.PREF_INSTALL_DEBUGGER);
 		if (pref != null) {

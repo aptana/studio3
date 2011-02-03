@@ -90,7 +90,7 @@ import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
-import com.aptana.debug.core.internal.LocalResourceMapper;
+import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;

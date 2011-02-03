@@ -58,7 +58,8 @@ import com.aptana.debug.ui.DebugUiPlugin;
  * @author Max Stepanov
  */
 public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGetterAdapter {
-	/**
+
+	/*
 	 * @see com.aptana.debug.core.IActiveResourcePathGetterAdapter#getActiveResource()
 	 */
 	public IResource getActiveResource() {
@@ -81,7 +82,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		return result[0];
 	}
 
-	/**
+	/*
 	 * @see com.aptana.debug.core.IActiveResourcePathGetterAdapter#getActiveResourcePath()
 	 */
 	public IPath getActiveResourcePath() {
@@ -106,7 +107,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		return result[0];
 	}
 
-	/**
+	/*
 	 * @see com.aptana.debug.core.IActiveResourcePathGetterAdapter#getActiveResourceURL()
 	 */
 	public URL getActiveResourceURL() {
@@ -133,7 +134,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		return result[0];
 	}
 
-	/**
+	/*
 	 * findConnectedResource
 	 * 
 	 * @param resource
@@ -151,14 +152,14 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 		return resource;
 	}
 
-	/**
+	/*
 	 * findConnectedPath
 	 * 
 	 * @param path
 	 * @return IPath
 	 */
 	private IPath findConnectedPath(IPath path) {
-		/*
+		/* TODO
 		 * String uri = path.toFile().toURI().toString(); // XXX: workaround for
 		 * file:// issue in Profile if (uri.startsWith("file:/") &&
 		 * uri.charAt(6) != '/') { //$NON-NLS-1$ uri = "file://" +
@@ -178,9 +179,8 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 
-		/**
-		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-		 *      java.lang.Class)
+		/*
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == IActiveResourcePathGetterAdapter.class) {
@@ -189,7 +189,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 			return null;
 		}
 
-		/**
+		/*
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
 		public Class[] getAdapterList() {

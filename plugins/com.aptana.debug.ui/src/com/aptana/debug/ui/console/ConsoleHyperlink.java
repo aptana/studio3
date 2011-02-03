@@ -71,19 +71,19 @@ public class ConsoleHyperlink implements IHyperlink {
 		fLineNumber = lineNumber;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IHyperlink#linkEntered()
 	 */
 	public void linkEntered() {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IHyperlink#linkExited()
 	 */
 	public void linkExited() {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IHyperlink#linkActivated()
 	 */
 	public void linkActivated() {

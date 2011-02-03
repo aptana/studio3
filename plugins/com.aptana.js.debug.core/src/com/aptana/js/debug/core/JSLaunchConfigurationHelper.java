@@ -59,7 +59,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugOptionsManager;
-import com.aptana.debug.core.internal.LocalResourceMapper;
+import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;

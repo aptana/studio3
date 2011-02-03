@@ -58,7 +58,7 @@ public abstract class StorageEditorInput extends PlatformObject implements IStor
 		fStorage = storage;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
@@ -70,49 +70,49 @@ public abstract class StorageEditorInput extends PlatformObject implements IStor
 		return super.getAdapter(adapter);
 	}
 
-	/**
+	/*
 	 * @see IStorageEditorInput#getStorage()
 	 */
 	public IStorage getStorage() {
 		return fStorage;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
 	 */
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#getName()
 	 */
 	public String getName() {
 		return getStorage().getName();
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#getPersistable()
 	 */
 	public IPersistableElement getPersistable() {
 		return null;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
 	 */
 	public String getToolTipText() {
 		return getStorage().getFullPath().toOSString();
 	}
 
-	/**
+	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object object) {
 		return object instanceof StorageEditorInput && getStorage().equals(((StorageEditorInput) object).getStorage());
 	}
 
-	/**
+	/*
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {

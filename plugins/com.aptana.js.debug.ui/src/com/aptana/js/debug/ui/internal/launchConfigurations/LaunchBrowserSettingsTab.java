@@ -76,10 +76,10 @@ import org.eclipse.ui.views.navigator.ResourceComparator;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.debug.ui.internal.ActiveResourcePathGetterAdapter;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * Launch settings tab
@@ -492,7 +492,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 				}
 			}
 		} catch (CoreException e) {
-			DebugUiPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
+			JSDebugUIPlugin.log("Reading launch configuration fails", e); //$NON-NLS-1$
 		} finally {
 			hookListeners(true);
 			updateEnablement();
@@ -620,7 +620,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 	 */
 	public Image getImage() {
 		if (image == null) {
-			image = DebugUiPlugin.getImageDescriptor("icons/full/obj16/launch-main.gif").createImage(); //$NON-NLS-1$
+			image = JSDebugUIPlugin.getImageDescriptor("icons/full/obj16/launch-main.gif").createImage(); //$NON-NLS-1$
 		}
 		return image;
 	}

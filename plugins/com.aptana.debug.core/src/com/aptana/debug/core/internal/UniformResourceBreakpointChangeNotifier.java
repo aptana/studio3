@@ -49,11 +49,13 @@ import com.aptana.core.resources.MarkerUtils;
  * @author Max Stepanov
  */
 public class UniformResourceBreakpointChangeNotifier implements IBreakpointManagerListener {
+
 	/**
 	 * Uniform resource change listener
 	 */
 	private class ResourceChangeListener implements IUniformResourceChangeListener {
-		/**
+
+		/*
 		 * @see com.aptana.ide.core.resources.IUniformResourceChangeListener#resourceChanged(com.aptana.ide.core.resources.IUniformResourceChangeEvent)
 		 */
 		public void resourceChanged(IUniformResourceChangeEvent event) {
@@ -116,7 +118,7 @@ public class UniformResourceBreakpointChangeNotifier implements IBreakpointManag
 
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.debug.core.IBreakpointManagerListener#breakpointManagerEnablementChanged(boolean)
 	 */
 	public void breakpointManagerEnablementChanged(boolean enabled) {

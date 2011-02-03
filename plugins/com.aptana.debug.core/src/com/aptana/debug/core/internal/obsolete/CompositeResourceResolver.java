@@ -33,7 +33,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.debug.core.internal;
+package com.aptana.debug.core.internal.obsolete;
 
 import java.io.File;
 import java.util.ArrayList;

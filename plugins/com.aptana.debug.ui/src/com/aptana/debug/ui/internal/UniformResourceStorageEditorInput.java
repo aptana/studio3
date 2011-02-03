@@ -70,7 +70,7 @@ public class UniformResourceStorageEditorInput extends StorageEditorInput {
 		locationProvider.validate(this);
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
 	@SuppressWarnings("rawtypes")
@@ -81,7 +81,7 @@ public class UniformResourceStorageEditorInput extends StorageEditorInput {
 		return super.getAdapter(adapter);
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#exists()
 	 */
 	public boolean exists() {
@@ -92,7 +92,7 @@ public class UniformResourceStorageEditorInput extends StorageEditorInput {
 		return true;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
 	 */
 	public String getToolTipText() {
@@ -110,7 +110,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 	/** TODO: find a better way for remote->local file mapping */
 	private Map<IStorage, String> map = new Hashtable<IStorage, String>();
 
-	/**
+	/*
 	 * @see org.eclipse.ui.editors.text.ILocationProvider#getPath(java.lang.Object)
 	 */
 	public IPath getPath(Object element) {
@@ -142,7 +142,7 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 		return null;
 	}
 
-	public void validate(UniformResourceStorageEditorInput editorInput) {
+	/* package */ void validate(UniformResourceStorageEditorInput editorInput) {
 		IStorage storage = editorInput.getStorage();
 		IPath path = ((UniformResourceStorage) storage).getFullPath();
 		if (path != null) {

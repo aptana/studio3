@@ -53,9 +53,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.aptana.debug.core.IEditorOpenAdapter#openInEditor(java.lang.Object)
+	 * @see com.aptana.debug.core.IEditorOpenAdapter#openInEditor(java.lang.Object)
 	 */
 	public void openInEditor(Object sourceElement) {
 		final IEditorInput editorInput = SourceDisplayUtil.getEditorInput(sourceElement);
@@ -78,10 +76,7 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 
 		/*
 		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-		 * java.lang.Class)
+		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 		 */
 		public Object getAdapter(Object adaptableObject, Class adapterType) {
 			if (adapterType == IEditorOpenAdapter.class) {
@@ -92,7 +87,6 @@ public class EditorOpenAdapter implements IEditorOpenAdapter {
 
 		/*
 		 * (non-Javadoc)
-		 * 
 		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 		 */
 		public Class[] getAdapterList() {

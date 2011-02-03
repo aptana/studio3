@@ -48,8 +48,8 @@ import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
 
 /**
@@ -108,7 +108,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		IPreferenceStore store = getPreferenceStore();
 		String key = fView.getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
 		store.setValue(key, action.isChecked());
-		DebugUiPlugin.getDefault().savePluginPreferences();
+		JSDebugUIPlugin.getDefault().savePluginPreferences();
 		getStructuredViewer().refresh();
 	}
 
@@ -130,7 +130,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 					return !((IJSVariable) element).isConst();
 				}
 			} catch (DebugException e) {
-				DebugUiPlugin.log(e);
+				JSDebugUIPlugin.log(e);
 			}
 		}
 		return true;
@@ -142,7 +142,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 	 * @return IPreferenceStore
 	 */
 	protected IPreferenceStore getPreferenceStore() {
-		return DebugUiPlugin.getDefault().getPreferenceStore();
+		return JSDebugUIPlugin.getDefault().getPreferenceStore();
 	}
 
 	/**

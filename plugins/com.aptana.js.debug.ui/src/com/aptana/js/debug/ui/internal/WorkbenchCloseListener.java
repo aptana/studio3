@@ -45,8 +45,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.debug.core.DebugOptionsManager;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -65,7 +65,7 @@ public final class WorkbenchCloseListener implements Listener {
 				&& PlatformUI.getWorkbench().getWorkbenchWindows()[0].getShell() == event.widget) {
 			// last workbench window is about to close
 			if (DebugOptionsManager.isDebuggerActive(JSDebugModel.getModelIdentifier())) { //$NON-NLS-1$
-				IPreferenceStore store = DebugUiPlugin.getDefault().getPreferenceStore();
+				IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
 				if (store.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER)) {
 					if (store.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER) == false) {
 						return;
@@ -84,7 +84,7 @@ public final class WorkbenchCloseListener implements Listener {
 				}
 				if (dlg.getToggleState()) {
 					store.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, false);
-					DebugUiPlugin.getDefault().savePluginPreferences();
+					JSDebugUIPlugin.getDefault().savePluginPreferences();
 				}
 			}
 		}

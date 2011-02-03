@@ -65,6 +65,7 @@ import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -95,7 +96,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			createHitCountEditor(mainComposite);
 			createTypeSpecificEditors(mainComposite);
 		} catch (CoreException e) {
-			DebugUiPlugin.log(e);
+			JSDebugUIPlugin.log(e);
 		}
 		setValid(true);
 		return mainComposite;
@@ -346,7 +347,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 				lineNumber.append(lNumber);
 			}
 		} catch (CoreException ce) {
-			DebugUiPlugin.log(ce);
+			JSDebugUIPlugin.log(ce);
 		}
 		if (lineNumber.length() > 0) {
 			createLabel(parent, Messages.JSLineBreakpointPropertyPage_LineNumber);
@@ -468,9 +469,8 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, null);
 		} catch (CoreException e) {
-			DebugUiPlugin
-					.errorDialog(Messages.JSLineBreakpointPropertyPage_ExceptionWhileSavingBreakpointProperties, e);
-			DebugUiPlugin.log(e);
+			DebugUiPlugin.errorDialog(Messages.JSLineBreakpointPropertyPage_ExceptionWhileSavingBreakpointProperties, e);
+			JSDebugUIPlugin.log(e);
 		}
 		return super.performOk();
 	}
@@ -492,14 +492,8 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			try {
 				hitCount = Integer.parseInt(fHitCountText.getText());
 			} catch (NumberFormatException e) {
-				DebugUiPlugin
-						.log(new Status(
-								IStatus.ERROR,
-								DebugUiPlugin.PLUGIN_ID,
-								IStatus.ERROR,
-								MessageFormat
-										.format(Messages.JSLineBreakpointPropertyPage_PageAllowedInputOfInvalidStringForHitCountValue_0,
-												fHitCountText.getText()), e));
+				JSDebugUIPlugin.log(MessageFormat.format(Messages.JSLineBreakpointPropertyPage_PageAllowedInputOfInvalidStringForHitCountValue_0,
+												fHitCountText.getText()), e);
 			}
 		}
 		breakpoint.setHitCount(hitCount);

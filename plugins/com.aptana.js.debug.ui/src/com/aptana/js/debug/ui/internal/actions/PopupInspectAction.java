@@ -50,6 +50,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSInspectExpression;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.js.debug.ui.JSDebugUIPlugin;
 
 /**
  * @author Max Stepanov
@@ -109,7 +110,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 		viewer = (ITextViewer) part.getAdapter(ITextViewer.class);
 		if (viewer == null) {
 			System.err.println("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()");
-			DebugUiPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()");
+			JSDebugUIPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()");
 		}
 		if (viewer == null) {
 			super.displayResult(result);
@@ -120,7 +121,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 
 	private IWorkbenchPart getTargetPart() {
 		// TODO
-		return DebugUiPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+		return DebugUiPlugin.getActiveWorkbenchWindow().getActivePage().getActivePart();
 	}
 
 	/**
