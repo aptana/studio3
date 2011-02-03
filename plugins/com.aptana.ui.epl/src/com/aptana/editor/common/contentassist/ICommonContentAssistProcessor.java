@@ -25,11 +25,11 @@ public interface ICommonContentAssistProcessor
 	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated);
 	
 	/**
-	 * Is the current position a valid identifier?
-	 * @param c
-	 * @param keyCode
-	 * @param document
-	 * @param offset
+	 * Is the current position a valid place to show content assist?
+	 * @param c Character
+	 * @param keyCode Key code
+	 * @param document The current document
+	 * @param offset Offset into the document
 	 * @return
 	 */
 	boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset);

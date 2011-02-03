@@ -1540,8 +1540,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
 					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
 				}
-
-			case IN_CLOSE_TAG:
 			default:
 				return false;
 		}
