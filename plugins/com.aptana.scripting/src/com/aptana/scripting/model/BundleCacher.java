@@ -726,8 +726,8 @@ public class BundleCacher
 				{
 					ScalarNode keyNode = (ScalarNode) tuple.getKeyNode();
 					String key = keyNode.getValue();
-					// "pairs", "scope"
-					if ("pairs".equals(key))
+					// "pairs", "scope", "displayName" are required
+					if ("pairs".equals(key)) //$NON-NLS-1$
 					{
 						SequenceNode pairsValueNode = (SequenceNode) tuple.getValueNode();
 						List<Character> pairs = new ArrayList<Character>();
@@ -740,10 +740,15 @@ public class BundleCacher
 						}
 						be.setPairs(pairs);
 					}
-					else if ("scope".equals(key))
+					else if ("scope".equals(key)) //$NON-NLS-1$
 					{
 						ScalarNode scopeValueNode = (ScalarNode) tuple.getValueNode();
 						be.setScope(scopeValueNode.getValue());
+					}
+					else if ("displayName".equals(key)) //$NON-NLS-1$
+					{
+						ScalarNode displayNameNode = (ScalarNode) tuple.getValueNode();
+						be.setDisplayName(displayNameNode.getValue());
 					}
 				}
 				return be;
