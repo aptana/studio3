@@ -48,7 +48,10 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			super.createPresentation(presentation, region);
+			synchronized (fScanner)
+			{
+				super.createPresentation(presentation, region);				
+			}
 			scope = null;
 			fLastLine = null;
 			fCountForLine = 0;

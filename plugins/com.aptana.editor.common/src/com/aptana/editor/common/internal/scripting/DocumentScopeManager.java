@@ -38,6 +38,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 
 	private static final QualifiedContentType UNKNOWN = new QualifiedContentType(ICommonConstants.CONTENT_TYPE_UKNOWN);
 	private WeakHashMap<IDocument, ExtendedDocumentInfo> infos = new WeakHashMap<IDocument, ExtendedDocumentInfo>();
+	private static boolean[] reconcileLock = new boolean[] { false };
 
 	/**
 	 * Store the filename for the document so we can dynamically look up the scope later.
@@ -138,7 +139,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		return partitionFragment;
 	}
-
+	
 	private String getTokenScopeFragments(ITextViewer viewer, IDocument document, int offset)
 	{
 		if (!(viewer instanceof ISourceViewer))
@@ -170,34 +171,37 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			{
 				return null;
 			}
-			scanner.setRange(document, region.getOffset(), region.getLength());
-			while (true)
+			synchronized (scanner)
 			{
-				IToken token = scanner.nextToken();
-				if (token == null || token.isEOF())
+				scanner.setRange(document, region.getOffset(), region.getLength());
+				while (true)
 				{
-					// we unexpectedly hit EOF, stop looping
-					break;
-				}
-				int tokenOffset = scanner.getTokenOffset();
-				if (tokenOffset > offset) // we passed the offset, quit looping
-				{
-					break;
-				}
-				if (offset >= tokenOffset && offset < (tokenOffset + scanner.getTokenLength()))
-				{
-					// token spans the offset, should contain a String containing the token-level scope fragments
-					Object data = token.getData();
-					if (data instanceof String)
+					IToken token = scanner.nextToken();
+					if (token == null || token.isEOF())
 					{
-						return (String) data;
+						// we unexpectedly hit EOF, stop looping
+						break;
+					}
+					int tokenOffset = scanner.getTokenOffset();
+					if (tokenOffset > offset) // we passed the offset, quit looping
+					{
+						break;
+					}
+					if (offset >= tokenOffset && offset < (tokenOffset + scanner.getTokenLength()))
+					{
+						// token spans the offset, should contain a String containing the token-level scope fragments
+						Object data = token.getData();
+						if (data instanceof String)
+						{
+							return (String) data;
+						}
 					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			// ignore
+			CommonEditorPlugin.logError(e);
 		}
 		return null;
 	}
