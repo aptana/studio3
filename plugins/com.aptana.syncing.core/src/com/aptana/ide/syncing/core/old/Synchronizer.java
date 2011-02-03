@@ -31,8 +31,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.core.ILoggable;
-import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -1493,7 +1491,7 @@ public class Synchronizer implements ILoggable
 	}
 
 	/**
-	 * @see com.aptana.ide.core.ILoggable#getLogger()
+	 * @see com.com.aptana.ide.syncing.core.old.ILoggable#getLogger()
 	 */
 	public ILogger getLogger()
 	{
@@ -1501,7 +1499,7 @@ public class Synchronizer implements ILoggable
 	}
 
 	/**
-	 * @see com.aptana.ide.core.ILoggable#setLogger(com.aptana.ide.core.ILogger)
+	 * @see com.com.aptana.ide.syncing.core.old.ILoggable#setLogger(com.com.aptana.ide.syncing.core.old.ILogger)
 	 */
 	public void setLogger(ILogger logger)
 	{
