@@ -184,7 +184,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 				{
 					break;
 				}
-				if (offset >= tokenOffset && offset <= (tokenOffset + scanner.getTokenLength()))
+				if (offset >= tokenOffset && offset < (tokenOffset + scanner.getTokenLength()))
 				{
 					// token spans the offset, should contain a String containing the token-level scope fragments
 					Object data = token.getData();

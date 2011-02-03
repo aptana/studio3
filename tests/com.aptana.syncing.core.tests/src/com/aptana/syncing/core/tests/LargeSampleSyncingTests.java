@@ -22,7 +22,6 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.ILogger;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.ide.core.io.ConnectionContext;
@@ -30,6 +29,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 

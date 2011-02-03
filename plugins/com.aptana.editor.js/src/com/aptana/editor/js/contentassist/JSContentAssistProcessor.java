@@ -126,7 +126,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = JSModelFormatter.getDescription(property, projectURI);
 				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
+						.getDocumentDisplayName(documents.get(0)) : null;
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -162,8 +163,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		String displayName = name;
 		int length = name.length();
@@ -180,7 +181,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		IContextInformation contextInfo = null;
 
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
@@ -304,7 +306,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				case IN_VARIABLE_NAME:
 				{
 					String name = node.getParent().getFirstChild().getText();
-					IContextInformation ci = this.createContextInformation(JSTypeConstants.WINDOW_TYPE, name, functionOffset);
+					IContextInformation ci = this.createContextInformation(JSTypeConstants.WINDOW_TYPE, name,
+							functionOffset);
 
 					if (ci != null)
 					{
@@ -315,7 +318,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 				case IN_PROPERTY_NAME:
 				{
-					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node, ((JSNode) node).getContainingStatementNode());
+					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node,
+							((JSNode) node).getContainingStatementNode());
 					List<String> types = this.getParentObjectTypes(propertyNode, offset);
 
 					if (types.size() > 0)
@@ -394,7 +398,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		IDocument document = viewer.getDocument();
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
@@ -493,11 +498,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			JSPlugin.PLUGIN_ID, //
-			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				JSPlugin.PLUGIN_ID, //
+				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -904,4 +909,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		return (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER);
+	}
+
 }
