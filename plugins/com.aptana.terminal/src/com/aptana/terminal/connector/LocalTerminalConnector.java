@@ -11,6 +11,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,8 +190,13 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 
 	private boolean startProcess(ITerminalControl control) {
 		try {
-			
-			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory = getInitialDirectory());
+			initialDirectory = getInitialDirectory();
+			if (!initialDirectory.toFile().canExecute()) {
+				control.displayTextInTerminal(MessageFormat.format(Messages.LocalTerminalConnector_WorkingDirectoryPermissionErrorMessage, initialDirectory.toOSString()));
+				initialDirectory = null;
+				initialDirectory = getInitialDirectory();
+			}
+			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory);
 			processLauncher.addProcessListener(this);
 			processLauncher.launch();
 			
@@ -235,7 +241,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null && location.toFile().isDirectory()) {
+				if (location != null && location.toFile().isDirectory() && location.toFile().canExecute()) {
 					return location;
 				}
 			}
