@@ -13,6 +13,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -170,7 +171,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			{
 				return null;
 			}
-			synchronized (scanner)
+			synchronized (getLockObject(document))
 			{
 				scanner.setRange(document, region.getOffset(), region.getLength());
 				while (true)
@@ -203,6 +204,19 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			CommonEditorPlugin.logError(e);
 		}
 		return null;
+	}
+	
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) object).getLockObject();
+			if (lock != null)
+			{
+				return lock;
+			}
+		}
+		return object;
 	}
 
 	public String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException
