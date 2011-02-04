@@ -14,6 +14,11 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.ide.ui.io.dialogs.messages"; //$NON-NLS-1$
 
+	public static String CloakExpressionDialog_LBL_Expression;
+	public static String CloakExpressionDialog_LBL_Message;
+	public static String CloakExpressionDialog_LBL_ShellTitle;
+	public static String CloakExpressionDialog_LBL_Title;
+
 	public static String GenericConnectionPropertyDialog_CreateText;
 	public static String GenericConnectionPropertyDialog_CreateTitle;
 	public static String GenericConnectionPropertyDialog_EditText;

@@ -629,11 +629,11 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			CSSPlugin.PLUGIN_ID, //
-			IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				CSSPlugin.PLUGIN_ID, //
+				IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -1100,5 +1100,17 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 				this._replaceRange = this._currentLexeme = null;
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		return (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON));
 	}
 }
