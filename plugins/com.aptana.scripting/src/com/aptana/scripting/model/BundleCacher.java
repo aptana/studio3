@@ -59,6 +59,8 @@ public class BundleCacher
 	private static final String SCOPE_SELECTOR_TAG = "!scope"; //$NON-NLS-1$
 	private static final String ENVIRONMENT_TAG = "!environment"; //$NON-NLS-1$
 	private static final String COMMAND_TAG = "!command"; //$NON-NLS-1$
+	private static final String CONTENT_ASSIST_TAG = "!content_assist"; //$NON-NLS-1$
+	private static final String TEMPLATE_TAG = "!template"; //$NON-NLS-1$
 
 	private LoadCycleListener listener;
 
@@ -395,7 +397,7 @@ public class BundleCacher
 
 	private Yaml createYAML(File bundleDirectory)
 	{
-		return new Yaml(new BundleElementsContructor(bundleDirectory), new MyRepresenter(bundleDirectory));
+		return new Yaml(new BundleElementsConstructor(bundleDirectory), new MyRepresenter(bundleDirectory));
 	}
 
 	private class MyRepresenter extends Representer
@@ -409,6 +411,8 @@ public class BundleCacher
 			this.representers.put(ScopeSelector.class, new RepresentScopeSelector());
 			this.addClassTag(LazyCommandElement.class, new Tag(COMMAND_TAG));
 			this.addClassTag(LazyEnvironmentElement.class, new Tag(ENVIRONMENT_TAG));
+			this.addClassTag(LazyTemplateElement.class, new Tag(TEMPLATE_TAG));
+			this.addClassTag(LazyContentAssistElement.class, new Tag(CONTENT_ASSIST_TAG));
 		}
 
 		@Override
@@ -485,18 +489,20 @@ public class BundleCacher
 		}
 	}
 
-	class BundleElementsContructor extends Constructor
+	class BundleElementsConstructor extends Constructor
 	{
 
 		private File bundleDirectory;
 
-		public BundleElementsContructor(File bundleDirectory)
+		public BundleElementsConstructor(File bundleDirectory)
 		{
 			this.bundleDirectory = bundleDirectory;
 			this.yamlConstructors.put(new Tag(SCOPE_SELECTOR_TAG), new ConstructScopeSelector());
 			this.yamlConstructors.put(new Tag(REGEXP_TAG), new ConstructRubyRegexp());
 			this.yamlConstructors.put(new Tag(COMMAND_TAG), new ConstructCommandElement());
 			this.yamlConstructors.put(new Tag(ENVIRONMENT_TAG), new ConstructEnvironmentElement());
+			this.yamlConstructors.put(new Tag(CONTENT_ASSIST_TAG), new ConstructContentAssistElement());
+			this.yamlConstructors.put(new Tag(TEMPLATE_TAG), new ConstructTemplateElement());
 			this.yamlConstructors.put(new Tag(BundleElement.class), new ConstructBundleElement());
 			this.yamlConstructors.put(new Tag(MenuElement.class), new ConstructMenuElement());
 			this.yamlConstructors.put(new Tag(SnippetElement.class), new ConstructSnippetElement());
@@ -580,6 +586,46 @@ public class BundleCacher
 				}
 				return path;
 			}
+
+			/**
+			 * Fix for https://aptana.lighthouseapp.com/projects/35272/tickets/1658 Sets the prefix triggers for
+			 * CommandElements and subclasses. Fixes an issue where "[def]" isn't treated as an array of strings with
+			 * "def" as an item in it (and would instead think it's a string of "[def]").
+			 */
+			protected void setPrefixTriggers(Node node, CommandElement be)
+			{
+				MappingNode mapNode = (MappingNode) node;
+				List<NodeTuple> tuples = mapNode.getValue();
+				for (NodeTuple tuple : tuples)
+				{
+					ScalarNode keyNode = (ScalarNode) tuple.getKeyNode();
+					String key = keyNode.getValue();
+					if ("customProperties".equals(key)) //$NON-NLS-1$
+					{
+						Node customPropertiesValueNode = tuple.getValueNode();
+						if (customPropertiesValueNode instanceof MappingNode)
+						{
+							MappingNode custompropertiesNode = (MappingNode) customPropertiesValueNode;
+							for (NodeTuple propTuple : custompropertiesNode.getValue())
+							{
+								ScalarNode propKeyNode = (ScalarNode) propTuple.getKeyNode();
+								if ("prefix_values".equals(propKeyNode.getValue())) //$NON-NLS-1$
+								{
+									SequenceNode prefixValuesNode = (SequenceNode) propTuple.getValueNode();
+									List<String> values = new ArrayList<String>();
+									for (Node prefixValue : prefixValuesNode.getValue())
+									{
+										ScalarNode blah = (ScalarNode) prefixValue;
+										values.add(blah.getValue());
+									}
+									be.setTrigger(TriggerType.PREFIX.getName(),
+											values.toArray(new String[values.size()]));
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		private class ConstructBundleElement extends AbstractBundleElementConstruct
@@ -606,6 +652,7 @@ public class BundleCacher
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
+				setPrefixTriggers(node, be);
 				return be;
 			}
 		}
@@ -620,6 +667,7 @@ public class BundleCacher
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
+				setPrefixTriggers(node, be);
 				return be;
 			}
 		}
@@ -691,10 +739,11 @@ public class BundleCacher
 			{
 				node.setType(TemplateElement.class);
 				String path = getPath(node);
-				TemplateElement be = new TemplateElement(path);
+				TemplateElement be = new LazyTemplateElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
+				setPrefixTriggers(node, be);
 				return be;
 			}
 		}
@@ -705,10 +754,11 @@ public class BundleCacher
 			{
 				node.setType(ContentAssistElement.class);
 				String path = getPath(node);
-				ContentAssistElement be = new ContentAssistElement(path);
+				ContentAssistElement be = new LazyContentAssistElement(path);
 				Construct mappingConstruct = yamlClassConstructors.get(NodeId.mapping);
 				mappingConstruct.construct2ndStep(node, be);
 				be.setPath(path);
+				setPrefixTriggers(node, be);
 				return be;
 			}
 		}
@@ -853,10 +903,134 @@ public class BundleCacher
 
 				// Now load up the file so it really loads into the BundleManager
 				BundleManager.getInstance().loadScript(new File(getPath()));
+				// If bundle.rb itself was reloaded we need to update the bundle element we're attached to as owner!
+				if (getPath().equals(owning.getPath()))
+				{
+					owning = BundleManager.getInstance().getBundleFromPath(new File(getPath()).getParent());
+					this.setOwningBundle(owning);
+				}
 
 				// Now for whatever code is holding a reference to this, redirect method calls to the
 				// real command
 				real = owning.getCommandByName(getDisplayName());
+			}
+		}
+	}
+
+	/**
+	 * Lazily loads the real CA element from disk when we try to access the invoke string/block or try to execute it,
+	 * since that stuff doesn't get serialized.
+	 * 
+	 * @author cwilliams
+	 */
+	private class LazyContentAssistElement extends ContentAssistElement
+	{
+		private ContentAssistElement real;
+
+		public LazyContentAssistElement(String path)
+		{
+			super(path);
+		}
+
+		@Override
+		public boolean isExecutable()
+		{
+			// FIXME Should really serialize some value that records what OSes the command has an invoke for so we can
+			// tell better if this is executable on this os!
+			return true;
+		}
+
+		@Override
+		public String getInvoke()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvoke();
+		}
+
+		@Override
+		public RubyProc getInvokeBlock()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvokeBlock();
+		}
+
+		@Override
+		public CommandResult execute(CommandContext context)
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.execute(context);
+		}
+
+		@Override
+		public Ruby getRuntime()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getRuntime();
+		}
+
+		@Override
+		public CommandContext createCommandContext()
+		{
+			lazyLoad();
+			return new CommandContext(real);
+		}
+
+		private synchronized void lazyLoad()
+		{
+			if (real == null)
+			{
+				BundleElement owning = getOwningBundle();
+				if (owning == null) // we haven't even been attached yet!
+				{
+					return;
+				}
+				// remove all elements that are declared in the same file, since they'll end up getting
+				// loaded below.
+				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
+				for (AbstractElement element : elements)
+				{
+					if (element instanceof AbstractBundleElement)
+					{
+						AbstractBundleElement abe = (AbstractBundleElement) element;
+						owning.removeChild(abe);
+					}
+				}
+
+				// Now load up the file so it really loads into the BundleManager
+				BundleManager.getInstance().loadScript(new File(getPath()));
+				// If bundle.rb itself was reloaded we need to update the bundle element we're attached to as owner!
+				if (getPath().equals(owning.getPath()))
+				{
+					owning = BundleManager.getInstance().getBundleFromPath(new File(getPath()).getParent());
+					this.setOwningBundle(owning);
+				}
+
+				// Now for whatever code is holding a reference to this, redirect method calls to the
+				// real command
+				for (ContentAssistElement ca : owning.getContentAssists())
+				{
+					if (ca.getDisplayName().equals(getDisplayName()))
+					{
+						real = ca;
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -880,7 +1054,12 @@ public class BundleCacher
 		public RubyProc getInvokeBlock()
 		{
 			lazyLoad();
-			return real.getInvokeBlock();
+			if (real != null)
+			{
+				return real.getInvokeBlock();
+			}
+			// TODO Log an error!
+			return null;
 		}
 
 		private synchronized void lazyLoad()
@@ -902,15 +1081,127 @@ public class BundleCacher
 
 				// Now load up the file so it really loads into the BundleManager
 				BundleManager.getInstance().loadScript(new File(getPath()));
+				// If bundle.rb itself was reloaded we need to update the bundle element we're attached to as owner!
+				if (getPath().equals(owning.getPath()))
+				{
+					owning = BundleManager.getInstance().getBundleFromPath(new File(getPath()).getParent());
+					this.setOwningBundle(owning);
+				}
 
 				// Now for whatever code is holding a reference to this, redirect method calls to the
 				// real command
 				List<EnvironmentElement> envs = owning.getEnvs();
 				for (EnvironmentElement env : envs)
 				{
-					if (env.getPath().equals(getPath()))
+					// This is pretty messed up. The display name is a random guid, so our best equals check is same
+					// file and same scope
+					if (env.getPath().equals(getPath()) && env.getScope().equals(getScope()))
 					{
 						real = env;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private class LazyTemplateElement extends TemplateElement
+	{
+		private TemplateElement real;
+
+		public LazyTemplateElement(String path)
+		{
+			super(path);
+		}
+
+		@Override
+		public String getInvoke()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvoke();
+		}
+
+		@Override
+		public RubyProc getInvokeBlock()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getInvokeBlock();
+		}
+
+		@Override
+		public CommandResult execute(CommandContext context)
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.execute(context);
+		}
+
+		@Override
+		public Ruby getRuntime()
+		{
+			lazyLoad();
+			if (real == null)
+			{
+				return null;
+			}
+			return real.getRuntime();
+		}
+
+		@Override
+		public CommandContext createCommandContext()
+		{
+			lazyLoad();
+			return new CommandContext(real);
+		}
+
+		private synchronized void lazyLoad()
+		{
+			if (real == null)
+			{
+				BundleElement owning = getOwningBundle();
+				if (owning == null) // we haven't even been attached yet!
+				{
+					return;
+				}
+				// remove all elements that are declared in the same file, since they'll end up getting
+				// loaded below.
+				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
+				for (AbstractElement element : elements)
+				{
+					if (element instanceof AbstractBundleElement)
+					{
+						AbstractBundleElement abe = (AbstractBundleElement) element;
+						owning.removeChild(abe);
+					}
+				}
+
+				// Now load up the file so it really loads into the BundleManager
+				BundleManager.getInstance().loadScript(new File(getPath()));
+				// If bundle.rb itself was reloaded we need to update the bundle element we're attached to as owner!
+				if (getPath().equals(owning.getPath()))
+				{
+					owning = BundleManager.getInstance().getBundleFromPath(new File(getPath()).getParent());
+					this.setOwningBundle(owning);
+				}
+
+				// Now for whatever code is holding a reference to this, redirect method calls to the
+				// real template
+				for (TemplateElement template : owning.getFileTemplates())
+				{
+					if (template.getDisplayName().equals(getDisplayName()))
+					{
+						real = template;
 						break;
 					}
 				}
