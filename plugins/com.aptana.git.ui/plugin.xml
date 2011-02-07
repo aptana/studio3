@@ -1847,4 +1847,10 @@
             icon="icons/elcl16/arrow_right.png">
       </image>
    </extension>
+   <extension
+         point="com.aptana.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.git.ui.hyperlink.HyperlinkDetector">
+      </detector>
+   </extension>
 </plugin>
