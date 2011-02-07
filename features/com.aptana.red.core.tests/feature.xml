@@ -24,7 +24,6 @@
       <import plugin="com.aptana.editor.css" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.html" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.js" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="com.aptana.editor.sass" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.scripting" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.editor.xml" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.aptana.git.core" version="1.0.0" match="greaterOrEqual"/>
@@ -120,14 +119,6 @@
 
    <plugin
          id="com.aptana.editor.js.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.aptana.editor.sass.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -360,7 +351,7 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-         
+
    <plugin
          id="com.aptana.editor.html.formatter.tests"
          download-size="0"
@@ -368,7 +359,7 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-         
+
    <plugin
          id="com.aptana.editor.js.formatter.tests"
          download-size="0"
@@ -376,5 +367,5 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-         
+
 </feature>

@@ -9,6 +9,7 @@ package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
@@ -48,11 +49,27 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			super.createPresentation(presentation, region);
+			synchronized (getLockObject(fDocument))
+			{
+				super.createPresentation(presentation, region);				
+			}
 			scope = null;
 			fLastLine = null;
 			fCountForLine = 0;
 		}
+	}
+
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) object).getLockObject();
+			if (lock != null)
+			{
+				return lock;
+			}
+		}
+		return object;
 	}
 
 	@Override

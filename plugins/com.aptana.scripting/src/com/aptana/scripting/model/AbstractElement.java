@@ -9,6 +9,7 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -364,7 +365,15 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		{
 			for (Map.Entry<String, Object> entry : this._customProperties.entrySet())
 			{
-				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString()); //$NON-NLS-1$
+				Object value = entry.getValue();
+				String valueAsString = value.toString();
+				// If it's an array, turn into a list to make it prettier?
+				if (value.getClass().isArray())
+				{
+					List<Object> list = Arrays.asList((Object[]) value);
+					valueAsString = list.toString();
+				}
+				printer.printWithIndent(entry.getKey()).print(": ").println(valueAsString); //$NON-NLS-1$
 			}
 		}
 

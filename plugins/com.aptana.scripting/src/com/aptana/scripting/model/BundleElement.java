@@ -676,6 +676,16 @@ public class BundleElement extends AbstractElement
 	}
 
 	/**
+	 * getFileTemplates
+	 * 
+	 * @return
+	 */
+	public List<TemplateElement> getFileTemplates()
+	{
+		return this.getChildrenByType(TemplateElement.class);
+	}
+
+	/**
 	 * getGitRepo
 	 * 
 	 * @return
@@ -778,7 +788,7 @@ public class BundleElement extends AbstractElement
 		printer.printWithIndent("description: ").println(this._description); //$NON-NLS-1$
 		printer.printWithIndent("repository: ").println(this._repository); //$NON-NLS-1$
 
-		// output commands
+		// output commands and snippets
 		for (CommandElement command : this.getCommands())
 		{
 			command.toSource(printer);
@@ -788,6 +798,24 @@ public class BundleElement extends AbstractElement
 		for (MenuElement menu : this.getMenus())
 		{
 			menu.toSource(printer);
+		}
+
+		// output smart typing pairs
+		for (SmartTypingPairsElement pairs : this.getPairs())
+		{
+			pairs.toSource(printer);
+		}
+
+		// output environment mods
+		for (EnvironmentElement env : this.getEnvs())
+		{
+			env.toSource(printer);
+		}
+
+		// output environment mods
+		for (ProjectTemplateElement projTemplates : this.getProjectTemplates())
+		{
+			projTemplates.toSource(printer);
 		}
 	}
 

@@ -34,7 +34,6 @@ public class UITests
 		suite.addTest(com.aptana.editor.js.formatter.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.json.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.markdown.tests.AllTests.suite());
-		suite.addTest(com.aptana.editor.sass.tests.AllTests.suite());
 		// suite.addTest(com.aptana.editor.text.tests.AllTests.suite()); // TODO Add Tests for editor.text
 		suite.addTest(com.aptana.editor.xml.tests.AllTests.suite());
 		suite.addTest(com.aptana.editor.xml.formatter.tests.AllTests.suite());

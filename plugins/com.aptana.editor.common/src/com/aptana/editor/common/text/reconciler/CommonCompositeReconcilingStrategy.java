@@ -49,7 +49,7 @@ public class CommonCompositeReconcilingStrategy extends CompositeReconcilingStra
 	{
 		try
 		{
-			super.reconcile(partition);
+			super.reconcile(partition);				
 		}
 		finally
 		{
