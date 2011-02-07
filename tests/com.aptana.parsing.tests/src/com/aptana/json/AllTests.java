@@ -22,6 +22,7 @@ public class AllTests
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		//$JUnit-BEGIN$
 		suite.addTestSuite(JSONSchemaTests.class);
+		suite.addTestSuite(JSONSchemaTransitionTests.class);
 		//$JUnit-END$
 		return suite;
 	}
