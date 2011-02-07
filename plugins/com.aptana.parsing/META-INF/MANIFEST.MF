@@ -7,7 +7,8 @@ Bundle-Activator: com.aptana.parsing.ParsingPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  beaver;visibility:=reexport,
- com.aptana.core
+ com.aptana.core,
+ json.simple
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.parsing,
