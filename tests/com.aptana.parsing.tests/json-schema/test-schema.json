@@ -1,0 +1,69 @@
+{
+	"schema": {
+		"name": "JS Schema",
+		"result": "Array<Type>"
+	},
+	"types": [
+		{
+			"name": "Type",
+			"properties": {
+				"name": "String",
+				"description": "String",
+				"since": "Array<Since>",
+				"userAgents": "Array<UserAgent>",
+				"properties": "Array<Property>",
+				"functions": "Array<Function>"
+			}
+		}, {
+			"name": "Since",
+			"properties": {}
+		}, {
+			"name": "UserAgent",
+			"properties": {}
+		}, {
+			"name": "Property",
+			"properties": {
+				"name": "String",
+				"description": "String",
+				"since": "Array<Since>",
+				"userAgents": "Array<UserAgent>",
+				"owningType": {
+					"type": "String",
+					"optional": true
+				},
+				"isClassProperty": "boolean",
+				"isInstanceProperty": "boolean",
+				"isInternal": "boolean",
+				"types": "Array<PropertyType>",
+				"examples": "Array<Example>"
+			}
+		}, {
+			"name": "PropertyType",
+			"properties": {
+				"type": "String",
+				"description": "String"
+			}
+		}, {
+			"name": "Example",
+			"properties": {}
+		}, {
+			"name": "Function",
+			"properties": {
+				"name": "String",
+				"description": "String",
+				"since": "Array<Since>",
+				"userAgents": "Array<UserAgent>",
+				"owningType": {
+					"type": "String",
+					"optional": true
+				},
+				"isConstructor": "boolean",
+				"isMethod": "boolean",
+				"parameters": "Array<Parameter>",
+				"returnTypes": "Array<ReturnType>",
+				"exceptions": "Array<Exception>",
+				"references": "Array<Reference>"
+			}
+		}
+	]
+}
