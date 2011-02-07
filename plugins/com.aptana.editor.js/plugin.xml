@@ -116,5 +116,12 @@
             name="JavaScript">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            class="com.aptana.editor.common.ExternalFileAnnotationModelFactory"
+            contentTypeId="com.aptana.contenttype.js">
+      </factory>
+   </extension>
 
 </plugin>
