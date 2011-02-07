@@ -7,10 +7,40 @@
  */
 package com.aptana.json;
 
-/**
- * SchemaString
- */
-public class SchemaRegExp extends SchemaValue
-{
+import com.aptana.core.util.StringUtil;
 
+/**
+ * SchemaType
+ */
+public class Type
+{
+	private String _name;
+
+	/**
+	 * Type
+	 */
+	public Type()
+	{
+		this(StringUtil.EMPTY);
+	}
+
+	/**
+	 * Type
+	 * 
+	 * @param name
+	 */
+	public Type(String name)
+	{
+		this._name = name;
+	}
+
+	/**
+	 * getName
+	 * 
+	 * @return
+	 */
+	public String getName()
+	{
+		return this._name;
+	}
 }

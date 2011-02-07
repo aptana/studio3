@@ -10,18 +10,36 @@ package com.aptana.json;
 /**
  * SchemaArray
  */
-public class SchemaArray extends SchemaValue
+public class SchemaArray implements State
 {
-	private SchemaType _elementType;
+	private Type _elementType;
+	private boolean _inArray;
 
 	/**
 	 * SchemaArray
 	 * 
 	 * @param elementType
 	 */
-	public SchemaArray(SchemaType elementType)
+	public SchemaArray(Type elementType)
 	{
 		this._elementType = elementType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#enter()
+	 */
+	public void enter()
+	{
+		this._inArray = false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#exit()
+	 */
+	public void exit()
+	{
 	}
 
 	/**
@@ -29,8 +47,46 @@ public class SchemaArray extends SchemaValue
 	 * 
 	 * @return
 	 */
-	public SchemaType getElementType()
+	public Type getElementType()
 	{
 		return this._elementType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
+	 */
+	public void transition(Context context, EventType event, Object value)
+	{
+		switch (event)
+		{
+			case START_ARRAY:
+				if (this._inArray)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inArray = true;
+
+				// Push element type into current context. Note that processing of that type will automatically remove
+				// itself from the stack
+				context.pushType(this._elementType);
+				break;
+
+			case END_ARRAY:
+				if (this._inArray == false)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inArray = false;
+				
+				// Remove this type from the current context
+				context.popType();
+				break;
+
+			default:
+				throw new IllegalStateException();
+		}
 	}
 }

@@ -8,11 +8,17 @@
 package com.aptana.json;
 
 /**
- * SchemaState
+ * EventType
  */
-public interface SchemaState
+public enum EventType
 {
-	void onEnter();
-	
-	void onExit();
+	START_PARSE,
+	START_OBJECT,
+	START_ARRAY,
+	START_OBJECT_ENTRY,
+	PRIMITIVE,
+	END_OBJECT,
+	END_ARRAY,
+	END_OBJECT_ENTRY,
+	END_PARSE;
 }

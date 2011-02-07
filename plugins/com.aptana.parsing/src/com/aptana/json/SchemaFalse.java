@@ -8,9 +8,9 @@
 package com.aptana.json;
 
 /**
- * SchemaString
+ * SchemaFalse
  */
-public class SchemaString implements State
+public class SchemaFalse implements State
 {
 	/*
 	 * (non-Javadoc)
@@ -30,13 +30,16 @@ public class SchemaString implements State
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.json.State#transition(com.aptana.json.EventType, com.aptana.json.Context)
+	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
 	public void transition(Context context, EventType event, Object value)
 	{
 		if (event == EventType.PRIMITIVE && value instanceof String)
 		{
-			// OK
+			if (((String) value).equals("false") == false)
+			{
+				throw new IllegalStateException();
+			}
 		}
 		else
 		{

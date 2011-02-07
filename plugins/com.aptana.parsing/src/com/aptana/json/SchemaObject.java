@@ -13,22 +13,120 @@ import java.util.Map;
 /**
  * SchemaObject
  */
-public class SchemaObject extends SchemaValue
+public class SchemaObject implements State
 {
-	private Map<String,SchemaProperty> _properties;
-	
+	private Map<String, Property> _properties;
+	private boolean _inObject;
+	private boolean _inProperty;
+
 	/**
 	 * addProperty
 	 * 
 	 * @param property
 	 */
-	public void addProperty(SchemaProperty property)
+	public void addProperty(Property property)
 	{
 		if (this._properties == null)
 		{
-			this._properties = new HashMap<String, SchemaProperty>();
+			this._properties = new HashMap<String, Property>();
 		}
-		
+
 		this._properties.put(property.getName(), property);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#enter()
+	 */
+	public void enter()
+	{
+		this._inObject = false;
+		this._inProperty = false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#exit()
+	 */
+	public void exit()
+	{
+	}
+
+	/**
+	 * getProperty
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Property getProperty(String name)
+	{
+		Property result = null;
+
+		if (this._properties != null)
+		{
+			result = this._properties.get(name);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
+	 */
+	public void transition(Context context, EventType event, Object value)
+	{
+		switch (event)
+		{
+			case START_OBJECT:
+				if (this._inObject)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inObject = true;
+				break;
+
+			case START_OBJECT_ENTRY:
+				if (this._inProperty)
+				{
+					throw new IllegalStateException();
+				}
+
+				String name = value.toString();
+				Property property = this.getProperty(name);
+
+				if (property == null)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inProperty = true;
+				context.pushType(property.getType());
+				break;
+
+			case END_OBJECT:
+				if (this._inObject == false)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inObject = false;
+				context.popType();
+				break;
+
+			case END_OBJECT_ENTRY:
+				if (this._inProperty == false)
+				{
+					throw new IllegalStateException();
+				}
+
+				this._inProperty = false;
+				context.popType();
+				break;
+
+			default:
+				throw new IllegalStateException();
+		}
 	}
 }

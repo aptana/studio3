@@ -8,42 +8,26 @@
 package com.aptana.json;
 
 /**
- * SchemaProperty
+ * SchemaState
  */
-public class SchemaProperty
+public interface State
 {
-	private String _name;
-	private String _type;
+	/**
+	 * Enter this new state and perform any processing relevant to this state
+	 */
+	void enter();
 
 	/**
-	 * SchemaProperty
-	 * 
-	 * @param name
-	 * @param type
+	 * Exit this state before entering a new state
 	 */
-	public SchemaProperty(String name, String type)
-	{
-		this._name = name;
-		this._type = type;
-	}
+	void exit();
 
 	/**
-	 * getName
+	 * Transition to a new state from this current state
 	 * 
-	 * @return
+	 * @param context
+	 * @param event
+	 * @param value
 	 */
-	public String getName()
-	{
-		return this._name;
-	}
-
-	/**
-	 * getType
-	 * 
-	 * @return
-	 */
-	public String getType()
-	{
-		return this._type;
-	}
+	void transition(Context context, EventType event, Object value);
 }

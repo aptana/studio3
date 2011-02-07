@@ -8,22 +8,23 @@
 package com.aptana.json;
 
 /**
- * SchemaType
+ * SchemaProperty
  */
-public class SchemaType
+public class Property
 {
 	private String _name;
-	private SchemaValue _value;
+	private Type _type;
 
 	/**
-	 * SchemaType
+	 * SchemaProperty
 	 * 
 	 * @param name
+	 * @param type
 	 */
-	public SchemaType(String name, SchemaValue value)
+	public Property(String name, Type type)
 	{
 		this._name = name;
-		this._value = value;
+		this._type = type;
 	}
 
 	/**
@@ -35,14 +36,14 @@ public class SchemaType
 	{
 		return this._name;
 	}
-	
+
 	/**
-	 * getValue
+	 * getType
 	 * 
 	 * @return
 	 */
-	public SchemaValue getValue()
+	public Type getType()
 	{
-		return this._value;
+		return this._type;
 	}
 }

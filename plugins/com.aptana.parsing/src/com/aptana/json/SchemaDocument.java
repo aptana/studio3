@@ -22,17 +22,17 @@ import org.json.simple.parser.ParseException;
  */
 public class SchemaDocument implements ContentHandler
 {
-	private Map<String, SchemaType> _typesByName;
-	private SchemaType _rootType;
-	private Stack<SchemaType> _typeStack;
-	private SchemaType _currentType;
+	private Map<String, Type> _typesByName;
+	private Type _rootType;
+	private Stack<Type> _typeStack;
+	private Type _currentType;
 
 	/**
 	 * SchemaDocument
 	 */
 	public SchemaDocument()
 	{
-		this._typeStack = new Stack<SchemaType>();
+		this._typeStack = new Stack<Type>();
 	}
 
 	/**
@@ -40,12 +40,12 @@ public class SchemaDocument implements ContentHandler
 	 * 
 	 * @param type
 	 */
-	public void addType(SchemaType type)
+	public void addType(Type type)
 	{
 		// TODO: Warn on duplicate entry or merge entries?
 		if (this._typesByName == null)
 		{
-			this._typesByName = new HashMap<String, SchemaType>();
+			this._typesByName = new HashMap<String, Type>();
 		}
 
 		this._typesByName.put(type.getName(), type);
@@ -98,7 +98,7 @@ public class SchemaDocument implements ContentHandler
 	 * 
 	 * @return
 	 */
-	public SchemaType getRootType()
+	public Type getRootType()
 	{
 		return this._rootType;
 	}
@@ -109,9 +109,9 @@ public class SchemaDocument implements ContentHandler
 	 * @param typeName
 	 * @return
 	 */
-	public SchemaType getType(String typeName)
+	public Type getType(String typeName)
 	{
-		SchemaType result = null;
+		Type result = null;
 
 		if (this._typesByName != null)
 		{

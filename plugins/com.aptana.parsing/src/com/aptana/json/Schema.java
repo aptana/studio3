@@ -8,39 +8,38 @@
 package com.aptana.json;
 
 /**
- * SchemaString
+ * Schema
  */
-public class SchemaString implements State
+public class Schema implements State
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#enter()
+	private Type _schemaType;
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.json.SchemaState#enter()
 	 */
 	public void enter()
 	{
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#exit()
-	 */
-	public void exit()
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#transition(com.aptana.json.EventType, com.aptana.json.Context)
+	/* (non-Javadoc)
+	 * @see com.aptana.json.SchemaState#transition(com.aptana.json.EventType)
 	 */
 	public void transition(Context context, EventType event, Object value)
 	{
-		if (event == EventType.PRIMITIVE && value instanceof String)
+		if (event == EventType.START_PARSE)
 		{
-			// OK
+			context.pushType(this._schemaType);
 		}
 		else
 		{
 			throw new IllegalStateException();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.json.SchemaState#exit()
+	 */
+	public void exit()
+	{
 	}
 }
