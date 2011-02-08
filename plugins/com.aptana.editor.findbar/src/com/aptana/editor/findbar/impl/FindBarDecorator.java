@@ -36,8 +36,12 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -70,8 +74,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
 
 	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
-	private static final String PREVIOUS = "icons/previous.png"; //$NON-NLS-1$
-	private static final String NEXT = "icons/next.png"; //$NON-NLS-1$
+	private static final String CLOSE_ENTER = "icons/close_enter.png"; //$NON-NLS-1$
+	private static final String SEARCH_BACKWARD = "icons/search_backward.png"; //$NON-NLS-1$
 	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
 	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
 	private static final String SEARCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
@@ -106,7 +110,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		Composite content = new Composite(composite, SWT.NONE);
 		content.setLayout(new FillLayout());
-		content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		content.setLayoutData(createdDefaultGridData(SWT.FILL, SWT.FILL, true, true));
 		return content;
 	}
 
@@ -115,18 +119,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		this.sourceViewer = sourceViewer;
 		findBarFinder = new FindBarFinder(textEditor, sourceViewer, this);
 		findBar = new Composite(composite, SWT.BORDER);
-		findBarGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		findBarGridData = createdDefaultGridData(SWT.FILL, SWT.CENTER, true, false);
 		findBarGridData.exclude = true;
 		findBar.setLayoutData(findBarGridData);
 
-		int NUMBER_OF_ITEMS = 17;
-		GridLayout gridLayout = new GridLayout(NUMBER_OF_ITEMS, false);
-		gridLayout.marginHeight = 0;
-		gridLayout.horizontalSpacing = 4;
-		gridLayout.verticalSpacing = 0;
-		findBar.setLayout(gridLayout);
-
-		close = createButton(CLOSE, true);
+		close = createLabel(CLOSE, true, CLOSE_ENTER);
 		close.setToolTipText(Messages.FindBarDecorator_TOOLTIP_HideFindBar);
 
 		findButton = createButton(null, true);
@@ -136,19 +133,16 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		comboReplace = createCombo(PREFERENCE_NAME_REPLACE);
 
-		previous = createButton(PREVIOUS, false);
-		next = createButton(NEXT, false);
-
 		ToolBar optionsToolBar = new ToolBar(findBar, SWT.NONE);
-		optionsToolBar.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		optionsToolBar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false));
 
-		caseSensitive = new ToolItem(optionsToolBar, SWT.CHECK);
+		caseSensitive = createToolItem(optionsToolBar);
 		caseSensitive.setImage(FindBarPlugin.getImage(CASE_SENSITIVE));
 		caseSensitive.setDisabledImage(FindBarPlugin.getImage(CASE_SENSITIVE_DISABLED));
 		caseSensitive.setToolTipText(Messages.FindBarDecorator_LABEL_CaseSensitive);
 		caseSensitive.addSelectionListener(this);
 
-		wholeWord = new ToolItem(optionsToolBar, SWT.CHECK);
+		wholeWord = createToolItem(optionsToolBar);
 		wholeWord.setImage(FindBarPlugin.getImage(WHOLE_WORD));
 		wholeWord.setDisabledImage(FindBarPlugin.getImage(WHOLE_WORD_DISABLED));
 		wholeWord.setToolTipText(Messages.FindBarDecorator_LABEL_WholeWord);
@@ -158,7 +152,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
 		if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
 		{
-			regularExpression = new ToolItem(optionsToolBar, SWT.CHECK);
+			regularExpression = createToolItem(optionsToolBar);
 			regularExpression.setImage(FindBarPlugin.getImage(REGEX));
 			regularExpression.setDisabledImage(FindBarPlugin.getImage(REGEX_DISABLED));
 			regularExpression.setToolTipText(Messages.FindBarDecorator_LABEL_RegularExpression);
@@ -176,6 +170,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			});
 		}
 
+		searchBackward = createToolItem(optionsToolBar);
+		searchBackward.setImage(FindBarPlugin.getImage(SEARCH_BACKWARD));
+		searchBackward.setToolTipText(Messages.FindBarDecorator_LABEL_SearchBackward);
+		searchBackward.addSelectionListener(this);
+
 		replaceFind = createButton(null, true);
 		replaceFind.setText(Messages.FindBarDecorator_LABEL_ReplaceFind);
 
@@ -190,21 +189,31 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		countTotal.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowMatchCount);
 
 		count = new Label(findBar, SWT.NONE);
-		count.setText("            "); //$NON-NLS-1$
+		count.setText("       "); //$NON-NLS-1$
 		count.setToolTipText(Messages.FindBarDecorator_TOOLTIP_MatchCount);
-		count.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		count.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false));
 
-		Label streach = new Label(findBar, SWT.NONE);
-		streach.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-		
 		searchInOpenFiles = createButton(SEARCH_OPEN_FILES, true);
 		searchInOpenFiles.setToolTipText(Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles);
 
 		showFindReplaceDialog = createButton(FINDREPLACE, true);
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog);
+
+		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, countTotal, findButton,
+				replaceFind, replace, replaceAll, count, showFindReplaceDialog, searchInOpenFiles };
 		
-		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, next, previous, countTotal,
-				findButton, replaceFind, replace, replaceAll, count, showFindReplaceDialog, searchInOpenFiles};
+		int NUMBER_OF_ITEMS = disableWhenHidden.length;
+		GridLayout gridLayout = new GridLayout(NUMBER_OF_ITEMS, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.horizontalSpacing = 4;
+		gridLayout.verticalSpacing = 0;
+		findBar.setLayout(gridLayout);
+
+	}
+
+	private ToolItem createToolItem(ToolBar optionsToolBar)
+	{
+		return new ToolItem(optionsToolBar, SWT.CHECK);
 	}
 
 	/**
@@ -213,10 +222,24 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Button createCheck()
 	{
 		Button button = new Button(findBar, SWT.CHECK);
-		button.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+		button.setLayoutData(createdDefaultGridData());
 		button.addSelectionListener(this);
 		setDefaultFocusListener(button);
 		return button;
+	}
+
+	private GridData createdDefaultGridData(int horizontalAlignment, int verticalAlignment,
+			boolean grabExcessHorizontalSpace, boolean grabExcessVerticalSpace)
+	{
+		GridData gridData = new GridData(horizontalAlignment, verticalAlignment, grabExcessHorizontalSpace,
+				grabExcessVerticalSpace);
+		gridData.heightHint = 22;
+		return gridData;
+	}
+
+	private GridData createdDefaultGridData()
+	{
+		return createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false);
 	}
 
 	/**
@@ -224,7 +247,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	 */
 	private Button createButton(String image, boolean enabled)
 	{
-		GridData layoutData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		GridData layoutData = createdDefaultGridData();
 		Button button = new Button(findBar, SWT.PUSH);
 		button.setEnabled(enabled);
 		if (image != null)
@@ -236,6 +259,43 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		setDefaultFocusListener(button);
 
 		return button;
+	}
+
+	/**
+	 * Create a label (with a different image when the mouse is over). When it's clicked, use the default handler to treat the action.
+	 */
+	private Label createLabel(String image, boolean enabled, String imageEntered)
+	{
+		GridData layoutData = createdDefaultGridData();
+		final Label label = new Label(findBar, SWT.CENTER);
+		label.setEnabled(enabled);
+		final Image imageRegular = FindBarPlugin.getImage(image);
+		label.setImage(imageRegular);
+
+		final Image imageMouseOver = FindBarPlugin.getImage(imageEntered);
+		label.addMouseTrackListener(new MouseTrackAdapter()
+		{
+			public void mouseExit(MouseEvent e)
+			{
+				label.setImage(imageRegular);
+			}
+
+			public void mouseEnter(MouseEvent e)
+			{
+				label.setImage(imageMouseOver);
+			}
+		});
+
+		label.addMouseListener(new MouseAdapter()
+		{
+			public void mouseUp(MouseEvent e)
+			{
+				handleWidgetSelected(label);
+			}
+		});
+		label.setLayoutData(layoutData);
+
+		return label;
 	}
 
 	/**
@@ -255,8 +315,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		final Combo combo = new Combo(findBar, SWT.DROP_DOWN);
 		combo.setText("                            "); //$NON-NLS-1$
 		Point size = combo.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		GridData comboGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		comboGridData.widthHint = size.x;
+		GridData comboGridData = createdDefaultGridData(SWT.FILL, SWT.CENTER, true, false);
+		comboGridData.minimumWidth = size.x;
 		combo.setLayoutData(comboGridData);
 
 		List<String> list = FindBarEntriesHelper.loadEntries(preferenceName);
@@ -322,12 +382,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				return;
 			}
 			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-			if(!preferenceStore.getBoolean(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR))
+			if (!preferenceStore.getBoolean(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR))
 			{
 				return;
 			}
 
-			combo.setForeground(null);
 			boolean wrap = true;
 			String text = combo.getText();
 			if (lastText.startsWith(text))
@@ -366,7 +425,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		public void keyPressed(KeyEvent e)
 		{
-			switch(e.keyCode)
+			switch (e.keyCode)
 			{
 				case SWT.ARROW_UP:
 				case SWT.ARROW_DOWN:
@@ -441,6 +500,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();
+		handleWidgetSelected(source);
+	}
+
+	public void handleWidgetSelected(Object source)
+	{
 		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
 		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
 				statusLineManager);
@@ -448,14 +512,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		if (source == close)
 		{
 			hideFindBar();
-		}
-		else if (source == previous)
-		{
-			findPrevious();
-		}
-		else if (source == next)
-		{
-			findNext();
 		}
 		else if (source == caseSensitive || source == wholeWord)
 		{
@@ -475,7 +531,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		else if (source == findButton)
 		{
-			findNext();
+			findNextOrPrev();
 		}
 		else if (source == replaceFind || source == replace)
 		{
@@ -518,7 +574,14 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 			if (source == replaceFind)
 			{
-				findBarFinder.find(true);
+				if (searchBackward.getSelection())
+				{
+					findBarFinder.find(false);
+				}
+				else
+				{
+					findBarFinder.find(true);
+				}
 			}
 			else
 			{
@@ -573,10 +636,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/* default */Combo comboReplace;
 	ToolItem caseSensitive;
 	ToolItem wholeWord;
+	ToolItem searchBackward;
 	ToolItem regularExpression;
-	private Button close;
-	private Button next;
-	private Button previous;
+	private Label close;
 	private Button countTotal;
 	private Button findButton;
 	private Button replaceFind;
@@ -597,8 +659,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private void adjustEnablement()
 	{
 		String text = combo.getText();
-		previous.setEnabled(!EMPTY.equals(text));
-		next.setEnabled(!EMPTY.equals(text));
+		findButton.setEnabled(!EMPTY.equals(text));
 		count.setText(EMPTY);
 		wholeWord.setEnabled(!EMPTY.equals(text) && !regularExpression.getSelection() && isWord(text));
 	}
@@ -699,6 +760,19 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		setFindText(combo.getText());
 	}
 
+	/* default */void findNextOrPrev()
+	{
+		if (searchBackward.getSelection())
+		{
+			findPrevious();
+		}
+		else
+		{
+			findNext();
+
+		}
+	}
+
 	boolean getWholeWord()
 	{
 		return wholeWord.getEnabled() && wholeWord.getSelection() && !regularExpression.getSelection();
@@ -793,22 +867,24 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			count.setText(String.valueOf(total));
 		}
 	}
-	
-	
+
 	void searchInOpenFiles()
 	{
 		String searchText = combo.getText();
-		if(searchText.length() >= 0){
+		if (searchText.length() >= 0)
+		{
 			boolean isWholeWord = wholeWord.getSelection();
 			boolean isRegEx = regularExpression.getSelection();
 			boolean isCaseSensitive = caseSensitive.getSelection();
-			if(isWholeWord && !isRegEx && isWord(searchText)){
+			if (isWholeWord && !isRegEx && isWord(searchText))
+			{
 				isRegEx = true;
-				searchText = "\\b"+searchText+"\\b";
+				searchText = "\\b" + searchText + "\\b";
 			}
 
 			IStatusLineManager statusLineManager = (IStatusLineManager) textEditor.getAdapter(IStatusLineManager.class);
-			FindInOpenDocuments.findInOpenDocuments(searchText, isCaseSensitive, isWholeWord, isRegEx, statusLineManager);
+			FindInOpenDocuments.findInOpenDocuments(searchText, isCaseSensitive, isWholeWord, isRegEx,
+					statusLineManager);
 		}
 
 	}
