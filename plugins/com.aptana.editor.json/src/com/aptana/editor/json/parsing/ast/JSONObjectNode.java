@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.json.parsing.ast;
 
+import com.aptana.parsing.ast.IParseNode;
+
 /**
  * JSONObjectNode
  */
@@ -36,6 +38,36 @@ public class JSONObjectNode extends JSONNode
 	 */
 	public String getText()
 	{
-		return "<Object>"; //$NON-NLS-1$
+		String result = "<Object>"; //$NON-NLS-1$
+
+		if (this.hasChildren())
+		{
+			for (IParseNode child : this)
+			{
+				if (child instanceof JSONEntryNode)
+				{
+					JSONEntryNode entry = (JSONEntryNode) child;
+					IParseNode key = entry.getFirstChild();
+
+					if (key instanceof JSONStringNode)
+					{
+						String name = key.getText();
+
+						// TODO: store/retrieve property names in a preference
+						if ("name".equals(name)) //$NON-NLS-1$
+						{
+							IParseNode value = entry.getLastChild();
+
+							if (value instanceof JSONStringNode)
+							{
+								result += ": " + value.getText(); //$NON-NLS-1$
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 }
