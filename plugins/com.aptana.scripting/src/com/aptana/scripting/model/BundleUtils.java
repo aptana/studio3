@@ -9,9 +9,10 @@ package com.aptana.scripting.model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,12 +55,12 @@ public class BundleUtils
 
 		if (bundleFile.isFile() && bundleFile.canRead())
 		{
-			FileReader fr = null;
+			InputStreamReader fr = null;
 			BufferedReader reader = null;
 
 			try
 			{
-				fr = new FileReader(bundleFile);
+				fr = new InputStreamReader(new FileInputStream(bundleFile), "UTF-8");
 				reader = new BufferedReader(fr);
 				String line;
 

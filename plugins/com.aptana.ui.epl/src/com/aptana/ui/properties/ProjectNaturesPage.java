@@ -130,7 +130,15 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 		fProject = (IProject) getElement().getAdapter(IResource.class);
 		try
 		{
-			fCurrentProjectNatures = fProject.getDescription().getNatureIds();
+			if (fProject.isOpen())
+			{
+				// Can only access decription if project exists and is open...
+				fCurrentProjectNatures = fProject.getDescription().getNatureIds();
+			}
+			else
+			{
+				fCurrentProjectNatures = new String[0];
+			}
 		}
 		catch (CoreException e)
 		{
@@ -508,8 +516,11 @@ public class ProjectNaturesPage extends PropertyPage implements IWorkbenchProper
 
 	private boolean isPrimaryNatureModified()
 	{
-		return (fInitialPrimaryNature == null && fPrimaryNature != null)
-				|| !fInitialPrimaryNature.equals(fPrimaryNature);
+		if (fInitialPrimaryNature == null)
+		{		
+			return fPrimaryNature != null;
+		}
+		return !fInitialPrimaryNature.equals(fPrimaryNature);
 	}
 
 	private class NaturesLabelProvider extends LabelProvider implements IFontProvider

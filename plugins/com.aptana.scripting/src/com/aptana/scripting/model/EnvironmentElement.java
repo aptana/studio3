@@ -55,6 +55,13 @@ public class EnvironmentElement extends AbstractBundleElement
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+
+		// output invoke block, if it is defined
+		if (this.getInvokeBlock() != null)
+		{
+			// Spit out something repeatable. block type for now
+			printer.printWithIndent("block: ").println(this.getInvokeBlock().getBlock().type.toString()); //$NON-NLS-1$
+		}
 	}
 
 	/**

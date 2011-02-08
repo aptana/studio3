@@ -1,7 +1,7 @@
 module Ruble
   class Env < BaseElement
     def initialize(scope, path, &block)
-      super("snippet-#{java.util.UUID.randomUUID().toString()}", path)
+      super("environment-#{java.util.UUID.randomUUID().toString()}", path)
 
       @jobj.set_invoke_block(&block)
       @jobj.setScope(scope)
