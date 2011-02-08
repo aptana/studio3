@@ -17,6 +17,14 @@ public class SchemaArray implements State
 
 	/**
 	 * SchemaArray
+	 */
+	public SchemaArray()
+	{
+		this(null);
+	}
+
+	/**
+	 * SchemaArray
 	 * 
 	 * @param elementType
 	 */
@@ -52,6 +60,16 @@ public class SchemaArray implements State
 		return this._elementType;
 	}
 
+	/**
+	 * setElementType
+	 * 
+	 * @param type
+	 */
+	public void setElementType(State type)
+	{
+		this._elementType = type;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
@@ -63,7 +81,7 @@ public class SchemaArray implements State
 			case START_ARRAY:
 				if (this._inArray)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to start an array that has already been started");
 				}
 
 				this._inArray = true;
@@ -76,17 +94,17 @@ public class SchemaArray implements State
 			case END_ARRAY:
 				if (this._inArray == false)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to end an araray that has not been started");
 				}
 
 				this._inArray = false;
-				
+
 				// Remove this type from the current context
 				context.popType();
 				break;
 
 			default:
-				throw new IllegalStateException();
+				throw new IllegalStateException("Unsupported event type: " + event.name());
 		}
 	}
 }
