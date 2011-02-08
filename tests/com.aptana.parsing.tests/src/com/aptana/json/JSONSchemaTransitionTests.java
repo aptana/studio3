@@ -126,7 +126,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		{
 			// reset the context
 			this._context.reset();
-			
+
 			// initialize the state's state
 			if (initializer != null)
 			{
@@ -251,13 +251,13 @@ public class JSONSchemaTransitionTests extends TestCase
 		SchemaObject state = new SchemaObject();
 		String propertyName = "myProperty";
 		state.addProperty(new Property(propertyName, new SchemaString()));
-		
+
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
 			EnumSet.of(EventType.START_OBJECT_ENTRY, EventType.END_OBJECT), //
 			propertyName //
-		);
-		
+			);
+
 		// build initializer used before each test runs
 		StateInitializer initializer = new StateInitializer()
 		{
@@ -272,10 +272,105 @@ public class JSONSchemaTransitionTests extends TestCase
 	}
 
 	/**
-	 * testArrayStates
+	 * testEndObjectEntryStates
 	 */
-	public void testArrayStates()
+	public void testEndObjectEntryStates()
 	{
+		// create object and configure it
+		SchemaObject state = new SchemaObject();
+		final String propertyName = "myProperty";
+		state.addProperty(new Property(propertyName, new SchemaString()));
 
+		// build tests
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.END_OBJECT_ENTRY), //
+			propertyName //
+			);
+
+		// build initializer used before each test runs
+		StateInitializer initializer = new StateInitializer()
+		{
+			public void initialize(State state)
+			{
+				state.enter();
+				state.transition(_context, EventType.START_OBJECT, null);
+				state.transition(_context, EventType.START_OBJECT_ENTRY, propertyName);
+			}
+		};
+
+		this.testStates(state, initializer, goodList.toArray(new EventResult[goodList.size()]));
+	}
+
+	/**
+	 * testEndObjectStates
+	 */
+	public void testEndObjectStates()
+	{
+		// create object and configure it
+		SchemaObject state = new SchemaObject();
+		String propertyName = "myProperty";
+		state.addProperty(new Property(propertyName, new SchemaString()));
+
+		// build tests
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.END_OBJECT, EventType.START_OBJECT_ENTRY), //
+			propertyName //
+			);
+
+		// build initializer used before each test runs
+		StateInitializer initializer = new StateInitializer()
+		{
+			public void initialize(State state)
+			{
+				state.enter();
+				state.transition(_context, EventType.START_OBJECT, null);
+			}
+		};
+
+		this.testStates(state, initializer, goodList.toArray(new EventResult[goodList.size()]));
+	}
+
+	/**
+	 * testStartArrayStates
+	 */
+	public void testStartArrayStates()
+	{
+		// create array and configure it
+		SchemaArray state = new SchemaArray(new SchemaString());
+
+		// build tests
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.START_ARRAY), //
+			null //
+			);
+
+		this.testStates(state, goodList.toArray(new EventResult[goodList.size()]));
+	}
+
+	/**
+	 * testEndArrayStates
+	 */
+	public void testEndArrayStates()
+	{
+		// create array and configure it
+		SchemaArray state = new SchemaArray(new SchemaString());
+
+		// build tests
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.END_ARRAY), //
+			null //
+			);
+
+		// build initializer used before each test runs
+		StateInitializer initializer = new StateInitializer()
+		{
+			public void initialize(State state)
+			{
+				state.enter();
+				state.transition(_context, EventType.START_ARRAY, null);
+			}
+		};
+
+		this.testStates(state, initializer, goodList.toArray(new EventResult[goodList.size()]));
 	}
 }
