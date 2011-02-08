@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * SchemaState
  */
-public interface State
+public interface IState
 {
 	/**
 	 * Enter this new state and perform any processing relevant to this state
@@ -21,6 +21,15 @@ public interface State
 	 * Exit this state before entering a new state
 	 */
 	void exit();
+
+	/**
+	 * Determine if the current state can transition to the new state.
+	 * 
+	 * @param type
+	 * @param value
+	 * @return
+	 */
+	boolean isValidTransition(EventType event, Object value);
 
 	/**
 	 * Transition to a new state from this current state
