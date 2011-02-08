@@ -24,7 +24,7 @@ public interface ISchemaContext
 	 * 
 	 * @param type
 	 */
-	void pushType(State type);
+	void pushType(IState type);
 
 	void reset();
 

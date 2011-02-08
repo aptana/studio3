@@ -14,8 +14,8 @@ import java.util.Stack;
  */
 public class Context implements ISchemaContext
 {
-	private Stack<State> _typeStack;
-	private State _currentType;
+	private Stack<IState> _typeStack;
+	private IState _currentType;
 
 	/**
 	 * Context
@@ -42,13 +42,13 @@ public class Context implements ISchemaContext
 	/* (non-Javadoc)
 	 * @see com.aptana.json.ISchemaContext#pushType(com.aptana.json.State)
 	 */
-	public void pushType(State type)
+	public void pushType(IState type)
 	{
 		if (this._currentType != null)
 		{
 			if (this._typeStack == null)
 			{
-				this._typeStack = new Stack<State>();
+				this._typeStack = new Stack<IState>();
 			}
 		}
 
