@@ -25,5 +25,11 @@ public interface IPreferencesConstants
 	 * Preferences indicating whether we should do incremental searches in the find bar.
 	 */
 	public static final String INCREMENTAL_SEARCH_ON_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".incrementalSearchOnFindBar"; //$NON-NLS-1$
+	
+	
+	/**
+	 * Preferences indicating whether Ctrl+F should open the eclipse search or focus the find combo 
+	 */
+	public static final String CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".ctrlFTwiceOpensEclipseFindBar"; //$NON-NLS-1$
 
 }
