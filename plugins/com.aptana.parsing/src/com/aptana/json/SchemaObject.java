@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * SchemaObject
  */
-public class SchemaObject implements State
+public class SchemaObject implements IState
 {
 	private Map<String, Property> _properties;
 	private boolean _inObject;
@@ -67,6 +67,37 @@ public class SchemaObject implements State
 			result = this._properties.get(name);
 		}
 
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
+	 */
+	public boolean isValidTransition(EventType event, Object value)
+	{
+		boolean result = false;
+		
+		switch (event)
+		{
+			case START_OBJECT:
+				result = (this._inObject == false);
+				break;
+
+			case START_OBJECT_ENTRY:
+				result = (this._inObject && this._inProperty == false && value != null && value.toString().length() > 0);
+				
+				// TODO: check property name?
+				break;
+
+			case END_OBJECT:
+				result = (this._inProperty == false && this._inObject);
+				break;
+
+			case END_OBJECT_ENTRY:
+				result = (this._inObject && this._inProperty);
+				break;
+		}
+		
 		return result;
 	}
 

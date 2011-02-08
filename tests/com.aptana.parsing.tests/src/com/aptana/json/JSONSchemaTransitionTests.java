@@ -44,7 +44,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 	private static interface StateInitializer
 	{
-		void initialize(State state);
+		void initialize(IState state);
 	}
 
 	private ISchemaContext _context;
@@ -100,13 +100,13 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * 
 	 * @param state
 	 */
-	protected void testStates(State state, EventResult... results)
+	protected void testStates(IState state, EventResult... results)
 	{
 		this.testStates( //
 			state, //
 			new StateInitializer()
 			{
-				public void initialize(State state)
+				public void initialize(IState state)
 				{
 					state.enter();
 				}
@@ -120,7 +120,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * 
 	 * @param state
 	 */
-	protected void testStates(State state, StateInitializer initializer, EventResult... results)
+	protected void testStates(IState state, StateInitializer initializer, EventResult... results)
 	{
 		for (EventResult result : results)
 		{
@@ -160,11 +160,11 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * @param goodValue
 	 * @param badValue
 	 */
-	protected void testPrimitive(Class<? extends State> stateClass, String goodValue, String badValue)
+	protected void testPrimitive(Class<? extends IState> stateClass, String goodValue, String badValue)
 	{
 		try
 		{
-			State state = stateClass.newInstance();
+			IState state = stateClass.newInstance();
 			List<EventResult> testList = this.createGoodList( //
 				EnumSet.of(EventType.PRIMITIVE), //
 				goodValue //
@@ -261,7 +261,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		// build initializer used before each test runs
 		StateInitializer initializer = new StateInitializer()
 		{
-			public void initialize(State state)
+			public void initialize(IState state)
 			{
 				state.enter();
 				state.transition(_context, EventType.START_OBJECT, null);
@@ -290,7 +290,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		// build initializer used before each test runs
 		StateInitializer initializer = new StateInitializer()
 		{
-			public void initialize(State state)
+			public void initialize(IState state)
 			{
 				state.enter();
 				state.transition(_context, EventType.START_OBJECT, null);
@@ -320,7 +320,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		// build initializer used before each test runs
 		StateInitializer initializer = new StateInitializer()
 		{
-			public void initialize(State state)
+			public void initialize(IState state)
 			{
 				state.enter();
 				state.transition(_context, EventType.START_OBJECT, null);
@@ -364,7 +364,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		// build initializer used before each test runs
 		StateInitializer initializer = new StateInitializer()
 		{
-			public void initialize(State state)
+			public void initialize(IState state)
 			{
 				state.enter();
 				state.transition(_context, EventType.START_ARRAY, null);

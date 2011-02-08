@@ -10,36 +10,46 @@ package com.aptana.json;
 /**
  * Schema
  */
-public class Schema implements State
+public class Schema implements IState
 {
-	private State _schemaType;
-	
-	/* (non-Javadoc)
+	private IState _schemaType;
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaState#enter()
 	 */
 	public void enter()
 	{
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.json.SchemaState#transition(com.aptana.json.EventType)
-	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
-	{
-		if (event == EventType.START_PARSE)
-		{
-			context.pushType(this._schemaType);
-		}
-		else
-		{
-			throw new IllegalStateException();
-		}
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaState#exit()
 	 */
 	public void exit()
 	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
+	 */
+	public boolean isValidTransition(EventType event, Object value)
+	{
+		return event == EventType.START_PARSE;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaState#transition(com.aptana.json.EventType)
+	 */
+	public void transition(ISchemaContext context, EventType event, Object value)
+	{
+		if (event != EventType.START_PARSE)
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+
+		context.pushType(this._schemaType);
 	}
 }

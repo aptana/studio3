@@ -10,9 +10,9 @@ package com.aptana.json;
 /**
  * SchemaArray
  */
-public class SchemaArray implements State
+public class SchemaArray implements IState
 {
-	private State _elementType;
+	private IState _elementType;
 	private boolean _inArray;
 
 	/**
@@ -28,7 +28,7 @@ public class SchemaArray implements State
 	 * 
 	 * @param elementType
 	 */
-	public SchemaArray(State elementType)
+	public SchemaArray(IState elementType)
 	{
 		this._elementType = elementType;
 	}
@@ -55,9 +55,30 @@ public class SchemaArray implements State
 	 * 
 	 * @return
 	 */
-	public State getElementType()
+	public IState getElementType()
 	{
 		return this._elementType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
+	 */
+	public boolean isValidTransition(EventType event, Object value)
+	{
+		boolean result = false;
+
+		switch (event)
+		{
+			case START_ARRAY:
+				result = this._inArray;
+				break;
+
+			case END_ARRAY:
+				result = (this._inArray == false);
+		}
+
+		return result;
 	}
 
 	/**
@@ -65,7 +86,7 @@ public class SchemaArray implements State
 	 * 
 	 * @param type
 	 */
-	public void setElementType(State type)
+	public void setElementType(IState type)
 	{
 		this._elementType = type;
 	}

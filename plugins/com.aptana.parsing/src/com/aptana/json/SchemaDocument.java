@@ -22,17 +22,17 @@ import org.json.simple.parser.ParseException;
  */
 public class SchemaDocument implements ContentHandler
 {
-	private Map<String, State> _typesByName;
-	private State _rootType;
-	private Stack<State> _typeStack;
-	private State _currentType;
+	private Map<String, IState> _typesByName;
+	private IState _rootType;
+	private Stack<IState> _typeStack;
+	private IState _currentType;
 
 	/**
 	 * SchemaDocument
 	 */
 	public SchemaDocument()
 	{
-		this._typeStack = new Stack<State>();
+		this._typeStack = new Stack<IState>();
 	}
 
 	/**
@@ -40,12 +40,12 @@ public class SchemaDocument implements ContentHandler
 	 * 
 	 * @param type
 	 */
-	public void addType(String name, State type)
+	public void addType(String name, IState type)
 	{
 		// TODO: Warn on duplicate entry or merge entries?
 		if (this._typesByName == null)
 		{
-			this._typesByName = new HashMap<String, State>();
+			this._typesByName = new HashMap<String, IState>();
 		}
 
 		this._typesByName.put(name, type);
@@ -98,7 +98,7 @@ public class SchemaDocument implements ContentHandler
 	 * 
 	 * @return
 	 */
-	public State getRootType()
+	public IState getRootType()
 	{
 		return this._rootType;
 	}
@@ -109,9 +109,9 @@ public class SchemaDocument implements ContentHandler
 	 * @param typeName
 	 * @return
 	 */
-	public State getType(String typeName)
+	public IState getType(String typeName)
 	{
-		State result = null;
+		IState result = null;
 
 		if (this._typesByName != null)
 		{
