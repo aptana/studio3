@@ -327,7 +327,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				return;
 			}
 
-			combo.setForeground(null);
 			boolean wrap = true;
 			String text = combo.getText();
 			if (lastText.startsWith(text))
