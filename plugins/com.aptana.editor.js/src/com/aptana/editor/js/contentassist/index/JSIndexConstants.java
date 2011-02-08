@@ -39,23 +39,11 @@ public interface JSIndexConstants
 	static final String TYPE = PREFIX + "type"; //$NON-NLS-1$
 	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
-	static final String DESCRIPTION = PREFIX + "description"; //$NON-NLS-1$
-	static final String PARAMETERS = PREFIX + "parameters"; //$NON-NLS-1$
-	static final String RETURN_TYPES = PREFIX + "return_types"; //$NON-NLS-1$
-	static final String USER_AGENT = PREFIX + "user_agent"; //$NON-NLS-1$
-	static final String SINCE_LIST = PREFIX + "since_list"; //$NON-NLS-1$
-	static final String EXAMPLES = PREFIX + "examples"; //$NON-NLS-1$
 
 	static final String[] ALL_CATEGORIES = new String[] { //
 	TYPE, //
 		FUNCTION, //
-		PROPERTY, //
-		DESCRIPTION, //
-		PARAMETERS, //
-		RETURN_TYPES, //
-		USER_AGENT, //
-		SINCE_LIST, //
-		EXAMPLES //
+		PROPERTY //
 	};
 
 	// special values
