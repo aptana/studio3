@@ -347,7 +347,7 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING, StringUtil.EMPTY);
+		//configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING, StringUtil.EMPTY);
 	}
 
 	/**
@@ -356,7 +356,7 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab {
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			String[] list = DebugOptionsManager.parseList(configuration.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING, StringUtil.EMPTY));
+					"UNUSED", StringUtil.EMPTY));
 			elements = new ArrayList<PathElement>();
 			for (int i = 0, length = list.length; i < length;) {
 				String serverPath = list[i++];
@@ -383,8 +383,7 @@ public class HttpServerSettingsTab extends AbstractLaunchConfigurationTab {
 			values[index++] = element.enabled ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING,
-				DebugOptionsManager.serializeList(values));
+		//configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING, DebugOptionsManager.serializeList(values));
 	}
 
 	/**

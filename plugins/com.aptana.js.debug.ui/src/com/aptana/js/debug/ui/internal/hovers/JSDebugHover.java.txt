@@ -61,9 +61,8 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
 public class JSDebugHover implements ITextHover, ITextHoverExtension {
 	private IDebugModelPresentation modelPresentation;
 
-	/**
-	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer,
-	 *      org.eclipse.jface.text.IRegion)
+	/*
+	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
 	 */
 	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
 		IJSStackFrame frame = getFrame();
@@ -90,15 +89,11 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension {
 		return null;
 	}
 
-	/**
-	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer,
-	 *      int)
+	/*
+	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
 	 */
 	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-		return null; /*
-					 * JavaWordFinder.findWord(textViewer.getDocument(),
-					 * offset);
-					 */
+		return null; // JavaWordFinder.findWord(textViewer.getDocument(), offset);
 	}
 
 	/**
