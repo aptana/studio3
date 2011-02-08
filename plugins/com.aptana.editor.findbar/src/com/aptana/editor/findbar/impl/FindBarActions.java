@@ -23,6 +23,7 @@ import org.eclipse.jface.bindings.BindingManagerEvent;
 import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -43,6 +44,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import com.aptana.editor.findbar.FindBarPlugin;
+import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 
 /**
  * Helper to manage the activation of actions. When some control of the find bar receives the focus, the binding service
@@ -61,6 +63,7 @@ public class FindBarActions
 	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev";  //$NON-NLS-1$
 	public static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind"; //$NON-NLS-1$
+	public static final String FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"; //$NON-NLS-1$
 	public static final String TOGGLE_CASE_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleCaseMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_REGEXP_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleRegexpMatching"; //$NON-NLS-1$
 	public static final String TOGGLE_SEARCH_BACKWARD_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchBackward"; //$NON-NLS-1$
@@ -103,6 +106,7 @@ public class FindBarActions
 		fCommandToHandler.put(FIND_NEXT_COMMAND_ID, new FindNextHandler());
 		fCommandToHandler.put(FIND_NEXT_OR_PREV_COMMAND_ID, new FindNextOrPrevHandler());
 		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler());
+		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID, new FocusFindOrOpenEclipseSearchFindBarHandler());
 		fCommandToHandler.put(FOCUS_REPLACE_COMMAND_ID, new FocusReplaceFindBarHandler());
 		fCommandToHandler.put(TOGGLE_CASE_MATCHING_COMMAND_ID, new ToggleCaseFindBarHandler());
 		fCommandToHandler.put(TOGGLE_WORD_MATCHING_COMMAND_ID, new ToggleWordFindBarHandler());
@@ -325,6 +329,30 @@ public class FindBarActions
 			{
 				dec.combo.setFocus();
 				dec.combo.setSelection(new Point(0, dec.combo.getText().length()));
+			}
+			return null;
+		}
+	}
+	
+	private class FocusFindOrOpenEclipseSearchFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+				boolean openEclipseFindBar = preferenceStore.getBoolean(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR);
+
+				if(openEclipseFindBar)
+				{
+					dec.showFindReplaceDialog();
+				}
+				else
+				{
+					dec.combo.setFocus();
+					dec.combo.setSelection(new Point(0, dec.combo.getText().length()));
+				}
 			}
 			return null;
 		}

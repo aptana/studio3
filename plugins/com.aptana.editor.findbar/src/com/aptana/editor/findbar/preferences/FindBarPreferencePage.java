@@ -40,6 +40,9 @@ public final class FindBarPreferencePage extends FieldEditorPreferencePage imple
 		//Users can choose whether to do incremental searches or not.
 		addField(new BooleanFieldEditor(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR,
 				Messages.FindBarPreferencesPage_AskIncrementalSearchesOnFindBar, p));
+		
+		addField(new BooleanFieldEditor(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR,
+				Messages.FindBarPreferencesPage_AskCtrlFTwiceOpensEclipseSearchOnFindBar, p));
 	}
 
 }
