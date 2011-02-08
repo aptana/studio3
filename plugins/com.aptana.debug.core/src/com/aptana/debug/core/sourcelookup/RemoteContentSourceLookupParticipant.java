@@ -59,9 +59,9 @@ public abstract class RemoteContentSourceLookupParticipant extends AbstractSourc
 					.getDebugTarget().getAdapter(IFileContentRetriever.class);
 			if (fileContentRetriever != null) {
 				Object[] objects = super.findSourceElements(object);
-				for (int i = 0; i < objects.length; ++i) {
-					if (objects[i] instanceof RemoteFileStorage) {
-						((RemoteFileStorage) objects[i]).setFileContentRetriever(fileContentRetriever);
+				for (Object i : objects) {
+					if (i instanceof RemoteFileStorage) {
+						((RemoteFileStorage) i).setFileContentRetriever(fileContentRetriever);
 					}
 				}
 				return objects;

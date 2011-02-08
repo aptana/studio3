@@ -119,9 +119,9 @@ public final class BrowserUtil {
 				// TODO: find a better solution
 				browserExecutable2 += "-bin"; //$NON-NLS-1$
 			}
-			for (int i = 0; i < processes.length; ++i) {
-				if (browserExecutable.equals(processes[i].getExecutableName())
-						|| browserExecutable2.equals(processes[i].getExecutableName())) {
+			for (PlatformUtil.ProcessItem process : processes) {
+				if (browserExecutable.equals(process.getExecutableName())
+						|| browserExecutable2.equals(process.getExecutableName())) {
 					return true;
 				}
 			}

@@ -313,10 +313,9 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	 * @see com.aptana.js.debug.core.model.IJSStackFrame#findVariable(java.lang.String)
 	 */
 	public IVariable findVariable(String variableName) throws DebugException {
-		IVariable[] vars = getVariables();
-		for (int i = 0; i < vars.length; ++i) {
-			if (vars[i].getName().equals(variableName)) {
-				return vars[i];
+		for (IVariable var : getVariables()) {
+			if (var.getName().equals(variableName)) {
+				return var;
 			}
 		}
 		return ((JSDebugTarget) getDebugTarget()).findVariable(variableName, this);
@@ -355,8 +354,8 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 			return;
 		}
 		variables = ((JSDebugTarget) getDebugTarget()).loadVariables(MessageFormat.format("frame[{0}]", frameId)); //$NON-NLS-1$
-		for (int i = 0; i < variables.length; ++i) {
-			((JSDebugVariable) variables[i]).flags |= JSDebugVariable.FLAGS_TOPLEVEL;
+		for (IVariable var : variables) {
+			((JSDebugVariable) var).flags |= JSDebugVariable.FLAGS_TOPLEVEL;
 		}
 	}
 

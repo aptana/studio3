@@ -47,11 +47,8 @@ import com.aptana.js.debug.core.model.xhr.IXHRTransfer;
  * @author Max Stepanov
  */
 public class XHRService implements IXHRService {
-	private Map<String, IXHRTransfer> transfers = new LinkedHashMap<String, IXHRTransfer>(); /*
-																							 * preserve
-																							 * insertion
-																							 * order
-																							 */
+	
+	private Map<String, IXHRTransfer> transfers = new LinkedHashMap<String, IXHRTransfer>(); // preserver insertion order
 
 	/**
 	 * XHRService
@@ -84,8 +81,8 @@ public class XHRService implements IXHRService {
 	public void setRequestHeaders(String rid, String[][] headers) {
 		XHRTransfer xhr = (XHRTransfer) transfers.get(rid);
 		if (xhr != null) {
-			for (int i = 0; i < headers.length; ++i) {
-				xhr.addRequestHeader(headers[i][0], headers[i][1]);
+			for (String[] header : headers) {
+				xhr.addRequestHeader(header[0], header[1]);
 			}
 			fireChangeEvent(xhr);
 		}
@@ -114,8 +111,8 @@ public class XHRService implements IXHRService {
 	public void setResponseHeaders(String rid, String[][] headers) {
 		XHRTransfer xhr = (XHRTransfer) transfers.get(rid);
 		if (xhr != null) {
-			for (int i = 0; i < headers.length; ++i) {
-				xhr.addResponseHeader(headers[i][0], headers[i][1]);
+			for (String[] header : headers) {
+				xhr.addResponseHeader(header[0], header[1]);
 			}
 			fireChangeEvent(xhr);
 		}

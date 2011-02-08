@@ -189,7 +189,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess {
 		if (fAttributes == null) {
 			return null;
 		}
-		return (String) fAttributes.get(key);
+		return fAttributes.get(key);
 	}
 
 	/*
@@ -248,10 +248,9 @@ public class JSDebugProcess extends PlatformObject implements IProcess {
 			return this;
 		} else if (adapter == IDebugTarget.class) {
 			ILaunch launch = getLaunch();
-			IDebugTarget[] targets = launch.getDebugTargets();
-			for (int i = 0; i < targets.length; i++) {
-				if (this.equals(targets[i].getProcess())) {
-					return targets[i];
+			for (IDebugTarget target : launch.getDebugTargets()) {
+				if (this.equals(target.getProcess())) {
+					return target;
 				}
 			}
 			return null;
@@ -355,8 +354,7 @@ public class JSDebugProcess extends PlatformObject implements IProcess {
 	private class DebugEventSetListener implements IDebugEventSetListener {
 
 		public void handleDebugEvents(DebugEvent[] events) {
-			for (int i = 0; i < events.length; i++) {
-				DebugEvent event = events[i];
+			for (DebugEvent event : events) {
 				switch (event.getKind()) {
 				case DebugEvent.TERMINATE: {
 					Object source = event.getSource();

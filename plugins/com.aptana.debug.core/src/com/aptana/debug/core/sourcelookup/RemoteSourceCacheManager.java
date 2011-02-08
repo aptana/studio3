@@ -35,7 +35,7 @@
 package com.aptana.debug.core.sourcelookup;
 
 import java.net.URI;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugEvent;
@@ -50,7 +50,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	
 	private static RemoteSourceCacheManager fgDefault;
 
-	private Map<URI, RemoteFileStorage> cache = new Hashtable<URI, RemoteFileStorage>();
+	private Map<URI, RemoteFileStorage> cache = new HashMap<URI, RemoteFileStorage>();
 	private IFileContentRetriever fileContentRetriever;
 
 	private RemoteSourceCacheManager() {
@@ -75,7 +75,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	 * @param uri
 	 * @return RemoteFileStorage
 	 */
-	public RemoteFileStorage getStorage(URI uri) {
+	public synchronized RemoteFileStorage getStorage(URI uri) {
 		return cache.get(uri);
 	}
 
@@ -85,7 +85,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	 * @param uri
 	 * @param storage
 	 */
-	public void add(URI uri, RemoteFileStorage storage) {
+	public synchronized void add(URI uri, RemoteFileStorage storage) {
 		cache.put(uri, storage);
 		if (storage.getFileContentRetriever() == null) {
 			storage.setFileContentRetriever(fileContentRetriever);
@@ -97,8 +97,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; ++i) {
-			DebugEvent event = events[i];
+		for (DebugEvent event : events) {
 			if (event.getSource() instanceof IDebugTarget) {
 				switch (event.getKind()) {
 				case DebugEvent.CREATE:
@@ -120,7 +119,7 @@ public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	 * @param target
 	 * @param clear
 	 */
-	private void updateStorageContent(IDebugTarget target, boolean clear) {
+	private synchronized void updateStorageContent(IDebugTarget target, boolean clear) {
 		fileContentRetriever = (IFileContentRetriever) target.getAdapter(IFileContentRetriever.class);
 		if (fileContentRetriever != null) {
 			for (RemoteFileStorage storage : cache.values()) {

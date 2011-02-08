@@ -48,14 +48,16 @@ import com.aptana.js.debug.core.model.IJSImplicitBreakpoint;
  */
 public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImplicitBreakpoint {
 
-	protected static final int TYPE_DEBUGGER_KEYWORD = 1;
-	protected static final int TYPE_FIRST_LINE = 2;
-	protected static final int TYPE_EXCEPTION = 3;
-	protected static final int TYPE_WATCHPOINT = 4;
+	enum Type {
+		DEBUGGER_KEYWORD,
+		FIRST_LINE,
+		EXCEPTION,
+		WATCHPOINT
+	}
 
 	private final URI fileName;
 	private final int lineNumber;
-	private final int type;
+	private final Type type;
 
 	/**
 	 * JSDebugImplicitBreakpoint
@@ -64,7 +66,7 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	 * @param lineNumber
 	 * @param type
 	 */
-	public JSDebugImplicitBreakpoint(URI fileName, int lineNumber, int type) {
+	public JSDebugImplicitBreakpoint(URI fileName, int lineNumber, Type type) {
 		this.fileName = fileName;
 		this.lineNumber = lineNumber;
 		this.type = type;
@@ -81,28 +83,28 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isDebuggerKeyword()
 	 */
 	public boolean isDebuggerKeyword() {
-		return (type == TYPE_DEBUGGER_KEYWORD);
+		return (type == Type.DEBUGGER_KEYWORD);
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isFirstLine()
 	 */
 	public boolean isFirstLine() {
-		return (type == TYPE_FIRST_LINE);
+		return (type == Type.FIRST_LINE);
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isException()
 	 */
 	public boolean isException() {
-		return (type == TYPE_EXCEPTION);
+		return (type == Type.EXCEPTION);
 	}
 
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#isWatchpoint()
 	 */
 	public boolean isWatchpoint() {
-		return (type == TYPE_EXCEPTION);
+		return (type == Type.WATCHPOINT);
 	}
 
 	/*

@@ -85,10 +85,8 @@ public class WebFilesPropertyTester extends PropertyTester {
 	private void loadExtensions() {
 		IEclipsePreferences preferences = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 		String[] files = preferences.get(ICorePreferenceConstants.PREF_WEB_FILES, StringUtil.EMPTY).split(";"); //$NON-NLS-1$
-		
 		extensions = new HashSet<String>();
-		for( int i = 0; i < files.length; ++i ) {
-			String ext = files[i];
+		for (String ext : files) {
 			int index = ext.lastIndexOf('.');
 			if ( index >= 0 ) {
 				ext = ext.substring(index+1);

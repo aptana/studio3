@@ -169,9 +169,7 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 */
 	public static ILineBreakpoint lineBreakpointExists(IResource resource, int lineNumber) {
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier());
-		for (int i = 0; i < breakpoints.length; ++i) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
 			try {
 				if (breakpoint instanceof ILineBreakpoint && resource.equals(breakpoint.getMarker().getResource())
 						&& ((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber) {
@@ -192,9 +190,7 @@ public final class JSDebugModel {
 	 * @return ILineBreakpoint
 	 */
 	public static ILineBreakpoint lineBreakpointExists(IUniformResource resource, int lineNumber) {
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier());
-		for (int i = 0; i < breakpoints.length; ++i) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
 			try {
 				IMarker marker = breakpoint.getMarker();
 				if (breakpoint instanceof ILineBreakpoint && marker instanceof IUniformResourceMarker
@@ -240,10 +236,7 @@ public final class JSDebugModel {
 	 * @return IJSExceptionBreakpoint
 	 */
 	public static IJSExceptionBreakpoint exceptionBreakpointExists(String exceptionTypeName) {
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
-				.getBreakpoints(getModelIdentifier());
-		for (int i = 0; i < breakpoints.length; ++i) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
 			try {
 				if (breakpoint instanceof IJSExceptionBreakpoint
 						&& exceptionTypeName.equals(((IJSExceptionBreakpoint) breakpoint).getExceptionTypeName())) {

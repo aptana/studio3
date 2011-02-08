@@ -99,8 +99,7 @@ public class UniformResourceBreakpointChangeNotifier implements IBreakpointManag
 		if (!breakpointManager.isEnabled()) {
 			return;
 		}
-		for (int i = 0; i < markerDeltas.length; i++) {
-			IMarkerDelta delta = markerDeltas[i];
+		for (IMarkerDelta delta : markerDeltas) {
 			int kind = delta.getKind();
 			if (kind == IResourceDelta.ADDED || kind == IResourceDelta.REMOVED || kind == IResourceDelta.CHANGED) {
 				IBreakpoint breakpoint = breakpointManager.getBreakpoint(delta.getMarker());

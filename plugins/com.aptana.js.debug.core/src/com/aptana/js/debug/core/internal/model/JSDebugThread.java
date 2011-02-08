@@ -304,15 +304,15 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 					if (BREAKPOINT.equals(reason)) {
 						breakpointHit(sourceFile, Integer.parseInt(args[3]));
 					} else {
-						int type = 0;
+						JSDebugImplicitBreakpoint.Type type = null;
 						if (KEYWORD.equals(reason)) {
-							type = JSDebugImplicitBreakpoint.TYPE_DEBUGGER_KEYWORD;
+							type = JSDebugImplicitBreakpoint.Type.DEBUGGER_KEYWORD;
 						} else if (FIRST_LINE.equals(reason)) {
-							type = JSDebugImplicitBreakpoint.TYPE_FIRST_LINE;
+							type = JSDebugImplicitBreakpoint.Type.FIRST_LINE;
 						} else if (EXCEPTION.equals(reason)) {
-							type = JSDebugImplicitBreakpoint.TYPE_EXCEPTION;
+							type = JSDebugImplicitBreakpoint.Type.EXCEPTION;
 						} else if (WATCHPOINT.equals(reason)) {
-							type = JSDebugImplicitBreakpoint.TYPE_WATCHPOINT;
+							type = JSDebugImplicitBreakpoint.Type.WATCHPOINT;
 						}
 						implicitBreakpointHit(sourceFile, Integer.parseInt(args[3]), type);
 					}
@@ -380,7 +380,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		// TODO: where to find runToLine breakpoint ?
 	}
 
-	private void implicitBreakpointHit(URI filename, int line, int type) {
+	private void implicitBreakpointHit(URI filename, int line, JSDebugImplicitBreakpoint.Type type) {
 		/* TODO: use project-related path ? */
 		breakpoints = new IBreakpoint[] { new JSDebugImplicitBreakpoint(filename, line, type) };
 	}

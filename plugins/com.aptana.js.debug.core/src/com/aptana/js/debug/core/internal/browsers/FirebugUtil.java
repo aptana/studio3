@@ -46,7 +46,6 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -106,8 +105,8 @@ public final class FirebugUtil {
 						editorsFound = true;
 						String[] editors = value.split(","); //$NON-NLS-1$
 						boolean addEntry = true;
-						for (int i = 0; i < editors.length; ++i) {
-							if (id.equals(editors[i].trim())) {
+						for (String editor : editors) {
+							if (id.equals(editor.trim())) {
 								addEntry = false;
 								break;
 							}
@@ -151,9 +150,8 @@ public final class FirebugUtil {
 				doWrite = true;
 			}
 			if (!options.isEmpty()) {
-				for (Iterator<String> i = options.keySet().iterator(); i.hasNext();) {
-					String option = (String) i.next();
-					String value = (String) options.get(option);
+				for (String option : options.keySet()) {
+					String value = options.get(option);
 					if (value.length() > 0) {
 						lines.add(MessageFormat.format(PREF_FORMAT, '.' + id + '.' + option, value));
 						doWrite = true;
@@ -163,8 +161,8 @@ public final class FirebugUtil {
 			if (doWrite) {
 				writer = new PrintWriter(
 						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(prefs.toFile()), "UTF8"))); //$NON-NLS-1$
-				for (Iterator<String> i = lines.iterator(); i.hasNext();) {
-					writer.println((String) i.next());
+				for (String string : lines) {
+					writer.println(string);
 				}
 			}
 		} catch (IOException e) {

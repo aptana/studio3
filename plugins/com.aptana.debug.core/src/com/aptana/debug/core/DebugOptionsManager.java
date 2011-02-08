@@ -39,7 +39,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -48,9 +47,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
@@ -141,8 +140,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 */
 	public void setDetailFormatters(Collection<DetailFormatter> formatters) {
 		fDetailFormattersMap.clear();
-		for (Iterator<DetailFormatter> i = formatters.iterator(); i.hasNext();) {
-			DetailFormatter formatter = (DetailFormatter) i.next();
+		for (DetailFormatter formatter : formatters) {
 			fDetailFormattersMap.put(formatter.getTypeName(), formatter);
 		}
 		savePreferences();
@@ -185,7 +183,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 * @return DetailFormatter
 	 */
 	public DetailFormatter getAssociatedDetailFormatter(String typeName) {
-		return (DetailFormatter) fDetailFormattersMap.get(typeName);
+		return fDetailFormattersMap.get(typeName);
 	}
 
 	/**
@@ -263,11 +261,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	}
 
 	private void savePreferences() {
-		Collection<DetailFormatter> valuesList = fDetailFormattersMap.values();
-		String[] values = new String[valuesList.size() * 3];
+		String[] values = new String[fDetailFormattersMap.size() * 3];
 		int i = 0;
-		for (Iterator<DetailFormatter> iter = valuesList.iterator(); iter.hasNext();) {
-			DetailFormatter detailFormatter = (DetailFormatter) iter.next();
+		for (DetailFormatter detailFormatter : fDetailFormattersMap.values()) {
 			values[i++] = detailFormatter.getTypeName();
 			values[i++] = detailFormatter.getSnippet().replace(',', '\u0000');
 			values[i++] = detailFormatter.isEnabled() ? DETAIL_FORMATTER_IS_ENABLED : DETAIL_FORMATTER_IS_DISABLED;
@@ -283,9 +279,8 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	}
 
 	private void notifyChangeListeners() {
-		Object[] listeners = changeListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((IDetailFormattersChangeListener) listeners[i]).detailFormattersChanged();
+		for (Object listener : changeListeners.getListeners()) {
+			((IDetailFormattersChangeListener) listener).detailFormattersChanged();
 		}
 	}
 
@@ -293,8 +288,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; ++i) {
-			DebugEvent event = events[i];
+		for (DebugEvent event : events) {
 			if (event.getSource() instanceof IDebugTarget && modelIdentifier.equals(((IDebugTarget) event.getSource()).getModelIdentifier())) {
 				switch (event.getKind()) {
 				case DebugEvent.CREATE:
@@ -313,10 +307,9 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 
 	private void cleanupBreakpoints() {
 		IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
-		IBreakpoint[] breakpoints = breakpointManager.getBreakpoints(modelIdentifier);
-		for (int i = 0; i < breakpoints.length; ++i) {
+		for (IBreakpoint breakpoint : breakpointManager.getBreakpoints(modelIdentifier)) {
 			try {
-				IMarker marker = breakpoints[i].getMarker();
+				IMarker marker = breakpoint.getMarker();
 				URI uri = null;
 				if (marker instanceof IUniformResourceMarker) {
 					uri = ((IUniformResourceMarker) marker).getUniformResource().getURI();
@@ -330,7 +323,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 				}
 				if (uri != null && "dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
 				{
-					breakpoints[i].delete();
+					breakpoint.delete();
 				}
 			} catch (CoreException e) {
 				DebugCorePlugin.log(e);

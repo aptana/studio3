@@ -95,12 +95,11 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 		// TODO remove when multiple debug targets supported
 		if ("debug".equals(mode)) { //$NON-NLS-1$
-			IDebugTarget[] targets = DebugPlugin.getDefault().getLaunchManager().getDebugTargets();
 			IDebugTarget activeSession = null;
-			for (int i = 0; i < targets.length; i++) {
-				if (IJSDebugConstants.ID_DEBUG_MODEL.equals(targets[i].getModelIdentifier())) {
-					if (!targets[i].isTerminated()) {
-						activeSession = targets[i];
+			for (IDebugTarget target : DebugPlugin.getDefault().getLaunchManager().getDebugTargets()) {
+				if (IJSDebugConstants.ID_DEBUG_MODEL.equals(target.getModelIdentifier())) {
+					if (!target.isTerminated()) {
+						activeSession = target;
 						break;
 					}
 				}
@@ -251,10 +250,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		String browserCmdLine = configuration.getAttribute(
 				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
 		if (browserCmdLine != null && browserCmdLine.length() > 0) {
-			String[] args = browserCmdLine.split(" ");
-			for (int i = 0; i < args.length; ++i) {
-				if (args[i].trim().length() > 0) {
-					browserArgs.add(args[i].trim());
+			for (String arg : browserCmdLine.split(" ")) {
+				if (arg.trim().length() > 0) {
+					browserArgs.add(arg.trim());
 				}
 			}
 		}

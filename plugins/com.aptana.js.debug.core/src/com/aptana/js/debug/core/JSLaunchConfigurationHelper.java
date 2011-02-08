@@ -35,18 +35,14 @@
 package com.aptana.js.debug.core;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Enumeration;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Preferences;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -62,7 +58,6 @@ import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
  * @author Max Stepanov
  * 
  */
-@SuppressWarnings("deprecation")
 public final class JSLaunchConfigurationHelper {
 
 	public static final String FIREFOX = "Firefox"; //$NON-NLS-1$
@@ -104,9 +99,8 @@ public final class JSLaunchConfigurationHelper {
 			if (Platform.OS_WIN32.equals(Platform.getOS())) {
 				/* Firefox */
 				if (FIREFOX.equals(nature) || (nature == null)) {
-					String[] locations = ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_FIREFOX;
-					for (int i = 0; i < locations.length; ++i) {
-						String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_WINDOWS_FIREFOX) {
+						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
 						if (file.exists() && !file.isDirectory()) {
 							browser = location;
@@ -129,9 +123,8 @@ public final class JSLaunchConfigurationHelper {
 			} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 				/* Firefox */
 				if (FIREFOX.equals(nature) || (nature == null)) {
-					String[] locations = ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX;
-					for (int i = 0; i < locations.length; ++i) {
-						String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
+					for (String location: ILaunchConfigurationConstants.DEFAULT_BROWSER_MACOSX_FIREFOX) {
+						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
 						if (file.exists() && file.isDirectory()) {
 							browser = location;
@@ -154,9 +147,8 @@ public final class JSLaunchConfigurationHelper {
 			} else if (Platform.OS_LINUX.equals(Platform.getOS())) {
 				/* Firefox */
 				if (FIREFOX.equals(nature) || (nature == null)) {
-					String[] locations = ILaunchConfigurationConstants.DEFAULT_BROWSER_LINUX_FIREFOX;
-					for (int i = 0; i < locations.length; ++i) {
-						String location = PlatformUtil.expandEnvironmentStrings(locations[i]);
+					for (String location : ILaunchConfigurationConstants.DEFAULT_BROWSER_LINUX_FIREFOX) {
+						location = PlatformUtil.expandEnvironmentStrings(location);
 						File file = new File(location);
 						if (file.exists() && file.isFile()) {
 							browser = location;
@@ -228,16 +220,16 @@ public final class JSLaunchConfigurationHelper {
 	 * @param configuration
 	 */
 	public static void setDebugDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		Preferences store = JSDebugPlugin.getDefault().getPluginPreferences();
+		IScopeContext[] scopes = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false);
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, store
-				.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, store
-				.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS, store
-				.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, store
-				.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes));
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes));
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes));
+		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
+				Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes));
 	}
 
 	/**
@@ -304,81 +296,6 @@ public final class JSLaunchConfigurationHelper {
 		return getContributedAdapter(this, clazz);
 	}
 
-	public static URL getBaseURL(ILaunchConfiguration configuration, IResource resource) throws CoreException {
-		int serverType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE,
-				ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
-		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
-				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
-		boolean appendProjectName = true;
-
-		URL baseURL = null;
-
-		try {
-			if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL
-					|| serverType == ILaunchConfigurationConstants.SERVER_MANAGED) {
-				String externalBaseUrl = null;
-				if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
-					externalBaseUrl = configuration.getAttribute(
-							ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
-				} else {/*
-					String serverId = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID,
-							(String) null);
-					String host = null;
-					IServer server = ServerCore.getServerManager().findServer(serverId);
-					if (server != null) {
-						host = server.getHost();
-						if (host == null) {
-							host = "localhost"; //$NON-NLS-1$
-						}
-					}
-					if (host == null) {
-						throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-								Messages.JSLaunchConfigurationHelper_Host_Not_Specified, null));
-					}
-					externalBaseUrl = MessageFormat.format("http://{0}/", host); //$NON-NLS-1$
-					*/
-				}
-				if (StringUtil.isEmpty(externalBaseUrl)) {
-					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationHelper_Empty_Server_URL, null));
-				}
-				if (externalBaseUrl.charAt(externalBaseUrl.length() - 1) != '/') {
-					externalBaseUrl = externalBaseUrl + '/';
-				}
-				baseURL = new URL(externalBaseUrl);
-
-			} else if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL) {
-				if (startActionType != ILaunchConfigurationConstants.START_ACTION_START_URL && resource != null) {
-					/*IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(
-							new JSLaunchConfigurationDelegate(), IHttpServerProviderAdapter.class);
-					if (httpServerProvider != null) {
-						IServer server = httpServerProvider.getServer(resource);
-						if (server != null) {
-							baseURL = new URL(MessageFormat.format("http://{0}/", server.getHost())); //$NON-NLS-1$
-							IPath documentRoot = server.getDocumentRoot();
-							if (documentRoot != null
-									&& documentRoot.equals(ResourcesPlugin.getWorkspace().getRoot().getLocation())) {
-								appendProjectName = true;
-							}
-						}
-					}
-					*/
-				}
-			}
-			if (baseURL != null) {
-				if (appendProjectName) {
-					IProject project = resource.getProject();
-					baseURL = new URL(baseURL, project.getName() + '/');
-				}
-			}
-		} catch (MalformedURLException e) {
-			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-					Messages.JSLaunchConfigurationHelper_Malformed_URL, e));
-		}
-
-		return baseURL;
-	}
-
 	public static void initializeLaunchAttributes(ILaunchConfiguration configuration, ILaunch launch)
 			throws CoreException {
 		if (configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false)) {
@@ -395,15 +312,15 @@ public final class JSLaunchConfigurationHelper {
 					.toString(configuration.getAttribute(
 							ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, false)));
 		} else {
-			Preferences store = JSDebugPlugin.getDefault().getPluginPreferences();
+			IScopeContext[] scopes = new IScopeContext[] { new InstanceScope(), new DefaultScope() };
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE, Boolean
-					.toString(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE)));
+					.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, false, scopes)));
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS, Boolean
-					.toString(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS, Boolean.toString(store
-					.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS)));
-			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, Boolean
-					.toString(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD)));
+					.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, false, scopes)));
+			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, false, scopes)));
+			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS,
+					Boolean.toString(Platform.getPreferencesService().getBoolean(JSDebugPlugin.PLUGIN_ID, IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, false, scopes)));
 
 		}
 	}
