@@ -260,6 +260,35 @@ public class CommandElement extends AbstractBundleElement
 	}
 
 	/**
+	 * Used for YAML serialization/deserialization.
+	 * 
+	 * @return
+	 */
+	public List<String> getInput()
+	{
+		if (getInputTypes() == null)
+		{
+			return null;
+		}
+		List<String> inputs = new ArrayList<String>();
+		for (InputType it : getInputTypes())
+		{
+			inputs.add(it.getName());
+		}
+		return inputs;
+	}
+
+	/**
+	 * Used for YAMl deserialization...
+	 * 
+	 * @param inputs
+	 */
+	public void setInput(List<String> inputs)
+	{
+		setInputType(inputs.toArray(new String[inputs.size()]));
+	}
+
+	/**
 	 * getInvokeUnion
 	 * 
 	 * @return
@@ -669,7 +698,8 @@ public class CommandElement extends AbstractBundleElement
 		// output invoke block, if it is defined
 		if (this.getInvokeBlock() != null)
 		{
-			printer.printWithIndent("block: ").println(this.getInvokeBlock().to_s().asJavaString()); //$NON-NLS-1$
+			// Spit out something repeatable, for now just block type
+			printer.printWithIndent("block: ").println(this.getInvokeBlock().getBlock().type.toString()); //$NON-NLS-1$
 		}
 
 		// output key bindings, if it is defined
@@ -726,7 +756,7 @@ public class CommandElement extends AbstractBundleElement
 		}
 
 		// output output type
-		printer.printWithIndent("output: ").println(this._outputType.getName()); //$NON-NLS-1$
+		printer.printWithIndent("output: ").println(this.getOutputType()); //$NON-NLS-1$
 
 		// output a comma-delimited list of triggers, if any are defined
 		String[] triggers = this.getTriggerTypeValues(TriggerType.PREFIX);

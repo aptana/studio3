@@ -25,6 +25,7 @@ import org.eclipse.text.edits.TextEdit;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.epl.FormatterPlugin;
+import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterException;
 import com.aptana.formatter.ui.FormatterSyntaxProblemException;
 import com.aptana.formatter.ui.util.Util;
@@ -55,7 +56,12 @@ public class FormatterPreviewUtils
 				return;
 			}
 			IScriptFormatter formatter = factory.createFormatter(LINE_SEPARATOR, preferences);
-			final int tabSize = formatter.getTabSize();
+			int tabSize = formatter.getTabSize();
+			String indentType = formatter.getIndentType();
+			if (CodeFormatterConstants.EDITOR.equals(indentType))
+			{
+				tabSize = formatter.getEditorSpecificTabWidth();
+			}
 			if (tabSize != viewer.getTextWidget().getTabs())
 			{
 				viewer.getTextWidget().setTabs(tabSize);
@@ -68,7 +74,6 @@ public class FormatterPreviewUtils
 				{
 					IDocument document = new Document(content);
 					textEdit.apply(document);
-					// TODO change background to white
 					viewer.getDocument().set(document.get());
 					return;
 				}

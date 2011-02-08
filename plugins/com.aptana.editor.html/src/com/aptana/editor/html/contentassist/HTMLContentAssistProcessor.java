@@ -1277,9 +1277,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(),
-												previousPartition.getLength()).trim();
-										if (src.charAt(src.length() - 1) == '>')
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
 										}
@@ -1527,6 +1527,37 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		if (startingLexeme != null && endingLexeme != null)
 		{
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+
+		// first step is to determine if we're inside an open tag, close tag, text, etc.
+		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
+
+		switch (location)
+		{
+			case IN_OPEN_TAG:
+				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
+				if (c == ' ' || c == '\t')
+				{
+					return true;
+				}
+				else
+				{
+					// If that's not the case, check if we are actually typing the attribute name
+					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
+				}
+			default:
+				return false;
 		}
 	}
 }

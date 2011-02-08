@@ -75,7 +75,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.xml.preferences.XMLPreferencePage"
             id="com.aptana.editor.xml.preferences.XMLPreferencePage"
-            name="XML">
+            name="%page.preference.name">
       </page>
    </extension>
    <extension
