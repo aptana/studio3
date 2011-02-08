@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.model;
 
+import java.net.URI;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 
@@ -48,7 +50,7 @@ public interface IJSImplicitBreakpoint extends ILineBreakpoint {
 	 * @return String
 	 * @throws CoreException
 	 */
-	String getFileName() throws CoreException;
+	URI getFileName() throws CoreException;
 
 	/**
 	 * Returns if this breakpoint is a debugger keyword hard-coded breakpoint

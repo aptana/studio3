@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.model;
 
+import java.net.URI;
+
 import org.eclipse.debug.core.model.IDebugElement;
 
 /**
@@ -46,6 +48,6 @@ public interface ISourceLink extends IDebugElement {
 	 * 
 	 * @return String
 	 */
-	String getLocation();
+	URI getLocation();
 
 }

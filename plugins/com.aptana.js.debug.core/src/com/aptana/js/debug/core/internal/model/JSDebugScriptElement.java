@@ -34,6 +34,7 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class JSDebugScriptElement extends JSDebugElement implements IJSScriptEle
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLocation()
 	 */
-	public String getLocation() {
+	public URI getLocation() {
 		return getParent().getLocation();
 	}
 

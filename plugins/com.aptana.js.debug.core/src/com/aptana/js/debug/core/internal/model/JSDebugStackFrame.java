@@ -34,6 +34,7 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
 import java.text.MessageFormat;
 
 import org.eclipse.debug.core.DebugException;
@@ -54,7 +55,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	private final IThread thread;
 	private int frameId;
 	private final String function;
-	private final String sourceFile;
+	private final URI sourceFile;
 	private int sourceLine;
 	private IVariable[] variables;
 
@@ -73,7 +74,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	 * @param pc
 	 * @param scriptTag
 	 */
-	public JSDebugStackFrame(IDebugTarget target, IThread thread, int frameId, String function, String sourceFile,
+	public JSDebugStackFrame(IDebugTarget target, IThread thread, int frameId, String function, URI sourceFile,
 			int sourceLine, long pc, int scriptTag) {
 		super(target);
 		this.thread = thread;
@@ -304,7 +305,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSStackFrame#getSourceFileName()
 	 */
-	public String getSourceFileName() {
+	public URI getSourceFileName() {
 		return sourceFile;
 	}
 

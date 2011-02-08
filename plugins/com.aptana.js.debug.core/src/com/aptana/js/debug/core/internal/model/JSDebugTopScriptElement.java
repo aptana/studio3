@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
+
 import org.eclipse.debug.core.model.IDebugTarget;
 
 import com.aptana.js.debug.core.model.IJSScriptElement;
@@ -43,7 +45,7 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
  */
 public class JSDebugTopScriptElement extends JSDebugScriptElement {
 	
-	private final String location;
+	private final URI location;
 
 	/**
 	 * JSDebugTopScriptElement
@@ -52,7 +54,7 @@ public class JSDebugTopScriptElement extends JSDebugScriptElement {
 	 * @param name
 	 * @param location
 	 */
-	public JSDebugTopScriptElement(IDebugTarget target, String name, String location) {
+	public JSDebugTopScriptElement(IDebugTarget target, String name, URI location) {
 		super(target, name, -1, -1);
 		this.location = location;
 	}
@@ -60,7 +62,7 @@ public class JSDebugTopScriptElement extends JSDebugScriptElement {
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSScriptElement#getLocation()
 	 */
-	public String getLocation() {
+	public URI getLocation() {
 		return location;
 	}
 

@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.model;
 
+import java.net.URI;
+
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
@@ -48,7 +50,7 @@ public interface IJSStackFrame extends IStackFrame {
 	 * 
 	 * @return String
 	 */
-	String getSourceFileName();
+	URI getSourceFileName();
 
 	/**
 	 * Find a variable by name in this stack frame

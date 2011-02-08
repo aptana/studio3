@@ -37,6 +37,7 @@ package com.aptana.js.debug.ui.internal;
 import java.net.URI;
 import java.text.MessageFormat;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -115,7 +116,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 			} else if (element instanceof IJSScriptElement) {
 				return getScriptElementText((IJSScriptElement) element);
 			} else if (element instanceof ISourceLink) {
-				return ((ISourceLink) element).getLocation();
+				return ((ISourceLink) element).getLocation().toString();
 			} else if (element instanceof IMarker) {
 				IBreakpoint breakpoint = getBreakpoint((IMarker) element);
 				if (breakpoint != null) {
@@ -158,16 +159,13 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	 * 
 	 * @param frame
 	 * @return String
-	 * @throws DebugException
+	 * @throws CoreException
 	 */
-	private String getStackFrameText(IStackFrame frame) throws DebugException {
+	private String getStackFrameText(IStackFrame frame) throws CoreException {
 		String fileName;
 		if (frame instanceof IJSStackFrame) {
-			fileName = ((IJSStackFrame) frame).getSourceFileName();
-			IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-			if (file != null) {
-				fileName = file.getFullPath().lastSegment();
-			}
+			URI uri = ((IJSStackFrame) frame).getSourceFileName();
+			fileName = EFS.getStore(uri).getName();
 		} else {
 			fileName = Messages.JSDebugModelPresentation_line;
 		}
@@ -197,11 +195,8 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 				String lineNumber;
 				if (breakpoint instanceof IJSImplicitBreakpoint) {
 					IJSImplicitBreakpoint implicitBreakpoint = (IJSImplicitBreakpoint) breakpoint;
-					fileName = implicitBreakpoint.getFileName();
-					IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-					if (file != null) {
-						fileName = file.getFullPath().toString();
-					}
+					URI uri = implicitBreakpoint.getFileName();
+					fileName = EFS.getStore(uri).getName();
 
 					try {
 						lineNumber = Integer.toString(implicitBreakpoint.getLineNumber());

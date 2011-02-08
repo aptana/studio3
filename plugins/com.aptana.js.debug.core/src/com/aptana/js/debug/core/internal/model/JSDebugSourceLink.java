@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
+
 import com.aptana.js.debug.core.model.ISourceLink;
 
 /**
@@ -41,14 +43,14 @@ import com.aptana.js.debug.core.model.ISourceLink;
  */
 public class JSDebugSourceLink extends JSDebugElement implements ISourceLink {
 
-	private String location;
+	private URI location;
 
 	/**
 	 * JSDebugSourceLink
 	 * 
 	 * @param location
 	 */
-	public JSDebugSourceLink(String location) {
+	public JSDebugSourceLink(URI location) {
 		super(null);
 		this.location = location;
 	}
@@ -56,7 +58,7 @@ public class JSDebugSourceLink extends JSDebugElement implements ISourceLink {
 	/*
 	 * @see com.aptana.js.debug.core.model.ISourceLink#getLocation()
 	 */
-	public String getLocation() {
+	public URI getLocation() {
 		return location;
 	}
 

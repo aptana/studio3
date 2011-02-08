@@ -280,7 +280,7 @@ public final class JSDebugModel {
 	 * @param location
 	 * @return
 	 */
-	public static ISourceLink createSourceLink(String location) {
+	public static ISourceLink createSourceLink(URI location) {
 		return new JSDebugSourceLink(location);
 	}
 

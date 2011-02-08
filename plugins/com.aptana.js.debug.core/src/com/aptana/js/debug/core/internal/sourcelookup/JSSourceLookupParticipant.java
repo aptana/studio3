@@ -34,6 +34,9 @@
  */
 package com.aptana.js.debug.core.internal.sourcelookup;
 
+import java.net.URI;
+
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 
 import com.aptana.debug.core.sourcelookup.RemoteContentSourceLookupParticipant;
@@ -52,11 +55,15 @@ public class JSSourceLookupParticipant extends RemoteContentSourceLookupParticip
 	 */
 	public String getSourceName(Object object) throws CoreException {
 		if (object instanceof IJSStackFrame) {
-			return ((IJSStackFrame) object).getSourceFileName();
+			return ((IJSStackFrame) object).getSourceFileName().toString();
 		} else if (object instanceof IJSScriptElement) {
-			return ((IJSScriptElement) object).getLocation();
+			return ((IJSScriptElement) object).getLocation().toString();
 		} else if (object instanceof ISourceLink) {
-			return ((ISourceLink) object).getLocation();
+			return ((ISourceLink) object).getLocation().toString();
+		} else if (object instanceof IFileStore) {
+			return ((IFileStore) object).toURI().toString();
+		} else if (object instanceof URI) {
+			return ((URI) object).toString();
 		} else if (object instanceof String) {
 			// assume it's a file name
 			return (String) object;

@@ -34,6 +34,7 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Vector;
 
@@ -298,7 +299,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				details = DebugEvent.BREAKPOINT;
 				stackFrames = null;
 				/* find breakpoint(s) */
-				String sourceFile = ((JSDebugTarget) getDebugTarget()).resolveSourceFile(Util.decodeData(args[2]));
+				URI sourceFile = ((JSDebugTarget) getDebugTarget()).resolveSourceFile(Util.decodeData(args[2]));
 				try {
 					if (BREAKPOINT.equals(reason)) {
 						breakpointHit(sourceFile, Integer.parseInt(args[3]));
@@ -364,7 +365,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				MessageFormat.format(STEP_TO_FRAME_0, targetFrameId));
 	}
 
-	private void breakpointHit(String filename, int lineNumber) {
+	private void breakpointHit(URI filename, int lineNumber) {
 		IBreakpoint breakpoint = ((JSDebugTarget) getDebugTarget()).findBreakpointAt(filename, lineNumber);
 		if (breakpoint != null && breakpoint instanceof IJSLineBreakpoint) {
 			try {
@@ -379,7 +380,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		// TODO: where to find runToLine breakpoint ?
 	}
 
-	private void implicitBreakpointHit(String filename, int line, int type) {
+	private void implicitBreakpointHit(URI filename, int line, int type) {
 		/* TODO: use project-related path ? */
 		breakpoints = new IBreakpoint[] { new JSDebugImplicitBreakpoint(filename, line, type) };
 	}
@@ -406,7 +407,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				} else {
 					function += MessageFormat.format("({0})", arguments); //$NON-NLS-1$
 				}
-				String sourceFile = target.resolveSourceFile(Util.decodeData(subargs[j++]));
+				URI sourceFile = target.resolveSourceFile(Util.decodeData(subargs[j++]));
 				int sourceLine = Integer.parseInt(subargs[j++]);
 				++j; // skip native flag
 				long pc = Long.parseLong(subargs[j++]);

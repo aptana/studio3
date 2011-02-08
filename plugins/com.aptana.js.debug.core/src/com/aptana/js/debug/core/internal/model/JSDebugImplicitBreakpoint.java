@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.core.internal.model;
 
+import java.net.URI;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
@@ -51,7 +53,7 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	protected static final int TYPE_EXCEPTION = 3;
 	protected static final int TYPE_WATCHPOINT = 4;
 
-	private final String fileName;
+	private final URI fileName;
 	private final int lineNumber;
 	private final int type;
 
@@ -62,7 +64,7 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	 * @param lineNumber
 	 * @param type
 	 */
-	public JSDebugImplicitBreakpoint(String fileName, int lineNumber, int type) {
+	public JSDebugImplicitBreakpoint(URI fileName, int lineNumber, int type) {
 		this.fileName = fileName;
 		this.lineNumber = lineNumber;
 		this.type = type;
@@ -71,7 +73,7 @@ public class JSDebugImplicitBreakpoint extends PlatformObject implements IJSImpl
 	/*
 	 * @see com.aptana.js.debug.core.model.IJSImplicitBreakpoint#getFileName()
 	 */
-	public String getFileName() throws CoreException {
+	public URI getFileName() throws CoreException {
 		return fileName;
 	}
 

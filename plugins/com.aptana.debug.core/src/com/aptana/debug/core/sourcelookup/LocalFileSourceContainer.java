@@ -35,66 +35,60 @@
 package com.aptana.debug.core.sourcelookup;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.eclipse.core.filesystem.URIUtil;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
 
 import com.aptana.core.resources.LocalFileStorage;
+import com.aptana.ide.core.io.efs.EFSUtils;
 
 /**
  * @author Max Stepanov
  */
 public class LocalFileSourceContainer extends AbstractSourceContainer {
 	
-	private final IWorkspaceRoot fRoot;
-
-	/**
-	 * LocalFileSourceContainer
-	 */
-	public LocalFileSourceContainer() {
-		fRoot = ResourcesPlugin.getWorkspace().getRoot();
-	}
+	private static final Object[] EMPTY = new Object[0];
 
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceContainer#findSourceElements(java.lang.String)
 	 */
-	public Object[] findSourceElements(String path) throws CoreException {
-		ArrayList<Object> sources = new ArrayList<Object>();
-		IPath ipath = new Path(path);
-		if (ipath.isAbsolute()) {
-			File osFile = new File(path);
-			if (osFile.exists()) {
-				try {
-					IPath canonicalPath = new Path(osFile.getCanonicalPath());
-					IFile[] files = fRoot.findFilesForLocationURI(URIUtil.toURI(canonicalPath.makeAbsolute()));
-					if (files.length > 0) {
-						for (int i = 0; i < files.length; i++) {
-							sources.add(files[i]);
-						}
-					} else {
-						sources.add(new LocalFileStorage(osFile));
-					}
-				} catch (IOException e) {
+	public Object[] findSourceElements(String uriString) throws CoreException {
+		URI uri = null;
+		try {
+			uri = new URI(uriString);
+		} catch (URISyntaxException e) {
+			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(uriString));
+			if (resource != null) {
+				uri = EFSUtils.getFileStore(resource).toURI();
+			}
+		}
+		if (uri != null) {
+			IFileStore fileStore = EFS.getStore(uri);
+			if (fileStore.fetchInfo().exists()) {
+				IResource resource = (IResource) fileStore.getAdapter(IResource.class);
+				if (resource != null && resource.exists()) {
+					return new Object[] { resource };
+				}
+				File file = (File) fileStore.getAdapter(File.class);
+				if (file != null && file.isFile()) {
+					return new Object[] { new LocalFileStorage(file) }; // TODO: check if we could use iFileStore here instead
+				}
+				file = fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
+				if (file != null && file.isFile()) {
+					return new Object[] { new LocalFileStorage(file) }; // TODO: check if we could use iFileStore here instead
 				}
 			}
-		} else {
-			IResource res = fRoot.findMember(ipath);
-			if (res instanceof IFile) {
-				sources.add(res);
-			}
-
 		}
-		return sources.toArray();
+		return EMPTY;
 	}
 
 	/*

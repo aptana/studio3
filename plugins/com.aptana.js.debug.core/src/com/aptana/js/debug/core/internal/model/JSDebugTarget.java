@@ -49,18 +49,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -84,14 +82,12 @@ import org.osgi.framework.Constants;
 
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
-import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
-import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
-import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -104,6 +100,7 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 import com.aptana.js.debug.core.model.xhr.IXHRService;
+import com.aptana.webserver.core.IURLMapper;
 
 /**
  * @author Max Stepanov
@@ -195,15 +192,15 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private IProcess process;
 	private OutputStream out;
 	private OutputStream err;
-	private LocalResourceMapper resourceMapper;
+	private IURLMapper urlMapper;
 	private JSDebugThread[] threads = new JSDebugThread[0];
 	private IFileContentRetriever fileContentRetriever;
 	private XHRService xhrService;
-	private Map<String, IJSScriptElement> topScriptElements = new HashMap<String, IJSScriptElement>();
+	private Map<URI, IJSScriptElement> topScriptElements = new HashMap<URI, IJSScriptElement>();
 	private Map<Integer, IJSScriptElement> scripts = new HashMap<Integer, IJSScriptElement>();
 	private List<IBreakpoint> runToLineBreakpoints = new ArrayList<IBreakpoint>();
-	private Map<String, String> sourceResolveCache = new HashMap<String, String>(64);
-	private String mainFile = null;
+	private Map<String, URI> sourceResolveCache = new HashMap<String, URI>(64);
+	private URI mainFile = null;
 	private IBreakpoint skipOperationOnBreakpoint = null;
 	private boolean ignoreBreakpointCreation = false;
 	private boolean contentChanged = false;
@@ -252,9 +249,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, IProcess process, HttpServerProcess httpServer,
-			LocalResourceMapper resourceMapper, DebugConnection connection, boolean debugMode) throws CoreException {
-		this(launch, null, process, httpServer, resourceMapper, connection, debugMode);
+	public JSDebugTarget(ILaunch launch, IProcess process, IURLMapper urlMapper, DebugConnection connection, boolean debugMode) throws CoreException {
+		this(launch, null, process, urlMapper, connection, debugMode);
 	}
 
 	/**
@@ -269,14 +265,13 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, String label, IProcess process, HttpServerProcess httpServer,
-			LocalResourceMapper resourceMapper, DebugConnection connection, boolean debugMode) throws CoreException {
+	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURLMapper urlMapper, DebugConnection connection, boolean debugMode) throws CoreException {
 		super(null);
 		this.launch = launch;
 		this.label = label;
 		this.process = process;
-		this.resourceMapper = resourceMapper;
 		this.connection = connection;
+		this.urlMapper = urlMapper;
 
 		try {
 			if (debugMode) {
@@ -285,9 +280,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				/* TODO: do some refactoring here */
 				if (process instanceof JSDebugProcess) {
 					((JSDebugProcess) process).setDebugTarget(this);
-				}
-				if (httpServer != null) {
-					httpServer.setDebugTarget(this);
 				}
 			}
 			init(debugMode);
@@ -351,12 +343,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			StringBuffer sb = new StringBuffer(text);
 			String type = args[3];
 			if (SRC.equals(type) && args.length >= 6) {
-				String fileName = resolveSourceFile(Util.decodeData(args[4]));
-				IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-				if (file != null) {
-					fileName = file.getFullPath().makeRelative().toString();
-				}
-				sb.append(MessageFormat.format(" ({0}:{1})", fileName, args[5])); //$NON-NLS-1$
+				URI fileName = resolveSourceFile(Util.decodeData(args[4]));
+				sb.append(MessageFormat.format(" ({0}:{1})", fileName.getPath(), args[5])); //$NON-NLS-1$
 			} else if (TRACE.equals(type)) {
 				sb.append('\n');
 				for (int i = 4; i < args.length; ++i) {
@@ -366,13 +354,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 								i == args.length - 1 ? Messages.JSDebugTarget_TopLevelScript
 										: Messages.JSDebugTarget_EvalScript);
 					}
-					String fileName = resolveSourceFile(Util.decodeData(subargs[2]));
-					IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-					if (file != null) {
-						fileName = file.getFullPath().makeRelative().toString();
-					}
+					URI fileName = resolveSourceFile(Util.decodeData(subargs[2]));
 					sb.append(MessageFormat.format("\tat {0}({1}) ({2}:{3})\n", //$NON-NLS-1$
-							Util.decodeData(subargs[0]), Util.decodeData(subargs[1]), fileName,
+							Util.decodeData(subargs[0]), Util.decodeData(subargs[1]), fileName.getPath(),
 									subargs[3]));
 				}
 			}
@@ -507,7 +491,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			} catch (DebugException ignore) {
 			}
 		} else if (OPEN.equals(action)) {
-			String fileName = resolveSourceFile(Util.decodeData(args[j++]));
+			URI fileName = resolveSourceFile(Util.decodeData(args[j++]));
 			if (fileName != null) {
 				Object sourceElement = null;
 				ISourceLocator locator = launch.getSourceLocator();
@@ -542,12 +526,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					scriptTag = Integer.parseInt(subargs[j++]);
 				} catch (NumberFormatException e) {
 				}
-				String fileName = Util.decodeData(subargs[j++]);
-				if (fileName.length() == 0 || "[Eval-script]".equals(fileName) //$NON-NLS-1$
-						|| fileName.startsWith("javascript:")) { //$NON-NLS-1$ 
+				String source = Util.decodeData(subargs[j++]);
+				if (source.length() == 0 || "[Eval-script]".equals(source) //$NON-NLS-1$
+						|| source.startsWith("javascript:")) { //$NON-NLS-1$ 
 					continue;
 				}
-				fileName = resolveSourceFile(fileName);
+				URI fileName = resolveSourceFile(source);
 				String scriptName = Util.decodeData(subargs[j++]);
 				int baseLine = -1;
 				int lineExtent = -1;
@@ -561,12 +545,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				}
 				JSDebugScriptElement topScriptElement = (JSDebugScriptElement) topScriptElements.get(fileName);
 				if (topScriptElement == null) {
-					String name = fileName;
-					IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-					if (file != null) {
-						name = file.getFullPath().toString();
-					}
-					topScriptElement = new JSDebugTopScriptElement(this, name, fileName);
+					topScriptElement = new JSDebugTopScriptElement(this, fileName.getPath(), fileName);
 					topScriptElements.put(fileName, topScriptElement);
 				}
 				JSDebugScriptElement scriptElement = new JSDebugScriptElement(this, scriptName, baseLine, lineExtent);
@@ -587,7 +566,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				scriptTag = Integer.parseInt(subargs[j++]);
 			} catch (NumberFormatException e) {
 			}
-			String fileName = resolveSourceFile(Util.decodeData(subargs[j++]));
+			URI fileName = resolveSourceFile(Util.decodeData(subargs[j++]));
 			JSDebugScriptElement topScriptElement = (JSDebugScriptElement) topScriptElements.get(fileName);
 			if (scriptTag > 0) {
 				JSDebugScriptElement scriptElement = (JSDebugScriptElement) scripts.remove(new Integer(scriptTag));
@@ -1389,20 +1368,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		URL url = null;
 		String properties = StringUtil.EMPTY;
 		try {
-			URI uri = null;
+			URI fileName = null;
 			if (marker instanceof IUniformResourceMarker) {
-				uri = ((IUniformResourceMarker) marker).getUniformResource().getURI();
+				fileName = ((IUniformResourceMarker) marker).getUniformResource().getURI();
 			} else {
 				IResource resource = marker.getResource();
 				if (resource instanceof IWorkspaceRoot) {
-					uri = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
+					fileName = URI.create((String) marker.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
 				} else {
-					uri = resource.getLocation().makeAbsolute().toFile().toURI();
+					fileName = EFSUtils.getFileStore(resource).toURI();
 				}
 			}
-			if (uri != null && resourceMapper != null) {
-				uri = resourceMapper.resolveLocalURI(uri);
+			if (fileName != null && urlMapper != null) {
+				url = urlMapper.resolve(EFS.getStore(fileName));
 			}
+			/*
 			if (uri != null) {
 				if ("dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
 				{
@@ -1411,8 +1391,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					url = uri.toURL();
 				}
 			}
-		} catch (MalformedURLException e) {
-			JSDebugPlugin.log(e);
+			*/
 		} catch (CoreException e) {
 			JSDebugPlugin.log(e);
 		}
@@ -1433,8 +1412,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			String condition = conditionEnabled ? marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION,
 					StringUtil.EMPTY) : StringUtil.EMPTY;
 			String suspendOnTrue = marker.getAttribute(IJSDebugConstants.BREAKPOINT_CONDITION_SUSPEND_ON_TRUE, true) ? "1" : "0"; //$NON-NLS-1$ //$NON-NLS-2$
-			properties = MessageFormat
-					.format(
+			properties = MessageFormat.format(
 							"*{0}*{1}*{2}*{3}", //$NON-NLS-1$
 							enabled ? "1" : "0", Integer.toString(hitCount), Util.encodeData(condition), suspendOnTrue); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -1538,15 +1516,15 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param lineNumber
 	 * @return IBreakpoint
 	 */
-	protected IBreakpoint findBreakpointAt(String filename, int lineNumber) {
+	protected IBreakpoint findBreakpointAt(URI fileName, int lineNumber) {
 		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
 				.getBreakpoints(getModelIdentifier());
-		IBreakpoint breakpoint = findBreakpointIn(filename, lineNumber, breakpoints);
+		IBreakpoint breakpoint = findBreakpointIn(fileName, lineNumber, breakpoints);
 		if (breakpoint != null) {
 			return breakpoint;
 		}
 		if (!runToLineBreakpoints.isEmpty()) {
-			return findBreakpointIn(filename, lineNumber, (IBreakpoint[]) runToLineBreakpoints
+			return findBreakpointIn(fileName, lineNumber, (IBreakpoint[]) runToLineBreakpoints
 					.toArray(new IBreakpoint[runToLineBreakpoints.size()]));
 		}
 		return null;
@@ -1560,7 +1538,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param breakpoints
 	 * @return IBreakpoint
 	 */
-	protected IBreakpoint findBreakpointIn(String fileName, int lineNumber, IBreakpoint[] breakpoints) {
+	protected IBreakpoint findBreakpointIn(URI fileName, int lineNumber, IBreakpoint[] breakpoints) {
 		for (int i = 0; i < breakpoints.length; ++i) {
 			IBreakpoint breakpoint = breakpoints[i];
 			if (getDebugTarget().supportsBreakpoint(breakpoint)) {
@@ -1570,26 +1548,25 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 						boolean fileMatched = false;
 						if (marker instanceof IUniformResourceMarker) {
 							URI breakpointURI = ((IUniformResourceMarker) marker).getUniformResource().getURI();
-							fileMatched = new URI(Util.fixupURI(fileName)).equals(breakpointURI);
+							fileMatched = /*new URI(Util.fixupURI(*/fileName/*))*/.equals(breakpointURI);
 						} else if (marker.getResource() instanceof IWorkspaceRoot) {
 							URI breakpointURI = URI.create((String) marker
 									.getAttribute(IJSDebugConstants.BREAKPOINT_LOCATION));
-							fileMatched = new URI(Util.fixupURI(fileName)).equals(breakpointURI);
+							fileMatched = /*new URI(Util.fixupURI(*/fileName/*))*/.equals(breakpointURI);
 						} else {
-							IFile file = ResourceUtil.findWorkspaceFile(Path.fromOSString(fileName));
-							if (file != null) {
-								fileMatched = file.equals(marker.getResource());
+							IFileStore fileStore = EFS.getStore(fileName);
+							IResource resource = (IResource) fileStore.getAdapter(IResource.class);
+							if (resource != null) {
+								fileMatched = resource.equals(marker.getResource());
 							} else {
 								File breakpointFile = marker.getResource().getLocation().toFile();
-								fileMatched = new File(fileName).equals(breakpointFile);
+								fileMatched = breakpointFile.equals(fileStore.getAdapter(File.class));
 							}
 						}
 						if (fileMatched && ((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber) {
 							return breakpoint;
 						}
 					} catch (CoreException e) {
-						JSDebugPlugin.log(e);
-					} catch (URISyntaxException e) {
 						JSDebugPlugin.log(e);
 					}
 				}
@@ -1604,8 +1581,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param sourceFile
 	 * @return String
 	 */
-	protected String resolveSourceFile(String sourceFile) {
-		String resolved = (String) sourceResolveCache.get(sourceFile);
+	protected URI resolveSourceFile(String sourceFile) {
+		URI resolved = sourceResolveCache.get(sourceFile);
 		if (resolved != null) {
 			return resolved;
 		}
@@ -1613,21 +1590,12 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			URI uri = new URI(sourceFile);
 			String scheme = uri.getScheme();
 			if (FILE.equals(scheme)) {
-				try {
-					File osFile = new File(uri.getSchemeSpecificPart());
-					IPath canonicalPath = new Path(osFile.getCanonicalPath());
-					IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(canonicalPath);
-					if (file != null) {
-						resolved = file.getLocation().toString();
-					} else {
-						resolved = osFile.getAbsolutePath();
-					}
-				} catch (IOException e) {
-				}
-			} else if (HTTP.equals(scheme) && resourceMapper != null) {
-				File osFile = resourceMapper.resolveServerURL(uri.toURL());
-				if (osFile != null) {
-					resolved = osFile.getAbsolutePath();
+				File osFile = new File(uri.getSchemeSpecificPart());
+				resolved = EFSUtils.fromLocalFile(osFile).toURI();
+			} else if (HTTP.equals(scheme) && urlMapper != null) {
+				IFileStore fileStore = urlMapper.resolve(uri.toURL());
+				if (fileStore != null) {
+					resolved = fileStore.toURI();
 				}
 			} else if (JAVASCRIPT.equals(scheme)) {
 				if (mainFile != null) {
@@ -1648,7 +1616,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		} catch (MalformedURLException e) {
 			JSDebugPlugin.log(e);
 		}
-		return sourceFile;
+		try {
+			return new URI(sourceFile);
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -1658,11 +1630,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @return Object
 	 * @throws CoreException
 	 */
-	private Object findSourceResource(String sourceFile) throws CoreException {
+	private Object findSourceResource(URI fileName) throws CoreException {
 		ISourceLocator locator = launch.getSourceLocator();
 		if (locator instanceof ISourceLookupDirector) {
 			ISourceLookupDirector lookupDirector = (ISourceLookupDirector) locator;
-			Object[] result = lookupDirector.findSourceElements(sourceFile);
+			Object[] result = lookupDirector.findSourceElements(fileName);
 			if (result != null && result.length > 0) {
 				Object resource = result[0];
 				if (resource instanceof IResource) {
@@ -1744,7 +1716,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			} else if (BREAKPOINT.equals(action)) {
 				action = args[j++];
 				/* find breakpoint(s) */
-				String sourceFile = resolveSourceFile(Util.decodeData(args[j++]));
+				URI sourceFile = resolveSourceFile(Util.decodeData(args[j++]));
 				int lineNumber = -1;
 				try {
 					lineNumber = Integer.parseInt(args[j++]);
