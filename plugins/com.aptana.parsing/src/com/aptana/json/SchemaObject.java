@@ -74,23 +74,31 @@ public class SchemaObject implements State
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(Context context, EventType event, Object value)
+	public void transition(ISchemaContext context, EventType event, Object value)
 	{
 		switch (event)
 		{
 			case START_OBJECT:
 				if (this._inObject)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to start and object that has already been started");
 				}
 
 				this._inObject = true;
 				break;
 
 			case START_OBJECT_ENTRY:
+				if (this._inObject == false)
+				{
+					throw new IllegalStateException("Attempted to start an object entry in an object that has not been started");
+				}
 				if (this._inProperty)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to start an object entry that has already been started");
+				}
+				if (value == null || value.toString().length() == 0)
+				{
+					throw new IllegalStateException("Attempted to start an object entry without providing its name");
 				}
 
 				String name = value.toString();
@@ -98,7 +106,7 @@ public class SchemaObject implements State
 
 				if (property == null)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to start an object entry that does not exist in this object: " + name);
 				}
 
 				this._inProperty = true;
@@ -106,9 +114,13 @@ public class SchemaObject implements State
 				break;
 
 			case END_OBJECT:
+				if (this._inProperty)
+				{
+					throw new IllegalStateException("Attempted to end an object that has an open object entry");
+				}
 				if (this._inObject == false)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to end an object that is already ended");
 				}
 
 				this._inObject = false;
@@ -116,9 +128,13 @@ public class SchemaObject implements State
 				break;
 
 			case END_OBJECT_ENTRY:
+				if (this._inObject == false)
+				{
+					throw new IllegalStateException("Attempted to end an object entry in an object that has not been started");
+				}
 				if (this._inProperty == false)
 				{
-					throw new IllegalStateException();
+					throw new IllegalStateException("Attempted to end an object entry that has not been started");
 				}
 
 				this._inProperty = false;
@@ -126,7 +142,7 @@ public class SchemaObject implements State
 				break;
 
 			default:
-				throw new IllegalStateException();
+				throw new IllegalStateException("Unsupported event type: " + event.name());
 		}
 	}
 }

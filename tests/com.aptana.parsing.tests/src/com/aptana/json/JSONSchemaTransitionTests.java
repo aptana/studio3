@@ -42,14 +42,45 @@ public class JSONSchemaTransitionTests extends TestCase
 		}
 	}
 
+	private static interface StateInitializer
+	{
+		void initialize(State state);
+	}
+
+	private ISchemaContext _context;
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+
+		this._context = new Context();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception
+	{
+		this._context = null;
+
+		super.tearDown();
+	}
+
 	/**
 	 * createGoodList
 	 * 
-	 * @param value
 	 * @param events
+	 * @param value
 	 * @return
 	 */
-	private List<EventResult> createGoodList(String value, EnumSet<EventType> events)
+	private List<EventResult> createGoodList(EnumSet<EventType> events, String value)
 	{
 		List<EventResult> result = new ArrayList<EventResult>();
 
@@ -71,13 +102,41 @@ public class JSONSchemaTransitionTests extends TestCase
 	 */
 	protected void testStates(State state, EventResult... results)
 	{
-		Context context = new Context();
+		this.testStates( //
+			state, //
+			new StateInitializer()
+			{
+				public void initialize(State state)
+				{
+					state.enter();
+				}
+			}, //
+			results //
+		);
+	}
 
+	/**
+	 * testStates
+	 * 
+	 * @param state
+	 */
+	protected void testStates(State state, StateInitializer initializer, EventResult... results)
+	{
 		for (EventResult result : results)
 		{
+			// reset the context
+			this._context.reset();
+			
+			// initialize the state's state
+			if (initializer != null)
+			{
+				initializer.initialize(state);
+			}
+
+			// try current event type test
 			try
 			{
-				state.transition(context, result.event, result.value);
+				state.transition(this._context, result.event, result.value);
 
 				if (result.valid == false)
 				{
@@ -88,7 +147,7 @@ public class JSONSchemaTransitionTests extends TestCase
 			{
 				if (result.valid)
 				{
-					fail("Was supposed to pass, but failed: " + result);
+					fail("Was supposed to pass, but failed: " + result + "\n" + e.getMessage());
 				}
 			}
 		}
@@ -107,8 +166,8 @@ public class JSONSchemaTransitionTests extends TestCase
 		{
 			State state = stateClass.newInstance();
 			List<EventResult> testList = this.createGoodList( //
-				goodValue, //
-				EnumSet.of(EventType.PRIMITIVE) //
+				EnumSet.of(EventType.PRIMITIVE), //
+				goodValue //
 				);
 
 			testList.add(new EventResult(EventType.PRIMITIVE, badValue, false));
@@ -170,11 +229,46 @@ public class JSONSchemaTransitionTests extends TestCase
 	}
 
 	/**
-	 * testObjectStates
+	 * testStartObjectStates
 	 */
-	public void testObjectStates()
+	public void testStartObjectStates()
 	{
+		SchemaObject state = new SchemaObject();
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.START_OBJECT), //
+			"property" //
+		);
 
+		this.testStates(state, goodList.toArray(new EventResult[goodList.size()]));
+	}
+
+	/**
+	 * testStartObjectEntryStates
+	 */
+	public void testStartObjectEntryStates()
+	{
+		// create object and configure it
+		SchemaObject state = new SchemaObject();
+		String propertyName = "myProperty";
+		state.addProperty(new Property(propertyName, new SchemaString()));
+		
+		// build tests
+		List<EventResult> goodList = this.createGoodList( //
+			EnumSet.of(EventType.START_OBJECT_ENTRY, EventType.END_OBJECT), //
+			propertyName //
+		);
+		
+		// build initializer used before each test runs
+		StateInitializer initializer = new StateInitializer()
+		{
+			public void initialize(State state)
+			{
+				state.enter();
+				state.transition(_context, EventType.START_OBJECT, null);
+			}
+		};
+
+		this.testStates(state, initializer, goodList.toArray(new EventResult[goodList.size()]));
 	}
 
 	/**
