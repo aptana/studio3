@@ -32,7 +32,7 @@ public class SchemaString implements State
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.EventType, com.aptana.json.Context)
 	 */
-	public void transition(Context context, EventType event, Object value)
+	public void transition(ISchemaContext context, EventType event, Object value)
 	{
 		if (event == EventType.PRIMITIVE && value instanceof String)
 		{

@@ -8,26 +8,24 @@
 package com.aptana.json;
 
 /**
- * SchemaState
+ * @author klindsey
+ *
  */
-public interface State
+public interface ISchemaContext
 {
-	/**
-	 * Enter this new state and perform any processing relevant to this state
-	 */
-	void enter();
 
 	/**
-	 * Exit this state before entering a new state
+	 * popType
 	 */
-	void exit();
+	void popType();
 
 	/**
-	 * Transition to a new state from this current state
+	 * pushType
 	 * 
-	 * @param context
-	 * @param event
-	 * @param value
+	 * @param type
 	 */
-	void transition(ISchemaContext context, EventType event, Object value);
+	void pushType(State type);
+
+	void reset();
+
 }

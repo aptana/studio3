@@ -12,7 +12,7 @@ package com.aptana.json;
  */
 public class SchemaArray implements State
 {
-	private Type _elementType;
+	private State _elementType;
 	private boolean _inArray;
 
 	/**
@@ -20,7 +20,7 @@ public class SchemaArray implements State
 	 * 
 	 * @param elementType
 	 */
-	public SchemaArray(Type elementType)
+	public SchemaArray(State elementType)
 	{
 		this._elementType = elementType;
 	}
@@ -47,7 +47,7 @@ public class SchemaArray implements State
 	 * 
 	 * @return
 	 */
-	public Type getElementType()
+	public State getElementType()
 	{
 		return this._elementType;
 	}
@@ -56,7 +56,7 @@ public class SchemaArray implements State
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(Context context, EventType event, Object value)
+	public void transition(ISchemaContext context, EventType event, Object value)
 	{
 		switch (event)
 		{

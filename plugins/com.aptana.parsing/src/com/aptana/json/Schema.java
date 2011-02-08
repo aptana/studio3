@@ -12,7 +12,7 @@ package com.aptana.json;
  */
 public class Schema implements State
 {
-	private Type _schemaType;
+	private State _schemaType;
 	
 	/* (non-Javadoc)
 	 * @see com.aptana.json.SchemaState#enter()
@@ -24,7 +24,7 @@ public class Schema implements State
 	/* (non-Javadoc)
 	 * @see com.aptana.json.SchemaState#transition(com.aptana.json.EventType)
 	 */
-	public void transition(Context context, EventType event, Object value)
+	public void transition(ISchemaContext context, EventType event, Object value)
 	{
 		if (event == EventType.START_PARSE)
 		{

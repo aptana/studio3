@@ -32,7 +32,7 @@ public class SchemaTrue implements State
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(Context context, EventType event, Object value)
+	public void transition(ISchemaContext context, EventType event, Object value)
 	{
 		if (event == EventType.PRIMITIVE && value instanceof String)
 		{

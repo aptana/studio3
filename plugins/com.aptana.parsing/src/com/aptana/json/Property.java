@@ -13,7 +13,7 @@ package com.aptana.json;
 public class Property
 {
 	private String _name;
-	private Type _type;
+	private State _type;
 
 	/**
 	 * SchemaProperty
@@ -21,7 +21,7 @@ public class Property
 	 * @param name
 	 * @param type
 	 */
-	public Property(String name, Type type)
+	public Property(String name, State type)
 	{
 		this._name = name;
 		this._type = type;
@@ -42,7 +42,7 @@ public class Property
 	 * 
 	 * @return
 	 */
-	public Type getType()
+	public State getType()
 	{
 		return this._type;
 	}
