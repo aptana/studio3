@@ -1268,7 +1268,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									result = LocationType.IN_TEXT;
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
+									// We should report in open tag still!
+									if (offset == 0)
+									{
+										result = LocationType.IN_TEXT;
+									}
+									else
+									{
+										ITypedRegion previousPartition = document.getPartition(offset - 1);
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
+										{
+											result = LocationType.IN_TEXT;
+										}
+									}
 								}
 								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{
@@ -1517,10 +1532,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int,
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 

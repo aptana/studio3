@@ -56,7 +56,7 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 
 	public void verifyKey(VerifyEvent event)
 	{
-		if (textViewer == null || document == null)
+		if (textViewer == null || document == null || !canModifyEditor || !event.doit || event.character != '\t')
 		{
 			return;
 		}
@@ -67,48 +67,45 @@ public class ExpandSnippetVerifyKeyListener implements VerifyKeyListener
 			return;
 		}
 
-		if (canModifyEditor && event.doit && event.character == '\t')
+		ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
+		if (selection.getLength() == 0)
 		{
-			ITextSelection selection = (ITextSelection) textEditor.getSelectionProvider().getSelection();
-			if (selection.getLength() == 0)
+			int offset = selection.getOffset() - 1;
+			try
 			{
-				int offset = selection.getOffset() - 1;
-				try
+				String previousChar = document.get(offset, 1);
+				if (!Character.isWhitespace(previousChar.charAt(0)))
 				{
-					String previousChar = document.get(offset, 1);
-					if (!Character.isWhitespace(previousChar.charAt(0)))
+					int caretOffset = textViewer.getTextWidget().getCaretOffset();
+					String scope = getScope(textViewer, caretOffset);
+					AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
+					List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
+					if (commandsFromScope.size() > 0)
 					{
-						int caretOffset = textViewer.getTextWidget().getCaretOffset();
-						String scope = getScope(textViewer, caretOffset);
-						AndFilter filter = new AndFilter(new ScopeFilter(scope), new HasTriggerFilter());
-						List<CommandElement> commandsFromScope = BundleManager.getInstance().getExecutableCommands(filter);
-						if (commandsFromScope.size() > 0)
+						// chop off portions of prefix from beginning until we have a match!
+						String prefix = SnippetsCompletionProcessor.extractPrefixFromDocument(document, caretOffset);
+						while (prefix != null && prefix.length() > 0)
 						{
-							// chop off portions of prefix from beginning until we have a match!
-							String prefix = SnippetsCompletionProcessor
-									.extractPrefixFromDocument(document, caretOffset);
-							while (prefix != null && prefix.length() > 0)
+							if (hasMatchingSnippet(prefix, commandsFromScope))
 							{
-								if (hasMatchingSnippet(prefix, commandsFromScope))
+								if (contentAssistant != null)
 								{
-									if (contentAssistant != null)
-									{
-										contentAssistant.showPossibleCompletions();
-										event.doit = false;
-									}
-									return;
+									contentAssistant.showPossibleCompletions();
+									event.doit = false;
 								}
-								prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
+								return;
 							}
+							prefix = SnippetsCompletionProcessor.narrowPrefix(prefix);
 						}
 					}
 				}
-				catch (BadLocationException e)
-				{
-					return;
-				}
+			}
+			catch (BadLocationException e)
+			{
+				return;
 			}
 		}
+
 	}
 
 	protected boolean hasMatchingSnippet(String prefix, List<CommandElement> commandsFromScope)

@@ -28,6 +28,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.Activator;
@@ -191,7 +192,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	private boolean startProcess(ITerminalControl control) {
 		try {
 			initialDirectory = getInitialDirectory();
-			if (!initialDirectory.toFile().canExecute()) {
+			if (!FileUtil.isDirectoryAccessible(initialDirectory.toFile())) {
 				control.displayTextInTerminal(MessageFormat.format(Messages.LocalTerminalConnector_WorkingDirectoryPermissionErrorMessage, initialDirectory.toOSString()));
 				initialDirectory = null;
 				initialDirectory = getInitialDirectory();
@@ -241,7 +242,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null && location.toFile().isDirectory() && location.toFile().canExecute()) {
+				if (location != null && location.toFile().isDirectory() && FileUtil.isDirectoryAccessible(location.toFile())) {
 					return location;
 				}
 			}

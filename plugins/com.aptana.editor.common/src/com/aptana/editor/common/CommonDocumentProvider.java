@@ -67,7 +67,7 @@ public class CommonDocumentProvider extends TextFileDocumentProvider
 	{
 		FileInfo fileInfo = getFileInfo(element);
 
-		if (fileInfo.fCount == 1)
+		if (fileInfo != null && fileInfo.fCount == 1)
 		{
 			IDocument document = getDocument(element);
 

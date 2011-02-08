@@ -192,8 +192,17 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	protected void setPreviewContent(TemplateElement template)
 	{
 		WizardNewFileCreationPage fileCreationPage = (WizardNewFileCreationPage) getPreviousPage();
-		IPath path = fileCreationPage.getContainerFullPath().append(fileCreationPage.getFileName());
-		String templateContent = NewFileWizard.getTemplateContent(template, path);
+		String templateContent = null;
+		try
+		{
+			IPath path = fileCreationPage.getContainerFullPath().append(fileCreationPage.getFileName());
+			templateContent = NewFileWizard.getTemplateContent(template, path);
+		}
+		catch (Exception e)
+		{
+			// logs the exception but allows the page to continue
+			CommonEditorPlugin.logError(e);
+		}
 		if (templateContent == null)
 		{
 			templatePreview.setText(""); //$NON-NLS-1$

@@ -590,9 +590,9 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
+	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
 	{
 		return false;
 	}

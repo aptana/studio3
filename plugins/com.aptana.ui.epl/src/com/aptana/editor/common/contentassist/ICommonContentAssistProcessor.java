@@ -32,5 +32,5 @@ public interface ICommonContentAssistProcessor
 	 * @param offset Offset into the document
 	 * @return
 	 */
-	boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset);
+	boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset);
 }

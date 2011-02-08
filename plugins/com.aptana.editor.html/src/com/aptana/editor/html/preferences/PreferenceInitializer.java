@@ -11,10 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.core.util.StringUtil;
-import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -28,11 +25,5 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
 		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "</>=&'\""); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
-
-		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);
-		String[] filtered = new String[] { ".*canvas.*" }; //$NON-NLS-1$
-		prefs.put(IHTMLParserConstants.LANGUAGE + ":" //$NON-NLS-1$
-				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
-				StringUtil.join("####", filtered)); //$NON-NLS-1$
 	}
 }
