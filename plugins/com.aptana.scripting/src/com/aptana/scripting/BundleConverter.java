@@ -8,7 +8,6 @@
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
@@ -537,7 +536,7 @@ public class BundleConverter
 		{
 			File outFile = new File(outFilePath);
 			outFile.getParentFile().mkdirs();
-			writer = new FileWriter(outFile);
+			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), "UTF-8");
 			writer.write(output);
 		}
 		finally

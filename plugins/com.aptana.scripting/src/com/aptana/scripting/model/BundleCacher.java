@@ -2,9 +2,11 @@ package com.aptana.scripting.model;
 
 import java.beans.IntrospectionException;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,11 +145,11 @@ public class BundleCacher
 		}
 
 		// Now write the config file out...
-		FileWriter writer = null;
+		OutputStreamWriter writer = null;
 		try
 		{
 			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
-			writer = new FileWriter(configFile);
+			writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8");
 
 			Yaml yaml = createYAML(be.getBundleDirectory());
 			yaml.dump(be, writer);
@@ -193,11 +195,11 @@ public class BundleCacher
 			}
 
 			// Load up the bundle contents from the cache
-			FileReader reader = null;
+			InputStreamReader reader = null;
 			try
 			{
 				Yaml yaml = createYAML(bundleDirectory);
-				reader = new FileReader(cacheFile);
+				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8");
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
 				be = (BundleElement) yaml.load(reader);
