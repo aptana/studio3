@@ -53,6 +53,7 @@ public class JSONObjectNode extends JSONNode
 					{
 						String name = key.getText();
 
+						// TODO: store/retrieve property names in a preference
 						if ("name".equals(name)) //$NON-NLS-1$
 						{
 							IParseNode value = entry.getLastChild();
