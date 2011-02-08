@@ -187,11 +187,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		countTotal = createCheck();
 		countTotal.setImage(FindBarPlugin.getImage(SIGMA));
 		countTotal.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowMatchCount);
-
-		count = new Label(findBar, SWT.NONE);
-		count.setText("       "); //$NON-NLS-1$
-		count.setToolTipText(Messages.FindBarDecorator_TOOLTIP_MatchCount);
-		count.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false));
+		countTotal.setText("           "); //$NON-NLS-1$
+		GridData countLayoutData = (GridData) countTotal.getLayoutData();
+		countLayoutData.minimumWidth = countTotal.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+		countTotal.setLayoutData(countLayoutData);
 
 		searchInOpenFiles = createButton(SEARCH_OPEN_FILES, true);
 		searchInOpenFiles.setToolTipText(Messages.FindBarDecorator_TOOLTIP_SearchInOpenFiles);
@@ -200,7 +199,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		showFindReplaceDialog.setToolTipText(Messages.FindBarDecorator_TOOLTIP_ShowFindReplaceDialog);
 
 		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, countTotal, findButton,
-				replaceFind, replace, replaceAll, count, showFindReplaceDialog, searchInOpenFiles };
+				replaceFind, replace, replaceAll, showFindReplaceDialog, searchInOpenFiles };
 		
 		int NUMBER_OF_ITEMS = disableWhenHidden.length;
 		GridLayout gridLayout = new GridLayout(NUMBER_OF_ITEMS, false);
@@ -314,8 +313,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		final Combo combo = new Combo(findBar, SWT.DROP_DOWN);
 		combo.setText("                            "); //$NON-NLS-1$
-		Point size = combo.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		GridData comboGridData = createdDefaultGridData(SWT.FILL, SWT.CENTER, true, false);
+		Point size = combo.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		comboGridData.minimumWidth = size.x;
 		combo.setLayoutData(comboGridData);
 
@@ -644,7 +643,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private Button replaceFind;
 	private Button replace;
 	private Button replaceAll;
-	private Label count;
 	private Button showFindReplaceDialog;
 	Button searchInOpenFiles;
 	private Control[] disableWhenHidden;
@@ -660,7 +658,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		String text = combo.getText();
 		findButton.setEnabled(!EMPTY.equals(text));
-		count.setText(EMPTY);
+		countTotal.setText(EMPTY);
 		wholeWord.setEnabled(!EMPTY.equals(text) && !regularExpression.getSelection() && isWord(text));
 	}
 
@@ -821,7 +819,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		if (!countTotal.getSelection())
 		{
-			count.setText(EMPTY);
+			countTotal.setText(EMPTY);
 			return;
 		}
 		String patternString = combo.getText();
@@ -860,11 +858,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		if ((TOO_MANY != -1) && total > TOO_MANY)
 		{
-			count.setText("> " + TOO_MANY); //$NON-NLS-1$
+			countTotal.setText("> " + TOO_MANY); //$NON-NLS-1$
 		}
 		else
 		{
-			count.setText(String.valueOf(total));
+			countTotal.setText(String.valueOf(total));
 		}
 	}
 
