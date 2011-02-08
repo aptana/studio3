@@ -437,7 +437,7 @@ public class JSIndexReader extends IndexReader
 
 		if (index != null)
 		{
-			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, "*", SearchPattern.PATTERN_MATCH);
+			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
 
 			if (types != null)
 			{

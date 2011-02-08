@@ -33,8 +33,8 @@ public class JSONPropertyRule implements IPredicateRule
 	 */
 	public JSONPropertyRule(IToken singleQuotedToken, IToken doubleQuotedToken, IToken token)
 	{
-		this._singleQuotedRule = new SingleLineRule("'", "'", singleQuotedToken, '\\');
-		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken, '\\');
+		this._singleQuotedRule = new SingleLineRule("'", "'", singleQuotedToken, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
+		this._doubleQuotedRule = new SingleLineRule("\"", "\"", doubleQuotedToken, '\\'); //$NON-NLS-1$ //$NON-NLS-2$
 		this._token = token;
 		this._successToken = Token.UNDEFINED;
 	}

@@ -53,13 +53,13 @@ public class JSONObjectNode extends JSONNode
 					{
 						String name = key.getText();
 
-						if ("name".equals(name))
+						if ("name".equals(name)) //$NON-NLS-1$
 						{
 							IParseNode value = entry.getLastChild();
 
 							if (value instanceof JSONStringNode)
 							{
-								result += ": " + value.getText();
+								result += ": " + value.getText(); //$NON-NLS-1$
 							}
 						}
 					}

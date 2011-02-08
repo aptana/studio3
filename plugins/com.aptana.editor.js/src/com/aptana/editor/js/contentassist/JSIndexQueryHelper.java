@@ -192,9 +192,9 @@ public class JSIndexQueryHelper
 					return arg0.getName().compareTo(arg1.getName());
 				}
 			});
-			
+
 			// include types as a separate property
-			docs.put("types", types);
+			docs.put("types", types); //$NON-NLS-1$
 
 			// convert to JSON
 			result = JSON.toString(docs);
