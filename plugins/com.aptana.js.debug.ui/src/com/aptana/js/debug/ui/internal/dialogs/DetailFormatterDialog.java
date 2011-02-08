@@ -37,6 +37,7 @@ package com.aptana.js.debug.ui.internal.dialogs;
 
 import java.util.List;
 
+import org.eclipse.debug.internal.ui.actions.StatusInfo;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -63,12 +64,12 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.ui.IDebugHelpContextIds;
-import com.aptana.debug.ui.internal.StatusInfo;
 
 /**
  * @author Max Stepanov
  * 
  */
+@SuppressWarnings("restriction")
 public class DetailFormatterDialog extends StatusDialog {
 	private Text typeName;
 	private Button enabled;

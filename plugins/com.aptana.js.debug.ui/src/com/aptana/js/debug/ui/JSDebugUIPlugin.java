@@ -17,7 +17,6 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.WorkbenchJob;
@@ -27,6 +26,7 @@ import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.DebugUIImages;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -145,7 +145,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 	}
 
 	private void closeDebugEditors() {
-		IWorkbenchPage page = getActivePage();
+		IWorkbenchPage page = UIUtils.getActivePage();
 		if (page != null) {
 			IEditorReference[] editorRefs = page.getEditorReferences();
 			ArrayList<IEditorReference> closeEditors = new ArrayList<IEditorReference>();
@@ -171,28 +171,6 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 			}
 		}
 
-	}
-
-	/**
-	 * getActivePage
-	 * 
-	 * @return IWorkbenchPage
-	 */
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the active workbench window
-	 * 
-	 * @return the active workbench window
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
 	}
 
 }

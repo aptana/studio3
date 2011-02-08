@@ -24,5 +24,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.js.debug.ui,
- com.aptana.js.debug.ui.internal,
- com.aptana.js.debug.ui.internal.launchConfigurations;x-friends:="com.aptana.ide.framework.apollo"
+ com.aptana.js.debug.ui.internal

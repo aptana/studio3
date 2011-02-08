@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.core,
- com.aptana.js.debug.core
+ com.aptana.js.debug.core,
+ com.aptana.ui
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.debug.ui;

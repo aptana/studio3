@@ -57,11 +57,6 @@ public class Activator extends AbstractUIPlugin
 		return plugin;
 	}
 
-	public static IWorkbenchWindow getActiveWorkbenchWindow()
-	{
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-
 	public static void log(IStatus status)
 	{
 		Activator.getDefault().getLog().log(status);

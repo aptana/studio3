@@ -48,20 +48,24 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
 
 /**
  * @author Max Stepanov
  */
 public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
+	
+	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
+	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger"; //$NON-NLS-1$
+
 	/**
 	 * @see org.eclipse.debug.core.IStatusHandler#handleStatus(org.eclipse.core.runtime.IStatus,
 	 *      java.lang.Object)
 	 */
 	public Object handleStatus(IStatus status, Object source) throws CoreException {
-		Shell shell = DebugUiPlugin.getActiveWorkbenchShell();
+		Shell shell = UIUtils.getActiveShell();
 		String title = Messages.InstallDebuggerPromptStatusHandler_InstallDebuggerExtension;
 
 		if ("install".equals(source)) { //$NON-NLS-1$
@@ -86,7 +90,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 				return new Boolean(true);
 			case 3:
 				WorkbenchBrowserUtil
-						.launchExternalBrowser("http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger"); //$NON-NLS-1$
+						.launchExternalBrowser(URL_DOCS_INSTALL_IE_DEBUGGER); 
 				return new Boolean(true);
 			default:
 				break;
@@ -117,8 +121,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 					break;
 				}
 				String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-				? "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
-						: "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
+					? URL_DOCS_INSTALL_IE_DEBUGGER : URL_DOCS_INSTALL_DEBUGGER;
 				WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 			}
 		}
@@ -149,8 +152,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 				break;
 			}
 			String urlString = ((String) source).indexOf("Internet Explorer") != -1 //$NON-NLS-1$
-			? "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger" //$NON-NLS-1$
-					: "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
+				? URL_DOCS_INSTALL_IE_DEBUGGER : URL_DOCS_INSTALL_DEBUGGER;
 			WorkbenchBrowserUtil.launchExternalBrowser(urlString);
 		}
 	}

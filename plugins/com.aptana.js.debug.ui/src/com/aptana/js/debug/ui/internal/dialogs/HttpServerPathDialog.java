@@ -41,6 +41,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.debug.internal.ui.actions.StatusInfo;
 import org.eclipse.jface.dialogs.StatusDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.Viewer;
@@ -64,7 +65,6 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.ui.internal.StatusInfo;
 
 /**
  * @author Max Stepanov

@@ -51,6 +51,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.aptana.js.debug.core.model.IJSScriptElement;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.debug.ui.SourceDisplayUtil;
 
@@ -125,7 +126,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 				SourceDisplayUtil.openInEditor(editorInput, lineNumber);
 				return;
 			}
-			MessageDialog.openInformation(DebugUiPlugin.getActiveWorkbenchShell(),
+			MessageDialog.openInformation(UIUtils.getActiveShell(),
 					Messages.OpenScriptSourceAction_Information,
 					MessageFormat.format(Messages.OpenScriptSourceAction_SourceNotFoundFor_0, location.getPath()));
 		} catch (CoreException e) {

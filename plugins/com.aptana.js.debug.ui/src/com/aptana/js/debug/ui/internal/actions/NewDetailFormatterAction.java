@@ -42,11 +42,11 @@ import org.eclipse.jface.window.Window;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugOptionsManager;
 import com.aptana.debug.core.DetailFormatter;
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.dialogs.DetailFormatterDialog;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -74,7 +74,7 @@ public class NewDetailFormatterAction extends ObjectActionDelegate {
 		}
 		DebugOptionsManager detailFormattersManager = JSDebugPlugin.getDefault().getDebugOptionsManager();
 		DetailFormatter detailFormatter = new DetailFormatter(typeName, StringUtil.EMPTY, true);
-		if (new DetailFormatterDialog(DebugUiPlugin.getActivePage().getWorkbenchWindow().getShell(), detailFormatter,
+		if (new DetailFormatterDialog(UIUtils.getActiveShell(), detailFormatter,
 				null, true, false).open() == Window.OK) {
 			detailFormattersManager.setAssociatedDetailFormatter(detailFormatter);
 			refreshCurrentSelection();

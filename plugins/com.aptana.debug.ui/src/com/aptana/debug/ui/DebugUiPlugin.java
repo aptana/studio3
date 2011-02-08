@@ -40,10 +40,10 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import com.aptana.ui.util.UIUtils;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -122,43 +122,6 @@ public class DebugUiPlugin extends AbstractUIPlugin {
 		getDefault().getLog().log(status);
 	}
 
-
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell() {
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null) {
-			return window.getShell();
-		}
-		return null;
-	}
-
-	/**
-	 * getActivePage
-	 * 
-	 * @return IWorkbenchPage
-	 */
-	public static IWorkbenchPage getActivePage() {
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null) {
-			return w.getActivePage();
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the active workbench window
-	 * 
-	 * @return the active workbench window
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-
-
 	/**
 	 * Returns the standard display to be used. The method first checks, if the
 	 * thread calling this method has an associated display. If so, this display
@@ -183,7 +146,7 @@ public class DebugUiPlugin extends AbstractUIPlugin {
 	 */
 	public static void errorDialog(String message, Throwable t) {
 		log(t);
-		Shell shell = getActiveWorkbenchShell();
+		Shell shell = UIUtils.getActiveShell();
 		if (shell != null) {
 			IStatus status = new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR,
 					"Error logged from Aptana Debug UI: ", t); //$NON-NLS-1$	

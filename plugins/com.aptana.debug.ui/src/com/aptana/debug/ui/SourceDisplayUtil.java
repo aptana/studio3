@@ -63,6 +63,7 @@ import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.resources.UniformResourceStorage;
 import com.aptana.debug.ui.internal.LocalFileStorageEditorInput;
 import com.aptana.debug.ui.internal.UniformResourceStorageEditorInput;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -149,7 +150,7 @@ public final class SourceDisplayUtil {
 	 * @throws PartInitException
 	 */
 	public static void openInEditor(IEditorInput input, int lineNumber) throws PartInitException {
-		openInEditor(DebugUiPlugin.getActivePage(), input, lineNumber);
+		openInEditor(UIUtils.getActivePage(), input, lineNumber);
 	}
 
 	/**
@@ -209,11 +210,11 @@ public final class SourceDisplayUtil {
 	 * @return IEditorPart
 	 */
 	public static IEditorPart findEditor(IEditorInput input) {
-		return DebugUiPlugin.getActivePage().findEditor(input);
+		return UIUtils.getActivePage().findEditor(input);
 	}
 
 	public static void displaySource(Object context, boolean forceSourceLookup) {
-		displaySource(context, DebugUiPlugin.getActivePage(), forceSourceLookup);
+		displaySource(context, UIUtils.getActivePage(), forceSourceLookup);
 	}
 
 	public static void displaySource(Object context, IWorkbenchPage page, boolean forceSourceLookup) {

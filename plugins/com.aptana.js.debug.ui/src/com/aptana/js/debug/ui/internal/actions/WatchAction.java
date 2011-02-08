@@ -60,6 +60,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 
 import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -158,7 +159,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 	 * showExpressionsView
 	 */
 	protected void showExpressionsView() {
-		IWorkbenchPage page = DebugUiPlugin.getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = UIUtils.getActivePage();
 		IViewPart part = page.findView(IDebugUIConstants.ID_EXPRESSION_VIEW);
 		if (part == null) {
 			try {

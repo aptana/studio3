@@ -47,10 +47,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSInspectExpression;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -121,7 +121,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 
 	private IWorkbenchPart getTargetPart() {
 		// TODO
-		return DebugUiPlugin.getActiveWorkbenchWindow().getActivePage().getActivePart();
+		return UIUtils.getActivePart();
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 		if (getTargetPart() != null) {
 			return getTargetPart().getSite().getShell();
 		}
-		return DebugUiPlugin.getActiveWorkbenchShell();
+		return UIUtils.getActiveShell();
 	}
 
 	/**

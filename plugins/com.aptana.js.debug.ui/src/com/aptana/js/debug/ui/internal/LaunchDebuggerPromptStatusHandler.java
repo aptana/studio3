@@ -42,7 +42,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.debug.ui.DebugUiPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -53,7 +53,7 @@ public class LaunchDebuggerPromptStatusHandler implements IStatusHandler {
 	 *      java.lang.Object)
 	 */
 	public Object handleStatus(IStatus status, Object source) throws CoreException {
-		Shell shell = DebugUiPlugin.getActiveWorkbenchShell();
+		Shell shell = UIUtils.getActiveShell();
 		String title = Messages.LaunchDebuggerPromptStatusHandler_Title;
 		String message = Messages.LaunchDebuggerPromptStatusHandler_DebuggerSessionIsActive;
 

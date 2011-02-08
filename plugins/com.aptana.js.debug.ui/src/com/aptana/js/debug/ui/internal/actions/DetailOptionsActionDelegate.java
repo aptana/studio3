@@ -48,6 +48,7 @@ import org.eclipse.ui.IViewPart;
 
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.ui.internal.preferences.JSDetailFormattersPreferencePage;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -68,7 +69,7 @@ public class DetailOptionsActionDelegate implements IViewActionDelegate {
 
 		PreferenceManager manager = new PreferenceManager();
 		manager.addToRoot(targetNode);
-		final PreferenceDialog dialog = new PreferenceDialog(DebugUiPlugin.getActiveWorkbenchShell(), manager);
+		final PreferenceDialog dialog = new PreferenceDialog(UIUtils.getActiveShell(), manager);
 		final boolean[] result = new boolean[] { false };
 		BusyIndicator.showWhile(DebugUiPlugin.getStandardDisplay(), new Runnable() {
 			public void run() {

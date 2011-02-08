@@ -34,8 +34,6 @@
  */
 package com.aptana.js.debug.ui.internal.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -49,6 +47,7 @@ import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.dialogs.HitCountDialog;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -136,7 +135,7 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 		}
 		String initialValue = currentHitCount > 0 ? Integer.toString(currentHitCount) : "1"; //$NON-NLS-1$;
 
-		HitCountDialog dlg = new HitCountDialog(DebugUiPlugin.getActiveWorkbenchShell(),
+		HitCountDialog dlg = new HitCountDialog(UIUtils.getActiveShell(),
 				Messages.BreakpointHitCountAction_SetBreakpointHitCount,
 				Messages.BreakpointHitCountAction_EnterNewHitCountForBreakpoint, initialValue, inputValidator);
 		if (dlg.open() != Window.OK) {

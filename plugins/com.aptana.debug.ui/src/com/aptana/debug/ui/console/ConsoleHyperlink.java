@@ -49,6 +49,7 @@ import org.eclipse.ui.console.TextConsole;
 
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.debug.ui.SourceDisplayUtil;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -96,7 +97,7 @@ public class ConsoleHyperlink implements IHyperlink {
 			}
 			MessageDialog
 					.openInformation(
-							DebugUiPlugin.getActiveWorkbenchShell(),
+							UIUtils.getActiveShell(),
 							Messages.ConsoleHyperlink_SourceNotFound_Title, MessageFormat.format(Messages.ConsoleHyperlink_SourceNotFound_Message, fFilename));
 		} catch (CoreException e) {
 			DebugUiPlugin.errorDialog("An exception occurred while following link.", e);  //$NON-NLS-1$

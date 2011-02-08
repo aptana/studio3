@@ -56,6 +56,7 @@ import org.eclipse.ui.IViewPart;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 import com.aptana.js.debug.core.model.JSDebugModel;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -102,7 +103,7 @@ public class AddExceptionBreakpointDialog extends JSTypeSelectionDialog {
 					list.add(breakpoint);
 					Runnable r = new Runnable() {
 						public void run() {
-							IViewPart part = DebugUiPlugin.getActivePage().findView(
+							IViewPart part = UIUtils.getActivePage().findView(
 									IDebugUIConstants.ID_BREAKPOINT_VIEW);
 							if (part instanceof IDebugView) {
 								Viewer viewer = ((IDebugView) part).getViewer();

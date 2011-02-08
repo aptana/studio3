@@ -45,8 +45,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.PropertyDialogAction;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -66,7 +66,7 @@ public class BreakpointPropertiesAction implements IObjectActionDelegate {
 	 */
 	public void run(IAction action) {
 		PropertyDialogAction propertyAction = new PropertyDialogAction(new SameShellProvider(
-				DebugUiPlugin.getActiveWorkbenchShell()), new ISelectionProvider() {
+				UIUtils.getActiveShell()), new ISelectionProvider() {
 			public void addSelectionChangedListener(ISelectionChangedListener listener) {
 			}
 

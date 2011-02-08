@@ -39,8 +39,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.ui.internal.dialogs.AddExceptionBreakpointDialog;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
@@ -50,7 +50,7 @@ public class AddExceptionBreakpointAction implements IWorkbenchWindowActionDeleg
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		AddExceptionBreakpointDialog dialog = new AddExceptionBreakpointDialog(DebugUiPlugin.getActiveWorkbenchShell());
+		AddExceptionBreakpointDialog dialog = new AddExceptionBreakpointDialog(UIUtils.getActiveShell());
 		dialog.setTitle(Messages.AddExceptionBreakpointAction_AddJavaScriptExceptionBreakpoint);
 		dialog.setMessage(Messages.AddExceptionBreakpointAction_ChooseException);
 		dialog.open();
