@@ -34,6 +34,8 @@
  */
 package com.aptana.js.debug.ui.internal.actions;
 
+import java.net.URI;
+
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
@@ -79,7 +81,7 @@ public class OpenURLAction implements IWorkbenchWindowActionDelegate {
 		InputURLDialog dlg = new InputURLDialog(fWindow.getShell(), Messages.OpenURLAction_Open_URL,
 				Messages.OpenURLAction_Specify_URL_To_Open, "http://"); //$NON-NLS-3$ //$NON-NLS-1$
 		if (dlg.open() == Window.OK) {
-			SourceDisplayUtil.displaySource(JSDebugModel.createSourceLink(dlg.getValue()), fWindow.getActivePage(),
+			SourceDisplayUtil.displaySource(JSDebugModel.createSourceLink(URI.create(dlg.getValue())), fWindow.getActivePage(),
 					true);
 		}
 	}

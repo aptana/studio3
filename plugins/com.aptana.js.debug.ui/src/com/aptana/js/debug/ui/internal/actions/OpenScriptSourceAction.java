@@ -34,6 +34,7 @@
  */
 package com.aptana.js.debug.ui.internal.actions;
 
+import java.net.URI;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.CoreException;
@@ -78,7 +79,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 			Object element = selection.getFirstElement();
 			if (element instanceof IJSScriptElement) {
 				scriptElement = (IJSScriptElement) element;
-				String location = scriptElement.getLocation();
+				URI location = scriptElement.getLocation();
 				if (location != null) {
 					setEnabled(true);
 					int lineNumber = scriptElement.getBaseLine();
@@ -110,8 +111,8 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 				return;
 			}
 		}
-		String location = scriptElement.getLocation();
-		if (location == null || location.length() == 0) {
+		URI location = scriptElement.getLocation();
+		if (location == null) {
 			return;
 		}
 		int lineNumber = scriptElement.getBaseLine();
@@ -126,7 +127,7 @@ public class OpenScriptSourceAction extends SelectionProviderAction {
 			}
 			MessageDialog.openInformation(DebugUiPlugin.getActiveWorkbenchShell(),
 					Messages.OpenScriptSourceAction_Information,
-					MessageFormat.format(Messages.OpenScriptSourceAction_SourceNotFoundFor_0, location));
+					MessageFormat.format(Messages.OpenScriptSourceAction_SourceNotFoundFor_0, location.getPath()));
 		} catch (CoreException e) {
 			DebugUiPlugin.errorDialog(Messages.OpenScriptSourceAction_ExceptionWhileOpeningScriptSource, e);
 		}
