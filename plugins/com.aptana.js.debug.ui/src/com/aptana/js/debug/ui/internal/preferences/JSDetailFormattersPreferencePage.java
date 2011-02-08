@@ -287,6 +287,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void removeTypes() {
 		Object[] list = formatters.toArray();
 		IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
@@ -299,7 +300,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 			}
 		}
 
-		removeDetailFormatters(selection.toArray());
+		removeDetailFormatters((DetailFormatter[]) selection.toList().toArray(new DetailFormatter[selection.size()]));
 
 		list = formatters.toArray();
 		if (index > list.length - 1) {
@@ -358,10 +359,10 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		updatePage(selection);
 	}
 
-	private void removeDetailFormatters(Object[] detailFormatters) {
-		for (int i = 0; i < detailFormatters.length; ++i) {
-			formatters.remove(detailFormatters[i]);
-			types.remove(((DetailFormatter) detailFormatters[i]).getTypeName());
+	private void removeDetailFormatters(DetailFormatter[] detailFormatters) {
+		for (DetailFormatter detailFormatter : detailFormatters) {
+			formatters.remove(detailFormatter);
+			types.remove(detailFormatter.getTypeName());
 		}
 		listViewer.refresh();
 		listViewer.setSelection(StructuredSelection.EMPTY);

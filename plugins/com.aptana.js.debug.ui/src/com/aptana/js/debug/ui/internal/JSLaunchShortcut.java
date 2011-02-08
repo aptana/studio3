@@ -118,8 +118,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 		try {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager()
 					.getLaunchConfigurations(configType);
-			for (int i = 0; i < configs.length; i++) {
-				ILaunchConfiguration config = configs[i];
+			for (ILaunchConfiguration config : configs) {
 				if (config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_TYPE, -1) == ILaunchConfigurationConstants.SERVER_INTERNAL) {
 					if (path != null
 							&& config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE, -1) == ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE) {

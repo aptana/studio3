@@ -233,9 +233,9 @@ public class AJAXMonitorView extends AbstractDebugView implements IDebugEventSet
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; i++) {
-			final DebugEvent event = events[i];
+		for (DebugEvent event : events) {
 			Object source = event.getSource();
+			final Object data = event.getData();
 			if (current == null || currentTerminated) {
 				if ((event.getKind() == DebugEvent.CREATE)
 						&& (source instanceof IDebugTarget || source instanceof IProcess)) {
@@ -259,7 +259,6 @@ public class AJAXMonitorView extends AbstractDebugView implements IDebugEventSet
 			case DebugEvent.CHANGE:
 				getViewer().getControl().getDisplay().syncExec(new Runnable() {
 					public void run() {
-						Object data = event.getData();
 						if (data != null) {
 							((StructuredViewer) getViewer()).update(current, null);
 						} else {

@@ -68,9 +68,8 @@ public final class DebugUtil {
 			if (result == null) {
 				ILaunch launch = (ILaunch) adaptableObject.getAdapter(ILaunch.class);
 				if (launch != null) {
-					IProcess[] processes = launch.getProcesses();
-					for (int i = 0; i < processes.length; ++i) {
-						result = processes[i].getAdapter(adapterType);
+					for (IProcess process : launch.getProcesses()) {
+						result = process.getAdapter(adapterType);
 						if (result != null) {
 							break;
 						}

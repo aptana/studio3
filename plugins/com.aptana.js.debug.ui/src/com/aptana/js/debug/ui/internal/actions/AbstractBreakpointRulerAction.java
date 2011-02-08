@@ -78,8 +78,7 @@ public abstract class AbstractBreakpointRulerAction extends Action implements IU
 		allBreakPoints.addAll(Arrays.asList(phpBreakpoints));
 		breakpoints = new IBreakpoint[allBreakPoints.size()];
 		allBreakPoints.toArray(breakpoints);*/
-		for (int i = 0; i < breakpoints.length; i++) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : breakpoints) {
 			if (breakpoint instanceof ILineBreakpoint) {
 				ILineBreakpoint jBreakpoint = (ILineBreakpoint) breakpoint;
 				try {

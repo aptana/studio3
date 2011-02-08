@@ -467,8 +467,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static String[][] getXHRHeaders(String string) {
 		String[] headers = string.split("\\n"); //$NON-NLS-1$
 		List<String[]> list = new ArrayList<String[]>(headers.length);
-		for (int i = 0; i < headers.length; ++i) {
-			String header = headers[i];
+		for (String header : headers) {
 			String value = StringUtil.EMPTY;
 			int pos = header.indexOf(": "); //$NON-NLS-1$
 			if (pos != -1) {
@@ -961,8 +960,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 			JSDebugThread thread = new JSDebugThread(this);
 			threads = new JSDebugThread[] { thread };
-			for (int i = 0; i < threads.length; ++i) {
-				threads[i].fireCreationEvent();
+			for (JSDebugThread i : threads) {
+				i.fireCreationEvent();
 			}
 			fireChangeEvent(DebugEvent.CONTENT);
 
@@ -984,10 +983,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			JSDebugPlugin.getDefault().getDebugOptionsManager().addChangeListener(this);
 
 			/* restore breakpoints */
-			IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(
-					getModelIdentifier());
-			for (int i = 0; i < breakpoints.length; ++i) {
-				breakpointAdded(breakpoints[i]);
+			for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
+				breakpointAdded(breakpoint);
 			}
 
 			// Register listeners
@@ -1152,10 +1149,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @see org.eclipse.debug.core.IBreakpointManagerListener#breakpointManagerEnablementChanged(boolean)
 	 */
 	public void breakpointManagerEnablementChanged(boolean enabled) {
-		IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
-				.getBreakpoints(getModelIdentifier());
-		for (int i = 0; i < breakpoints.length; i++) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(getModelIdentifier())) {
 			if (enabled) {
 				breakpointAdded(breakpoint);
 			} else {
@@ -1178,9 +1172,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		List<IVariable> list = new ArrayList<IVariable>();
 		String[] args = connection.sendCommandAndWait(MessageFormat.format(VARIABLES_0, Util.encodeData(qualifier)));
 		if (args != null) {
-			for (int i = 1; i < args.length; ++i) {
+			for (String varData : args) {
 				int j = 0;
-				String varData = args[i];
 				if (varData.length() == 0) {
 					break;
 				}
@@ -1555,8 +1548,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @return IBreakpoint
 	 */
 	protected IBreakpoint findBreakpointIn(URI fileName, int lineNumber, IBreakpoint[] breakpoints) {
-		for (int i = 0; i < breakpoints.length; ++i) {
-			IBreakpoint breakpoint = breakpoints[i];
+		for (IBreakpoint breakpoint : breakpoints) {
 			if (getDebugTarget().supportsBreakpoint(breakpoint)) {
 				if (breakpoint instanceof ILineBreakpoint) {
 					try {

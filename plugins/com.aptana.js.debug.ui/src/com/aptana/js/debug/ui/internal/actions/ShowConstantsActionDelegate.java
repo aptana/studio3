@@ -69,9 +69,9 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		StructuredViewer viewer = getStructuredViewer();
 		ViewerFilter[] filters = viewer.getFilters();
 		ViewerFilter filter = null;
-		for (int i = 0; i < filters.length; i++) {
-			if (filters[i] == this) {
-				filter = filters[i];
+		for (ViewerFilter f : filters) {
+			if (f == this) {
+				filter = f;
 				break;
 			}
 		}

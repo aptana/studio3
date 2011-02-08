@@ -204,8 +204,7 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 	 */
 	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; i++) {
-			DebugEvent event = events[i];
+		for (DebugEvent event : events) {
 			Object source = event.getSource();
 			if (currentTarget == null || currentTerminated) {
 				if ((event.getKind() == DebugEvent.CREATE) && source instanceof IDebugTarget) {

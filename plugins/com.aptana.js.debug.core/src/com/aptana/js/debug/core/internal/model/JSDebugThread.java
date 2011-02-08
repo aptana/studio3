@@ -442,8 +442,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 
 	private void invalidateStackFrames() {
 		if (stackFrames != null) {
-			for (int i = 0; i < stackFrames.length; ++i) {
-				((JSDebugStackFrame) stackFrames[i]).invalidate();
+			for (IStackFrame stackFrame : stackFrames) {
+				((JSDebugStackFrame) stackFrame).invalidate();
 			}
 		}
 		validateFrames = true;

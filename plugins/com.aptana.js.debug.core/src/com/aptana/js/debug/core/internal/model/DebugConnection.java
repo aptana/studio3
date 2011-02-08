@@ -141,8 +141,7 @@ public class DebugConnection {
 		synchronized (locks) {
 			Object[] list = locks.values().toArray();
 			locks.clear();
-			for (int i = 0; i < list.length; ++i) {
-				Object lock = list[i];
+			for (Object lock : list) {
 				synchronized (lock) {
 					lock.notify();
 				}

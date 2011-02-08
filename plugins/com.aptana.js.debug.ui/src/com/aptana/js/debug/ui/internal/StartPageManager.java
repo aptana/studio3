@@ -104,8 +104,8 @@ public final class StartPageManager {
 		try {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager()
 					.getLaunchConfigurations(configType);
-			for (int i = 0; i < configs.length; i++) {
-				launchConfigurationAddedInternal(configs[i]);
+			for (ILaunchConfiguration config : configs) {
+				launchConfigurationAddedInternal(config);
 			}
 		} catch (CoreException e) {
 			JSDebugUIPlugin.log(e);
@@ -177,8 +177,7 @@ public final class StartPageManager {
 		try {
 			ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager()
 					.getLaunchConfigurations(configType);
-			for (int i = 0; i < configs.length; i++) {
-				ILaunchConfiguration config = configs[i];
+			for (ILaunchConfiguration config : configs) {
 				if (config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE, -1) == ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE) {
 					String location = config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH,
 							StringUtil.EMPTY);
@@ -198,8 +197,7 @@ public final class StartPageManager {
 					.getLaunchHistory("org.eclipse.debug.ui.launchGroup.debug"); //$NON-NLS-1$
 			if (history != null) {
 				ILaunchConfiguration[] configs = history.getHistory();
-				for (int i = 0; i < configs.length; i++) {
-					ILaunchConfiguration config = configs[i];
+				for (ILaunchConfiguration config : configs) {
 					if (configType.equals(config.getType())) {
 						return config;
 					}
@@ -268,9 +266,8 @@ public final class StartPageManager {
 
 	private void notifyListeners(String location) {
 		IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(location);
-		Object[] list = listeners.getListeners();
-		for (int i = 0; i < list.length; ++i) {
-			((IStartPageChangeListener) list[i]).startPageChanged(resource);
+		for (Object listener : listeners.getListeners()) {
+			((IStartPageChangeListener) listener).startPageChanged(resource);
 		}
 	}
 

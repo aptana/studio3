@@ -68,42 +68,41 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	private ISelection fSelection;
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
 	public void dispose() {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
 	public void init(IWorkbenchWindow window) {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
 	public void init(IViewPart view) {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.ui.IEditorPart)
 	 */
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@SuppressWarnings("rawtypes")
 	public void run(IAction action) {
 		if (fSelection == null) {
 			return;
 		}
 		if (fSelection instanceof IStructuredSelection) {
-			for (Iterator iter = ((IStructuredSelection) fSelection).iterator(); iter.hasNext();) {
-				IVariable variable = (IVariable) iter.next();
+			for (Object object : ((IStructuredSelection) fSelection).toList()) {
+				IVariable variable = (IVariable) object;
 				try {
 					createExpression(variable.getName());
 				} catch (DebugException e) {
@@ -118,7 +117,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 		}
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
@@ -155,7 +154,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 		}
 	}
 
-	/**
+	/*
 	 * showExpressionsView
 	 */
 	protected void showExpressionsView() {
@@ -172,7 +171,7 @@ public class WatchAction implements IWorkbenchWindowActionDelegate, IEditorActio
 
 	}
 
-	/**
+	/*
 	 * createExpression
 	 * 
 	 * @param expressionText

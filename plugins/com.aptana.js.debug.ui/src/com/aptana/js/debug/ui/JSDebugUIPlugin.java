@@ -58,8 +58,7 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 		if (debugEventListener == null) {
 			debugEventListener = new IDebugEventSetListener() {
 				public void handleDebugEvents(DebugEvent[] events) {
-					for (int i = 0; i < events.length; ++i) {
-						DebugEvent event = events[i];
+					for (DebugEvent event : events) {
 						if ((event.getSource() instanceof IJSDebugTarget) && (event.getKind() == DebugEvent.TERMINATE)) {
 							WorkbenchJob job = new WorkbenchJob("Close Temporary Debug Editors") { //$NON-NLS-1$
 								public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -150,16 +149,16 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 		if (page != null) {
 			IEditorReference[] editorRefs = page.getEditorReferences();
 			ArrayList<IEditorReference> closeEditors = new ArrayList<IEditorReference>();
-			for (int i = 0; i < editorRefs.length; ++i) {
+			for (IEditorReference ref : editorRefs) {
 				try {
-					IEditorInput input = editorRefs[i].getEditorInput();
+					IEditorInput input = ref.getEditorInput();
 					UniformResourceStorage storage = (UniformResourceStorage) input
 							.getAdapter(UniformResourceStorage.class);
 					if (storage != null) {
 						URI uri = storage.getURI();
 						if ("dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
 						{
-							closeEditors.add(editorRefs[i]);
+							closeEditors.add(ref);
 						}
 					}
 				} catch (PartInitException e) {

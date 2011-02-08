@@ -107,11 +107,10 @@ public class BreakpointHitCountAction implements IObjectActionDelegate {
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@SuppressWarnings("rawtypes")
 	public void run(IAction action) {
 		if (selection != null && !selection.isEmpty()) {
-			for (Iterator i = selection.iterator(); i.hasNext();) {
-				IJSLineBreakpoint breakpoint = (IJSLineBreakpoint) i.next();
+			for (Object object : selection.toList()) {
+				IJSLineBreakpoint breakpoint = (IJSLineBreakpoint) object;
 				try {
 					int oldValue = breakpoint.getHitCount();
 					int newValue = showDialog(breakpoint);

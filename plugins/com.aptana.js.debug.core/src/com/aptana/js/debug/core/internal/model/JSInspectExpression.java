@@ -165,8 +165,7 @@ public class JSInspectExpression extends PlatformObject implements IJSInspectExp
 		 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
 		 */
 		public void handleDebugEvents(DebugEvent[] events) {
-			for (int i = 0; i < events.length; i++) {
-				DebugEvent event = events[i];
+			for (DebugEvent event : events) {
 				if (event.getKind() == DebugEvent.TERMINATE && event.getSource().equals(getDebugTarget())) {
 					DebugPlugin.getDefault().getExpressionManager().removeExpression(JSInspectExpression.this);
 				}

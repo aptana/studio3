@@ -129,9 +129,8 @@ public class StartPageDecorator implements ILightweightLabelDecorator, StartPage
 	}
 
 	private void fireLabelProviderChanged(final LabelProviderChangedEvent event) {
-		Object[] list = listeners.getListeners();
-		for (int i = 0; i < list.length; ++i) {
-			final ILabelProviderListener listener = (ILabelProviderListener) list[i];
+		for (Object object : listeners.getListeners()) {
+			final ILabelProviderListener listener = (ILabelProviderListener) object;
 			SafeRunner.run(new ISafeRunnable() {
 				public void handleException(Throwable exception) {
 				}

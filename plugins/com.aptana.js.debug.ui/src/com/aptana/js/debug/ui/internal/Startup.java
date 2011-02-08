@@ -132,9 +132,9 @@ public class Startup implements IStartup {
 			}
 		}
 
-		for (int i = 0; i < history.length; ++i) {
+		for (ILaunchConfiguration i : history) {
 			for (Iterator<ILaunchConfiguration> j = defaultConfigurations.iterator(); j.hasNext();) {
-				if (history[i].equals(j.next())) {
+				if (i.equals(j.next())) {
 					j.remove();
 					break;
 				}
@@ -233,8 +233,7 @@ public class Startup implements IStartup {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		try {
 			ILaunchConfiguration[] configs = manager.getLaunchConfigurations(configType);
-			for (int i = 0; i < configs.length; ++i) {
-				ILaunchConfiguration config = configs[i];
+			for (ILaunchConfiguration config : configs) {
 				if (nature.equals(config.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_BROWSER_NATURE,
 						StringUtil.EMPTY))) {
 					return config;
