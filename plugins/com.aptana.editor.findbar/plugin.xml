@@ -20,6 +20,11 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            name="%FindNextOrPrev.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.findPrevious"
             name="%FindPrevious.command.name">
       </command>
@@ -47,6 +52,11 @@
             categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
             name="%ToggleRegexpMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleSearchBackward"
+            name="%ToggleSearchBackward.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
@@ -93,20 +103,21 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+K">
       </key>
+      <!-- Find Next or Prev-->
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
       </key>
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+N">
       </key>
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F3">
@@ -152,6 +163,13 @@
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+X">
+      </key>
+      <!-- Toggle search backward -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleSearchBackward"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+B">
       </key>
       <!-- Search in open files -->      
       <key
