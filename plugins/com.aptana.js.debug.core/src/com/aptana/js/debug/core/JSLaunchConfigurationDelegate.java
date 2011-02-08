@@ -56,6 +56,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -92,9 +93,10 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
 		IStatusHandler prompter = DebugPlugin.getDefault().getStatusHandler(promptStatus);
+		boolean debug = ILaunchManager.DEBUG_MODE.equals(mode);
 
 		// TODO remove when multiple debug targets supported
-		if ("debug".equals(mode)) { //$NON-NLS-1$
+		if (debug) {
 			IDebugTarget activeSession = null;
 			for (IDebugTarget target : DebugPlugin.getDefault().getLaunchManager().getDebugTargets()) {
 				if (IJSDebugConstants.ID_DEBUG_MODEL.equals(target.getModelIdentifier())) {
@@ -129,10 +131,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 		boolean debugCompatible = BrowserUtil.isBrowserDebugCompatible(browserExecutable);
 		boolean debugAvailable = false;
-		boolean debug = "debug".equals(mode); //$NON-NLS-1$
 		boolean advancedRun = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
 
-		if (debugCompatible && ("debug".equals(mode) || advancedRun)) { //$NON-NLS-1$
+		if (debugCompatible && (debug || advancedRun)) {
 			monitor.subTask(Messages.JSLaunchConfigurationDelegate_CheckingBrowserForDebugger);
 			debugAvailable = BrowserUtil.isBrowserDebugAvailable(browserExecutable);
 			if (!debugAvailable) {
@@ -209,7 +210,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				}
 				if (urlMapper == null) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-							MessageFormat.format("Server configuration {0} not found.", serverName), null));
+							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 				String externalBaseUrl = configuration.getAttribute(
@@ -250,7 +251,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		String browserCmdLine = configuration.getAttribute(
 				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
 		if (browserCmdLine != null && browserCmdLine.length() > 0) {
-			for (String arg : browserCmdLine.split(" ")) {
+			for (String arg : browserCmdLine.split(" ")) { //$NON-NLS-1$
 				if (arg.trim().length() > 0) {
 					browserArgs.add(arg.trim());
 				}
@@ -359,7 +360,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 			} else {
 				DebugPlugin.newProcess(launch, process, browserExecutable);
 			}
-		} else if ("run".equals(mode)) { //$NON-NLS-1$
+		} else if (ILaunchManager.RUN_MODE.equals(mode)) { //$NON-NLS-1$
 			try {
 				String launchPage = launchURL.toExternalForm();
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {

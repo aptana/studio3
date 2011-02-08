@@ -45,11 +45,6 @@ import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
  */
 public abstract class RemoteContentSourceLookupParticipant extends AbstractSourceLookupParticipant {
 
-	protected RemoteContentSourceLookupParticipant() {
-		super();
-		RemoteSourceCacheManager.getDefault();
-	}
-
 	/*
 	 * @see org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant#findSourceElements(java.lang.Object)
 	 */

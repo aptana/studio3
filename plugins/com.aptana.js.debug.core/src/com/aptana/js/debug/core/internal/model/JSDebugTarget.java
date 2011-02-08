@@ -161,8 +161,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String LOG = "log"; //$NON-NLS-1$
 	private static final String SUCCESS = "success"; //$NON-NLS-1$
 	private static final String GET_SOURCE_0 = "getSource*{0}"; //$NON-NLS-1$
-	private static final String STEP_FILTERS_ENABLED2 = "stepFiltersEnabled";
-	private static final String BYPASS_CONSTRUCTORS = "bypassConstructors";
+	private static final String STEP_FILTERS_ENABLED2 = "stepFiltersEnabled"; //$NON-NLS-1$
+	private static final String BYPASS_CONSTRUCTORS = "bypassConstructors"; //$NON-NLS-1$
+	private static final String SUSPEND_ON_KEYWORDS = "suspendOnKeywords"; //$NON-NLS-1$
+	private static final String SUSPEND_ON_ERRORS = "suspendOnErrors"; //$NON-NLS-1$
+	private static final String SUSPEND_ON_EXCEPTIONS = "suspendOnExceptions"; //$NON-NLS-1$
+	private static final String SUSPEND_ON_FIRST_LINE = "suspendOnFirstLine"; //$NON-NLS-1$
+
+	private static final char VARIABLE_FLAG_WRITABLE = 'w';
+	private static final char VARIABLE_FLAG_CONST = 'c';
+	private static final char VARIABLE_FLAG_LOCAL = 'l';
+	private static final char VARIABLE_FLAG_ARG = 'a';
+	private static final char VARIABLE_FLAG_EXCEPTION = 'e';
+
+	private static final char WATCHPOINT_FLAG_READ = 'r';
+	private static final char WATCHPOINT_FLAG_WRITE = 'w';
 
 	private static final int PROTOCOL_VERSION_MIN = 0;
 	private static final int PROTOCOL_VERSION_MAX = 1;
@@ -881,13 +894,13 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		String value = getAttribute(key);
 		boolean boolValue = Boolean.valueOf(value).booleanValue();
 		if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_FIRST_LINE.equals(key)) {
-			setOption("suspendOnFirstLine", Boolean.toString(boolValue)); //$NON-NLS-1$
+			setOption(SUSPEND_ON_FIRST_LINE, Boolean.toString(boolValue));
 		} else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_EXCEPTIONS.equals(key)) {
-			setOption("suspendOnExceptions", Boolean.toString(boolValue)); //$NON-NLS-1$
+			setOption(SUSPEND_ON_EXCEPTIONS, Boolean.toString(boolValue));
 		} else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS.equals(key)) {
-			setOption("suspendOnErrors", Boolean.toString(boolValue)); //$NON-NLS-1$
+			setOption(SUSPEND_ON_ERRORS, Boolean.toString(boolValue));
 		} else if (ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS.equals(key)) {
-			setOption("suspendOnKeywords", Boolean.toString(boolValue)); //$NON-NLS-1$
+			setOption(SUSPEND_ON_KEYWORDS, Boolean.toString(boolValue));
 		}
 	}
 
@@ -1097,18 +1110,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		connection.stop();
 		updateContentJob.cancel();
 		if (threads.length > 0) {
-			for (int i = 0; i < threads.length; ++i) {
-				threads[i].fireTerminateEvent();
+			try {
+				for (JSDebugThread thread : threads) {
+					thread.fireTerminateEvent();
+				}
+				threads = new JSDebugThread[0];
+				topScriptElements.clear();
+				scripts.clear();
+				fireChangeEvent(DebugEvent.CONTENT);
+			} finally {
+				// Unregister listeners
+				JSDebugPlugin.getDefault().getDebugOptionsManager().removeChangeListener(this);
+				DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
+				DebugPlugin.getDefault().getBreakpointManager().removeBreakpointManagerListener(this);
 			}
-			threads = new JSDebugThread[0];
-			topScriptElements.clear();
-			scripts.clear();
-			fireChangeEvent(DebugEvent.CONTENT);
 
-			// Unregister listeners
-			JSDebugPlugin.getDefault().getDebugOptionsManager().removeChangeListener(this);
-			DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
-			DebugPlugin.getDefault().getBreakpointManager().removeBreakpointManagerListener(this);
 		}
 	}
 
@@ -1489,10 +1505,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		if (enabled) {
 			try {
 				if (watchpoint.isAccess()) {
-					kind += 'r';
+					kind += WATCHPOINT_FLAG_READ;
 				}
 				if (watchpoint.isModification()) {
-					kind += 'w';
+					kind += WATCHPOINT_FLAG_WRITE;
 				}
 			} catch (CoreException ignore) {
 			}
@@ -1652,7 +1668,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		return null;
 	}
 
-	/**
+	/*
 	 * convertVariableFlags
 	 * 
 	 * @param string
@@ -1660,22 +1676,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	private static int convertVariableFlags(String string) {
 		int flags = 0;
-		char[] chars = string.toCharArray();
-		for (int i = 0; i < chars.length; ++i) {
-			switch (chars[i]) {
-			case 'w':
+		for (char c : string.toCharArray()) {
+			switch (c) {
+			case VARIABLE_FLAG_WRITABLE:
 				flags |= JSDebugVariable.FLAGS_MODIFIABLE;
 				break;
-			case 'c':
+			case VARIABLE_FLAG_CONST:
 				flags |= JSDebugVariable.FLAGS_CONST;
 				break;
-			case 'l':
+			case VARIABLE_FLAG_LOCAL:
 				flags |= JSDebugVariable.FLAGS_LOCAL;
 				break;
-			case 'a':
+			case VARIABLE_FLAG_ARG:
 				flags |= JSDebugVariable.FLAGS_ARGUMENT;
 				break;
-			case 'e':
+			case VARIABLE_FLAG_EXCEPTION:
 				flags |= JSDebugVariable.FLAGS_EXCEPTION;
 				break;
 			default:
@@ -1685,7 +1700,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		return flags;
 	}
 
-	/**
+	/*
 	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#getTopScriptElements()
 	 */
 	public IJSScriptElement[] getTopScriptElements() {

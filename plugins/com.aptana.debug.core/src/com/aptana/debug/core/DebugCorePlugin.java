@@ -39,9 +39,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.debug.core.internal.UniformResourceBreakpointChangeNotifier;
+import com.aptana.debug.core.sourcelookup.RemoteSourceCacheManager;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -58,6 +60,7 @@ public class DebugCorePlugin extends Plugin {
 	private static DebugCorePlugin plugin;
 
 	private UniformResourceBreakpointChangeNotifier breakpointHelper;
+	private RemoteSourceCacheManager remoteSourceCacheManager;
 
 	/**
 	 * The constructor.
@@ -75,6 +78,7 @@ public class DebugCorePlugin extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		breakpointHelper = new UniformResourceBreakpointChangeNotifier();
+		DebugPlugin.getDefault().addDebugEventListener(remoteSourceCacheManager = new RemoteSourceCacheManager());
 	}
 
 	/**
@@ -85,6 +89,7 @@ public class DebugCorePlugin extends Plugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		breakpointHelper.cleanup();
+		DebugPlugin.getDefault().removeDebugEventListener(remoteSourceCacheManager);
 		super.stop(context);
 		plugin = null;
 	}
@@ -96,6 +101,10 @@ public class DebugCorePlugin extends Plugin {
 	 */
 	public static DebugCorePlugin getDefault() {
 		return plugin;
+	}
+	
+	public RemoteSourceCacheManager getRemoteSourceCacheManager() {
+		return remoteSourceCacheManager;
 	}
 
 	public static void log(Throwable e) {

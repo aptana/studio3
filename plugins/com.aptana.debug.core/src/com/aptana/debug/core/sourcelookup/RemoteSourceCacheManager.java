@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugTarget;
 
@@ -48,26 +47,8 @@ import org.eclipse.debug.core.model.IDebugTarget;
  */
 public final class RemoteSourceCacheManager implements IDebugEventSetListener {
 	
-	private static RemoteSourceCacheManager fgDefault;
-
 	private Map<URI, RemoteFileStorage> cache = new HashMap<URI, RemoteFileStorage>();
 	private IFileContentRetriever fileContentRetriever;
-
-	private RemoteSourceCacheManager() {
-		DebugPlugin.getDefault().addDebugEventListener(this);
-	}
-
-	/**
-	 * getDefault
-	 * 
-	 * @return RemoteSourceCacheManager
-	 */
-	public static RemoteSourceCacheManager getDefault() {
-		if (fgDefault == null) {
-			fgDefault = new RemoteSourceCacheManager();
-		}
-		return fgDefault;
-	}
 
 	/**
 	 * getStorage

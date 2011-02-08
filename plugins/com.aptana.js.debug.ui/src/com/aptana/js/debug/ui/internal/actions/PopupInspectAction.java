@@ -109,8 +109,8 @@ public class PopupInspectAction extends InspectAction implements IInformationPro
 		IWorkbenchPart part = getTargetPart();
 		viewer = (ITextViewer) part.getAdapter(ITextViewer.class);
 		if (viewer == null) {
-			System.err.println("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()");
-			JSDebugUIPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()");
+			System.err.println("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()"); //$NON-NLS-1$
+			JSDebugUIPlugin.log("TODO: com.aptana.js.debug.ui.internal.actions.PopupInspectAction.displayResult()"); //$NON-NLS-1$
 		}
 		if (viewer == null) {
 			super.displayResult(result);

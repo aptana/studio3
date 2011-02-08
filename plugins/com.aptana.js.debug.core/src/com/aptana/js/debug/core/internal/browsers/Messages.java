@@ -40,7 +40,7 @@ import org.eclipse.osgi.util.NLS;
  * @author Ingo Muschenetz
  */
 public final class Messages extends NLS {
-	private static final String BUNDLE_NAME = "com.aptana.debug.core.internal.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.js.debug.core.internal.browsers.messages"; //$NON-NLS-1$
 
 	private Messages() {
 	}
@@ -61,5 +61,7 @@ public final class Messages extends NLS {
 	 * BrowserUtil_InstallError
 	 */
 	public static String BrowserUtil_InstallError;
+
+	public static String BrowserUtil_PreviousVersionFound_Message;
 
 }

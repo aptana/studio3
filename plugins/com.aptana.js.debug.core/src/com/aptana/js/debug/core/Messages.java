@@ -109,6 +109,8 @@ public final class Messages extends NLS {
 	 */
 	public static String JSLaunchConfigurationDelegate_OpeningSocketOnPort;
 
+	public static String JSLaunchConfigurationDelegate_ServerNotFound0_Error;
+
 	/**
 	 * JSLaunchConfigurationDelegate_SocketConnectionError
 	 */

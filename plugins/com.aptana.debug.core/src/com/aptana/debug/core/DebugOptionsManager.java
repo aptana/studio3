@@ -121,7 +121,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener {
 	}
 	
 	public static boolean isDebuggerActive(String modelIdentifier) {
-		return "true".equals(System.getProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX));
+		return "true".equals(System.getProperty(modelIdentifier+DEBUGGER_ACTIVE_SUFFIX)); //$NON-NLS-1$
 	}
 
 	/**

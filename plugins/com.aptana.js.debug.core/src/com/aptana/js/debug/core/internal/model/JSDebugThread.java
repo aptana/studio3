@@ -77,18 +77,20 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String SUBARGS_SPLIT = "\\|"; //$NON-NLS-1$
 	private static final String STEP_TO_FRAME_0 = "stepToFrame*{0}"; //$NON-NLS-1$
 
-	private static final int STATE_STARTING = 0;
-	private static final int STATE_RUNNING = 1;
-	private static final int STATE_SUSPENDED = 2;
-	private static final int STATE_SUSPENDING = 3;
-	private static final int STATE_STEPPPING = 4;
+	private enum State {
+		STARTING,
+		RUNNING,
+		SUSPENDED,
+		SUSPENDING,
+		STEPPPING
+	}
 
 	private static final IStackFrame[] emptyStack = new IStackFrame[0];
 	private static final IBreakpoint[] emptyBreakpoints = new IBreakpoint[0];
 	
 	private IStackFrame[] stackFrames = emptyStack;
 	private IBreakpoint[] breakpoints = emptyBreakpoints;
-	private int runningState = STATE_STARTING;
+	private State runningState = State.STARTING;
 	private boolean validateFrames = false;
 
 	/**
@@ -144,7 +146,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		return MessageFormat.format(Messages.JSDebugThread_ThreadMain_0, (runningState == STATE_SUSPENDING ? MessageFormat
+		return MessageFormat.format(Messages.JSDebugThread_ThreadMain_0, (runningState == State.SUSPENDING ? MessageFormat
 				.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
 				: StringUtil.EMPTY));
 	}
@@ -167,24 +169,24 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canSuspend()
 	 */
 	public boolean canSuspend() {
-		return !isSuspended() && runningState != STATE_STARTING;
+		return !isSuspended() && runningState != State.STARTING;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
-		return runningState == STATE_SUSPENDED;
+		return runningState == State.SUSPENDED;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
-		if (runningState != STATE_SUSPENDED) {
+		if (runningState != State.SUSPENDED) {
 			return;
 		}
-		runningState = STATE_STEPPPING;
+		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(RESUME);
 	}
@@ -193,10 +195,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
-		if (runningState != STATE_RUNNING) {
+		if (runningState != State.RUNNING) {
 			return;
 		}
-		runningState = STATE_SUSPENDING;
+		runningState = State.SUSPENDING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(SUSPEND);
 	}
@@ -226,17 +228,17 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
-		return runningState == STATE_STEPPPING;
+		return runningState == State.STEPPPING;
 	}
 
 	/*
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
-		if (runningState != STATE_SUSPENDED) {
+		if (runningState != State.SUSPENDED) {
 			return;
 		}
-		runningState = STATE_STEPPPING;
+		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_INTO);
 	}
@@ -245,10 +247,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
 	public void stepOver() throws DebugException {
-		if (runningState != STATE_SUSPENDED) {
+		if (runningState != State.SUSPENDED) {
 			return;
 		}
-		runningState = STATE_STEPPPING;
+		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_OVER);
 	}
@@ -257,10 +259,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
-		if (runningState != STATE_SUSPENDED) {
+		if (runningState != State.SUSPENDED) {
 			return;
 		}
-		runningState = STATE_STEPPPING;
+		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_RETURN);
 	}
@@ -291,7 +293,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		int details = DebugEvent.UNSPECIFIED;
 		if (SUSPENDED.equals(action)) {
 			invalidateStackFrames();
-			runningState = STATE_SUSPENDED;
+			runningState = State.SUSPENDED;
 			breakpoints = null;
 			String reason = args[1];
 			if (BREAKPOINT.equals(reason) || KEYWORD.equals(reason) || FIRST_LINE.equals(reason)
@@ -337,11 +339,11 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				details = DebugEvent.STEP_RETURN;
 			} else if (RESUME.equals(reason)) {
 				details = DebugEvent.CLIENT_REQUEST;
-				runningState = STATE_RUNNING;
+				runningState = State.RUNNING;
 			} else if (ABORT.equals(reason) || START.equals(reason)) {
-				runningState = STATE_RUNNING;
+				runningState = State.RUNNING;
 			} else {
-				runningState = STATE_RUNNING;
+				runningState = State.RUNNING;
 			}
 			if (reason.startsWith(STEP)) {
 				/* top-level frame */
@@ -355,11 +357,11 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	}
 
 	/* package */ void stepToFrame(IStackFrame frame) throws DebugException {
-		if (runningState != STATE_SUSPENDED) {
+		if (runningState != State.SUSPENDED) {
 			return;
 		}
 		int targetFrameId = ((JSDebugStackFrame) frame).getFrameId();
-		runningState = STATE_STEPPPING;
+		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
 		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(
 				MessageFormat.format(STEP_TO_FRAME_0, targetFrameId));

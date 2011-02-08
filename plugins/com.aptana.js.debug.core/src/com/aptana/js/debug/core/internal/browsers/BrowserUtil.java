@@ -340,7 +340,7 @@ public final class BrowserUtil {
 							prompter
 									.handleStatus(
 											installDebuggerPromptStatus,
-											"warning_" + "Previous version of Firebug extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
+											"warning_" + Messages.BrowserUtil_PreviousVersionFound_Message); //$NON-NLS-1$
 							return false;
 						}
 						String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
@@ -348,7 +348,7 @@ public final class BrowserUtil {
 							prompter
 									.handleStatus(
 											installDebuggerPromptStatus,
-											"warning_" + "Previous version of Firebug extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
+											"warning_" + Messages.BrowserUtil_PreviousVersionFound_Message); //$NON-NLS-1$
 							return false;
 						}
 

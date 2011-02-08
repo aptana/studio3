@@ -41,6 +41,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
 
+import com.aptana.debug.core.DebugCorePlugin;
+
 /**
  * @author Max Stepanov
  */
@@ -54,10 +56,10 @@ public class RemoteSourceContainer extends AbstractSourceContainer {
 			URI uri = new URI(path);
 			String scheme = uri.getScheme();
 			if ("http".equals(scheme) || "https".equals(scheme) || "dbgsource".equals(scheme)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				RemoteFileStorage storage = RemoteSourceCacheManager.getDefault().getStorage(uri);
+				RemoteFileStorage storage = DebugCorePlugin.getDefault().getRemoteSourceCacheManager().getStorage(uri);
 				if (storage == null) {
 					storage = new RemoteFileStorage(uri, null);
-					RemoteSourceCacheManager.getDefault().add(uri, storage);
+					DebugCorePlugin.getDefault().getRemoteSourceCacheManager().add(uri, storage);
 				}
 				return new Object[] { storage };
 			}

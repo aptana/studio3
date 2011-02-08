@@ -1,4 +1,2 @@
 com.aptana.debug.core/debugger_debug = true
 com.aptana.debug.core/skip_debugger_install = true
-com.aptana.debug.core/jaxer_debugger = true
-com.aptana.debug.core/external_server_is_jaxer = true
