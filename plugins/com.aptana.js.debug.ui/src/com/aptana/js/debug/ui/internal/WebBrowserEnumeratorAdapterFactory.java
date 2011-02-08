@@ -34,10 +34,11 @@
  */
 package com.aptana.js.debug.ui.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.internal.browser.BrowserManager;
@@ -48,26 +49,26 @@ import org.eclipse.ui.internal.browser.IBrowserDescriptor;
  */
 @SuppressWarnings({ "rawtypes", "restriction" })
 public class WebBrowserEnumeratorAdapterFactory implements IAdapterFactory {
-	/**
-	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
-	 *      java.lang.Class)
+	
+	/*
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
 	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adapterType == Enumeration.class) {
-			return getWebBrowsers().elements();
+			return Collections.enumeration(getWebBrowsers());
 		}
 		return null;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
 	public Class[] getAdapterList() {
 		return new Class[] { Enumeration.class };
 	}
 
-	private Vector getWebBrowsers() {
-		Vector<String> v = new Vector<String>();
+	private List<String> getWebBrowsers() {
+		List<String> browsers = new ArrayList<String>();
 		List list = BrowserManager.getInstance().getWebBrowsers();
 		IBrowserDescriptor current = BrowserManager.getInstance().getCurrentWebBrowser();
 		for (Iterator i = list.iterator(); i.hasNext();) {
@@ -77,11 +78,11 @@ public class WebBrowserEnumeratorAdapterFactory implements IAdapterFactory {
 				continue;
 			}
 			if (desc == current) {
-				v.add(0, location);
+				browsers.add(0, location);
 			} else {
-				v.add(location);
+				browsers.add(location);
 			}
 		}
-		return v;
+		return browsers;
 	}
 }

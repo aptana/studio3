@@ -58,6 +58,8 @@ public final class Messages extends NLS {
 
 	public static String LaunchDebuggerPromptStatusHandler_CloseActiveSession;
 
+	public static String StartPageManager_DefaultConfigurationName;
+
 	public static String Startup_DontAskAgain;
 
 	/**

@@ -206,7 +206,7 @@ public final class StartPageManager {
 		} catch (CoreException e) {
 			JSDebugUIPlugin.log(e);
 		}
-		return createConfiguration("Default"); //$NON-NLS-1$
+		return createConfiguration(Messages.StartPageManager_DefaultConfigurationName);
 	}
 
 	private ILaunchConfiguration createConfiguration(String namePrefix) {

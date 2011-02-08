@@ -57,6 +57,7 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
  */
 public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 	
+	private static final String URL_INSTALL_PDM = "http://www.aptana.com/pro/pdm.php"; //$NON-NLS-1$
 	private static final String URL_DOCS_INSTALL_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_JavaScript_debugger"; //$NON-NLS-1$
 	private static final String URL_DOCS_INSTALL_IE_DEBUGGER = "http://docs.aptana.com/docs/index.php/Installing_the_IE_debugger"; //$NON-NLS-1$
 
@@ -84,7 +85,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 			switch (md.open()) {
 			case 0:
 				WorkbenchBrowserUtil.launchExternalBrowser(
-						"http://www.aptana.com/pro/pdm.php", "org.eclipse.ui.browser.ie"); //$NON-NLS-1$ //$NON-NLS-2$
+						URL_INSTALL_PDM, "org.eclipse.ui.browser.ie"); //$NON-NLS-1$
 				/* continue */
 			case 1:
 				return new Boolean(true);

@@ -90,6 +90,7 @@ public class RemoteFileStorage extends UniformResourceStorage {
 	 * 
 	 * @return boolean
 	 */
+	@Override
 	public boolean isValid() {
 		return fIn != null || super.isValid();
 	}

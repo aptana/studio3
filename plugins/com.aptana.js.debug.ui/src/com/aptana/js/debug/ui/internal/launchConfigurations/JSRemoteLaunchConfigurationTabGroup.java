@@ -34,6 +34,7 @@
  */
 package com.aptana.js.debug.ui.internal.launchConfigurations;
 
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
@@ -53,7 +54,7 @@ public class JSRemoteLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 	 */
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs;
-		if ("debug".equals(mode)) { //$NON-NLS-1$
+		if (ILaunchManager.DEBUG_MODE.equals(mode)) {
 			tabs = new ILaunchConfigurationTab[] { new LaunchServerSettingsTab(), new HttpSettingsTab(),
 					new DebugSettingsTab(), new CommonTab() };
 		} else {

@@ -60,6 +60,7 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.debug.ui.DebugUiPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
@@ -248,7 +249,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 			}
 		});
 		int hitCount = breakpoint.getHitCount();
-		String hitCountString = ""; //$NON-NLS-1$
+		String hitCountString = StringUtil.EMPTY;
 		if (hitCount > 0) {
 			hitCountString = new Integer(hitCount).toString();
 			fHitCountButton.setSelection(true);

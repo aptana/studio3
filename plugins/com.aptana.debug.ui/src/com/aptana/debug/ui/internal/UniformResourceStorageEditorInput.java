@@ -39,7 +39,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -105,7 +104,7 @@ public class UniformResourceStorageEditorInput extends StorageEditorInput {
 
 }
 
-/** XXX: temporary solution until UnifiedEditor issues with FileInfo resolved */
+/** XXX: use ILocationProviderExtension + EFS */
 class UniformResourceStorageLocationProvider implements ILocationProvider {
 	/** TODO: find a better way for remote->local file mapping */
 	private Map<IStorage, String> map = new Hashtable<IStorage, String>();
@@ -211,16 +210,10 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 	}
 
 	private boolean validateContents(UniformResourceStorage storage, boolean remove) {
-		try {
-			Method method = storage.getClass().getDeclaredMethod("isValid", new Class[0]); //$NON-NLS-1$
-			Boolean result = (Boolean) method.invoke(storage, new Object[0]);
-			if (remove && !result.booleanValue()) {
-				map.remove(storage);
-			}
-			return result.booleanValue();
-		} catch (Exception e) {
-			DebugUiPlugin.log(e);
+		boolean valid = storage.isValid();
+		if (remove && !valid) {
+			map.remove(storage);
 		}
-		return false;
+		return valid;
 	}
 }

@@ -96,7 +96,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 * 
 	 * @return boolean
 	 */
-	protected boolean isValid()
+	public boolean isValid()
 	{
 		if (timestamp == -1) {
 			return false;

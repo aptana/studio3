@@ -68,6 +68,7 @@ import com.aptana.debug.core.util.DebugUtil;
  * @author Max Stepanov
  */
 public class ScriptsView extends AbstractDebugView implements IDebugEventSetListener {
+	private static final String GOTO_FILE_ACTION = "GotoFile";
 	private ISelectionListener selectionListener;
 	private IDebugTarget currentTarget;
 	private boolean currentTerminated;
@@ -101,7 +102,7 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 	 */
 	protected void createActions() {
 		IAction action = new OpenScriptSourceAction(getViewer());
-		setAction("GotoFile", action); //$NON-NLS-1$
+		setAction(GOTO_FILE_ACTION, action);
 		setAction(DOUBLE_CLICK_ACTION, action);
 	}
 
@@ -116,7 +117,7 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 	 * @see org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
 	protected void fillContextMenu(IMenuManager menu) {
-		menu.add(getAction("GotoFile")); //$NON-NLS-1$
+		menu.add(getAction(GOTO_FILE_ACTION));
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
@@ -124,7 +125,7 @@ public class ScriptsView extends AbstractDebugView implements IDebugEventSetList
 	 * @see org.eclipse.debug.ui.AbstractDebugView#configureToolBar(org.eclipse.jface.action.IToolBarManager)
 	 */
 	protected void configureToolBar(IToolBarManager tbm) {
-		tbm.add(getAction("GotoFile")); //$NON-NLS-1$
+		tbm.add(getAction(GOTO_FILE_ACTION));
 	}
 
 	/**

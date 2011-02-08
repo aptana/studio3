@@ -42,6 +42,7 @@ import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
 
@@ -63,8 +64,8 @@ public class JSDebugUIPreferenceInitializer extends AbstractPreferenceInitialize
 
 		// override default org.eclipse.debug.ui options
 		node = new DefaultScope().getNode(DebugUIPlugin.getDefault().getBundle().getSymbolicName());
-		if (MessageDialogWithToggle.NEVER.equals(node.get(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, ""))) { //$NON-NLS-1$
-			node.put(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, "prompt"); //$NON-NLS-1$
+		if (MessageDialogWithToggle.NEVER.equals(node.get(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, StringUtil.EMPTY))) {
+			node.put(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.PROMPT);
 		}
 	}
 }
