@@ -8,7 +8,8 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
  org.eclipse.debug.core,
- com.aptana.core
+ com.aptana.core,
+ com.aptana.core.io
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.debug.core;
@@ -21,7 +22,6 @@ Export-Package: com.aptana.debug.core;
    org.osgi.framework,
    org.eclipse.debug.core.model",
  com.aptana.debug.core.internal;x-friends:="com.aptana.ide.framework.apollo,com.aptana.js.debug.core",
- com.aptana.debug.core.internal.obsolete,
  com.aptana.debug.core.sourcelookup;x-friends:="com.aptana.ide.framework.apollo,com.aptana.js.debug.core",
  com.aptana.debug.core.util;uses:="org.eclipse.core.runtime"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

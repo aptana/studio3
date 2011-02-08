@@ -34,10 +34,12 @@
  */
 package com.aptana.js.debug.ui.internal.preferences;
 
-import org.eclipse.core.runtime.Preferences;
+import java.io.IOException;
+
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -47,8 +49,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.debug.core.DebugCorePlugin;
+import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
@@ -57,7 +60,6 @@ import com.aptana.js.debug.ui.internal.IJSDebugUIConstants;
  * @author Max Stepanov
  */
 public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-	private Preferences store;
 	private Button suspendOnFirstLine;
 	private Button suspendOnExceptions;
 	private Button suspendOnErrors;
@@ -70,24 +72,7 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	 */
 	public JSDebugPreferencePage() {
 		super();
-		store = getPreferences();
-	}
-
-	/**
-	 * @param title
-	 */
-	public JSDebugPreferencePage(String title) {
-		super(title);
-		store = getPreferences();
-	}
-
-	/**
-	 * @param title
-	 * @param image
-	 */
-	public JSDebugPreferencePage(String title, ImageDescriptor image) {
-		super(title, image);
-		store = getPreferences();
+		setPreferenceStore(new ScopedPreferenceStore(new InstanceScope(), JSDebugPlugin.PLUGIN_ID));
 	}
 
 	/**
@@ -143,20 +128,11 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 		return super.performOk();
 	}
 
-	/**
-	 * getPreferences
-	 * 
-	 * @return Preferences
-	 */
-	protected Preferences getPreferences() {
-		return DebugCorePlugin.getDefault().getPluginPreferences();
-	}
-
 	private void setInitialValues() {
-		suspendOnFirstLine.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-		suspendOnExceptions.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
-		suspendOnErrors.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
-		suspendOnDebuggerKeyword.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+		suspendOnFirstLine.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
+		suspendOnExceptions.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
+		suspendOnErrors.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
+		suspendOnDebuggerKeyword.setSelection(getPreferenceStore().getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		if (!uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER)) {
@@ -169,29 +145,28 @@ public class JSDebugPreferencePage extends PreferencePage implements IWorkbenchP
 	}
 
 	private void setDefaultValues() {
-		suspendOnFirstLine.setSelection(store.getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-		suspendOnExceptions.setSelection(store.getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
-		suspendOnErrors.setSelection(store.getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
-		suspendOnDebuggerKeyword.setSelection(store
+		suspendOnFirstLine.setSelection(getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
+		suspendOnExceptions.setSelection(getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
+		suspendOnErrors.setSelection(getPreferenceStore().getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
+		suspendOnDebuggerKeyword.setSelection(getPreferenceStore()
 				.getDefaultBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
-		if (uiStore.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER)) {
-			confirmExitDebugger.setSelection(uiStore.getDefaultBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
-		} else {
-			confirmExitDebugger.setSelection(true);
-		}
+		confirmExitDebugger.setSelection(uiStore.getDefaultBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER));
 	}
 
 	private void setValues() {
-		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, suspendOnFirstLine.getSelection());
-		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, suspendOnExceptions.getSelection());
-		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, suspendOnErrors.getSelection());
-		store.setValue(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, suspendOnDebuggerKeyword.getSelection());
-		DebugCorePlugin.getDefault().savePluginPreferences();
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE, suspendOnFirstLine.getSelection());
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS, suspendOnExceptions.getSelection());
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS, suspendOnErrors.getSelection());
+		getPreferenceStore().setValue(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD, suspendOnDebuggerKeyword.getSelection());
 
 		IPreferenceStore uiStore = JSDebugUIPlugin.getDefault().getPreferenceStore();
 		uiStore.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, confirmExitDebugger.getSelection());
-		JSDebugUIPlugin.getDefault().savePluginPreferences();
+		try {
+			((IPersistentPreferenceStore) uiStore).save();
+		} catch (IOException e) {
+			JSDebugUIPlugin.log(e);
+		}
 	}
 }

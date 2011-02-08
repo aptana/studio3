@@ -54,7 +54,6 @@ import com.aptana.core.util.FirefoxUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.VersionUtil;
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.js.debug.core.JSDebugPlugin;
 
 /**
@@ -80,7 +79,7 @@ public final class BrowserUtil {
 	};
 
 	private static final String FIREBUG_MIN_VERSION = "1.1.0"; //$NON-NLS-1$
-	private static final String IE_PLUGIN_ID = DebugCorePlugin.PLUGIN_ID + ".ie"; //$NON-NLS-1$
+	private static final String IE_PLUGIN_ID = JSDebugPlugin.PLUGIN_ID + ".ie"; //$NON-NLS-1$
 	private static final String EXTENSIONS = "extensions/"; //$NON-NLS-1$
 	private static final String DEBUGGER_FILE = "chrome/aptanadebugger.jar"; //$NON-NLS-1$
 
@@ -157,7 +156,7 @@ public final class BrowserUtil {
 	public static void resetBrowserCache(String browserExecutable) {
 		browserCache.remove(browserExecutable);
 		if (InternetExplorer.isBrowserExecutable(browserExecutable)) {
-			IPath dllPath = DebugCorePlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
+			IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 					.append("AptanaDebugger.dll"); //$NON-NLS-1$
 			if (dllPath.toFile().exists()) {
 				dllPath.addFileExtension("registered").toFile().delete(); //$NON-NLS-1$
@@ -202,7 +201,7 @@ public final class BrowserUtil {
 			 * Internet Explorer
 			 */
 		} else if (InternetExplorer.isBrowserExecutable(browserExecutable) && isIEDebuggerAvailable()) {
-			IPath dllPath = DebugCorePlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
+			IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 					.append("AptanaDebugger.dll"); //$NON-NLS-1$
 			boolean available = dllPath.toFile().exists() && dllPath.addFileExtension("registered").toFile().exists(); //$NON-NLS-1$
 
@@ -253,7 +252,7 @@ public final class BrowserUtil {
 
 					}
 				} catch (IOException e) {
-					DebugCorePlugin.log(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK, e.getMessage(), e));
+					JSDebugPlugin.log(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, e.getMessage(), e));
 				}
 			}
 
@@ -336,17 +335,6 @@ public final class BrowserUtil {
 				IPath profile = FirefoxUtil.findDefaultProfileLocation();
 				if (profile != null) {
 					try {
-						/*
-						 * Check for previous debugger versions
-						 */
-						String version = FirefoxUtil.getExtensionVersion("{85c7d2bd-b7c6-4644-95b2-9145a8505c4d}", profile); //$NON-NLS-1$
-						if (version != null) {
-							prompter
-									.handleStatus(
-											installDebuggerPromptStatus,
-											"warning_" + "Previous version of AptanaDebugger extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
-							return false;
-						}
 						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
 						if (extension.toFile().exists() && extension.append(DEBUGGER_FILE).toFile().exists()) {
 							prompter
@@ -355,7 +343,7 @@ public final class BrowserUtil {
 											"warning_" + "Previous version of Firebug extension for Firefox has been found.\n Uninstall it and try again."); //$NON-NLS-1$ //$NON-NLS-2$
 							return false;
 						}
-						version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
+						String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) { //$NON-NLS-1$
 							prompter
 									.handleStatus(
@@ -365,11 +353,11 @@ public final class BrowserUtil {
 						}
 
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) == null) {
-							installed = FirefoxUtil.installExtension(Platform.getBundle(DebugCorePlugin.PLUGIN_ID).getEntry(
+							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
 									EXTENSION_LOCAL_PATH[0]), EXTENSION_ID[0], profile.append(EXTENSIONS).toFile());
 						}
 						if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile) == null) {
-							installed = FirefoxUtil.installExtension(Platform.getBundle(DebugCorePlugin.PLUGIN_ID).getEntry(
+							installed = FirefoxUtil.installExtension(Platform.getBundle(JSDebugPlugin.PLUGIN_ID).getEntry(
 									EXTENSION_LOCAL_PATH[1]), EXTENSION_ID[1], profile.append(EXTENSIONS).toFile());
 						}
 
@@ -380,10 +368,10 @@ public final class BrowserUtil {
 							}
 						}
 					} catch (Exception e) {
-						DebugCorePlugin.log(e);
+						JSDebugPlugin.log(e);
 					}
 				} else {
-					DebugCorePlugin.log(Messages.BrowserUtil_FirefoxProfileNotFound);
+					JSDebugPlugin.log(Messages.BrowserUtil_FirefoxProfileNotFound);
 				}
 
 				if (installed && Platform.OS_MACOSX.equals(Platform.getOS())) {
@@ -392,14 +380,14 @@ public final class BrowserUtil {
 						execProcess(new String[] {
 								"/usr/bin/open", //$NON-NLS-1$
 								"-b", //$NON-NLS-1$
-								getMacOSXApplicationIdentifier(browserExecutable), "about:blank" }, -1); //$NON-NLS-1$
+								getMacOSXApplicationIdentifier(browserExecutable) }, -1); //$NON-NLS-1$
 						try {
 							Thread.sleep(INSTALL_TIMEOUT);
 						} catch (InterruptedException e) {
 							Thread.interrupted();
 						}
 					} catch (IOException e) {
-						throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+						throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 								Messages.BrowserUtil_InstallError, e));
 					}
 				}
@@ -422,7 +410,7 @@ public final class BrowserUtil {
 					prompter.handleStatus(installDebuggerPromptStatus, "quit_" + browserName); //$NON-NLS-1$
 				}
 
-				IPath dllPath = DebugCorePlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
+				IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 						.append("AptanaDebugger.dll"); //$NON-NLS-1$
 				try {
 					File file = dllPath.toFile();
@@ -451,7 +439,7 @@ public final class BrowserUtil {
 					}
 					dllPath.addFileExtension("registered").toFile().createNewFile(); //$NON-NLS-1$
 				} catch (IOException e) {
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.BrowserUtil_InstallError, e));
 				}
 			}

@@ -36,19 +36,14 @@ package com.aptana.js.debug.core;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
 import org.eclipse.core.runtime.Status;
@@ -58,12 +53,9 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.DebugOptionsManager;
-import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
-import com.aptana.js.debug.core.internal.model.HttpServerProcess;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 
 /**
@@ -228,7 +220,6 @@ public final class JSLaunchConfigurationHelper {
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, StringUtil.EMPTY);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, StringUtil.EMPTY);
 		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY);
-		configuration.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
 	}
 
 	/**
@@ -318,8 +309,7 @@ public final class JSLaunchConfigurationHelper {
 				ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
 		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
-		boolean appendProjectName = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
+		boolean appendProjectName = true;
 
 		URL baseURL = null;
 
@@ -389,73 +379,6 @@ public final class JSLaunchConfigurationHelper {
 		return baseURL;
 	}
 
-	public static URL getLaunchURL(ILaunchConfiguration configuration, IResource resource) throws CoreException {
-		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
-				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
-
-		URL launchURL = null;
-
-		try {
-			if (startActionType == ILaunchConfigurationConstants.START_ACTION_START_URL) {
-				launchURL = new URL(configuration.getAttribute(
-						ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, StringUtil.EMPTY));
-				resource = null;
-			} else if (startActionType == ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE) {
-				String resourcePath = configuration.getAttribute(
-						ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, (String) null);
-				if (resourcePath != null && resourcePath.length() > 0) {
-					resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(resourcePath));
-				} else {
-					resource = null;
-				}
-			}
-			if (resource != null) {
-				URL baseURL = getBaseURL(configuration, resource);
-
-				if (baseURL != null) {
-					LocalResourceMapper resourceMapper = new LocalResourceMapper();
-					IPath location = resource.getProject().getLocation();
-					if (location == null) { // sample location ?
-						location = resource.getWorkspace().getRoot().getLocation().append(
-								resource.getProject().getFullPath());
-					}
-					resourceMapper.addMapping(baseURL, location.toFile());
-					setResourceMapping(configuration, baseURL, resourceMapper, null);
-
-					URI locationURI = resource.getLocationURI();
-					if (locationURI == null) { // sample location ?
-						locationURI = resource.getWorkspace().getRoot().getLocation().append(resource.getFullPath())
-								.toFile().toURI();
-					}
-					launchURL = resourceMapper.resolveLocalURI(locationURI).toURL();
-				} else {
-					IPath location = resource.getLocation();
-					if (location == null) { // sample location ?
-						location = resource.getWorkspace().getRoot().getLocation().append(resource.getFullPath());
-					}
-					launchURL = location.toFile().toURI().toURL();
-				}
-			}
-
-			if (launchURL != null) {
-				String httpGetQuery = configuration.getAttribute(
-						ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
-				if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null
-						&& launchURL.getRef() == null) {
-					if (httpGetQuery.charAt(0) != '?') {
-						httpGetQuery = '?' + httpGetQuery;
-					}
-					launchURL = new URL(launchURL, launchURL.getFile() + httpGetQuery);
-				}
-			}
-		} catch (MalformedURLException e) {
-			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
-					Messages.JSLaunchConfigurationHelper_Malformed_URL, e));
-		}
-
-		return launchURL;
-	}
-
 	public static void initializeLaunchAttributes(ILaunchConfiguration configuration, ILaunch launch)
 			throws CoreException {
 		if (configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES, false)) {
@@ -482,34 +405,6 @@ public final class JSLaunchConfigurationHelper {
 			launch.setAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS, Boolean
 					.toString(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD)));
 
-		}
-	}
-
-	/* package */static void setResourceMapping(ILaunchConfiguration configuration, URL baseURL,
-			LocalResourceMapper resourceMapper, HttpServerProcess server) throws CoreException {
-		String[] list = DebugOptionsManager.parseList(configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_SERVER_PATHS_MAPPING, StringUtil.EMPTY));
-		for (int i = 0, length = list.length; i < length;) {
-			String serverPath = list[i++];
-			String workspacePath = list[i++];
-			boolean enabled = !"0".equals(list[i++]); //$NON-NLS-1$
-			if (enabled) {
-				try {
-					URL url = new URL(baseURL, new Path(serverPath).makeRelative().toPortableString());
-					IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(workspacePath));
-					if (resource != null) {
-						File file = resource.getLocation().toFile();
-						resourceMapper.addMapping(url, file);
-						if (server != null) {
-							server.addServerPath(baseURL.toURI().relativize(url.toURI()).toASCIIString(), file);
-						}
-					}
-				} catch (MalformedURLException e) {
-					JSDebugPlugin.log(e);
-				} catch (URISyntaxException e) {
-					JSDebugPlugin.log(e);
-				}
-			}
 		}
 	}
 

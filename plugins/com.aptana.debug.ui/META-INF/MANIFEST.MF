@@ -6,21 +6,14 @@ Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.debug.ui.DebugUiPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.core.expressions,
- org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.jface.text,
  org.eclipse.ui,
- org.eclipse.ui.browser,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.core,
- com.aptana.ui,
- com.aptana.ui.epl,
- com.aptana.debug.core,
  com.aptana.js.debug.core
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy

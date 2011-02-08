@@ -51,9 +51,9 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.js.debug.core.IJSDebugConstants;
+import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSExceptionBreakpoint;
 
 /**
@@ -159,7 +159,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, new NullProgressMonitor());
 		} catch (CoreException e) {
-			DebugCorePlugin.log(Messages.JSDebugExceptionBreakpoint_BreakpointMarkerCreationFailed, e);
+			JSDebugPlugin.log(Messages.JSDebugExceptionBreakpoint_BreakpointMarkerCreationFailed, e);
 		}
 	}
 

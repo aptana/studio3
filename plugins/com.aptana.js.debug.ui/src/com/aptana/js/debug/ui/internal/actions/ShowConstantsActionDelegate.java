@@ -35,10 +35,11 @@
 
 package com.aptana.js.debug.ui.internal.actions;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -47,6 +48,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IActionDelegate2;
 import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -59,7 +61,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 	private IViewPart fView;
 	private IAction fAction;
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
 	public void init(IViewPart view) {
@@ -80,20 +82,20 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		fAction.setChecked(getPreferenceValue(view));
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate2#dispose()
 	 */
 	public void dispose() {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate2#init(org.eclipse.jface.action.IAction)
 	 */
 	public void init(IAction action) {
 		fAction = action;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate2#runWithEvent(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.swt.widgets.Event)
 	 */
@@ -101,25 +103,29 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		run(action);
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
 	public void run(IAction action) {
-		IPreferenceStore store = getPreferenceStore();
+		IEclipsePreferences preferences = getPreferences();
 		String key = fView.getSite().getId() + "." + getPreferenceKey(); //$NON-NLS-1$
-		store.setValue(key, action.isChecked());
-		JSDebugUIPlugin.getDefault().savePluginPreferences();
+		preferences.putBoolean(key, action.isChecked());
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			JSDebugUIPlugin.log(e);
+		}
 		getStructuredViewer().refresh();
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
 	 *      java.lang.Object, java.lang.Object)
 	 */
@@ -136,16 +142,11 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		return true;
 	}
 
-	/**
-	 * getPreferenceStore
-	 * 
-	 * @return IPreferenceStore
-	 */
-	protected IPreferenceStore getPreferenceStore() {
-		return JSDebugUIPlugin.getDefault().getPreferenceStore();
+	protected IEclipsePreferences getPreferences() {
+		return new InstanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
 	}
 
-	/**
+	/*
 	 * getPreferenceValue
 	 * 
 	 * @param part
@@ -155,17 +156,11 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		String baseKey = getPreferenceKey();
 		String viewKey = part.getSite().getId();
 		String compositeKey = viewKey + "." + baseKey; //$NON-NLS-1$
-		IPreferenceStore store = getPreferenceStore();
-		boolean value = false;
-		if (store.contains(compositeKey)) {
-			value = store.getBoolean(compositeKey);
-		} else {
-			value = store.getBoolean(baseKey);
-		}
-		return value;
+		IEclipsePreferences preferences = getPreferences();
+		return preferences.getBoolean(compositeKey, preferences.getBoolean(baseKey, false));
 	}
 
-	/**
+	/*
 	 * getStructuredViewer
 	 * 
 	 * @return StructuredViewer
@@ -181,7 +176,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		return null;
 	}
 
-	/**
+	/*
 	 * Returns whether this action is seleted/checked.
 	 * 
 	 * @return whether this action is seleted/checked
@@ -190,7 +185,7 @@ public class ShowConstantsActionDelegate extends ViewerFilter implements IViewAc
 		return fAction.isChecked();
 	}
 
-	/**
+	/*
 	 * getPreferenceKey
 	 * 
 	 * @return String

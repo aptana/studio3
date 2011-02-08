@@ -51,9 +51,9 @@ import org.eclipse.debug.core.model.LineBreakpoint;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.js.debug.core.IJSDebugConstants;
+import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.model.IJSLineBreakpoint;
 
 /**
@@ -160,7 +160,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 		try {
 			ResourcesPlugin.getWorkspace().run(wr, null, 0, new NullProgressMonitor());
 		} catch (CoreException e) {
-			DebugCorePlugin.log(Messages.JSDebugLineBreakpoint_BreakpointMarkerCreationFailed,e);
+			JSDebugPlugin.log(Messages.JSDebugLineBreakpoint_BreakpointMarkerCreationFailed,e);
 		}
 	}
 

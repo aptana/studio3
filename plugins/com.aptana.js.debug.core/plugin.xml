@@ -34,6 +34,7 @@
             sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
       </launchConfigurationType>
+      <!--
       <launchConfigurationType
             delegate="com.aptana.js.debug.core.JSRemoteLaunchConfigurationDelegate"
             id="com.aptana.js.debug.core.remoteLaunchConfigurationType"
@@ -43,6 +44,7 @@
             sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"
             sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
       </launchConfigurationType>
+      -->
    </extension>
    <extension
          point="org.eclipse.debug.core.watchExpressionDelegates">

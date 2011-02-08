@@ -1,14 +1,11 @@
 package com.aptana.js.debug.core;
 
-import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.debug.core.DebugOptionsManager;
-import com.aptana.debug.core.IEditorOpenAdapter;
 
 /**
  * 

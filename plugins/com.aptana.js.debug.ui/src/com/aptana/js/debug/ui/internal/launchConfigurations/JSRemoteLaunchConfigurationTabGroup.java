@@ -55,10 +55,10 @@ public class JSRemoteLaunchConfigurationTabGroup extends AbstractLaunchConfigura
 		ILaunchConfigurationTab[] tabs;
 		if ("debug".equals(mode)) { //$NON-NLS-1$
 			tabs = new ILaunchConfigurationTab[] { new LaunchServerSettingsTab(), new HttpSettingsTab(),
-					new HttpServerSettingsTab(), new DebugSettingsTab(), new CommonTab() };
+					new DebugSettingsTab(), new CommonTab() };
 		} else {
 			tabs = new ILaunchConfigurationTab[] { new LaunchServerSettingsTab(), new HttpSettingsTab(),
-					new HttpServerSettingsTab(), new AdvancedSettingsTab(), new CommonTab() };
+					new AdvancedSettingsTab(), new CommonTab() };
 		}
 		setTabs(tabs);
 	}

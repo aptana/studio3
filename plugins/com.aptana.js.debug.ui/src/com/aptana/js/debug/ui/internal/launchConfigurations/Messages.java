@@ -123,6 +123,8 @@ public final class Messages extends NLS {
 	 */
 	public static String LaunchBrowserSettingsTab_Server;
 
+	public static String LaunchBrowserSettingsTab_ServerNotSelected;
+
 	/**
 	 * LaunchBrowserSettingsTab_UseBuiltInWebServer
 	 */

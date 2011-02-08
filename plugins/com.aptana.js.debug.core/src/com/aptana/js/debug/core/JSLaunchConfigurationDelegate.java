@@ -43,7 +43,6 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -54,7 +53,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -65,16 +63,17 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import com.aptana.core.util.SocketUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
-import com.aptana.debug.core.internal.obsolete.LocalResourceMapper;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
 import com.aptana.js.debug.core.internal.model.DebugConnection;
-import com.aptana.js.debug.core.internal.model.HttpServerProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugTarget;
+import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IURLMapper;
+import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
  * @author Max Stepanov
@@ -84,15 +83,11 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 	protected static final int DEFAULT_PORT = 8999;
 
-	/**
-	 * launchBrowserPromptStatus
-	 */
 	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 302, StringUtil.EMPTY, null);
 
-	/**
-	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration,
-	 *      java.lang.String, org.eclipse.debug.core.ILaunch,
-	 *      org.eclipse.core.runtime.IProgressMonitor)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.debug.core.model.ILaunchConfigurationDelegate#launch(org.eclipse.debug.core.ILaunchConfiguration, java.lang.String, org.eclipse.debug.core.ILaunch, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor) throws CoreException {
 
@@ -117,7 +112,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				} else {
 					String errorMessage = Messages.JSLaunchConfigurationDelegate_MultipleJavaScriptDebugNotSupported
 							+ Messages.JSLaunchConfigurationDelegate_PleaseTerminateActiveSession;
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, Status.ERROR, errorMessage,
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR, errorMessage,
 							null));
 				}
 			}
@@ -127,7 +122,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		String browserExecutable = configuration.getAttribute(
 				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_EXECUTABLE, (String) null);
 		if (browserExecutable == null || !new File(browserExecutable).exists()) {
-			throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK, MessageFormat.format(
+			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, MessageFormat.format(
 					Messages.JSLaunchConfigurationDelegate_WebBrowserDoesNotExist, browserExecutable), null));
 		}
 
@@ -136,8 +131,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		boolean debugCompatible = BrowserUtil.isBrowserDebugCompatible(browserExecutable);
 		boolean debugAvailable = false;
 		boolean debug = "debug".equals(mode); //$NON-NLS-1$
-		boolean advancedRun = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
+		boolean advancedRun = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_ADVANCED_RUN_ENABLED, false);
 
 		if (debugCompatible && ("debug".equals(mode) || advancedRun)) { //$NON-NLS-1$
 			monitor.subTask(Messages.JSLaunchConfigurationDelegate_CheckingBrowserForDebugger);
@@ -150,7 +144,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				debugAvailable = BrowserUtil.isBrowserDebugAvailable(browserExecutable);
 			}
 			if (debug && !debugAvailable) {
-				throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_DebuggerExtensionNotInstalled, null));
 			}
 		}
@@ -160,365 +154,254 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				ILaunchConfigurationConstants.DEFAULT_SERVER_TYPE);
 		int startActionType = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_ACTION_TYPE,
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
-		boolean appendProjectName = configuration.getAttribute(
-				ILaunchConfigurationConstants.CONFIGURATION_APPEND_PROJECT_NAME, false);
 
-		LocalResourceMapper resourceMapper = null;
-		HttpServerProcess httpServer = null;
-		boolean launchHttpServer = false;
-		//boolean launchServerDebugger = false;
-		URL baseURL = null;
+		URL launchURL = null;
+		IURLMapper urlMapper = null;
 		try {
-			if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL) {
-				if (startActionType != ILaunchConfigurationConstants.START_ACTION_START_URL) {
-					launchHttpServer = true;
-				} /* else => do not launch server for direct URLs */
-			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL
-					|| serverType == ILaunchConfigurationConstants.SERVER_MANAGED) {
-				String externalBaseUrl = null;
-				if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
-					externalBaseUrl = configuration.getAttribute(
-							ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
-				} else {/*
-					String serverId = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_ID, (String) null);
-					String host = null;
-					IServer server = ServerCore.getServerManager().findServer(serverId);
-					if (server != null) {
-						host = server.getHost();
-						if (host == null) {
-							host = "localhost"; //$NON-NLS-1$
+			IResource startResource = null;
+			switch (startActionType) {
+			case ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE:
+				startResource = getCurrentEditorResource();
+				if (startResource == null) {
+					IPath path = getCurrentEditorPath();
+					if (path != null) {
+						if (debug && InternetExplorer.isBrowserExecutable(browserExecutable)) {
+							throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
+									Messages.JSLaunchConfigurationDelegate_Only_Project_Debugging_Supported, null));
 						}
-						for (IServer associatedServer : server.getAssociatedServers()) {
-							if ("Jaxer Server".equals(associatedServer.getDescription())) { //$NON-NLS-1$
-								launchServerDebugger = true;
-							}
+						launchURL = path.toFile().toURI().toURL();
+					} else {
+						launchURL = getCurrentEditorURL();
+						if (launchURL == null) {
+							monitor.setCanceled(true);
+							return;
 						}
 					}
-					if (host == null) {
-						throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-								Messages.JSLaunchConfigurationDelegate_Host_Not_Specified, null));
-					}
-					externalBaseUrl = MessageFormat.format("http://{0}/", host); //$NON-NLS-1$
-					*/
 				}
+				break;
+			case ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE:
+				String resourcePath = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, (String) null);
+				if (resourcePath != null && resourcePath.length() > 0) {
+					startResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(resourcePath));
+				}
+				break;
+			case ILaunchConfigurationConstants.START_ACTION_START_URL:
+				launchURL = new URL(configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, StringUtil.EMPTY));				
+				break;
+			}
+			
+			if (startResource == null && launchURL == null) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
+			}
+
+			if (launchURL != null) {
+				// XXX: temporary solution for IE
+				if (launchURL.toExternalForm().endsWith(".js") && InternetExplorer.isBrowserExecutable(browserExecutable)) { //$NON-NLS-1$
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
+							Messages.JSLaunchConfigurationDelegate_Cannot_Debug_JS_File, null));
+				}
+			} else if (serverType == ILaunchConfigurationConstants.SERVER_INTERNAL) {
+				urlMapper = WebServerCorePlugin.getDefault().getDefaultWebServerConfiguration();
+			} else if (serverType == ILaunchConfigurationConstants.SERVER_MANAGED) {
+				String serverName = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_SERVER_NAME, (String) null);
+				if (serverName != null) {
+					urlMapper = WebServerCorePlugin.getDefault().getServerConfigurationManager().findServerConfiguration(serverName);
+				}
+				if (urlMapper == null) {
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+							MessageFormat.format("Server configuration {0} not found.", serverName), null));
+				}
+			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
+				String externalBaseUrl = configuration.getAttribute(
+						ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
 				if (StringUtil.isEmpty(externalBaseUrl)) {
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.JSLaunchConfigurationDelegate_Empty_URL, null));
 				}
 				if (externalBaseUrl.charAt(externalBaseUrl.length() - 1) != '/') {
 					externalBaseUrl = externalBaseUrl + '/';
 				}
-				baseURL = new URL(externalBaseUrl);
-				resourceMapper = new LocalResourceMapper();
-				resourceMapper.addMapping(baseURL, ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile());
+				urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
 			} else {
-				throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_No_Server_Type, null));
 			}
+			
+			if (urlMapper != null) {
+				launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+			}
+
+			String httpGetQuery = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
+			if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null && launchURL.getRef() == null) {
+				if (httpGetQuery.charAt(0) != '?') {
+					httpGetQuery = '?' + httpGetQuery;
+				}
+				launchURL = new URL(launchURL, launchURL.getFile() + httpGetQuery);
+			}
+			launchURL = new URL(launchURL, URLEncoder.encode(launchURL.getPath(), launchURL.getQuery(), launchURL.getRef()));
 		} catch (MalformedURLException e) {
-			throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
+			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 					Messages.JSLaunchConfigurationDelegate_MalformedServerURL, e));
 		}
+		
+		monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingBrowser);
+		Process process = null;
+		ArrayList<String> browserArgs = new ArrayList<String>();
+		String browserCmdLine = configuration.getAttribute(
+				ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
+		if (browserCmdLine != null && browserCmdLine.length() > 0) {
+			String[] args = browserCmdLine.split(" ");
+			for (int i = 0; i < args.length; ++i) {
+				if (args[i].trim().length() > 0) {
+					browserArgs.add(args[i].trim());
+				}
+			}
+		}
+		ArrayList<String> args = new ArrayList<String>();
 
-		try {
-			URL launchURL = null;
+		if (debugAvailable) {
+
+			int port = SocketUtil.findFreePort(null);
+			if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+				port = 2525;
+			}
+			if (port == -1) {
+				port = DEFAULT_PORT;
+			}
+
+			ServerSocket listenSocket = null;
 			try {
-				if (startActionType == ILaunchConfigurationConstants.START_ACTION_START_URL) {
-					if (resourceMapper != null) {
-						JSLaunchConfigurationHelper.setResourceMapping(configuration, baseURL, resourceMapper,
-								httpServer);
-					}
-					launchURL = new URL(configuration.getAttribute(
-							ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_URL, StringUtil.EMPTY));
+				listenSocket = new ServerSocket(port);
+				if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+					listenSocket.setSoTimeout(DebugConnection.SOCKET_TIMEOUT);
+				}
+			} catch (IOException e) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
+			}
+
+			String debuggerLaunchUrl = BrowserUtil.DEBUGGER_LAUNCH_URL + Integer.toString(port);
+			try {
+				if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+					args.add("/usr/bin/open"); //$NON-NLS-1$
+					args.add("-b"); //$NON-NLS-1$
+					args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
+					args.add(debuggerLaunchUrl);
+
+				} else if (InternetExplorer.isBrowserExecutable(browserExecutable)) {
+					args.add(browserExecutable);
+					args.add(debuggerLaunchUrl);
 				} else {
-					IResource resource = null;
-					if (startActionType == ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE) {
-						resource = getCurrentEditorResource();
-					} else if (startActionType == ILaunchConfigurationConstants.START_ACTION_SPECIFIC_PAGE) {
-						String resourcePath = configuration.getAttribute(
-								ILaunchConfigurationConstants.CONFIGURATION_START_PAGE_PATH, (String) null);
-						if (resourcePath != null && resourcePath.length() > 0) {
-							resource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(resourcePath));
-						}
-					}
-					if (resource != null) {
-						if (baseURL == null && launchHttpServer) {
-							monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingHTTPServer);
-							/*
-							IHttpServerProviderAdapter httpServerProvider = (IHttpServerProviderAdapter) getContributedAdapter(IHttpServerProviderAdapter.class);
-							IServer server = null;
-							if (httpServerProvider != null) {
-								server = httpServerProvider.getServer(resource);
-								if (server != null) {
-									for (IServer associatedServer : server.getAssociatedServers()) {
-										if ("Jaxer Server".equals(associatedServer.getDescription())) { //$NON-NLS-1$
-											launchServerDebugger = true;
-										}
-									}
-									IPath documentRoot = server.getDocumentRoot();
-									if (documentRoot != null
-											&& documentRoot.equals(ResourcesPlugin.getWorkspace().getRoot()
-													.getLocation())) {
-										appendProjectName = true;
-									}
-								}
-							}
-							*/
-
-							File root = resource.getProject().getLocation().toFile();
-							/*if (server != null) {
-								baseURL = new URL(MessageFormat.format("http://{0}/", server.getHost())); //$NON-NLS-1$
-							} else */{
-								httpServer = new HttpServerProcess(launch);
-								httpServer.setServerRoot(root);
-								baseURL = httpServer.getBaseURL();
-							}
-							if (appendProjectName) {
-								IProject project = resource.getProject();
-								baseURL = new URL(baseURL, project.getName() + '/');
-							}
-
-							resourceMapper = new LocalResourceMapper();
-							resourceMapper.addMapping(baseURL, root);
-							JSLaunchConfigurationHelper.setResourceMapping(configuration, baseURL, resourceMapper,
-									httpServer);
-
-							launchURL = resourceMapper.resolveLocalURI(resource.getLocationURI()).toURL();
-							// launchURL = new URL(baseURL,
-							// resource.getProjectRelativePath().makeRelative().toPortableString());
-						} else if (baseURL != null) {
-							IProject project = resource.getProject();
-							if (appendProjectName) {
-								baseURL = new URL(baseURL, project.getName() + '/');
-							}
-							resourceMapper.addMapping(baseURL, project.getLocation().toFile());
-							JSLaunchConfigurationHelper.setResourceMapping(configuration, baseURL, resourceMapper,
-									httpServer);
-
-							launchURL = resourceMapper.resolveLocalURI(resource.getLocationURI()).toURL();
-							// launchURL = new URL(baseURL,
-							// resource.getProjectRelativePath().makeRelative().toPortableString());
-						} else {
-							launchURL = resource.getLocation().toFile().toURI().toURL();
-						}
-					} else if (startActionType == ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE) {
-						IPath path = getCurrentEditorPath();
-						if (path != null) {
-							if (debug && InternetExplorer.isBrowserExecutable(browserExecutable)) {
-								String errorMessage = Messages.JSLaunchConfigurationDelegate_Only_Project_Debugging_Supported;
-								throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, Status.ERROR,
-										errorMessage, null));
-							}
-							launchURL = path.toFile().toURI().toURL();
-						} else {
-							launchURL = getCurrentEditorURL();
-							if (launchURL == null) {
-								monitor.setCanceled(true);
-								return;
-							}
-						}
-					}
+					args.add(browserExecutable);
+					args.add(debuggerLaunchUrl);
 				}
-
-				if (launchURL == null) {
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));
-				}
-
-				// XXX: temporary solution for IE
-				if (launchURL.toExternalForm().endsWith(".js") && InternetExplorer.isBrowserExecutable(browserExecutable)) { //$NON-NLS-1$
-					String errorMessage = Messages.JSLaunchConfigurationDelegate_Cannot_Debug_JS_File;
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, Status.ERROR, errorMessage,
-							null));
-				}
-
-				String httpGetQuery = configuration.getAttribute(
-						ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
-				if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null
-						&& launchURL.getRef() == null) {
-					if (httpGetQuery.charAt(0) != '?') {
-						httpGetQuery = '?' + httpGetQuery;
-					}
-					launchURL = new URL(launchURL, launchURL.getFile() + httpGetQuery);
-				}
-				launchURL = new URL(launchURL, URLEncoder.encode(launchURL.getPath(), launchURL.getQuery(), launchURL
-						.getRef()));
-			} catch (MalformedURLException e) {
-				throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-						Messages.JSLaunchConfigurationDelegate_MalformedLaunchURL, e));
-			}
-
-			monitor.subTask(Messages.JSLaunchConfigurationDelegate_LaunchingBrowser);
-
-			Process process = null;
-			ArrayList<String> browserArgs = new ArrayList<String>();
-			String browserCmdLine = configuration.getAttribute(
-					ILaunchConfigurationConstants.CONFIGURATION_BROWSER_COMMAND_LINE, StringUtil.EMPTY);
-			if (browserCmdLine != null && browserCmdLine.length() > 0) {
-				String[] args = browserCmdLine.split(" ");
-				for (int i = 0; i < args.length; ++i) {
-					if (args[i].trim().length() > 0) {
-						browserArgs.add(args[i].trim());
-					}
-				}
-			}
-			ArrayList<String> args = new ArrayList<String>();
-
-			if (debugAvailable) {
-
-				int port = SocketUtil.findFreePort(null);
 				if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					port = 2525;
-				}
-				if (port == -1) {
-					port = DEFAULT_PORT;
+					args = null;
 				}
 
-				ServerSocket listenSocket = null;
-				try {
-					listenSocket = new ServerSocket(port);
-					if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-						listenSocket.setSoTimeout(DebugConnection.SOCKET_TIMEOUT);
-					}
-				} catch (IOException e) {
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
-				}
-
-				String debuggerLaunchUrl = BrowserUtil.DEBUGGER_LAUNCH_URL + Integer.toString(port);
-				try {
-					if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-						args.add("/usr/bin/open"); //$NON-NLS-1$
-						args.add("-b"); //$NON-NLS-1$
-						args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
-						args.add(debuggerLaunchUrl);
-
-					} else if (InternetExplorer.isBrowserExecutable(browserExecutable)) {
-						args.add(browserExecutable);
-						args.add(debuggerLaunchUrl);
-					} else {
-						args.add(browserExecutable);
-						args.add(debuggerLaunchUrl);
-					}
-					if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-						args = null;
-					}
-
-					if (args != null) {
-						args.addAll(browserArgs);
-						process = Runtime.getRuntime().exec((String[]) args.toArray(new String[args.size()]));
-					}
-				} catch (IOException e) {
-					if (listenSocket != null) {
-						try {
-							listenSocket.close();
-						} catch (IOException ignore) {
-						}
-						listenSocket = null;
-					}
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationDelegate_LaunchProcessError, e));
-				}
-
-				// TODO: use separate thread
-				Socket socket = null;
-				try {
-					monitor.subTask(MessageFormat
-							.format(Messages.JSLaunchConfigurationDelegate_OpeningSocketOnPort, port));
-					socket = listenSocket.accept();
-				} catch (IOException e) {
-					BrowserUtil.resetBrowserCache(browserExecutable);
-					if (debug) {
-						throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-								Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
-					}
-				} finally {
-					if (listenSocket != null) {
-						try {
-							listenSocket.close();
-						} catch (IOException ignore) {
-						}
-					}
-				}
-				if (socket != null) {
-					monitor.subTask(Messages.JSLaunchConfigurationDelegate_InitializingDebugger);
-					JSDebugTarget debugTarget = null;
-					try {
-						JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
-						DebugConnection controller = DebugConnection.createConnection(socket);
-						debugTarget = new JSDebugTarget(launch, debugProcess, httpServer, resourceMapper, controller,
-								debug);
-						monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage,
-								launchURL));
-						debugTarget.openURL(launchURL);
-					} catch (CoreException e) {
-						DebugCorePlugin.log(e);
-						if (debugTarget != null) {
-							debugTarget.terminate();
-						} else {
-							try {
-								socket.close();
-							} catch (IOException ignore) {
-							}
-						}
-						throw e;
-					}
-				} else {
-					DebugPlugin.newProcess(launch, process, browserExecutable);
-				}
-			} else if ("run".equals(mode)) { //$NON-NLS-1$
-				try {
-					String launchPage = launchURL.toExternalForm();
-					if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-						args.add("/usr/bin/open"); //$NON-NLS-1$
-						args.add("-b"); //$NON-NLS-1$
-						args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
-						args.add(launchPage);
-					} else {
-						args.add(browserExecutable);
-						if (debugCompatible && Firefox.isBrowserExecutable(browserExecutable)) {
-							if (advancedRun) {
-								args.add(Firefox.NEW_WINDOW);
-								browserArgs.remove(Firefox.NEW_WINDOW);
-								browserArgs.remove(Firefox.NEW_TAB);
-							} else {
-								if (browserArgs.contains(Firefox.NEW_WINDOW)) {
-									args.add(Firefox.NEW_WINDOW);
-								} else {
-									args.add(Firefox.NEW_TAB);
-								}
-								browserArgs.remove(Firefox.NEW_WINDOW);
-								browserArgs.remove(Firefox.NEW_TAB);
-							}
-						}
-						args.add(launchPage);
-					}
-
+				if (args != null) {
 					args.addAll(browserArgs);
 					process = Runtime.getRuntime().exec((String[]) args.toArray(new String[args.size()]));
-
-				} catch (IOException e) {
-					throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK,
-							Messages.JSLaunchConfigurationDelegate_LaunchProcessError, e));
 				}
-				DebugPlugin.newProcess(launch, process, browserExecutable);
-
-			} else {
-				throw new CoreException(new Status(IStatus.ERROR, DebugCorePlugin.PLUGIN_ID, IStatus.OK, MessageFormat.format(
-						Messages.JSLaunchConfigurationDelegate_ConfiguredBrowserDoesNotSupportDebugging,
-						browserExecutable), null));
+			} catch (IOException e) {
+				if (listenSocket != null) {
+					try {
+						listenSocket.close();
+					} catch (IOException ignore) {
+					}
+					listenSocket = null;
+				}
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchProcessError, e));
 			}
-		} catch (CoreException e) {
-			/* Shutdown HTTP server on error if launched */
-			if (httpServer != null) {
-				launch.removeProcess(httpServer);
+
+			// TODO: use separate thread
+			Socket socket = null;
+			try {
+				monitor.subTask(MessageFormat
+						.format(Messages.JSLaunchConfigurationDelegate_OpeningSocketOnPort, port));
+				socket = listenSocket.accept();
+			} catch (IOException e) {
+				BrowserUtil.resetBrowserCache(browserExecutable);
+				if (debug) {
+					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+							Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
+				}
+			} finally {
+				if (listenSocket != null) {
+					try {
+						listenSocket.close();
+					} catch (IOException ignore) {
+					}
+				}
+			}
+			if (socket != null) {
+				monitor.subTask(Messages.JSLaunchConfigurationDelegate_InitializingDebugger);
+				JSDebugTarget debugTarget = null;
 				try {
-					httpServer.terminate();
-				} catch (DebugException e1) {
-					DebugCorePlugin.log(e1);
+					JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
+					DebugConnection controller = DebugConnection.createConnection(socket);
+					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, debug);
+					monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage,
+							launchURL));
+					debugTarget.openURL(launchURL);
+				} catch (CoreException e) {
+					JSDebugPlugin.log(e);
+					if (debugTarget != null) {
+						debugTarget.terminate();
+					} else {
+						try {
+							socket.close();
+						} catch (IOException ignore) {
+						}
+					}
+					throw e;
 				}
+			} else {
+				DebugPlugin.newProcess(launch, process, browserExecutable);
 			}
-			throw e;
+		} else if ("run".equals(mode)) { //$NON-NLS-1$
+			try {
+				String launchPage = launchURL.toExternalForm();
+				if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+					args.add("/usr/bin/open"); //$NON-NLS-1$
+					args.add("-b"); //$NON-NLS-1$
+					args.add(BrowserUtil.getMacOSXApplicationIdentifier(browserExecutable));
+					args.add(launchPage);
+				} else {
+					args.add(browserExecutable);
+					if (debugCompatible && Firefox.isBrowserExecutable(browserExecutable)) {
+						if (advancedRun) {
+							args.add(Firefox.NEW_WINDOW);
+							browserArgs.remove(Firefox.NEW_WINDOW);
+							browserArgs.remove(Firefox.NEW_TAB);
+						} else {
+							if (browserArgs.contains(Firefox.NEW_WINDOW)) {
+								args.add(Firefox.NEW_WINDOW);
+							} else {
+								args.add(Firefox.NEW_TAB);
+							}
+							browserArgs.remove(Firefox.NEW_WINDOW);
+							browserArgs.remove(Firefox.NEW_TAB);
+						}
+					}
+					args.add(launchPage);
+				}
+
+				args.addAll(browserArgs);
+				process = Runtime.getRuntime().exec((String[]) args.toArray(new String[args.size()]));
+
+			} catch (IOException e) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchProcessError, e));
+			}
+			DebugPlugin.newProcess(launch, process, browserExecutable);
+
+		} else {
+			throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK, MessageFormat.format(
+					Messages.JSLaunchConfigurationDelegate_ConfiguredBrowserDoesNotSupportDebugging,
+					browserExecutable), null));
 		}
 	}
 

@@ -48,21 +48,25 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.Preferences.IPropertyChangeListener;
-import org.eclipse.core.runtime.Preferences.PropertyChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.resources.IUniformResourceMarker;
+import com.aptana.core.util.StringUtil;
 
 /**
  * @author Max Stepanov
  */
-public final class DebugOptionsManager implements IDebugEventSetListener, IPropertyChangeListener {
+public final class DebugOptionsManager implements IDebugEventSetListener {
 	
 	/**
 	 * DEBUGGER_ACTIVE_SUFFIX
@@ -81,6 +85,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 
 	private final String modelIdentifier;
 	private final ListenerList changeListeners = new ListenerList();
+	private IPreferenceChangeListener preferenceChangeListener;
 
 	/**
 	 * Map of types to the associated formatter (code snippet). (
@@ -98,7 +103,14 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 	public void startup() {
 		DebugPlugin.getDefault().addDebugEventListener(this);
 		populateDetailFormattersMap();
-		DebugCorePlugin.getDefault().getPluginPreferences().addPropertyChangeListener(this);
+		new InstanceScope().getNode(DebugCorePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener = new IPreferenceChangeListener() {
+			public void preferenceChange(PreferenceChangeEvent event) {
+				if (getDetailFormattersPrefName().equals(event.getKey())) {
+					populateDetailFormattersMap();
+					notifyChangeListeners();
+				}
+			}
+		});
 	}
 
 	/**
@@ -106,6 +118,7 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 	 */
 	public void shutdown() {
 		DebugPlugin.getDefault().removeDebugEventListener(this);
+		new InstanceScope().getNode(DebugCorePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
 	}
 	
 	public static boolean isDebuggerActive(String modelIdentifier) {
@@ -238,8 +251,8 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 	 * Populate the detail formatters map with data from preferences.
 	 */
 	private void populateDetailFormattersMap() {
-		String[] detailFormattersList = DebugOptionsManager.parseList(DebugCorePlugin.getDefault()
-				.getPluginPreferences().getString(getDetailFormattersPrefName()));
+		String[] detailFormattersList = DebugOptionsManager.parseList(
+				new InstanceScope().getNode(DebugCorePlugin.PLUGIN_ID).get(getDetailFormattersPrefName(), StringUtil.EMPTY));
 		fDetailFormattersMap = new HashMap<String, DetailFormatter>(detailFormattersList.length / 3);
 		for (int i = 0, length = detailFormattersList.length; i < length;) {
 			String typeName = detailFormattersList[i++];
@@ -259,25 +272,20 @@ public final class DebugOptionsManager implements IDebugEventSetListener, IPrope
 			values[i++] = detailFormatter.getSnippet().replace(',', '\u0000');
 			values[i++] = detailFormatter.isEnabled() ? DETAIL_FORMATTER_IS_ENABLED : DETAIL_FORMATTER_IS_DISABLED;
 		}
-		String pref = DebugOptionsManager.serializeList(values);
-		DebugCorePlugin.getDefault().getPluginPreferences().setValue(getDetailFormattersPrefName(), pref);
-		DebugCorePlugin.getDefault().savePluginPreferences();
+		String value = DebugOptionsManager.serializeList(values);
+		IEclipsePreferences preferences = new InstanceScope().getNode(DebugCorePlugin.PLUGIN_ID);
+		preferences.put(getDetailFormattersPrefName(), value);
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			DebugCorePlugin.log(e);
+		}
 	}
 
 	private void notifyChangeListeners() {
 		Object[] listeners = changeListeners.getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
 			((IDetailFormattersChangeListener) listeners[i]).detailFormattersChanged();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.Preferences.IPropertyChangeListener#propertyChange(org.eclipse.core.runtime.Preferences.PropertyChangeEvent)
-	 */
-	public void propertyChange(PropertyChangeEvent event) {
-		if (getDetailFormattersPrefName().equals(event.getProperty())) {
-			populateDetailFormattersMap();
-			notifyChangeListeners();
 		}
 	}
 

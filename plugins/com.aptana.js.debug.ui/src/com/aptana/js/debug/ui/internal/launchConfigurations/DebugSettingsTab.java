@@ -35,10 +35,11 @@
 package com.aptana.js.debug.ui.internal.launchConfigurations;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Preferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,9 +51,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
-import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
+import com.aptana.js.debug.core.JSDebugPlugin;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
 import com.aptana.js.debug.core.preferences.IJSDebugPreferenceNames;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
@@ -131,20 +133,20 @@ public class DebugSettingsTab extends AbstractLaunchConfigurationTab {
 			if (enableOverride) {
 				setValuesFrom(launchConfiguration);
 			} else {
-				setValuesFrom(DebugCorePlugin.getDefault().getPluginPreferences());
+				setValuesFrom(new ScopedPreferenceStore(new InstanceScope(), JSDebugPlugin.PLUGIN_ID));
 			}
 		} catch (CoreException ignore) {
 		}
 	}
 
 	private void setValuesFrom(Object object) throws CoreException {
-		if (object instanceof Preferences) {
-			Preferences store = (Preferences) object;
-			suspendOnFirstLine.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
-			suspendOnExceptions.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
-			suspendOnErrors.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
+		if (object instanceof IPreferenceStore) {
+			IPreferenceStore preferences = (IPreferenceStore) object;
+			suspendOnFirstLine.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_FIRST_LINE));
+			suspendOnExceptions.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_EXCEPTIONS));
+			suspendOnErrors.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_ERRORS));
 			suspendOnDebuggerKeyword
-					.setSelection(store.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
+					.setSelection(preferences.getBoolean(IJSDebugPreferenceNames.SUSPEND_ON_DEBUGGER_KEYWORD));
 		} else if (object instanceof ILaunchConfiguration) {
 			ILaunchConfiguration configuration = (ILaunchConfiguration) object;
 			suspendOnFirstLine.setSelection(configuration.getAttribute(

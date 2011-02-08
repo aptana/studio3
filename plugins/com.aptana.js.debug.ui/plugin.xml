@@ -444,6 +444,7 @@
                perspective="org.eclipse.debug.ui.DebugPerspective"/>
          <launchMode mode="run"/>
       </launchConfigurationTabGroup>
+      <!--
       <launchConfigurationTabGroup
             class="com.aptana.js.debug.ui.internal.launchConfigurations.JSRemoteLaunchConfigurationTabGroup"
             description="%launchConfigurationTabGroup.description.jsremote"
@@ -454,6 +455,7 @@
                perspective="org.eclipse.debug.ui.DebugPerspective"/>
          <launchMode mode="run"/>
       </launchConfigurationTabGroup>
+      -->
    </extension>
    <extension
          point="org.eclipse.debug.ui.debugModelPresentations">
@@ -467,10 +469,10 @@
             configTypeID="com.aptana.js.debug.core.webbrowserLaunchConfigurationType"
             icon="icons/full/obj16/launch-httpServer.gif"
             id="com.aptana.js.debug.ui.webbrowserLaunchConfigurationTypeImage"/>
-      <launchConfigurationTypeImage
+      <!--launchConfigurationTypeImage
             configTypeID="com.aptana.js.debug.core.remoteLaunchConfigurationType"
             icon="icons/full/obj16/launch-httpServer.gif"
-            id="com.aptana.js.debug.ui.jsRemoteLaunchConfigurationTypeImage"/>
+            id="com.aptana.js.debug.ui.jsRemoteLaunchConfigurationTypeImage"/ -->
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchShortcuts">
@@ -523,11 +525,11 @@
             class="com.aptana.debug.ui.internal.EditorOpenAdapter$Factory">
          <adapter type="com.aptana.debug.core.IEditorOpenAdapter"/>
       </factory>
-      <factory
+      <!--factory
             adaptableType="com.aptana.ide.editors.unified.hover.LexemeTextHover"
             class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover$Factory">
          <adapter type="org.eclipse.jface.text.ITextHover"/>
-      </factory>
+      </factory -->
       <factory
             adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationHelper"
             class="com.aptana.js.debug.ui.internal.WebBrowserEnumeratorAdapterFactory">
@@ -569,11 +571,15 @@
    <extension
          point="org.eclipse.ui.propertyPages">
   <page
-        adaptable="true"
         class="com.aptana.js.debug.ui.internal.propertypages.JSLineBreakpointPropertyPage"
         id="com.aptana.js.debug.ui.propertypages.common"
-        name="%page.name.common"
-        objectClass="com.aptana.js.debug.core.model.IJSLineBreakpoint"/>
+        name="%page.name.common">
+     <enabledWhen>
+        <instanceof
+              value="com.aptana.js.debug.core.model.IJSLineBreakpoint">
+        </instanceof>
+     </enabledWhen>
+  </page>
    </extension>
    <extension
          point="org.eclipse.debug.core.statusHandlers">
@@ -831,9 +837,7 @@
             location="BOTTOM_RIGHT"
             state="true">
          <enablement>
-            <or>
-               <objectClass name="org.eclipse.core.resources.IFile"/>
-            </or>
+            <objectClass name="org.eclipse.core.resources.IFile"/>
          </enablement>
       </decorator>
    </extension>

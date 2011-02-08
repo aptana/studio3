@@ -34,15 +34,17 @@
  */
 package com.aptana.js.debug.ui.internal;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.debug.core.DebugOptionsManager;
 import com.aptana.js.debug.core.model.JSDebugModel;
@@ -65,11 +67,9 @@ public final class WorkbenchCloseListener implements Listener {
 				&& PlatformUI.getWorkbench().getWorkbenchWindows()[0].getShell() == event.widget) {
 			// last workbench window is about to close
 			if (DebugOptionsManager.isDebuggerActive(JSDebugModel.getModelIdentifier())) { //$NON-NLS-1$
-				IPreferenceStore store = JSDebugUIPlugin.getDefault().getPreferenceStore();
-				if (store.contains(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER)) {
-					if (store.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER) == false) {
-						return;
-					}
+				IEclipsePreferences preferences = new InstanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
+				if (preferences.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true) == false) {
+					return;
 				}
 				event.doit = false;
 				MessageDialogWithToggle dlg = MessageDialogWithToggle.openOkCancelConfirm((Shell) event.widget,
@@ -83,8 +83,12 @@ public final class WorkbenchCloseListener implements Listener {
 					return;
 				}
 				if (dlg.getToggleState()) {
-					store.setValue(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, false);
-					JSDebugUIPlugin.getDefault().savePluginPreferences();
+					preferences.putBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, false);
+					try {
+						preferences.flush();
+					} catch (BackingStoreException e) {
+						JSDebugUIPlugin.log(e);
+					}
 				}
 			}
 		}

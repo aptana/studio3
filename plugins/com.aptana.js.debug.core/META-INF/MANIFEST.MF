@@ -8,6 +8,7 @@ Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  com.aptana.core,
+ com.aptana.core.io,
  com.aptana.webserver.core,
  com.aptana.debug.core;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

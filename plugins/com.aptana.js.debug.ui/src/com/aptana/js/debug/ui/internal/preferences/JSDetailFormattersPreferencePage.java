@@ -35,9 +35,6 @@
 
 package com.aptana.js.debug.ui.internal.preferences;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -334,15 +331,13 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 			value = IJSDebugUIConstants.INLINE_FORMATTERS;
 		}
 		getPreferenceStore().setValue(IJSDebugUIConstants.PREF_SHOW_DETAILS, value);
-		JSDebugUIPlugin.getDefault().savePluginPreferences();
 		return true;
 	}
 
 	private void updateViewerCheckboxes() {
 		DetailFormatter[] checkedElementsTmp = new DetailFormatter[formatters.size()];
 		int i = 0;
-		for (Iterator iter = formatters.iterator(); iter.hasNext();) {
-			DetailFormatter detailFormatter = (DetailFormatter) iter.next();
+		for (DetailFormatter detailFormatter : formatters) {
 			if (detailFormatter.isEnabled()) {
 				checkedElementsTmp[i++] = detailFormatter;
 			}
@@ -375,10 +370,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 
 	private void loadDetailFormatters() {
 		formatters = new TreeSet<DetailFormatter>();
-		Collection detailFormatters = JSDebugPlugin.getDefault().getDebugOptionsManager().getDetailFormatters();
-		types = new ArrayList<String>(detailFormatters.size());
-		for (Iterator i = detailFormatters.iterator(); i.hasNext();) {
-			DetailFormatter detailFormatter = (DetailFormatter) i.next();
+		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager().getDetailFormatters()) {
 			formatters.add(detailFormatter);
 			types.add(detailFormatter.getTypeName());
 		}

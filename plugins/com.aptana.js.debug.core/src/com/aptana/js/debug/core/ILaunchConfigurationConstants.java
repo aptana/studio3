@@ -84,19 +84,14 @@ public interface ILaunchConfigurationConstants {
 	String CONFIGURATION_SERVER_HOST = "serverHost"; //$NON-NLS-1$
 
 	/**
-	 * CONFIGURATION_SERVER_ID
+	 * CONFIGURATION_SERVER_NAME
 	 */
-	String CONFIGURATION_SERVER_ID = "serverName"; //$NON-NLS-1$
+	String CONFIGURATION_SERVER_NAME = "serverName"; //$NON-NLS-1$
 
 	/**
 	 * CONFIGURATION_EXTERNAL_BASE_URL
 	 */
 	String CONFIGURATION_EXTERNAL_BASE_URL = "externalBaseUrl"; //$NON-NLS-1$
-
-	/**
-	 * CONFIGURATION_INCLUDE_PROJECT_NAME
-	 */
-	String CONFIGURATION_APPEND_PROJECT_NAME = "appendProjectName"; //$NON-NLS-1$
 
 	/**
 	 * CONFIGURATION_HTTP_GET_QUERY
@@ -112,11 +107,6 @@ public interface ILaunchConfigurationConstants {
 	 * CONFIGURATION_HTTP_POST_CONTENT_TYPE
 	 */
 	String CONFIGURATION_HTTP_POST_CONTENT_TYPE = "httpPostContentType"; //$NON-NLS-1$
-
-	/**
-	 * CONFIGURATION_SERVER_PATHS_MAPPING
-	 */
-	String CONFIGURATION_SERVER_PATHS_MAPPING = "pathsMapping"; //$NON-NLS-1$
 
 	/**
 	 * CONFIGURATION_OVERRIDE_DEBUG_PREFERENCES
@@ -154,14 +144,14 @@ public interface ILaunchConfigurationConstants {
 	int SERVER_INTERNAL = 1;
 
 	/**
-	 * SERVER_EXTERNAL
-	 */
-	int SERVER_EXTERNAL = 2;
-
-	/**
 	 * SERVER_MANAGED
 	 */
-	int SERVER_MANAGED = 3;
+	int SERVER_MANAGED = 2;
+
+	/**
+	 * SERVER_EXTERNAL
+	 */
+	int SERVER_EXTERNAL = 3;
 
 	/**
 	 * START_ACTION_CURRENT_PAGE
