@@ -528,6 +528,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
 				}
 
+				// TODO: Temporary hack for jQuery CA until we resolve
+				// handling of function properties and derived types
+				if ("jQuery".equals(typeName)) //$NON-NLS-1$
+				{
+					typeName = "Function<jQuery>"; //$NON-NLS-1$
+				}
+
 				// lookup up rhs name in type and add that value's type here
 				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, memberName);
 
