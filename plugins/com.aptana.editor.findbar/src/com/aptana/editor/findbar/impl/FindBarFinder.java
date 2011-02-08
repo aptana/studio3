@@ -152,7 +152,6 @@ public class FindBarFinder
 
 				if (newOffset != -1)
 				{
-					dec.combo.setForeground(null);
 					if (!forward)
 					{
 						selection = textWidget.getSelection();
@@ -176,9 +175,7 @@ public class FindBarFinder
 							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
 						}
 					}
-					dec.combo.setForeground(dec.combo.getDisplay().getSystemColor(SWT.COLOR_RED));
-					textWidget.getDisplay().beep();
-					dec.statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
+					dec.statusLineManager.setMessage(true, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			}
 			finally

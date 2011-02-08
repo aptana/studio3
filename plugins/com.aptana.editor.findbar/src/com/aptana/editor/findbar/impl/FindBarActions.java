@@ -520,30 +520,11 @@ public class FindBarActions
 	}
 
 	/**
-	 * Creates a listener to manage the focus on buttons.
+	 * Creates a listener to manage the focus on our controls.
 	 */
-	public FocusListener createFocusListener(Button button)
+	public FocusListener createFocusListener(Control control)
 	{
-		return new FindBarControlFocusListener(button);
+		return new FindBarControlFocusListener(control);
 	}
 
-	/**
-	 * Creates a listener to manage the focus on combos.
-	 */
-	public FocusListener createFocusListener(Combo combo)
-	{
-		final WeakReference<Combo> weakCombo = new WeakReference<Combo>(combo);
-		return new FindBarControlFocusListener(combo)
-		{
-			public void focusGained(FocusEvent e)
-			{
-				Combo c = weakCombo.get();
-				if (c != null)
-				{
-					c.setForeground(null);
-				}
-				super.focusGained(e);
-			}
-		};
-	}
 }
