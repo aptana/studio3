@@ -48,21 +48,21 @@ import org.eclipse.ui.console.TextConsole;
 public class ConsoleTracker implements IPatternMatchListenerDelegate {
 	private TextConsole fConsole;
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IPatternMatchListenerDelegate#connect(org.eclipse.ui.console.TextConsole)
 	 */
 	public void connect(TextConsole console) {
 		fConsole = console;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IPatternMatchListenerDelegate#disconnect()
 	 */
 	public void disconnect() {
 		fConsole = null;
 	}
 
-	/**
+	/*
 	 * @see org.eclipse.ui.console.IPatternMatchListenerDelegate#matchFound(org.eclipse.ui.console.PatternMatchEvent)
 	 */
 	public void matchFound(PatternMatchEvent event) {

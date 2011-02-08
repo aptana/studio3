@@ -97,9 +97,9 @@ public class ConsoleHyperlink implements IHyperlink {
 			MessageDialog
 					.openInformation(
 							DebugUiPlugin.getActiveWorkbenchShell(),
-							"Information", MessageFormat.format("Source not found for {0}", fFilename));
+							Messages.ConsoleHyperlink_SourceNotFound_Title, MessageFormat.format(Messages.ConsoleHyperlink_SourceNotFound_Message, fFilename));
 		} catch (CoreException e) {
-			DebugUiPlugin.errorDialog("An exception occurred while following link.", e);
+			DebugUiPlugin.errorDialog("An exception occurred while following link.", e);  //$NON-NLS-1$
 		}
 	}
 

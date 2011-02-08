@@ -40,6 +40,7 @@ import java.net.URI;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
@@ -180,6 +181,11 @@ public final class SourceDisplayUtil {
 			}
 			if (textEditor != null) {
 				IDocumentProvider provider = textEditor.getDocumentProvider();
+				try {
+					provider.connect(textEditor.getEditorInput());
+				} catch (CoreException e) {
+					return;
+				}
 				IDocument document = provider.getDocument(textEditor.getEditorInput());
 				try {
 					IRegion line = document.getLineInformation(lineNumber - 1); // documents start at 0

@@ -61,6 +61,7 @@ public class WatchExpressionFactoryAdapter implements IWatchExpressionFactoryAda
 		return variable.getName();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static class Factory implements IAdapterFactory {
 
 		/*

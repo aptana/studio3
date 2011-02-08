@@ -60,6 +60,7 @@ import com.aptana.js.debug.ui.JSDebugUIPlugin;
  * @author Max Stepanov
  * 
  */
+@SuppressWarnings("restriction")
 public final class StartPageManager {
 
 	/**
