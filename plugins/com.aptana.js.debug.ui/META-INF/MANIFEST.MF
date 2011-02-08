@@ -7,6 +7,7 @@ Bundle-Activator: com.aptana.js.debug.ui.JSDebugUIPlugin
 Bundle-Vendor: %Bundle-Vendor
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
+ org.eclipse.core.filesystem,
  org.eclipse.ui,
  org.eclipse.jface.text,
  org.eclipse.debug.ui,
@@ -18,7 +19,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.js.debug.core,
  com.aptana.ui,
  com.aptana.ui.epl,
- com.aptana.debug.ui
+ com.aptana.debug.ui,
+ com.aptana.webserver.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.js.debug.ui,

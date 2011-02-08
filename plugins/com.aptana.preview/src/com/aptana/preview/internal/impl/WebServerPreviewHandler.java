@@ -16,7 +16,7 @@ import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
+import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
@@ -30,14 +30,14 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
+		IURLMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
 		if (serverConfiguration != null) {
 			URL url = serverConfiguration.resolve(config.getFileStore());
 			if (url != null) {
 				return new PreviewConfig(url);
 			}
 		} else {
-			for (AbstractWebServerConfiguration configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
+			for (IURLMapper configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
 				URL url = configuration.resolve(config.getFileStore());
 				if (url != null) {
 					return new PreviewConfig(url);
