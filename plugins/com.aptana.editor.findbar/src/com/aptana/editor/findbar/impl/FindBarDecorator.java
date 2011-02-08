@@ -887,7 +887,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	}
 
-	private void showFindReplaceDialog()
+	void showFindReplaceDialog()
 	{
 		// It's important that the combo has the focus.
 		// Doing the find (Ctrl+F) anywhere will put the focus on the combo, but if the combo
