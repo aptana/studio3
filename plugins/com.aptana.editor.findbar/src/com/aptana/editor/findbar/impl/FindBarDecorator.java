@@ -41,6 +41,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -50,6 +51,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -353,6 +355,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	}
 
 	private final UpdateFindBarActionOnPropertyChange fFindBarActionOnPropertyChange = new UpdateFindBarActionOnPropertyChange();
+	private Color fStringNotFoundColor;
 
 	/**
 	 * Do searches when we're modifying the text in the combo -- i.e.: incremental search.
@@ -386,6 +389,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				return;
 			}
 
+			combo.setBackground(null);
 			boolean wrap = true;
 			String text = combo.getText();
 			if (lastText.startsWith(text))
@@ -485,11 +489,25 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	}
 
+	public Color getfStringNotFoundColor()
+	{
+		if(fStringNotFoundColor == null)
+		{
+			fStringNotFoundColor = new Color(Display.getCurrent(), 0xff, 0xcc, 0x66);
+		}
+		return fStringNotFoundColor;
+	}
+	
 	public void dispose()
 	{
 		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
 		preferenceStore.removePropertyChangeListener(fFindBarActionOnPropertyChange);
 		fOriginalFindBarAction = null;
+		if(fStringNotFoundColor != null)
+		{
+			fStringNotFoundColor.dispose();
+			fStringNotFoundColor = null;
+		}
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e)

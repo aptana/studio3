@@ -14,6 +14,7 @@ import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -151,6 +152,7 @@ public class FindBarFinder
 
 				if (newOffset != -1)
 				{
+					dec.combo.setBackground(null);
 					if (!forward)
 					{
 						selection = textWidget.getSelection();
@@ -174,7 +176,8 @@ public class FindBarFinder
 							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
 						}
 					}
-					dec.statusLineManager.setMessage(true, Messages.FindBarDecorator_MSG_StringNotFound, null);
+					dec.combo.setBackground(dec.getfStringNotFoundColor());
+					dec.statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			}
 			finally

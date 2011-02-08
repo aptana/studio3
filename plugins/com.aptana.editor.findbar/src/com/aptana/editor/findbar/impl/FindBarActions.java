@@ -29,6 +29,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -579,11 +580,30 @@ public class FindBarActions
 	}
 
 	/**
-	 * Creates a listener to manage the focus on our controls.
+	 * Creates a listener to manage the focus on buttons.
 	 */
-	public FocusListener createFocusListener(Control control)
+	public FocusListener createFocusListener(Button button)
 	{
-		return new FindBarControlFocusListener(control);
+		return new FindBarControlFocusListener(button);
 	}
 
+	/**
+	 * Creates a listener to manage the focus on combos.
+	 */
+	public FocusListener createFocusListener(Combo combo)
+	{
+		final WeakReference<Combo> weakCombo = new WeakReference<Combo>(combo);
+		return new FindBarControlFocusListener(combo)
+		{
+			public void focusGained(FocusEvent e)
+			{
+				Combo c = weakCombo.get();
+				if (c != null)
+				{
+					c.setBackground(null);
+				}
+				super.focusGained(e);
+			}
+		};
+	}
 }
