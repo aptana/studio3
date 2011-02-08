@@ -25,7 +25,8 @@ public class FindBarPreferencesInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences pref = new DefaultScope().getNode(FindBarPlugin.PLUGIN_ID);
 
 		pref.put(IPreferencesConstants.USE_CUSTOM_FIND_BAR, "true");
-		pref.put(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR, "true");
+		pref.put(IPreferencesConstants.INCREMENTAL_SEARCH_ON_FIND_BAR, "false"); //default not incremental!
+		pref.put(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR, "false");
 
 	}
 

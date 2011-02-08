@@ -15,6 +15,7 @@ public class Messages extends NLS
 	private static final String BUNDLE_NAME = "com.aptana.editor.findbar.preferences.messages"; //$NON-NLS-1$
 	public static String FindBarPreferencesPage_AskUseCustomFindBar;
 	public static String FindBarPreferencesPage_AskIncrementalSearchesOnFindBar;
+	public static String FindBarPreferencesPage_AskCtrlFTwiceOpensEclipseSearchOnFindBar;
 
 	static
 	{
