@@ -10,44 +10,35 @@ package com.aptana.json;
 /**
  * SchemaString
  */
-public class SchemaNumber implements State
+public class SchemaNumber extends SchemaPrimitive
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#enter()
-	 */
-	public void enter()
+	public SchemaNumber()
 	{
+		super(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#exit()
+	/* (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void exit()
+	@Override
+	public boolean isValidTransition(EventType event, Object value)
 	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
-	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
-	{
+		boolean result = false;
+		
 		if (event == EventType.PRIMITIVE && value instanceof String)
 		{
 			try
 			{
 				Double.parseDouble((String) value);
+				
+				result = true;
 			}
 			catch (NumberFormatException e)
 			{
-				throw new IllegalStateException();
 			}
 		}
-		else
-		{
-			throw new IllegalStateException();
-		}
+		
+		return result;
 	}
+	
 }

@@ -10,40 +10,10 @@ package com.aptana.json;
 /**
  * SchemaTrue
  */
-public class SchemaNull implements State
+public class SchemaNull extends SchemaPrimitive
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#enter()
-	 */
-	public void enter()
+	public SchemaNull()
 	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#exit()
-	 */
-	public void exit()
-	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
-	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
-	{
-		if (event == EventType.PRIMITIVE && value instanceof String)
-		{
-			if (((String) value).equals("null") == false)
-			{
-				throw new IllegalStateException();
-			}
-		}
-		else
-		{
-			throw new IllegalStateException();
-		}
+		super("null");
 	}
 }

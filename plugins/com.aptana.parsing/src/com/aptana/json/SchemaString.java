@@ -10,37 +10,19 @@ package com.aptana.json;
 /**
  * SchemaString
  */
-public class SchemaString implements State
+public class SchemaString extends SchemaPrimitive
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#enter()
-	 */
-	public void enter()
+	public SchemaString()
 	{
+		super(null);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#exit()
+	
+	/* (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void exit()
+	@Override
+	public boolean isValidTransition(EventType event, Object value)
 	{
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.State#transition(com.aptana.json.EventType, com.aptana.json.Context)
-	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
-	{
-		if (event == EventType.PRIMITIVE && value instanceof String)
-		{
-			// OK
-		}
-		else
-		{
-			throw new IllegalStateException();
-		}
+		return (event == EventType.PRIMITIVE && value instanceof String);
 	}
 }
