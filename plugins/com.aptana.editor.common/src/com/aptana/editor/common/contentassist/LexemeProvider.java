@@ -37,23 +37,43 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	 * 
 	 * @param document
 	 * @param offset
+	 * @param scanner
 	 */
 	public LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
-		int length = 0;
+		this(document, offset, offset, scanner);
+	}
+	
+	/**
+	 * Convert the partition that contains the given offset into a list of
+	 * lexemes. If the includeOffset is not within the partition found at
+	 * offset, then the range is extended to include it
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param includeOffset
+	 * @param scanner
+	 */
+	public LexemeProvider(IDocument document, int offset, int includeOffset, ITokenScanner scanner)
+	{
+		int start = offset;
+		int end = offset;
 		
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
 			
-			offset = partition.getOffset();
-			length = partition.getLength();
+			start = partition.getOffset();
+			end = start + partition.getLength();
+			
+			start = Math.min(start, includeOffset);
+			end = Math.min(Math.max(end, includeOffset), document.getLength());
 		}
 		catch (BadLocationException e)
 		{
 		}
 		
-		this.createLexemeList(document, offset, length, scanner);
+		this.createLexemeList(document, start, end - start, scanner);
 	}
 	
 	/**
