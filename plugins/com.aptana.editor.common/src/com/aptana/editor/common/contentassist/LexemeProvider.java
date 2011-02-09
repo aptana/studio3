@@ -32,8 +32,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	private List<Lexeme<T>> _lexemes;
 
 	/**
-	 * Convert the partition that contains the given offset into a list of
-	 * lexemes.
+	 * Convert the partition that contains the given offset into a list of lexemes.
 	 * 
 	 * @param document
 	 * @param offset
@@ -43,11 +42,10 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		this(document, offset, offset, scanner);
 	}
-	
+
 	/**
-	 * Convert the partition that contains the given offset into a list of
-	 * lexemes. If the includeOffset is not within the partition found at
-	 * offset, then the range is extended to include it
+	 * Convert the partition that contains the given offset into a list of lexemes. If the includeOffset is not within
+	 * the partition found at offset, then the range is extended to include it
 	 * 
 	 * @param document
 	 * @param offset
@@ -58,24 +56,24 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		int start = offset;
 		int end = offset;
-		
+
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
-			
+
 			start = partition.getOffset();
 			end = start + partition.getLength();
-			
+
 			start = Math.min(start, includeOffset);
 			end = Math.min(Math.max(end, includeOffset), document.getLength());
 		}
 		catch (BadLocationException e)
 		{
 		}
-		
+
 		this.createLexemeList(document, start, end - start, scanner);
 	}
-	
+
 	/**
 	 * Convert the specified range of text into a list of lexemes
 	 * 
@@ -90,9 +88,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * Add the specified lexeme to the lexeme provider's list. Subclasses can
-	 * use override this method to filter which type of lexemes should be added
-	 * to the list
+	 * Add the specified lexeme to the lexeme provider's list. Subclasses can use override this method to filter which
+	 * type of lexemes should be added to the list
 	 * 
 	 * @param lexeme
 	 */
@@ -100,7 +97,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		this._lexemes.add(lexeme);
 	}
-	
+
 	/**
 	 * createLexemeList
 	 */
@@ -192,7 +189,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		return this.getLexeme(0);
 	}
-	
+
 	/**
 	 * Gets the lexeme at the specified offset. If it is a whitespace character it will return the previous (lower)
 	 * lexeme if one exists. If not found it will return null.
@@ -207,7 +204,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 
 		return this.getLexeme(index);
 	}
-	
+
 	/**
 	 * Returns the last lexeme in the list. If there is no lexeme at that position (i.e. empty list), returns null
 	 * 
@@ -219,8 +216,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * Get a lexeme at the specified index. This method will return null if the index
-	 * is not within the range of this lexeme list
+	 * Get a lexeme at the specified index. This method will return null if the index is not within the range of this
+	 * lexeme list
 	 * 
 	 * @param index
 	 *            The index to retrieve
