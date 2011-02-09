@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.sourcePathComputers">
+      <sourcePathComputer
+            class="com.aptana.debug.core.sourcelookup.SourcePathComputerDelegate"
+            id="com.aptana.debug.core.sourcePathComputer"/>
+   </extension>
+   <extension
+         id="lineBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.debug.core.lineBreakpointMarker"/>
+      <persistent value="true"/>
+      <attribute name="com.aptana.debug.core.breakpointHitCount"/>
+      <attribute name="com.aptana.debug.core.breakpointCondition"/>
+      <attribute name="com.aptana.debug.core.breakpointConditionSuspendOnTrue"/>
+   </extension>
+   <extension
+         id="exceptionBreakpointMarker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.debug.core.breakpointMarker"/>
+      <persistent value="true"/>
+   </extension>
+   <extension
+         id="watchpointMarker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.debug.core.breakpointMarker"/>
+      <persistent value="true"/>
+   </extension>
+
+</plugin>

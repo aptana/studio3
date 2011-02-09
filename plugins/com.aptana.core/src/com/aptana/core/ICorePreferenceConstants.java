@@ -14,5 +14,6 @@ package com.aptana.core;
  */
 public interface ICorePreferenceConstants {
 
-	String SHELL_EXECUTABLE_PATH = "shell_executable_path"; //$NON-NLS-1$
+	String PREF_SHELL_EXECUTABLE_PATH = "shell_executable_path"; //$NON-NLS-1$
+	String PREF_WEB_FILES = "web_files"; //$NON-NLS-1$
 }

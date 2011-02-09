@@ -26,7 +26,6 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 import com.aptana.ui.util.UIUtils;
@@ -67,7 +66,7 @@ public class EditorUtils
 						{
 							try
 							{
-								IWorkbenchPage page = IOUIPlugin.getActivePage();
+								IWorkbenchPage page = UIUtils.getActivePage();
 								IEditorPart editorPart = null;
 								if (page != null)
 								{

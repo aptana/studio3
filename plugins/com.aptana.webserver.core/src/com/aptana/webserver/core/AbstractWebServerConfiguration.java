@@ -22,7 +22,7 @@ import com.aptana.core.epl.IMemento;
  * @author Max Stepanov
  * 
  */
-public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable {
+public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURLMapper {
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
@@ -35,8 +35,14 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	protected AbstractWebServerConfiguration() {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.webserver.core.IURLMapper#resolve(org.eclipse.core.filesystem.IFileStore)
+	 */
 	public abstract URL resolve(IFileStore file);
 
+	/* (non-Javadoc)
+	 * @see com.aptana.webserver.core.IURLMapper#resolve(java.net.URL)
+	 */
 	public abstract IFileStore resolve(URL url);
 
 	public abstract URL getBaseURL();

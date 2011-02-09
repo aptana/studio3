@@ -14,6 +14,9 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.webserver.core.builtin.LocalWebServer;
+
 /**
  * 
  * @author Max Stepanov
@@ -29,6 +32,7 @@ public class WebServerCorePlugin extends Plugin {
 	private static WebServerCorePlugin plugin;
 	
 	private ServerConfigurationManager serverConfigurationManager;
+	private LocalWebServer defaultWebServer;
 
 	/*
 	 * (non-Javadoc)
@@ -56,6 +60,9 @@ public class WebServerCorePlugin extends Plugin {
 		ResourcesPlugin.getWorkspace().removeSaveParticipant(this);
 		plugin = null;
 		serverConfigurationManager = null;
+		if (defaultWebServer != null) {
+			defaultWebServer.dispose();
+		}
 		super.stop(context);
 	}
 
@@ -100,6 +107,24 @@ public class WebServerCorePlugin extends Plugin {
 	 */
 	public void saveServerConfigurations() {
 		new DelayedSnapshotJob(((Workspace) ResourcesPlugin.getWorkspace()).getSaveManager()).schedule();
+	}
+	
+	public AbstractWebServerConfiguration getDefaultWebServerConfiguration() {
+		ensureDefaultWebServer();
+		if (defaultWebServer != null) {
+			return defaultWebServer.getConfiguration();
+		}
+		return null;
+	}
+	
+	public synchronized void ensureDefaultWebServer() {
+		if (defaultWebServer == null) {
+			try {
+				defaultWebServer = new LocalWebServer(EFSUtils.getFileStore(ResourcesPlugin.getWorkspace().getRoot()).toURI());
+			} catch (CoreException e) {
+				log(e);
+			}
+		}
 	}
 
 
