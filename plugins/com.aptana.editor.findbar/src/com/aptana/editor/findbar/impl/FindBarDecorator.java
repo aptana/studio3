@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.findbar.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +45,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -53,6 +55,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -78,6 +82,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
 	private static final String CLOSE_ENTER = "icons/close_enter.png"; //$NON-NLS-1$
 	private static final String SEARCH_BACKWARD = "icons/search_backward.png"; //$NON-NLS-1$
+	private static final String OPTIONS = "icons/gear.png"; //$NON-NLS-1$
 	private static final String SIGMA = "icons/sigma.png"; //$NON-NLS-1$
 	private static final String FINDREPLACE = "icons/findreplace.png"; //$NON-NLS-1$
 	private static final String SEARCH_OPEN_FILES = "icons/searchopenfiles.png"; //$NON-NLS-1$
@@ -95,11 +100,91 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	private final String PREFERENCE_NAME_REPLACE = "FIND_BAR_DECORATOR_REPLACE_ENTRIES"; //$NON-NLS-1$
 	private IAction fOriginalFindBarAction;
 
-	public FindBarDecorator(ITextEditor textEditor)
+	private List<FindBarOption> fFindBarOptions = new ArrayList<FindBarOption>();
+
+	public FindBarDecorator(final ITextEditor textEditor)
 	{
 		this.textEditor = textEditor;
 		this.statusLineManager = (IEditorStatusLine) textEditor.getAdapter(IEditorStatusLine.class);
 		findBarActions = new FindBarActions(textEditor, this);
+
+		fFindBarOptions.add(new FindBarOption("caseSensitive",//$NON-NLS-1$ 
+				CASE_SENSITIVE, CASE_SENSITIVE_DISABLED, Messages.FindBarDecorator_LABEL_CaseSensitive, this)
+		{
+			public void execute(FindBarDecorator dec)
+			{
+				dec.findNextOrprevAfterChangeOption();
+			}
+		});
+		fFindBarOptions.add(new FindBarOption("wholeWord", //$NON-NLS-1$
+				WHOLE_WORD, WHOLE_WORD_DISABLED, Messages.FindBarDecorator_LABEL_WholeWord, this, false)
+		{
+			public void execute(FindBarDecorator dec)
+			{
+				dec.findNextOrprevAfterChangeOption();
+			}
+		});
+		fFindBarOptions.add(new FindBarOption("regularExpression", //$NON-NLS-1$
+				REGEX, REGEX_DISABLED, Messages.FindBarDecorator_LABEL_RegularExpression, this)
+		{
+
+			@Override
+			protected boolean canCreateItem()
+			{
+				// Cannot create it if it's not supported.
+				IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor
+						.getAdapter(IFindReplaceTarget.class);
+				return findReplaceTarget instanceof IFindReplaceTargetExtension3;
+			}
+
+			@Override
+			public ToolItem createToolItem(ToolBar optionsToolBar)
+			{
+				ToolItem item = super.createToolItem(optionsToolBar);
+				if (item == null)
+				{
+					return null;
+				}
+				item.addSelectionListener(new SelectionListener()
+				{
+
+					public void widgetSelected(SelectionEvent e)
+					{
+						adjustEnablement(); // Because whole word is not valid when regexp is chosen.
+					}
+
+					public void widgetDefaultSelected(SelectionEvent e)
+					{
+					}
+				});
+				return item;
+			}
+
+			public void execute(FindBarDecorator dec)
+			{
+				dec.findNextOrprevAfterChangeOption();
+			}
+		});
+		fFindBarOptions.add(new FindBarOption("searchBackward", //$NON-NLS-1$
+				SEARCH_BACKWARD, null, Messages.FindBarDecorator_LABEL_SearchBackward, this)
+		{
+			public void execute(FindBarDecorator dec)
+			{
+				// no-op (don't do anything in this case)
+			}
+		});
+		FindBarOption opt = new FindBarOption("options", //$NON-NLS-1$
+				OPTIONS, null, Messages.FindBarDecorator_LABEL_ShowOptions, this)
+		{
+			public void execute(FindBarDecorator dec)
+			{
+				showOptions(true);
+			}
+		};
+		opt.isCheckable = false;
+		opt.createMenuItem = false;
+		fFindBarOptions.add(opt);
+
 	}
 
 	public Composite createFindBarComposite(Composite parent)
@@ -138,44 +223,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		ToolBar optionsToolBar = new ToolBar(findBar, SWT.NONE);
 		optionsToolBar.setLayoutData(createdDefaultGridData(SWT.LEFT, SWT.CENTER, false, false));
 
-		caseSensitive = createToolItem(optionsToolBar);
-		caseSensitive.setImage(FindBarPlugin.getImage(CASE_SENSITIVE));
-		caseSensitive.setDisabledImage(FindBarPlugin.getImage(CASE_SENSITIVE_DISABLED));
-		caseSensitive.setToolTipText(Messages.FindBarDecorator_LABEL_CaseSensitive);
-		caseSensitive.addSelectionListener(this);
-
-		wholeWord = createToolItem(optionsToolBar);
-		wholeWord.setImage(FindBarPlugin.getImage(WHOLE_WORD));
-		wholeWord.setDisabledImage(FindBarPlugin.getImage(WHOLE_WORD_DISABLED));
-		wholeWord.setToolTipText(Messages.FindBarDecorator_LABEL_WholeWord);
-		wholeWord.addSelectionListener(this);
-		wholeWord.setEnabled(false);
-
-		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
-		if (findReplaceTarget instanceof IFindReplaceTargetExtension3)
+		for (FindBarOption option : fFindBarOptions)
 		{
-			regularExpression = createToolItem(optionsToolBar);
-			regularExpression.setImage(FindBarPlugin.getImage(REGEX));
-			regularExpression.setDisabledImage(FindBarPlugin.getImage(REGEX_DISABLED));
-			regularExpression.setToolTipText(Messages.FindBarDecorator_LABEL_RegularExpression);
-			regularExpression.addSelectionListener(new SelectionListener()
-			{
-
-				public void widgetSelected(SelectionEvent e)
-				{
-					adjustEnablement(); // Because whole word is not valid when regexp is chosen.
-				}
-
-				public void widgetDefaultSelected(SelectionEvent e)
-				{
-				}
-			});
+			option.createToolItem(optionsToolBar);
 		}
-
-		searchBackward = createToolItem(optionsToolBar);
-		searchBackward.setImage(FindBarPlugin.getImage(SEARCH_BACKWARD));
-		searchBackward.setToolTipText(Messages.FindBarDecorator_LABEL_SearchBackward);
-		searchBackward.addSelectionListener(this);
 
 		replaceFind = createButton(null, true);
 		replaceFind.setText(Messages.FindBarDecorator_LABEL_ReplaceFind);
@@ -202,7 +253,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		disableWhenHidden = new Control[] { combo, comboReplace, optionsToolBar, close, countTotal, findButton,
 				replaceFind, replace, replaceAll, showFindReplaceDialog, searchInOpenFiles };
-		
+
 		int NUMBER_OF_ITEMS = disableWhenHidden.length;
 		GridLayout gridLayout = new GridLayout(NUMBER_OF_ITEMS, false);
 		gridLayout.marginHeight = 0;
@@ -210,11 +261,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		gridLayout.verticalSpacing = 0;
 		findBar.setLayout(gridLayout);
 
-	}
-
-	private ToolItem createToolItem(ToolBar optionsToolBar)
-	{
-		return new ToolItem(optionsToolBar, SWT.CHECK);
 	}
 
 	/**
@@ -263,7 +309,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	}
 
 	/**
-	 * Create a label (with a different image when the mouse is over). When it's clicked, use the default handler to treat the action.
+	 * Create a label (with a different image when the mouse is over). When it's clicked, use the default handler to
+	 * treat the action.
 	 */
 	private Label createLabel(String image, boolean enabled, String imageEntered)
 	{
@@ -379,6 +426,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 		public void modifyText(ModifyEvent e)
 		{
+			adjustEnablement();
 			if (ignore > 0 || !searchOnModifyText)
 			{
 				return;
@@ -397,7 +445,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				wrap = false;
 			}
 			lastText = text;
-			adjustEnablement();
 			if (EMPTY.equals(text))
 			{
 				ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
@@ -491,19 +538,19 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	public Color getfStringNotFoundColor()
 	{
-		if(fStringNotFoundColor == null)
+		if (fStringNotFoundColor == null)
 		{
 			fStringNotFoundColor = new Color(Display.getCurrent(), 0xff, 0xcc, 0x66);
 		}
 		return fStringNotFoundColor;
 	}
-	
+
 	public void dispose()
 	{
 		IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
 		preferenceStore.removePropertyChangeListener(fFindBarActionOnPropertyChange);
 		fOriginalFindBarAction = null;
-		if(fStringNotFoundColor != null)
+		if (fStringNotFoundColor != null)
 		{
 			fStringNotFoundColor.dispose();
 			fStringNotFoundColor = null;
@@ -522,25 +569,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	public void handleWidgetSelected(Object source)
 	{
-		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
-		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
-				statusLineManager);
-
 		if (source == close)
 		{
 			hideFindBar();
 		}
-		else if (source == caseSensitive || source == wholeWord)
+		else if (source == caseSensitive || source == wholeWord || source == regularExpression)
 		{
-			setFindText(combo.getText());
-			findBarFinder.find(true, true);
-			showCountTotal();
-		}
-		else if (source == regularExpression)
-		{
-			setFindText(combo.getText());
-			findBarFinder.find(true, true);
-			showCountTotal();
+			findNextOrprevAfterChangeOption();
 		}
 		else if (source == countTotal)
 		{
@@ -552,82 +587,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		else if (source == replaceFind || source == replace)
 		{
-			setFindText(combo.getText());
-			setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
-			PatternSyntaxException exception = null;
-			try
-			{
-				findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
-				showCountTotal();
-			}
-			catch (PatternSyntaxException e1)
-			{
-				// Don't log it now, there's still a chance that doing a find will get us to the proper state.
-				exception = e1;
-			}
-			catch (IllegalStateException e1)
-			{
-				if (findBarFinder.find(true, true, true, false, true))
-				{
-					try
-					{
-						findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
-						showCountTotal();
-					}
-					catch (IllegalStateException e2)
-					{
-						// ignore
-					}
-					catch (PatternSyntaxException e3)
-					{
-						exception = e3;
-					}
-				}
-				else
-				{
-					statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_ReplaceNeedsFind, null);
-					return;
-				}
-			}
-			if (source == replaceFind)
-			{
-				if (searchBackward.getSelection())
-				{
-					findBarFinder.find(false);
-				}
-				else
-				{
-					findBarFinder.find(true);
-				}
-			}
-			else
-			{
-				if (exception != null)
-				{
-					statusLineManager.setMessage(true, exception.getMessage(), null);
-				}
-				else
-				{
-					statusLineManager.setMessage(false, EMPTY, null);
-				}
-			}
+			replace(source == replaceFind);
 		}
 		else if (source == replaceAll)
 		{
-			setFindText(combo.getText());
-			setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
-			try
-			{
-				int replaced = findReplaceDialog.replaceAll(combo.getText(), comboReplace.getText(), true,
-						caseSensitive.getSelection(), getWholeWord(), regularExpression.getSelection());
-				showCountTotal();
-				statusLineManager.setMessage(false, String.format(Messages.FindBarDecorator_MSG_Replaced, replaced),
-						null);
-			}
-			catch (PatternSyntaxException e1)
-			{
-				statusLineManager.setMessage(true, e1.getMessage(), null);
-			}
+			replaceAll();
 		}
 		else if (source == searchInOpenFiles)
 		{
@@ -636,6 +600,105 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		else if (source == showFindReplaceDialog)
 		{
 			showFindReplaceDialog();
+		}
+		else if (source == options)
+		{
+			showOptions(true);
+		}
+	}
+
+	private void findNextOrprevAfterChangeOption()
+	{
+		setFindText(combo.getText());
+		findBarFinder.find(!searchBackward.getSelection(), true);
+		showCountTotal();
+	}
+
+	private void replace(boolean newFind)
+	{
+		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
+		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
+				statusLineManager);
+
+		setFindText(combo.getText());
+		setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
+		PatternSyntaxException exception = null;
+		try
+		{
+			findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
+			showCountTotal();
+		}
+		catch (PatternSyntaxException e1)
+		{
+			// Don't log it now, there's still a chance that doing a find will get us to the proper state.
+			exception = e1;
+		}
+		catch (IllegalStateException e1)
+		{
+			if (findBarFinder.find(true, true, true, false, true))
+			{
+				try
+				{
+					findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
+					showCountTotal();
+				}
+				catch (IllegalStateException e2)
+				{
+					// ignore
+				}
+				catch (PatternSyntaxException e3)
+				{
+					exception = e3;
+				}
+			}
+			else
+			{
+				statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_ReplaceNeedsFind, null);
+				return;
+			}
+		}
+		if (newFind)
+		{
+			if (searchBackward.getSelection())
+			{
+				findBarFinder.find(false);
+			}
+			else
+			{
+				findBarFinder.find(true);
+			}
+		}
+		else
+		{
+			if (exception != null)
+			{
+				statusLineManager.setMessage(true, exception.getMessage(), null);
+			}
+			else
+			{
+				statusLineManager.setMessage(false, EMPTY, null);
+			}
+		}
+	}
+
+	private void replaceAll()
+	{
+		IFindReplaceTarget findReplaceTarget = (IFindReplaceTarget) textEditor.getAdapter(IFindReplaceTarget.class);
+		CopiedFromFindReplaceDialog findReplaceDialog = new CopiedFromFindReplaceDialog(findReplaceTarget,
+				statusLineManager);
+
+		setFindText(combo.getText());
+		setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
+		try
+		{
+			int replaced = findReplaceDialog.replaceAll(combo.getText(), comboReplace.getText(), true,
+					caseSensitive.getSelection(), getWholeWord(), regularExpression.getSelection());
+			showCountTotal();
+			statusLineManager.setMessage(false, String.format(Messages.FindBarDecorator_MSG_Replaced, replaced), null);
+		}
+		catch (PatternSyntaxException e1)
+		{
+			statusLineManager.setMessage(true, e1.getMessage(), null);
 		}
 	}
 
@@ -654,6 +717,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	ToolItem caseSensitive;
 	ToolItem wholeWord;
 	ToolItem searchBackward;
+	ToolItem options;
 	ToolItem regularExpression;
 	private Label close;
 	private Button countTotal;
@@ -882,6 +946,31 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			countTotal.setText(String.valueOf(total));
 		}
+	}
+
+	void showOptions(boolean useMousePos)
+	{
+		Shell shell = new Shell(Display.getCurrent());
+		Menu menu = new Menu(shell, SWT.POP_UP);
+
+		for (FindBarOption option : fFindBarOptions)
+		{
+			option.createMenuItem(menu);
+		}
+
+		Point location;
+		if (useMousePos)
+		{
+			Display current = Display.getCurrent();
+			location = current.getCursorLocation();
+		}
+		else
+		{
+			Rectangle bounds = options.getBounds();
+			location = options.getParent().toDisplay(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+		}
+		menu.setLocation(location);
+		menu.setVisible(true);
 	}
 
 	void searchInOpenFiles()

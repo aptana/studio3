@@ -70,6 +70,7 @@ public class FindBarActions
 	public static final String TOGGLE_SEARCH_BACKWARD_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleSearchBackward"; //$NON-NLS-1$
 	public static final String TOGGLE_WORD_MATCHING_COMMAND_ID = "org.eclipse.ui.edit.findbar.toggleWordMatching"; //$NON-NLS-1$
 	public static final String SEARCH_IN_OPEN_FILES_COMMAND_ID = "org.eclipse.ui.edit.findbar.searchInOpenFiles"; //$NON-NLS-1$
+	public static final String SHOW_OPTIONS_COMMAND_ID = "org.eclipse.ui.edit.findbar.showOptions"; //$NON-NLS-1$
 
 	private boolean fActivated;
 	private IContextActivation findBarContextActivation;
@@ -114,6 +115,7 @@ public class FindBarActions
 		fCommandToHandler.put(TOGGLE_REGEXP_MATCHING_COMMAND_ID, new ToggleRegexpFindBarHandler());
 		fCommandToHandler.put(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, new ToggleSearchBackwardFindBarHandler());
 		fCommandToHandler.put(SEARCH_IN_OPEN_FILES_COMMAND_ID, new SearchInOpenFilesFindBarHandler());
+		fCommandToHandler.put(SHOW_OPTIONS_COMMAND_ID, new ShowOptionsFindBarHandler());
 
 		// Now, aside from the find bar commands, there are some other commands that it's nice to have available too,
 		// even if the editor does not have focus.
@@ -404,7 +406,7 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if (dec != null)
+			if (dec != null && dec.regularExpression != null)
 			{
 				dec.regularExpression.setSelection(!dec.regularExpression.getSelection());
 			}
@@ -433,6 +435,19 @@ public class FindBarActions
 			if (dec != null)
 			{
 				dec.searchInOpenFiles();
+			}
+			return null;
+		}
+	}
+	
+	private class ShowOptionsFindBarHandler extends AbstractHandler
+	{
+		public Object execute(ExecutionEvent event) throws ExecutionException
+		{
+			FindBarDecorator dec = findBarDecorator.get();
+			if (dec != null)
+			{
+				dec.showOptions(false);
 			}
 			return null;
 		}
@@ -497,10 +512,15 @@ public class FindBarActions
 			updateTooltip(TOGGLE_WORD_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_WholeWord, dec.wholeWord);
 			updateTooltip(TOGGLE_CASE_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_CaseSensitive,
 					dec.caseSensitive);
-			updateTooltip(TOGGLE_REGEXP_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_RegularExpression,
-					dec.regularExpression);
+			if(dec.regularExpression != null)
+			{
+				updateTooltip(TOGGLE_REGEXP_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_RegularExpression,
+						dec.regularExpression);
+			}
 			updateTooltip(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchBackward,
 					dec.searchBackward);
+			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions,
+					dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (bindings != null && bindings.size() > 0)
