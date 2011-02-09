@@ -11,7 +11,6 @@ package com.aptana.webserver.core.builtin;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -69,8 +68,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
 				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
-				URI uri = URI.create(target);
-				IFileStore fileStore = configuration.resolve(uri);
+				IFileStore fileStore = configuration.resolve(Path.fromPortableString(target));
 				IFileInfo fileInfo = fileStore.fetchInfo();
 				if (fileInfo.isDirectory()) {
 					fileInfo = getIndex(fileStore);
@@ -108,7 +106,7 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			} else {
 				throw new MethodNotSupportedException(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_UNSUPPORTED_METHOD, method));
 			}
-		} catch (CoreException e) {
+		} catch (Exception e) {
 			WebServerCorePlugin.log(e);
 			response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
 			response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_INTERNAL_SERVER_ERROR));

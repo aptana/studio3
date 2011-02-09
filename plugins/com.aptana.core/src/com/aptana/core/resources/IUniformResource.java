@@ -16,8 +16,9 @@ import org.eclipse.core.runtime.IAdaptable;
  *
  */
 public interface IUniformResource extends IAdaptable {
+	
 	/**
-	 * getURI
+	 * Resource URI
 	 *
 	 * @return URI
 	 */

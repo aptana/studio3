@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="com.aptana.js.debug.core.internal.model.JSDebugLineBreakpoint"
+            id="com.aptana.js.debug.core.lineBreakpoint"
+            markerType="com.aptana.debug.core.lineBreakpointMarker"/>
+      <breakpoint
+            class="com.aptana.js.debug.core.internal.model.JSDebugExceptionBreakpoint"
+            id="com.aptana.js.debug.core.exceptionBreakpoint"
+            markerType="com.aptana.debug.core.exceptionBreakpointMarker"/>
+      <breakpoint
+            class="com.aptana.js.debug.core.internal.model.JSDebugWatchpoint"
+            id="com.aptana.js.debug.core.variableWatchpoint"
+            markerType="com.aptana.debug.core.watchpointMarker"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.sourceLocators">
+      <sourceLocator
+            class="com.aptana.js.debug.core.internal.sourcelookup.JSSourceLookupDirector"
+            id="com.aptana.js.debug.core.sourceLookupDirector"
+            name="%sourceLocator.name"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="com.aptana.js.debug.core.JSLaunchConfigurationDelegate"
+            id="com.aptana.js.debug.core.webbrowserLaunchConfigurationType"
+            modes="run,debug"
+            name="%launchConfigurationType.webbrowser.name"
+            public="true"
+            sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"
+            sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
+      </launchConfigurationType>
+      <!--
+      <launchConfigurationType
+            delegate="com.aptana.js.debug.core.JSRemoteLaunchConfigurationDelegate"
+            id="com.aptana.js.debug.core.remoteLaunchConfigurationType"
+            modes="run,debug"
+            name="%launchConfigurationType.remote.name"
+            public="true"
+            sourceLocatorId="com.aptana.js.debug.core.sourceLookupDirector"
+            sourcePathComputerId="com.aptana.debug.core.sourcePathComputer">
+      </launchConfigurationType>
+      -->
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.watchExpressionDelegates">
+      <watchExpressionDelegate
+            debugModel="com.aptana.js.debug.core"
+            delegateClass="com.aptana.js.debug.core.internal.model.WatchExpressionDelegate"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="com.aptana.js.debug.core.internal.preferences.JSDebugPreferenceInitializer"/>
+   </extension>
+
+</plugin>
