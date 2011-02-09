@@ -8,10 +8,10 @@
 package com.aptana.workbench.commands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.action.ContributionItem;
@@ -111,7 +111,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 
 	private Map<String, List<TemplateElement>> getNewFileTemplates()
 	{
-		Map<String, List<TemplateElement>> templatesByBundle = new HashMap<String, List<TemplateElement>>();
+		Map<String, List<TemplateElement>> templatesByBundle = new TreeMap<String, List<TemplateElement>>();
 		List<CommandElement> commands = BundleManager.getInstance().getExecutableCommands(new IModelFilter()
 		{
 

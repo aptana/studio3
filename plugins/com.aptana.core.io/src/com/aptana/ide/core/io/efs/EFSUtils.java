@@ -53,6 +53,14 @@ public final class EFSUtils
 	{
 		return EFS.getLocalFileSystem().fromLocalFile(file);
 	}
+	
+	public static IFileStore fromLocalFile(File file) {
+		IFileStore fileStore = WorkspaceFileSystem.getInstance().fromLocalFile(file);
+		if (fileStore == null) {
+			fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
+		}
+		return fileStore;
+	}
 
 	/**
 	 * Sets the modification time of the client file

@@ -22,7 +22,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
@@ -251,46 +250,6 @@ public class IOUIPlugin extends AbstractUIPlugin
 			image = registry.get(path);
 		}
 		return image;
-	}
-
-	/**
-	 * Returns the active workbench window
-	 * 
-	 * @return the active workbench window
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow()
-	{
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell()
-	{
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null)
-		{
-			return window.getShell();
-		}
-		return null;
-	}
-
-	/**
-	 * getActivePage
-	 * 
-	 * @return IWorkbenchPage
-	 */
-	public static IWorkbenchPage getActivePage()
-	{
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null)
-		{
-			return w.getActivePage();
-		}
-		return null;
 	}
 
 	public static void refreshNavigatorView(Object element)

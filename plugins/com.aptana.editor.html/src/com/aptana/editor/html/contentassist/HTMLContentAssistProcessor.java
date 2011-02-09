@@ -63,8 +63,8 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -360,11 +360,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+				IURLMapper serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault()
+					for (IURLMapper server : WebServerCorePlugin.getDefault()
 							.getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
