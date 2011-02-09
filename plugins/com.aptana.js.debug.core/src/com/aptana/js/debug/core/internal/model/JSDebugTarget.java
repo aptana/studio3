@@ -1145,7 +1145,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		List<IVariable> list = new ArrayList<IVariable>();
 		String[] args = connection.sendCommandAndWait(MessageFormat.format(VARIABLES_0, Util.encodeData(qualifier)));
 		if (args != null) {
-			for (String varData : args) {
+			for (int i = 1; i < args.length; ++i) {
+				String varData = args[i];
 				int j = 0;
 				if (varData.length() == 0) {
 					break;
