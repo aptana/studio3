@@ -79,7 +79,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	protected int getArgumentIndex(int offset)
 	{
 		IDocument document = this._viewer.getDocument();
-		LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, new JSTokenScanner());
+		LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, this._startingOffset, new JSTokenScanner());
 		int index = lexemeProvider.getLexemeFloorIndex(offset - 1);
 		int commaCount = 0;
 		int parenCount = 0;
