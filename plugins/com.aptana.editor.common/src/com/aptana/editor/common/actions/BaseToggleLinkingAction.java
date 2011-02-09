@@ -22,9 +22,9 @@ public class BaseToggleLinkingAction extends Action
 	 */
 	public BaseToggleLinkingAction()
 	{
-		super(Messages.AbstractToggleLinkingAction_LBL);
-		setDescription(Messages.AbstractToggleLinkingAction_Description);
-		setToolTipText(Messages.AbstractToggleLinkingAction_TTP);
+		super(Messages.getString("AbstractToggleLinkingAction.LBL")); //$NON-NLS-1$
+		setDescription(Messages.getString("AbstractToggleLinkingAction.Description")); //$NON-NLS-1$
+		setToolTipText(Messages.getString("AbstractToggleLinkingAction.TTP")); //$NON-NLS-1$
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_ELCL_SYNCED));
 	}
