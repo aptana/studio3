@@ -32,4 +32,15 @@ public interface IPreferencesConstants
 	 */
 	public static final String CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".ctrlFTwiceOpensEclipseFindBar"; //$NON-NLS-1$
 
+	
+	public static final String SEARCH_BACKWARD_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".searchBackwardFindBar"; //$NON-NLS-1$
+
+
+	public static final String REGULAR_EXPRESSION_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".regularExpressionFindBar"; //$NON-NLS-1$
+
+
+	public static final String CASE_SENSITIVE_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".caseSensitiveFindBar"; //$NON-NLS-1$
+
+
+	public static final String WHOLE_WORD_IN_FIND_BAR = FindBarPlugin.PLUGIN_ID + ".wholeWordFindBar"; //$NON-NLS-1$
 }
