@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,8 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
@@ -153,6 +156,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				}
 				catch (TemplateException e1)
 				{
+					CommonEditorPlugin.logWarning(MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e1.getMessage()));
 					fSelectedRegion = fRegion;
 					return;
 				}
