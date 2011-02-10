@@ -1,14 +1,15 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -364,7 +365,15 @@ public abstract class AbstractElement implements Comparable<AbstractElement>
 		{
 			for (Map.Entry<String, Object> entry : this._customProperties.entrySet())
 			{
-				printer.printWithIndent(entry.getKey()).print(": ").println(entry.getValue().toString()); //$NON-NLS-1$
+				Object value = entry.getValue();
+				String valueAsString = value.toString();
+				// If it's an array, turn into a list to make it prettier?
+				if (value.getClass().isArray())
+				{
+					List<Object> list = Arrays.asList((Object[]) value);
+					valueAsString = list.toString();
+				}
+				printer.printWithIndent(entry.getKey()).print(": ").println(valueAsString); //$NON-NLS-1$
 			}
 		}
 

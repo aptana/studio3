@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.scripting;
 
 import org.eclipse.core.runtime.IPath;
@@ -192,8 +192,17 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	protected void setPreviewContent(TemplateElement template)
 	{
 		WizardNewFileCreationPage fileCreationPage = (WizardNewFileCreationPage) getPreviousPage();
-		IPath path = fileCreationPage.getContainerFullPath().append(fileCreationPage.getFileName());
-		String templateContent = NewFileWizard.getTemplateContent(template, path);
+		String templateContent = null;
+		try
+		{
+			IPath path = fileCreationPage.getContainerFullPath().append(fileCreationPage.getFileName());
+			templateContent = NewFileWizard.getTemplateContent(template, path);
+		}
+		catch (Exception e)
+		{
+			// logs the exception but allows the page to continue
+			CommonEditorPlugin.logError(e);
+		}
 		if (templateContent == null)
 		{
 			templatePreview.setText(""); //$NON-NLS-1$

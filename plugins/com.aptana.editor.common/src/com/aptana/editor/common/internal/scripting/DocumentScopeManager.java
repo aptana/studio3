@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.editor.common.internal.scripting;
 
@@ -13,6 +13,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
@@ -117,6 +118,10 @@ public class DocumentScopeManager implements IDocumentScopeManager
 	 */
 	public String getScopeAtOffset(ITextViewer viewer, int offset) throws BadLocationException
 	{
+		if (viewer == null)
+		{
+			return ""; //$NON-NLS-1$
+		}
 		IDocument document = viewer.getDocument();
 		String partitionFragment = getPartitionScopeFragmentsAtOffset(document, offset);
 		String tokenPortion = getTokenScopeFragments(viewer, document, offset);
@@ -134,7 +139,7 @@ public class DocumentScopeManager implements IDocumentScopeManager
 		}
 		return partitionFragment;
 	}
-
+	
 	private String getTokenScopeFragments(ITextViewer viewer, IDocument document, int offset)
 	{
 		if (!(viewer instanceof ISourceViewer))
@@ -166,36 +171,52 @@ public class DocumentScopeManager implements IDocumentScopeManager
 			{
 				return null;
 			}
-			scanner.setRange(document, region.getOffset(), region.getLength());
-			while (true)
+			synchronized (getLockObject(document))
 			{
-				IToken token = scanner.nextToken();
-				if (token == null || token.isEOF())
+				scanner.setRange(document, region.getOffset(), region.getLength());
+				while (true)
 				{
-					// we unexpectedly hit EOF, stop looping
-					break;
-				}
-				int tokenOffset = scanner.getTokenOffset();
-				if (tokenOffset > offset) // we passed the offset, quit looping
-				{
-					break;
-				}
-				if (offset >= tokenOffset && offset <= (tokenOffset + scanner.getTokenLength()))
-				{
-					// token spans the offset, should contain a String containing the token-level scope fragments
-					Object data = token.getData();
-					if (data instanceof String)
+					IToken token = scanner.nextToken();
+					if (token == null || token.isEOF())
 					{
-						return (String) data;
+						// we unexpectedly hit EOF, stop looping
+						break;
+					}
+					int tokenOffset = scanner.getTokenOffset();
+					if (tokenOffset > offset) // we passed the offset, quit looping
+					{
+						break;
+					}
+					if (offset >= tokenOffset && offset < (tokenOffset + scanner.getTokenLength()))
+					{
+						// token spans the offset, should contain a String containing the token-level scope fragments
+						Object data = token.getData();
+						if (data instanceof String)
+						{
+							return (String) data;
+						}
 					}
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			// ignore
+			CommonEditorPlugin.logError(e);
 		}
 		return null;
+	}
+	
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) object).getLockObject();
+			if (lock != null)
+			{
+				return lock;
+			}
+		}
+		return object;
 	}
 
 	public String getPartitionScopeFragmentsAtOffset(IDocument document, int offset) throws BadLocationException

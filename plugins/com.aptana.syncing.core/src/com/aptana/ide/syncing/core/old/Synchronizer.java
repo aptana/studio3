@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.syncing.core.old;
 
 import java.io.IOException;
@@ -31,8 +31,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.core.ILoggable;
-import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -450,7 +448,7 @@ public class Synchronizer implements ILoggable
 			{
 				if (serverFileInfo.getAttribute(EFS.ATTRIBUTE_SYMLINK))
 					continue;
-				
+
 				VirtualFileSyncPair item = new VirtualFileSyncPair(null, serverFile, relativePath,
 						SyncState.ServerItemOnly);
 				fileList.put(relativePath, item);
@@ -466,11 +464,12 @@ public class Synchronizer implements ILoggable
 			item.setDestinationFile(serverFile);
 
 			IFileInfo clientFileInfo = item.getSourceFileInfo(monitor);
-			if(clientFileInfo == null && item.getSyncState() == SyncState.ServerItemOnly) {
+			if (clientFileInfo == null && item.getSyncState() == SyncState.ServerItemOnly)
+			{
 				// This is an item we've seen already. Continue on.
 				continue;
 			}
-			
+
 			if (clientFileInfo.isDirectory() != serverFileInfo.isDirectory())
 			{
 				// this only occurs if one file is a directory and the other
@@ -514,14 +513,14 @@ public class Synchronizer implements ILoggable
 				if (timeDiff < 0)
 				{
 					item.setSyncState(SyncState.ClientItemIsNewer);
-					logDebug(MessageFormat.format(Messages.Synchronizer_Source_Newer, new long[] { Math.round(Math
-							.abs(timeDiff / 1000)) }));
+					logDebug(MessageFormat.format(Messages.Synchronizer_Source_Newer,
+							new long[] { Math.round(Math.abs(timeDiff / 1000)) }));
 				}
 				else
 				{
 					item.setSyncState(SyncState.ServerItemIsNewer);
-					logDebug(MessageFormat.format(Messages.Synchronizer_Destination_Newer, new long[] { Math.round(Math
-							.abs(timeDiff / 1000)) }));
+					logDebug(MessageFormat.format(Messages.Synchronizer_Destination_Newer,
+							new long[] { Math.round(Math.abs(timeDiff / 1000)) }));
 				}
 			}
 		}
@@ -633,8 +632,8 @@ public class Synchronizer implements ILoggable
 			}
 			catch (IOException e)
 			{
-				SyncingPlugin.logError(MessageFormat.format(Messages.Synchronizer_ErrorClosingStreams, item
-						.getRelativePath()), e);
+				SyncingPlugin.logError(
+						MessageFormat.format(Messages.Synchronizer_ErrorClosingStreams, item.getRelativePath()), e);
 			}
 
 			result = (clientCRC == serverCRC) ? SyncState.ItemsMatch : SyncState.CRCMismatch;
@@ -740,7 +739,7 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Downloading_Files, fileList.length); 
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Downloading_Files, fileList.length);
 		Policy.checkCanceled(subMonitor);
 
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
@@ -877,14 +876,15 @@ public class Synchronizer implements ILoggable
 
 	/**
 	 * Returns a string describing what's going on during the synchronization
+	 * 
 	 * @param item
 	 * @return
 	 */
 	private String getSyncStatus(VirtualFileSyncPair item)
 	{
-		if(item.getSyncDirection() == VirtualFileSyncPair.Direction_ClientToServer)
+		if (item.getSyncDirection() == VirtualFileSyncPair.Direction_ClientToServer)
 			return MessageFormat.format(Messages.Synchronizer_Uploading, item.getRelativePath());
-		if(item.getSyncDirection() == VirtualFileSyncPair.Direction_ServerToClient)
+		if (item.getSyncDirection() == VirtualFileSyncPair.Direction_ServerToClient)
 			return MessageFormat.format(Messages.Synchronizer_Downloading, item.getRelativePath());
 		else
 			return MessageFormat.format(Messages.Synchronizer_Skipping_File, item.getRelativePath());
@@ -1016,8 +1016,8 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on server
-							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item
-									.getSourceFile(), _serverFileRoot);
+							final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot,
+									item.getSourceFile(), _serverFileRoot);
 
 							if (clientFileInfo.isDirectory())
 							{
@@ -1039,7 +1039,8 @@ public class Synchronizer implements ILoggable
 								logUploading(clientFile);
 								try
 								{
-									SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
+									SyncUtils
+											.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
 									Synchronizer.this._clientFileTransferedCount++;
 									_newFilesUploaded.add(targetServerFile);
 									logSuccess();
@@ -1115,8 +1116,8 @@ public class Synchronizer implements ILoggable
 						else
 						{
 							// creates the item on client
-							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item
-									.getDestinationFile(), _clientFileRoot);
+							final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
+									item.getDestinationFile(), _clientFileRoot);
 
 							if (serverFileInfo.isDirectory())
 							{
@@ -1141,7 +1142,8 @@ public class Synchronizer implements ILoggable
 
 								try
 								{
-									SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
+									SyncUtils
+											.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
 									Synchronizer.this._serverFileTransferedCount++;
 									_newFilesDownloaded.add(targetClientFile);
 									logSuccess();
@@ -1163,8 +1165,9 @@ public class Synchronizer implements ILoggable
 
 					case SyncState.CRCMismatch:
 						result = false;
-						SyncingPlugin.logError(StringUtil.format(Messages.Synchronizer_FullSyncCRCMismatches, item
-								.getRelativePath()), null);
+						SyncingPlugin.logError(
+								StringUtil.format(Messages.Synchronizer_FullSyncCRCMismatches, item.getRelativePath()),
+								null);
 						if (!syncError(item, null, childMonitor))
 						{
 							break FILE_LOOP;
@@ -1188,7 +1191,7 @@ public class Synchronizer implements ILoggable
 				{
 					break FILE_LOOP;
 				}
-			}			
+			}
 		}
 
 		return result;
@@ -1261,9 +1264,9 @@ public class Synchronizer implements ILoggable
 
 		this.reset();
 
-		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Uploading_Files, fileList.length); 
+		SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.Synchronizer_Uploading_Files, fileList.length);
 		Policy.checkCanceled(subMonitor);
-		
+
 		FILE_LOOP: for (int i = 0; i < fileList.length; i++)
 		{
 			final VirtualFileSyncPair item = fileList[i];
@@ -1488,7 +1491,7 @@ public class Synchronizer implements ILoggable
 	}
 
 	/**
-	 * @see com.aptana.ide.core.ILoggable#getLogger()
+	 * @see com.com.aptana.ide.syncing.core.old.ILoggable#getLogger()
 	 */
 	public ILogger getLogger()
 	{
@@ -1496,7 +1499,7 @@ public class Synchronizer implements ILoggable
 	}
 
 	/**
-	 * @see com.aptana.ide.core.ILoggable#setLogger(com.aptana.ide.core.ILogger)
+	 * @see com.com.aptana.ide.syncing.core.old.ILoggable#setLogger(com.com.aptana.ide.syncing.core.old.ILogger)
 	 */
 	public void setLogger(ILogger logger)
 	{
@@ -1551,6 +1554,7 @@ public class Synchronizer implements ILoggable
 
 	private void logError(Exception e)
 	{
+		SyncingPlugin.logError(e.getLocalizedMessage(), e);
 		if (this.logger != null)
 		{
 			if (e.getCause() != null)

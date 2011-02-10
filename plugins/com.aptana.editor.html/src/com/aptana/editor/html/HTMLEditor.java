@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html;
 
 import java.util.ArrayList;
@@ -23,9 +23,12 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
@@ -34,6 +37,7 @@ import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.xml.TagUtil;
 
+@SuppressWarnings("restriction")
 public class HTMLEditor extends AbstractThemeableEditor
 {
 	private static final char[] HTML_PAIR_MATCHING_CHARS = new char[] { '(', ')', '{', '}', '[', ']', '`', '`', '\'',
@@ -56,8 +60,15 @@ public class HTMLEditor extends AbstractThemeableEditor
 	{
 		super.initializeEditor();
 
+		setPreferenceStore(getChainedPreferenceStore());
 		setSourceViewerConfiguration(new HTMLSourceViewerConfiguration(getPreferenceStore(), this));
 		setDocumentProvider(new HTMLDocumentProvider());
+	}
+
+	public static IPreferenceStore getChainedPreferenceStore()
+	{
+		return new ChainedPreferenceStore(new IPreferenceStore[] { HTMLPlugin.getDefault().getPreferenceStore(),
+				CommonEditorPlugin.getDefault().getPreferenceStore(), EditorsPlugin.getDefault().getPreferenceStore() });
 	}
 
 	@Override

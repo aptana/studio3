@@ -1,12 +1,13 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.scripting.snippets;
 
+import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +42,8 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+
+import com.aptana.editor.common.CommonEditorPlugin;
 
 public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
 {
@@ -153,6 +156,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				}
 				catch (TemplateException e1)
 				{
+					CommonEditorPlugin.logWarning(MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e1.getMessage()));
 					fSelectedRegion = fRegion;
 					return;
 				}

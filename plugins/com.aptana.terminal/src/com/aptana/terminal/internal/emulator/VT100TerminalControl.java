@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.terminal.internal.emulator;
 
 import java.io.UnsupportedEncodingException;
@@ -12,6 +12,9 @@ import java.io.UnsupportedEncodingException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -30,6 +33,7 @@ import com.aptana.theme.ThemePlugin;
 public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
 
 	private IPreferenceChangeListener preferenceChangeListener;
+	private IPropertyChangeListener propertyChangeListener;
 	
 	public VT100TerminalControl(ITerminalListener target, Composite wndParent, ITerminalConnector[] connectors) {
 		super(target, wndParent, connectors);
@@ -46,6 +50,14 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 			}
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(preferenceChangeListener);
+		propertyChangeListener = new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				if (JFaceResources.TEXT_FONT.equals(event.getProperty())) {
+					setFont(JFaceResources.getTextFont());
+				}
+			}
+		};
+		JFaceResources.getFontRegistry().addListener(propertyChangeListener);
 		getCtlText().addMouseListener(new MouseAdapter() {
 			public void mouseDown(MouseEvent e) {
 				if (e.button == 2) { //paste clipboard selection
@@ -74,6 +86,7 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 	 */
 	@Override
 	public void disposeTerminal() {
+		JFaceResources.getFontRegistry().removeListener(propertyChangeListener);
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(preferenceChangeListener);
 		super.disposeTerminal();
 	}

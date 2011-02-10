@@ -1,12 +1,14 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.findbar;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -67,5 +69,12 @@ public class FindBarPlugin extends AbstractUIPlugin {
 			}
 		}
 		return getDefault().getImageRegistry().get(string);
+	}
+
+	public static void log(Throwable e)
+	{
+		Status s = new Status(IStatus.ERROR, FindBarPlugin.PLUGIN_ID, IStatus.ERROR,
+				e.getMessage(), e);
+		FindBarPlugin.getDefault().getLog().log(s);
 	}
 }

@@ -20,48 +20,13 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            name="%FindNextOrPrev.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.findPrevious"
             name="%FindPrevious.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.cut"
-            name="%Cut.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.copy"
-            name="%Copy.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.paste"
-            name="%Paste.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.selectall"
-            name="%SelectAll.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.home"
-            name="%Home.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.end"
-            name="%End.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.selectHome"
-            name="%SelectHome.command.name">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="org.eclipse.ui.edit.findbar.selectEnd"
-            name="%SelectEnd.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
@@ -70,8 +35,43 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"
+            name="%FocusFindOrEclipseSearch.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.focusReplace"
             name="%FocusReplace.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleCaseMatching"
+            name="%ToggleCaseMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleWordMatching"
+            name="%ToggleWordMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
+            name="%ToggleRegexpMatching.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleSearchBackward"
+            name="%ToggleSearchBackward.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.searchInOpenFiles"
+            name="%SearchInOpenFiles.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.showOptions"
+            name="%ShowOptions.command.name">
       </command>
    </extension>
    
@@ -99,6 +99,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+K">
       </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findPrevious"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M2+ENTER">
+      </key>
       
       <!-- Find Next -->
       <key
@@ -107,16 +113,29 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+K">
       </key>
+      <!-- Find Next or Prev-->
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
       </key>
-
-      <!-- Show Eclipse's Find/Replace dialog -->      
       <key
-            commandId="org.eclipse.ui.edit.findReplace"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+N">
+      </key>
+      <key
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="F3">
+      </key>
+
+      <!-- Focus the find combo -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
@@ -127,59 +146,54 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+F">
       </key>
+      <!-- Focus the replace combo -->      
       <key
             commandId="org.eclipse.ui.edit.findbar.focusReplace"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+E">
       </key>
+      <!-- Toggle case matching -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.cut"
+            commandId="org.eclipse.ui.edit.findbar.toggleCaseMatching"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+X">
+            sequence="M3+C">
       </key>
+      <!-- Toggle word matching -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.copy"
+            commandId="org.eclipse.ui.edit.findbar.toggleWordMatching"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+C">
+            sequence="M3+W">
       </key>
+      <!-- Toggle regexp matching -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.paste"
+            commandId="org.eclipse.ui.edit.findbar.toggleRegexpMatching"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+V">
+            sequence="M3+X">
       </key>
+      <!-- Toggle search backward -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.selectall"
+            commandId="org.eclipse.ui.edit.findbar.toggleSearchBackward"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+A">
+            sequence="M3+B">
       </key>
+      <!-- Search in open files -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.home"
+            commandId="org.eclipse.ui.edit.findbar.searchInOpenFiles"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="HOME">
+            sequence="M3+S">
       </key>
+      <!-- Show the search options -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.end"
+            commandId="org.eclipse.ui.edit.findbar.showOptions"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="END">
-      </key>
-      <key
-            commandId="org.eclipse.ui.edit.findbar.selectHome"
-            contextId="org.eclipse.ui.textEditorScope.findbar"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M2+HOME">
-      </key>
-      <key
-            commandId="org.eclipse.ui.edit.findbar.selectEnd"
-            contextId="org.eclipse.ui.textEditorScope.findbar"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M2+END">
+            sequence="M3+O">
       </key>
    </extension>
    
@@ -224,4 +238,20 @@
             parentId="org.eclipse.ui.textEditorScope">
       </context>
    </extension>
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.editor.findbar.preferences.FindBarPreferencePage"
+            id="com.aptana.editor.findbar.preferences.FindBarPreferencePage"
+            name="%FindBar.preferences.name"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.editor.findbar.preferences.FindBarPreferencesInitializer">
+      </initializer>
+   </extension>
+
 </plugin>

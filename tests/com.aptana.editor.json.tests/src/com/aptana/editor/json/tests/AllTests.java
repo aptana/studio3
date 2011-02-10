@@ -3,8 +3,6 @@ package com.aptana.editor.json.tests;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.aptana.editor.json.internal.text.JSONFoldingComputerTest;
-
 public class AllTests
 {
 
@@ -12,7 +10,8 @@ public class AllTests
 	{
 		TestSuite suite = new TestSuite(AllTests.class.getName());
 		// $JUnit-BEGIN$
-		suite.addTestSuite(JSONFoldingComputerTest.class);
+		suite.addTest(com.aptana.editor.json.AllTests.suite());
+		suite.addTest(com.aptana.editor.json.internal.text.AllTests.suite());
 		// $JUnit-END$
 		return suite;
 	}

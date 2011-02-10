@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.formatter.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -34,7 +34,7 @@ public class HTMLFormatterPreferenceInitializer extends AbstractPreferenceInitia
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences store = new DefaultScope().getNode(HTMLFormatterPlugin.PLUGIN_ID);
-		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.SPACE);
+		store.put(HTMLFormatterConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		store.put(HTMLFormatterConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		store.put(HTMLFormatterConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
 		store.putBoolean(HTMLFormatterConstants.WRAP_COMMENTS, false);

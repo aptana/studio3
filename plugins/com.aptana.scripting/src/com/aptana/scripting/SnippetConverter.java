@@ -1,14 +1,13 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Writer;
@@ -116,7 +115,7 @@ public class SnippetConverter
 		{
 			File outFile = new File(outputFilePath);
 			outFile.getParentFile().mkdirs();
-			writer = new FileWriter(outFile);
+			writer = new java.io.OutputStreamWriter(new java.io.FileOutputStream(outFile), "UTF-8");
 			for (String snippet : snippets)
 			{
 				writer.write(snippet);

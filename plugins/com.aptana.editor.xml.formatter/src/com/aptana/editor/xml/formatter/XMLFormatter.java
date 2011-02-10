@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.xml.formatter;
 
 import java.util.Map;
@@ -17,9 +17,11 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.editor.xml.XMLPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
@@ -145,9 +147,9 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
-					ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -187,6 +189,24 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 	public int getTabSize()
 	{
 		return getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#getEditorSpecificTabWidth()
+	 */
+	public int getEditorSpecificTabWidth()
+	{
+		return FormatterUtils.getEditorTabWidth(XMLPlugin.getDefault().getPreferenceStore());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(XMLPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**
@@ -233,10 +253,10 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		document.setInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(XMLFormatterConstants.WRAP_COMMENTS, getBoolean(XMLFormatterConstants.WRAP_COMMENTS));
 		document.setInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS));
-		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-				getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
-				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
+				XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;

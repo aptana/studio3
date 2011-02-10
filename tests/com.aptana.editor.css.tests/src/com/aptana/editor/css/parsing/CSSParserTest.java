@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.parsing;
 
 import junit.framework.TestCase;
@@ -394,7 +394,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageFunctionDeclaration() throws Exception
 	{
-		parseTest("@page {testing: rgb (10,20,30);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: rgb(10,20,30);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -424,7 +424,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiSlashDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc/123/rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc/123/rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -444,7 +444,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiCommaDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc,123,rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc,123,rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**
@@ -464,7 +464,7 @@ public class CSSParserTest extends TestCase
 	 */
 	public void testPageMultiSpaceDeclaration() throws Exception
 	{
-		parseTest("@page {testing: abc 123 rgb (1,2,3);}" + EOL); //$NON-NLS-1$
+		parseTest("@page {testing: abc 123 rgb(1,2,3);}" + EOL); //$NON-NLS-1$
 	}
 
 	/**

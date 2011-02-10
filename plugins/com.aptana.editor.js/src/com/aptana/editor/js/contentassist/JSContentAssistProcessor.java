@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.net.URI;
@@ -34,6 +34,7 @@ import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -61,7 +62,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private static final EnumSet<LocationType> IGNORED_TYPES = EnumSet.of(LocationType.UNKNOWN, LocationType.NONE);
 
 	private JSIndexQueryHelper _indexHelper;
-	private IContextInformationValidator _validator;
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
@@ -126,7 +126,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = JSModelFormatter.getDescription(property, projectURI);
 				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
+						.getDocumentDisplayName(documents.get(0)) : null;
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -141,60 +142,13 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	protected void addProperties(Set<ICompletionProposal> proposals, int offset)
 	{
-		JSGetPropertyNode node = this.getGetPropertyNode();
+		JSGetPropertyNode node = this.getGetPropertyNode(this._targetNode, this._statementNode);
+		List<String> types = this.getParentObjectTypes(node, offset);
 
-		if (node != null)
+		// add all properties of each type to our proposal list
+		for (String type : types)
 		{
-			JSScope localScope = this.getScopeAtOffset(offset);
-
-			if (localScope != null)
-			{
-				List<String> typeList = Collections.emptyList();
-
-				// lookup in current file
-				IParseNode lhs = node.getLeftHandSide();
-
-				if (lhs instanceof JSNode)
-				{
-					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, this.getIndex(), this.getURI());
-
-					typeWalker.visit((JSNode) lhs);
-
-					typeList = typeWalker.getTypes();
-				}
-
-				// TEMP: Show types for debugging info
-				if (Platform.inDevelopmentMode())
-				{
-					System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				// add all properties of each type to our proposal list
-				for (String type : typeList)
-				{
-					// TODO: Temporary hack for jQuery CA until we resolve
-					// handling of function properties and derived types
-					if ("jQuery".equals(type)) //$NON-NLS-1$
-					{
-						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
-					}
-
-					if (JSTypeUtil.isFunctionPrefix(type))
-					{
-						String functionType = JSTypeUtil.getFunctionSignatureType(type);
-
-						this.addTypeProperties(proposals, functionType, offset);
-					}
-					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
-					{
-						this.addTypeProperties(proposals, JSTypeConstants.ARRAY_TYPE, offset);
-					}
-					else
-					{
-						this.addTypeProperties(proposals, type, offset);
-					}
-				}
-			}
+			this.addTypeProperties(proposals, type, offset);
 		}
 	}
 
@@ -209,8 +163,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
 		String displayName = name;
 		int length = name.length();
@@ -227,7 +181,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		IContextInformation contextInfo = null;
 
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
+				displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
@@ -320,6 +275,99 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * com.aptana.editor.common.CommonContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer
+	 * , int)
+	 */
+	@Override
+	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
+	{
+		IParseNode node = this.getActiveASTNode(offset);
+		List<IContextInformation> result = new ArrayList<IContextInformation>();
+
+		// work a way up the AST to determine if we're in an arguments node
+		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		{
+			node = node.getParent();
+		}
+
+		// process arguments node as long as we're not to the left of the opening parenthesis
+		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
+		{
+			// grab the content assist location type for the symbol before the arguments list
+			int functionOffset = node.getStartingOffset();
+			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
+
+			// process variables and properties
+			switch (location)
+			{
+				case IN_VARIABLE_NAME:
+				{
+					String name = node.getParent().getFirstChild().getText();
+					IContextInformation ci = this.createContextInformation(JSTypeConstants.WINDOW_TYPE, name,
+							functionOffset);
+
+					if (ci != null)
+					{
+						result.add(ci);
+					}
+					break;
+				}
+
+				case IN_PROPERTY_NAME:
+				{
+					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node,
+							((JSNode) node).getContainingStatementNode());
+					List<String> types = this.getParentObjectTypes(propertyNode, offset);
+
+					if (types.size() > 0)
+					{
+						String typeName = types.get(0);
+						String methodName = propertyNode.getLastChild().getText();
+						IContextInformation ci = this.createContextInformation(typeName, methodName, functionOffset);
+
+						if (ci != null)
+						{
+							result.add(ci);
+						}
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+		return result.toArray(new IContextInformation[result.size()]);
+	}
+
+	/**
+	 * createContextInformation
+	 * 
+	 * @param typeName
+	 * @param functionName
+	 * @param startingOffset
+	 * @return
+	 */
+	private IContextInformation createContextInformation(String typeName, String functionName, int startingOffset)
+	{
+		PropertyElement function = this._indexHelper.getTypeMember(this.getIndex(), typeName, functionName);
+		IContextInformation result = null;
+
+		if (function instanceof FunctionElement)
+		{
+			String info = JSModelFormatter.getContextInfo((FunctionElement) function);
+			List<String> lines = JSModelFormatter.getContextLines((FunctionElement) function);
+
+			result = new JSContextInformation(info, StringUtil.join("\n\ufeff", lines), startingOffset); //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
 	/**
 	 * createLexemeProvider
 	 * 
@@ -350,7 +398,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		IDocument document = viewer.getDocument();
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
@@ -449,13 +498,23 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			JSPlugin.PLUGIN_ID, //
-			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				JSPlugin.PLUGIN_ID, //
+				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getContextInformationAutoActivationCharacters()
+	 */
+	@Override
+	public char[] getContextInformationAutoActivationCharacters()
+	{
+		return new char[] { '(', ',' };
 	}
 
 	/*
@@ -465,32 +524,29 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformationValidator getContextInformationValidator()
 	{
-		if (this._validator == null)
-		{
-			this._validator = new JSContextInformationValidator();
-		}
-
-		return this._validator;
+		return new JSContextInformationValidator();
 	}
 
 	/**
 	 * getGetPropertyNode
 	 * 
+	 * @param targetNode
+	 * @param statementNode
 	 * @return
 	 */
-	private JSGetPropertyNode getGetPropertyNode()
+	private JSGetPropertyNode getGetPropertyNode(IParseNode targetNode, IParseNode statementNode)
 	{
 		JSGetPropertyNode propertyNode = null;
 
-		if (this._targetNode != null)
+		if (targetNode != null)
 		{
-			if (this._targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			if (targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
-				propertyNode = (JSGetPropertyNode) this._targetNode;
+				propertyNode = (JSGetPropertyNode) targetNode;
 			}
 			else
 			{
-				IParseNode parentNode = this._targetNode.getParent();
+				IParseNode parentNode = targetNode.getParent();
 
 				if (parentNode != null && parentNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 				{
@@ -499,15 +555,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			}
 		}
 
-		if (propertyNode == null && this._statementNode != null)
+		if (propertyNode == null && statementNode != null)
 		{
-			if (this._statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
+			if (statementNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
-				propertyNode = (JSGetPropertyNode) this._statementNode;
+				propertyNode = (JSGetPropertyNode) statementNode;
 			}
 			else
 			{
-				IParseNode child = this._statementNode.getFirstChild();
+				IParseNode child = statementNode.getFirstChild();
 
 				if (child != null && child.getNodeType() == JSNodeTypes.GET_PROPERTY)
 				{
@@ -753,6 +809,74 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * getParentObjectTypes
+	 * 
+	 * @param node
+	 * @param offset
+	 * @return
+	 */
+	protected List<String> getParentObjectTypes(JSGetPropertyNode node, int offset)
+	{
+		List<String> result = new ArrayList<String>();
+
+		if (node != null)
+		{
+			JSScope localScope = this.getScopeAtOffset(offset);
+
+			if (localScope != null)
+			{
+				List<String> typeList = Collections.emptyList();
+
+				// lookup in current file
+				IParseNode lhs = node.getLeftHandSide();
+
+				if (lhs instanceof JSNode)
+				{
+					JSNodeTypeInferrer typeWalker = new JSNodeTypeInferrer(localScope, this.getIndex(), this.getURI());
+
+					typeWalker.visit((JSNode) lhs);
+
+					typeList = typeWalker.getTypes();
+				}
+
+				// TEMP: Show types for debugging info
+				if (Platform.inDevelopmentMode())
+				{
+					System.out.println("types: " + StringUtil.join(", ", typeList)); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				// add all properties of each type to our proposal list
+				for (String type : typeList)
+				{
+					// TODO: Temporary hack for jQuery CA until we resolve
+					// handling of function properties and derived types
+					if ("jQuery".equals(type)) //$NON-NLS-1$
+					{
+						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
+					}
+
+					if (JSTypeUtil.isFunctionPrefix(type))
+					{
+						String functionType = JSTypeUtil.getFunctionSignatureType(type);
+
+						result.add(functionType);
+					}
+					else if (type.startsWith(JSTypeConstants.GENERIC_ARRAY_OPEN))
+					{
+						result.add(JSTypeConstants.ARRAY_TYPE);
+					}
+					else
+					{
+						result.add(type);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getScopeAtOffset
 	 * 
 	 * @param offset
@@ -785,4 +909,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		return UserAgentManager.getInstance().getUserAgentImages(userAgentNames);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
+		return (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER);
+	}
+
 }

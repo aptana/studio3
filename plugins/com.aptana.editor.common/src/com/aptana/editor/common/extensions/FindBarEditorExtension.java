@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.extensions;
 
 import java.lang.ref.WeakReference;
@@ -20,14 +20,37 @@ import com.aptana.editor.findbar.api.IFindBarDecorator;
 
 /**
  * Decorates an editor with a find bar (so, ctrl+F won't bring the default dialog, but a bar that appears similar to the
- * firefox search). The default usage for an editor that wants the find bar is: public MyEditor() { super();
- * fThemeableEditorFindBarExtension = new FindBarEditorExtension(this); } protected void createActions() {
- * super.createActions(); this.fThemeableEditorFindBarExtension.createFindBarActions(); } public void
- * createPartControl(Composite parent) { Composite findBarComposite = (Composite)
- * this.fThemeableEditorFindBarExtension.createFindBarComposite(parent); super.createPartControl(findBarComposite); }
- * public Object getAdapter(Class adapter) { Object adaptable =
- * this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter); if(adaptable != null){ return adaptable; }
- * return super.getAdapter(adapter); }
+ * firefox search). The default usage for an editor that wants the find bar is: <code>
+ *  public MyEditor() {
+ *      super();
+ *      fThemeableEditorFindBarExtension = new FindBarEditorExtension(this);
+ *  }
+ * 
+ *  protected void createActions() {
+ *      super.createActions();
+ *      this.fThemeableEditorFindBarExtension.createFindBarActions();
+ *  }
+ * 
+ *  protected void dispose() {
+ *      super.dispose();
+ *      this.fThemeableEditorFindBarExtension.dispose();
+ *  }
+ * 
+ *  public void createPartControl(Composite parent) {
+ *      Composite findBarComposite = (Composite) this.fThemeableEditorFindBarExtension.createFindBarComposite(parent);
+ *      super.createPartControl(findBarComposite);
+ *  }
+ * 
+ *  public Object getAdapter(Class adapter) {
+ *      Object adaptable = this.fThemeableEditorFindBarExtension.getFindBarDecoratorAdapter(adapter);
+ *      if (adaptable != null) {
+ *          return adaptable;
+ *      }
+ *      return super.getAdapter(adapter);
+ *  }
+ * </code>
+ * 
+ * @author Fabio
  */
 public class FindBarEditorExtension
 {
@@ -129,6 +152,10 @@ public class FindBarEditorExtension
 	public void dispose()
 	{
 		this.fFindBarDecorated = null;
+		if (fFindBarDecorator != null)
+		{
+			fFindBarDecorator.dispose();
+		}
 		this.fFindBarDecorator = null;
 		if (this.fEditor != null)
 		{

@@ -1,17 +1,17 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.workbench.commands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.action.ContributionItem;
@@ -111,7 +111,7 @@ public class NewFileTemplateMenuContributor extends ContributionItem
 
 	private Map<String, List<TemplateElement>> getNewFileTemplates()
 	{
-		Map<String, List<TemplateElement>> templatesByBundle = new HashMap<String, List<TemplateElement>>();
+		Map<String, List<TemplateElement>> templatesByBundle = new TreeMap<String, List<TemplateElement>>();
 		List<CommandElement> commands = BundleManager.getInstance().getExecutableCommands(new IModelFilter()
 		{
 

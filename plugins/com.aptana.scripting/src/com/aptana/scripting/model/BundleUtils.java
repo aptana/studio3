@@ -1,17 +1,18 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,12 +55,12 @@ public class BundleUtils
 
 		if (bundleFile.isFile() && bundleFile.canRead())
 		{
-			FileReader fr = null;
+			InputStreamReader fr = null;
 			BufferedReader reader = null;
 
 			try
 			{
-				fr = new FileReader(bundleFile);
+				fr = new InputStreamReader(new FileInputStream(bundleFile), "UTF-8");
 				reader = new BufferedReader(fr);
 				String line;
 

@@ -1,14 +1,15 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.text.rules;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ISynchronizable;
 import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
@@ -48,11 +49,27 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		}
 		finally
 		{
-			super.createPresentation(presentation, region);
+			synchronized (getLockObject(fDocument))
+			{
+				super.createPresentation(presentation, region);				
+			}
 			scope = null;
 			fLastLine = null;
 			fCountForLine = 0;
 		}
+	}
+
+	private static Object getLockObject(Object object)
+	{
+		if (object instanceof ISynchronizable)
+		{
+			Object lock = ((ISynchronizable) object).getLockObject();
+			if (lock != null)
+			{
+				return lock;
+			}
+		}
+		return object;
 	}
 
 	@Override

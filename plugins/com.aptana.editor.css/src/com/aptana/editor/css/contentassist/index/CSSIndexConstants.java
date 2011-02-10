@@ -1,18 +1,18 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.contentassist.index;
 
 public interface CSSIndexConstants
 {
-	// the content format version of the JS index files
+	// the content format version of the CSS index files
 	// 0.1 - Initial version
 	// 0.11 - Using JSON for element and property content assist model elements
-	public static final double INDEX_VERSION = 0.1;
+	public static final double INDEX_VERSION = 0.11;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;

@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.scripting.model;
 
 import org.jruby.RubyProc;
@@ -55,6 +55,13 @@ public class EnvironmentElement extends AbstractBundleElement
 		// output path and scope
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
 		printer.printWithIndent("scope: ").println(this.getScope()); //$NON-NLS-1$
+
+		// output invoke block, if it is defined
+		if (this.getInvokeBlock() != null)
+		{
+			// Spit out something repeatable. block type for now
+			printer.printWithIndent("block: ").println(this.getInvokeBlock().getBlock().type.toString()); //$NON-NLS-1$
+		}
 	}
 
 	/**

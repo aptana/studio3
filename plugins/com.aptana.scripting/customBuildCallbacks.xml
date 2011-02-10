@@ -56,17 +56,20 @@
 	</target>
 
 	<target name="clone-bundle">
-		<delete dir="${bundle.dir.name}" failonerror="false"/>
+		<delete dir="${bundle.dir.name}" failonerror="true"/>
+		<echo message="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}"></echo>
 		<exec executable="/bin/bash" dir="bundles">
 			<arg value="-c" />
 			<arg value="git clone git://github.com/aptana/${bundle.name}.git ${bundle.dir.name}" />
 		</exec>
 		<!-- Checkout the specified branch -->
+		<echo message="git checkout ${bundle.branch}"></echo>
 		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
 			<arg value="-c" />
 			<arg value="git checkout ${bundle.branch}" />
 		</exec>
 		<!-- Now checkout the revision of the bundle as of the latest commit date for red_core -->
+		<echo message="git checkout `git rev-list -n 1 --before=${last.commit.date} ${bundle.branch}`"></echo>
 		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
 			<arg value="-c" />
 			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} ${bundle.branch}`" />
@@ -177,11 +180,6 @@
             <param name="bundle.dir.name" value="shell-script.ruble" />
 		  	<param name="bundle.branch" value="master" />
         </antcall>
-		<antcall target="clone-bundle">
-		    <param name="bundle.name" value="zen-coding.ruble" />
-		    <param name="bundle.dir.name" value="zen-coding.ruble" />
-		  	<param name="bundle.branch" value="master" />
-		</antcall>
 		<antcall target="clone-bundle">
 			<param name="bundle.name" value="php.ruble" />
 			<param name="bundle.dir.name" value="php.ruble" />

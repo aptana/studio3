@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.outline;
 
 import java.io.FileNotFoundException;
@@ -75,14 +75,11 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			}
 			else
 			{
-				IParseNode[] styleNodes = item.getCSSStyleNodes();
-				if (styleNodes.length > 0)
-				{
-					List<IParseNode> children = new ArrayList<IParseNode>();
-					children.addAll(Arrays.asList(styleNodes));
-					children.addAll(Arrays.asList(item.getChildren()));
-					return filter(children.toArray(new IParseNode[children.size()]));
-				}
+				List<IParseNode> children = new ArrayList<IParseNode>();
+				children.addAll(Arrays.asList(item.getCSSStyleNodes()));
+				children.addAll(Arrays.asList(item.getJSAttributeNodes()));
+				children.addAll(Arrays.asList(item.getChildren()));
+				return filter(children.toArray(new IParseNode[children.size()]));
 			}
 		}
 		// Handle embedded languages (JS and CSS)
@@ -180,7 +177,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			if (isJavascriptTag(item))
 			{
 				String attribute = getExternalJSReference(item);
-				
+
 				if (attribute != null && attribute.length() > 0)
 				{
 					return true;

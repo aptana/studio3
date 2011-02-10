@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.text;
 
 import java.text.MessageFormat;
@@ -144,70 +144,73 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
 		Object result = null;
 
-		switch (lexeme.getType())
+		if (lexeme != null)
 		{
-			case COLOR:
-			case RGB:
+			switch (lexeme.getType())
 			{
-				result = parseHexRGB(CSSColors.to6CharHexWithLeadingHash(lexeme.getText()));
-				break;
-			}
-
-			case FUNCTION:
-			{
-				if (RGB.equals(lexeme.getText()))
+				case COLOR:
+				case RGB:
 				{
-					int start = lexeme.getEndingOffset();
-					List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
+					result = parseHexRGB(CSSColors.to6CharHexWithLeadingHash(lexeme.getText()));
+					break;
+				}
 
-					if (lexemes.size() == 8)
+				case FUNCTION:
+				{
+					if (RGB.equals(lexeme.getText()))
 					{
-						Lexeme<CSSTokenType> redLexeme = lexemes.get(2);
-						Lexeme<CSSTokenType> greenLexeme = lexemes.get(4);
-						Lexeme<CSSTokenType> blueLexeme = lexemes.get(6);
+						int start = lexeme.getEndingOffset();
+						List<Lexeme<CSSTokenType>> lexemes = this.getFunctionLexemes(lexemeProvider, start);
 
-						if (isNumber(redLexeme) && isNumber(greenLexeme) && isNumber(blueLexeme))
+						if (lexemes.size() == 8)
 						{
-							int red = Integer.parseInt(redLexeme.getText());
-							int green = Integer.parseInt(greenLexeme.getText());
-							int blue = Integer.parseInt(blueLexeme.getText());
+							Lexeme<CSSTokenType> redLexeme = lexemes.get(2);
+							Lexeme<CSSTokenType> greenLexeme = lexemes.get(4);
+							Lexeme<CSSTokenType> blueLexeme = lexemes.get(6);
 
-							result = new RGB(red, green, blue);
+							if (isNumber(redLexeme) && isNumber(greenLexeme) && isNumber(blueLexeme))
+							{
+								int red = Integer.parseInt(redLexeme.getText());
+								int green = Integer.parseInt(greenLexeme.getText());
+								int blue = Integer.parseInt(blueLexeme.getText());
+
+								result = new RGB(red, green, blue);
+							}
 						}
 					}
+					break;
 				}
-				break;
-			}
 
-			case ELEMENT:
-			{
-				CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-				ElementElement element = queryHelper.getElement(lexeme.getText());
-
-				if (element != null)
+				case ELEMENT:
 				{
-					result = element.getDescription();
+					CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+					ElementElement element = queryHelper.getElement(lexeme.getText());
+
+					if (element != null)
+					{
+						result = element.getDescription();
+					}
+					break;
 				}
-				break;
-			}
 
-			case PROPERTY:
-			{
-				CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
-				PropertyElement property = queryHelper.getProperty(lexeme.getText());
-
-				if (property != null)
+				case PROPERTY:
 				{
-					result = property.getDescription();
-				}
-				break;
-			}
+					CSSIndexQueryHelper queryHelper = new CSSIndexQueryHelper();
+					PropertyElement property = queryHelper.getProperty(lexeme.getText());
 
-			default:
-				if (Platform.inDevelopmentMode())
-				{
-					System.out.println(lexeme.getType().name());
+					if (property != null)
+					{
+						result = property.getDescription();
+					}
+					break;
 				}
+
+				default:
+					if (Platform.inDevelopmentMode())
+					{
+						System.out.println(lexeme.getType().name());
+					}
+			}
 		}
 
 		return result;

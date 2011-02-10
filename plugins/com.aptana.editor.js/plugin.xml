@@ -107,5 +107,21 @@
             sequence="M1+O">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.js.preferences.JSPreferencePage"
+            id="com.aptana.editor.js.preferences.JSPreferencePage"
+            name="JavaScript">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            class="com.aptana.editor.common.ExternalFileAnnotationModelFactory"
+            contentTypeId="com.aptana.contenttype.js">
+      </factory>
+   </extension>
 
 </plugin>

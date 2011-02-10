@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.contentassist;
 
 import java.util.ArrayList;
@@ -32,30 +32,48 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	private List<Lexeme<T>> _lexemes;
 
 	/**
-	 * Convert the partition that contains the given offset into a list of
-	 * lexemes.
+	 * Convert the partition that contains the given offset into a list of lexemes.
 	 * 
 	 * @param document
 	 * @param offset
+	 * @param scanner
 	 */
 	public LexemeProvider(IDocument document, int offset, ITokenScanner scanner)
 	{
-		int length = 0;
-		
+		this(document, offset, offset, scanner);
+	}
+
+	/**
+	 * Convert the partition that contains the given offset into a list of lexemes. If the includeOffset is not within
+	 * the partition found at offset, then the range is extended to include it
+	 * 
+	 * @param document
+	 * @param offset
+	 * @param includeOffset
+	 * @param scanner
+	 */
+	public LexemeProvider(IDocument document, int offset, int includeOffset, ITokenScanner scanner)
+	{
+		int start = offset;
+		int end = offset;
+
 		try
 		{
 			ITypedRegion partition = document.getPartition(offset);
-			
-			offset = partition.getOffset();
-			length = partition.getLength();
+
+			start = partition.getOffset();
+			end = start + partition.getLength();
+
+			start = Math.min(start, includeOffset);
+			end = Math.min(Math.max(end, includeOffset), document.getLength());
 		}
 		catch (BadLocationException e)
 		{
 		}
-		
-		this.createLexemeList(document, offset, length, scanner);
+
+		this.createLexemeList(document, start, end - start, scanner);
 	}
-	
+
 	/**
 	 * Convert the specified range of text into a list of lexemes
 	 * 
@@ -70,9 +88,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * Add the specified lexeme to the lexeme provider's list. Subclasses can
-	 * use override this method to filter which type of lexemes should be added
-	 * to the list
+	 * Add the specified lexeme to the lexeme provider's list. Subclasses can use override this method to filter which
+	 * type of lexemes should be added to the list
 	 * 
 	 * @param lexeme
 	 */
@@ -80,7 +97,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		this._lexemes.add(lexeme);
 	}
-	
+
 	/**
 	 * createLexemeList
 	 */
@@ -172,7 +189,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	{
 		return this.getLexeme(0);
 	}
-	
+
 	/**
 	 * Gets the lexeme at the specified offset. If it is a whitespace character it will return the previous (lower)
 	 * lexeme if one exists. If not found it will return null.
@@ -187,7 +204,7 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 
 		return this.getLexeme(index);
 	}
-	
+
 	/**
 	 * Returns the last lexeme in the list. If there is no lexeme at that position (i.e. empty list), returns null
 	 * 
@@ -199,8 +216,8 @@ public abstract class LexemeProvider<T extends ITypePredicate> implements Iterab
 	}
 
 	/**
-	 * Get a lexeme at the specified index. This method will return null if the index
-	 * is not within the range of this lexeme list
+	 * Get a lexeme at the specified index. This method will return null if the index is not within the range of this
+	 * lexeme list
 	 * 
 	 * @param index
 	 *            The index to retrieve

@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.ide.ui.io;
 
@@ -22,7 +22,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
@@ -251,46 +250,6 @@ public class IOUIPlugin extends AbstractUIPlugin
 			image = registry.get(path);
 		}
 		return image;
-	}
-
-	/**
-	 * Returns the active workbench window
-	 * 
-	 * @return the active workbench window
-	 */
-	public static IWorkbenchWindow getActiveWorkbenchWindow()
-	{
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
-	}
-
-	/**
-	 * Returns the active workbench shell or <code>null</code> if none
-	 * 
-	 * @return the active workbench shell or <code>null</code> if none
-	 */
-	public static Shell getActiveWorkbenchShell()
-	{
-		IWorkbenchWindow window = getActiveWorkbenchWindow();
-		if (window != null)
-		{
-			return window.getShell();
-		}
-		return null;
-	}
-
-	/**
-	 * getActivePage
-	 * 
-	 * @return IWorkbenchPage
-	 */
-	public static IWorkbenchPage getActivePage()
-	{
-		IWorkbenchWindow w = getActiveWorkbenchWindow();
-		if (w != null)
-		{
-			return w.getActivePage();
-		}
-		return null;
 	}
 
 	public static void refreshNavigatorView(Object element)

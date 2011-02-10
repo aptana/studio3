@@ -1,21 +1,28 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.mortbay.util.ajax.JSON;
+
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
@@ -147,6 +154,54 @@ public class JSIndexQueryHelper
 		if (result == null)
 		{
 			result = this.getMember(getIndex(), JSTypeConstants.WINDOW_TYPE, name);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getIndexAsJSON
+	 * 
+	 * @return
+	 */
+	public String getIndexAsJSON()
+	{
+		return this.getIndexAsJSON(getIndex());
+	}
+
+	/**
+	 * getIndexAsJSON
+	 * 
+	 * @param index
+	 * @return
+	 */
+	public String getIndexAsJSON(Index index)
+	{
+		String result = StringUtil.EMPTY;
+
+		try
+		{
+			List<TypeElement> types = this._reader.getTypes(index, true);
+			Map<String, Object> docs = new HashMap<String, Object>();
+
+			// sort types by name
+			Collections.sort(types, new Comparator<TypeElement>()
+			{
+				public int compare(TypeElement arg0, TypeElement arg1)
+				{
+					return arg0.getName().compareTo(arg1.getName());
+				}
+			});
+
+			// include types as a separate property
+			docs.put("types", types); //$NON-NLS-1$
+
+			// convert to JSON
+			result = JSON.toString(docs);
+		}
+		catch (IOException e)
+		{
+			JSPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;

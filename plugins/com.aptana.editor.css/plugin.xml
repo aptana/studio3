@@ -71,5 +71,21 @@
             name="%validator.css.name">
       </validator>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.css.preferences.CSSPreferencePage"
+            id="com.aptana.editor.html.preferences.CSSPreferencePage"
+            name="CSS">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.filebuffers.annotationModelCreation">
+      <factory
+            class="com.aptana.editor.common.ExternalFileAnnotationModelFactory"
+            contentTypeId="com.aptana.contenttype.css">
+      </factory>
+   </extension>
 
 </plugin>

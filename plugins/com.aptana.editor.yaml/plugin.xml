@@ -34,5 +34,14 @@
             language="text/yaml">
       </parser>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.yaml.preferences.YAMLPreferencePage"
+            id="com.aptana.editor.yaml.preferences.YamlPreferencePage"
+            name="YAML">
+      </page>
+   </extension>
 
 </plugin>

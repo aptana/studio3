@@ -15,6 +15,9 @@
          <contentTypeBinding
                contentTypeId="org.eclipse.core.runtime.xml">
          </contentTypeBinding>
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.xsl">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
@@ -65,6 +68,25 @@
             name="com.aptana.xml.tagPair.occurrences"
             super="com.aptana.editor.common.occurrence">
       </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="com.aptana.editor.common.preferences.EditorsPreferencePage"
+            class="com.aptana.editor.xml.preferences.XMLPreferencePage"
+            id="com.aptana.editor.xml.preferences.XMLPreferencePage"
+            name="%page.preference.name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xsl"
+            id="com.aptana.contenttype.xsl"
+            name="%content-type.xsl.name"
+            priority="normal">
+      </content-type>
    </extension>
 
 </plugin>

@@ -1,15 +1,16 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.index;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -25,6 +26,34 @@ import com.aptana.index.core.SearchPattern;
 
 public class JSIndexReader extends IndexReader
 {
+	/**
+	 * attachMembers
+	 * 
+	 * @param type
+	 * @param index
+	 * @throws IOException
+	 */
+	protected void attachMembers(TypeElement type, Index index) throws IOException
+	{
+		// members
+		if (type != null && index != null)
+		{
+			String typeName = type.getName();
+
+			// properties
+			for (PropertyElement property : this.getProperties(index, typeName))
+			{
+				type.addProperty(property);
+			}
+
+			// functions
+			for (FunctionElement function : this.getFunctions(index, typeName))
+			{
+				type.addProperty(function);
+			}
+		}
+	}
+
 	/**
 	 * createFunction
 	 * 
@@ -45,6 +74,49 @@ public class JSIndexReader extends IndexReader
 	protected PropertyElement createProperty(QueryResult property)
 	{
 		return this.populateElement(new PropertyElement(), property, 2);
+	}
+
+	/**
+	 * createType
+	 * 
+	 * @param type
+	 * @return
+	 * @throws IOException
+	 */
+	protected TypeElement createType(QueryResult type) throws IOException
+	{
+		TypeElement result;
+		String[] columns = this.getDelimiterPattern().split(type.getWord());
+		int column = 0;
+
+		// create type
+		result = new TypeElement();
+
+		// name
+		result.setName(columns[column]);
+		column++;
+
+		// super types
+		for (String parentType : this.getSubDelimiterPattern().split(columns[column]))
+		{
+			result.addParentType(parentType);
+		}
+		column++;
+
+		// description
+		if (column < columns.length)
+		{
+			result.setDescription(columns[column]);
+		}
+		column++;
+
+		// documents
+		for (String document : type.getDocuments())
+		{
+			result.addDocument(document);
+		}
+
+		return result;
 	}
 
 	/*
@@ -316,52 +388,13 @@ public class JSIndexReader extends IndexReader
 
 				if (types != null && types.isEmpty() == false)
 				{
-					QueryResult type = types.get(0);
-					String[] columns = this.getDelimiterPattern().split(type.getWord());
-					String retrievedName = columns[0];
-					int column = 0;
+					result = createType(types.get(0));
 
-					// create type
-					result = new TypeElement();
-
-					// name
-					result.setName(columns[column]);
-					column++;
-
-					// super types
-					for (String parentType : this.getSubDelimiterPattern().split(columns[column]))
-					{
-						result.addParentType(parentType);
-					}
-					column++;
-
-					// description
-					if (column < columns.length)
-					{
-						result.setDescription(columns[column]);
-					}
-					column++;
-
-					// members
 					if (includeMembers)
 					{
-						// properties
-						for (PropertyElement property : this.getProperties(index, retrievedName))
-						{
-							result.addProperty(property);
-						}
-
-						// functions
-						for (FunctionElement function : this.getFunctions(index, retrievedName))
-						{
-							result.addProperty(function);
-						}
-					}
-
-					// documents
-					for (String document : type.getDocuments())
-					{
-						result.addDocument(document);
+						this.attachMembers(result, index);
+						
+						result.setSerializeProperties(true);
 					}
 				}
 			}
@@ -388,6 +421,45 @@ public class JSIndexReader extends IndexReader
 		properties.addAll(this.getFunctions(index, typeName));
 
 		return properties;
+	}
+
+	/**
+	 * getTypes
+	 * 
+	 * @param index
+	 * @param includeMembers
+	 * @return
+	 * @throws IOException
+	 */
+	public List<TypeElement> getTypes(Index index, boolean includeMembers) throws IOException
+	{
+		List<TypeElement> result = Collections.emptyList();
+
+		if (index != null)
+		{
+			List<QueryResult> types = index.query(new String[] { JSIndexConstants.TYPE }, "*", SearchPattern.PATTERN_MATCH); //$NON-NLS-1$
+
+			if (types != null)
+			{
+				result = new ArrayList<TypeElement>();
+				
+				for (QueryResult type : types)
+				{
+					TypeElement t = this.createType(type);
+
+					if (includeMembers)
+					{
+						this.attachMembers(t, index);
+						
+						t.setSerializeProperties(true);
+					}
+
+					result.add(t);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

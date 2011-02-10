@@ -115,6 +115,26 @@
             </or>
          </enablement>
       </actionProvider>
+      <actionProvider
+            class="com.aptana.ide.syncing.ui.navigator.actions.SyncingActionProvider"
+            id="com.aptana.ide.syncing.ui.navigator.actions.SyncingActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
+               </instanceof>
+               <instanceof
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
    </extension>
    <extension
          point="org.eclipse.ui.navigator.viewer">
@@ -625,51 +645,6 @@
       <initializer
             class="com.aptana.ide.syncing.ui.preferences.PreferenceInitializer">
       </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.synchronize.files"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
-                  </instanceof>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.upload"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
-                  </instanceof>
-               </iterate>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="com.aptana.ide.syncing.ui.commands.download"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <instanceof
-                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
-                  </instanceof>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
 
 </plugin>

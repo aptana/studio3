@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.syncing.ui.old.views;
 
 import java.io.File;
@@ -77,7 +77,6 @@ import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.core.ILogger;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
@@ -86,6 +85,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
+import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
 import com.aptana.ide.syncing.core.old.ISyncResource;
 import com.aptana.ide.syncing.core.old.SyncFile;
@@ -567,7 +567,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 	private SearchComposite createSearchComposite(Composite myComposite)
 	{
 		SearchComposite search = new SearchComposite(myComposite, this);
-		search.setSearchOnEnter(true);
+		search.setSearchOnEnter(false);
 		search.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		search.setInitialText(Messages.SmartSyncDialog_searchText);
 		return search;

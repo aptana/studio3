@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.util.HashSet;
@@ -26,6 +26,8 @@ import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
+import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
+import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.information.InformationPresenter;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -50,6 +52,7 @@ import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrate
 import com.aptana.editor.common.text.reconciler.CommonReconciler;
 import com.aptana.formatter.ScriptFormatterManager;
 import com.aptana.theme.IThemeManager;
+import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
@@ -63,7 +66,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	protected static final String CONTENTTYPE_HTML_PREFIX = "com.aptana.contenttype.html"; //$NON-NLS-1$
 	public static final int DEFAULT_CONTENT_ASSIST_DELAY = 200;
 	public static final int LONG_CONTENT_ASSIST_DELAY = 1000;
-	
+
 	/**
 	 * CommonSourceViewerConfiguration
 	 * 
@@ -86,7 +89,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		fDoubleClickStrategy = null;
 		if (fAutoActivationListener != null)
 		{
-			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(fAutoActivationListener);
+			new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).removePreferenceChangeListener(
+					fAutoActivationListener);
 			fAutoActivationListener = null;
 		}
 		if (fThemeChangeListener != null)
@@ -99,11 +103,12 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	/**
 	 * getAbstractThemeableEditor
 	 * 
+	 * @deprecated Use {@link #getEditor()}
 	 * @return
 	 */
 	protected AbstractThemeableEditor getAbstractThemeableEditor()
 	{
-		return fTextEditor;
+		return getEditor();
 	}
 
 	/*
@@ -166,6 +171,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		if (fPreferenceStore != null)
 		{
 			setAutoActivationOptions(assistant);
+			// Auto-insert single proposals
+			boolean autoInsert = fPreferenceStore.getBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT);
+			assistant.enableAutoInsert(autoInsert);
 		}
 
 		fAutoActivationListener = new IPreferenceChangeListener()
@@ -178,6 +186,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		new InstanceScope().getNode(CommonEditorPlugin.PLUGIN_ID).addPreferenceChangeListener(fAutoActivationListener);
 
 		assistant.setContextInformationPopupOrientation(IContentAssistant.CONTEXT_INFO_BELOW);
+		assistant.setContextInformationPopupBackground(getThemeBackground());
+		assistant.setContextInformationPopupForeground(getThemeForeground());
 
 		fThemeChangeListener = new IPreferenceChangeListener()
 		{
@@ -194,18 +204,19 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		};
 		new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
 
-		
 		return assistant;
 	}
 
 	private void setAutoActivationOptions(final ContentAssistant assistant)
 	{
 		int delay = fPreferenceStore.getInt(IPreferenceConstants.CONTENT_ASSIST_DELAY);
-		if(delay >= 0) {
+		if (delay >= 0)
+		{
 			assistant.enableAutoActivation(true);
-			assistant.setAutoActivationDelay(delay);				
+			assistant.setAutoActivationDelay(delay);
 		}
-		else {
+		else
+		{
 			assistant.enableAutoActivation(false);
 		}
 	}
@@ -222,7 +233,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 */
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		return new CommonContentAssistProcessor(getAbstractThemeableEditor());
+		return new CommonContentAssistProcessor(getEditor());
 	}
 
 	/**
@@ -300,7 +311,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkDetectorTargets(org.eclipse.jface.text.
 	 * source.ISourceViewer)
 	 */
-	@SuppressWarnings( { "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
@@ -348,7 +359,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(false))
+				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(true))
 				{
 					@Override
 					protected Color getBackground()
@@ -374,19 +385,19 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	protected Color getThemeBackground()
 	{
-		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground();
+		RGB bg = getCurrentTheme().getBackground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	protected Color getThemeForeground()
 	{
-		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground();
+		RGB bg = getCurrentTheme().getForeground();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
 	protected Color getThemeSelection()
 	{
-		RGB bg = ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getSelectionAgainstBG();
+		RGB bg = getCurrentTheme().getSelectionAgainstBG();
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
@@ -471,5 +482,22 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	protected AbstractThemeableEditor getEditor()
 	{
 		return fTextEditor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see
+	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getHyperlinkPresenter(org.eclipse.jface.text.source
+	 * .ISourceViewer)
+	 */
+	public IHyperlinkPresenter getHyperlinkPresenter(ISourceViewer sourceViewer)
+	{
+		RGB rgb = getCurrentTheme().getForegroundAsRGB("hyperlink"); //$NON-NLS-1$
+		return new DefaultHyperlinkPresenter(rgb);
+	}
+
+	protected Theme getCurrentTheme()
+	{
+		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
 	}
 }

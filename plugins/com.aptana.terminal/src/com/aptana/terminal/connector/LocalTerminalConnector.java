@@ -1,16 +1,17 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.terminal.connector;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
 import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
 
+import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.PlatformUtil;
 import com.aptana.core.util.PlatformUtil.ProcessItem;
 import com.aptana.terminal.Activator;
@@ -189,8 +191,13 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 
 	private boolean startProcess(ITerminalControl control) {
 		try {
-			
-			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory = getInitialDirectory());
+			initialDirectory = getInitialDirectory();
+			if (!FileUtil.isDirectoryAccessible(initialDirectory.toFile())) {
+				control.displayTextInTerminal(MessageFormat.format(Messages.LocalTerminalConnector_WorkingDirectoryPermissionErrorMessage, initialDirectory.toOSString()));
+				initialDirectory = null;
+				initialDirectory = getInitialDirectory();
+			}
+			processLauncher = new ProcessLauncher(getCurrentConfiguration(), initialDirectory);
 			processLauncher.addProcessListener(this);
 			processLauncher.launch();
 			
@@ -235,7 +242,7 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(activeProjeectName);
 			if (project != null) {
 				IPath location = project.getLocation();
-				if (location != null && location.toFile().isDirectory()) {
+				if (location != null && location.toFile().isDirectory() && FileUtil.isDirectoryAccessible(location.toFile())) {
 					return location;
 				}
 			}

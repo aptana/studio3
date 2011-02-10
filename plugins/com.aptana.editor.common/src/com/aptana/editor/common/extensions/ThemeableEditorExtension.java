@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.extensions;
 
 import java.lang.ref.WeakReference;
@@ -256,7 +256,7 @@ public class ThemeableEditorExtension
 			return;
 
 		// Set the character pair matching color to this
-		setCharacterPairColor(caretColor);
+		setCharacterPairColor(getThemeManager().getCurrentTheme().getCharacterPairColor());
 
 		// This is an ugly hack. Setting a black image doesn't work for some reason, but setting no image will cause it
 		// to be black.

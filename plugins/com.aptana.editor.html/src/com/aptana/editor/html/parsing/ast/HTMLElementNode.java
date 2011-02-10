@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.parsing.ast;
 
 import java.util.ArrayList;
@@ -30,6 +30,7 @@ public class HTMLElementNode extends HTMLNode
 	private INameNode fEndNode;
 	private Map<String, String> fAttributes;
 	private List<IParseNode> fCSSStyleNodes;
+	private List<IParseNode> fJSAttributeNodes;
 
 	public HTMLElementNode(Symbol tagSymbol, int start, int end)
 	{
@@ -61,6 +62,7 @@ public class HTMLElementNode extends HTMLNode
 		fNameNode = new NameNode(tag, tagSymbol.getStart(), tagSymbol.getEnd());
 		fAttributes = new HashMap<String, String>();
 		fCSSStyleNodes = new ArrayList<IParseNode>();
+		fJSAttributeNodes = new ArrayList<IParseNode>();
 	}
 
 	@Override
@@ -75,6 +77,11 @@ public class HTMLElementNode extends HTMLNode
 	public void addCSSStyleNode(IParseNode node)
 	{
 		fCSSStyleNodes.add(node);
+	}
+
+	public void addJSAttributeNode(IParseNode node)
+	{
+		fJSAttributeNodes.add(node);
 	}
 
 	public String getName()
@@ -137,6 +144,11 @@ public class HTMLElementNode extends HTMLNode
 	public IParseNode[] getCSSStyleNodes()
 	{
 		return fCSSStyleNodes.toArray(new IParseNode[fCSSStyleNodes.size()]);
+	}
+
+	public IParseNode[] getJSAttributeNodes()
+	{
+		return fJSAttributeNodes.toArray(new IParseNode[fJSAttributeNodes.size()]);
 	}
 
 	@Override

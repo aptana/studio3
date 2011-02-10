@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.filesystem.secureftp.internal;
 
@@ -302,7 +302,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		return ftpClient != null && ftpClient.connected();
 	}
 
-	protected void changeCurrentDir(IPath path) throws FTPException, IOException, CoreException {
+	protected void changeCurrentDir(IPath path) throws FTPException, IOException, PermissionDeniedException {
 		try {
 			if (cwd == null) {
 				cwd = new Path(ftpClient.pwd());
@@ -319,7 +319,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		}
 	}
 
-	private static void throwWrappedException(FTPException e, IPath path) throws FileNotFoundException, FTPException, CoreException {
+	private static void throwWrappedException(FTPException e, IPath path) throws FileNotFoundException, FTPException, PermissionDeniedException {
 		int reply = e.getReplyCode();
 		if (reply == -1 && e.getCause() instanceof FTPException) {
 			reply = ((FTPException) e.getCause()).getReplyCode();
@@ -328,9 +328,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			throw new FileNotFoundException(path.toPortableString());
 		}
         if (reply == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
-			PermissionDeniedException ex = new PermissionDeniedException(path.toPortableString(), e);
-			throw new CoreException(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID,
-					MessageFormat.format(Messages.SFTPConnectionFileManager_PermissionDenied0, path.toPortableString()), ex));
+			throw new PermissionDeniedException(path.toPortableString(), e);
         }
 		throw e;
 	}
@@ -408,7 +406,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#fetchFile(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+	protected ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			String name = path.lastSegment();
@@ -435,6 +433,8 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			}
 		} catch (FileNotFoundException e) {
 			throw e;
+		} catch (PermissionDeniedException e) {
+			throw e;
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
@@ -457,7 +457,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#fetchFiles(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+	protected ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		monitor = Policy.subMonitorFor(monitor, 1);
 		try {
 			FTPFile[] ftpFiles = listFiles(path, monitor);
@@ -478,7 +478,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			return list.toArray(new ExtendedFileInfo[list.size()]);
 		} catch (FileNotFoundException e) {
 			throw e;
-		} catch (CoreException e) {
+		} catch (PermissionDeniedException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
 			throw e;
@@ -628,8 +628,9 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			}
 		} catch (FileNotFoundException e) {
 			throw e;
-		} catch (CoreException e) {
-			throw e;
+		} catch (PermissionDeniedException e) {
+			throw new CoreException(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID,
+					MessageFormat.format(Messages.SFTPConnectionFileManager_PermissionDenied0, sourcePath.toPortableString()), e));
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
@@ -797,7 +798,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		}
 	}
 
-	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException, CoreException {
+	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException, PermissionDeniedException {
 		Policy.checkCanceled(monitor);
 		try {
 			return ftpClient.dirDetails(dirPath.toPortableString());

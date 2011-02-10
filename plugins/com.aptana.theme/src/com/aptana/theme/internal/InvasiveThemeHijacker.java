@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.theme.internal;
 
 import java.lang.reflect.Field;
@@ -25,6 +25,7 @@ import org.eclipse.debug.internal.ui.views.memory.IMemoryViewPane;
 import org.eclipse.debug.internal.ui.views.memory.MemoryView;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.hyperlink.DefaultHyperlinkPresenter;
@@ -39,6 +40,7 @@ import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -629,6 +631,13 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		setToken(prefs, theme, "punctuation.separator.key-value.java-props", "pf_coloring_assignment", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 		setToken(prefs, theme, "string.interpolated.java-props", "pf_coloring_argument", revertToDefaults); //$NON-NLS-1$ //$NON-NLS-2$
 
+		// Override pair matching colors
+		if (!revertToDefaults)
+		{
+			// FIXME Revert back to default value if revertToDefaults!
+			prefs.put("matchingBracketsColor", StringConverter.asString(theme.getCharacterPairColor())); //$NON-NLS-1$
+		}
+
 		try
 		{
 			prefs.flush();
@@ -636,6 +645,18 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		catch (BackingStoreException e)
 		{
 			ThemePlugin.logError(e);
+		}
+
+		// Override JDT editor font
+		if (!revertToDefaults)
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
+		}
+		else
+		{
+			Font fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
+			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
 		}
 	}
 
@@ -790,13 +811,16 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			TextAttribute consoleHyperlink = theme.getTextAttribute("console.hyperlink"); //$NON-NLS-1$
 			TextAttribute editorHyperlink = theme.getTextAttribute("hyperlink"); //$NON-NLS-1$
 
 			prefs.put(JFacePreferences.HYPERLINK_COLOR,
-					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+			JFaceResources.getColorRegistry().put(JFacePreferences.HYPERLINK_COLOR,
+					editorHyperlink.getForeground().getRGB());
 			prefs.put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
-					StringConverter.asString(consoleHyperlink.getForeground().getRGB()));
+					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
+			JFaceResources.getColorRegistry().put(JFacePreferences.ACTIVE_HYPERLINK_COLOR,
+					editorHyperlink.getForeground().getRGB());
 			prefs.putBoolean(DefaultHyperlinkPresenter.HYPERLINK_COLOR_SYSTEM_DEFAULT, false);
 			prefs.put(DefaultHyperlinkPresenter.HYPERLINK_COLOR,
 					StringConverter.asString(editorHyperlink.getForeground().getRGB()));
@@ -853,11 +877,15 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND_SYSTEM_DEFAULT, true);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, true);
-			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);			
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, true);
-			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);			
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, true);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
+
+			// FIXME Revert back to default current line color...
+			// prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+			// StringConverter.asString(theme.getLineHighlightAgainstBG()));
 		}
 		else
 		{
@@ -866,9 +894,14 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND_SYSTEM_DEFAULT, false);
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT, false);
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND, StringConverter.asString(theme.getSelectionAgainstBG()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND,
+					StringConverter.asString(theme.getSelectionAgainstBG()));
 			prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND, StringConverter.asString(theme.getForeground()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+					StringConverter.asString(theme.getForeground()));
+
+			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+					StringConverter.asString(theme.getLineHighlightAgainstBG()));
 
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$

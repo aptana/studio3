@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the Eclipse Public License (EPL).
- * Please see the license-epl.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.contentassist;
 
 /***********************************************************************************************************************
@@ -42,6 +42,7 @@ import org.eclipse.jface.text.contentassist.IContextInformationPresenter;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -66,12 +67,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * The standard implementation of the <code>IContentAssistant</code> interface. Usually, clients instantiate this
- * class and configure it before using it.
+ * The standard implementation of the <code>IContentAssistant</code> interface. Usually, clients instantiate this class
+ * and configure it before using it.
  */
 @SuppressWarnings("deprecation")
 public class ContentAssistant implements IContentAssistant, IContentAssistantExtension, IWidgetTokenKeeper,
-		IWidgetTokenKeeperExtension//, IUnifiedContentAssistant
+		IWidgetTokenKeeperExtension// , IUnifiedContentAssistant
 {
 
 	/**
@@ -84,8 +85,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		/** The shell that a <code>ControlListener</code> is registered with. */
 		private Shell fShell;
 		/**
-		 * The control that a <code>MouseListener</code>, a<code>FocusListener</code> and a
-		 * <code>DisposeListener</code> are registered with.
+		 * The control that a <code>MouseListener</code>, a<code>FocusListener</code> and a <code>DisposeListener</code>
+		 * are registered with.
 		 */
 		private Control fControl;
 
@@ -242,10 +243,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	}
 
 	/**
-	 * An implementation of <code>IContentAssistListener</code>, this class is used to monitor key events in support
-	 * of automatic activation of the code assistant. If enabled, the implementation utilizes a thread to watch for
-	 * input characters matching the activation characters specified by the code assist processor, and if detected, will
-	 * wait the indicated delay interval before activating the code assistant.
+	 * An implementation of <code>IContentAssistListener</code>, this class is used to monitor key events in support of
+	 * automatic activation of the code assistant. If enabled, the implementation utilizes a thread to watch for input
+	 * characters matching the activation characters specified by the code assist processor, and if detected, will wait
+	 * the indicated delay interval before activating the code assistant.
 	 */
 	class AutoAssistListener extends KeyAdapter implements KeyListener, Runnable, VerifyKeyListener
 	{
@@ -366,12 +367,21 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			{
 				return;
 			}
+
 			// Only act on characters that are trigger candidates. This
 			// avoids computing the model selection on every keystroke
+			boolean validAssistLocation = false;
 			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0)
 			{
-				stop();
-				return;
+				StyledText styledText = (StyledText) e.widget;
+				IDocument document = fContentAssistSubjectControlAdapter.getDocument();
+				int offset = styledText.getCaretOffset();
+				validAssistLocation = isValidAssistLocation(e.character, e.keyCode, document, offset);
+				if (!validAssistLocation)
+				{
+					stop();
+					return;
+				}
 			}
 
 			int showStyle;
@@ -381,7 +391,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			activation = fContentAssistSubjectControlAdapter.getCompletionProposalAutoActivationCharacters(
 					ContentAssistant.this, pos);
 
-			if (contains(activation, e.character) && !fProposalPopup.isActive())
+			if ((contains(activation, e.character) || validAssistLocation) && !fProposalPopup.isActive())
 			{
 				showStyle = SHOW_PROPOSALS;
 				fProposalPopup.setActivationKey(e.character);
@@ -390,7 +400,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			{
 				activation = fContentAssistSubjectControlAdapter.getContextInformationAutoActivationCharacters(
 						ContentAssistant.this, pos);
-				if (contains(activation, e.character) && fContextInfoPopup != null && !fContextInfoPopup.isActive())
+				if ((contains(activation, e.character) || validAssistLocation) && fContextInfoPopup != null
+						&& !fContextInfoPopup.isActive())
 				{
 					showStyle = SHOW_CONTEXT_INFO;
 				}
@@ -435,41 +446,21 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 					{
 						public void run()
 						{
-//							if (fViewer == null || editor == null)
-//							{
-//								return;
-//							}
-//							StyledText styledText = fViewer.getTextWidget();
-//							EditorFileContext context = editor.getFileContext();
-//							IUnifiedEditorContributor baseContrib = editor.getBaseContributor();
-//							if (context == null || baseContrib == null)
-//							{
-//								return;
-//							}
-//							ITypedRegion reg = context.getPartitionAtOffset(styledText.getCaretOffset());
-//							if (reg == null)
-//							{
-//								return;
-//							}
-//							final String contentType = reg.getType();
-//							IUnifiedEditorContributor contributor = baseContrib.findChildContributor(contentType);
-//							if (contributor != null && contributor.isAutoActivateContentAssist())
-//							{
-								Control c = d.getFocusControl();
-								if (c == null)
-								{
-									return;
-								}
+							Control c = d.getFocusControl();
+							if (c == null)
+							{
+								return;
+							}
 
-								if (showStyle == SHOW_PROPOSALS)
-								{
-									fProposalPopup.showProposals(true);
-								}
-								else if (showStyle == SHOW_CONTEXT_INFO && fContextInfoPopup != null)
-								{
-									fContextInfoPopup.showContextProposals(true);
-								}
-//							}
+							if (showStyle == SHOW_PROPOSALS)
+							{
+								fProposalPopup.showProposals(true);
+							}
+							else if (showStyle == SHOW_CONTEXT_INFO && fContextInfoPopup != null)
+							{
+								fContextInfoPopup.showContextProposals(true);
+							}
+							// }
 						}
 					});
 				}
@@ -538,7 +529,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		 */
 		protected void checkType(int type)
 		{
-			//Assert.isTrue(type == LAYOUT_PROPOSAL_SELECTOR || type == LAYOUT_CONTEXT_SELECTOR || type == LAYOUT_CONTEXT_INFO_POPUP);
+			// Assert.isTrue(type == LAYOUT_PROPOSAL_SELECTOR || type == LAYOUT_CONTEXT_SELECTOR || type ==
+			// LAYOUT_CONTEXT_INFO_POPUP);
 		}
 
 		/**
@@ -688,16 +680,16 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 				proposedLocation.x -= 32;
 
 				shell.setLocation(proposedLocation);
-				
+
 				// clip right side of popup to right side of screen, if necessary
 				Rectangle bounds = Display.getCurrent().getBounds();
 				int screenRight = bounds.x + bounds.width;
 				int proposalRight = proposedLocation.x + shell.getSize().x;
-				
+
 				if (proposalRight > screenRight)
 				{
 					int newWidth = shell.getSize().x - (proposalRight - screenRight);
-					
+
 					shell.setSize(newWidth, shell.getSize().y);
 				}
 			}
@@ -960,7 +952,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			// Move down one line and add padding
 			location.y = location.y + fContentAssistSubjectControlAdapter.getLineHeight() + 5;
 
-//			shiftHorizontalLocation(location, shellBounds, displayBounds);
+			// shiftHorizontalLocation(location, shellBounds, displayBounds);
 			shiftVerticalLocation(location, shellBounds, displayBounds, keepOnScreen);
 
 			return location;
@@ -1112,7 +1104,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	private boolean fIsAutoInserting = false;
 	private int fProposalPopupOrientation = PROPOSAL_OVERLAY;
 	private int fContextInfoPopupOrientation = CONTEXT_INFO_ABOVE;
-	private Map<String,IContentAssistProcessor> fProcessors;
+	private Map<String, IContentAssistProcessor> fProcessors;
 
 	/**
 	 * The partitioning.
@@ -1138,7 +1130,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	private CompletionProposalPopup fProposalPopup;
 	private ContextInformationPopup fContextInfoPopup;
 
-	//private IUnifiedEditor editor;
+	// private IUnifiedEditor editor;
 
 	/**
 	 * Flag which tells whether a verify key listener is hooked.
@@ -1218,7 +1210,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	{
 		if (fProcessors == null)
 		{
-			fProcessors = new HashMap<String,IContentAssistProcessor>();
+			fProcessors = new HashMap<String, IContentAssistProcessor>();
 		}
 
 		if (processor == null)
@@ -1258,28 +1250,51 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		}
 
 		StringBuffer buf = new StringBuffer(5);
-		Iterator<Entry<String,IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
-		
+		Iterator<Entry<String, IContentAssistProcessor>> iter = fProcessors.entrySet().iterator();
+
 		while (iter.hasNext())
 		{
-			Entry<String,IContentAssistProcessor> entry = iter.next();
+			Entry<String, IContentAssistProcessor> entry = iter.next();
 			IContentAssistProcessor processor = entry.getValue();
 			char[] triggers = processor.getCompletionProposalAutoActivationCharacters();
-			
+
 			if (triggers != null)
 			{
 				buf.append(triggers);
 			}
-			
+
 			triggers = processor.getContextInformationAutoActivationCharacters();
-			
+
 			if (triggers != null)
 			{
 				buf.append(triggers);
 			}
 		}
-		
+
 		return buf.toString();
+	}
+
+	/**
+	 * @param offset
+	 * @param document
+	 */
+	private boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		if (keyCode == SWT.ESC || (keyCode & SWT.KEYCODE_BIT) != 0)
+		{
+			return false;
+		}
+
+		IContentAssistProcessor processor = getProcessor(fContentAssistSubjectControlAdapter, offset);
+		if (processor instanceof ICommonContentAssistProcessor)
+		{
+			return ((ICommonContentAssistProcessor) processor).triggerAdditionalAutoActivation(c, keyCode, document,
+					offset);
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -1377,14 +1392,14 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * <ul>
 	 * <li>PROPOSAL_OVERLAY
 	 * <p>
-	 * proposal popup windows should overlay each other </li>
+	 * proposal popup windows should overlay each other</li>
 	 * <li>PROPOSAL_REMOVE
 	 * <p>
-	 * any currently shown proposal popup should be closed </li>
+	 * any currently shown proposal popup should be closed</li>
 	 * <li>PROPOSAL_STACKED
 	 * <p>
 	 * proposal popup windows should be vertical stacked, with no overlap, beneath the line containing the current
-	 * cursor location </li>
+	 * cursor location</li>
 	 * </ul>
 	 * 
 	 * @param orientation
@@ -1400,10 +1415,10 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * <ul>
 	 * <li>CONTEXT_ABOVE
 	 * <p>
-	 * context information popup should always appear above the line containing the current cursor location </li>
+	 * context information popup should always appear above the line containing the current cursor location</li>
 	 * <li>CONTEXT_BELOW
 	 * <p>
-	 * context information popup should always appear below the line containing the current cursor location </li>
+	 * context information popup should always appear below the line containing the current cursor location</li>
 	 * </ul>
 	 * 
 	 * @param orientation
@@ -1563,13 +1578,14 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 		fInformationControlCreator = creator;
 	}
 
-//	/**
-//	 * @see com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistant#setEditor(com.aptana.ide.editors.unified.IUnifiedEditor)
-//	 */
-//	public void setEditor(IUnifiedEditor editor)
-//	{
-//		this.editor = editor;
-//	}
+	// /**
+	// * @see
+	// com.aptana.ide.editors.unified.contentassist.IUnifiedContentAssistant#setEditor(com.aptana.ide.editors.unified.IUnifiedEditor)
+	// */
+	// public void setEditor(IUnifiedEditor editor)
+	// {
+	// this.editor = editor;
+	// }
 
 	/**
 	 * install
@@ -2105,26 +2121,27 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @return an array of completion proposals
 	 * @see IContentAssistProcessor#computeCompletionProposals(ITextViewer, int)
 	 */
-	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		fLastErrorMessage = null;
 
 		ICompletionProposal[] result = null;
 		IContentAssistProcessor processor = this.getProcessor(viewer, offset);
-		
+
 		if (processor != null)
 		{
 			if (processor instanceof ICommonContentAssistProcessor)
 			{
 				ICommonContentAssistProcessor commonProcessor = (ICommonContentAssistProcessor) processor;
-				
+
 				result = commonProcessor.computeCompletionProposals(viewer, offset, activationChar, autoActivated);
 			}
 			else
 			{
 				result = processor.computeCompletionProposals(viewer, offset);
 			}
-				
+
 			fLastErrorMessage = processor.getErrorMessage();
 		}
 
@@ -2402,8 +2419,8 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * dialog settings and to store the control's last valid size in the given dialog settings.
 	 * <p>
 	 * Note: This API is only valid if the information control implements
-	 * {@link org.eclipse.jface.text.IInformationControlExtension3}. Not following this restriction will later result
-	 * in an {@link UnsupportedOperationException}.
+	 * {@link org.eclipse.jface.text.IInformationControlExtension3}. Not following this restriction will later result in
+	 * an {@link UnsupportedOperationException}.
 	 * </p>
 	 * <p>
 	 * The constants used to store the values are:
@@ -2534,7 +2551,7 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	{
 		fProposalSelectorSelectionColor = color;
 	}
-	
+
 	Color getProposalSelectorSelectionColor()
 	{
 		return fProposalSelectorSelectionColor;

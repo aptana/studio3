@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import com.aptana.editor.html.contentassist.HTMLContentAssistProcessor.LocationType;
@@ -190,5 +190,39 @@ public class ContentAssistCoarseLocationTests extends LocationTestCase
 	public void testCloseTag()
 	{
 		this.tagTests("</body>", LocationType.IN_CLOSE_TAG);
+	}
+	
+	/**
+	 * testEmptyText
+	 */
+	public void testEmptyText()
+	{
+		String source = "<div>   </div>";
+		
+		this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, 4),
+			new LocationTypeRange(LocationType.IN_TEXT, 5, 8),
+			new LocationTypeRange(LocationType.IN_CLOSE_TAG, 9, 13),
+			new LocationTypeRange(LocationType.IN_TEXT, 14)
+		);
+	}
+	
+	/**
+	 * testText
+	 */
+	public void testText()
+	{
+		String source = "<div> a </div>";
+		
+		this.coarseLocationTests(
+			source,
+			new LocationTypeRange(LocationType.IN_TEXT, 0),
+			new LocationTypeRange(LocationType.IN_OPEN_TAG, 1, 4),
+			new LocationTypeRange(LocationType.IN_TEXT, 5, 8),
+			new LocationTypeRange(LocationType.IN_CLOSE_TAG, 9, 13),
+			new LocationTypeRange(LocationType.IN_TEXT, 14)
+		);
 	}
 }

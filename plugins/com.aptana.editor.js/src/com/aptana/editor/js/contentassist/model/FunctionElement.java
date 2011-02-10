@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.model;
 
 import java.util.ArrayList;
@@ -182,6 +182,23 @@ public class FunctionElement extends PropertyElement
 		for (ExceptionElement exception : this.getExceptions())
 		{
 			result.add(exception.getType());
+		}
+
+		return result;
+	}
+
+	/**
+	 * getParamterNames
+	 * 
+	 * @return
+	 */
+	public List<String> getParameterNames()
+	{
+		List<String> result = new ArrayList<String>();
+
+		for (ParameterElement parameter : this.getParameters())
+		{
+			result.add(parameter.getName());
 		}
 
 		return result;

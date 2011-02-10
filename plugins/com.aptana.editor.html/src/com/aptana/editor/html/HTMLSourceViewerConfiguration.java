@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html;
 
 import java.util.Map;
@@ -88,9 +88,7 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
-
-		return getContentAssistProcessor(contentType, editor);
+		return getContentAssistProcessor(contentType, this.getEditor());
 	}
 
 	/*

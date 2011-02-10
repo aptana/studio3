@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.inferencing;
 
 import java.net.URI;
@@ -108,9 +108,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 							// TODO: Temporary hack for jQuery CA until we resolve
 							// handling of function properties and derived types
-							if ("jQuery".equals(type))
+							if ("jQuery".equals(type)) //$NON-NLS-1$
 							{
-								type = "Function<jQuery>:jQuery";
+								type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
 							}
 
 							this.addType(type);
@@ -526,6 +526,13 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{
 					typeName = JSTypeUtil.getFunctionSignatureType(typeName);
+				}
+
+				// TODO: Temporary hack for jQuery CA until we resolve
+				// handling of function properties and derived types
+				if ("jQuery".equals(typeName)) //$NON-NLS-1$
+				{
+					typeName = "Function<jQuery>"; //$NON-NLS-1$
 				}
 
 				// lookup up rhs name in type and add that value's type here

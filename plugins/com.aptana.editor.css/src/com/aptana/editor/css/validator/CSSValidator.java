@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.validator;
 
 import java.io.ByteArrayInputStream;
@@ -251,6 +251,7 @@ public class CSSValidator implements IValidator
 				message = MessageFormat.format("{0} : {1} for {2}", errorsubtype, skippedstring, property); //$NON-NLS-1$
 			}
 			message = StringEscapeUtils.unescapeHtml(message);
+			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
 			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE) && !containsCSS3Property(message))
 			{

@@ -1,12 +1,13 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.index.core;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -121,16 +122,28 @@ public abstract class IndexReader
 	{
 		if (element != null && value != null)
 		{
-			Object m = JSON.parse(value);
-
-			if (m instanceof Map)
+			try
 			{
-				element.fromJSON((Map) m);
+				Object m = JSON.parse(value);
+
+				if (m instanceof Map)
+				{
+					element.fromJSON((Map) m);
+				}
+
+				for (String document : element.getDocuments())
+				{
+					element.addDocument(document);
+				}
 			}
-
-			for (String document : element.getDocuments())
+			catch (Throwable t)
 			{
-				element.addDocument(document);
+				String message = MessageFormat.format( //
+					"An error occurred while processing the following JSON string\n{0}", //
+					value //
+					);
+
+				IndexPlugin.logError(message, t);
 			}
 		}
 

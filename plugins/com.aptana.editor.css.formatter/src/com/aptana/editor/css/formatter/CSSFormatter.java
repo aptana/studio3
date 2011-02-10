@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.css.formatter;
 
 import java.util.Map;
@@ -19,9 +19,11 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.css.CSSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
@@ -147,9 +149,9 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(
-					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
-					ERROR_DISPLAY_TIMEOUT, true);
+			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
+					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
+					true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -189,6 +191,24 @@ public class CSSFormatter extends AbstractScriptFormatter implements IScriptForm
 	public int getTabSize()
 	{
 		return getInt(CSSFormatterConstants.FORMATTER_TAB_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#getEditorSpecificTabWidth()
+	 */
+	public int getEditorSpecificTabWidth()
+	{
+		return FormatterUtils.getEditorTabWidth(CSSPlugin.getDefault().getPreferenceStore());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(CSSPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**

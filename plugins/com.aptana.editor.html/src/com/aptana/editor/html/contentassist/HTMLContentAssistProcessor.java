@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
@@ -63,8 +63,8 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -360,11 +360,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+				IURLMapper serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault()
+					for (IURLMapper server : WebServerCorePlugin.getDefault()
 							.getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
@@ -547,6 +547,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				}
 			}
 
+			// If user doesn't want tags closed for them, then don't do it!
+			boolean addCloseTag = HTMLPlugin.getDefault().getPreferenceStore()
+					.getBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS);
+
 			HTMLParseState state = null;
 			for (ElementElement element : elements)
 			{
@@ -592,7 +596,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 						{
 							// ignore
 						}
-						if (!TagUtil.tagClosed(doc, element.getName()))
+						if (addCloseTag && !TagUtil.tagClosed(doc, element.getName()))
 						{
 							replaceString += "></" + element.getName() + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 							positions.add(cursorPosition + 1);
@@ -853,6 +857,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		Lexeme<HTMLTokenType> closeLexeme = lexemeProvider.getLexeme(2); // Close of tag
 
 		int replaceLength = 0;
+		if (tagLexeme != null && tagLexeme.contains(offset))
+		{
+			replaceLength += tagLexeme.getLength();
+		}
 
 		// We can be at: |<a, <|a, |</a, </|a, etc.
 		// If our cursor is before the tag in the lexeme list, assume we aren't
@@ -874,7 +882,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				replaceLength += tagLexeme.getLength();
 			}
 			// current tag isn't closed, so we will close it for the user
-			if (closeLexeme != null && !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
+			if (closeLexeme == null || !HTMLTokenType.TAG_END.equals(closeLexeme.getType()))
 			{
 				replaceString += ">"; //$NON-NLS-1$
 			}
@@ -1166,11 +1174,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-			HTMLPlugin.PLUGIN_ID, //
-			IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
-			"", //$NON-NLS-1$
-			null //
-			);
+				HTMLPlugin.PLUGIN_ID, //
+				IPreferenceContants.HTML_ACTIVATION_CHARACTERS, //
+				"", //$NON-NLS-1$
+				null //
+				);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -1269,9 +1277,9 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(),
-												previousPartition.getLength()).trim();
-										if (src.charAt(src.length() - 1) == '>')
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
 										}
@@ -1519,6 +1527,37 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		if (startingLexeme != null && endingLexeme != null)
 		{
 			this._replaceRange = new Range(startingLexeme.getStartingOffset(), endingLexeme.getEndingOffset() - 1);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
+	 * org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	{
+		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
+
+		// first step is to determine if we're inside an open tag, close tag, text, etc.
+		LocationType location = this.getCoarseLocationType(document, lexemeProvider, offset);
+
+		switch (location)
+		{
+			case IN_OPEN_TAG:
+				// If we are inside an open tag and typing space or tab, assume we're wanting to add attributes
+				if (c == ' ' || c == '\t')
+				{
+					return true;
+				}
+				else
+				{
+					// If that's not the case, check if we are actually typing the attribute name
+					LocationType fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+					return (fineLocation == LocationType.IN_ATTRIBUTE_NAME);
+				}
+			default:
+				return false;
 		}
 	}
 }

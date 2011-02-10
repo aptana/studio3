@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.webserver.core;
 
@@ -70,7 +70,7 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 			return null;
 		}
 		try {
-			return resolve(url.toURI().relativize(baseURL.toURI()));
+			return resolve(Path.fromPortableString(baseURL.toURI().relativize(url.toURI()).getPath()));
 		} catch (URISyntaxException e) {
 			WebServerCorePlugin.log(e);
 			return null;
@@ -82,12 +82,12 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 	 * @param uri
 	 * @return
 	 */
-	public IFileStore resolve(URI uri) {
+	public IFileStore resolve(IPath path) {
 		if (!isValid()) {
 			return null;
 		}
 		try {
-			return EFS.getStore(documentRoot).getFileStore(Path.fromPortableString(uri.getPath()));
+			return EFS.getStore(documentRoot).getFileStore(path);
 		} catch (CoreException e) {
 			WebServerCorePlugin.log(e);
 			return null;
@@ -165,6 +165,13 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 	 */
 	public void setDocumentRoot(URI documentRoot) {
 		this.documentRoot = documentRoot;
+	}
+	
+	public static EFSWebServerConfiguration create(URL baseURL, URI documentRoot) {
+		EFSWebServerConfiguration configuration = new EFSWebServerConfiguration();
+		configuration.setBaseURL(baseURL);
+		configuration.setDocumentRoot(documentRoot);
+		return configuration;
 	}
 
 }

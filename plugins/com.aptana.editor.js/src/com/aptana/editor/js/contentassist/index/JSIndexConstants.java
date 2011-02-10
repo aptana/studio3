@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.contentassist.index;
 
 public interface JSIndexConstants
@@ -39,23 +39,11 @@ public interface JSIndexConstants
 	static final String TYPE = PREFIX + "type"; //$NON-NLS-1$
 	static final String FUNCTION = PREFIX + "function"; //$NON-NLS-1$
 	static final String PROPERTY = PREFIX + "property"; //$NON-NLS-1$
-	static final String DESCRIPTION = PREFIX + "description"; //$NON-NLS-1$
-	static final String PARAMETERS = PREFIX + "parameters"; //$NON-NLS-1$
-	static final String RETURN_TYPES = PREFIX + "return_types"; //$NON-NLS-1$
-	static final String USER_AGENT = PREFIX + "user_agent"; //$NON-NLS-1$
-	static final String SINCE_LIST = PREFIX + "since_list"; //$NON-NLS-1$
-	static final String EXAMPLES = PREFIX + "examples"; //$NON-NLS-1$
 
 	static final String[] ALL_CATEGORIES = new String[] { //
 	TYPE, //
 		FUNCTION, //
-		PROPERTY, //
-		DESCRIPTION, //
-		PARAMETERS, //
-		RETURN_TYPES, //
-		USER_AGENT, //
-		SINCE_LIST, //
-		EXAMPLES //
+		PROPERTY //
 	};
 
 	// special values

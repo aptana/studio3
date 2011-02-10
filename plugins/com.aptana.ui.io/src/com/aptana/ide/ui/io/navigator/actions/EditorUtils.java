@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.ui.io.navigator.actions;
 
 import java.text.MessageFormat;
@@ -26,7 +26,6 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 import com.aptana.ui.util.UIUtils;
@@ -67,7 +66,7 @@ public class EditorUtils
 						{
 							try
 							{
-								IWorkbenchPage page = IOUIPlugin.getActivePage();
+								IWorkbenchPage page = UIUtils.getActivePage();
 								IEditorPart editorPart = null;
 								if (page != null)
 								{

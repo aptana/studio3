@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.webserver.core;
 
@@ -21,10 +21,14 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.webserver.core.ServerConfigurationChangeEvent.Kind;
 
 /**
  * @author Max Stepanov
@@ -48,6 +52,7 @@ public final class ServerConfigurationManager {
 	private List<ConfigurationType> types = new ArrayList<ConfigurationType>();
 	private List<AbstractWebServerConfiguration> serverConfigurations = Collections.synchronizedList(new ArrayList<AbstractWebServerConfiguration>());
 	private List<IMemento> unresolvedElements = new ArrayList<IMemento>();
+	private ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
 	public final class ConfigurationType {
 		private String id;
@@ -173,6 +178,9 @@ public final class ServerConfigurationManager {
 				}
 			}
 		}
+		for (AbstractWebServerConfiguration serverConfiguration : serverConfigurations) {
+			notifyListeners(Kind.UPDATED, serverConfiguration);
+		}
 	}
 
 	public List<ConfigurationType> getConfigurationTypes() {
@@ -197,12 +205,14 @@ public final class ServerConfigurationManager {
 		}
 		if (!serverConfigurations.contains(serverConfiguration)) {
 			serverConfigurations.add(serverConfiguration);
+			notifyListeners(Kind.ADDED, serverConfiguration);
 		}
 	}
 
 	public void removeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
 		if (serverConfigurations.contains(serverConfiguration)) {
 			serverConfigurations.remove(serverConfiguration);
+			notifyListeners(Kind.REMOVED, serverConfiguration);
 		}
 	}
 
@@ -219,6 +229,34 @@ public final class ServerConfigurationManager {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns true if the specified configuration is persistent
+	 * 
+	 * @param serverConfiguration
+	 * @return
+	 */
+	public boolean isPersistent(AbstractWebServerConfiguration serverConfiguration) {
+		return serverConfigurations.contains(serverConfiguration) && serverConfiguration.isPersistent();
+	}
+	
+	/**
+	 * Add changes listener
+	 * 
+	 * @param listener
+	 */
+	public void addServerConfigurationChangeListener(IServerConfigurationChangeListener listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * Remove changes listener
+	 * 
+	 * @param listener
+	 */
+	public void removeServerConfigurationChangeListener(IServerConfigurationChangeListener listener) {
+		listeners.remove(listener);
 	}
 
 	private IMemento storeServerConfiguration(AbstractWebServerConfiguration serverConfiguration) {
@@ -242,6 +280,22 @@ public final class ServerConfigurationManager {
 			}
 		}
 		return serverConfiguration;
+	}
+		
+	private void notifyListeners(Kind kind, AbstractWebServerConfiguration serverConfiguration) {
+		final ServerConfigurationChangeEvent event = new ServerConfigurationChangeEvent(kind, serverConfiguration);
+		for (Object i : listeners.getListeners()) {
+			final IServerConfigurationChangeListener listener = (IServerConfigurationChangeListener) i;
+			SafeRunner.run(new ISafeRunnable() {
+				public void run() throws Exception {
+					listener.configurationChanged(event);
+				}
+				
+				public void handleException(Throwable exception) {
+					WebServerCorePlugin.log(exception);
+				}
+			});
+		}
 	}
 
 }

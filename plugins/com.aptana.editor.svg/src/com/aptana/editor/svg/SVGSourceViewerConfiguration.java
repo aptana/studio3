@@ -51,7 +51,7 @@ public class SVGSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	@Override
 	protected IContentAssistProcessor getContentAssistProcessor(ISourceViewer sourceViewer, String contentType)
 	{
-		AbstractThemeableEditor editor = this.getAbstractThemeableEditor();
+		AbstractThemeableEditor editor = this.getEditor();
 
 		if (contentType.startsWith(JSSourceConfiguration.PREFIX))
 		{

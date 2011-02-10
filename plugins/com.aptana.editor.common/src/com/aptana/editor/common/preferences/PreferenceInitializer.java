@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -31,9 +31,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.put(IPreferenceConstants.TASK_TAG_PRIORITIES, "NORMAL,HIGH,NORMAL"); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceConstants.TASK_TAGS_CASE_SENSITIVE, true);
 
-		// Do not set Aptana-wide preferences until we have a way to override them in pref pages.
-		//prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
-		//prefs.putInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 2);
 		prefs.putBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_LINE_NUMBER_RULER, true);
 
 		// mark occurrences
@@ -42,6 +39,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		// content assist
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY);
+		prefs.putBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT, true);
 
 		// insert matching characters
 		prefs.putBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE, true);

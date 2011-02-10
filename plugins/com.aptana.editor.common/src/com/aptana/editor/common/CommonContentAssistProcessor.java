@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -585,5 +586,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 				}
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
+	 */
+	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
 	}
 }

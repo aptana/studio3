@@ -123,6 +123,51 @@ public class DocumentScopeManagerTest extends TestCase
 			}
 		}
 	}
+	
+	public void testOffByOneBug() throws Exception
+	{
+		ITextEditor editor = null;
+		File file = null;
+		try
+		{
+			IWorkbenchPage page = UIUtils.getActivePage();
+			file = File.createTempFile("testing", ".html");
+			FileWriter writer = new FileWriter(file);
+			writer.write("<html>\n  <head>\n" +
+					"    <style type=\"text/css\">\n" +
+					"    h1 { color: #f00; }\n" +
+					"  </style>\n" +
+					"</head>\n" +
+					"<body>\n" +
+					"</html>");
+			writer.close();
+
+			IEditorPart part = IDE.openEditorOnFileStore(page, EFS.getLocalFileSystem().fromLocalFile(file));
+			editor = (ITextEditor) part;
+			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
+
+			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer, 32));
+			assertEquals("text.html.basic meta.tag.block.any.html string.quoted.double.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer, 41));
+			assertEquals("text.html.basic meta.tag.block.any.html punctuation.definition.tag.end.html", CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(viewer, 42));
+		}
+		finally
+		{
+			if (editor != null)
+			{
+				editor.close(false);
+			}
+			if (file != null)
+			{
+				if (!file.delete())
+				{
+					file.deleteOnExit();
+				}
+			}
+		}
+	}
 
 	/**
 	 * This level gives back only partition level scopes.

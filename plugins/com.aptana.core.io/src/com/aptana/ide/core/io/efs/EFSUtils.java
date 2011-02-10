@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 
 package com.aptana.ide.core.io.efs;
 
@@ -52,6 +52,14 @@ public final class EFSUtils
 	public static IFileStore getLocalFileStore(File file)
 	{
 		return EFS.getLocalFileSystem().fromLocalFile(file);
+	}
+	
+	public static IFileStore fromLocalFile(File file) {
+		IFileStore fileStore = WorkspaceFileSystem.getInstance().fromLocalFile(file);
+		if (fileStore == null) {
+			fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
+		}
+		return fileStore;
 	}
 
 	/**

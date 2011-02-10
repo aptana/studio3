@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.js.formatter.preferences;
 
 import java.net.URL;
@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.formatter.JSFormatterConstants;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -36,11 +37,12 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 {
 	private static final String INDENTATION_PREVIEW_FILE = "indentation-preview.js"; //$NON-NLS-1$
 	private final String[] TAB_OPTION_ITEMS = new String[] { CodeFormatterConstants.SPACE, CodeFormatterConstants.TAB,
-			CodeFormatterConstants.MIXED };
+			CodeFormatterConstants.MIXED, CodeFormatterConstants.EDITOR };
 	private final String[] TAB_OPTION_NAMES = new String[] {
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_SPACE,
 			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_TAB,
-			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_MIXED };
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_MIXED,
+			FormatterMessages.IndentationTabPage_general_group_option_tab_policy_EDITOR };
 
 	/**
 	 * Constructs a new JSFormatterIndentationTabPage
@@ -85,7 +87,7 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 				}
 			}
 		});
-		new TabOptionHandler(manager, tabOptions, indentationSize);
+		new TabOptionHandler(manager, tabOptions, indentationSize, tabSize);
 
 		group = SWTFactory.createGroup(parent, Messages.JSFormatterTabPage_indentGroupLabel, 1, 1,
 				GridData.FILL_HORIZONTAL);
@@ -110,17 +112,21 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 		private IFormatterControlManager manager;
 		private Combo tabOptions;
 		private Text indentationSize;
+		private final Text tabSize;
 
 		/**
 		 * Constructor.
 		 * 
 		 * @param controlManager
+		 * @param tabSize
 		 */
-		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize)
+		public TabOptionHandler(IFormatterControlManager controlManager, Combo tabOptions, Text indentationSize,
+				Text tabSize)
 		{
 			this.manager = controlManager;
 			this.tabOptions = tabOptions;
 			this.indentationSize = indentationSize;
+			this.tabSize = tabSize;
 			tabOptions.addSelectionListener(this);
 			manager.addInitializeListener(this);
 		}
@@ -135,7 +141,13 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 			if (index >= 0)
 			{
 				final boolean tabMode = CodeFormatterConstants.TAB.equals(TAB_OPTION_ITEMS[index]);
-				manager.enableControl(indentationSize, !tabMode);
+				final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(TAB_OPTION_ITEMS[index]);
+				manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+				manager.enableControl(tabSize, !editorSettingsMode);
+				if (editorSettingsMode)
+				{
+					setEditorTabWidth(JSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+				}
 			}
 		}
 
@@ -143,7 +155,14 @@ public class JSFormatterIndentationTabPage extends FormatterModifyTabPage
 		{
 			final boolean tabMode = CodeFormatterConstants.TAB.equals(manager
 					.getString(JSFormatterConstants.FORMATTER_TAB_CHAR));
-			manager.enableControl(indentationSize, !tabMode);
+			final boolean editorSettingsMode = CodeFormatterConstants.EDITOR.equals(manager
+					.getString(JSFormatterConstants.FORMATTER_TAB_CHAR));
+			manager.enableControl(indentationSize, !(tabMode || editorSettingsMode));
+			manager.enableControl(tabSize, !editorSettingsMode);
+			if (editorSettingsMode)
+			{
+				setEditorTabWidth(JSPlugin.getDefault().getPreferenceStore(), tabSize, indentationSize);
+			}
 		}
 	}
 

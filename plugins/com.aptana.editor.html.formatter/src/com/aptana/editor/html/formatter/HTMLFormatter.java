@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.html.formatter;
 
 import java.util.Map;
@@ -17,12 +17,14 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.common.parsing.CompositeParser;
+import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
+import com.aptana.formatter.FormatterUtils;
 import com.aptana.formatter.FormatterWriter;
 import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IScriptFormatter;
@@ -197,6 +199,24 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	public int getTabSize()
 	{
 		return getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#getEditorSpecificTabWidth()
+	 */
+	public int getEditorSpecificTabWidth()
+	{
+		return FormatterUtils.getEditorTabWidth(HTMLPlugin.getDefault().getPreferenceStore());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#isEditorInsertSpacesForTabs()
+	 */
+	public boolean isEditorInsertSpacesForTabs()
+	{
+		return FormatterUtils.isInsertSpacesForTabs(HTMLPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**

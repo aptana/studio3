@@ -1,10 +1,10 @@
 /**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.editor.common.internal.peer;
 
 import java.util.Collections;
@@ -201,7 +201,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	private boolean isModifierKey(int keyCode)
 	{
-		// TODO Ignore if it's not in the superset of character pairs!
+		// TODO Add more non alphanumeric keys we should skip!
 		switch (keyCode)
 		{
 			case SWT.SHIFT:
@@ -214,6 +214,10 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 			case SWT.CTRL:
 			case SWT.COMMAND:
 			case SWT.ALT:
+			case SWT.ARROW_DOWN:
+			case SWT.ARROW_LEFT:
+			case SWT.ARROW_RIGHT:
+			case SWT.ARROW_UP:
 				return true;
 		}
 		return false;
@@ -248,7 +252,11 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	protected String getScopeAtOffset(IDocument document, final int offset) throws BadLocationException
 	{
-		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+		if (textViewer == null)
+		{
+			return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(document, offset);
+		}
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(textViewer, offset);
 	}
 
 	boolean unpairedClose(char openingChar, char closingCharacter, IDocument document, int offset)
