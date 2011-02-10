@@ -510,7 +510,13 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.editor.common.AbstractThemeableEditor"
+            adaptableType="com.aptana.editor.html.HTMLEditor"
+            class="com.aptana.js.debug.ui.internal.actions.RetargettableActionAdapterFactory">
+         <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
+         <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
+      </factory>
+      <factory
+            adaptableType="com.aptana.editor.js.JSSourceEditor"
             class="com.aptana.js.debug.ui.internal.actions.RetargettableActionAdapterFactory">
          <adapter type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget"/>
          <adapter type="org.eclipse.debug.ui.actions.IRunToLineTarget"/>
