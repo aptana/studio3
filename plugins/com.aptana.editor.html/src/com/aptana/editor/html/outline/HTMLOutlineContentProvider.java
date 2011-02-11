@@ -81,7 +81,7 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 				{
 					List<IParseNode> children = new ArrayList<IParseNode>();
 					children.addAll(Arrays.asList(styleNodes));
-					children.addAll(Arrays.asList(item.getJSAttributeNodes()));
+					children.addAll(Arrays.asList(jsAttrNodes));
 					children.addAll(Arrays.asList(item.getChildren()));
 					return filter(children.toArray(new IParseNode[children.size()]));
 				}
