@@ -19,24 +19,6 @@ public interface IJSDebugConstants {
 	String ID_DEBUG_MODEL = JSDebugPlugin.PLUGIN_ID;
 
 	/**
-	 * Unique identifier for the JS line breakpoint markers (value
-	 * <code>com.aptana.debug.core.lineBreakpointMarker</code>).
-	 */
-	String ID_LINE_BREAKPOINT_MARKER = ID_DEBUG_MODEL + ".lineBreakpointMarker"; //$NON-NLS-1$
-
-	/**
-	 * Unique identifier for the JS exception breakpoint markers (value
-	 * <code>com.aptana.debug.core.exceptionBreakpointMarker</code>).
-	 */
-	String ID_EXCEPTION_BREAKPOINT_MARKER = ID_DEBUG_MODEL + ".exceptionBreakpointMarker"; //$NON-NLS-1$
-
-	/**
-	 * Unique identifier for the JS watchpoint markers (value
-	 * <code>com.aptana.debug.core.watchpointMarker</code>).
-	 */
-	String ID_WATCHPOINT_MARKER = ID_DEBUG_MODEL + ".watchpointMarker"; //$NON-NLS-1$
-
-	/**
 	 * Unique identifier for the JS breakpoints location (value
 	 * <code>com.aptana.debug.core.breakpointLocation</code>).
 	 */
