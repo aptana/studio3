@@ -38,7 +38,12 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 		URI uri = null;
 		try {
 			uri = new URI(uriString);
+			if (uri.getScheme() == null) {
+				uri = null;
+			}
 		} catch (URISyntaxException e) {
+		}
+		if (uri == null) {
 			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(uriString));
 			if (resource != null) {
 				uri = EFSUtils.getFileStore(resource).toURI();
