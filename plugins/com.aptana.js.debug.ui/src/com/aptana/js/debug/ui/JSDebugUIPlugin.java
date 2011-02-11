@@ -3,6 +3,7 @@ package com.aptana.js.debug.ui;
 import java.net.URI;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,9 +24,13 @@ import org.eclipse.ui.progress.WorkbenchJob;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.UniformResourceStorage;
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.IJSDebugConstants;
+import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
 import com.aptana.js.debug.core.model.IJSDebugTarget;
 import com.aptana.js.debug.ui.internal.DebugUIImages;
+import com.aptana.js.debug.ui.internal.LaunchConfigurationsHelper;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -76,6 +81,8 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 			};
 		}
 		DebugPlugin.getDefault().addDebugEventListener(debugEventListener);
+		registerAsFirebugEditor();
+		LaunchConfigurationsHelper.doCheckDefaultLaunchConfigurations();
 	}
 
 	/*
@@ -142,6 +149,13 @@ public class JSDebugUIPlugin extends AbstractUIPlugin {
 			fUtilPresentation = DebugUITools.newDebugModelPresentation(IJSDebugConstants.ID_DEBUG_MODEL);
 		}
 		return fUtilPresentation;
+	}
+
+	private void registerAsFirebugEditor() {
+		IPath launcher = EclipseUtil.getApplicationLauncher();
+		if (launcher != null) {
+			FirebugUtil.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 
 	private void closeDebugEditors() {

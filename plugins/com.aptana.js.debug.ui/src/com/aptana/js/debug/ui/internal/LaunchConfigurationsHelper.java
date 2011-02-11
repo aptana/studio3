@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -37,16 +36,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
-import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSLaunchConfigurationHelper;
-import com.aptana.js.debug.core.internal.browsers.FirebugUtil;
 import com.aptana.js.debug.ui.JSDebugUIPlugin;
 import com.aptana.ui.PopupSchedulingRule;
 import com.aptana.ui.util.WorkbenchBrowserUtil;
@@ -56,18 +52,17 @@ import com.aptana.ui.util.WorkbenchBrowserUtil;
  * 
  */
 @SuppressWarnings("restriction")
-public class Startup implements IStartup {
+public final class LaunchConfigurationsHelper {
 
-	/**
-	 * @see org.eclipse.ui.IStartup#earlyStartup()
-	 */
-	public void earlyStartup() {
-		registerAsFirebugEditor();
+	private LaunchConfigurationsHelper() {
+	}
+	
+	public static void doCheckDefaultLaunchConfigurations() {
 		UIJob job = new UIJob("Checking default launch configuration") { //$NON-NLS-1$
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
-				checkDefaultLaunchConfiguration();
+				new LaunchConfigurationsHelper().checkDefaultLaunchConfiguration();
 				WorkbenchCloseListener.init();
 				return Status.OK_STATUS;
 			}
@@ -78,12 +73,6 @@ public class Startup implements IStartup {
 		job.schedule();
 	}
 
-	private void registerAsFirebugEditor() {
-		IPath launcher = EclipseUtil.getApplicationLauncher();
-		if (launcher != null) {
-			FirebugUtil.registerEditor("Aptana", "Aptana Studio", launcher, StringUtil.EMPTY); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
 
 	private void checkDefaultLaunchConfiguration() {
 		Stack<ILaunchConfiguration> defaultConfigurations = new Stack<ILaunchConfiguration>();
