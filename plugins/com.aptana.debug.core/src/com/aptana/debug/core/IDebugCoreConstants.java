@@ -15,6 +15,24 @@ public interface IDebugCoreConstants {
 	String PREFIX = DebugCorePlugin.PLUGIN_ID;
 	
 	/**
+	 * Unique identifier for the JS line breakpoint markers (value
+	 * <code>com.aptana.debug.core.lineBreakpointMarker</code>).
+	 */
+	String ID_LINE_BREAKPOINT_MARKER = PREFIX + ".lineBreakpointMarker"; //$NON-NLS-1$
+
+	/**
+	 * Unique identifier for the JS exception breakpoint markers (value
+	 * <code>com.aptana.debug.core.exceptionBreakpointMarker</code>).
+	 */
+	String ID_EXCEPTION_BREAKPOINT_MARKER = PREFIX + ".exceptionBreakpointMarker"; //$NON-NLS-1$
+
+	/**
+	 * Unique identifier for the JS watchpoint markers (value
+	 * <code>com.aptana.debug.core.watchpointMarker</code>).
+	 */
+	String ID_WATCHPOINT_MARKER = PREFIX + ".watchpointMarker"; //$NON-NLS-1$
+
+	/**
 	 * Unique identifier for the JS breakpoints location (value
 	 * <code>com.aptana.debug.core.breakpointLocation</code>).
 	 */
