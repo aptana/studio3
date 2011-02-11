@@ -866,10 +866,6 @@
       </factory>
    </extension>
    <extension
-         point="org.eclipse.ui.startup">
-      <startup class="com.aptana.js.debug.ui.internal.Startup"/>
-   </extension>
-   <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="com.aptana.js.debug.ui.internal.StartPagePropertyTester"
