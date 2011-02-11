@@ -12,10 +12,13 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.internal.scripting.messages"; //$NON-NLS-1$
+
 	public static String TemplateSelectionPage_title;
 	public static String TemplateSelectionPage_description;
 	public static String TemplateSelectionPage_available_templates;
 	public static String TemplateSelectionPage_use_templates_button_text;
+	public static String WizardNewFilePage_ERR_NoProject;
+
 	static
 	{
 		// initialize resource bundle

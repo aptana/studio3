@@ -90,7 +90,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	{
 		if (ResourcesPlugin.getWorkspace().getRoot().getProjects().length == 0)
 		{
-			setErrorMessage("No project exists in the workspace.");
+			setErrorMessage(Messages.WizardNewFilePage_ERR_NoProject);
 			return false;
 		}
 		return super.validatePage();
