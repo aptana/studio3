@@ -59,6 +59,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
+import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
@@ -1365,21 +1366,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (fileName != null && urlMapper != null) {
 				url = urlMapper.resolve(EFS.getStore(fileName));
 			}
-			/*
-			if (uri != null) {
-				if ("dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
-				{
-					url = new URL(null, uri.toString(), DbgSourceURLStreamHandler.getDefault());
-				} else {
-					url = uri.toURL();
+			if (url == null && fileName != null) {
+				try {
+					if ("dbgsource".equals(fileName.getScheme())) { //$NON-NLS-1$
+						url = new URL(null, fileName.toString(), DbgSourceURLStreamHandler.getDefault());
+					} else {
+						url = fileName.toURL();
+					}
+				} catch (MalformedURLException e) {
 				}
 			}
-			*/
 		} catch (CoreException e) {
 			JSDebugPlugin.log(e);
 		}
 		int lineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1);
-		if (lineNumber == -1) {
+		if (lineNumber == -1 || url == null) {
 			return;
 		}
 
