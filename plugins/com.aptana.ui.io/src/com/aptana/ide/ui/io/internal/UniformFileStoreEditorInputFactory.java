@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 
 public class UniformFileStoreEditorInputFactory implements IElementFactory
 {
@@ -58,6 +59,9 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 
 	public static IEditorInput getUniformEditorInput(IFileStore fileStore, IProgressMonitor monitor)
 	{
+		if (fileStore.getFileSystem() == EFS.getLocalFileSystem()) {
+			return new FileStoreEditorInput(fileStore);
+		}
 		try
 		{
 			IFileStore localFileStore = toLocalFileStore(fileStore, monitor);
