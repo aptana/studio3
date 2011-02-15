@@ -517,7 +517,7 @@ public class JSOutlineContentProvider extends CommonOutlineContentProvider
 		String name = property.getText();
 		if (property.getNodeType() == JSNodeTypes.STRING)
 		{
-			name = name.substring(1, name.length());
+			name = name.substring(1, name.length() - 1);
 		}
 
 		IParseNode value = node.getChild(1);
