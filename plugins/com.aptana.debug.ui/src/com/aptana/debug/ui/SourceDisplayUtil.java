@@ -9,13 +9,13 @@ package com.aptana.debug.ui;
 
 import java.net.URI;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.debug.core.model.ILineBreakpoint;
-import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.debug.internal.ui.sourcelookup.SourceLookupManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -25,6 +25,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -33,7 +34,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.resources.UniformResourceStorage;
-import com.aptana.debug.ui.internal.LocalFileStorageEditorInput;
 import com.aptana.debug.ui.internal.UniformResourceStorageEditorInput;
 import com.aptana.ui.util.UIUtils;
 
@@ -68,12 +68,12 @@ public final class SourceDisplayUtil {
 				return new FileEditorInput((IFile) marker.getResource());
 			}
 		}
-		if (element instanceof LocalFileStorage) {
-			return new LocalFileStorageEditorInput((LocalFileStorage) element);
+		if (element instanceof IFileStore) {
+			return new FileStoreEditorInput((IFileStore) element);
 		}
 		if (element instanceof UniformResourceStorage) {
 			if (((UniformResourceStorage) element).getFullPath() != null) {
-				return new LocalFileStorageEditorInput((UniformResourceStorage) element);
+				// TODO return new LocalFileStorageEditorInput((UniformResourceStorage) element);
 			}
 			if (((UniformResourceStorage) element).exists()) {
 				return new UniformResourceStorageEditorInput((UniformResourceStorage) element);
