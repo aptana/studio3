@@ -121,17 +121,15 @@ public final class JSDebugModel {
 	 * @throws CoreException
 	 */
 	public static ILineBreakpoint createLineBreakpointForResource(Object resource, int line, Map<String, Object> attributes, boolean register) throws CoreException {
-		URI location = null;
 		if (resource instanceof IResource) {
-			location = ((IResource) resource).getLocation().makeAbsolute().toFile().toURI();
+			return createLineBreakpoint((IResource) resource, line, attributes, register);
 		} else if (resource instanceof IUniformResource) {
-			location = ((IUniformResource) resource).getURI();
+			return createLineBreakpoint((IUniformResource) resource, line, attributes, register);
+		} else if (resource instanceof String) {
+			attributes.put(IJSDebugConstants.BREAKPOINT_LOCATION, (String) resource);
+			return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register);			
 		}
-		if (location == null) {
-			return null;
-		}
-		attributes.put(IJSDebugConstants.BREAKPOINT_LOCATION, location.toString());
-		return new JSDebugLineBreakpoint(ResourcesPlugin.getWorkspace().getRoot(), line, attributes, register);
+		return null;
 	}
 
 	/**
