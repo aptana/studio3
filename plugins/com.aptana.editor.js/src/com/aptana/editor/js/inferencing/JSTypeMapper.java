@@ -35,11 +35,17 @@ public class JSTypeMapper
 	 * 
 	 * @return
 	 */
-	public static synchronized JSTypeMapper getInstance()
+	public static JSTypeMapper getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new JSTypeMapper();
+			synchronized (JSTypeMapper.class)
+			{
+				if (INSTANCE == null)
+				{
+					INSTANCE = new JSTypeMapper();
+				}
+			}
 		}
 
 		return INSTANCE;
@@ -106,7 +112,7 @@ public class JSTypeMapper
 				{
 					for (IConfigurationElement element : extension.getConfigurationElements())
 					{
-						if (element.getName().equals(TAG_TYPE_MAP))
+						if (TAG_TYPE_MAP.equals(element.getName()))
 						{
 							String srcType = element.getAttribute(ATTR_SRC_TYPE);
 							String dstType = element.getAttribute(ATTR_DST_TYPE);
