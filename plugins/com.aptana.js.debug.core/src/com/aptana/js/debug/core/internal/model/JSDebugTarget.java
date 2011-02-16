@@ -1574,7 +1574,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			String scheme = uri.getScheme();
 			if (FILE.equals(scheme)) {
 				File osFile = new File(uri.getSchemeSpecificPart());
-				resolved = EFSUtils.fromLocalFile(osFile).toURI();
+				resolved = EFSUtils.getLocalFileStore(osFile).toURI();
 			} else if (HTTP.equals(scheme) && urlMapper != null) {
 				IFileStore fileStore = urlMapper.resolve(uri.toURL());
 				if (fileStore != null) {
