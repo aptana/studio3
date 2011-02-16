@@ -66,9 +66,9 @@ public class SDocParser extends Parser {
 		{
 		}
 	}
-	
+
 	private SDocScanner fScanner;
-	
+
 	/**
 	 * parse
 	 *
@@ -78,7 +78,7 @@ public class SDocParser extends Parser {
 	{
 		return parse(source, 0);
 	}
-	
+
 	/**
 	 * parse
 	 *
@@ -89,7 +89,7 @@ public class SDocParser extends Parser {
 	{
 		fScanner.setOffset(offset);
 		fScanner.setSource(source);
-		
+
 		return parse(fScanner);
 	}
 
@@ -136,7 +136,7 @@ public class SDocParser extends Parser {
 					final Tag tag = (Tag) _symbol_tag.value;
 					
 			((List<Tag>) tags.value).add(tag);
-			
+
 			return tags;
 			}
 			case 16: // Tags = Tag.tag
@@ -145,9 +145,9 @@ public class SDocParser extends Parser {
 					final Tag tag = (Tag) _symbol_tag.value;
 					
 			List<Tag> tags = new ArrayList<Tag>();
-			
+
 			tags.add(tag);
-			
+
 			return new Symbol(tags);
 			}
 			case 19: // Tag = ADVANCED opt$Text.text
@@ -285,7 +285,7 @@ public class SDocParser extends Parser {
 					final Type type = (Type) _symbol_type.value;
 					
 			((List<Type>) types.value).add(type);
-			
+
 			return types;
 			}
 			case 39: // Types = Type.type
@@ -294,9 +294,9 @@ public class SDocParser extends Parser {
 					final Type type = (Type) _symbol_type.value;
 					
 			List<Type> types = new ArrayList<Type>();
-			
+
 			types.add(type);
-			
+
 			return new Symbol(types);
 			}
 			case 42: // Type = IDENTIFIER.name
@@ -353,9 +353,9 @@ public class SDocParser extends Parser {
 					final Type returnType = (Type) _symbol_returnType.value;
 					
 			FunctionType function = new FunctionType();
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 			}
 			case 51: // Type = FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
@@ -363,12 +363,12 @@ public class SDocParser extends Parser {
 					final Symbol returnTypes = _symbols[offset + 4];
 					
 			FunctionType function = new FunctionType();
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 			}
 			case 52: // Type = FUNCTION LPAREN RPAREN
@@ -382,9 +382,9 @@ public class SDocParser extends Parser {
 					final Type returnType = (Type) _symbol_returnType.value;
 					
 			FunctionType function = new FunctionType();
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 			}
 			case 54: // Type = FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
@@ -392,12 +392,12 @@ public class SDocParser extends Parser {
 					final Symbol returnTypes = _symbols[offset + 6];
 					
 			FunctionType function = new FunctionType();
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 			}
 			case 55: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN
@@ -405,12 +405,12 @@ public class SDocParser extends Parser {
 					final Symbol parameterTypes = _symbols[offset + 3];
 					
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			return function;
 			}
 			case 56: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
@@ -420,14 +420,14 @@ public class SDocParser extends Parser {
 					final Type returnType = (Type) _symbol_returnType.value;
 					
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 			}
 			case 57: // Type = FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
@@ -436,17 +436,17 @@ public class SDocParser extends Parser {
 					final Symbol returnTypes = _symbols[offset + 7];
 					
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 			}
 			case 58: // Type = PROPERTIES LESS_THAN Type.memberType GREATER_THAN
@@ -469,27 +469,27 @@ public class SDocParser extends Parser {
 					final String name = (String) _symbol_name.value;
 					
 			Parameter result = new Parameter(name);
-			
+
 			result.setUsage(Usage.OPTIONAL);
-			
+
 			return result;
 			}
 			case 63: // ParamName = ELLIPSIS
 			{
 					
 			Parameter result = new Parameter("...");
-			
+
 			result.setUsage(Usage.ONE_OR_MORE);
-			
+
 			return result;
 			}
 			case 64: // ParamName = LBRACKET ELLIPSIS RBRACKET
 			{
 					
 			Parameter result = new Parameter("...");
-			
+
 			result.setUsage(Usage.ZERO_OR_MORE);
-			
+
 			return result;
 			}
 			case 17: // opt$Text = 
