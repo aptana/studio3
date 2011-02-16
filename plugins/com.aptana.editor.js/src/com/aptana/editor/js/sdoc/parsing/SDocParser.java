@@ -1,10 +1,3 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
 package com.aptana.editor.js.sdoc.parsing;
 
 import java.util.ArrayList;
@@ -17,34 +10,34 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "SDoc.grammar".
  */
-@SuppressWarnings({ "unchecked", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDocParser extends Parser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pjLbbm5LKGFJFlvIL2C975c8GG80GX2IyX2r5Y4C7W0W4HHHGNS4LHL5nGKOYe851#g5L" +
-		"MAHzMMPQb7tvPBXyWuX8KGK4GD20OWyObHWK11Krxxfr#avbdqEWVLIHr#lGztTEtP#RUEm" +
-		"zm9w4FJa8cCd0Y#g8NUgCVJaPFHD03ut4snY4Nfs8whiBrk0ltuK6SW2naem25c8ahS2tkm" +
-		"68iHKhNTKGmnDQPrCqwtSjAxMRUYYwwEguSwqhShj0uYktAka0wK8CgZ5Gxbf5pa4PheXV3" +
-		"bTMX#FcyEeffjiefU9Iy77MqmpKU3sMVWNfVzsQzJFx0179wA2#Ub7MvZYSdPNdHAoqFn3M" +
-		"XQ3e6OJ2Ao9Uohr68CUCMt8YRgPXxCJ0PzRZ7#gP6Vyor$03kzBM7SIyv1wVvodmiylt9UC" +
-		"HoFPQHyucXlFywd8KfbYVY8jfvcC78TLQPWmMqURYVIWEz0NY8LT9bhRmfQzZRC9HW14fHX" +
-		"d9Ke1BLE1rZS1j6enPdCdOkpgCjmLHSI7i9CGkpSJMll87#JRWLj#DkUWk9T2oXJPC$uS3b" +
-		"AHJboHBZVa$Z3Y$Y6n$EcNfnBMHmLVJcskXhpvailibitd4kdqSU#yldapDFge2dJzTry1$" +
-		"hT7Us$z$LSUNOLypASloL1Nv3Ut95UpQJaGpk4KUZLTpXuRYvEbEhcBnoxWI7fuKNTqBPPj" +
-		"Q4dfWLUdKmp$bRbZSkJCfAHCDPdlKgkcINVQMmBuVMvLqNsNinC1anQiOtDI9QozMdaV0D3" +
-		"$MLOO5eeKPZoWRcr8ZplvDJQSEH2bznwHNQBbtRROHdKWaxZNB64lvUYDAEv9oULqhVs0H7" +
-		"B2hyAokP5LMrLBKocB#L3JGYyXMfb2YWBu0pc$ueyjCDDWtpb1SOxYwKbXDF4AjORnUn6d2" +
-		"pE7wUU9b#Bj6VoEFuDRrkBV4#jG7CNqWqShp5YpcBFNRpYK7g6tq9sT6SzVGBrLz6FwR#2l" +
-		"f5wizGVZBHQBXtPoQnbPYZuwTeXYJbJ2KE4dDr$0mnItkgelySmVj0azvNYtARvbGpleayc" +
-		"eC36kkWbagjXlm2yH6nWSZidDUD4hNgZmdqawtQMFel4PyHWrKRH$zLefaerlnAefQnEl8R" +
-		"H2inGMDJEklobmRSYQhN9EB4gg1cmEMpHxNvoS$qdy3yQSIpn3hYHTMQbRSH#yBvY6Xikta" +
-		"7waydzXDbEZvqbBcE74Nl2FY7EtqtC9UtnfAks#6jGN#TDPbt5CvnK$IzzT2SdVJJ0ZLscr" +
-		"XWBIrIVYnG8qsrnvLRgFK9#9b4ElrNkhg$f9vV3$XxULq$yfg0rkhjKwTHnsrcZmRy7F967" +
-		"MyEz9ZZCLOYwKz#bdPfan$bYFmklyaXEIW7v5VPB$la5pdC#0$4ztxsTyhjyYrjgp$wXlPp" +
-		"#PHscsfRPJFj9zR$MBXVP0knoOutoWxPBjm7yY6nmMeVo7loBfaxKzPRfT6l$ZMnbsZn5Pw" +
-		"DqkntrIvVoZlMUvjuIzPHsUF7TllU5xIx$D5Eeab#qYBZUROw$6f6557xHIcstwv$Hpbpo$" +
-		"KhEO9SPhzb2QGa#SbZmx4kuXx7sK#SDKiL9HOH8geSKIqQYAK4E5LZCVFRbzyZnwBI8k9p1" +
-		"Jc1why0dDIymG==");
+		"U9pjLbbmL4KKFU$DP192WB1bCSGGOlPCaiaaB8BYGbHKGC8MKHGbAegAkE364XKLt2Zzq2e" +
+		"$$D4$jVH7Yr89AYgAg8Yue8Y2Y28I5K44ZTVJFNTUdc766ZwfuasTFkSkVRlVc#v#3t3RC1" +
+		"3zaOr#w8j1w8C168mSz4O0cOP5S18AK8wPc8DhS3kMu5xqGYxoKO9IN8hBC1UtuXuyW2hv1" +
+		"sa9gfs9SRPY1ghXogifLaijAmTvI4yvzmGyac1#npt7kgVMhh4pCDJo1RH7emaHd8LY3ADr" +
+		"ccUFmMISvrcryZTcOIAoS2vNHv6lNwpY39$ThPhHWig44TDdQjB8XKcgNOVJa$QPd22IWp8" +
+		"YwDaFSVuFsnsMXKki5RBMKCost8BBiG33SODz6iQp25TP7eBvbk$2RHofqDkfDs8nbkD4py" +
+		"x2tHX9TJKMndtIWHKsrem7CGNDiXgJE58pVwsucEtDkDPQTwATUSkOyHhkPwKAr22CEjIZ0" +
+		"L4qOWH6uMISYbCmbf5pS3REntXCeAx1D4ndUn7HXYjm9NlFexuUD#4Mt46rbCZ2VMmpf0iE" +
+		"N9vQGPv18Pu96Jm5gXcfufCp3F80hfr1zdpBvRcHp$EWWC#Wa7TQnATbdau9JpkNkUK9glN" +
+		"bcZEL8gmqdFDEhLfgMQPk#L7b7Zc$uvvZtsFMMBQFC#tkwsFPuRaNjqsVRCzok69THgijQd" +
+		"pzOfNw##nk5UPUh4iOYOr#T94mPv2yMYX1nCpK86v7Q4NLM#kp7Dt15UGq$j9j3#DnDH9GD" +
+		"dQ8PqfyfwRJTlcBswPkgLMLdYzU8qokqxke89ipojYLjerPiJpNgW1Fi31d4sJ5C4$ae6qR" +
+		"B9j8ANMPrUQaCnomQ6J$MEycvWRLMw##2CorifsDY6mdzIFAg8LSIem2d2NjDWqBbPSQJXM" +
+		"ybXEF4ayIJxFUOQADIoYJzdF4IzJvH37HGBj3#wqZDjBNoFnbrCE8BR6OioB6RXCnGdKk$H" +
+		"p7pTESJkhHgX#dBb2zW7giwjdAJn5JZvoxop4TpjajqRovnBl4VBMV9Lh$syTvWkWY5gdz8" +
+		"l6Crfj0lOfOJ6E7tkSUvVsQCudnFUGM6brQ8qJmlt6da5SJ7SHU8iytLxv9t6cgf$lcKwo#" +
+		"LkgtYOD4bVfcKgyd#7yxKSqVGpGpDekyYToBF55ZCxhhyWqCTuxg#5Wl42#hBn3FvNBQfd5" +
+		"lNgc0LvHzNY6FD$UjDJOgc$lPvS$dEFfCdUSvjzwgvr5dKAJhFMSb7ilDJk8Vc2Z7h3Uj$n" +
+		"Zru2Hzyxkriuzs3b6eze7uclJb3p4#inSqvn1raQ$6uTW#SLQflKPvhQz6aVesAE#cJ$zli" +
+		"oxTShEUuy$n$y2SpRww1looSRRwV7mNkBNqxLGxPFQhJqVCFepVlwzV9CPOYHwN$2gTyhFi" +
+		"bR$aaFmf1#KFEI3xvNVP9xy9xrwuC#GdBtktSgVyoFO7pzh5TejyodQp#ZuHdYMooUgFv4E" +
+		"s7nCVM7k3V2wVoHUQoJqYxnFhhVMUl2LhoTpriivwtl56#PxOINpdUNQmtUxDhbE#bJUjUe" +
+		"DO8w$JyuqNs#QfhzbkzQolY2$b5oqoZjz#3hy00ugWVOkOzrHr2eWoDshVQUQBrE69x$gGr" +
+		"aFtj0s74iHZNCVvrB5clI9i4I22oW7r1NsnD1#dQon4P5ZTm3o39ek0nutaE4R#2$hHoqO=");
 
 	// suppress parser error reporting and let the custom error recovery mechanism handle it
 	private static class SDocEvents extends Events
@@ -456,14 +449,21 @@ public class SDocParser extends Parser {
 			
 			return function;
 			}
-			case 60: // ParamName = TEXT.name
+			case 58: // Type = PROPERTIES LESS_THAN Type.memberType GREATER_THAN
+			{
+					final Symbol _symbol_memberType = _symbols[offset + 3];
+					final Type memberType = (Type) _symbol_memberType.value;
+					
+			return new PropertiesType(memberType);
+			}
+			case 61: // ParamName = TEXT.name
 			{
 					final Symbol _symbol_name = _symbols[offset + 1];
 					final String name = (String) _symbol_name.value;
 					
 			return new Parameter(name);
 			}
-			case 61: // ParamName = LBRACKET TEXT.name RBRACKET
+			case 62: // ParamName = LBRACKET TEXT.name RBRACKET
 			{
 					final Symbol _symbol_name = _symbols[offset + 2];
 					final String name = (String) _symbol_name.value;
@@ -474,7 +474,7 @@ public class SDocParser extends Parser {
 			
 			return result;
 			}
-			case 62: // ParamName = ELLIPSIS
+			case 63: // ParamName = ELLIPSIS
 			{
 					
 			Parameter result = new Parameter("...");
@@ -483,7 +483,7 @@ public class SDocParser extends Parser {
 			
 			return result;
 			}
-			case 63: // ParamName = LBRACKET ELLIPSIS RBRACKET
+			case 64: // ParamName = LBRACKET ELLIPSIS RBRACKET
 			{
 					
 			Parameter result = new Parameter("...");
@@ -510,11 +510,11 @@ public class SDocParser extends Parser {
 			case 18: // opt$Text = Text
 			case 40: // TypeDelimiter = COMMA
 			case 41: // TypeDelimiter = PIPE
-			case 58: // ReturnDelimiter = COLON
-			case 59: // ReturnDelimiter = ARROW
-			case 64: // Namespace = IDENTIFIER
-			case 65: // Namespace = FUNCTION
-			case 66: // Namespace = ARRAY
+			case 59: // ReturnDelimiter = COLON
+			case 60: // ReturnDelimiter = ARROW
+			case 65: // Namespace = IDENTIFIER
+			case 66: // Namespace = FUNCTION
+			case 67: // Namespace = ARRAY
 			{
 				return _symbols[offset + 1];
 			}
