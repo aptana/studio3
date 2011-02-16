@@ -57,6 +57,24 @@
 
 		return parse(fScanner);
 	}
+
+	/**
+	 * parseType
+	 * 
+	 * @param source
+	 * @return
+	 * @throws java.lang.Exception
+	 */
+	public List<Type> parseType(String source) throws java.lang.Exception
+	{
+		fScanner.setOffset(0);
+		fScanner.setSource(source);
+		fScanner.queueTypeTokens(0, source.length());
+
+		Object result = parse(fScanner, AltGoals.Types);
+
+		return (result instanceof List) ? (List<Type>) result : null;
+	}
 :};
 %init {:
 	report = new SDocEvents();
@@ -81,6 +99,7 @@
 %typeof Type = "Type";
 
 %goal Grammar;
+%goal Types;
 
 Grammar
 	=	Block
