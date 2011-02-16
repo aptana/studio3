@@ -1,0 +1,3 @@
+<docs>
+	<exception cref="CustomError">This is an exception</exception>
+</docs>

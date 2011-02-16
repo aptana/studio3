@@ -1,0 +1,3 @@
+<docs>
+	<param name="xyz" optional="false" parameterArray="false" type="String">This is a parameter</param>
+</docs>
