@@ -7,7 +7,6 @@
  */
 package com.aptana.js.debug.ui.internal.preferences;
 
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -69,7 +68,6 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 	private CheckboxTableViewer listViewer;
 	private SourceViewer sourceViewer;
 
-	private List<String> types;
 	private Set<DetailFormatter> formatters;
 
 	/**
@@ -86,7 +84,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		initializeDialogUnits(parent);
 
 		Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).margins(0, 0).create());
+		composite.setLayout(GridLayoutFactory.swtDefaults().numColumns(2).create());
 
 		GridDataFactory.fillDefaults().applyTo(composite);
 		composite.setFont(parent.getFont());
@@ -253,7 +251,7 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 
 	private void addType() {
 		DetailFormatter detailFormatfer = new DetailFormatter(StringUtil.EMPTY, StringUtil.EMPTY, true);
-		DetailFormatterDialog dlg = new DetailFormatterDialog(getShell(), detailFormatfer, types, false);
+		DetailFormatterDialog dlg = new DetailFormatterDialog(getShell(), detailFormatfer, null, false);
 		if (dlg.open() == Window.OK) {
 			addDetailFormatter(detailFormatfer);
 		}
@@ -323,7 +321,6 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 
 	private void addDetailFormatter(DetailFormatter detailFormatter) {
 		formatters.add(detailFormatter);
-		types.add(detailFormatter.getTypeName());
 		listViewer.refresh();
 		updateViewerCheckboxes();
 		IStructuredSelection selection = new StructuredSelection(detailFormatter);
@@ -334,7 +331,6 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 	private void removeDetailFormatters(DetailFormatter[] detailFormatters) {
 		for (DetailFormatter detailFormatter : detailFormatters) {
 			formatters.remove(detailFormatter);
-			types.remove(detailFormatter.getTypeName());
 		}
 		listViewer.refresh();
 		listViewer.setSelection(StructuredSelection.EMPTY);
@@ -345,7 +341,6 @@ public class JSDetailFormattersPreferencePage extends PreferencePage implements 
 		formatters = new TreeSet<DetailFormatter>();
 		for (DetailFormatter detailFormatter : JSDebugPlugin.getDefault().getDebugOptionsManager().getDetailFormatters()) {
 			formatters.add(detailFormatter);
-			types.add(detailFormatter.getTypeName());
 		}
 	}
 

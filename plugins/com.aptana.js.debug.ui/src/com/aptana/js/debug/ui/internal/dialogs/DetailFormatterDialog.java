@@ -48,7 +48,6 @@ public class DetailFormatterDialog extends StatusDialog {
 	private SourceViewer snippetViewer;
 
 	private DetailFormatter formatter;
-	private String type;
 	private List<String> definedTypes;
 	private boolean editTypeName;
 
@@ -90,7 +89,7 @@ public class DetailFormatterDialog extends StatusDialog {
 		container.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
 
 		typeName = new Text(container, SWT.SINGLE | SWT.BORDER);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(typeName);
+		GridDataFactory.swtDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(typeName);
 		typeName.setEditable(editTypeName);
 		typeName.setText(formatter.getTypeName());
 		typeName.setFont(font);
@@ -113,9 +112,7 @@ public class DetailFormatterDialog extends StatusDialog {
 
 		snippetViewer = new SourceViewer(composite, null, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		GridDataFactory.fillDefaults().grab(true, true)
-		// CHECKSTYLE:OFF
 				.hint(convertWidthInCharsToPixels(80), convertHeightInCharsToPixels(10))
-				// CHECKSTYLE:ON
 				.applyTo(snippetViewer.getControl());
 
 		enabled = new Button(composite, SWT.CHECK | SWT.LEFT);
@@ -170,8 +167,7 @@ public class DetailFormatterDialog extends StatusDialog {
 		if (dlg.open() == Window.OK) {
 			Object[] types = dlg.getResult();
 			if (types != null && types.length > 0) {
-				type = (String) types[0];
-				typeName.setText(type);
+				typeName.setText((String) types[0]);
 			}
 		}
 	}
@@ -193,8 +189,6 @@ public class DetailFormatterDialog extends StatusDialog {
 			status.setError(Messages.DetailFormatterDialog_DetailFormatterIsDefinedForThisType);
 		} else if (snippetViewer.getDocument().get().trim().length() == 0) {
 			status.setError(Messages.DetailFormatterDialog_CodeSnippetMustNotBeEmpty);
-		} else if (type == null) {
-			status.setWarning(Messages.DetailFormatterDialog_NoTypeWithGivenNameFoundInWorkspace);
 		}
 		updateStatus(status);
 	}
