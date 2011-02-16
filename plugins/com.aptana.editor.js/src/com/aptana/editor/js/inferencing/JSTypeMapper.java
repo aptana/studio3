@@ -94,8 +94,6 @@ public class JSTypeMapper
 	 */
 	protected void loadMappings()
 	{
-		// this.addTypeMapping("jQuery", "Function<jQuery>:jQuery");
-
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 
 		if (registry != null)
