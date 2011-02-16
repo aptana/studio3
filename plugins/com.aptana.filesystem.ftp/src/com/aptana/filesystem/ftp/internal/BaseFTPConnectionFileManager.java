@@ -76,11 +76,10 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 				if (tempFileInfo != null) {
 					defaultOwner = tempFileInfo.getOwner();
 					defaultGroup = tempFileInfo.getGroup();
-				} else {
-					return false;
 				}
 			}
-			if (!defaultOwner.equals(fileInfo.getOwner())
+			if (defaultOwner == null || defaultGroup == null
+				|| !defaultOwner.equals(fileInfo.getOwner())
 				|| !defaultGroup.equals(fileInfo.getGroup())) {
 				return false;
 			}
