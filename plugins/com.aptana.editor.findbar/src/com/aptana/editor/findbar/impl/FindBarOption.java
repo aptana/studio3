@@ -29,7 +29,7 @@ import com.aptana.editor.findbar.FindBarPlugin;
  * 
  * @author Fabio Zadrozny
  */
-public abstract class FindBarOption extends SelectionAdapter implements SelectionListener
+abstract class FindBarOption extends SelectionAdapter implements SelectionListener
 {
 	/**
 	 * The image to be gotten for the item.
