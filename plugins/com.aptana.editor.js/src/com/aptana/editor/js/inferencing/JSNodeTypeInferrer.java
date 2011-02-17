@@ -402,6 +402,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		if (child instanceof JSNode)
 		{
 			List<String> types = this.getTypes(child);
+			List<String> returnTypes = new ArrayList<String>();
 
 			for (String typeName : types)
 			{
@@ -411,7 +412,24 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				{
 					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
 					{
-						this.addType(returnTypeName);
+						returnTypes.add(returnTypeName);
+					}
+				}
+				else
+				{
+					returnTypes.add(typeName);
+				}
+			}
+
+			for (String typeName : returnTypes)
+			{
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, JSTypeConstants.PROTOTYPE_PROPERTY);
+
+				if (property != null)
+				{
+					for (String propertyType : property.getTypeNames())
+					{
+						this.addType(propertyType);
 					}
 				}
 			}
