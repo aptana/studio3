@@ -108,7 +108,7 @@ public class SDocScanner extends Scanner
 	 * @param typesLength
 	 * @throws Exception
 	 */
-	protected void queueTypeTokens(int typesOffset, int typesLength) throws Exception
+	public void queueTypeTokens(int typesOffset, int typesLength) throws Exception
 	{
 		fTypeTokenScanner.setRange(fDocument, typesOffset, typesLength);
 		IToken token = fTypeTokenScanner.nextToken();

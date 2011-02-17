@@ -58,20 +58,18 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 		memento.createChild(ELEMENT_NAME).putTextData(name);
 	}
 
+	/**
+	 * Returns true if this type of configurations should be persistent by manager
+	 * @return
+	 */
 	protected boolean isPersistent() {
 		return true;
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org
-	 * .eclipse.core.runtime.IConfigurationElement, java.lang.String,
-	 * java.lang.Object)
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
 	 */
-	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-			throws CoreException {
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 		type = config.getAttribute(ServerConfigurationManager.ATT_ID);
 	}
 
@@ -80,8 +78,6 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see com.aptana.core.Identifiable#getId()
 	 */
 	public final String getId() {

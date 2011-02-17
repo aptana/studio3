@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.js.debug.core;
@@ -75,6 +48,7 @@ import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.WorkspaceResolvingURLMapper;
 
 /**
  * @author Max Stepanov
@@ -159,18 +133,13 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		IURLMapper urlMapper = null;
 		try {
 			IResource startResource = null;
+			IPath startPath = null;
 			switch (startActionType) {
 			case ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE:
 				startResource = getCurrentEditorResource();
 				if (startResource == null) {
-					IPath path = getCurrentEditorPath();
-					if (path != null) {
-						if (debug && InternetExplorer.isBrowserExecutable(browserExecutable)) {
-							throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
-									Messages.JSLaunchConfigurationDelegate_Only_Project_Debugging_Supported, null));
-						}
-						launchURL = path.toFile().toURI().toURL();
-					} else {
+					startPath = getCurrentEditorPath();
+					if (startPath == null) {
 						launchURL = getCurrentEditorURL();
 						if (launchURL == null) {
 							monitor.setCanceled(true);
@@ -190,7 +159,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				break;
 			}
 			
-			if (startResource == null && launchURL == null) {
+			if (startResource == null && startPath == null && launchURL == null) {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
 			}
@@ -212,6 +181,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
+				if (startResource != null) {
+					urlMapper = new WorkspaceResolvingURLMapper(urlMapper);
+				}
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 				String externalBaseUrl = configuration.getAttribute(
 						ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
@@ -222,16 +194,31 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				if (externalBaseUrl.charAt(externalBaseUrl.length() - 1) != '/') {
 					externalBaseUrl = externalBaseUrl + '/';
 				}
-				urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				if (startResource != null) {
+					urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				}
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_No_Server_Type, null));
 			}
 			
 			if (urlMapper != null) {
-				launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+				if (startResource != null) {
+					launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+				} else if (startPath != null) {
+					launchURL = urlMapper.resolve(EFSUtils.getLocalFileStore(startPath.toFile()));
+					if (launchURL == null) {
+						launchURL = startPath.toFile().toURI().toURL();
+					}
+				}
+			} else if (launchURL == null && startPath != null) {
+				launchURL = startPath.toFile().toURI().toURL();
 			}
 
+			if (launchURL == null) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
+			}
 			String httpGetQuery = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
 			if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null && launchURL.getRef() == null) {
 				if (httpGetQuery.charAt(0) != '?') {

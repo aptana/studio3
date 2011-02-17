@@ -134,8 +134,8 @@ public class FindBarFinder
 					{
 						// When searching backward, we have to get the offset-1 (otherwise it doesn't work properly)
 						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget).findAndSelect(forward ? offset
-								: offset - 1, findText, forward, dec.caseSensitive.getSelection(), dec.getWholeWord(),
-								dec.regularExpression.getSelection());
+								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec.getWholeWord(),
+								dec.getConfiguration().getRegularExpression());
 					}
 					catch (PatternSyntaxException e)
 					{
@@ -146,11 +146,12 @@ public class FindBarFinder
 				else
 				{
 					newOffset = findReplaceTarget.findAndSelect(offset, findText, forward,
-							dec.caseSensitive.getSelection(), dec.getWholeWord());
+							dec.getConfiguration().getCaseSensitive(), dec.getWholeWord());
 				}
 
 				if (newOffset != -1)
 				{
+					dec.combo.setBackground(null);
 					if (!forward)
 					{
 						selection = textWidget.getSelection();
@@ -174,7 +175,8 @@ public class FindBarFinder
 							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
 						}
 					}
-					dec.statusLineManager.setMessage(true, Messages.FindBarDecorator_MSG_StringNotFound, null);
+					dec.combo.setBackground(dec.getfStringNotFoundColor());
+					dec.statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			}
 			finally

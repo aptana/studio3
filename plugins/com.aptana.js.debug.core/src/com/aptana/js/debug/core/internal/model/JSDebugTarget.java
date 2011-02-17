@@ -1,35 +1,8 @@
 /**
- * This file Copyright (c) 2005-2008 Aptana, Inc. This program is
- * dual-licensed under both the Aptana Public License and the GNU General
- * Public license. You may elect to use one or the other of these licenses.
- * 
- * This program is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT. Redistribution, except as permitted by whichever of
- * the GPL or APL you select, is prohibited.
- *
- * 1. For the GPL license (GPL), you can redistribute and/or modify this
- * program under the terms of the GNU General Public License,
- * Version 3, as published by the Free Software Foundation.  You should
- * have received a copy of the GNU General Public License, Version 3 along
- * with this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- * 
- * Aptana provides a special exception to allow redistribution of this file
- * with certain other free and open source software ("FOSS") code and certain additional terms
- * pursuant to Section 7 of the GPL. You may view the exception and these
- * terms on the web at http://www.aptana.com/legal/gpl/.
- * 
- * 2. For the Aptana Public License (APL), this program and the
- * accompanying materials are made available under the terms of the APL
- * v1.0 which accompanies this distribution, and is available at
- * http://www.aptana.com/legal/apl/.
- * 
- * You may view the GPL, Aptana's exception and additional terms, and the
- * APL in the file titled license.html at the root of the corresponding
- * plugin containing this source file.
- * 
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.js.debug.core.internal.model;
@@ -86,6 +59,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
+import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
@@ -1172,7 +1146,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		List<IVariable> list = new ArrayList<IVariable>();
 		String[] args = connection.sendCommandAndWait(MessageFormat.format(VARIABLES_0, Util.encodeData(qualifier)));
 		if (args != null) {
-			for (String varData : args) {
+			for (int i = 1; i < args.length; ++i) {
+				String varData = args[i];
 				int j = 0;
 				if (varData.length() == 0) {
 					break;
@@ -1391,21 +1366,21 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (fileName != null && urlMapper != null) {
 				url = urlMapper.resolve(EFS.getStore(fileName));
 			}
-			/*
-			if (uri != null) {
-				if ("dbgsource".equals(uri.getScheme())) //$NON-NLS-1$
-				{
-					url = new URL(null, uri.toString(), DbgSourceURLStreamHandler.getDefault());
-				} else {
-					url = uri.toURL();
+			if (url == null && fileName != null) {
+				try {
+					if ("dbgsource".equals(fileName.getScheme())) { //$NON-NLS-1$
+						url = new URL(null, fileName.toString(), DbgSourceURLStreamHandler.getDefault());
+					} else {
+						url = fileName.toURL();
+					}
+				} catch (MalformedURLException e) {
 				}
 			}
-			*/
 		} catch (CoreException e) {
 			JSDebugPlugin.log(e);
 		}
 		int lineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1);
-		if (lineNumber == -1) {
+		if (lineNumber == -1 || url == null) {
 			return;
 		}
 
@@ -1599,7 +1574,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			String scheme = uri.getScheme();
 			if (FILE.equals(scheme)) {
 				File osFile = new File(uri.getSchemeSpecificPart());
-				resolved = EFSUtils.fromLocalFile(osFile).toURI();
+				resolved = EFSUtils.getLocalFileStore(osFile).toURI();
 			} else if (HTTP.equals(scheme) && urlMapper != null) {
 				IFileStore fileStore = urlMapper.resolve(uri.toURL());
 				if (fileStore != null) {
