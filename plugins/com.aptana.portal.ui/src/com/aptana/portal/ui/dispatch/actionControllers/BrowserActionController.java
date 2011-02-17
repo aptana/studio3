@@ -17,6 +17,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
 import com.aptana.portal.ui.PortalUIPlugin;
+import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.dispatch.IBrowserNotificationConstants;
 import com.aptana.portal.ui.internal.Portal;
 
@@ -32,12 +33,13 @@ public class BrowserActionController extends AbstractActionController
 	/**
 	 * Refresh the portal by trying to re-connect to the remote content.<br>
 	 * This action is useful when the user was offline while the portal was opened. In that case, a 'reload' button on
-	 * the offline content will call this function in order to re-initiate the portal loading.
+	 * the offline content will call this function in order to re-initiate the portal loading.<br>
+	 * Note: The refresh is done on the PortalBrowserEditor.WEB_BROWSER_EDITOR_ID portal only (at this time)
 	 */
 	@ControllerAction
 	public Object refreshPortal(Object attributes)
 	{
-		Portal.getInstance().openPortal(null);
+		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
 		return IBrowserNotificationConstants.JSON_OK;
 	}
 

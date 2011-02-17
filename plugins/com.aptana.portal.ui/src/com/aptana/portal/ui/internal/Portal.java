@@ -105,8 +105,11 @@ public class Portal
 	 * 
 	 * @param url
 	 *            A URL (can be null).
+	 * @param browserEditorId
+	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
+	 *            point.
 	 */
-	public void openPortal(URL url)
+	public void openPortal(URL url, final String browserEditorId)
 	{
 		try
 		{
@@ -140,8 +143,7 @@ public class Portal
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try
 				{
-					portalBrowser = (PortalBrowserEditor) page.openEditor(input,
-							PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
+					portalBrowser = (PortalBrowserEditor) page.openEditor(input, browserEditorId);
 					portalBrowser.addDisposeListener(new PortalDisposeListener());
 				}
 				catch (PartInitException e)

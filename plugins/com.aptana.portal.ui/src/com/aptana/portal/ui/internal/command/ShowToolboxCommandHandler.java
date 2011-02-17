@@ -11,6 +11,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
+import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.internal.Portal;
 
 /**
@@ -27,7 +28,7 @@ public class ShowToolboxCommandHandler extends AbstractHandler
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		Portal.getInstance().openPortal(null);
+		Portal.getInstance().openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
 		return null;
 	}
 }
