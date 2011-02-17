@@ -7,9 +7,7 @@
  */
 package com.aptana.editor.common;
 
-import java.net.URI;
-
-import org.eclipse.core.filesystem.URIUtil;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResourceDelta;
@@ -17,12 +15,10 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.ui.texteditor.AbstractMarkerAnnotationModel;
 
-import com.aptana.core.resources.AbstractUniformResource;
-import com.aptana.core.resources.IMarkerConstants;
+import com.aptana.core.resources.FileStoreUniformResource;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceChangeEvent;
 import com.aptana.core.resources.IUniformResourceChangeListener;
@@ -35,16 +31,16 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel
 	private IUniformResource resource;
 	private IUniformResourceChangeListener resourceChangeListener;
 
-	public ExternalFileAnnotationModel(IPath file)
+	public ExternalFileAnnotationModel(IFileStore fileStore)
 	{
-		resource = new DefaultUniformResource(file);
+		resource = new FileStoreUniformResource(fileStore);
 		resourceChangeListener = new ResourceChangeListener();
 	}
 
 	@Override
 	protected IMarker[] retrieveMarkers() throws CoreException
 	{
-		return MarkerUtils.findMarkers(resource, IMarkerConstants.PROBLEM_MARKER, true);
+		return MarkerUtils.findMarkers(resource, IMarker.MARKER, true);
 	}
 
 	@Override
@@ -113,22 +109,6 @@ public class ExternalFileAnnotationModel extends AbstractMarkerAnnotationModel
 			}
 		}
 		fireModelChanged();
-	}
-
-	private class DefaultUniformResource extends AbstractUniformResource
-	{
-
-		private URI uri;
-
-		public DefaultUniformResource(IPath path)
-		{
-			uri = URIUtil.toURI(path);
-		}
-
-		public URI getURI()
-		{
-			return uri;
-		}
 	}
 
 	private class ResourceChangeListener implements IUniformResourceChangeListener

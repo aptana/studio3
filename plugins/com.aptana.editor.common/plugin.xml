@@ -572,4 +572,14 @@
             name="%page.validation.name">
       </page>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"
+            class="com.aptana.editor.common.internal.FileStoreEditorInputUniformResource$Factory">
+         <adapter
+               type="com.aptana.core.resources.IUniformResource">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>
