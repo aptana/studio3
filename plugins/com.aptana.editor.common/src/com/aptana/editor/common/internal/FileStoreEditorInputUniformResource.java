@@ -10,18 +10,15 @@ package com.aptana.editor.common.internal;
 
 import java.net.URI;
 
-import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.core.resources.AbstractUniformResource;
-import com.aptana.core.resources.IUniformResource;
 
 /**
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("rawtypes")
-public final class FileStoreEditorInputUniformResource extends AbstractUniformResource {
+/* package */ final class FileStoreEditorInputUniformResource extends AbstractUniformResource {
 
 	private final FileStoreEditorInput editorInput;
 	
@@ -30,10 +27,19 @@ public final class FileStoreEditorInputUniformResource extends AbstractUniformRe
 		this.editorInput = editorInput;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.resources.IUniformResource#getURI()
+	 */
 	public URI getURI() {
 		return editorInput.getURI();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
+	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object getAdapter(Class adapter) {
 		Object object = super.getAdapter(adapter);
@@ -41,27 +47,6 @@ public final class FileStoreEditorInputUniformResource extends AbstractUniformRe
 			object = editorInput.getAdapter(adapter);
 		}
 		return object;
-	}
-
-	public static class Factory implements IAdapterFactory {
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
-		 */
-		public Object getAdapter(final Object adaptableObject, Class adapterType) {
-			if (IUniformResource.class == adapterType && adaptableObject instanceof FileStoreEditorInput) {
-				return new FileStoreEditorInputUniformResource((FileStoreEditorInput) adaptableObject);
-			}
-			return null;
-		}
-
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
-		 */
-		public Class[] getAdapterList() {
-			return new Class[] { IUniformResource.class };
-		}
-
 	}
 
 }
