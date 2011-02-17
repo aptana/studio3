@@ -50,7 +50,7 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	public static final String BASE_URL_PREFIX = "http://173.45.232.197/toolbox"; //$NON-NLS-1$
+	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
 
 	// Note: 173.45.232.197 is the staging site
 	// For debugging, do NOT check in with these uncommented:
