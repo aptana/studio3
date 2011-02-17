@@ -35,9 +35,8 @@ public class FindBarEntriesHelper
 {
 
 	/**
-	 * Keep the items that we're controlling so that we can update the combo when the preferences change.
-	 * 
-	 * Note that it's identity compared/hashed.
+	 * Keep the items that we're controlling so that we can update the combo when the preferences change. Note that it's
+	 * identity compared/hashed.
 	 */
 	static class EntriesControlHandle
 	{
@@ -59,7 +58,6 @@ public class FindBarEntriesHelper
 	 */
 	private Map<String, Set<EntriesControlHandle>> preferenceToComboAndListener = new HashMap<String, Set<EntriesControlHandle>>();
 
-	
 	private Properties createPropertiesFromString(String asPortableString)
 	{
 		Properties properties = new Properties();
@@ -119,8 +117,8 @@ public class FindBarEntriesHelper
 	private static final Object lock = new Object();
 
 	/**
-	 * When a search is entered, this method should be called to add the searched text to the list of 
-	 * available searches (and it'll be replicated for all the combos controlled).
+	 * When a search is entered, this method should be called to add the searched text to the list of available searches
+	 * (and it'll be replicated for all the combos controlled).
 	 */
 	public void addEntry(String entry, String preferenceName)
 	{
@@ -205,7 +203,8 @@ public class FindBarEntriesHelper
 					if (preferenceName.equals(event.getProperty()))
 					{
 						List<String> entries = loadEntries(preferenceName);
-						for(EntriesControlHandle entry:usedInternal){
+						for (EntriesControlHandle entry : usedInternal)
+						{
 							setItemsInCombo(entry.combo, entry.modifyListener, entries);
 						}
 					}
