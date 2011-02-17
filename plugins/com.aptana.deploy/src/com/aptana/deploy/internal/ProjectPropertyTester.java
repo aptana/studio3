@@ -16,6 +16,7 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 
@@ -87,7 +88,14 @@ public class ProjectPropertyTester extends PropertyTester
 	private static boolean isFTPProject(IProject project)
 	{
 		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(project);
-		return siteConnections.length > 0;
+		for (ISiteConnection site : siteConnections)
+		{
+			if (site.getDestination() instanceof IBaseRemoteConnectionPoint)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean isEngineYardProject(IProject project)

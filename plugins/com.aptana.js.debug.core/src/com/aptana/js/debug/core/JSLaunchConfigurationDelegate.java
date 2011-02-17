@@ -48,6 +48,7 @@ import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.WorkspaceResolvingURLMapper;
 
 /**
  * @author Max Stepanov
@@ -132,18 +133,13 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 		IURLMapper urlMapper = null;
 		try {
 			IResource startResource = null;
+			IPath startPath = null;
 			switch (startActionType) {
 			case ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE:
 				startResource = getCurrentEditorResource();
 				if (startResource == null) {
-					IPath path = getCurrentEditorPath();
-					if (path != null) {
-						if (debug && InternetExplorer.isBrowserExecutable(browserExecutable)) {
-							throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
-									Messages.JSLaunchConfigurationDelegate_Only_Project_Debugging_Supported, null));
-						}
-						launchURL = path.toFile().toURI().toURL();
-					} else {
+					startPath = getCurrentEditorPath();
+					if (startPath == null) {
 						launchURL = getCurrentEditorURL();
 						if (launchURL == null) {
 							monitor.setCanceled(true);
@@ -163,7 +159,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				break;
 			}
 			
-			if (startResource == null && launchURL == null) {
+			if (startResource == null && startPath == null && launchURL == null) {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
 			}
@@ -185,6 +181,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
+				if (startResource != null) {
+					urlMapper = new WorkspaceResolvingURLMapper(urlMapper);
+				}
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 				String externalBaseUrl = configuration.getAttribute(
 						ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
@@ -195,16 +194,31 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				if (externalBaseUrl.charAt(externalBaseUrl.length() - 1) != '/') {
 					externalBaseUrl = externalBaseUrl + '/';
 				}
-				urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				if (startResource != null) {
+					urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				}
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_No_Server_Type, null));
 			}
 			
 			if (urlMapper != null) {
-				launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+				if (startResource != null) {
+					launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+				} else if (startPath != null) {
+					launchURL = urlMapper.resolve(EFSUtils.getLocalFileStore(startPath.toFile()));
+					if (launchURL == null) {
+						launchURL = startPath.toFile().toURI().toURL();
+					}
+				}
+			} else if (launchURL == null && startPath != null) {
+				launchURL = startPath.toFile().toURI().toURL();
 			}
 
+			if (launchURL == null) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
+			}
 			String httpGetQuery = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
 			if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null && launchURL.getRef() == null) {
 				if (httpGetQuery.charAt(0) != '?') {

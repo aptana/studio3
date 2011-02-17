@@ -8,6 +8,7 @@
 package com.aptana.editor.common;
 
 import org.eclipse.core.filebuffers.IAnnotationModelFactory;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -24,6 +25,6 @@ public class ExternalFileAnnotationModelFactory implements IAnnotationModelFacto
 		{
 			return new ResourceMarkerAnnotationModel(file);
 		}
-		return new ExternalFileAnnotationModel(location);
+		return new ExternalFileAnnotationModel(EFS.getLocalFileSystem().getStore(location));
 	}
 }

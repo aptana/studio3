@@ -24,6 +24,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -87,7 +88,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				IMarker marker = resource.createMarker(IJSDebugConstants.ID_EXCEPTION_BREAKPOINT_MARKER);
+				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_EXCEPTION_BREAKPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
 				attributes.put(IJSDebugConstants.EXCEPTION_TYPE_NAME, exceptionTypeName);
@@ -117,7 +118,7 @@ public class JSDebugExceptionBreakpoint extends Breakpoint implements IJSExcepti
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
 				IMarker marker = MarkerUtils.createMarker(resource, attributes,
-						IJSDebugConstants.ID_EXCEPTION_BREAKPOINT_MARKER);
+						IDebugCoreConstants.ID_EXCEPTION_BREAKPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
 				attributes.put(IJSDebugConstants.EXCEPTION_TYPE_NAME, exceptionTypeName);

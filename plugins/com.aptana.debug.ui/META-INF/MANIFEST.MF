@@ -14,6 +14,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.ui.workbench.texteditor,
  com.aptana.core,
+ org.eclipse.core.filesystem,
  com.aptana.debug.core,
  com.aptana.ui
 Eclipse-LazyStart: true

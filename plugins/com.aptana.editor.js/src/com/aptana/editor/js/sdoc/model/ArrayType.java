@@ -55,9 +55,9 @@ public class ArrayType extends Type
 
 		if (this._memberType != Type.OBJECT_TYPE)
 		{
-			writer.print("<"); //$NON-NLS-1$
+			writer.print(JSTypeConstants.GENERIC_OPEN);
 			this._memberType.toSource(writer);
-			writer.print(">"); //$NON-NLS-1$
+			writer.print(JSTypeConstants.GENERIC_CLOSE);
 		}
 	}
 }

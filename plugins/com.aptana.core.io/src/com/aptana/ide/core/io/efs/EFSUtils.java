@@ -46,11 +46,19 @@ public final class EFSUtils
 
 	public static IFileStore getFileStore(IResource resource)
 	{
+		if (resource == null)
+		{
+			return null;
+		}
 		return WorkspaceFileSystem.getInstance().getStore(resource.getFullPath());
 	}
 
 	public static IFileStore getLocalFileStore(File file)
 	{
+		if (file == null)
+		{
+			return null;
+		}
 		return EFS.getLocalFileSystem().fromLocalFile(file);
 	}
 	

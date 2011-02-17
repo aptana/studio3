@@ -21,6 +21,7 @@ import org.eclipse.debug.core.model.Breakpoint;
 import org.eclipse.debug.core.model.IBreakpoint;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.debug.core.IDebugCoreConstants;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSVariable;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
@@ -94,7 +95,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 			final boolean register) throws CoreException {
 		IWorkspaceRunnable wr = new IWorkspaceRunnable() {
 			public void run(IProgressMonitor monitor) throws CoreException {
-				IMarker marker = resource.createMarker(IJSDebugConstants.ID_WATCHPOINT_MARKER);
+				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_WATCHPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
 				attributes.put(IJSDebugConstants.WATCHPOINT_VARIABLE_ACCESSOR, ((JSDebugVariable) variable).getQualifier());

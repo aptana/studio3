@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
 
-import com.aptana.core.resources.LocalFileStorage;
 import com.aptana.ide.core.io.efs.EFSUtils;
 
 /**
@@ -38,7 +37,12 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 		URI uri = null;
 		try {
 			uri = new URI(uriString);
+			if (uri.getScheme() == null) {
+				uri = null;
+			}
 		} catch (URISyntaxException e) {
+		}
+		if (uri == null) {
 			IResource resource = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(uriString));
 			if (resource != null) {
 				uri = EFSUtils.getFileStore(resource).toURI();
@@ -53,11 +57,11 @@ public class LocalFileSourceContainer extends AbstractSourceContainer {
 				}
 				File file = (File) fileStore.getAdapter(File.class);
 				if (file != null && file.isFile()) {
-					return new Object[] { new LocalFileStorage(file) }; // TODO: check if we could use iFileStore here instead
+					return new Object[] { fileStore }; // TODO: check if we could use iFileStore here instead
 				}
 				file = fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
 				if (file != null && file.isFile()) {
-					return new Object[] { new LocalFileStorage(file) }; // TODO: check if we could use iFileStore here instead
+					return new Object[] { fileStore }; // TODO: check if we could use iFileStore here instead
 				}
 			}
 		}

@@ -8,7 +8,6 @@
 package com.aptana.editor.common;
 
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -60,7 +59,7 @@ import org.eclipse.ui.texteditor.TextOperationAction;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
-import com.aptana.core.resources.AbstractUniformResource;
+import com.aptana.core.resources.IUniformResource;
 import com.aptana.editor.common.actions.FilterThroughCommandAction;
 import com.aptana.editor.common.actions.FoldingActionsGroup;
 import com.aptana.editor.common.extensions.FindBarEditorExtension;
@@ -86,7 +85,6 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.util.UIUtils;
 
 /**
  * Provides a way to override the editor fg, bg caret, highlight and selection from what is set in global text editor
@@ -536,14 +534,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		}
 		else
 		{
-			resource = new AbstractUniformResource()
-			{
-
-				public URI getURI()
-				{
-					return UIUtils.getURI(input);
-				}
-			};
+			resource = input.getAdapter(IUniformResource.class);
 		}
 		getFileService().setResource(resource);
 	}

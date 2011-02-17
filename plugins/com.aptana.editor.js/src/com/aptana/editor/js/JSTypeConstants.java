@@ -23,12 +23,14 @@ public class JSTypeConstants
 	public static final String STRING_TYPE = "String"; //$NON-NLS-1$
 	public static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 	public static final String USER_TYPE = "UserType"; //$NON-NLS-1$
+	public static final String PROPERTIES_TYPE = "Properties"; //$NON-NLS-1$
 
 	public static final String NO_TYPE = "none"; //$NON-NLS-1$
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
 	public static final String VOID_TYPE = "void"; //$NON-NLS-1$
 	public static final String NULL_TYPE = "null"; //$NON-NLS-1$
 
+	public static final String PROTOTYPE_PROPERTY = "prototype"; //$NON-NLS-1$
 	public static final String WINDOW_PROPERTY = "window"; //$NON-NLS-1$
 
 	public static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
