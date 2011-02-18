@@ -20,6 +20,7 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
@@ -43,6 +44,31 @@ public class HTMLIndexQueryHelper
 	public HTMLIndexQueryHelper()
 	{
 		this._reader = new HTMLIndexReader();
+	}
+
+	/**
+	 * getAttribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	private List<AttributeElement> getAttribute(String name)
+	{
+		List<AttributeElement> result = Collections.emptyList();
+
+		if (name != null && name.length() > 0)
+		{
+			try
+			{
+				result = this._reader.getAttribute(getIndex(), name);
+			}
+			catch (IOException e)
+			{
+				HTMLPlugin.logError(e.getMessage(), e);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -90,48 +116,29 @@ public class HTMLIndexQueryHelper
 
 		return result;
 	}
-	
+
 	/**
-	 * getAttribute
+	 * getAttributes
 	 * 
-	 * @param name
+	 * @param element
 	 * @return
 	 */
-	private List<AttributeElement> getAttribute(String name)
+	public List<AttributeElement> getAttributes(ElementElement element)
 	{
 		List<AttributeElement> result = Collections.emptyList();
-		
-		if (name != null && name.length() > 0)
+
+		if (element != null)
 		{
+			List<String> names = element.getAttributes();
+
 			try
 			{
-				result = this._reader.getAttributes(getIndex(), name);
+				result = this._reader.getAttributes(getIndex(), names);
 			}
 			catch (IOException e)
 			{
 				HTMLPlugin.logError(e.getMessage(), e);
 			}
-		}
-		
-		return result;
-	}
-
-	/**
-	 * getAttributes
-	 * 
-	 * @return
-	 */
-	public List<AttributeElement> getAttributes()
-	{
-		List<AttributeElement> result = Collections.emptyList();
-
-		try
-		{
-			result = this._reader.getAttributes(getIndex());
-		}
-		catch (IOException e)
-		{
-			HTMLPlugin.logError(e.getMessage(), e);
 		}
 
 		return result;
@@ -214,6 +221,33 @@ public class HTMLIndexQueryHelper
 		catch (IOException e)
 		{
 			HTMLPlugin.logError(e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param element
+	 * @return
+	 */
+	public List<EventElement> getEvents(ElementElement element)
+	{
+		List<EventElement> result = Collections.emptyList();
+
+		if (element != null)
+		{
+			List<String> names = element.getEvents();
+
+			try
+			{
+				result = this._reader.getEvents(getIndex(), names);
+			}
+			catch (IOException e)
+			{
+				HTMLPlugin.logError(e.getMessage(), e);
+			}
 		}
 
 		return result;

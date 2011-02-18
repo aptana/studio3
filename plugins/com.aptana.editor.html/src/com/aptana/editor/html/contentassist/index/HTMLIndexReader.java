@@ -10,12 +10,14 @@ package com.aptana.editor.html.contentassist.index;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
@@ -75,21 +77,22 @@ public class HTMLIndexReader extends IndexReader
 	}
 
 	/**
-	 * getAttributes
+	 * getAttribute
 	 * 
+	 * @param index
+	 * @param name
 	 * @return
-	 * @throws IOException
 	 */
-	public List<AttributeElement> getAttributes(Index index) throws IOException
+	public List<AttributeElement> getAttribute(Index index, String name) throws IOException
 	{
 		List<AttributeElement> result = new ArrayList<AttributeElement>();
 
-		if (index != null)
+		if (index != null && name != null && name.length() > 0)
 		{
 			List<QueryResult> attributes = index.query( //
 				new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-				"*", //$NON-NLS-1$
-				SearchPattern.PATTERN_MATCH //
+				name + CSSIndexConstants.DELIMITER, //
+				SearchPattern.PREFIX_MATCH //
 				);
 
 			if (attributes != null)
@@ -105,6 +108,19 @@ public class HTMLIndexReader extends IndexReader
 	}
 
 	/**
+	 * getAttributePattern
+	 * 
+	 * @param names
+	 * @return
+	 */
+	private String getAttributePattern(List<String> names)
+	{
+		String namePattern = RegexUtil.createQuotedListPattern(names);
+
+		return MessageFormat.format("^{1}{0}", this.getDelimiter(), namePattern);
+	}
+
+	/**
 	 * getAttribute
 	 * 
 	 * @param index
@@ -112,26 +128,23 @@ public class HTMLIndexReader extends IndexReader
 	 * @return
 	 * @throws IOException
 	 */
-	public List<AttributeElement> getAttributes(Index index, String... names) throws IOException
+	public List<AttributeElement> getAttributes(Index index, List<String> names) throws IOException
 	{
 		List<AttributeElement> result = new ArrayList<AttributeElement>();
 
 		if (index != null && names != null)
 		{
-			for (String name : names)
-			{
-				List<QueryResult> attributes = index.query( //
-					new String[] { HTMLIndexConstants.ATTRIBUTE }, //
-					name + CSSIndexConstants.DELIMITER, //
-					SearchPattern.PREFIX_MATCH //
-					);
+			List<QueryResult> attributes = index.query( //
+				new String[] { HTMLIndexConstants.ATTRIBUTE }, //
+				this.getAttributePattern(names), //
+				SearchPattern.REGEX_MATCH //
+				);
 
-				if (attributes != null)
+			if (attributes != null)
+			{
+				for (QueryResult attribute : attributes)
 				{
-					for (QueryResult attribute : attributes)
-					{
-						result.add(this.createAttribute(attribute));
-					}
+					result.add(this.createAttribute(attribute));
 				}
 			}
 		}
@@ -307,6 +320,38 @@ public class HTMLIndexReader extends IndexReader
 
 					// there should only be one match
 					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	public List<EventElement> getEvents(Index index, List<String> names) throws IOException
+	{
+		List<EventElement> result = new ArrayList<EventElement>();
+
+		if (index != null && names != null)
+		{
+			List<QueryResult> events = index.query( //
+				new String[] { HTMLIndexConstants.EVENT }, //
+				this.getAttributePattern(names), //
+				SearchPattern.REGEX_MATCH //
+				);
+
+			if (events != null)
+			{
+				for (QueryResult event : events)
+				{
+					result.add(this.createEvent(event));
 				}
 			}
 		}
