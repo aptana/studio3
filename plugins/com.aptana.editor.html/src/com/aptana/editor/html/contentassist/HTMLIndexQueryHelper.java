@@ -9,10 +9,13 @@ package com.aptana.editor.html.contentassist;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
@@ -129,15 +132,66 @@ public class HTMLIndexQueryHelper
 
 		if (element != null)
 		{
-			List<String> names = element.getAttributes();
+			List<AttributeElement> attributes = null;
 
 			try
 			{
-				result = this._reader.getAttributes(getIndex(), names);
+				attributes = this._reader.getAttributes(getIndex(), element.getAttributes());
 			}
 			catch (IOException e)
 			{
 				HTMLPlugin.logError(e.getMessage(), e);
+			}
+
+			if (attributes != null && attributes.isEmpty() == false)
+			{
+				String elementName = element.getName();
+				Map<String, AttributeElement> attributeMap = new HashMap<String, AttributeElement>();
+
+				// filter attribute list
+				for (AttributeElement attribute : attributes)
+				{
+					// grab the current attribute's name and any element to which it is bound
+					String attributeName = attribute.getName();
+					String owningElement = attribute.getElement();
+
+					// a null or empty owning element name means this attribute is good for any element, otherwise, we
+					// only want this attribute if it is specifically for this element
+					boolean validAttribute = (owningElement == null || owningElement.length() == 0 || owningElement.equals(elementName));
+
+					if (validAttribute)
+					{
+						// see if we already have an attribute with this name
+						AttributeElement previousAttribute = attributeMap.get(attributeName);
+
+						if (previousAttribute == null)
+						{
+							// no other attribute with this name, so use this one
+							attributeMap.put(attributeName, attribute);
+						}
+						else
+						{
+							boolean currentHasElement = StringUtil.isEmpty(owningElement) == false;
+							boolean previousHasElement = StringUtil.isEmpty(previousAttribute.getName()) == false;
+
+							// xnor element names
+							if ((currentHasElement && previousHasElement) || (!currentHasElement && !previousHasElement))
+							{
+								// either duplicate entry for this element, or dupe for any element
+								// last definition wins
+								attributeMap.put(attributeName, attribute);
+							}
+							else if (currentHasElement)
+							{
+								// element-specific attribute wins over general case
+								attributeMap.put(attributeName, attribute);
+							}
+							// else the one in the map is already more specific
+						}
+					}
+				}
+
+				result = new ArrayList<AttributeElement>(attributeMap.values());
 			}
 		}
 
