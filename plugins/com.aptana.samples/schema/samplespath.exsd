@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="com.aptana.samples" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="com.aptana.samples" id="samplespath" name="Samples Path"/>
+      </appinfo>
+      <documentation>
+         This extension point allows contribution to the Samples view.  It also allows handlers to be specified for previewing and importing the samples.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="samplesinfo"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="samplesinfo">
+      <annotation>
+         <documentation>
+            Adds an additional location to the set of locations to search for samples This only supports samples at the root level of the supplied folder. Nested directories are not supported.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="nature" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="include" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of these samples.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="directory" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The directory where the samples are located.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="infoFile" type="string">
+            <annotation>
+               <documentation>
+                  An optional HTML document to open to get more info on the samples.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="iconFile" type="string">
+            <annotation>
+               <documentation>
+                  An optional icon to use for the samples.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="projectHandler" type="string">
+            <annotation>
+               <documentation>
+                  A handler for adding custom steps as the sample project is getting created.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISampleProjectHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="previewHandler" type="string">
+            <annotation>
+               <documentation>
+                  A handler for generating preview on a sample.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":com.aptana.samples.handlers.ISamplePreviewHandler"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="nature">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The id of the nature to add to the sample project.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="include">
+      <complexType>
+         <attribute name="path" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The path to the files and folders to include when this sample is created as a project or previewed.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         This extension point was added in Aptana Studio 0.2.9.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+&lt;pre&gt;
+&lt;extension point=&quot;com.aptana.samples.samplespath&quot;&gt;
+ &lt;samplesinfo
+  directory=&quot;mySamples&quot;
+  iconFile=&quot;icons/mySamples.png&quot;
+  infoFile=&quot;samples/helpFile.html&quot;
+  name=&quot;My Library Samples&quot;
+  projectHandler=&quot;com.my.xyz.MySampleProjectCreationHandler&quot;
+  previewHandler=&quot;com.my.xyz.MySamplePreviewHandler&quot;&gt;
+     &lt;nature id=&quot;com.my.xyz.projectNature&quot;/&gt;
+ &lt;/samplesinfo&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+This example contributes a samples directory.  Each folder directly under that directory will be displayed as a sample in the Samples view.  The name attribute will be the name of the parent node, and its icon will be the specified iconFile.  A help option will be enabled when the infoFile is specified.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         Both the preview and project handlers are optional.  If the preview handler is missing, the preview option in the Samples view will be disabled.  If the project handler is missing, the project will just be created normally with the samples files, any included directories, and any additional natures specified.
+      </documentation>
+   </annotation>
+
+
+
+</schema>
