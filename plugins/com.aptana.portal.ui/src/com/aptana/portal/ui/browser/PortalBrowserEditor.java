@@ -114,6 +114,15 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 	}
 
 	/**
+	 * Returns the base URL prefix that will be used to verify the location of the page and register the dispatcher in
+	 * case the page is under this path.
+	 */
+	protected String getBaseURLPrefix()
+	{
+		return Portal.BASE_URL_PREFIX;
+	}
+
+	/**
 	 * Register the browser functions into the given browser.
 	 * 
 	 * @param browser
@@ -157,7 +166,7 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 	{
 		unregisterBrowserFunctions();
 		String url = browser.getUrl();
-		if (url != null && (url.startsWith(Portal.BASE_URL_PREFIX) || url.startsWith("file:"))) //$NON-NLS-1$
+		if (url != null && (url.startsWith(getBaseURLPrefix()) || url.startsWith("file:"))) //$NON-NLS-1$
 		{
 			registerBrowserFunctions(browser);
 		}

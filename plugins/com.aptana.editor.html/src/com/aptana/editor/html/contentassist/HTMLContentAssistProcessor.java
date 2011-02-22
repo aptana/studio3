@@ -53,6 +53,7 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -201,18 +202,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-			for (String attribute : element.getAttributes())
+			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, attribute.length() + length));
+				String name = attribute.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					ATTRIBUTE_ICON, //
+					attribute.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 
-			for (String event : element.getEvents())
+			for (EventElement event : this._queryHelper.getEvents(element))
 			{
-				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, event.length() + length));
+				String name = event.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					EVENT_ICON, //
+					event.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 		}
+
 		return proposals;
 	}
 

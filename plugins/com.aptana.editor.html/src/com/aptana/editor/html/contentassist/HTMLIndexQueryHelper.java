@@ -9,10 +9,13 @@ package com.aptana.editor.html.contentassist;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
@@ -20,6 +23,7 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexReader;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
 
@@ -43,6 +47,31 @@ public class HTMLIndexQueryHelper
 	public HTMLIndexQueryHelper()
 	{
 		this._reader = new HTMLIndexReader();
+	}
+
+	/**
+	 * getAttribute
+	 * 
+	 * @param name
+	 * @return
+	 */
+	private List<AttributeElement> getAttribute(String name)
+	{
+		List<AttributeElement> result = Collections.emptyList();
+
+		if (name != null && name.length() > 0)
+		{
+			try
+			{
+				result = this._reader.getAttribute(getIndex(), name);
+			}
+			catch (IOException e)
+			{
+				HTMLPlugin.logError(e.getMessage(), e);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -90,48 +119,80 @@ public class HTMLIndexQueryHelper
 
 		return result;
 	}
-	
+
 	/**
-	 * getAttribute
+	 * getAttributes
 	 * 
-	 * @param name
+	 * @param element
 	 * @return
 	 */
-	private List<AttributeElement> getAttribute(String name)
+	public List<AttributeElement> getAttributes(ElementElement element)
 	{
 		List<AttributeElement> result = Collections.emptyList();
-		
-		if (name != null && name.length() > 0)
+
+		if (element != null)
 		{
+			List<AttributeElement> attributes = null;
+
 			try
 			{
-				result = this._reader.getAttributes(getIndex(), name);
+				attributes = this._reader.getAttributes(getIndex(), element.getAttributes());
 			}
 			catch (IOException e)
 			{
 				HTMLPlugin.logError(e.getMessage(), e);
 			}
-		}
-		
-		return result;
-	}
 
-	/**
-	 * getAttributes
-	 * 
-	 * @return
-	 */
-	public List<AttributeElement> getAttributes()
-	{
-		List<AttributeElement> result = Collections.emptyList();
+			if (attributes != null && attributes.isEmpty() == false)
+			{
+				String elementName = element.getName();
+				Map<String, AttributeElement> attributeMap = new HashMap<String, AttributeElement>();
 
-		try
-		{
-			result = this._reader.getAttributes(getIndex());
-		}
-		catch (IOException e)
-		{
-			HTMLPlugin.logError(e.getMessage(), e);
+				// filter attribute list
+				for (AttributeElement attribute : attributes)
+				{
+					// grab the current attribute's name and any element to which it is bound
+					String attributeName = attribute.getName();
+					String owningElement = attribute.getElement();
+
+					// a null or empty owning element name means this attribute is good for any element, otherwise, we
+					// only want this attribute if it is specifically for this element
+					boolean validAttribute = (owningElement == null || owningElement.length() == 0 || owningElement.equals(elementName));
+
+					if (validAttribute)
+					{
+						// see if we already have an attribute with this name
+						AttributeElement previousAttribute = attributeMap.get(attributeName);
+
+						if (previousAttribute == null)
+						{
+							// no other attribute with this name, so use this one
+							attributeMap.put(attributeName, attribute);
+						}
+						else
+						{
+							boolean currentHasElement = StringUtil.isEmpty(owningElement) == false;
+							boolean previousHasElement = StringUtil.isEmpty(previousAttribute.getName()) == false;
+
+							// xnor element names
+							if ((currentHasElement && previousHasElement) || (!currentHasElement && !previousHasElement))
+							{
+								// either duplicate entry for this element, or dupe for any element
+								// last definition wins
+								attributeMap.put(attributeName, attribute);
+							}
+							else if (currentHasElement)
+							{
+								// element-specific attribute wins over general case
+								attributeMap.put(attributeName, attribute);
+							}
+							// else the one in the map is already more specific
+						}
+					}
+				}
+
+				result = new ArrayList<AttributeElement>(attributeMap.values());
+			}
 		}
 
 		return result;
@@ -214,6 +275,33 @@ public class HTMLIndexQueryHelper
 		catch (IOException e)
 		{
 			HTMLPlugin.logError(e.getMessage(), e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @param element
+	 * @return
+	 */
+	public List<EventElement> getEvents(ElementElement element)
+	{
+		List<EventElement> result = Collections.emptyList();
+
+		if (element != null)
+		{
+			List<String> names = element.getEvents();
+
+			try
+			{
+				result = this._reader.getEvents(getIndex(), names);
+			}
+			catch (IOException e)
+			{
+				HTMLPlugin.logError(e.getMessage(), e);
+			}
 		}
 
 		return result;
