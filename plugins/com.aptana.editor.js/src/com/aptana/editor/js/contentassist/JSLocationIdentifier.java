@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist;
 
 import beaver.Symbol;
 
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSArrayNode;
 import com.aptana.editor.js.parsing.ast.JSBinaryBooleanOperatorNode;
 import com.aptana.editor.js.parsing.ast.JSBreakNode;
@@ -843,9 +844,13 @@ public class JSLocationIdentifier extends JSTreeWalker
 			Symbol colon = node.getColon();
 			IParseNode value = node.getValue();
 
+			IParseNode parent = node.getParent();
+			IParseNode grandparent = (parent != null) ? parent.getParent() : null;
+			boolean configObject = (grandparent instanceof JSArgumentsNode);
+
 			if (this._offset < colon.getStart())
 			{
-				this.setType(LocationType.NONE);
+				this.setType(configObject ? LocationType.IN_CONFIG_OBJECT_PROPERTY : LocationType.NONE);
 			}
 			else if (this._offset < value.getStartingOffset())
 			{
