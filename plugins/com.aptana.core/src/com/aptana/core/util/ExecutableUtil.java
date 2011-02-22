@@ -29,6 +29,10 @@ import com.aptana.core.ShellExecutable;
 public final class ExecutableUtil
 {
 
+	private static final String PATHEXT = "PATHEXT"; //$NON-NLS-1$
+	private static final String WHICH_PATH = "/usr/bin/which"; //$NON-NLS-1$
+	private static final String PATH = "PATH"; //$NON-NLS-1$
+
 	private ExecutableUtil()
 	{
 	}
@@ -89,8 +93,9 @@ public final class ExecutableUtil
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
 			String[] paths;
-			if (env != null && env.containsKey("PATH")) { //$NON-NLS-1$
-				paths = env.get("PATH").split(ShellExecutable.PATH_SEPARATOR); //$NON-NLS-1$
+			if (env != null && env.containsKey(PATH))
+			{
+				paths = env.get(PATH).split(ShellExecutable.PATH_SEPARATOR);
 				for (int i = 0; i < paths.length; ++i)
 				{
 					if (paths[i].matches("^/(.)/.*")) { //$NON-NLS-1$
@@ -100,7 +105,7 @@ public final class ExecutableUtil
 			}
 			else
 			{
-				String pathENV = System.getenv("PATH"); //$NON-NLS-1$
+				String pathENV = System.getenv(PATH);
 				paths = pathENV.split(File.pathSeparator);
 			}
 			// Grab PATH and search it!
@@ -117,7 +122,7 @@ public final class ExecutableUtil
 		else
 		{
 			// No explicit path. Try it with "which"
-			String whichResult = ProcessUtil.outputForCommand("/usr/bin/which", workingDirectory, env, executableName); //$NON-NLS-1$
+			String whichResult = ProcessUtil.outputForCommand(WHICH_PATH, workingDirectory, env, executableName);
 			if (whichResult != null && whichResult.trim().length() > 0)
 			{
 				IPath whichPath = Path.fromOSString(whichResult.trim());
@@ -150,7 +155,7 @@ public final class ExecutableUtil
 	{
 		if (Platform.OS_WIN32.equals(Platform.getOS()) && appendExtension)
 		{
-			String[] extensions = System.getenv("PATHEXT").split(File.pathSeparator); //$NON-NLS-1$
+			String[] extensions = System.getenv(PATHEXT).split(File.pathSeparator);
 			for (String ext : extensions)
 			{
 				if (ext.startsWith(".")) //$NON-NLS-1$
