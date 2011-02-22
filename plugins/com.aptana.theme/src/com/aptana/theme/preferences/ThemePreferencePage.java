@@ -440,10 +440,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					lastSelected.setBackground(0, lastSelectedColor);
 				}
 				TableItem item = (TableItem) e.item;
-				lastSelectedColor = item.getBackground(0);
-				lastSelected = item;
-				item.setBackground(0,
-						ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelectionAgainstBG()));
+				if (item != null)
+				{
+					lastSelectedColor = item.getBackground(0);
+					lastSelected = item;
+					item.setBackground(0,
+							ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelectionAgainstBG()));
+				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e)
