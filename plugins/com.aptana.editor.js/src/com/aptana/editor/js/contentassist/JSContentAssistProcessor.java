@@ -35,6 +35,7 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -42,6 +43,7 @@ import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
@@ -107,6 +109,53 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addObjectLiteralProperties
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addObjectLiteralProperties(Set<ICompletionProposal> proposals, ITextViewer viewer, int offset)
+	{
+		FunctionElement function = this.getFunctionElement(viewer, offset);
+
+		if (function != null)
+		{
+			List<ParameterElement> params = function.getParameters();
+
+			if (params != null && params.size() > 0)
+			{
+				int index = this.getArgumentIndex(offset);
+
+				if (0 <= index && index < params.size())
+				{
+					ParameterElement param = params.get(index);
+					List<String> types = param.getTypes();
+
+					if (types != null)
+					{
+						for (String type : types)
+						{
+							List<PropertyElement> properties = this._indexHelper.getTypeProperties(getIndex(), type);
+
+							for (PropertyElement property : properties)
+							{
+								String name = property.getName();
+								String description = JSModelFormatter.getDescription(property, this.getProjectURI());
+								Image image = JSModelFormatter.getImage(property);
+								List<String> userAgentNames = property.getUserAgentNames();
+								Image[] userAgents = getUserAgentImages(userAgentNames);
+								String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
+
+								this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * addProjectGlobalFunctions
 	 * 
 	 * @param proposals
@@ -127,8 +176,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = JSModelFormatter.getDescription(property, projectURI);
 				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
-						.getDocumentDisplayName(documents.get(0)) : null;
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -164,8 +212,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
-			Image[] userAgents, String fileLocation, int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
+		int offset)
 	{
 		String displayName = name;
 		int length = name.length();
@@ -182,8 +230,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		IContextInformation contextInfo = null;
 
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
-				displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
@@ -285,88 +332,24 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
-		IParseNode node = this.getActiveASTNode(offset);
 		List<IContextInformation> result = new ArrayList<IContextInformation>();
+		FunctionElement function = this.getFunctionElement(viewer, offset);
 
-		// work a way up the AST to determine if we're in an arguments node
-		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		if (function != null)
 		{
-			node = node.getParent();
-		}
+			JSArgumentsNode node = this.getArgumentsNode(offset);
 
-		// process arguments node as long as we're not to the left of the opening parenthesis
-		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
-		{
-			// grab the content assist location type for the symbol before the arguments list
-			int functionOffset = node.getStartingOffset();
-			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
-
-			// process variables and properties
-			switch (location)
+			if (node != null)
 			{
-				case IN_VARIABLE_NAME:
-				{
-					String name = node.getParent().getFirstChild().getText();
-					IContextInformation ci = this.createContextInformation(JSTypeConstants.WINDOW_TYPE, name,
-							functionOffset);
+				String info = JSModelFormatter.getContextInfo(function);
+				List<String> lines = JSModelFormatter.getContextLines(function);
+				IContextInformation ci = new JSContextInformation(info, StringUtil.join("\n\ufeff", lines), node.getStartingOffset()); //$NON-NLS-1$
 
-					if (ci != null)
-					{
-						result.add(ci);
-					}
-					break;
-				}
-
-				case IN_PROPERTY_NAME:
-				{
-					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node,
-							((JSNode) node).getContainingStatementNode());
-					List<String> types = this.getParentObjectTypes(propertyNode, offset);
-
-					if (types.size() > 0)
-					{
-						String typeName = types.get(0);
-						String methodName = propertyNode.getLastChild().getText();
-						IContextInformation ci = this.createContextInformation(typeName, methodName, functionOffset);
-
-						if (ci != null)
-						{
-							result.add(ci);
-						}
-					}
-					break;
-				}
-
-				default:
-					break;
+				result.add(ci);
 			}
 		}
 
 		return result.toArray(new IContextInformation[result.size()]);
-	}
-
-	/**
-	 * createContextInformation
-	 * 
-	 * @param typeName
-	 * @param functionName
-	 * @param startingOffset
-	 * @return
-	 */
-	private IContextInformation createContextInformation(String typeName, String functionName, int startingOffset)
-	{
-		PropertyElement function = this._indexHelper.getTypeMember(this.getIndex(), typeName, functionName);
-		IContextInformation result = null;
-
-		if (function instanceof FunctionElement)
-		{
-			String info = JSModelFormatter.getContextInfo((FunctionElement) function);
-			List<String> lines = JSModelFormatter.getContextLines((FunctionElement) function);
-
-			result = new JSContextInformation(info, StringUtil.join("\n\ufeff", lines), startingOffset); //$NON-NLS-1$
-		}
-
-		return result;
 	}
 
 	/**
@@ -399,8 +382,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
-			boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
 	{
 		IDocument document = viewer.getDocument();
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
@@ -420,6 +402,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				this.addCoreGlobals(result, offset);
 				this.addProjectGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
+				break;
+
+			case IN_CONFIG_OBJECT_PROPERTY:
+				this.addObjectLiteralProperties(result, viewer, offset);
 				break;
 
 			default:
@@ -491,6 +477,58 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return result;
 	}
 
+	/**
+	 * getArgumentIndex
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	private int getArgumentIndex(int offset)
+	{
+		JSArgumentsNode arguments = this.getArgumentsNode(offset);
+		int result = -1;
+
+		if (arguments != null)
+		{
+			for (IParseNode child : arguments)
+			{
+				if (child.contains(offset))
+				{
+					result = child.getIndex();
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getArgumentsNode
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	private JSArgumentsNode getArgumentsNode(int offset)
+	{
+		IParseNode node = this.getActiveASTNode(offset);
+		JSArgumentsNode result = null;
+
+		// work a way up the AST to determine if we're in an arguments node
+		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		{
+			node = node.getParent();
+		}
+
+		// process arguments node as long as we're not to the left of the opening parenthesis
+		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
+		{
+			result = (JSArgumentsNode) node;
+		}
+
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -499,11 +537,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-				JSPlugin.PLUGIN_ID, //
-				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
+			JSPlugin.PLUGIN_ID, //
+			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -526,6 +564,67 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public IContextInformationValidator getContextInformationValidator()
 	{
 		return new JSContextInformationValidator();
+	}
+
+	/**
+	 * getFunctionElement
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	private FunctionElement getFunctionElement(ITextViewer viewer, int offset)
+	{
+		JSArgumentsNode node = this.getArgumentsNode(offset);
+		FunctionElement result = null;
+
+		// process arguments node as long as we're not to the left of the opening parenthesis
+		if (node != null)
+		{
+			// grab the content assist location type for the symbol before the arguments list
+			int functionOffset = node.getStartingOffset();
+			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
+			String typeName = null;
+			String methodName = null;
+
+			switch (location)
+			{
+				case IN_VARIABLE_NAME:
+				{
+					typeName = JSTypeConstants.WINDOW_TYPE;
+					methodName = node.getParent().getFirstChild().getText();
+					break;
+				}
+
+				case IN_PROPERTY_NAME:
+				{
+					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node, ((JSNode) node).getContainingStatementNode());
+					List<String> types = this.getParentObjectTypes(propertyNode, offset);
+
+					if (types.size() > 0)
+					{
+						typeName = types.get(0);
+						methodName = propertyNode.getLastChild().getText();
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+
+			if (typeName != null && methodName != null)
+			{
+				PropertyElement property = this._indexHelper.getTypeMember(this.getIndex(), typeName, methodName);
+
+				if (property instanceof FunctionElement)
+				{
+					result = (FunctionElement) property;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
