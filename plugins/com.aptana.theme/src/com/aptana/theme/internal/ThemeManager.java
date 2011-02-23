@@ -219,12 +219,11 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Force font
-		Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
 		for (String fontId : fontIds)
 		{
+			Font fFont = JFaceResources.getFontRegistry().get(fontId);
 			// Only set new values if they're different from existing!
 			Font existing = JFaceResources.getFont(fontId);
 			String existingString = ""; //$NON-NLS-1$
@@ -232,6 +231,7 @@ public class ThemeManager implements IThemeManager
 			{
 				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
 			}
+			String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
 			if (!existingString.equals(fdString))
 			{
 				// put in registry...

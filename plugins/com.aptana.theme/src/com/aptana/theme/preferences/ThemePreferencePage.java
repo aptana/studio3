@@ -231,7 +231,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Label label = new Label(themesComp, SWT.NONE);
 		label.setText(Messages.ThemePreferencePage_FontNameLabel);
 
-		fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
+		fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
 		fFontText = new Text(themesComp, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		fFontText.setText(toString(fFont));
 		fFontText.setFont(fFont);
@@ -957,36 +957,62 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected void performOkFonts()
 	{
-		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
+		final String[] fontIds = new String[] { JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-		String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
+
+		FontData[] data = fFont.getFontData();
 		for (String fontId : fontIds)
 		{
-			// Only set new values if they're different from existing!
-			Font existing = JFaceResources.getFont(fontId);
-			String existingString = ""; //$NON-NLS-1$
-			if (!existing.isDisposed())
+			setFont(fontId, data);
+		}
+
+		// Shrink by 2 for views!
+		data = fFont.getFontData();
+		FontData[] smaller = new FontData[data.length];
+		int i = 0;
+		for (FontData fd : data)
+		{
+			int height = fd.getHeight();
+			if (height >= 12)
 			{
-				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+				fd.setHeight(height - 2);
 			}
-			if (!existingString.equals(fdString))
+			else if (height >= 10)
 			{
-				// put in registry...
-				JFaceResources.getFontRegistry().put(fontId, fFont.getFontData());
-				// Save to prefs...
-				String key = ThemeElementHelper.createPreferenceKey(currentTheme, IThemeManager.VIEW_FONT_NAME);
-				store.setValue(key, fdString);
+				fd.setHeight(height - 1);
 			}
+			smaller[i++] = fd;
+		}
+		setFont(IThemeManager.VIEW_FONT_NAME, smaller);
+	}
+
+	private void setFont(String fontId, FontData[] data)
+	{
+		String fdString = PreferenceConverter.getStoredRepresentation(data);
+		// Only set new values if they're different from existing!
+		Font existing = JFaceResources.getFont(fontId);
+		String existingString = ""; //$NON-NLS-1$
+		if (!existing.isDisposed())
+		{
+			existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
+		}
+		if (!existingString.equals(fdString))
+		{
+			// put in registry...
+			JFaceResources.getFontRegistry().put(fontId, data);
+			// Save to prefs...
+			ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+			String key = ThemeElementHelper.createPreferenceKey(currentTheme, fontId);
+			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
+			store.setValue(key, fdString);
 		}
 	}
 
 	@Override
 	protected void performDefaults()
 	{
-		// Reset the font to what it was originally! TODO Grab the original default for TEXT_FONT?
-		setFont(JFaceResources.getFont(IThemeManager.VIEW_FONT_NAME));
+		// Reset the font to what it was originally!
+		setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 		try
 		{
 			Theme theme = getTheme();
