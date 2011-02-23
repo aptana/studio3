@@ -13,35 +13,34 @@ import beaver.*;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class SDocParser extends Parser {
 	static public class AltGoals {
-		static public final short Types = 43;
+		static public final short Types = 42;
 	}
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
-		"U9pjLbjKLLKKdUVSUu6KHDGGDH0pG1vUx#KPAfILOWzHp00p4vFCiZAixAL9PQMzjJ4QZJx" +
-		"wwRC#wgCniiIUvgCifOT9fKLffMIbbcNeRkxDuh2X8zAdOtZEc7kkkTRQw#ozppxxNi1TZ8" +
-		"jn8IRW0foFYIZ3HPW45$bgBSv62eQX005SZXhCndpSZAMu7oin5fDnAMQW2jUY3Wjn3nx64" +
-		"#guKYZogLQEIqoja6cpUbUjbrdbk0pdzJft6bRxZE#qvrJtn9gTDHgLXlEe1w4V#c0ufkCA" +
-		"gY6UFWlPEDTJiTmJuv69SHX9VupLJqUg4R5qfnM77CpoZUIOv$j5Kb6Be6z4zxZLDt963zN" +
-		"wOgYdipsh78M8HwcPrLEu4a#pFHF5HYVWQiFzCTTm9UOP7e3hS3j7VfjPA#rPZXiD3yHYmo" +
-		"jmBmOZqOn6wplGWCUGvEbKF8HSMZVXRi#NZCSbzYH6iKr555SPdeD5RE$4VMn3U91PZz1Am" +
-		"wCOWNEGZWnwGmXZ34Bgc6f3YJhA6Ubx2Yem5QLgdNfJlK4zatdN4DTZ0MwWleLsFPRWBYoZ" +
-		"zG1HYbLiIzG$S7Yc1VW6GkOjnt5jYtbkb73T4hWYsPp$0Cvt4FT74kUQp1qpb6UVdaqgrpN" +
-		"DZ6qaTuw#CdsgvNBtwLfHgTYxQhtBqhKp$rVkVyTtsdFgUzftLYVtuIaGp#zRiyFliqFhFl" +
-		"qzvPWzaSZlAP7#iDMl8zAfEwqGlrhNDpBAFDyl4cQFY6z4z$2l5koXMhfLBSQpz9Z3R3NdS" +
-		"LO5R3FOQXsYrXmKTeJDQSAHnvegskDA94DOwtm#KOz6wrXgLqRNKI5YhAmklivOc7Ua2sUP" +
-		"DYhzskSJvXFpZJSghAyy8jVS0PxWBjarjzPHGQ6dYpYke1Tfz#MPEciQs2Ybzf3I0MS5cMU" +
-		"Miwh1X9rdY4rYlqQi9ZQBFa0S4ljPOg$OzO0xMEnQuHVuZEFQji6y5CPU90#Nl0N4CcAHw9" +
-		"VqwTcrZpE3Q2QMYdw5g95wKzXay5cATWNj4lAqzXYM22$lFewUm6ibmNdZUKAFjPBFgoDp7" +
-		"7YPuBguLKGrKKEzNlfj9BRHDvFvhnFFKU#KSSwYRYHUfMYH$Ft2XoLdDkD7oRKKnsIkCKG2" +
-		"VNF96uYtY3OYsLhJH6AUs7NMkeqGttpQMyYwLhRuzBetaVkHyoL$F36HleNa7UHaSeN4ggt" +
-		"rcSfOlRQvx4qIr$ieGAxoNrDdxGdysorxjsMt2NC$kF7#VTqaA$yWzK1YYCJGiIUj$6Jjqt" +
-		"jGDCVh3hF7IAoJM8hbdow#TBznd0YyWkoJ0VFjkfbI8qrYasddT5kBHk4vZ8sHV5qZLxzxQ" +
-		"nwnHDZwBhSAMslfveglMVW8VSKIYoCAY0Zzkqu#3wV5gjkNu3VcxBDyt4FkEFqEHEltCC6o" +
-		"ophVfsk$Zp9PYpMmBhL3VSgsITHszJ7RRSRUgZvY#mdneT5RrEVgC$M5PBv7R2Os6RLHlQl" +
-		"U8Nz0R32UzxiyvO1gLVlKVlMtEgB#L7#em#gGEgX#Lx#fNzLVZFzC$EHb$oZSglQotUEf7p" +
-		"phUwA5#CxpVCjsjrUXLUrIRnkBNx1gLElf#SQBVUrPNx5jzjHEualrYnIPnDFD8Lp#CtNut" +
-		"pGW29fVfz7cr$haA61kWVdT0#5mTxeMGjtixbfpZ4#ydICSJuGreuAmGO082WV45xHY8OjZ" +
-		"9QR$XyGPEvzv6aK60OyBoHqO#o#fHVxw");
+		"U9pjLbbmL4KKFU$DJ2PWI889X0Y6a8GiXc4IaX0ZieXi1Z4ODn0N58q8WajKK1JYnYgKfN$" +
+		"gdrPPLgdbXwMMWeYe8A8IKP55N2AYE0eY4GMXFTtlvj4p3XhzeugPElUSk$IT#$fj0xYJCG" +
+		"B3C1HdOmZEmLaOZf5m4LMlAOK#E1szCGuNOpAknOsOYtln80PZ5CPW8Xfn5QRY1jo9#x44W" +
+		"vBqqUlx8sIuh9DzEbTLtScwvKccEXavqIDXL210gw#hWUeeKf2DT7GLcyjCFb8btmF5w1AN" +
+		"BsIcBmRGdeipQMjnMLpUizxgC4gGHnj4Mj8QtI4F5#8qgahwNdmPrSCunVV3w9Qmpbu$0PF" +
+		"4hnE#00tiSGMgJ3uJLqhTrSWmKsdl9bnZwhI#1Ksu6QTYdf$Dmcp3BPZZnnRX7ixQ7QL#f1" +
+		"Zt6Lril3kmM8vdAOfeRqM4$cXYB74#SH6ZURWKKwYdcvt9mKp3URWR2nXzWAed5g8Nx$f#Q" +
+		"4O1EOGpK8wGEgB#H8qwnAFKt$DGZ$6eKwlKIlKw$KjOTpan3TVXUlepg6VXDjoEkwZc4tLu" +
+		"YBP67OR39rI0voJ4Cn$ccUx2kx#MauFxdCuzwiwzoE9Uzk0iEPmbb#UdjpdIF9xvV4vMmAk" +
+		"WA4aVRtt5V#hJsL$x$rETZ9puaJBU1OvSL#2TrPNFXpIncSnaiDhBwrN1l#KpZItdSyl1GF" +
+		"QtyvxrLZjyuqPeemc$qL6ZEqJO8Igzl7WbLHMV0uvVLvAmpbwl9$3ySgkgabDLcNoG#Owwa" +
+		"9bAUwwiqZf47UOShfyjaJMwobuHuLHHFv8YsHJZbSeQxtWYxEWTbOq8lr69wvqPHDq$BXhX" +
+		"l7fr1NEbXhNIh3#LHBdv1lYlmoMxvglz2a6rxzUmLz3FUB5AqsT5Yo57UsdakSHKOfx4cuX" +
+		"PeXSIyubbuhSI6qKl9TQAdW6uHQ8d2I$NjYK1Z4yX3XBJnN#49Z##XiyUE8U9cLBp937Hqs" +
+		"urJQ7YXxg6UZ2vLjRD5fwJ#Bl$1A4bnAF44#p79xYpcZo4$jF4yzH3YM74SFelophMO3rZ8" +
+		"rZFEcS1$LQPSoJzPuaDTBP9VPjmJ6f6CR#PF9PEk#IECXPcR1pvEM8hiOF8F3Ql6oBgHO#t" +
+		"zZPNOXEeNoJQY0A9DL2$IiI8SgddNZhwk1h9Audzn1Z9DLZxKyyQSrwvxPibFmtI8$cUEat" +
+		"7YRzYwPYbZmWtwtEVPDrxn27EuOY$dL3nDQwEw#iY93KxgGDM3tsjFzwnXrQyKMBTairyF7" +
+		"ZxwwQJTv4pf4Ugv7PJPoNKDml$m5oEfRF9ZrbrUnZhINvA$6U4Nx2EDLjYBmdlPQolw7tKV" +
+		"OXUrAiwSHnhB7s0w$gHrrcnTiOAoPl4r#UXpDB5v2tYRxTcBFOOAs1zr1R5QrvzB5wh#f1s" +
+		"az4Vg8sq7n7l6t#3#bHzeZwZujbNwqridLghtYA$IxnZ8c$7TVzPnTGUzQFwGnrKlwbsTK3" +
+		"zglQhNzG#jLVzpZptMttlL#yMZgdlQ7VvthU#QYE#8Rxs8r$HVkbtYAcTQerHRn9lgDMCVE" +
+		"7dTlYArwlQvdjRYS$LJz9aDFypEeJBfvd3Vv01GT2yUmQOjzs$eygyz$Ix3eHZteF744hGY" +
+		"Rxcb2HvZwES9ygU5OA8GS2yipmEI2nevK8MXoMNGgJolUOOr1W4VAucTw3kBt1CxeW=");
 
 	// suppress parser error reporting and let the custom error recovery mechanism handle it
 	private static class SDocEvents extends Events
@@ -471,21 +470,14 @@ public class SDocParser extends Parser {
 
 			return function;
 			}
-			case 60: // Type = PROPERTIES LESS_THAN Type.memberType GREATER_THAN
-			{
-					final Symbol _symbol_memberType = _symbols[offset + 3];
-					final Type memberType = (Type) _symbol_memberType.value;
-					
-			return new PropertiesType(memberType);
-			}
-			case 63: // ParamName = TEXT.name
+			case 62: // ParamName = TEXT.name
 			{
 					final Symbol _symbol_name = _symbols[offset + 1];
 					final String name = (String) _symbol_name.value;
 					
 			return new Parameter(name);
 			}
-			case 64: // ParamName = LBRACKET TEXT.name RBRACKET
+			case 63: // ParamName = LBRACKET TEXT.name RBRACKET
 			{
 					final Symbol _symbol_name = _symbols[offset + 2];
 					final String name = (String) _symbol_name.value;
@@ -496,7 +488,7 @@ public class SDocParser extends Parser {
 
 			return result;
 			}
-			case 65: // ParamName = ELLIPSIS
+			case 64: // ParamName = ELLIPSIS
 			{
 					
 			Parameter result = new Parameter("...");
@@ -505,7 +497,7 @@ public class SDocParser extends Parser {
 
 			return result;
 			}
-			case 66: // ParamName = LBRACKET ELLIPSIS RBRACKET
+			case 65: // ParamName = LBRACKET ELLIPSIS RBRACKET
 			{
 					
 			Parameter result = new Parameter("...");
@@ -533,11 +525,11 @@ public class SDocParser extends Parser {
 			case 20: // opt$Text = Text
 			case 42: // TypeDelimiter = COMMA
 			case 43: // TypeDelimiter = PIPE
-			case 61: // ReturnDelimiter = COLON
-			case 62: // ReturnDelimiter = ARROW
-			case 67: // Namespace = IDENTIFIER
-			case 68: // Namespace = FUNCTION
-			case 69: // Namespace = ARRAY
+			case 60: // ReturnDelimiter = COLON
+			case 61: // ReturnDelimiter = ARROW
+			case 66: // Namespace = IDENTIFIER
+			case 67: // Namespace = FUNCTION
+			case 68: // Namespace = ARRAY
 			{
 				return _symbols[offset + 1];
 			}

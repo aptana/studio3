@@ -23,7 +23,6 @@ public class JSTypeConstants
 	public static final String STRING_TYPE = "String"; //$NON-NLS-1$
 	public static final String WINDOW_TYPE = "Window"; //$NON-NLS-1$
 	public static final String USER_TYPE = "UserType"; //$NON-NLS-1$
-	public static final String PROPERTIES_TYPE = "Properties"; //$NON-NLS-1$
 
 	public static final String NO_TYPE = "none"; //$NON-NLS-1$
 	public static final String UNDEFINED_TYPE = "undefined"; //$NON-NLS-1$
