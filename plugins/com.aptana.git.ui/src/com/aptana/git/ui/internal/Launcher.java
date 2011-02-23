@@ -110,10 +110,32 @@ public abstract class Launcher
 		}
 		if (!env.isEmpty())
 		{
+			env = filterOutVariables(env);
 			config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
 			config.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
 		}
 		return config;
+	}
+
+	/**
+	 * Filter out any env vars that contain "${" in their value. Otherwise Eclipse will try to substitute and fail!
+	 * TODO Maybe we can escape the ${ to avoid the issue?
+	 * @param env
+	 * @return
+	 */
+	private static Map<String, String> filterOutVariables(Map<String, String> env)
+	{
+		Map<String, String> filtered = new HashMap<String, String>();
+		for (Map.Entry<String, String> entry : env.entrySet())
+		{
+			String value = entry.getValue();
+			if (value.contains("${")) //$NON-NLS-1$
+			{
+				continue;
+			}
+			filtered.put(entry.getKey(), value);
+		}
+		return filtered;
 	}
 
 	private static String getLastPortion(String command)
