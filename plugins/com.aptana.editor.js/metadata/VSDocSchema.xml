@@ -10,6 +10,7 @@
 		<child-element name="see"/>
 		<child-element name="seealso"/>
 		<child-element name="summary"/>
+		<child-element name="userAgent"/>
 		
 		<!-- unsupported elements -->
 		<child-element name="c"/>
@@ -81,6 +82,11 @@
 	</element>
 	
 	<element name="summary" onEnter="startTextBuffer" onExit="exitSummary"/>
+	
+	<element name="userAgent" onEnter="enterUserAgent">
+		<attribute name="name"/>	<!-- string -->
+		<attribute name="version"/>	<!-- string -->
+	</element>
 	
 	<element name="value">
 		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
