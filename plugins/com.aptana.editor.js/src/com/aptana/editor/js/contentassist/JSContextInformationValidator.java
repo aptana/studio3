@@ -83,6 +83,8 @@ public class JSContextInformationValidator implements IContextInformationValidat
 		int index = lexemeProvider.getLexemeFloorIndex(offset - 1);
 		int commaCount = 0;
 		int parenCount = 0;
+		int curlyCount = 0;
+		int bracketCount = 0;
 
 		while (0 <= index && index < lexemeProvider.size())
 		{
@@ -102,14 +104,30 @@ public class JSContextInformationValidator implements IContextInformationValidat
 			switch (lexeme.getType())
 			{
 				case COMMA:
-					if (parenCount == 0)
+					if (bracketCount == 0 && curlyCount == 0 && parenCount == 0)
 					{
 						commaCount++;
 					}
 					break;
 
+				case RBRACKET:
+					bracketCount++;
+					break;
+
+				case RCURLY:
+					curlyCount++;
+					break;
+
 				case RPAREN:
 					parenCount++;
+					break;
+
+				case LBRACKET:
+					bracketCount--;
+					break;
+
+				case LCURLY:
+					curlyCount--;
 					break;
 
 				case LPAREN:
