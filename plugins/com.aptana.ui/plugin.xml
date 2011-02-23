@@ -258,5 +258,12 @@
             name="%category.web.name">
       </category>
    </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="com.aptana"
+            name="%category.name">
+      </category>
+   </extension>
 
 </plugin>
