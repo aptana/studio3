@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import com.aptana.core.util.CollectionsUtil;
+import com.aptana.core.util.RegexUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
@@ -233,7 +234,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	private String getMemberPattern(List<String> typeNames)
 	{
-		String typePattern = getUserTypesPattern(typeNames);
+		String typePattern = RegexUtil.createQuotedListPattern(typeNames);
 
 		return MessageFormat.format("^{1}{0}", new Object[] { this.getDelimiter(), typePattern }); //$NON-NLS-1$
 	}

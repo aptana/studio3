@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.portal.ui.browser.PortalBrowserEditor;
 import com.aptana.portal.ui.internal.Portal;
 
 /**
@@ -33,7 +34,7 @@ public class PortalStartup implements IStartup
 				Portal portal = Portal.getInstance();
 				if (portal.shouldOpenPortal())
 				{
-					portal.openPortal(null);
+					portal.openPortal(null, PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
 				}
 				return Status.OK_STATUS;
 			}

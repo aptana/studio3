@@ -703,6 +703,7 @@ public class Theme
 		{
 			return;
 		}
+		wipeCache();
 		defaultFG = newColor;
 		save();
 	}

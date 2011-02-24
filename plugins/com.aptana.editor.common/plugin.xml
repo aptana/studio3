@@ -576,7 +576,10 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"
-            class="com.aptana.editor.common.internal.FileStoreEditorInputUniformResource$Factory">
+            class="com.aptana.editor.common.internal.FileStoreEditorInputAdapterFactory">
+         <adapter
+               type="org.eclipse.core.resources.IFile">
+         </adapter>
          <adapter
                type="com.aptana.core.resources.IUniformResource">
          </adapter>

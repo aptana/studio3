@@ -45,6 +45,8 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 					IEditorInput editorInput = editorPart.getEditorInput();
 					if (editorInput instanceof IFileEditorInput) {
 						result[0] = ((IFileEditorInput) editorInput).getFile();
+					} else {
+						result[0] = (IResource) editorInput.getAdapter(IFile.class);
 					}
 				}
 			}
@@ -73,6 +75,7 @@ public class ActiveResourcePathGetterAdapter implements IActiveResourcePathGette
 					} else if (pathEditorInput != null) {
 						result[0] = pathEditorInput.getPath();
 					}
+					// TODO: for IURIEditorInput use ILocationProvider(Extension)
 				}
 			}
 		});

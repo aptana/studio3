@@ -242,7 +242,7 @@ public class JSSymbolTypeInferrer
 		for (String name : activeObject.getPropertyNames())
 		{
 			// TODO: Treat as new property if names match but not their types?
-			if (propertyMap.containsKey(name) == false || "prototype".equals(name)) //$NON-NLS-1$
+			if (propertyMap.containsKey(name) == false || JSTypeConstants.PROTOTYPE_PROPERTY.equals(name))
 			{
 				additionalProperties.add(name);
 			}

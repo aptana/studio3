@@ -30,6 +30,7 @@ public class JSTypeConstants
 	public static final String VOID_TYPE = "void"; //$NON-NLS-1$
 	public static final String NULL_TYPE = "null"; //$NON-NLS-1$
 
+	public static final String PROTOTYPE_PROPERTY = "prototype"; //$NON-NLS-1$
 	public static final String WINDOW_PROPERTY = "window"; //$NON-NLS-1$
 
 	public static final String ARRAY_LITERAL = "[]"; //$NON-NLS-1$
