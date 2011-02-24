@@ -396,7 +396,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				this.addSymbolsInScope(result, offset);
 				break;
 
-			case IN_CONFIG_OBJECT_PROPERTY:
+			case IN_OBJECT_LITERAL_PROPERTY:
 				this.addObjectLiteralProperties(result, viewer, offset);
 				break;
 

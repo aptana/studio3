@@ -850,7 +850,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 
 			if (this._offset < colon.getStart())
 			{
-				this.setType(configObject ? LocationType.IN_CONFIG_OBJECT_PROPERTY : LocationType.NONE);
+				this.setType(configObject ? LocationType.IN_OBJECT_LITERAL_PROPERTY : LocationType.NONE);
 			}
 			else if (this._offset < value.getStartingOffset())
 			{
