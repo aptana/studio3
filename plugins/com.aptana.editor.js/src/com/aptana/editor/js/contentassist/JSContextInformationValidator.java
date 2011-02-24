@@ -80,7 +80,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	{
 		IDocument document = this._viewer.getDocument();
 		LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, this._startingOffset, new JSTokenScanner());
-		int index = lexemeProvider.getLexemeFloorIndex(offset - 1);
+		int index = lexemeProvider.getLexemeFloorIndex(this._startingOffset);
 		int commaCount = 0;
 		int parenCount = 0;
 		int curlyCount = 0;
@@ -90,55 +90,51 @@ public class JSContextInformationValidator implements IContextInformationValidat
 		{
 			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
 
-			// no need to keep backing up beyond where we started
-			if (lexeme.getStartingOffset() == this._startingOffset)
+			if (lexeme.getStartingOffset() < offset)
 			{
-				if (parenCount > 0)
+				switch (lexeme.getType())
 				{
-					commaCount = -1;
+					case COMMA:
+						if (bracketCount == 0 && curlyCount == 0 && parenCount == 1)
+						{
+							commaCount++;
+						}
+						break;
+
+					case RBRACKET:
+						bracketCount--;
+						break;
+
+					case RCURLY:
+						curlyCount--;
+						break;
+
+					case RPAREN:
+						parenCount--;
+						break;
+
+					case LBRACKET:
+						bracketCount++;
+						break;
+
+					case LCURLY:
+						curlyCount++;
+						break;
+
+					case LPAREN:
+						parenCount++;
+						break;
+
+					default:
+						break;
 				}
 
+				index++;
+			}
+			else
+			{
 				break;
 			}
-
-			switch (lexeme.getType())
-			{
-				case COMMA:
-					if (bracketCount == 0 && curlyCount == 0 && parenCount == 0)
-					{
-						commaCount++;
-					}
-					break;
-
-				case RBRACKET:
-					bracketCount++;
-					break;
-
-				case RCURLY:
-					curlyCount++;
-					break;
-
-				case RPAREN:
-					parenCount++;
-					break;
-
-				case LBRACKET:
-					bracketCount--;
-					break;
-
-				case LCURLY:
-					curlyCount--;
-					break;
-
-				case LPAREN:
-					parenCount--;
-					break;
-
-				default:
-					break;
-			}
-
-			index--;
 		}
 
 		return commaCount;
@@ -211,11 +207,9 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	 */
 	public boolean updatePresentation(int offset, TextPresentation presentation)
 	{
-		boolean result = false;
-
 		// grab presentation text and split into separate lines
 		String info = this._contextInformation.getInformationDisplayString();
-		String[] lines = info.split("\ufeff"); //$NON-NLS-1$
+		String[] lines = info.split(JSContextInformation.DESCRIPTION_DELIMITER);
 
 		// determine which argument we are within
 		int argIndex = this.getArgumentIndex(offset);
@@ -286,10 +280,8 @@ public class JSContextInformationValidator implements IContextInformationValidat
 
 				runningLength += length + 1; // 1 for delimiter
 			}
-
-			result = true;
 		}
 
-		return result;
+		return true;
 	}
 }
