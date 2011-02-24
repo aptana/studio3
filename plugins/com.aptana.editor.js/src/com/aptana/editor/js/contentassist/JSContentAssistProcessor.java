@@ -121,34 +121,26 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (function != null)
 		{
 			List<ParameterElement> params = function.getParameters();
+			int index = this.getArgumentIndex(offset);
 
-			if (params != null && params.size() > 0)
+			if (0 <= index && index < params.size())
 			{
-				int index = this.getArgumentIndex(offset);
+				ParameterElement param = params.get(index);
 
-				if (0 <= index && index < params.size())
+				for (String type : param.getTypes())
 				{
-					ParameterElement param = params.get(index);
-					List<String> types = param.getTypes();
+					List<PropertyElement> properties = this._indexHelper.getTypeProperties(this.getIndex(), type);
 
-					if (types != null)
+					for (PropertyElement property : properties)
 					{
-						for (String type : types)
-						{
-							List<PropertyElement> properties = this._indexHelper.getTypeProperties(getIndex(), type);
+						String name = property.getName();
+						String description = JSModelFormatter.getDescription(property, this.getProjectURI());
+						Image image = JSModelFormatter.getImage(property);
+						List<String> userAgentNames = property.getUserAgentNames();
+						Image[] userAgents = getUserAgentImages(userAgentNames);
+						String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
 
-							for (PropertyElement property : properties)
-							{
-								String name = property.getName();
-								String description = JSModelFormatter.getDescription(property, this.getProjectURI());
-								Image image = JSModelFormatter.getImage(property);
-								List<String> userAgentNames = property.getUserAgentNames();
-								Image[] userAgents = getUserAgentImages(userAgentNames);
-								String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
-
-								this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
-							}
-						}
+						this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
 					}
 				}
 			}
