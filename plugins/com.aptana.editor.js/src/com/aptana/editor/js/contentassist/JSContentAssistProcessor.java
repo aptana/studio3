@@ -581,9 +581,17 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// process arguments node as long as we're not to the left of the opening parenthesis
 		if (node != null)
 		{
+			// save current replace range. A bit hacky but better than adding a flag ito getLocation's signature
+			IRange range = this._replaceRange;
+
 			// grab the content assist location type for the symbol before the arguments list
 			int functionOffset = node.getStartingOffset();
 			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
+
+			// restore replace range
+			this._replaceRange = range;
+
+			// init type and method names
 			String typeName = null;
 			String methodName = null;
 
