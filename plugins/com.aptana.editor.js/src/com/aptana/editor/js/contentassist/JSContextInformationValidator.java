@@ -137,7 +137,7 @@ public class JSContextInformationValidator implements IContextInformationValidat
 			}
 		}
 
-		return commaCount;
+		return (parenCount != 0) ? commaCount : -1;
 	}
 
 	/**
