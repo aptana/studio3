@@ -204,5 +204,38 @@ public abstract class ProcessUtil
 		}
 		return processBuilder.start();
 	}
+	
+	public static int waitForProcess(Process process, final long timeout, boolean forceKillAfterTimeout) {
+		final Thread waitingThread = Thread.currentThread();
+		Thread timeoutThread = new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(timeout);
+					waitingThread.interrupt();
+				} catch (InterruptedException ignore) {
+				}
+			}
+		};
+
+		int exitcode = 0;
+		if (timeout != -1) {
+			try {
+				timeoutThread.start();
+				exitcode = process.waitFor();
+				waitingThread.interrupt();
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
+			if (forceKillAfterTimeout) {
+				process.destroy();
+			}
+		}
+		try {
+			exitcode = process.waitFor();
+		} catch (InterruptedException e) {
+		}
+		return exitcode;
+		
+	}
 
 }
