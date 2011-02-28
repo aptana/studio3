@@ -39,6 +39,9 @@ import com.aptana.portal.ui.internal.WebBrowserEditorStub;
 public class PortalBrowserEditor extends WebBrowserEditorStub
 {
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.portal"; //$NON-NLS-1$
+
+	private static final String TITLE_TTP = "Aptana Portal"; //$NON-NLS-1$
+
 	private List<BrowserFunctionWrapper> browserFunctions;
 
 	/**
@@ -101,6 +104,12 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 		// Register this browser to receive notifications from any Browser-Notifier that was
 		// added to do so through the browserInteractions extension point.
 		BrowserNotifier.getInstance().registerBrowser(getEditorId(), browser);
+	}
+
+	@Override
+	public String getTitleToolTip()
+	{
+		return TITLE_TTP;
 	}
 
 	/**
