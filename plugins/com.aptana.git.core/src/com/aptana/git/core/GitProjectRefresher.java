@@ -122,7 +122,13 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 				for (IResource resource : resources)
 				{
 					if (sub.isCanceled())
+					{
 						return Status.CANCEL_STATUS;
+					}
+					if (resource == null)
+					{
+						continue;
+					}
 					if (resource.getType() == IResource.PROJECT)
 					{
 						// Check to see if this project exists in the new branch! If not, auto-close the project, or

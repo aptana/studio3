@@ -8,6 +8,7 @@
 package com.aptana.commandline.launcher;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -49,24 +50,24 @@ public class CommandlineArgumentsHandler
 	 * 
 	 * @param arguments
 	 */
-	public static void processCommandLineArgs(final String[] arguments)
+	public static ArrayList<File> processCommandLineArgs(final String[] arguments)
 	{
 		if (arguments == null || arguments.length == 0)
 		{
-			return;
+			return null;
 		}
+
+		final ArrayList<File> files = gatherFiles(arguments);
 
 		WorkbenchJob workbenchJob = new WorkbenchJob("Processing command line args.") //$NON-NLS-1$
 		{
-
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor)
 			{
 				SubMonitor sub = SubMonitor.convert(monitor, arguments.length);
-				for (String argument : arguments)
+				for (File f : files)
 				{
-
-					processArgument(argument, sub.newChild(1));
+					processArgument(f, sub.newChild(1));
 				}
 				return Status.OK_STATUS;
 			}
@@ -74,13 +75,36 @@ public class CommandlineArgumentsHandler
 		workbenchJob.setSystem(true);
 		workbenchJob.setPriority(WorkbenchJob.INTERACTIVE);
 		workbenchJob.schedule();
+
+		return files;
 	}
 
-	protected static void processArgument(String argument, IProgressMonitor monitor)
+	/**
+	 * Comb through the list of command-line arguments, and pull out the items that are files
+	 * 
+	 * @param arguments
+	 * @return
+	 */
+	public static ArrayList<File> gatherFiles(final String[] arguments)
+	{
+		final ArrayList<File> files = new ArrayList<File>();
+
+		for (String argument : arguments)
+		{
+			File file = new File(argument);
+			if (file.exists())
+			{
+				files.add(file);
+			}
+		}
+
+		return files;
+	}
+
+	protected static void processArgument(File file, IProgressMonitor monitor)
 	{
 		SubMonitor sub = SubMonitor.convert(monitor, 1);
 
-		File file = new File(argument);
 		if (!file.exists())
 		{
 			return;

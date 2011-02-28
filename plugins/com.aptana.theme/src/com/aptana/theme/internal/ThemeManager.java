@@ -153,6 +153,18 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
 		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
 		prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		// PyDev Occurrences (com.python.pydev.occurrences)
+		// Override them if pydev is set to use our themes
+		if (Platform.getPreferencesService().getBoolean("org.python.pydev.red_core", "PYDEV_USE_APTANA_THEMES", true, //$NON-NLS-1$ //$NON-NLS-2$
+				null))
+		{
+			// Have to use highlighting, since there's no pref key for text style to use box style. As a result we also
+			// use search result color, which is a lighter/darker selection/line highlight color
+			prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
+			prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+			prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		}
+
 		try
 		{
 			prefs.flush();
