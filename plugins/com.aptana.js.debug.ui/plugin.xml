@@ -88,22 +88,6 @@
                id="com.aptana.js.debug.ui.actions.jsToggleBreakpointAction">
          </action>
       </viewerContribution>
-   		<viewerContribution
-           id="com.aptana.js.debug.ui.RulerPopupActions"
-           targetID="com.aptana.editor.php">
-         <action
-               class="com.aptana.js.debug.ui.internal.actions.BreakpointPropertiesRulerActionDelegate"
-               helpContextId="breakpoint_properties_action_context"
-               id="com.aptana.js.debug.ui.actions.phpBreakpointPropertiesRulerActionDelegate"
-               label="%action.label.breakpoint.properties.php"
-               menubarPath="debug"/>
-         <action
-               label="%action.label.toggle.php"
-               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
-               menubarPath="debug"
-               id="com.aptana.js.debug.ui.actions.phpToggleBreakpointAction">
-         </action>
-      </viewerContribution>
      <viewerContribution
            id="com.aptana.js.debug.ui.debugViewerContribution"
            targetID="org.eclipse.debug.ui.DebugView">
@@ -245,67 +229,6 @@
                helpContextId="run_to_line_action_context"
                icon="icons/full/elcl16/runtoline_co.gif"
                id="com.aptana.js.debug.ui.actions.jsPopup.RunToLine"
-               label="%RunToLine.label"
-               menubarPath="debug">
-            <enablement>
-               <and>
-                  <systemProperty
-                        name="com.aptana.js.debug.core.debuggerActive"
-                        value="true"/>
-                  <objectClass name="org.eclipse.jface.text.ITextSelection"/>
-               </and>
-            </enablement>
-         </action>
-         <visibility>
-            <systemProperty
-                  name="com.aptana.js.debug.core.debuggerActive"
-                  value="true"/>
-         </visibility>
-     </viewerContribution>
-     <viewerContribution
-           id="com.aptana.js.debug.ui.ContextPopupActions"
-           targetID="com.aptana.editor.php">
-         <action
-               class="com.aptana.js.debug.ui.internal.actions.PopupInspectAction"
-               definitionId="com.aptana.debug.ui.commands.Inspect"
-               enablesFor="+"
-               helpContextId="inspect_action_context"
-               icon="icons/full/etool16/inspect.gif"
-               id="com.aptana.jsdebug.ui.actions.phpPopup.Inspect"
-               label="%InspectAction.label"
-               menubarPath="debug">
-            <enablement>
-               <and>
-                  <systemProperty
-                        name="com.aptana.js.debug.core.debuggerActive"
-                        value="true"/>
-                  <objectClass name="org.eclipse.jface.text.ITextSelection"/>
-               </and>
-            </enablement>
-         </action>
-         <action
-               class="com.aptana.js.debug.ui.internal.actions.WatchAction"
-               enablesFor="+"
-               helpContextId="watch_action_context"
-               icon="icons/full/etool16/watch_exp.gif"
-               id="com.aptana.js.debug.ui.actions.phpPopup.Watch"
-               label="%WatchAction.label"
-               menubarPath="debug">
-            <enablement>
-               <and>
-                  <systemProperty
-                        name="com.aptana.js.debug.core.debuggerActive"
-                        value="true"/>
-                  <objectClass name="org.eclipse.jface.text.ITextSelection"/>
-               </and>
-            </enablement>
-         </action>
-         <action
-               class="org.eclipse.debug.ui.actions.RunToLineActionDelegate"
-               definitionId="org.eclipse.debug.ui.commands.RunToLine"
-               helpContextId="run_to_line_action_context"
-               icon="icons/full/elcl16/runtoline_co.gif"
-               id="com.aptana.js.debug.ui.actions.phpPopup.RunToLine"
                label="%RunToLine.label"
                menubarPath="debug">
             <enablement>
