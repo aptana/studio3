@@ -41,6 +41,7 @@ public abstract class ProcessUtil
 		return result.values().iterator().next();
 	}
 
+	// TODO Return an IStatus that contains the exit code as the code, output as the message, uses OK if exit code is 0, ERROR otherwise.
 	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String... args)
 	{
 		return runInBackground(command, workingDir, null, args);
