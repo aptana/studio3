@@ -45,6 +45,9 @@
             <actionExtension
                   pattern="org\.eclipse\.ui\.navigator\.resources\.(?!WorkingSetActions).*">
             </actionExtension>
+            <actionExtension
+                  pattern="com.aptana.explorer.navigator.actions.*">
+            </actionExtension>
          </includes>
       </viewerActionBinding>
       <dragAssistant
@@ -132,6 +135,28 @@
             wizardId="com.aptana.ui.wizards.NewWebProject">
          <enablement></enablement>
       </commonWizard>
+      <actionProvider
+            class="com.aptana.explorer.navigator.actions.DeployActionProvider"
+            id="com.aptana.explorer.navigator.actions.DeployActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
+      <actionProvider
+            class="com.aptana.explorer.navigator.actions.CommandsActionProvider"
+            id="com.aptana.explorer.navigator.actions.CommandsActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
    </extension>
    <extension
          point="org.eclipse.ui.commands">

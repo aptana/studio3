@@ -1,0 +1,1934 @@
+Index: .classpath
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/.classpath,v
+retrieving revision 1.5
+diff -u -r1.5 .classpath
+--- .classpath	11 Apr 2008 17:37:14 -0000	1.5
++++ .classpath	1 Mar 2011 23:27:14 -0000
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <classpath>
+-	<classpathentry kind="src" path="src/"/>
+-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/CDC-1.1%Foundation-1.1"/>
++	<classpathentry kind="src" path="src"/>
+ 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+ 	<classpathentry kind="output" path="bin"/>
+ </classpath>
+Index: build.properties
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/build.properties,v
+retrieving revision 1.13
+diff -u -r1.13 build.properties
+--- build.properties	13 May 2009 22:43:24 -0000	1.13
++++ build.properties	1 Mar 2011 23:27:14 -0000
+@@ -27,14 +27,14 @@
+                about.properties,\
+                dsdp32.png,\
+                icons/,\
+-               HelpContexts.xml
++               HelpContexts.xml,\
++               license-epl.html
+                
+ source.. = src/
+ output.. = bin/
+ src.includes = schema/,\
+-               about.html,\
+-               .settings/,\
+-               build.properties
+-javacSource=1.4
+-javacTarget=1.4
++               about.html
++javacSource=1.5
++javacTarget=1.5
++javacErrors.. = -assertIdentifier
+                
+Index: META-INF/MANIFEST.MF
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/META-INF/MANIFEST.MF,v
+retrieving revision 1.30
+diff -u -r1.30 MANIFEST.MF
+--- META-INF/MANIFEST.MF	19 Aug 2010 13:36:37 -0000	1.30
++++ META-INF/MANIFEST.MF	1 Mar 2011 23:27:14 -0000
+@@ -1,36 +1,27 @@
+ Manifest-Version: 1.0
+ Bundle-ManifestVersion: 2
+ Bundle-Name: %pluginName
+-Bundle-SymbolicName: org.eclipse.tm.terminal; singleton:=true
++Bundle-SymbolicName: com.aptana.org.eclipse.tm.terminal; singleton:=true
+ Bundle-Version: 3.0.101.qualifier
+ Bundle-Activator: org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin
+ Bundle-Vendor: %providerName
+ Bundle-Localization: plugin
+ Require-Bundle: org.eclipse.core.runtime,
+- org.eclipse.ui
++ org.eclipse.ui,
++ org.eclipse.jface.text;bundle-version="3.0.0"
+ Bundle-ActivationPolicy: lazy
+ Eclipse-LazyStart: true
++Eclipse-ExtensibleAPI: true
+ Bundle-RequiredExecutionEnvironment: CDC-1.1/Foundation-1.1,
+  J2SE-1.4
+ Bundle-ClassPath: .
+ Export-Package: org.eclipse.tm.internal.terminal.connector;x-friends:="org.eclipse.tm.terminal.test",
+- org.eclipse.tm.internal.terminal.control;x-friends:="org.eclipse.tm.terminal.view",
+- org.eclipse.tm.internal.terminal.control.actions;x-friends:="org.eclipse.tm.terminal.view",
++ org.eclipse.tm.internal.terminal.control;x-friends:="com.aptana.terminal",
++ org.eclipse.tm.internal.terminal.control.actions;x-friends:="com.aptana.terminal",
+  org.eclipse.tm.internal.terminal.control.impl;x-friends:="org.eclipse.tm.terminal.test",
+- org.eclipse.tm.internal.terminal.emulator;x-friends:="org.eclipse.tm.terminal.test",
++ org.eclipse.tm.internal.terminal.emulator;x-friends:="com.aptana.terminal",
+  org.eclipse.tm.internal.terminal.model;x-friends:="org.eclipse.tm.terminal.test",
+- org.eclipse.tm.internal.terminal.provisional.api;
+-  x-friends:="org.eclipse.tm.terminal.serial,
+-   org.eclipse.tm.terminal.ssh,
+-   org.eclipse.tm.terminal.telnet,
+-   org.eclipse.tm.terminal.local,
+-   org.eclipse.tm.terminal.view,
+-   org.eclipse.tm.terminal.test",
+- org.eclipse.tm.internal.terminal.provisional.api.provider;
+-  x-friends:="org.eclipse.tm.terminal.serial,
+-   org.eclipse.tm.terminal.ssh,
+-   org.eclipse.tm.terminal.telnet,
+-   org.eclipse.tm.terminal.local,
+-   org.eclipse.tm.terminal.test",
+- org.eclipse.tm.internal.terminal.textcanvas;x-friends:="org.eclipse.tm.terminal.test",
++ org.eclipse.tm.internal.terminal.provisional.api;x-friends:="com.aptana.terminal",
++ org.eclipse.tm.internal.terminal.provisional.api.provider;x-friends:="com.aptana.terminal",
++ org.eclipse.tm.internal.terminal.textcanvas;x-friends:="com.aptana.terminal",
+  org.eclipse.tm.terminal.model
+Index: license-epl.html
+===================================================================
+RCS file: license-epl.html
+diff -N license-epl.html
+--- /dev/null	1 Jan 1970 00:00:00 -0000
++++ license-epl.html	1 Jan 1970 00:00:00 -0000
+@@ -0,0 +1,328 @@
++<html xmlns:o="urn:schemas-microsoft-com:office:office"
++xmlns:w="urn:schemas-microsoft-com:office:word"
++xmlns="http://www.w3.org/TR/REC-html40">
++
++<head>
++<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
++<meta name=ProgId content=Word.Document>
++<meta name=Generator content="Microsoft Word 9">
++<meta name=Originator content="Microsoft Word 9">
++<link rel=File-List
++href="./Eclipse%20EPL%202003_11_10%20Final_files/filelist.xml">
++<title>Eclipse Public License - Version 1.0</title>
++<!--[if gte mso 9]><xml>
++ <o:DocumentProperties>
++  <o:Revision>2</o:Revision>
++  <o:TotalTime>3</o:TotalTime>
++  <o:Created>2004-03-05T23:03:00Z</o:Created>
++  <o:LastSaved>2004-03-05T23:03:00Z</o:LastSaved>
++  <o:Pages>4</o:Pages>
++  <o:Words>1626</o:Words>
++  <o:Characters>9270</o:Characters>
++   <o:Lines>77</o:Lines>
++  <o:Paragraphs>18</o:Paragraphs>
++  <o:CharactersWithSpaces>11384</o:CharactersWithSpaces>
++  <o:Version>9.4402</o:Version>
++ </o:DocumentProperties>
++</xml><![endif]--><!--[if gte mso 9]><xml>
++ <w:WordDocument>
++  <w:TrackRevisions/>
++ </w:WordDocument>
++</xml><![endif]-->
++<style>
++<!--
++ /* Font Definitions */
++@font-face
++	{font-family:Tahoma;
++	panose-1:2 11 6 4 3 5 4 4 2 4;
++	mso-font-charset:0;
++	mso-generic-font-family:swiss;
++	mso-font-pitch:variable;
++	mso-font-signature:553679495 -2147483648 8 0 66047 0;}
++ /* Style Definitions */
++p.MsoNormal, li.MsoNormal, div.MsoNormal
++	{mso-style-parent:"";
++	margin:0in;
++	margin-bottom:.0001pt;
++	mso-pagination:widow-orphan;
++	font-size:12.0pt;
++	font-family:"Times New Roman";
++	mso-fareast-font-family:"Times New Roman";}
++p
++	{margin-right:0in;
++	mso-margin-top-alt:auto;
++	mso-margin-bottom-alt:auto;
++	margin-left:0in;
++	mso-pagination:widow-orphan;
++	font-size:12.0pt;
++	font-family:"Times New Roman";
++	mso-fareast-font-family:"Times New Roman";}
++p.BalloonText, li.BalloonText, div.BalloonText
++	{mso-style-name:"Balloon Text";
++	margin:0in;
++	margin-bottom:.0001pt;
++	mso-pagination:widow-orphan;
++	font-size:8.0pt;
++	font-family:Tahoma;
++	mso-fareast-font-family:"Times New Roman";}
++@page Section1
++	{size:8.5in 11.0in;
++	margin:1.0in 1.25in 1.0in 1.25in;
++	mso-header-margin:.5in;
++	mso-footer-margin:.5in;
++	mso-paper-source:0;}
++div.Section1
++	{page:Section1;}
++-->
++</style>
++</head>
++
++<body lang=EN-US style='tab-interval:.5in'>
++
++<div class=Section1>
++
++<p align=center style='text-align:center'><b>Eclipse Public License - v 1.0</b>
++</p>
++
++<p><span style='font-size:10.0pt'>THE ACCOMPANYING PROGRAM IS PROVIDED UNDER
++THE TERMS OF THIS ECLIPSE PUBLIC LICENSE (&quot;AGREEMENT&quot;). ANY USE,
++REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT'S ACCEPTANCE
++OF THIS AGREEMENT.</span> </p>
++
++<p><b><span style='font-size:10.0pt'>1. DEFINITIONS</span></b> </p>
++
++<p><span style='font-size:10.0pt'>&quot;Contribution&quot; means:</span> </p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>a)
++in the case of the initial Contributor, the initial code and documentation
++distributed under this Agreement, and<br clear=left>
++b) in the case of each subsequent Contributor:</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>i)
++changes to the Program, and</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>ii)
++additions to the Program;</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>where
++such changes and/or additions to the Program originate from and are distributed
++by that particular Contributor. A Contribution 'originates' from a Contributor
++if it was added to the Program by such Contributor itself or anyone acting on
++such Contributor's behalf. Contributions do not include additions to the
++Program which: (i) are separate modules of software distributed in conjunction
++with the Program under their own license agreement, and (ii) are not derivative
++works of the Program. </span></p>
++
++<p><span style='font-size:10.0pt'>&quot;Contributor&quot; means any person or
++entity that distributes the Program.</span> </p>
++
++<p><span style='font-size:10.0pt'>&quot;Licensed Patents &quot; mean patent
++claims licensable by a Contributor which are necessarily infringed by the use
++or sale of its Contribution alone or when combined with the Program. </span></p>
++
++<p><span style='font-size:10.0pt'>&quot;Program&quot; means the Contributions
++distributed in accordance with this Agreement.</span> </p>
++
++<p><span style='font-size:10.0pt'>&quot;Recipient&quot; means anyone who
++receives the Program under this Agreement, including all Contributors.</span> </p>
++
++<p><b><span style='font-size:10.0pt'>2. GRANT OF RIGHTS</span></b> </p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>a)
++Subject to the terms of this Agreement, each Contributor hereby grants Recipient
++a non-exclusive, worldwide, royalty-free copyright license to<span
++style='color:red'> </span>reproduce, prepare derivative works of, publicly
++display, publicly perform, distribute and sublicense the Contribution of such
++Contributor, if any, and such derivative works, in source code and object code
++form.</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>b)
++Subject to the terms of this Agreement, each Contributor hereby grants
++Recipient a non-exclusive, worldwide,<span style='color:green'> </span>royalty-free
++patent license under Licensed Patents to make, use, sell, offer to sell, import
++and otherwise transfer the Contribution of such Contributor, if any, in source
++code and object code form. This patent license shall apply to the combination
++of the Contribution and the Program if, at the time the Contribution is added
++by the Contributor, such addition of the Contribution causes such combination
++to be covered by the Licensed Patents. The patent license shall not apply to
++any other combinations which include the Contribution. No hardware per se is
++licensed hereunder. </span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>c)
++Recipient understands that although each Contributor grants the licenses to its
++Contributions set forth herein, no assurances are provided by any Contributor
++that the Program does not infringe the patent or other intellectual property
++rights of any other entity. Each Contributor disclaims any liability to Recipient
++for claims brought by any other entity based on infringement of intellectual
++property rights or otherwise. As a condition to exercising the rights and
++licenses granted hereunder, each Recipient hereby assumes sole responsibility
++to secure any other intellectual property rights needed, if any. For example,
++if a third party patent license is required to allow Recipient to distribute
++the Program, it is Recipient's responsibility to acquire that license before
++distributing the Program.</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>d)
++Each Contributor represents that to its knowledge it has sufficient copyright
++rights in its Contribution, if any, to grant the copyright license set forth in
++this Agreement. </span></p>
++
++<p><b><span style='font-size:10.0pt'>3. REQUIREMENTS</span></b> </p>
++
++<p><span style='font-size:10.0pt'>A Contributor may choose to distribute the
++Program in object code form under its own license agreement, provided that:</span>
++</p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>a)
++it complies with the terms and conditions of this Agreement; and</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>b)
++its license agreement:</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>i)
++effectively disclaims on behalf of all Contributors all warranties and
++conditions, express and implied, including warranties or conditions of title
++and non-infringement, and implied warranties or conditions of merchantability
++and fitness for a particular purpose; </span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>ii)
++effectively excludes on behalf of all Contributors all liability for damages,
++including direct, indirect, special, incidental and consequential damages, such
++as lost profits; </span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>iii)
++states that any provisions which differ from this Agreement are offered by that
++Contributor alone and not by any other party; and</span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>iv)
++states that source code for the Program is available from such Contributor, and
++informs licensees how to obtain it in a reasonable manner on or through a
++medium customarily used for software exchange.<span style='color:blue'> </span></span></p>
++
++<p><span style='font-size:10.0pt'>When the Program is made available in source
++code form:</span> </p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>a)
++it must be made available under this Agreement; and </span></p>
++
++<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt'>b) a
++copy of this Agreement must be included with each copy of the Program. </span></p>
++
++<p><span style='font-size:10.0pt'>Contributors may not remove or alter any
++copyright notices contained within the Program. </span></p>
++
++<p><span style='font-size:10.0pt'>Each Contributor must identify itself as the
++originator of its Contribution, if any, in a manner that reasonably allows
++subsequent Recipients to identify the originator of the Contribution. </span></p>
++
++<p><b><span style='font-size:10.0pt'>4. COMMERCIAL DISTRIBUTION</span></b> </p>
++
++<p><span style='font-size:10.0pt'>Commercial distributors of software may
++accept certain responsibilities with respect to end users, business partners
++and the like. While this license is intended to facilitate the commercial use
++of the Program, the Contributor who includes the Program in a commercial
++product offering should do so in a manner which does not create potential
++liability for other Contributors. Therefore, if a Contributor includes the
++Program in a commercial product offering, such Contributor (&quot;Commercial
++Contributor&quot;) hereby agrees to defend and indemnify every other
++Contributor (&quot;Indemnified Contributor&quot;) against any losses, damages and
++costs (collectively &quot;Losses&quot;) arising from claims, lawsuits and other
++legal actions brought by a third party against the Indemnified Contributor to
++the extent caused by the acts or omissions of such Commercial Contributor in
++connection with its distribution of the Program in a commercial product
++offering. The obligations in this section do not apply to any claims or Losses
++relating to any actual or alleged intellectual property infringement. In order
++to qualify, an Indemnified Contributor must: a) promptly notify the Commercial
++Contributor in writing of such claim, and b) allow the Commercial Contributor
++to control, and cooperate with the Commercial Contributor in, the defense and
++any related settlement negotiations. The Indemnified Contributor may participate
++in any such claim at its own expense.</span> </p>
++
++<p><span style='font-size:10.0pt'>For example, a Contributor might include the
++Program in a commercial product offering, Product X. That Contributor is then a
++Commercial Contributor. If that Commercial Contributor then makes performance
++claims, or offers warranties related to Product X, those performance claims and
++warranties are such Commercial Contributor's responsibility alone. Under this
++section, the Commercial Contributor would have to defend claims against the
++other Contributors related to those performance claims and warranties, and if a
++court requires any other Contributor to pay any damages as a result, the
++Commercial Contributor must pay those damages.</span> </p>
++
++<p><b><span style='font-size:10.0pt'>5. NO WARRANTY</span></b> </p>
++
++<p><span style='font-size:10.0pt'>EXCEPT AS EXPRESSLY SET FORTH IN THIS
++AGREEMENT, THE PROGRAM IS PROVIDED ON AN &quot;AS IS&quot; BASIS, WITHOUT
++WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING,
++WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
++MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is solely
++responsible for determining the appropriateness of using and distributing the
++Program and assumes all risks associated with its exercise of rights under this
++Agreement , including but not limited to the risks and costs of program errors,
++compliance with applicable laws, damage to or loss of data, programs or
++equipment, and unavailability or interruption of operations. </span></p>
++
++<p><b><span style='font-size:10.0pt'>6. DISCLAIMER OF LIABILITY</span></b> </p>
++
++<p><span style='font-size:10.0pt'>EXCEPT AS EXPRESSLY SET FORTH IN THIS
++AGREEMENT, NEITHER RECIPIENT NOR ANY CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR
++ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++(INCLUDING WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY
++OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
++NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OR DISTRIBUTION OF
++THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED HEREUNDER, EVEN IF ADVISED OF
++THE POSSIBILITY OF SUCH DAMAGES.</span> </p>
++
++<p><b><span style='font-size:10.0pt'>7. GENERAL</span></b> </p>
++
++<p><span style='font-size:10.0pt'>If any provision of this Agreement is invalid
++or unenforceable under applicable law, it shall not affect the validity or
++enforceability of the remainder of the terms of this Agreement, and without
++further action by the parties hereto, such provision shall be reformed to the
++minimum extent necessary to make such provision valid and enforceable.</span> </p>
++
++<p><span style='font-size:10.0pt'>If Recipient institutes patent litigation
++against any entity (including a cross-claim or counterclaim in a lawsuit)
++alleging that the Program itself (excluding combinations of the Program with
++other software or hardware) infringes such Recipient's patent(s), then such
++Recipient's rights granted under Section 2(b) shall terminate as of the date
++such litigation is filed. </span></p>
++
++<p><span style='font-size:10.0pt'>All Recipient's rights under this Agreement
++shall terminate if it fails to comply with any of the material terms or
++conditions of this Agreement and does not cure such failure in a reasonable
++period of time after becoming aware of such noncompliance. If all Recipient's
++rights under this Agreement terminate, Recipient agrees to cease use and
++distribution of the Program as soon as reasonably practicable. However,
++Recipient's obligations under this Agreement and any licenses granted by
++Recipient relating to the Program shall continue and survive. </span></p>
++
++<p><span style='font-size:10.0pt'>Everyone is permitted to copy and distribute
++copies of this Agreement, but in order to avoid inconsistency the Agreement is
++copyrighted and may only be modified in the following manner. The Agreement
++Steward reserves the right to publish new versions (including revisions) of
++this Agreement from time to time. No one other than the Agreement Steward has
++the right to modify this Agreement. The Eclipse Foundation is the initial
++Agreement Steward. The Eclipse Foundation may assign the responsibility to
++serve as the Agreement Steward to a suitable separate entity. Each new version
++of the Agreement will be given a distinguishing version number. The Program
++(including Contributions) may always be distributed subject to the version of
++the Agreement under which it was received. In addition, after a new version of
++the Agreement is published, Contributor may elect to distribute the Program
++(including its Contributions) under the new version. Except as expressly stated
++in Sections 2(a) and 2(b) above, Recipient receives no rights or licenses to
++the intellectual property of any Contributor under this Agreement, whether
++expressly, by implication, estoppel or otherwise. All rights in the Program not
++expressly granted under this Agreement are reserved.</span> </p>
++
++<p><span style='font-size:10.0pt'>This Agreement is governed by the laws of the
++State of New York and the intellectual property laws of the United States of
++America. No party to this Agreement will bring a legal action under this
++Agreement more than one year after the cause of action arose. Each party waives
++its rights to a jury trial in any resulting litigation.</span> </p>
++
++<p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
++
++</div>
++
++</body>
++
++</html>
+\ No newline at end of file
+Index: plugin.xml
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/plugin.xml,v
+retrieving revision 1.13
+diff -u -r1.13 plugin.xml
+--- plugin.xml	15 Jul 2008 21:57:01 -0000	1.13
++++ plugin.xml	1 Mar 2011 23:27:15 -0000
+@@ -18,7 +18,7 @@
+       <context
+             name="%terminal.context.name"
+             description="%terminal.context.description"
+-            id="org.eclipse.tm.terminal.TerminalContext"
++            id="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             />
+    </extension>
+ 	<extension point="org.eclipse.help.contexts">
+@@ -28,12 +28,12 @@
+          point="org.eclipse.ui.commands">
+       <!-- Dummy commands for bindings, see below -->
+       <command
+-            categoryId="org.eclipse.tm.terminal.category1"
+-            id="org.eclipse.tm.terminal.command1"
++            categoryId="com.aptana.org.eclipse.tm.terminal.category1"
++            id="com.aptana.org.eclipse.tm.terminal.command1"
+             name="%terminal.insertion.name"/>
+       <category
+             description="%terminal.view.insertion.description"
+-            id="org.eclipse.tm.terminal.category1"
++            id="com.aptana.org.eclipse.tm.terminal.category1"
+             name="%terminal.insertion.category.name"/>
+    </extension>
+    <extension
+@@ -46,63 +46,63 @@
+       keys.
+       -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+A"/> <!-- Search -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+E"/> <!-- Edit -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+F"/> <!-- File -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+G"/> 
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+H"/> <!-- Help -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+N"/> <!-- Navigate -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+P"/> <!-- Project -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+R"/> <!-- Run -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+S"/> <!-- Source -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+T"/> <!-- Refactor -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+V"/> <!-- CVS -->
+       <key
+-            commandId="org.eclipse.tm.terminal.command1"
+-            contextId="org.eclipse.tm.terminal.TerminalContext"
++            commandId="com.aptana.org.eclipse.tm.terminal.command1"
++            contextId="com.aptana.org.eclipse.tm.terminal.TerminalContext"
+             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+             sequence="Alt+W"/> <!-- Window -->
+    </extension>
+Index: schema/terminalConnectors.exsd
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/schema/terminalConnectors.exsd,v
+retrieving revision 1.4
+diff -u -r1.4 terminalConnectors.exsd
+--- schema/terminalConnectors.exsd	10 Jul 2009 12:47:22 -0000	1.4
++++ schema/terminalConnectors.exsd	1 Mar 2011 23:27:15 -0000
+@@ -1,9 +1,9 @@
+ <?xml version='1.0' encoding='UTF-8'?>
+ <!-- Schema file written by PDE -->
+-<schema targetNamespace="org.eclipse.tm.terminal" xmlns="http://www.w3.org/2001/XMLSchema">
++<schema targetNamespace="com.aptana.org.eclipse.tm.terminal" xmlns="http://www.w3.org/2001/XMLSchema">
+ <annotation>
+       <appInfo>
+-         <meta.schema plugin="org.eclipse.tm.terminal" id="terminalConnectors" name="Terminal Connectors"/>
++         <meta.schema plugin="com.aptana.org.eclipse.tm.terminal" id="terminalConnectors" name="Terminal Connectors"/>
+       </appInfo>
+       <documentation>
+          
+Index: src/org/eclipse/tm/internal/terminal/connector/TerminalConnector.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/connector/TerminalConnector.java,v
+retrieving revision 1.7
+diff -u -r1.7 TerminalConnector.java
+--- src/org/eclipse/tm/internal/terminal/connector/TerminalConnector.java	9 Jul 2009 10:59:44 -0000	1.7
++++ src/org/eclipse/tm/internal/terminal/connector/TerminalConnector.java	1 Mar 2011 23:27:15 -0000
+@@ -23,7 +23,6 @@
+ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+ import org.eclipse.tm.internal.terminal.provisional.api.Logger;
+-import org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension;
+ import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+ import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
+ 
+@@ -44,7 +43,7 @@
+  * @noextend This class is not intended to be subclassed by clients.
+  * @noinstantiate This class is not intended to be instantiated by clients.
+  *                Clients can get terminal connector instances through the
+- *                {@link TerminalConnectorExtension} class.
++ *                {@link org.eclipse.tm.internal.terminal.provisional.api.TerminalConnectorExtension} class.
+  * @since org.eclipse.tm.terminal 2.0
+  */
+ public class TerminalConnector implements ITerminalConnector {
+@@ -197,6 +196,7 @@
+ 			fConnector.setTerminalSize(newWidth, newHeight);
+ 		}
+ 	}
++	@SuppressWarnings("rawtypes")
+ 	public Object getAdapter(Class adapter) {
+ 		TerminalConnectorImpl connector=null;
+ 		if(isInitialized())
+Index: src/org/eclipse/tm/internal/terminal/control/CommandInputFieldWithHistory.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/control/CommandInputFieldWithHistory.java,v
+retrieving revision 1.16
+diff -u -r1.16 CommandInputFieldWithHistory.java
+--- src/org/eclipse/tm/internal/terminal/control/CommandInputFieldWithHistory.java	16 Jul 2009 20:13:43 -0000	1.16
++++ src/org/eclipse/tm/internal/terminal/control/CommandInputFieldWithHistory.java	1 Mar 2011 23:27:15 -0000
+@@ -51,6 +51,7 @@
+  * </li>
+  *
+  */
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class CommandInputFieldWithHistory implements ICommandInputField {
+ 	private class FieldAssist implements IContentProposalProvider {
+ 
+Index: src/org/eclipse/tm/internal/terminal/control/ITerminalViewControl.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/control/ITerminalViewControl.java,v
+retrieving revision 1.14
+diff -u -r1.14 ITerminalViewControl.java
+--- src/org/eclipse/tm/internal/terminal/control/ITerminalViewControl.java	7 Jul 2008 20:38:07 -0000	1.14
++++ src/org/eclipse/tm/internal/terminal/control/ITerminalViewControl.java	1 Mar 2011 23:27:15 -0000
+@@ -18,7 +18,6 @@
+ import org.eclipse.swt.graphics.Font;
+ import org.eclipse.swt.widgets.Control;
+ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+-import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+ import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+ 
+ /**
+@@ -30,7 +29,7 @@
+ 	 * Set the encoding that the Terminal uses to decode byte streams into
+ 	 * characters.
+ 	 *
+-	 * @see ITerminalControl#setEncoding(String)
++	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#setEncoding(String)
+ 	 * @since org.eclipse.tm.terminal 2.0
+ 	 */
+ 	void setEncoding(String encoding) throws UnsupportedEncodingException;
+@@ -39,7 +38,7 @@
+ 	 * Get the Terminal's current encoding.
+ 	 *
+ 	 * @return the current Encoding of the Terminal.
+-	 * @see ITerminalControl#getEncoding()
++	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#getEncoding()
+ 	 * @since org.eclipse.tm.terminal 2.0
+ 	 */
+ 	String getEncoding();
+@@ -68,7 +67,7 @@
+     void disposeTerminal();
+     String getSettingsSummary();
+     ITerminalConnector[] getConnectors();
+-    void setFocus();
++    boolean setFocus();
+     ITerminalConnector getTerminalConnector();
+     void setConnector(ITerminalConnector connector);
+     void connectTerminal();
+Index: src/org/eclipse/tm/internal/terminal/control/impl/ITerminalControlForText.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/control/impl/ITerminalControlForText.java,v
+retrieving revision 1.7
+diff -u -r1.7 ITerminalControlForText.java
+--- src/org/eclipse/tm/internal/terminal/control/impl/ITerminalControlForText.java	8 Jun 2008 03:10:21 -0000	1.7
++++ src/org/eclipse/tm/internal/terminal/control/impl/ITerminalControlForText.java	1 Mar 2011 23:27:15 -0000
+@@ -27,6 +27,8 @@
+ 	void setState(TerminalState state);
+ 	void setTerminalTitle(String title);
+ 	
++	void setApplicationKeypad(boolean mode);
++	
+ 	ITerminalConnector getTerminalConnector();
+ 
+ 	OutputStream getOutputStream();
+Index: src/org/eclipse/tm/internal/terminal/control/impl/TerminalPlugin.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/control/impl/TerminalPlugin.java,v
+retrieving revision 1.5
+diff -u -r1.5 TerminalPlugin.java
+--- src/org/eclipse/tm/internal/terminal/control/impl/TerminalPlugin.java	25 Apr 2008 20:14:44 -0000	1.5
++++ src/org/eclipse/tm/internal/terminal/control/impl/TerminalPlugin.java	1 Mar 2011 23:27:15 -0000
+@@ -29,7 +29,7 @@
+ 
+ public class TerminalPlugin extends AbstractUIPlugin {
+ 	protected static TerminalPlugin fDefault;
+-	public static final String  PLUGIN_ID  = "org.eclipse.tm.terminal"; //$NON-NLS-1$
++	public static final String  PLUGIN_ID  = "com.aptana.org.eclipse.tm.terminal"; //$NON-NLS-1$
+ 	public static final String  HELP_VIEW  = PLUGIN_ID + ".terminal_view"; //$NON-NLS-1$
+ 
+ 	/**
+Index: src/org/eclipse/tm/internal/terminal/emulator/IVT100EmulatorBackend.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/emulator/IVT100EmulatorBackend.java,v
+retrieving revision 1.2
+diff -u -r1.2 IVT100EmulatorBackend.java
+--- src/org/eclipse/tm/internal/terminal/emulator/IVT100EmulatorBackend.java	19 Sep 2007 02:08:10 -0000	1.2
++++ src/org/eclipse/tm/internal/terminal/emulator/IVT100EmulatorBackend.java	1 Mar 2011 23:27:15 -0000
+@@ -169,4 +169,11 @@
+ 
+ 	int getColumns();
+ 
++	void setScrollingRegion(int topLine, int bottomLine);
++	
++	int getScrollingRegionTopLine();
++	int getScrollingRegionBottomLine();
++	
++	void setAlternativeScreenBuffer(boolean enable);
++
+ }
+\ No newline at end of file
+Index: src/org/eclipse/tm/internal/terminal/emulator/VT100BackendTraceDecorator.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/emulator/VT100BackendTraceDecorator.java,v
+retrieving revision 1.2
+diff -u -r1.2 VT100BackendTraceDecorator.java
+--- src/org/eclipse/tm/internal/terminal/emulator/VT100BackendTraceDecorator.java	19 Sep 2007 02:08:10 -0000	1.2
++++ src/org/eclipse/tm/internal/terminal/emulator/VT100BackendTraceDecorator.java	1 Mar 2011 23:27:15 -0000
+@@ -141,4 +141,24 @@
+ 		fBackend.setStyle(style);
+ 	}
+ 
++	public void setScrollingRegion(int topLine, int bottomLine) {
++		fWriter.println("setScrollingRegion("+topLine+", "+bottomLine+")"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
++		fBackend.setScrollingRegion(topLine, bottomLine);
++	}
++
++	public void setAlternativeScreenBuffer(boolean enable) {
++		fWriter.println("setAlternativeScreenBuffer("+enable+")"); //$NON-NLS-1$ //$NON-NLS-2$
++		fBackend.setAlternativeScreenBuffer(enable);
++	}
++
++	public int getScrollingRegionBottomLine() {
++		fWriter.println("getScrollingRegionBottomLine()"); //$NON-NLS-1$
++		return fBackend.getScrollingRegionBottomLine();
++	}
++
++	public int getScrollingRegionTopLine() {
++		fWriter.println("getScrollingRegionTopLine()"); //$NON-NLS-1$
++		return fBackend.getScrollingRegionTopLine();
++	}
++
+ }
+Index: src/org/eclipse/tm/internal/terminal/emulator/VT100Emulator.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/emulator/VT100Emulator.java,v
+retrieving revision 1.13
+diff -u -r1.13 VT100Emulator.java
+--- src/org/eclipse/tm/internal/terminal/emulator/VT100Emulator.java	1 Feb 2009 12:40:23 -0000	1.13
++++ src/org/eclipse/tm/internal/terminal/emulator/VT100Emulator.java	1 Mar 2011 23:27:16 -0000
+@@ -25,11 +25,11 @@
+ 
+ import org.eclipse.swt.events.ControlEvent;
+ import org.eclipse.swt.events.ControlListener;
++import org.eclipse.swt.widgets.Display;
+ import org.eclipse.tm.internal.terminal.control.impl.ITerminalControlForText;
+ import org.eclipse.tm.internal.terminal.control.impl.TerminalPlugin;
+ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalConnector;
+ import org.eclipse.tm.internal.terminal.provisional.api.Logger;
+-import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
+ import org.eclipse.tm.terminal.model.ITerminalTextData;
+ import org.eclipse.tm.terminal.model.Style;
+ 
+@@ -115,6 +115,11 @@
+ 	 * in field {@link #ansiParameters}.
+ 	 */
+ 	private int nextAnsiParameter = 0;
++	
++	private int lastCursorLine = -1;
++	private int lastCursorColumn = -1;
++	
++	private boolean insertMode = false;
+ 
+ 	Reader fReader;
+ 
+@@ -299,6 +304,10 @@
+ 				case '\u001b':
+ 					ansiState = ANSISTATE_ESCAPE; // Escape.
+ 					break;
++					
++				case '\u000e':
++				case '\u000f':
++					break;
+ 
+ 				default:
+ 					processNonControlCharacters(character);
+@@ -328,6 +337,12 @@
+ 					ansiOsCommand.delete(0, ansiOsCommand.length());
+ 					break;
+ 
++				case '=':
++				case '>':
++					terminal.setApplicationKeypad(character == '=');
++					ansiState = ANSISTATE_INITIAL;
++					break;
++					
+ 				case '7':
+ 					// Save cursor position and character attributes
+ 
+@@ -350,6 +365,12 @@
+ 					resetTerminal();
+ 					break;
+ 
++				case 'M':
++					// Reverse index
++					ansiState = ANSISTATE_INITIAL;
++					reverseIndex();
++					break;
++
+ 				default:
+ 					Logger
+ 							.log("Unsupported escape sequence: escape '" + character + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+@@ -398,6 +419,17 @@
+ 		text.setCursor(0, 0);
+ 		text.setStyle(text.getDefaultStyle());
+ 	}
++	
++	private void reverseIndex() {
++		int line = text.getCursorLine() - 1;
++		int topMargin = text.getScrollingRegionTopLine();
++		if (line < topMargin) {
++			text.insertLines(1);
++			line = topMargin;
++		}
++		text.setCursorLine(line);
++	}
++		
+ 	/**
+ 	 * This method is called when we have parsed an OS Command escape sequence.
+ 	 * The only one we support is "\e]0;...\u0007", which sets the terminal
+@@ -467,6 +499,11 @@
+ 			processAnsiCommand_G();
+ 			break;
+ 
++		case 'h':
++			// Set Mode.
++			processAnsiCommand_h();
++			break;
++
+ 		case 'H':
+ 			// Set cursor Position.
+ 			processAnsiCommand_H();
+@@ -482,6 +519,11 @@
+ 			processAnsiCommand_K();
+ 			break;
+ 
++		case 'l':
++			// Reset Mode.
++			processAnsiCommand_l();
++			break;
++
+ 		case 'L':
+ 			// Insert line(s) (current line moves down).
+ 			processAnsiCommand_L();
+@@ -507,6 +549,11 @@
+ 			processAnsiCommand_P();
+ 			break;
+ 
++		case 'r':
++			// Set Top and Bottom Margins.
++			processAnsiCommand_r();
++			break;
++
+ 		case 'S':
+ 			// Scroll up.
+ 			// Emacs, vi, and GNU readline don't seem to use this command, so we ignore
+@@ -618,8 +665,72 @@
+ 	 * sequence parameters (default is the upper left corner of the screen).
+ 	 */
+ 	private void processAnsiCommand_H() {
++		lastCursorLine = text.getCursorLine();
++		lastCursorColumn = text.getCursorColumn();
+ 		moveCursor(getAnsiParameter(0) - 1, getAnsiParameter(1) - 1);
+ 	}
++	
++	/**
++	 * This method sets terminal mode.
++	 */
++	private void processAnsiCommand_h() {
++		if (ansiParameters.length > 0 && ansiParameters[0].length() > 0) {
++			if (ansiParameters[0].charAt(0) == '?') {
++				ansiParameters[0].deleteCharAt(0);
++				int ansiParameter = getAnsiParameter(0);
++				switch (ansiParameter) {
++				case 1:
++					terminal.setApplicationKeypad(true);
++					break;
++				case 47:
++					text.setAlternativeScreenBuffer(true);
++					break;
++				case 1049:
++					// TODO: store position
++					text.setAlternativeScreenBuffer(true);
++					break;
++				}
++			} else {
++				int ansiParameter = getAnsiParameter(0);
++				switch (ansiParameter) {
++				case 4:
++					insertMode = true;
++					break;
++				}				
++			}
++		}
++	}
++
++	/**
++	 * This method resets terminal mode.
++	 */
++	private void processAnsiCommand_l() {
++		if (ansiParameters.length > 0 && ansiParameters[0].length() > 0) {
++			if (ansiParameters[0].charAt(0) == '?') {
++				ansiParameters[0].deleteCharAt(0);
++				int ansiParameter = getAnsiParameter(0);
++				switch (ansiParameter) {
++				case 1:
++					terminal.setApplicationKeypad(false);
++					break;
++				case 47:
++					text.setAlternativeScreenBuffer(false);
++					break;
++				case 1049:
++					// TODO: restore position
++					text.setAlternativeScreenBuffer(false);
++					break;
++				}
++			} else {
++				int ansiParameter = getAnsiParameter(0);
++				switch (ansiParameter) {
++				case 4:
++					insertMode = false;
++					break;
++				}								
++			}
++		}
++	}
+ 
+ 	/**
+ 	 * This method deletes some (or all) of the text on the screen without
+@@ -645,7 +756,18 @@
+ 
+ 		case 2:
+ 			// Erase entire display.
+-
++			
++			if (text.getCursorLine() == 0 && text.getCursorColumn() == 0
++					&& lastCursorLine != -1 && lastCursorColumn != -1) {
++				moveCursor(lastCursorLine, lastCursorColumn);
++				for (int i = text.getLines(); i > 0; --i) {
++					text.processNewline();
++				}
++				moveCursor(0, 0);
++				lastCursorLine = -1;
++				lastCursorColumn = -1;
++				
++			}
+ 			text.eraseAll();
+ 			break;
+ 
+@@ -858,6 +980,13 @@
+ 	private void processAnsiCommand_P() {
+ 		text.deleteCharacters(getAnsiParameter(0));
+ 	}
++	
++	/**
++	 * Set Top and Bottom Margins
++	 */
++	private void processAnsiCommand_r() {
++		text.setScrollingRegion(getAnsiParameter(0), getAnsiParameter(1));
++	}
+ 
+ 	/**
+ 	 * This method returns one of the numeric ANSI parameters received in the
+@@ -923,7 +1052,8 @@
+ 			character=getNextChar();
+ 			if(character == '\u0000' || character == '\b' || character == '\t'
+ 				|| character == '\u0007' || character == '\n'
+-				|| character == '\r' || character == '\u001b') {
++				|| character == '\r' || character == '\u001b'
++				|| character == '\u000e' || character == '\u000f') {
+ 				pushBackChar(character);
+ 				break;
+ 			}
+@@ -948,6 +1078,9 @@
+ 	 * <p>
+ 	 */
+ 	private void displayNewText(String buffer) {
++		if (insertMode) {
++			text.insertCharacters(buffer.length());
++		}
+ 		text.appendString(buffer);
+ 	}
+ 
+@@ -956,8 +1089,11 @@
+ 	 * Process a BEL (Control-G) character.
+ 	 */
+ 	private void processBEL() {
+-		// TODO
+-		//Display.getDefault().beep();
++		Display.getDefault().asyncExec(new Runnable() {
++			public void run() {
++				Display.getCurrent().beep();
++			}
++		});
+ 	}
+ 
+ 	/**
+@@ -1115,6 +1251,7 @@
+ 	public void resetState() {
+ 		ansiState=ANSISTATE_INITIAL;
+ 		text.setStyle(text.getDefaultStyle());
++		text.setCursorColumn(0);
+ 	}
+ 
+ //	public OutputStream getOutputStream() {
+@@ -1133,6 +1270,10 @@
+ 		} else {
+ 			c = fReader.read();
+ 		}
++		// workaround for unicode characters (for some reasons they appear as 137 63 63)
++		if (c == 137) {
++			c = ' ';
++		}
+ 		// TODO: better end of file handling
+ 		if(c==-1)
+ 			c=0;
+Index: src/org/eclipse/tm/internal/terminal/emulator/VT100EmulatorBackend.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/emulator/VT100EmulatorBackend.java,v
+retrieving revision 1.3
+diff -u -r1.3 VT100EmulatorBackend.java
+--- src/org/eclipse/tm/internal/terminal/emulator/VT100EmulatorBackend.java	8 Oct 2007 21:12:56 -0000	1.3
++++ src/org/eclipse/tm/internal/terminal/emulator/VT100EmulatorBackend.java	1 Mar 2011 23:27:16 -0000
+@@ -10,12 +10,16 @@
+  *******************************************************************************/
+ package org.eclipse.tm.internal.terminal.emulator;
+ 
++import java.util.Stack;
++
++import org.eclipse.tm.internal.terminal.model.TerminalTextDataStore;
+ import org.eclipse.tm.terminal.model.ITerminalTextData;
+ import org.eclipse.tm.terminal.model.Style;
+ 
+ /**
+  *
+  */
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class VT100EmulatorBackend implements IVT100EmulatorBackend {
+ 
+ 	/**
+@@ -50,6 +54,11 @@
+ 	private Style fStyle;
+ 	int fLines;
+ 	int fColumns;
++	private int fScrollingRegionTopLine;
++	private int fScrollingRegionBottomLine;
++	private Stack fBufferStack = new Stack();
++	private boolean wrapNewLine = false;
++	
+ 	final private ITerminalTextData fTerminal;
+ 	public VT100EmulatorBackend(ITerminalTextData terminal) {
+ 		fTerminal=terminal;
+@@ -103,6 +112,7 @@
+ 			}
+ 			fLines=lines;
+ 			fColumns=cols;
++			setScrollingRegion(1, fLines);
+ 			// make the terminal at least as high as we need lines
+ 			fTerminal.setDimensions(newLines, fColumns);
+ 			setCursor(cl, cc);
+@@ -206,7 +216,7 @@
+ 				return;
+ 			assert n>0;
+ 			int line=toAbsoluteLine(fCursorLine);
+-			int nLines=fTerminal.getHeight()-line;
++			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)+1-line;
+ 			fTerminal.scroll(line, nLines, n);
+ 		}
+ 	}
+@@ -236,13 +246,13 @@
+ 				return;
+ 			assert n>0;
+ 			int line=toAbsoluteLine(fCursorLine);
+-			int nLines=fTerminal.getHeight()-line;
++			int nLines=toAbsoluteLine(fScrollingRegionBottomLine)+1-line;
+ 			fTerminal.scroll(line, nLines, -n);
+ 		}
+ 	}
++	
+ 	private boolean isCusorInScrollingRegion() {
+-		// TODO Auto-generated method stub
+-		return true;
++		return (fScrollingRegionTopLine <= fCursorLine && fCursorLine <= fScrollingRegionBottomLine);
+ 	}
+ 
+ 	/* (non-Javadoc)
+@@ -287,18 +297,20 @@
+ 	public void appendString(String buffer) {
+ 		synchronized (fTerminal) {
+ 			char[] chars=buffer.toCharArray();
+-			int line=toAbsoluteLine(fCursorLine);
+ 			int i=0;
+ 			while (i < chars.length) {
++				if (wrapNewLine) {
++					doNewline();
++				}
++				int line=toAbsoluteLine(fCursorLine);
+ 				int n=Math.min(fColumns-fCursorColumn,chars.length-i);
+ 				fTerminal.setChars(line, fCursorColumn, chars, i, n, fStyle);
+ 				int col=fCursorColumn+n;
+ 				i+=n;
+ 				// wrap needed?
+ 				if(col>=fColumns) {
+-					doNewline();
+-					line=toAbsoluteLine(fCursorLine);
+ 					setCursorColumn(0);
++					wrapNewLine = true;
+ 				} else {
+ 					setCursorColumn(col);
+ 				}
+@@ -310,11 +322,14 @@
+ 	 * MUST be called from a synchronized block!
+ 	 */
+ 	private void doNewline() {
++		wrapNewLine = false;
+ 		if(fCursorLine+1>=fLines) {
+ 			int h=fTerminal.getHeight();
+ 			fTerminal.addLine();
+ 			if(h!=fTerminal.getHeight())
+ 				setCursorLine(fCursorLine+1);
++		} else if (fScrollingRegionTopLine != 0 || fScrollingRegionBottomLine != fLines-1) {
++			fTerminal.scroll(toAbsoluteLine(fScrollingRegionTopLine), fScrollingRegionBottomLine-fScrollingRegionTopLine+1, -1);
+ 		} else {
+ 			setCursorLine(fCursorLine+1);
+ 		}
+@@ -358,6 +373,7 @@
+ 	 */
+ 	public void setCursorColumn(int targetColumn) {
+ 		synchronized (fTerminal) {
++			wrapNewLine = false;
+ 			if(targetColumn<0)
+ 				targetColumn=0;
+ 			else if(targetColumn>=fColumns)
+@@ -375,6 +391,7 @@
+ 	 */
+ 	public void setCursorLine(int targetLine) {
+ 		synchronized (fTerminal) {
++			wrapNewLine = false;
+ 			if(targetLine<0)
+ 				targetLine=0;
+ 			else if(targetLine>=fLines)
+@@ -404,4 +421,46 @@
+ 			return fColumns;
+ 		}
+ 	}
++	
++	/* (non-Javadoc)
++	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setScrollingRegion(int, int)
++	 */
++	public void setScrollingRegion(int topLine, int bottomLine) {
++		fScrollingRegionTopLine=topLine-1;
++		fScrollingRegionBottomLine=bottomLine-1;
++	}
++
++	/* (non-Javadoc)
++	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionBottomLine()
++	 */
++	public int getScrollingRegionBottomLine() {
++		return fScrollingRegionBottomLine;
++	}
++
++	/* (non-Javadoc)
++	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#getScrollingRegionTopLine()
++	 */
++	public int getScrollingRegionTopLine() {
++		return fScrollingRegionTopLine;
++	}
++
++	/* (non-Javadoc)
++	 * @see org.eclipse.tm.internal.terminal.emulator.IVT100EmulatorBackend#setAlternativeScreenBuffer(boolean)
++	 */
++	public void setAlternativeScreenBuffer(boolean enable) {
++		synchronized (fTerminal) {
++			wrapNewLine = false;
++			if (enable) {
++				ITerminalTextData data = new TerminalTextDataStore();
++				data.copy(fTerminal);
++				fBufferStack.push(data);
++			} else if (!fBufferStack.isEmpty()) {
++				ITerminalTextData data = (ITerminalTextData) fBufferStack.pop();
++				if (fTerminal.getWidth() != data.getWidth()) {
++					data.setDimensions(data.getHeight(), fTerminal.getWidth());
++				}
++				fTerminal.copy(data);
++			}
++		}
++	}
+ }
+Index: src/org/eclipse/tm/internal/terminal/emulator/VT100TerminalControl.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/emulator/VT100TerminalControl.java,v
+retrieving revision 1.27
+diff -u -r1.27 VT100TerminalControl.java
+--- src/org/eclipse/tm/internal/terminal/emulator/VT100TerminalControl.java	4 Dec 2008 19:37:11 -0000	1.27
++++ src/org/eclipse/tm/internal/terminal/emulator/VT100TerminalControl.java	1 Mar 2011 23:27:16 -0000
+@@ -33,11 +33,14 @@
+ import java.io.OutputStream;
+ import java.io.UnsupportedEncodingException;
+ import java.net.SocketException;
++import java.util.Arrays;
+ 
+ import org.eclipse.core.runtime.IProgressMonitor;
+ import org.eclipse.core.runtime.IStatus;
+ import org.eclipse.core.runtime.Status;
+ import org.eclipse.core.runtime.jobs.Job;
++import org.eclipse.jface.bindings.keys.KeyStroke;
++import org.eclipse.jface.bindings.keys.SWTKeySupport;
+ import org.eclipse.jface.resource.JFaceResources;
+ import org.eclipse.osgi.util.NLS;
+ import org.eclipse.swt.SWT;
+@@ -67,6 +70,7 @@
+ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
+ import org.eclipse.tm.internal.terminal.provisional.api.Logger;
+ import org.eclipse.tm.internal.terminal.provisional.api.TerminalState;
++import org.eclipse.tm.internal.terminal.textcanvas.ILinelRenderer;
+ import org.eclipse.tm.internal.terminal.textcanvas.ITextCanvasModel;
+ import org.eclipse.tm.internal.terminal.textcanvas.PipedInputStream;
+ import org.eclipse.tm.internal.terminal.textcanvas.PollingTextCanvasModel;
+@@ -93,6 +97,14 @@
+ public class VT100TerminalControl implements ITerminalControlForText, ITerminalControl, ITerminalViewControl
+ {
+     protected final static String[] LINE_DELIMITERS = { "\n" }; //$NON-NLS-1$
++    
++    protected final static int[] BYPASS_ACCELERATORS = new int[] {
++    	SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'C')),
++		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'V')),
++		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.COMMAND == SWT.MOD1 ? SWT.MOD1 : SWT.MOD1 | SWT.MOD2, 'A')),
++		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.CONTROL, SWT.TAB)),
++		SWTKeySupport.convertKeyStrokeToAccelerator(KeyStroke.getInstance(SWT.CONTROL | SWT.SHIFT, SWT.TAB))
++    };
+ 
+     /**
+      * This field holds a reference to a TerminalText object that performs all ANSI
+@@ -119,6 +131,8 @@
+ 
+ 	private volatile TerminalState fState;
+ 
++	private boolean isApplicationKeypad = false;
++
+ 	private final ITerminalTextData fTerminalModel;
+ 
+ 	/**
+@@ -267,8 +281,8 @@
+ 	/* (non-Javadoc)
+ 	 * @see org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl#setFocus()
+ 	 */
+-	public void setFocus() {
+-		getCtlText().setFocus();
++	public boolean setFocus() {
++		return getCtlText().setFocus();
+ 	}
+ 
+ 	/* (non-Javadoc)
+@@ -491,6 +505,10 @@
+ 					Logger.log("sending ESC + '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					getOutputStream().write('\u001b');
+ 					getOutputStream().write(byteToSend);
++				} else if (byteToSend > 127) {
++					byte[] bytesToSend = String.valueOf(chKey).getBytes(fEncoding);
++					Logger.log("sending '" + Arrays.asList(bytesToSend) + "'"); //$NON-NLS-1$ //$NON-NLS-2$
++					getOutputStream().write(bytesToSend);
+ 				} else {
+ 					Logger.log("sending '" + byteToSend + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					getOutputStream().write(byteToSend);
+@@ -574,11 +592,9 @@
+ 		// TODO how to get the initial size correctly!
+ 		snapshot.updateSnapshot(false);
+ 		ITextCanvasModel canvasModel=new PollingTextCanvasModel(snapshot);
+-		fCtlText=new TextCanvas(fWndParent,canvasModel,SWT.NONE,new TextLineRenderer(fCtlText,canvasModel));
+-
++		fCtlText=createTextCanvas(fWndParent,canvasModel,createLineRenderer(canvasModel));
+ 
+ 		fCtlText.setLayoutData(new GridData(GridData.FILL_BOTH));
+-		fCtlText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+ 		fCtlText.addResizeHandler(new TextCanvas.ResizeListener() {
+ 			public void sizeChanged(int lines, int columns) {
+ 				fTerminalText.setDimensions(lines, columns);
+@@ -591,6 +607,14 @@
+ //		fViewer.setDocument(new TerminalDocument());
+ 		setFont(JFaceResources.getTextFont());
+ 	}
++	
++	protected TextCanvas createTextCanvas(Composite parent, ITextCanvasModel canvasModel, ILinelRenderer linelRenderer) {
++		return new TextCanvas(parent, canvasModel, SWT.NONE, linelRenderer);
++	}
++	
++	protected ILinelRenderer createLineRenderer(ITextCanvasModel model) {
++		return new TextLineRenderer(null,model);
++	}
+ 
+ 	protected void setupListeners() {
+ 		fKeyHandler = new TerminalKeyHandler();
+@@ -707,7 +731,7 @@
+ 			IContextService contextService = (IContextService) PlatformUI
+ 					.getWorkbench().getAdapter(IContextService.class);
+ 			contextActivation = contextService
+-					.activateContext("org.eclipse.tm.terminal.TerminalContext"); //$NON-NLS-1$
++					.activateContext("com.aptana.org.eclipse.tm.terminal.TerminalContext"); //$NON-NLS-1$
+ 		}
+ 
+ 		public void focusLost(FocusEvent event) {
+@@ -729,6 +753,19 @@
+ 		public void keyPressed(KeyEvent event) {
+ 			if (getState()==TerminalState.CONNECTING)
+ 				return;
++			
++			int accelerator = SWTKeySupport.convertEventToUnmodifiedAccelerator(event);
++			for (int i = 0; i < BYPASS_ACCELERATORS.length; ++i) {
++				if (BYPASS_ACCELERATORS[i] == accelerator) {
++					return;
++				}
++			}
++			char character = event.character;
++			if (character == '\u0000') {
++				if ((event.stateMask & SWT.MOD1) !=0 && event.keyCode >= SWT.F1 && event.keyCode <= SWT.F15) {
++					return;
++				}
++			}
+ 
+ 			// We set the event.doit to false to prevent any further processing of this
+ 			// key event.  The only reason this is here is because I was seeing the F10
+@@ -738,8 +775,6 @@
+ 
+ 			event.doit = false;
+ 
+-			char character = event.character;
+-
+ 			//if (!isConnected()) {
+ 			if (fState==TerminalState.CLOSED) {
+ 				// Pressing ENTER while not connected causes us to connect.
+@@ -773,35 +808,35 @@
+ 
+ 				switch (event.keyCode) {
+ 				case 0x1000001: // Up arrow.
+-					sendString("\u001b[A"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOA" : "\u001b[A"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x1000002: // Down arrow.
+-					sendString("\u001b[B"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOB" : "\u001b[B"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x1000003: // Left arrow.
+-					sendString("\u001b[D"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOD" : "\u001b[D"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x1000004: // Right arrow.
+-					sendString("\u001b[C"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOC" : "\u001b[C"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x1000005: // PgUp key.
+-					sendString("\u001b[I"); //$NON-NLS-1$
++					sendString("\u001b[5~"); //$NON-NLS-1$
+ 					break;
+ 
+ 				case 0x1000006: // PgDn key.
+-					sendString("\u001b[G"); //$NON-NLS-1$
++					sendString("\u001b[6~"); //$NON-NLS-1$
+ 					break;
+ 
+ 				case 0x1000007: // Home key.
+-					sendString("\u001b[H"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOH" : "\u001b[H"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x1000008: // End key.
+-					sendString("\u001b[F"); //$NON-NLS-1$
++					sendString(isApplicationKeypad ? "\u001bOF" : "\u001b[F"); //$NON-NLS-1$ //$NON-NLS-2$
+ 					break;
+ 
+ 				case 0x100000a: // F1 key.
+@@ -867,6 +902,17 @@
+ 				// It's ok to return here, because we never locally echo special keys.
+ 
+ 				return;
++			} else if (event.stateMask == 0) {
++				switch (event.keyCode) {
++				case 8:
++					sendString("\u007f"); //$NON-NLS-1$
++					return;
++				case 127:
++					sendString("\u001b[3~"); //$NON-NLS-1$
++					return;
++				default:
++					break;
++				}
+ 			}
+ 
+ 			// To fix SPR 110341, we consider the Alt key to be pressed only when the
+@@ -1019,4 +1065,8 @@
+ 	public void setInvertedColors(boolean invert) {
+ 		fCtlText.setInvertedColors(invert);
+ 	}
++
++	public void setApplicationKeypad(boolean mode) {
++		isApplicationKeypad = mode;
++	}
+ }
+Index: src/org/eclipse/tm/internal/terminal/model/TerminalTextData.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/model/TerminalTextData.java,v
+retrieving revision 1.6
+diff -u -r1.6 TerminalTextData.java
+--- src/org/eclipse/tm/internal/terminal/model/TerminalTextData.java	11 Apr 2008 17:37:13 -0000	1.6
++++ src/org/eclipse/tm/internal/terminal/model/TerminalTextData.java	1 Mar 2011 23:27:16 -0000
+@@ -184,6 +184,7 @@
+ 	 * Removes the snapshot from the @observer@ list
+ 	 * @param snapshot A snapshot of a terminal model
+ 	 */
++	@SuppressWarnings({"unchecked","rawtypes"})
+ 	protected void removeSnapshot(TerminalTextDataSnapshot snapshot) {
+ 		// poor mans approach to modify the array
+ 		List list=new ArrayList();
+@@ -192,6 +193,7 @@
+ 		fSnapshots=(TerminalTextDataSnapshot[]) list.toArray(new TerminalTextDataSnapshot[list.size()]);
+ 	}
+ 
++	@SuppressWarnings({"unchecked","rawtypes"})
+ 	public ITerminalTextDataSnapshot makeSnapshot() {
+ 		// poor mans approach to modify the array
+ 		TerminalTextDataSnapshot snapshot=new TerminalTextDataSnapshot(this);
+@@ -222,8 +224,10 @@
+ 
+ 	public void copy(ITerminalTextData source) {
+ 		fData.copy(source);
++		sendLinesChangedToSnapshot(0, getHeight());
+ 		fCursorLine=source.getCursorLine();
+ 		fCursorColumn=source.getCursorColumn();
++		sendCursorChanged();
+ 	}
+ 
+ 	public void copyLine(ITerminalTextData source, int sourceLine, int destLine) {
+Index: src/org/eclipse/tm/internal/terminal/model/TerminalTextDataFastScroll.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/model/TerminalTextDataFastScroll.java,v
+retrieving revision 1.2
+diff -u -r1.2 TerminalTextDataFastScroll.java
+--- src/org/eclipse/tm/internal/terminal/model/TerminalTextDataFastScroll.java	19 Sep 2007 02:08:13 -0000	1.2
++++ src/org/eclipse/tm/internal/terminal/model/TerminalTextDataFastScroll.java	1 Mar 2011 23:27:16 -0000
+@@ -90,10 +90,14 @@
+ 
+ 	public void copy(ITerminalTextData source) {
+ 		int n=source.getHeight();
++		int oldn = getHeight();
+ 		setDimensions(source.getHeight(),source.getWidth());
+ 		for (int i = 0; i < n; i++) {
+ 			fData.copyLine(source, i, getPositionOfLine(i));
+ 		}
++		for (int i = n; i < oldn; ++i) {
++			fData.cleanLine(getPositionOfLine(i));
++		}
+ 	}
+ 
+ 	public void copyLine(ITerminalTextData source, int sourceLine, int destLine) {
+Index: src/org/eclipse/tm/internal/terminal/model/TerminalTextDataSnapshot.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/model/TerminalTextDataSnapshot.java,v
+retrieving revision 1.2
+diff -u -r1.2 TerminalTextDataSnapshot.java
+--- src/org/eclipse/tm/internal/terminal/model/TerminalTextDataSnapshot.java	19 Sep 2007 02:08:13 -0000	1.2
++++ src/org/eclipse/tm/internal/terminal/model/TerminalTextDataSnapshot.java	1 Mar 2011 23:27:16 -0000
+@@ -239,6 +239,7 @@
+ 		return fSnapshot.makeSnapshot();
+ 	}
+ 
++	@SuppressWarnings({"unchecked","rawtypes"})
+ 	synchronized public void addListener(SnapshotOutOfDateListener listener) {
+ 		List list=new ArrayList();
+ 		list.addAll(Arrays.asList(fListener));
+@@ -246,6 +247,7 @@
+ 		fListener=(SnapshotOutOfDateListener[]) list.toArray(new SnapshotOutOfDateListener[list.size()]);
+ 	}
+ 
++	@SuppressWarnings({"unchecked","rawtypes"})
+ 	synchronized public void removeListener(SnapshotOutOfDateListener listener) {
+ 		List list=new ArrayList();
+ 		list.addAll(Arrays.asList(fListener));
+Index: src/org/eclipse/tm/internal/terminal/model/TerminalTextDataStore.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/model/TerminalTextDataStore.java,v
+retrieving revision 1.2
+diff -u -r1.2 TerminalTextDataStore.java
+--- src/org/eclipse/tm/internal/terminal/model/TerminalTextDataStore.java	19 Sep 2007 02:08:13 -0000	1.2
++++ src/org/eclipse/tm/internal/terminal/model/TerminalTextDataStore.java	1 Mar 2011 23:27:16 -0000
+@@ -91,6 +91,7 @@
+ 	 * @param newSize the new array size.
+ 	 * @return A new array with the same contents (chopped off if needed or filled with 0 or null).
+ 	 */
++	@SuppressWarnings("rawtypes")
+ 	private Object resizeArray(Object origArray, int newSize) {
+ 		int oldSize = Array.getLength(origArray);
+ 		if(oldSize==newSize)
+@@ -107,6 +108,7 @@
+ 	/* (non-Javadoc)
+ 	 * @see org.eclipse.tm.internal.terminal.text.ITerminalTextData#getLineSegments(int, int, int)
+ 	 */
++	@SuppressWarnings({"unchecked","rawtypes"})
+ 	public LineSegment[] getLineSegments(int line, int column, int len) {
+ 		// get the styles and chars for this line
+ 		Style[] styles=fStyle[line];
+@@ -289,18 +291,21 @@
+ 		fStyle[destLine]=source.getStyles(sourceLine);
+ 	}
+ 
++	@SuppressWarnings("cast")
+ 	public char[] getChars(int line) {
+ 		if(fChars[line]==null)
+ 			return null;
+ 		return (char[]) fChars[line].clone();
+ 	}
+ 
++	@SuppressWarnings("cast")
+ 	public Style[] getStyles(int line) {
+ 		if(fStyle[line]==null)
+ 			return null;
+ 		return (Style[]) fStyle[line].clone();
+ 	}
+ 
++	@SuppressWarnings("cast")
+ 	public void setLine(int line, char[] chars, Style[] styles) {
+ 		fChars[line]=(char[]) chars.clone();
+ 		fStyle[line]=(Style[]) styles.clone();
+Index: src/org/eclipse/tm/internal/terminal/provisional/api/ITerminalConnector.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/provisional/api/ITerminalConnector.java,v
+retrieving revision 1.12
+diff -u -r1.12 ITerminalConnector.java
+--- src/org/eclipse/tm/internal/terminal/provisional/api/ITerminalConnector.java	10 Jul 2009 12:47:21 -0000	1.12
++++ src/org/eclipse/tm/internal/terminal/provisional/api/ITerminalConnector.java	1 Mar 2011 23:27:16 -0000
+@@ -16,8 +16,6 @@
+ import java.io.OutputStream;
+ 
+ import org.eclipse.core.runtime.IAdaptable;
+-import org.eclipse.tm.internal.terminal.control.ITerminalViewControl;
+-import org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl;
+ 
+ /**
+  * A contributed connection type to manage a single connection.
+@@ -26,14 +24,14 @@
+  * <code>org.eclipse.tm.terminal.terminalConnectors</code> extension point. This
+  * class gives access to the static markup of a terminal connector extension as
+  * well as providing the lifecycle management for the dynamically loaded
+- * {@link TerminalConnectorImpl} instance, which performs the actual
++ * {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} instance, which performs the actual
+  * communications. This pattern allows for lazy initialization, bundle
+- * activation and class loading of the actual {@link TerminalConnectorImpl}
++ * activation and class loading of the actual {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl}
+  * instance.
+  *
+  * Clients can get terminal connector instances from the
+  * {@link TerminalConnectorExtension} class, or from
+- * {@link ITerminalViewControl#getTerminalConnector()} when running inside an
++ * {@link org.eclipse.tm.internal.terminal.control.ITerminalViewControl#getTerminalConnector()} when running inside an
+  * active terminal widget.
+  *
+  * @noimplement This interface is not intended to be implemented by clients.
+@@ -69,7 +67,7 @@
+ 	boolean isHidden();
+ 
+ 	/**
+-	 * @return true if the {@link TerminalConnectorImpl} has been initialized.
++	 * @return true if the {@link org.eclipse.tm.internal.terminal.provisional.api.provider.TerminalConnectorImpl} has been initialized.
+ 	 * If there was an initialization error, {@link #getInitializationErrorMessage()}
+ 	 * returns the error message.
+ 	 * @since org.eclipse.tm.terminal 2.0
+Index: src/org/eclipse/tm/internal/terminal/provisional/api/TerminalConnectorExtension.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/provisional/api/TerminalConnectorExtension.java,v
+retrieving revision 1.15
+diff -u -r1.15 TerminalConnectorExtension.java
+--- src/org/eclipse/tm/internal/terminal/provisional/api/TerminalConnectorExtension.java	10 Jul 2009 12:47:21 -0000	1.15
++++ src/org/eclipse/tm/internal/terminal/provisional/api/TerminalConnectorExtension.java	1 Mar 2011 23:27:16 -0000
+@@ -36,6 +36,7 @@
+  * team.
+  * </p>
+  */
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class TerminalConnectorExtension {
+ 	static private ITerminalConnector makeConnector(final IConfigurationElement config) {
+ 		String id = config.getAttribute("id"); //$NON-NLS-1$
+@@ -66,7 +67,7 @@
+ 	 * @since org.eclipse.tm.terminal 2.0
+ 	 */
+ 	public static ITerminalConnector makeTerminalConnector(String id) {
+-		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
++		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("com.aptana.org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
+ 		for (int i = 0; i < config.length; i++) {
+ 			if(id.equals(config[i].getAttribute("id"))) { //$NON-NLS-1$
+ 				return makeConnector(config[i]);
+@@ -87,7 +88,7 @@
+ 	 * @since org.eclipse.tm.terminal 2.0 return value is ITerminalConnector[]
+ 	 */
+ 	public static ITerminalConnector[] makeTerminalConnectors() {
+-		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
++		IConfigurationElement[] config = RegistryFactory.getRegistry().getConfigurationElementsFor("com.aptana.org.eclipse.tm.terminal.terminalConnectors"); //$NON-NLS-1$
+ 		List result=new ArrayList();
+ 		for (int i = 0; i < config.length; i++) {
+ 			result.add(makeConnector(config[i]));
+Index: src/org/eclipse/tm/internal/terminal/textcanvas/AbstractTextCanvasModel.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/textcanvas/AbstractTextCanvasModel.java,v
+retrieving revision 1.13
+diff -u -r1.13 AbstractTextCanvasModel.java
+--- src/org/eclipse/tm/internal/terminal/textcanvas/AbstractTextCanvasModel.java	11 Apr 2008 17:37:13 -0000	1.13
++++ src/org/eclipse/tm/internal/terminal/textcanvas/AbstractTextCanvasModel.java	1 Mar 2011 23:27:16 -0000
+@@ -19,6 +19,7 @@
+ import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
+ import org.eclipse.tm.terminal.model.ITerminalTextDataSnapshot;
+ 
++@SuppressWarnings({"unchecked","rawtypes"})
+ abstract public class AbstractTextCanvasModel implements ITextCanvasModel {
+ 	protected List fListeners = new ArrayList();
+ 	private int fCursorLine;
+@@ -46,6 +47,7 @@
+ 		fSnapshot=snapshot;
+ 		fLines=fSnapshot.getHeight();
+ 	}
++	
+ 	public void addCellCanvasModelListener(ITextCanvasModelListener listener) {
+ 		fListeners.add(listener);
+ 	}
+Index: src/org/eclipse/tm/internal/terminal/textcanvas/GridCanvas.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/textcanvas/GridCanvas.java,v
+retrieving revision 1.6
+diff -u -r1.6 GridCanvas.java
+--- src/org/eclipse/tm/internal/terminal/textcanvas/GridCanvas.java	20 May 2010 01:53:16 -0000	1.6
++++ src/org/eclipse/tm/internal/terminal/textcanvas/GridCanvas.java	1 Mar 2011 23:27:16 -0000
+@@ -36,7 +36,7 @@
+ 		addListener(SWT.MouseWheel, new Listener() {
+ 			public void handleEvent(Event event) {
+ 				if(getVerticalBar().isVisible()) {
+-					int delta=-fCellHeight;
++					int delta=-fCellHeight*5;
+ 					if(event.count<0)
+ 						delta=-delta;
+ 					scrollYDelta(delta);
+Index: src/org/eclipse/tm/internal/terminal/textcanvas/StyleMap.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/textcanvas/StyleMap.java,v
+retrieving revision 1.14
+diff -u -r1.14 StyleMap.java
+--- src/org/eclipse/tm/internal/terminal/textcanvas/StyleMap.java	18 Feb 2009 18:11:09 -0000	1.14
++++ src/org/eclipse/tm/internal/terminal/textcanvas/StyleMap.java	1 Mar 2011 23:27:16 -0000
+@@ -28,31 +28,32 @@
+ import org.eclipse.tm.terminal.model.Style;
+ import org.eclipse.tm.terminal.model.StyleColor;
+ 
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class StyleMap {
+-	private static final String BLACK = "black"; //$NON-NLS-1$
+-	private static final String WHITE = "white"; //$NON-NLS-1$
+-	private static final String WHITE_FOREGROUND = "white_foreground"; //$NON-NLS-1$
+-	private static final String GRAY = "gray"; //$NON-NLS-1$
+-	private static final String MAGENTA = "magenta"; //$NON-NLS-1$
+-	private static final String CYAN = "cyan"; //$NON-NLS-1$
+-	private static final String YELLOW = "yellow"; //$NON-NLS-1$
+-	private static final String BLUE = "blue"; //$NON-NLS-1$
+-	private static final String GREEN = "green"; //$NON-NLS-1$
+-	private static final String RED = "red"; //$NON-NLS-1$
++	protected static final String BLACK = "black"; //$NON-NLS-1$
++	protected static final String WHITE = "white"; //$NON-NLS-1$
++	protected static final String WHITE_FOREGROUND = "white_foreground"; //$NON-NLS-1$
++	protected static final String GRAY = "gray"; //$NON-NLS-1$
++	protected static final String MAGENTA = "magenta"; //$NON-NLS-1$
++	protected static final String CYAN = "cyan"; //$NON-NLS-1$
++	protected static final String YELLOW = "yellow"; //$NON-NLS-1$
++	protected static final String BLUE = "blue"; //$NON-NLS-1$
++	protected static final String GREEN = "green"; //$NON-NLS-1$
++	protected static final String RED = "red"; //$NON-NLS-1$
+ 	
+ 	private static final String PREFIX = "org.eclipse.tm.internal."; //$NON-NLS-1$
+ 	// TODO propagate the name of the font in the FontRegistry
+ 	private static final String fDefaultFontName="terminal.views.view.font.definition"; //$NON-NLS-1$
+ 	String fFontName=fDefaultFontName;
+-	Map fColorMapForeground=new HashMap();
+-	Map fColorMapBackground=new HashMap();
++	protected Map fColorMapForeground=new HashMap();
++	protected Map fColorMapBackground=new HashMap();
+ 	Map fFontMap=new HashMap();
+ 	private Point fCharSize;
+ 	private final Style fDefaultStyle;
+ 	private boolean fInvertColors;
+ 	private boolean fProportional;
+ 	private final int[] fOffsets=new int[256];
+-	StyleMap() {
++	protected StyleMap() {
+ 		initColors();
+ 		fDefaultStyle=Style.getStyle(StyleColor.getStyleColor(BLACK),StyleColor.getStyleColor(WHITE));
+ 		updateFont();
+@@ -123,7 +124,7 @@
+ 		else
+ 			return getColor(fColorMapBackground,style.getBackground());
+ 	}
+-	Color getColor(Map map,StyleColor color) {
++	protected Color getColor(Map map,StyleColor color) {
+ 		Color c=(Color) map.get(color);
+ 		if(c==null) {
+ 			c=Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
+Index: src/org/eclipse/tm/internal/terminal/textcanvas/TextCanvas.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/textcanvas/TextCanvas.java,v
+retrieving revision 1.21
+diff -u -r1.21 TextCanvas.java
+--- src/org/eclipse/tm/internal/terminal/textcanvas/TextCanvas.java	19 Aug 2010 13:36:37 -0000	1.21
++++ src/org/eclipse/tm/internal/terminal/textcanvas/TextCanvas.java	1 Mar 2011 23:27:16 -0000
+@@ -17,8 +17,12 @@
+ package org.eclipse.tm.internal.terminal.textcanvas;
+ 
+ 
++import org.eclipse.core.runtime.Platform;
++import org.eclipse.jface.text.hyperlink.IHyperlink;
+ import org.eclipse.swt.SWT;
++import org.eclipse.swt.SWTError;
+ import org.eclipse.swt.dnd.Clipboard;
++import org.eclipse.swt.dnd.DND;
+ import org.eclipse.swt.dnd.TextTransfer;
+ import org.eclipse.swt.dnd.Transfer;
+ import org.eclipse.swt.events.FocusEvent;
+@@ -27,6 +31,7 @@
+ import org.eclipse.swt.events.MouseListener;
+ import org.eclipse.swt.events.MouseMoveListener;
+ import org.eclipse.swt.graphics.Color;
++import org.eclipse.swt.graphics.Cursor;
+ import org.eclipse.swt.graphics.GC;
+ import org.eclipse.swt.graphics.Point;
+ import org.eclipse.swt.graphics.Rectangle;
+@@ -86,6 +91,9 @@
+ 		fCellCanvasModel.addCellCanvasModelListener(new ITextCanvasModelListener(){
+ 			public void rangeChanged(int col, int line, int width, int height) {
+ 				repaintRange(col,line,width,height);
++				for (int i = line; i < line + height; i++) {
++					searchLineForHyperlinks(i);
++				}
+ 			}
+ 			public void dimensionsChanged(int cols, int rows) {
+ 				calculateGrid();
+@@ -127,11 +135,20 @@
+ 					updateHasSelection(e);
+ 					if(fHasSelection)
+ 						setSelection(screenPointToCell(e.x, e.y));
+-					else
++					else {
+ 						fCellCanvasModel.setSelection(-1,-1,-1,-1);
++						detectHyperlinkClicks();
++					}
+ 					fDraggingStart=null;
+ 				}
+ 			}
++			
++			protected void detectHyperlinkClicks() {
++				IHyperlink under = findHyperlink(fDraggingStart);
++				if (under != null) {
++					under.open();
++				}
++			}
+ 		});
+ 		addMouseMoveListener(new MouseMoveListener() {
+ 
+@@ -140,6 +157,15 @@
+ 					updateHasSelection(e);
+ 					setSelection(screenPointToCell(e.x, e.y));
+ 				}
++				
++				// Change cursor to hand if over a hyperlink
++				IHyperlink link = findHyperlink(screenPointToCell(e.x, e.y));
++				if (link != null) {
++					Cursor c = getDisplay().getSystemCursor(SWT.CURSOR_HAND);
++					setCursor(c);
++				} else {
++					setCursor(null);
++				}
+ 			}
+ 		});
+ 		serVerticalBarVisible(true);
+@@ -170,11 +196,25 @@
+ 				fCellCanvasModel.setSelection(startRow, fDraggingStart.y, startColumn, fDraggingStart.x);
+ 			} else {
+ 				fCellCanvasModel.setSelection(fDraggingStart.y, p.y, fDraggingStart.x, p.x);
+-
+ 			}
++			setClipboardContent(DND.SELECTION_CLIPBOARD);
+ 		}
+ 	}
+-
++	
++	private void setClipboardContent(int clipboardType) throws SWTError {
++		if (!(Platform.WS_GTK.equals(Platform.getWS()) || Platform.WS_MOTIF.equals(Platform.getWS()))) {
++			return;
++		}
++		String text = fCellCanvasModel.getSelectedText();
++		if (text != null) {
++			Object[] data = new Object[]{ text };
++			Transfer[] types = new Transfer[]{ TextTransfer.getInstance() };
++			Clipboard clipboard = new Clipboard(getDisplay());
++			clipboard.setContents(data, types, clipboardType);
++			clipboard.dispose();
++		}
++	}
++	
+ 	int compare(Point p1, Point p2) {
+ 		if (p1.equals(p2))
+ 			return 0;
+@@ -385,6 +425,12 @@
+ 		}
+ 
+ 	}
++	
++	protected void searchLineForHyperlinks(int line) {
++	}
+ 
++	protected IHyperlink findHyperlink(Point cellCoords) {
++		return null;
++	}
+ }
+ 
+Index: src/org/eclipse/tm/internal/terminal/textcanvas/TextLineRenderer.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/internal/terminal/textcanvas/TextLineRenderer.java,v
+retrieving revision 1.10
+diff -u -r1.10 TextLineRenderer.java
+--- src/org/eclipse/tm/internal/terminal/textcanvas/TextLineRenderer.java	22 May 2010 00:07:35 -0000	1.10
++++ src/org/eclipse/tm/internal/terminal/textcanvas/TextLineRenderer.java	1 Mar 2011 23:27:16 -0000
+@@ -28,7 +28,7 @@
+  */
+ public class TextLineRenderer implements ILinelRenderer {
+ 	private final ITextCanvasModel fModel;
+-	StyleMap fStyleMap=new StyleMap();
++	protected StyleMap fStyleMap=new StyleMap();
+ 	public TextLineRenderer(TextCanvas c, ITextCanvasModel model) {
+ 		fModel=model;
+ 	}
+@@ -56,11 +56,15 @@
+ 				setupGC(gc, style);
+ 				String text=segment.getText();
+ 				drawText(gc, x, y, colFirst, segment.getColumn(), text);
++				if (style != null && style.isUnderline())
++				{
++					underlineText(gc, x, y, colFirst, segment.getColumn(), text);
++				}
+ 				drawCursor(model, gc, line, x, y, colFirst);
+ 			}
+ 			if(fModel.hasLineSelection(line)) {
+-				gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+-				gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION));
++				gc.setForeground(getSelectionForeground());
++				gc.setBackground(getSelectionBackground());
+ 				Point start=model.getSelectionStart();
+ 				Point end=model.getSelectionEnd();
+ 				char[] chars=model.getTerminalText().getChars(line);
+@@ -83,6 +87,14 @@
+ 			}
+ 		}
+ 	}
++	protected Color getSelectionBackground()
++	{
++		return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION);
++	}
++	protected Color getSelectionForeground()
++	{
++		return Display.getCurrent().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
++	}
+ 
+ 	private void fillBackground(GC gc, int x, int y, int width, int height) {
+ 		Color bg=gc.getBackground();
+@@ -137,6 +149,21 @@
+ 			gc.drawString(text,x+offset,y,false);
+ 		}
+ 	}
++	private void underlineText(GC gc, int x, int y, int colFirst, int col, String text) {
++		int offset=(col-colFirst)*getCellWidth();
++		if(fStyleMap.isFontProportional()) {
++			for (int i = 0; i < text.length(); i++) {
++				char c=text.charAt(i);
++				int xx=x+offset+i*fStyleMap.getFontWidth();
++				if(c!=' ' && c!='\000') {
++					gc.drawLine(fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y, fStyleMap.getFontWidth() + fStyleMap.getCharOffset(c)+xx, fStyleMap.getFontHeight() + y);
++				}
++			}
++		} else {
++			text=text.replace('\000', ' ');
++			gc.drawLine(x+offset, fStyleMap.getFontHeight() + y - 2, (fStyleMap.getFontWidth() * text.length()) + x+offset, fStyleMap.getFontHeight() + y - 2);
++		}
++	}
+ 	private void setupGC(GC gc, Style style) {
+ 		Color c=fStyleMap.getForegrondColor(style);
+ 		if(c!=gc.getForeground()) {
+Index: src/org/eclipse/tm/terminal/model/Style.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/terminal/model/Style.java,v
+retrieving revision 1.2
+diff -u -r1.2 Style.java
+--- src/org/eclipse/tm/terminal/model/Style.java	19 Sep 2007 02:08:16 -0000	1.2
++++ src/org/eclipse/tm/terminal/model/Style.java	1 Mar 2011 23:27:16 -0000
+@@ -21,6 +21,7 @@
+  */
+ // TODO add an Object for user data, use weak map to keep track of styles with associated
+ // user data
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class Style {
+ 	private final StyleColor fForground;
+ 	private final StyleColor fBackground;
+Index: src/org/eclipse/tm/terminal/model/StyleColor.java
+===================================================================
+RCS file: /cvsroot/dsdp/org.eclipse.tm.core/terminal/org.eclipse.tm.terminal/src/org/eclipse/tm/terminal/model/StyleColor.java,v
+retrieving revision 1.2
+diff -u -r1.2 StyleColor.java
+--- src/org/eclipse/tm/terminal/model/StyleColor.java	19 Sep 2007 02:08:16 -0000	1.2
++++ src/org/eclipse/tm/terminal/model/StyleColor.java	1 Mar 2011 23:27:16 -0000
+@@ -18,6 +18,7 @@
+  * Flyweight
+  * Threadsafe.
+  */
++@SuppressWarnings({"unchecked","rawtypes"})
+ public class StyleColor {
+ 	private final static Map fgStyleColors=new HashMap();
+ 	final String fName;
