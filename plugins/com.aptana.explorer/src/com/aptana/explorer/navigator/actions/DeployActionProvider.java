@@ -11,8 +11,9 @@ import org.eclipse.swt.graphics.Image;
 
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
+import com.aptana.ui.actions.DefaultNavigatorActionProvider;
 
-public class DeployActionProvider extends ExplorerActionProvider
+public class DeployActionProvider extends DefaultNavigatorActionProvider
 {
 
 	@Override
@@ -22,7 +23,7 @@ public class DeployActionProvider extends ExplorerActionProvider
 	}
 
 	@Override
-	protected String getMenuID()
+	protected String getMenuId()
 	{
 		return IExplorerUIConstants.DEPLOY_MENU_ID;
 	}
