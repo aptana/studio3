@@ -72,7 +72,7 @@ public class ScriptingConsole
 			
 			// create our scripting console so the getters can create streams
 			// from it
-			console = new MessageConsole(Messages.EarlyStartup_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
+			console = new MessageConsole(Messages.ScriptingConsole_SCRIPTING_CONSOLE_NAME, ScriptingUIPlugin.getImageDescriptor(CONSOLE_ICON_PATH));
 
 			// create the message stream color map so the getters can populate
 			// it

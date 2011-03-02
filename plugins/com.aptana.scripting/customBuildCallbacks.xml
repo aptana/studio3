@@ -181,11 +181,6 @@
 		  	<param name="bundle.branch" value="master" />
         </antcall>
 		<antcall target="clone-bundle">
-		    <param name="bundle.name" value="zen-coding.ruble" />
-		    <param name="bundle.dir.name" value="zen-coding.ruble" />
-		  	<param name="bundle.branch" value="master" />
-		</antcall>
-		<antcall target="clone-bundle">
 			<param name="bundle.name" value="php.ruble" />
 			<param name="bundle.dir.name" value="php.ruble" />
 		  	<param name="bundle.branch" value="master" />

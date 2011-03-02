@@ -20,6 +20,11 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.findNextOrPrev"
+            name="%FindNextOrPrev.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.findPrevious"
             name="%FindPrevious.command.name">
       </command>
@@ -27,6 +32,11 @@
             categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.focusFind"
             name="%FocusFind.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"
+            name="%FocusFindOrEclipseSearch.command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
@@ -50,8 +60,18 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.toggleSearchBackward"
+            name="%ToggleSearchBackward.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
             id="org.eclipse.ui.edit.findbar.searchInOpenFiles"
             name="%SearchInOpenFiles.command.name">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="org.eclipse.ui.edit.findbar.showOptions"
+            name="%ShowOptions.command.name">
       </command>
    </extension>
    
@@ -93,20 +113,21 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+K">
       </key>
+      <!-- Find Next or Prev-->
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="ENTER">
       </key>
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+N">
       </key>
       <key
-            commandId="org.eclipse.ui.edit.findbar.findNext"
+            commandId="org.eclipse.ui.edit.findbar.findNextOrPrev"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="F3">
@@ -114,7 +135,7 @@
 
       <!-- Focus the find combo -->      
       <key
-            commandId="org.eclipse.ui.edit.findbar.focusFind"
+            commandId="org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+F">
@@ -153,12 +174,26 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+X">
       </key>
+      <!-- Toggle search backward -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.toggleSearchBackward"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+B">
+      </key>
       <!-- Search in open files -->      
       <key
             commandId="org.eclipse.ui.edit.findbar.searchInOpenFiles"
             contextId="org.eclipse.ui.textEditorScope.findbar"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M3+S">
+      </key>
+      <!-- Show the search options -->      
+      <key
+            commandId="org.eclipse.ui.edit.findbar.showOptions"
+            contextId="org.eclipse.ui.textEditorScope.findbar"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+O">
       </key>
    </extension>
    

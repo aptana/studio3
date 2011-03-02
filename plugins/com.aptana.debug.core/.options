@@ -1,0 +1,2 @@
+com.aptana.debug.core/debugger_debug = true
+com.aptana.debug.core/skip_debugger_install = true

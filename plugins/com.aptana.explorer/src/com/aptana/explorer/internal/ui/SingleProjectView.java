@@ -28,14 +28,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.search.ui.IContextMenuConstants;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
@@ -60,12 +58,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.DeleteResourceAction;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
-import org.eclipse.ui.menus.IMenuService;
-import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonFilterDescriptor;
@@ -126,7 +120,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		TO_REMOVE.add("org.radrails.rails.ui.actions.DebugScriptServerAction"); //$NON-NLS-1$
 	};
 
-	private ToolItem deployToolItem;
 	private ToolItem projectToolItem;
 	private Menu projectsMenu;
 
@@ -144,7 +137,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
-	private static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
 	@Override
@@ -181,48 +173,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		// Let sub classes add to the toolbar (git branch)
 		doCreateToolbar(pulldowns);
-
-		// Now deploy button and gear...
-		Composite toolbarButtons = new Composite(toolbarComposite, SWT.NONE);
-		GridData buttonsData = new GridData(SWT.END, SWT.BEGINNING, false, false);
-		buttonsData.minimumWidth = 68;
-		toolbarButtons.setLayoutData(buttonsData);
-		GridLayout toolbarButtonsLayout = new GridLayout(2, false);
-		toolbarButtonsLayout.marginHeight = 0;
-		toolbarButtonsLayout.marginWidth = 0;
-		toolbarButtons.setLayout(toolbarButtonsLayout);
-
-		// Create Deploy menu
-		createDeployMenu(toolbarButtons);
-
-		// Now create Commands menu
-		final ToolBar commandsToolBar = new ToolBar(toolbarButtons, SWT.FLAT);
-		ToolItem commandsToolItem = new ToolItem(commandsToolBar, SWT.DROP_DOWN);
-		commandsToolItem.setImage(ExplorerPlugin.getImage(GEAR_MENU_ICON));
-		commandsToolItem.setToolTipText(Messages.SingleProjectView_TTP_Commands);
-		GridData gearMenuData = new GridData(SWT.END, SWT.CENTER, false, false);
-		gearMenuData.minimumWidth = 24;
-		commandsToolBar.setLayoutData(gearMenuData);
-
-		commandsToolItem.addSelectionListener(new SelectionAdapter()
-		{
-
-			@Override
-			public void widgetSelected(SelectionEvent selectionEvent)
-			{
-				Point toolbarLocation = commandsToolBar.getLocation();
-				toolbarLocation = commandsToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-				Point toolbarSize = commandsToolBar.getSize();
-				final MenuManager commandsMenuManager = new MenuManager(null, IExplorerUIConstants.GEAR_MENU_ID);
-				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(commandsMenuManager,
-						MenuUtil.menuUri(commandsMenuManager.getId()));
-				fillCommandsMenu(commandsMenuManager);
-				final Menu commandsMenu = commandsMenuManager.createContextMenu(commandsToolBar);
-				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
-				commandsMenu.setVisible(true);
-			}
-		});
 
 		createSearchComposite(parent);
 		filterComp = createFilterComposite(parent);
@@ -298,77 +248,6 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	}
 
 	protected abstract void doCreateToolbar(Composite toolbarComposite);
-
-	private void fillCommandsMenu(MenuManager menuManager)
-	{
-		// Filtering
-		// Run
-		// Git single files
-		// Git project level
-		// Git branching
-		// Git misc
-		// Misc project/properties
-
-		// Stick Delete in Properties area
-		menuManager.appendToGroup(IContextMenuConstants.GROUP_PROPERTIES, new ContributionItem()
-		{
-
-			@Override
-			public void fill(Menu menu, int index)
-			{
-				MenuItem item = new MenuItem(menu, SWT.PUSH);
-				item.setText(Messages.SingleProjectView_DeleteProjectMenuItem_LBL);
-				item.addSelectionListener(new SelectionAdapter()
-				{
-					@Override
-					public void widgetSelected(SelectionEvent e)
-					{
-						DeleteResourceAction action = new DeleteResourceAction(getSite());
-						action.selectionChanged(new StructuredSelection(selectedProject));
-						action.run();
-					}
-				});
-				boolean enabled = (selectedProject != null && selectedProject.exists());
-				ISharedImages images = PlatformUI.getWorkbench().getSharedImages();
-				item.setImage(enabled ? images.getImage(ISharedImages.IMG_TOOL_DELETE) : images
-						.getImage(ISharedImages.IMG_TOOL_DELETE_DISABLED));
-				item.setEnabled(enabled);
-			}
-
-			@Override
-			public boolean isDynamic()
-			{
-				return true;
-			}
-		});
-	}
-
-	private void createDeployMenu(Composite parent)
-	{
-		final ToolBar deployToolBar = new ToolBar(parent, SWT.FLAT);
-		deployToolItem = new ToolItem(deployToolBar, SWT.DROP_DOWN);
-		deployToolItem.setImage(ExplorerPlugin.getImage(IExplorerUIConstants.DEPLOY_MENU_ICON));
-		deployToolItem.setToolTipText(Messages.SingleProjectView_TTP_Deploy);
-		GridData deployComboData = new GridData(SWT.END, SWT.CENTER, true, false);
-		deployComboData.minimumWidth = 24;
-		deployToolBar.setLayoutData(deployComboData);
-
-		deployToolItem.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent selectionEvent)
-			{
-				Point toolbarLocation = deployToolBar.getLocation();
-				toolbarLocation = deployToolBar.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-				Point toolbarSize = deployToolBar.getSize();
-				final MenuManager deployMenuManager = new MenuManager(null, IExplorerUIConstants.DEPLOY_MENU_ID);
-				IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-				menuService.populateContributionManager(deployMenuManager, MenuUtil.menuUri(deployMenuManager.getId()));
-				final Menu commandsMenu = deployMenuManager.createContextMenu(deployToolBar);
-				commandsMenu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
-				commandsMenu.setVisible(true);
-			}
-		});
-	}
 
 	private IProject[] createProjectCombo(Composite parent)
 	{

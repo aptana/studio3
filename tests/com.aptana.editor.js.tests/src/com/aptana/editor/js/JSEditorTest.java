@@ -16,8 +16,11 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+@SuppressWarnings("restriction")
 public class JSEditorTest extends TestCase
 {
 
@@ -41,6 +44,25 @@ public class JSEditorTest extends TestCase
 		assertEquals(getClassName(), editor.getClass().getName());
 	}
 
+	public void testEditorPreferences()
+	{
+		String spacesForTabs;
+
+		EditorsPlugin.getDefault().getPreferenceStore()
+				.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+
+		spacesForTabs = JSSourceEditor.getChainedPreferenceStore().getString(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		assertEquals("false", spacesForTabs);
+
+		JSPlugin.getDefault().getPreferenceStore()
+				.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+
+		spacesForTabs = JSSourceEditor.getChainedPreferenceStore().getString(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		assertEquals("true", spacesForTabs);
+	}
+	
 	protected IFileStore getFileStore() throws Exception
 	{
 		return EFS.getStore((new File("dojo.js.uncompressed.js")).toURI());

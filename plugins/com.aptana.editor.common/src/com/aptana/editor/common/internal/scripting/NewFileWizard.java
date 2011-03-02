@@ -51,6 +51,19 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		addPage(templateSelectionPage);
 	}
 
+	@Override
+	public boolean canFinish()
+	{
+		if (getContainer().getCurrentPage() == mainPage)
+		{
+			if (mainPage.isPageComplete())
+			{
+				return true;
+			}
+		}
+		return super.canFinish();
+	}
+
 	/*
 	 * (non-Javadoc) Method declared on IWizard.
 	 */
@@ -90,7 +103,7 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 	 * 
 	 * @param template
 	 *            A {@link TemplateElement}
-	 * @param absoluteFilePath 
+	 * @param absoluteFilePath
 	 * @return The output string that this template yield when executed. Null, in case the given template was null or
 	 *         did not contain a file pattern.
 	 */

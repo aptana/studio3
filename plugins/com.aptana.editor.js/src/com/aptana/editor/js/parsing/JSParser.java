@@ -289,7 +289,6 @@ public class JSParser extends Parser implements IParser {
 			String text = (String) line.value;
 
 			buffer.append(text.substring(3));
-			buffer.append("\n");
 		}
 
 		buffer.append("</docs>");

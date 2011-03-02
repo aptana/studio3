@@ -11,6 +11,7 @@ package com.aptana.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,7 +123,7 @@ public final class ShellExecutable {
 	}
 	
 	private static IPath getPreferenceShellPath() {
-		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, null);
+		String pref = new InstanceScope().getNode(CorePlugin.PLUGIN_ID).get(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, null);
 		if (pref != null && !StringUtil.isEmpty(pref)) {
 			IPath path = Path.fromOSString(pref);
 			if (path.toFile().isDirectory()) {
@@ -140,9 +141,9 @@ public final class ShellExecutable {
 	public static void setPreferenceShellPath(IPath path) {
 		IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 		if (path != null) {
-			prefs.put(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH, path.toOSString());			
+			prefs.put(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH, path.toOSString());			
 		} else {
-			prefs.remove(ICorePreferenceConstants.SHELL_EXECUTABLE_PATH);
+			prefs.remove(ICorePreferenceConstants.PREF_SHELL_EXECUTABLE_PATH);
 		}
 		try {
 			prefs.flush();
@@ -167,6 +168,7 @@ public final class ShellExecutable {
 		Map<String, String> env = new HashMap<String, String>();
 		try {
 			env.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", workingDirectory, null)))); //$NON-NLS-1$
+			CorePlugin.logInfo(MessageFormat.format("ENV for {0}: {1}", workingDirectory, env)); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
 		}

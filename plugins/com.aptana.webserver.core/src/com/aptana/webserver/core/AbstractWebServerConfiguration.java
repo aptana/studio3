@@ -22,7 +22,7 @@ import com.aptana.core.epl.IMemento;
  * @author Max Stepanov
  * 
  */
-public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable {
+public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURLMapper {
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
@@ -35,8 +35,14 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	protected AbstractWebServerConfiguration() {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.aptana.webserver.core.IURLMapper#resolve(org.eclipse.core.filesystem.IFileStore)
+	 */
 	public abstract URL resolve(IFileStore file);
 
+	/* (non-Javadoc)
+	 * @see com.aptana.webserver.core.IURLMapper#resolve(java.net.URL)
+	 */
 	public abstract IFileStore resolve(URL url);
 
 	public abstract URL getBaseURL();
@@ -52,20 +58,18 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 		memento.createChild(ELEMENT_NAME).putTextData(name);
 	}
 
+	/**
+	 * Returns true if this type of configurations should be persistent by manager
+	 * @return
+	 */
 	protected boolean isPersistent() {
 		return true;
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org
-	 * .eclipse.core.runtime.IConfigurationElement, java.lang.String,
-	 * java.lang.Object)
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
 	 */
-	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-			throws CoreException {
+	public final void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException {
 		type = config.getAttribute(ServerConfigurationManager.ATT_ID);
 	}
 
@@ -74,8 +78,6 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see com.aptana.core.Identifiable#getId()
 	 */
 	public final String getId() {

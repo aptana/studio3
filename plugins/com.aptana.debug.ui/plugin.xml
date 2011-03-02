@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            id="com.aptana.debug.ui.commands.Inspect"
+            name="%ActionDefinition.inspect.name"/>
+   </extension>
+
+</plugin>

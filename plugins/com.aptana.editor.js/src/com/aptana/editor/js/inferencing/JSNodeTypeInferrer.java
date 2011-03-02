@@ -106,12 +106,8 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 						{
 							String type = parameterType.getName();
 
-							// TODO: Temporary hack for jQuery CA until we resolve
-							// handling of function properties and derived types
-							if ("jQuery".equals(type)) //$NON-NLS-1$
-							{
-								type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
-							}
+							// Fix up type names as might be necessary
+							type = JSTypeMapper.getInstance().getMappedType(type);
 
 							this.addType(type);
 							foundType = true;
@@ -406,6 +402,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 		if (child instanceof JSNode)
 		{
 			List<String> types = this.getTypes(child);
+			List<String> returnTypes = new ArrayList<String>();
 
 			for (String typeName : types)
 			{
@@ -415,7 +412,24 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 				{
 					for (String returnTypeName : typeName.substring(index + 1).split(",")) //$NON-NLS-1$
 					{
-						this.addType(returnTypeName);
+						returnTypes.add(returnTypeName);
+					}
+				}
+				else
+				{
+					returnTypes.add(typeName);
+				}
+			}
+
+			for (String typeName : returnTypes)
+			{
+				PropertyElement property = this._queryHelper.getTypeMember(this._index, typeName, JSTypeConstants.PROTOTYPE_PROPERTY);
+
+				if (property != null)
+				{
+					for (String propertyType : property.getTypeNames())
+					{
+						this.addType(propertyType);
 					}
 				}
 			}
@@ -523,6 +537,9 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 
 			for (String typeName : this.getTypes(lhs))
 			{
+				// Fix up type names as might be necessary
+				typeName = JSTypeMapper.getInstance().getMappedType(typeName);
+
 				if (JSTypeUtil.isFunctionPrefix(typeName))
 				{
 					typeName = JSTypeUtil.getFunctionSignatureType(typeName);

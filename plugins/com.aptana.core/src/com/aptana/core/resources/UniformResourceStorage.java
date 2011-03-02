@@ -26,6 +26,7 @@ import com.aptana.core.CorePlugin;
  * @author Max Stepanov
  *
  */
+// TODO: rework using EFS
 public abstract class UniformResourceStorage extends PlatformObject implements IStorage {
 
 	private long timestamp = -1;
@@ -96,7 +97,7 @@ public abstract class UniformResourceStorage extends PlatformObject implements I
 	 * 
 	 * @return boolean
 	 */
-	protected boolean isValid()
+	public boolean isValid()
 	{
 		if (timestamp == -1) {
 			return false;

@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.js.sdoc.parsing;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -126,7 +126,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 	@SuppressWarnings("nls")
 	public SDocTokenScanner()
 	{
-		List<IRule> rules = new LinkedList<IRule>();
+		List<IRule> rules = new ArrayList<IRule>();
 
 		rules.add(new WordRule(new WhitespaceDetector(), getToken(SDocTokenType.WHITESPACE)));
 		rules.add(createAlternateWhitespaceRule());

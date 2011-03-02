@@ -39,6 +39,9 @@ import com.aptana.portal.ui.internal.WebBrowserEditorStub;
 public class PortalBrowserEditor extends WebBrowserEditorStub
 {
 	public static final String WEB_BROWSER_EDITOR_ID = "com.aptana.portal.ui.browser.portal"; //$NON-NLS-1$
+
+	private static final String TITLE_TTP = "Aptana Portal"; //$NON-NLS-1$
+
 	private List<BrowserFunctionWrapper> browserFunctions;
 
 	/**
@@ -100,7 +103,32 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 		});
 		// Register this browser to receive notifications from any Browser-Notifier that was
 		// added to do so through the browserInteractions extension point.
-		BrowserNotifier.getInstance().registerBrowser(WEB_BROWSER_EDITOR_ID, browser);
+		BrowserNotifier.getInstance().registerBrowser(getEditorId(), browser);
+	}
+
+	@Override
+	public String getTitleToolTip()
+	{
+		return TITLE_TTP;
+	}
+
+	/**
+	 * Returns the editor-id for this browser editor.
+	 * 
+	 * @return The editor-id
+	 */
+	protected String getEditorId()
+	{
+		return WEB_BROWSER_EDITOR_ID;
+	}
+
+	/**
+	 * Returns the base URL prefix that will be used to verify the location of the page and register the dispatcher in
+	 * case the page is under this path.
+	 */
+	protected String getBaseURLPrefix()
+	{
+		return Portal.BASE_URL_PREFIX;
 	}
 
 	/**
@@ -113,7 +141,8 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 		browserFunctions = new ArrayList<BrowserFunctionWrapper>();
 		// For now, we register a single browser function that dispatch all the
 		// JavaScript requests through the browser-action-controller extensions.
-		BrowserFunctionWrapper dispatcherFunction = browser.createBrowserFunction(IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME, new DispatcherBrowserFunction());
+		BrowserFunctionWrapper dispatcherFunction = browser.createBrowserFunction(
+				IBrowserNotificationConstants.DISPATCH_FUNCTION_NAME, new DispatcherBrowserFunction());
 		browserFunctions.add(dispatcherFunction);
 
 		boolean executionResult = browser
@@ -146,7 +175,7 @@ public class PortalBrowserEditor extends WebBrowserEditorStub
 	{
 		unregisterBrowserFunctions();
 		String url = browser.getUrl();
-		if (url != null && (url.startsWith(Portal.BASE_URL_PREFIX) || url.startsWith("file:"))) //$NON-NLS-1$
+		if (url != null && (url.startsWith(getBaseURLPrefix()) || url.startsWith("file:"))) //$NON-NLS-1$
 		{
 			registerBrowserFunctions(browser);
 		}

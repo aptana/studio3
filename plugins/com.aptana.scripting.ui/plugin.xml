@@ -71,10 +71,6 @@
    <!-- uncomment to activate the bundles view -->
    <extension
          point="org.eclipse.ui.views">
-      <category
-            id="com.aptana"
-            name="%category.name">
-      </category>
       <view
             category="com.aptana"
             class="com.aptana.scripting.ui.views.BundleView"

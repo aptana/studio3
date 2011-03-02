@@ -14,7 +14,6 @@ import org.eclipse.jface.text.IFindReplaceTarget;
 import org.eclipse.jface.text.IFindReplaceTargetExtension;
 import org.eclipse.jface.text.IFindReplaceTargetExtension3;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -135,8 +134,8 @@ public class FindBarFinder
 					{
 						// When searching backward, we have to get the offset-1 (otherwise it doesn't work properly)
 						newOffset = ((IFindReplaceTargetExtension3) findReplaceTarget).findAndSelect(forward ? offset
-								: offset - 1, findText, forward, dec.caseSensitive.getSelection(), dec.getWholeWord(),
-								dec.regularExpression.getSelection());
+								: offset - 1, findText, forward, dec.getConfiguration().getCaseSensitive(), dec.getWholeWord(),
+								dec.getConfiguration().getRegularExpression());
 					}
 					catch (PatternSyntaxException e)
 					{
@@ -147,12 +146,12 @@ public class FindBarFinder
 				else
 				{
 					newOffset = findReplaceTarget.findAndSelect(offset, findText, forward,
-							dec.caseSensitive.getSelection(), dec.getWholeWord());
+							dec.getConfiguration().getCaseSensitive(), dec.getWholeWord());
 				}
 
 				if (newOffset != -1)
 				{
-					dec.combo.setForeground(null);
+					dec.combo.setBackground(null);
 					if (!forward)
 					{
 						selection = textWidget.getSelection();
@@ -176,8 +175,7 @@ public class FindBarFinder
 							return find(forward, incremental, wrap, true, initialSearchBeforeReplace);
 						}
 					}
-					dec.combo.setForeground(dec.combo.getDisplay().getSystemColor(SWT.COLOR_RED));
-					textWidget.getDisplay().beep();
+					dec.combo.setBackground(dec.getfStringNotFoundColor());
 					dec.statusLineManager.setMessage(false, Messages.FindBarDecorator_MSG_StringNotFound, null);
 				}
 			}

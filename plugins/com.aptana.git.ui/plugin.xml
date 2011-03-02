@@ -536,7 +536,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.team.ui.TeamPreferences"
-            class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
+            class="com.aptana.git.ui.internal.preferences.GitPreferencePage"
             id="com.aptana.git.ui.GitExecutableLocationPage"
             name="%page.git.name">
       </page>

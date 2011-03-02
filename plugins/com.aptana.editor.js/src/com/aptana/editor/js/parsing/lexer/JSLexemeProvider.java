@@ -21,6 +21,19 @@ public class JSLexemeProvider extends LexemeProvider<JSTokenType>
 	 * 
 	 * @param document
 	 * @param offset
+	 * @param includeOffset
+	 * @param scanner
+	 */
+	public JSLexemeProvider(IDocument document, int offset, int includeOffset, ITokenScanner scanner)
+	{
+		super(document, offset, includeOffset, scanner);
+	}
+	
+	/**
+	 * Convert the partition that contains the given offset into a list of lexemes.
+	 * 
+	 * @param document
+	 * @param offset
 	 * @param scanner
 	 */
 	public JSLexemeProvider(IDocument document, int offset, ITokenScanner scanner)

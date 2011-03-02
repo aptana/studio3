@@ -39,6 +39,7 @@ import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
 import com.aptana.editor.js.inferencing.JSScope;
+import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
@@ -848,12 +849,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				// add all properties of each type to our proposal list
 				for (String type : typeList)
 				{
-					// TODO: Temporary hack for jQuery CA until we resolve
-					// handling of function properties and derived types
-					if ("jQuery".equals(type)) //$NON-NLS-1$
-					{
-						type = "Function<jQuery>:jQuery"; //$NON-NLS-1$
-					}
+					// Fix up type names as might be necessary
+					type = JSTypeMapper.getInstance().getMappedType(type);
 
 					if (JSTypeUtil.isFunctionPrefix(type))
 					{

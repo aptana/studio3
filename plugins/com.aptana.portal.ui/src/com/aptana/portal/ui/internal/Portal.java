@@ -50,7 +50,7 @@ import com.aptana.usage.PingStartup;
 @SuppressWarnings("restriction")
 public class Portal
 {
-	public static final String BASE_URL_PREFIX = "http://173.45.232.197/toolbox"; //$NON-NLS-1$
+	public static final String BASE_URL_PREFIX = "http://toolbox.aptana.com/toolbox"; //$NON-NLS-1$
 
 	// Note: 173.45.232.197 is the staging site
 	// For debugging, do NOT check in with these uncommented:
@@ -105,8 +105,11 @@ public class Portal
 	 * 
 	 * @param url
 	 *            A URL (can be null).
+	 * @param browserEditorId
+	 *            the identifier of the browser-editor that was registered through the org.eclipse.ui.editors extension
+	 *            point.
 	 */
-	public void openPortal(URL url)
+	public void openPortal(URL url, final String browserEditorId)
 	{
 		try
 		{
@@ -140,8 +143,7 @@ public class Portal
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try
 				{
-					portalBrowser = (PortalBrowserEditor) page.openEditor(input,
-							PortalBrowserEditor.WEB_BROWSER_EDITOR_ID);
+					portalBrowser = (PortalBrowserEditor) page.openEditor(input, browserEditorId);
 					portalBrowser.addDisposeListener(new PortalDisposeListener());
 				}
 				catch (PartInitException e)

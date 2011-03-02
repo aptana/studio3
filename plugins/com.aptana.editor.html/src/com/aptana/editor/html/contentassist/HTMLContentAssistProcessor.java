@@ -53,6 +53,7 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -63,8 +64,8 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
-import com.aptana.webserver.core.AbstractWebServerConfiguration;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
+import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -201,18 +202,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-			for (String attribute : element.getAttributes())
+			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, attribute.length() + length));
+				String name = attribute.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					ATTRIBUTE_ICON, //
+					attribute.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 
-			for (String event : element.getEvents())
+			for (EventElement event : this._queryHelper.getEvents(element))
 			{
-				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, event.length() + length));
+				String name = event.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					EVENT_ICON, //
+					event.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 		}
+
 		return proposals;
 	}
 
@@ -360,11 +384,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				AbstractWebServerConfiguration serverConfiguration = ProjectPreviewUtil
+				IURLMapper serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (AbstractWebServerConfiguration server : WebServerCorePlugin.getDefault()
+					for (IURLMapper server : WebServerCorePlugin.getDefault()
 							.getServerConfigurationManager().getServerConfigurations())
 					{
 						URL url = server.resolve(editorStore);
@@ -1268,7 +1292,22 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 							{
 								if (firstLexeme.getStartingOffset() == offset)
 								{
-									result = LocationType.IN_TEXT;
+									// What if the preceding non-whitespace char isn't '>' and it isn't in the lexemes?
+									// We should report in open tag still!
+									if (offset == 0)
+									{
+										result = LocationType.IN_TEXT;
+									}
+									else
+									{
+										ITypedRegion previousPartition = document.getPartition(offset - 1);
+										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
+										
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
+										{
+											result = LocationType.IN_TEXT;
+										}
+									}
 								}
 								else if ("</".equals(firstLexeme.getText())) //$NON-NLS-1$
 								{

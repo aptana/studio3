@@ -153,6 +153,18 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
 		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
 		prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		// PyDev Occurrences (com.python.pydev.occurrences)
+		// Override them if pydev is set to use our themes
+		if (Platform.getPreferencesService().getBoolean("org.python.pydev.red_core", "PYDEV_USE_APTANA_THEMES", true, //$NON-NLS-1$ //$NON-NLS-2$
+				null))
+		{
+			// Have to use highlighting, since there's no pref key for text style to use box style. As a result we also
+			// use search result color, which is a lighter/darker selection/line highlight color
+			prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
+			prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+			prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		}
+
 		try
 		{
 			prefs.flush();
@@ -219,12 +231,11 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Force font
-		Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
-		String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
 		for (String fontId : fontIds)
 		{
+			Font fFont = JFaceResources.getFontRegistry().get(fontId);
 			// Only set new values if they're different from existing!
 			Font existing = JFaceResources.getFont(fontId);
 			String existingString = ""; //$NON-NLS-1$
@@ -232,6 +243,7 @@ public class ThemeManager implements IThemeManager
 			{
 				existingString = PreferenceConverter.getStoredRepresentation(existing.getFontData());
 			}
+			String fdString = PreferenceConverter.getStoredRepresentation(fFont.getFontData());
 			if (!existingString.equals(fdString))
 			{
 				// put in registry...

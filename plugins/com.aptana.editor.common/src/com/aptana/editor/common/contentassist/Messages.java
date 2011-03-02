@@ -28,8 +28,6 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 	
-	public static String CommonInformationControlCreator_clickToFocus;
-
 	public static String MetadataLoader_Error_Loading_Metadata;
 
 	/**

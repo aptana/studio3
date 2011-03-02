@@ -41,6 +41,7 @@ public abstract class ProcessUtil
 		return result.values().iterator().next();
 	}
 
+	// TODO Return an IStatus that contains the exit code as the code, output as the message, uses OK if exit code is 0, ERROR otherwise.
 	public static Map<Integer, String> runInBackground(String command, IPath workingDir, String... args)
 	{
 		return runInBackground(command, workingDir, null, args);
@@ -203,6 +204,39 @@ public abstract class ProcessUtil
 			processBuilder.environment().putAll(environment);
 		}
 		return processBuilder.start();
+	}
+	
+	public static int waitForProcess(Process process, final long timeout, boolean forceKillAfterTimeout) {
+		final Thread waitingThread = Thread.currentThread();
+		Thread timeoutThread = new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(timeout);
+					waitingThread.interrupt();
+				} catch (InterruptedException ignore) {
+				}
+			}
+		};
+
+		int exitcode = 0;
+		if (timeout != -1) {
+			try {
+				timeoutThread.start();
+				exitcode = process.waitFor();
+				waitingThread.interrupt();
+			} catch (InterruptedException e) {
+				Thread.interrupted();
+			}
+			if (forceKillAfterTimeout) {
+				process.destroy();
+			}
+		}
+		try {
+			exitcode = process.waitFor();
+		} catch (InterruptedException e) {
+		}
+		return exitcode;
+		
 	}
 
 }

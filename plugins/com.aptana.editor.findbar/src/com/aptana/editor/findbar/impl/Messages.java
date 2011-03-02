@@ -11,7 +11,9 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 	private static final String BUNDLE_NAME = "com.aptana.editor.findbar.impl.messages"; //$NON-NLS-1$
+	public static String FindBarDecorator_LABEL_ShowOptions;
 	public static String FindBarDecorator_LABEL_ReplaceAll;
+	public static String FindBarDecorator_LABEL_SearchBackward;
 	public static String FindBarDecorator_LABEL_CaseSensitive;
 	public static String FindBarDecorator_LABEL_Elipses;
 	public static String FindBarDecorator_LABEL_FInd;
