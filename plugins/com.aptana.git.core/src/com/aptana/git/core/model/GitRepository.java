@@ -489,11 +489,12 @@ public class GitRepository
 	 */
 	public Set<String> remotes()
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "remote"); //$NON-NLS-1$
-		int exitValue = result.keySet().iterator().next();
-		if (exitValue != 0)
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "remote"); //$NON-NLS-1$
+		if (result == null || !result.isOK())
+		{
 			return Collections.emptySet();
-		String output = result.values().iterator().next();
+		}
+		String output = result.getMessage();
 		String[] lines = output.split("\r\n|\r|\n"); //$NON-NLS-1$
 		Set<String> set = new HashSet<String>();
 		for (String line : lines)
@@ -571,10 +572,10 @@ public class GitRepository
 			closeProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
 
 			String oldBranchName = currentBranch.simpleRef().shortName();
-			Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
+			IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
 					branchName);
 			sub.worked(1);
-			if (result.keySet().iterator().next().intValue() != 0)
+			if (result == null || !result.isOK())
 			{
 				openProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
 				return false;
@@ -655,14 +656,14 @@ public class GitRepository
 			if (other != null && other.equals(this))
 			{
 				// Check if the project exists on the other branch!
-				Map<Integer, String> result = GitExecutable
+				IStatus result = GitExecutable
 						.instance()
 						.runInBackground(
 								workingDirectory(),
 								"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
 								branchName
 										+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
-				if (result.keySet().iterator().next().intValue() != 0)
+				if (result == null || !result.isOK())
 				{
 					projectsNotExistingOnNewBranch.add(project);
 				}
@@ -1108,9 +1109,9 @@ public class GitRepository
 			args.add(startPoint);
 		}
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
-		if (result.keySet().iterator().next() != 0)
+		if (result == null || !result.isOK())
 		{
 			return false;
 		}
@@ -1139,12 +1140,11 @@ public class GitRepository
 		}
 		args.add(branchName);
 
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
 				args.toArray(new String[args.size()]));
-		int exitCode = result.keySet().iterator().next();
-		if (exitCode != 0)
+		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, result.values().iterator().next(), null);
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
 		// Remove branch in model!
 		branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_HEADS + branchName)));
@@ -1154,22 +1154,21 @@ public class GitRepository
 
 	public boolean validBranchName(String branchName)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format", //$NON-NLS-1$
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format", //$NON-NLS-1$
 				GitRef.REFS_HEADS + branchName);
-		return result.keySet().iterator().next() == 0;
+		return result != null && result.isOK();
 	}
 
 	public IStatus deleteFile(String filePath)
 	{
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
 		}
-		if (result.keySet().iterator().next() != 0)
+		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
@@ -1177,15 +1176,15 @@ public class GitRepository
 
 	public IStatus deleteFolder(IPath folderPath)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
 				folderPath.toOSString());
 		if (result == null)
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
 		}
-		if (result.keySet().iterator().next() != 0)
+		if (!result.isOK())
 		{
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.values().iterator().next());
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
 		}
 		index().refreshAsync();
 		return Status.OK_STATUS;
@@ -1193,13 +1192,12 @@ public class GitRepository
 
 	public IStatus moveFile(IPath source, IPath dest)
 	{
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(workingDirectory(),
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
 				"mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
-		int exitCode = result.keySet().iterator().next();
-		if (exitCode != 0)
+		if (result == null || !result.isOK())
 		{
-			String message = result.values().iterator().next();
-			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), exitCode, message, null);
+			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), (result == null) ? 0 : result.getCode(),
+					(result == null) ? null : result.getMessage(), null);
 		}
 		index().refreshAsync();
 		return Status.OK_STATUS;

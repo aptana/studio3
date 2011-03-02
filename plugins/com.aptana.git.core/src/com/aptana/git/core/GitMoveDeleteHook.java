@@ -8,7 +8,6 @@
 package com.aptana.git.core;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -121,28 +120,35 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			return false;
 
 		// force is implied by always delete...
-		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;		
+		boolean alwaysDeleteContent = (updateFlags & IResource.ALWAYS_DELETE_PROJECT_CONTENT) != 0;
 		// If repo root is same as project root, we need to just punt and return false
 		// so filesystem takes care of it
-		try {
+		try
+		{
 			if (repo.workingDirectory().toFile().getCanonicalPath()
 					.equals(project.getLocation().toFile().getCanonicalPath()))
 			{
 				getGitRepositoryManager().removeRepository(project);
 				if (alwaysDeleteContent)
 				{
-					// Force delete the .git dir, since it's probably out of sync and not forcing could cause project delete to fail!
+					// Force delete the .git dir, since it's probably out of sync and not forcing could cause project
+					// delete to fail!
 					IFolder gitDir = project.getFolder(GitRepository.GIT_DIR);
 					if (gitDir.exists())
 					{
-						tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE,
-							new NullProgressMonitor()); // TODO Use a submonitor here?
+						tree.standardDeleteFolder(gitDir, updateFlags | IResource.FORCE, new NullProgressMonitor()); // TODO
+																														// Use
+																														// a
+																														// submonitor
+																														// here?
 						tree.deletedFolder(gitDir);
 					}
 				}
 				return false;
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			GitPlugin.logError("File.getCanonicalPath failed.", e); //$NON-NLS-1$
 		}
 
@@ -150,7 +156,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		// If project contains no already committed files, we need to punt!
 		if (hasNoCommittedFiles(source, repo))
 			return false;
-		
+
 		boolean force = alwaysDeleteContent || (updateFlags & IResource.FORCE) == IResource.FORCE;
 		if (force)
 		{
@@ -255,12 +261,9 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 	{
-		int exitCode = 1;
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
+		IStatus result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
 				"-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
-		if (result != null && !result.isEmpty())
-			exitCode = result.keySet().iterator().next();
-		return exitCode != 0;
+		return result != null && result.isOK();
 	}
 
 	public boolean moveProject(final IResourceTree tree, final IProject source, final IProjectDescription description,

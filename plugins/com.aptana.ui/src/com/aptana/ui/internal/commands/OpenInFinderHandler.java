@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -20,6 +19,7 @@ import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.ISources;
@@ -111,15 +111,15 @@ public class OpenInFinderHandler extends AbstractHandler
 		{
 			file = file.getParentFile();
 		}
-		
+
 		// TODO Do we also need to try 'gnome-open' or 'dolphin' if nautilus fails?
-		Map<Integer, String> result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$
+		IStatus result = ProcessUtil.runInBackground("nautilus", null, //$NON-NLS-1$
 				file.getAbsolutePath());
-		if (result == null || result.isEmpty())
+		if (result == null)
 		{
 			return false;
 		}
-		return result.keySet().iterator().next() == 0;
+		return result.isOK();
 	}
 
 	private boolean openInWindowsExplorer(File file)
@@ -147,8 +147,8 @@ public class OpenInFinderHandler extends AbstractHandler
 			subcommand = "reveal"; //$NON-NLS-1$
 		}
 		String appleScript = "tell application \"Finder\" to " + subcommand + " (POSIX file \"" + path + "\")\ntell application \"Finder\" to activate"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		Map<Integer, String> result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
-		if (result != null && result.keySet().iterator().next() == 0)
+		IStatus result = ProcessUtil.runInBackground("osascript", null, "-e", appleScript); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result != null && result.isOK())
 		{
 			return true;
 		}

@@ -10,7 +10,6 @@ package com.aptana.syncing.core.tests;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -19,6 +18,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -43,17 +43,23 @@ public abstract class SyncingErrorTests extends TestCase
 
 	protected IConnectionPoint clientManager;
 	protected IConnectionPoint serverManager;
-	
+
 	private static Properties cachedProperties;
 
-	protected static final Properties getConfig() {
-		if (cachedProperties == null) {
+	protected static final Properties getConfig()
+	{
+		if (cachedProperties == null)
+		{
 			cachedProperties = new Properties();
 			String propertiesFile = System.getenv("junit.properties");
-			if (propertiesFile != null && new File(propertiesFile).length() > 0) {
-				try {
+			if (propertiesFile != null && new File(propertiesFile).length() > 0)
+			{
+				try
+				{
 					cachedProperties.load(new FileInputStream(propertiesFile));
-				} catch (IOException ignore) {
+				}
+				catch (IOException ignore)
+				{
 				}
 			}
 		}
@@ -92,8 +98,8 @@ public abstract class SyncingErrorTests extends TestCase
 		{
 			if (clientDirectory.fetchInfo().exists())
 			{
-				//clientDirectory.delete(EFS.NONE, null);
-				//assertFalse(clientDirectory.fetchInfo().exists());
+				// clientDirectory.delete(EFS.NONE, null);
+				// assertFalse(clientDirectory.fetchInfo().exists());
 			}
 		}
 		finally
@@ -108,8 +114,8 @@ public abstract class SyncingErrorTests extends TestCase
 		{
 			if (serverDirectory.fetchInfo().exists())
 			{
-				//serverDirectory.delete(EFS.NONE, null);
-				//assertFalse(serverDirectory.fetchInfo().exists());
+				// serverDirectory.delete(EFS.NONE, null);
+				// assertFalse(serverDirectory.fetchInfo().exists());
 			}
 		}
 		finally
@@ -133,6 +139,7 @@ public abstract class SyncingErrorTests extends TestCase
 
 	/**
 	 * Tests synchronization cancelling to see what happens to the FTP server.
+	 * 
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
@@ -143,85 +150,100 @@ public abstract class SyncingErrorTests extends TestCase
 		int timeTolerance = 150000;
 
 		IFileStore clientTestDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_TEST + sysTime));
-		IFileStore serverTestDirectory = serverDirectory.getFileStore(new Path("/" + SERVER_TEST + sysTime));		
+		IFileStore serverTestDirectory = serverDirectory.getFileStore(new Path("/" + SERVER_TEST + sysTime));
 		serverTestDirectory.mkdir(EFS.NONE, null);
 
 		// clone version x of github-services to local directory (newer)
-		System.out.println("1) Writing github repo to " + EFSUtils.getAbsolutePath(clientTestDirectory) );
+		System.out.println("1) Writing github repo to " + EFSUtils.getAbsolutePath(clientTestDirectory));
 		runGitClone("http://github.com/DmitryBaranovskiy/raphael.git", clientDirectory, clientTestDirectory.getName());
-		
+
 		Synchronizer syncManager = new Synchronizer(true, timeTolerance, includeCloakedFiles);
-		syncManager.setLogger(new ILogger() {
+		syncManager.setLogger(new ILogger()
+		{
 
-			public void logWarning(String message, Throwable th) {
+			public void logWarning(String message, Throwable th)
+			{
 				System.out.println(message);
 			}
 
-			public void logInfo(String message, Throwable th) {
+			public void logInfo(String message, Throwable th)
+			{
 				System.out.println(message);
 			}
 
-			public void logError(String message, Throwable th) {
+			public void logError(String message, Throwable th)
+			{
 				System.out.println(message);
 			}
 		});
-		
+
 		System.out.println("2) upload from server_local to server_test");
-		
-		IProgressMonitor monitor = new NullProgressMonitor() {
-			
+
+		IProgressMonitor monitor = new NullProgressMonitor()
+		{
+
 			private int work_total = 0;
-			
+
 			@Override
-			public void worked(int work) {
+			public void worked(int work)
+			{
 				work_total += work;
 				System.out.println("worked " + work_total);
-				if(work_total >= 2) {
+				if (work_total >= 2)
+				{
 					this.setCanceled(true);
 				}
 			}
 		};
 
 		VirtualFileSyncPair[] items = null;
-		try {
-			items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory,
-					serverTestDirectory, monitor);			
+		try
+		{
+			items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory, serverTestDirectory,
+					monitor);
 			fail();
 		}
-		catch (OperationCanceledException ex) {
+		catch (OperationCanceledException ex)
+		{
 			assertNull(items);
 		}
 
-		items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory,
-				serverTestDirectory, null);
+		items = syncManager.getSyncItems(clientManager, serverManager, clientTestDirectory, serverTestDirectory, null);
 
-		IProgressMonitor monitor2 = new NullProgressMonitor() {
-			
+		IProgressMonitor monitor2 = new NullProgressMonitor()
+		{
+
 			private int work_total = 0;
-			
+
 			@Override
-			public void worked(int work) {
+			public void worked(int work)
+			{
 				work_total += work;
 				System.out.println("worked " + work_total);
-				if(work_total >= 2) {
+				if (work_total >= 2)
+				{
 					this.setCanceled(true);
 				}
 			}
 		};
 
-		try {
+		try
+		{
 			syncManager.upload(items, monitor2);
 			fail();
 		}
-		catch (OperationCanceledException ex) {
+		catch (OperationCanceledException ex)
+		{
 			assertTrue(syncManager.getClientFileTransferedCount() < items.length);
 		}
-	
+
 	}
 
-	protected void runGitClone(String url, IFileStore basePath, String directory) {
-		Map<Integer, String> results = GitExecutable.instance().runInBackground(new Path(EFSUtils.getAbsolutePath(basePath)), "clone", url, directory);
-		if (results != null && results.keySet().iterator().next() != 0)
+	protected void runGitClone(String url, IFileStore basePath, String directory)
+	{
+		IStatus results = GitExecutable.instance().runInBackground(new Path(EFSUtils.getAbsolutePath(basePath)),
+				"clone", url, directory);
+		if (results == null || !results.isOK())
 		{
 			fail("Git clone failed");
 		}
