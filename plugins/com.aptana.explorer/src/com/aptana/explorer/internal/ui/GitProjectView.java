@@ -140,6 +140,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 						IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
 				if (!performFetches)
 				{
+					// FIXME Listen for change to this pref and then schedule if it gets turned on!
 					return Status.OK_STATUS;
 				}
 
