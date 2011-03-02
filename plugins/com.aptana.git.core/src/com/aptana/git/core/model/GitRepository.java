@@ -16,7 +16,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -943,57 +942,6 @@ public class GitRepository
 		return index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
 	}
 
-	/**
-	 * Tries to calculate if a branch that has a corresponding remote branch has a different SHA as the tree/head. TODO
-	 * This is pretty inefficient if we loop over branches calling this. We should do one single ls-remote to grab all
-	 * remote SHAs at once rather than making a trip for each branch.
-	 * 
-	 * @param branchName
-	 * @deprecated Please use {@link #getOutOfDateBranches()}
-	 * @return
-	 */
-	@SuppressWarnings("nls")
-	public boolean shouldPull(String branchName)
-	{
-		GitRef remote = matchingRemoteBranch(branchName);
-		if (remote == null)
-		{
-			return false;
-		}
-		String[] commits = index().commitsBetween(GitRef.REFS_HEADS + branchName, remote.ref());
-		if (commits != null && commits.length > 0)
-			return true;
-		// Check to see if user has disabled performing remote fetches for pull indicator calculations.
-		boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
-				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
-		if (!performFetches)
-		{
-			return false;
-		}
-
-		// Use git ls-remote remotename remote-branchname
-		// Parse out the sha and compare vs the branch's local sha!
-		String output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote",
-				remote.getRemoteName(), remote.getRemoteBranchName());
-		if (output == null || output.length() < 40)
-		{
-			GitPlugin.logWarning(MessageFormat.format(
-					"Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}",
-					remote.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
-			return false;
-		}
-		String remoteSHA = output.substring(0, 40);
-		output = GitExecutable.instance().outputForCommand(workingDirectory(), "ls-remote", ".", "heads/" + branchName);
-		if (output == null || output.length() < 40)
-		{
-			GitPlugin.logWarning(MessageFormat.format("Got back unexpected output for ls-remote . heads/{0}: {1}",
-					branchName, output));
-			return false;
-		}
-		String localSHA = output.substring(0, 40);
-		return !localSHA.equals(remoteSHA);
-	}
-
 	public boolean isDirty()
 	{
 		return index().isDirty();
@@ -1579,14 +1527,22 @@ public class GitRepository
 		for (Map.Entry<String, GitRef> entry : localToRemote.entrySet())
 		{
 			String remote = entry.getValue().getRemoteName();
+			if (remoteNameToOutput.containsKey(remote))
+			{
+				// Only do ls-remote once per remote
+				continue;
+			}
 			IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "ls-remote", "--heads", //$NON-NLS-1$ //$NON-NLS-2$
 					remote);
 			if (result == null || !result.isOK())
 			{
-				// GitPlugin.logWarning(MessageFormat.format(
-				// "Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}",
-				// remote.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
-				remoteNameToOutput.put(remote, "");
+				// Failed to execute properly
+				if (result != null)
+				{
+					GitPlugin.getDefault().getLog().log(result);
+				}
+				// Store empty output to avoid hitting this remote again
+				remoteNameToOutput.put(remote, ""); //$NON-NLS-1$
 			}
 			else
 			{
@@ -1596,7 +1552,7 @@ public class GitRepository
 
 		// Now process the outputs, matching up the remote refs to local branches and comparing their SHAs
 		// TODO Move this pattern up to be a field that gets lazily compiled?
-		Pattern p = Pattern.compile("^([0-9a-fA-F]{40})\\s+(refs/heads/.+)$"); //$NON-NLS-1$
+		Pattern p = Pattern.compile("^([0-9a-fA-F]{40})\\s+(refs/heads/.+)$", Pattern.MULTILINE); //$NON-NLS-1$
 		for (Map.Entry<String, String> entry : remoteNameToOutput.entrySet())
 		{
 			String output = entry.getValue();
@@ -1615,7 +1571,9 @@ public class GitRepository
 				String localBranchName = null;
 				for (Map.Entry<String, GitRef> localToRemoteRefEntry : localToRemote.entrySet())
 				{
-					if (ref.equals(GitRef.REFS_HEADS + localToRemoteRefEntry.getValue().getRemoteBranchName()))
+					// Do both remote match and the branch name match?
+					if (entry.getKey().equals(localToRemoteRefEntry.getValue().getRemoteName())
+							&& ref.equals(GitRef.REFS_HEADS + localToRemoteRefEntry.getValue().getRemoteBranchName()))
 					{
 						localBranchName = localToRemoteRefEntry.getKey();
 						break;
@@ -1629,6 +1587,12 @@ public class GitRepository
 						// SHAs don't match, so there are changes. Big question is where did they occur? Do we need to
 						// check our local copy of the remote ref too?
 						toPull.add(localBranchName);
+						// This local branch is handled, remove it from eligible list...
+						localToRemote.remove(localBranchName);
+						if (localToRemote.isEmpty()) // no more local branches we need to handle?, break out of loop!
+						{
+							break;
+						}
 					}
 				}
 			}
