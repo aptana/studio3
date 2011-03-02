@@ -26,8 +26,9 @@ import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.internal.ui.Messages;
 import com.aptana.explorer.internal.ui.SingleProjectView;
+import com.aptana.ui.actions.DefaultNavigatorActionProvider;
 
-public class CommandsActionProvider extends ExplorerActionProvider
+public class CommandsActionProvider extends DefaultNavigatorActionProvider
 {
 
 	@Override
@@ -37,7 +38,7 @@ public class CommandsActionProvider extends ExplorerActionProvider
 	}
 
 	@Override
-	protected String getMenuID()
+	protected String getMenuId()
 	{
 		return IExplorerUIConstants.GEAR_MENU_ID;
 	}
