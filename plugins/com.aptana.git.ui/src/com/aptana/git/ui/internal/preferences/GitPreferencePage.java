@@ -22,14 +22,14 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 
-public class GitExecutableLocationPage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
+public class GitPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 
 	private FileFieldEditor fileEditor;
 	private BooleanFieldEditor pullIndicatorEditor;
 	private BooleanFieldEditor autoAttachEditor;
 
-	public GitExecutableLocationPage()
+	public GitPreferencePage()
 	{
 		super();
 	}
