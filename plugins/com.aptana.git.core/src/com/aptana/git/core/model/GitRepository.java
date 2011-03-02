@@ -24,11 +24,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyAdapter;
@@ -946,6 +949,7 @@ public class GitRepository
 	 * remote SHAs at once rather than making a trip for each branch.
 	 * 
 	 * @param branchName
+	 * @deprecated Please use {@link #getOutOfDateBranches()}
 	 * @return
 	 */
 	@SuppressWarnings("nls")
@@ -1506,5 +1510,130 @@ public class GitRepository
 				writer.close();
 			}
 		}
+	}
+
+	/**
+	 * Returns the set of branches that are tied to a remote branch that has changes.
+	 * 
+	 * @return
+	 */
+	public synchronized Set<String> getOutOfDateBranches()
+	{
+		// TODO Does this report properly if the local branch has commits and there's no changes remotely?
+		// TODO What about when we have commits locally and remotely?
+
+		// Check to see if user has disabled performing remote fetches for pull indicator calculations.
+		boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
+		if (!performFetches)
+		{
+			return Collections.emptySet();
+		}
+
+		// First limit it down to a map of local branches to their matching remotes.
+		Map<String, GitRef> localToRemote = new HashMap<String, GitRef>();
+		for (String branchName : localBranches())
+		{
+			GitRef remote = matchingRemoteBranch(branchName);
+			if (remote == null)
+			{
+				continue;
+			}
+			localToRemote.put(branchName, remote);
+		}
+
+		// If there are no branches with remote bracnhes, just return empty set
+		if (localToRemote.isEmpty())
+		{
+			return Collections.emptySet();
+		}
+
+		// First pass, compare the local branch ref to the local copy of the remote ref
+		// Have we already fetched, it has changes, but hasn't been merged?
+		Set<String> toPull = new HashSet<String>();
+		Iterator<Map.Entry<String, GitRef>> iter = localToRemote.entrySet().iterator();
+		while (iter.hasNext())
+		{
+			Map.Entry<String, GitRef> entry = iter.next();
+
+			String[] commits = index().commitsBetween(GitRef.REFS_HEADS + entry.getKey(), entry.getValue().ref());
+			if (commits != null && commits.length > 0)
+			{
+				// No need to hit network, we can see that there's changes on local copy of remote branch. fetched, but
+				// not yet merged
+				toPull.add(entry.getKey());
+				iter.remove();
+				continue;
+			}
+		}
+
+		// Can we stop early and avoid hitting ls-remote?
+		if (localToRemote.isEmpty())
+		{
+			return toPull;
+		}
+
+		// OK, do the heavy lifting, get the unique set of remotes from the left over branches.
+		// For each remote, do a ls-remote and store the output
+		Map<String, String> remoteNameToOutput = new HashMap<String, String>();
+		for (Map.Entry<String, GitRef> entry : localToRemote.entrySet())
+		{
+			String remote = entry.getValue().getRemoteName();
+			IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "ls-remote", "--heads", //$NON-NLS-1$ //$NON-NLS-2$
+					remote);
+			if (result == null || !result.isOK())
+			{
+				// GitPlugin.logWarning(MessageFormat.format(
+				// "Got back unexpected output for ls-remote {0} {1}, in {2} (local branch: {3}): {4}",
+				// remote.getRemoteName(), remote.getRemoteBranchName(), workingDirectory(), branchName, output));
+				remoteNameToOutput.put(remote, "");
+			}
+			else
+			{
+				remoteNameToOutput.put(remote, result.getMessage());
+			}
+		}
+
+		// Now process the outputs, matching up the remote refs to local branches and comparing their SHAs
+		// TODO Move this pattern up to be a field that gets lazily compiled?
+		Pattern p = Pattern.compile("^([0-9a-fA-F]{40})\\s+(refs/heads/.+)$"); //$NON-NLS-1$
+		for (Map.Entry<String, String> entry : remoteNameToOutput.entrySet())
+		{
+			String output = entry.getValue();
+			if (output.length() == 0)
+			{
+				continue;
+			}
+
+			Matcher m = p.matcher(output);
+			while (m.find())
+			{
+				String remoteSHA = m.group(1);
+				String ref = m.group(2);
+
+				// Find the local branch for this remote ref, compare SHAs
+				String localBranchName = null;
+				for (Map.Entry<String, GitRef> localToRemoteRefEntry : localToRemote.entrySet())
+				{
+					if (ref.equals(GitRef.REFS_HEADS + localToRemoteRefEntry.getValue().getRemoteBranchName()))
+					{
+						localBranchName = localToRemoteRefEntry.getKey();
+						break;
+					}
+				}
+				if (localBranchName != null)
+				{
+					String localSHA = toSHA(GitRef.refFromString(GitRef.REFS_HEADS + localBranchName));
+					if (!localSHA.equals(remoteSHA))
+					{
+						// SHAs don't match, so there are changes. Big question is where did they occur? Do we need to
+						// check our local copy of the remote ref too?
+						toPull.add(localBranchName);
+					}
+				}
+			}
+		}
+
+		return toPull;
 	}
 }

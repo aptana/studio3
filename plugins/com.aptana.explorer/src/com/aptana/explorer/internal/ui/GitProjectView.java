@@ -52,6 +52,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.BranchAddedEvent;
 import com.aptana.git.core.model.BranchChangedEvent;
 import com.aptana.git.core.model.BranchRemovedEvent;
@@ -134,12 +135,21 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				// Don't do any work if user has turned off calc'ing pull indicators.
+				boolean performFetches = Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+						IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, false, null);
+				if (!performFetches)
+				{
+					return Status.OK_STATUS;
+				}
+
 				if (monitor != null && monitor.isCanceled())
 					return Status.CANCEL_STATUS;
 
 				GitRepository repo = getGitRepositoryManager().getAttached(selectedProject);
 				if (repo == null)
 				{
+					// FIXME Don't reschedule, listen for repo attachment and then start running this.
 					schedule(5 * 60 * 1000); // reschedule for 5 minutes after we return!
 					return Status.OK_STATUS;
 				}
@@ -151,15 +161,14 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				{
 					branchToPullIndicator.clear();
 				}
+				Set<String> branchesToPull = repo.getOutOfDateBranches();
 				for (String branch : repo.localBranches())
 				{
 					if (monitor != null && monitor.isCanceled())
 						return Status.CANCEL_STATUS;
-
-					boolean shouldPull = repo.shouldPull(branch);
 					synchronized (branchToPullIndicator)
 					{
-						branchToPullIndicator.put(branch, shouldPull);
+						branchToPullIndicator.put(branch, branchesToPull.contains(branch));
 					}
 				}
 
@@ -168,6 +177,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				if (monitor != null && monitor.isCanceled())
 					return Status.CANCEL_STATUS;
 
+				// TODO Allow user to have control over how often we poll
 				schedule(5 * 60 * 1000); // reschedule for 5 minutes after we return!
 				return Status.OK_STATUS;
 			}
