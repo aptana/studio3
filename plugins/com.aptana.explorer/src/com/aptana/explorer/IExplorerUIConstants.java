@@ -30,4 +30,9 @@ public interface IExplorerUIConstants
 	 * The path to the icon for deploy menu
 	 */
 	public static final String DEPLOY_MENU_ICON = "icons/full/elcl16/network_arrow.png"; //$NON-NLS-1$
+
+	/**
+	 * The path to the icon for commands menu
+	 */
+	public static final String GEAR_MENU_ICON = "icons/full/elcl16/command.png"; //$NON-NLS-1$
 }
