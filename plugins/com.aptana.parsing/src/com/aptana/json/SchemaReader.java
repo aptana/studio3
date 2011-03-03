@@ -46,8 +46,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endArray() throws ParseException, IOException
 	{
-		System.out.println("end array");
-
 		this._schema.transition(this._context, SchemaEventType.END_ARRAY, null);
 
 		return true;
@@ -59,8 +57,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public void endJSON() throws ParseException, IOException
 	{
-		System.out.println("end parse");
-
 		this._schema.transition(this._context, SchemaEventType.END_PARSE, null);
 		this._schema.exit();
 	}
@@ -71,8 +67,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endObject() throws ParseException, IOException
 	{
-		System.out.println("end object");
-
 		this._schema.transition(this._context, SchemaEventType.END_OBJECT, null);
 
 		return true;
@@ -84,8 +78,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endObjectEntry() throws ParseException, IOException
 	{
-		System.out.println("end object entry");
-
 		this._schema.transition(this._context, SchemaEventType.END_OBJECT_ENTRY, null);
 
 		return true;
@@ -117,8 +109,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean primitive(Object value) throws ParseException, IOException
 	{
-		System.out.println("primitive: " + value);
-
 		this._schema.transition(this._context, SchemaEventType.PRIMITIVE, value);
 
 		return true;
@@ -169,8 +159,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startArray() throws ParseException, IOException
 	{
-		System.out.println("start array");
-
 		this._schema.transition(this._context, SchemaEventType.START_ARRAY, null);
 
 		return true;
@@ -182,8 +170,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public void startJSON() throws ParseException, IOException
 	{
-		System.out.println("start parse");
-
 		this._schema.enter();
 		this._schema.transition(this._context, SchemaEventType.START_PARSE, null);
 	}
@@ -194,8 +180,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startObject() throws ParseException, IOException
 	{
-		System.out.println("start object");
-
 		this._schema.transition(this._context, SchemaEventType.START_OBJECT, null);
 
 		return true;
@@ -207,8 +191,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startObjectEntry(String key) throws ParseException, IOException
 	{
-		System.out.println("start object entry: " + key);
-
 		this._schema.transition(this._context, SchemaEventType.START_OBJECT_ENTRY, key);
 
 		return true;
