@@ -15,8 +15,6 @@ import java.util.Stack;
 public class SchemaContext implements ISchemaContext
 {
 	private Stack<IState> _typeStack;
-	private IState _currentType;
-	private Stack<Integer> _topStack;
 	private IContextHandler _handler;
 
 	/**
@@ -68,7 +66,14 @@ public class SchemaContext implements ISchemaContext
 	 */
 	public IState getCurrentType()
 	{
-		return this._currentType;
+		IState result = null;
+
+		if (this.hasTypes())
+		{
+			result = this._typeStack.peek();
+		}
+
+		return result;
 	}
 
 	/**
@@ -82,20 +87,13 @@ public class SchemaContext implements ISchemaContext
 	}
 
 	/**
-	 * getStackTop
+	 * hasTypes
 	 * 
 	 * @return
 	 */
-	public int getStackTop()
+	public boolean hasTypes()
 	{
-		int result = 0;
-
-		if (this._topStack != null && this._topStack.isEmpty() == false)
-		{
-			result = this._topStack.peek();
-		}
-
-		return result;
+		return (this._typeStack != null && this._typeStack.isEmpty() == false);
 	}
 
 	/*
@@ -106,9 +104,16 @@ public class SchemaContext implements ISchemaContext
 	{
 		// NOTE: we leave the current type intact when we determine we can't pop. This is to preserve the current type
 		// for array elements
-		if (this._typeStack != null && this._typeStack.size() > this.getStackTop())
+		if (this._typeStack != null)
 		{
-			this._currentType = this._typeStack.pop();
+			if (this._typeStack.isEmpty() == false)
+			{
+				this._typeStack.pop();
+			}
+			else 
+			{
+				throw new IllegalArgumentException("Tried to pop an empty type stack");
+			}
 		}
 	}
 
@@ -116,19 +121,14 @@ public class SchemaContext implements ISchemaContext
 	 * (non-Javadoc)
 	 * @see com.aptana.json.ISchemaContext#pushType(java.lang.String, com.aptana.json.IState)
 	 */
-	public void pushType(IState type)
+	public void pushType(String typeName, IState type)
 	{
-		if (this._currentType != null)
+		if (this._typeStack == null)
 		{
-			if (this._typeStack == null)
-			{
-				this._typeStack = new Stack<IState>();
-			}
-
-			this._typeStack.push(this._currentType);
+			this._typeStack = new Stack<IState>();
 		}
 
-		this._currentType = type;
+		this._typeStack.push(type);
 	}
 
 	/*
@@ -138,34 +138,6 @@ public class SchemaContext implements ISchemaContext
 	public void reset()
 	{
 		this._typeStack = null;
-		this._currentType = null;
-		this._topStack = null;
-	}
-
-	/**
-	 * restoreTop
-	 */
-	public void restoreTop()
-	{
-		if (this._topStack != null)
-		{
-			this._topStack.pop();
-		}
-	}
-
-	/**
-	 * saveTop
-	 */
-	public void saveTop()
-	{
-		if (this._topStack == null)
-		{
-			this._topStack = new Stack<Integer>();
-		}
-
-		int top = (this._typeStack != null) ? this._typeStack.size() : 0;
-
-		this._topStack.push(top);
 	}
 
 	/**
