@@ -28,7 +28,7 @@ public class Schema implements IState
 	}
 
 	private Map<String, IState> _typesByName;
-	private IState _rootType;
+	private String _rootTypeName;
 	private boolean _inParse;
 
 	/**
@@ -123,7 +123,17 @@ public class Schema implements IState
 	 */
 	public IState getRootType()
 	{
-		return this._rootType;
+		return this.getType(this.getRootTypeName());
+	}
+
+	/**
+	 * getRootTypeName
+	 * 
+	 * @return
+	 */
+	public String getRootTypeName()
+	{
+		return this._rootTypeName;
 	}
 
 	/**
@@ -191,13 +201,13 @@ public class Schema implements IState
 	}
 
 	/**
-	 * setRootType
+	 * setRootTypeName
 	 * 
 	 * @param typeName
 	 */
-	public void setRootType(String typeName)
+	public void setRootTypeName(String typeName)
 	{
-		this._rootType = this.getType(typeName);
+		this._rootTypeName = typeName;
 	}
 
 	/*
@@ -215,7 +225,12 @@ public class Schema implements IState
 				}
 
 				this._inParse = true;
-				context.pushType(this._rootType);
+
+				// push type onto context stack
+				context.pushType(this.getRootType());
+
+				// fire type creation event
+				context.createType(this.getRootTypeName(), this.getRootType());
 				break;
 
 			case START_OBJECT:
