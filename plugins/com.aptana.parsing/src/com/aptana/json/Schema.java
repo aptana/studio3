@@ -15,6 +15,11 @@ import java.util.Map;
  */
 public class Schema implements IState
 {
+	private static enum SchemaState
+	{
+		READY, IN_PARSE, COMPLETE
+	}
+
 	private static final IState EMPTY_TYPE = new SchemaObject(null);
 	private static final Map<String, IState> BUILTIN_TYPES;
 
@@ -29,7 +34,7 @@ public class Schema implements IState
 
 	private Map<String, IState> _typesByName;
 	private String _rootTypeName;
-	private boolean _inParse;
+	private SchemaState _currentState;
 
 	/**
 	 * createType
@@ -105,7 +110,7 @@ public class Schema implements IState
 	 */
 	public void enter()
 	{
-		this._inParse = false;
+		this._currentState = SchemaState.READY;
 	}
 
 	/*
@@ -114,6 +119,7 @@ public class Schema implements IState
 	 */
 	public void exit()
 	{
+		this._currentState = null;
 	}
 
 	/**
@@ -186,18 +192,272 @@ public class Schema implements IState
 		switch (event)
 		{
 			case START_PARSE:
-				result = (this._inParse == false);
+				result = (this._currentState == SchemaState.READY);
 				break;
 
 			case END_PARSE:
-				result = this._inParse;
+				result = (this._currentState == SchemaState.IN_PARSE);
 				break;
 
 			default:
-				result = this._inParse;
+				result = (this._currentState == SchemaState.READY);
 		}
 
 		return result;
+	}
+
+	/**
+	 * processEndArray
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processEndArray(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			IState currentType = context.getCurrentType();
+
+			if (currentType instanceof SchemaArray)
+			{
+				if (currentType != null)
+				{
+					currentType.transition(context, event, value);
+					currentType.exit();
+				}
+
+				// check for possible END_ARRAY_ENTRY event state
+				currentType = context.getCurrentType();
+
+				if (currentType instanceof SchemaArray)
+				{
+					currentType.transition(context, SchemaEventType.END_ARRAY_ENTRY, value);
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException("Tried to end an array on a non-array type: " + currentType.getClass().getName());
+			}
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processEndObject
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processEndObject(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			IState currentType = context.getCurrentType();
+
+			if (currentType instanceof SchemaObject)
+			{
+				if (currentType != null)
+				{
+					currentType.transition(context, event, value);
+					currentType.exit();
+				}
+
+				// check for possible END_ARRAY_ENTRY event state
+				currentType = context.getCurrentType();
+
+				if (currentType instanceof SchemaArray)
+				{
+					currentType.transition(context, SchemaEventType.END_ARRAY_ENTRY, value);
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException("Tried to end an object on a non-object type: " + currentType.getClass().getName());
+			}
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processEndParse
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processEndParse(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			this._currentState = SchemaState.COMPLETE;
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processPrimitive
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processPrimitive(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			IState currentType = context.getCurrentType();
+
+			if (currentType instanceof SchemaArray)
+			{
+				currentType.transition(context, SchemaEventType.START_ARRAY_ENTRY, value);
+
+				// the current type should have been updated, so grab the new value
+				currentType = context.getCurrentType();
+			}
+
+			if (currentType instanceof SchemaPrimitive)
+			{
+				if (currentType != null)
+				{
+					currentType.enter();
+					currentType.transition(context, event, value);
+					currentType.exit();
+				}
+
+				// check for possible END_ARRAY_ENTRY event state
+				currentType = context.getCurrentType();
+
+				if (currentType instanceof SchemaArray)
+				{
+					currentType.transition(context, SchemaEventType.END_ARRAY_ENTRY, value);
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException("Tried to process non-primitive type as a primitive: " + currentType.getClass().getName());
+			}
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processStartArray
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processStartArray(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			IState currentType = context.getCurrentType();
+
+			if (currentType instanceof SchemaArray && currentType.isValidTransition(SchemaEventType.START_ARRAY_ENTRY, value))
+			{
+				currentType.transition(context, SchemaEventType.START_ARRAY_ENTRY, value);
+
+				// the current type should have been updated, so grab the new value
+				currentType = context.getCurrentType();
+			}
+
+			if (currentType instanceof SchemaArray)
+			{
+				if (currentType != null)
+				{
+					currentType.enter();
+					currentType.transition(context, event, value);
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException("Tried to start an array on a non-array type: " + currentType.getClass().getName());
+			}
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processStartObject
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processStartObject(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.IN_PARSE)
+		{
+			IState currentType = context.getCurrentType();
+
+			if (currentType instanceof SchemaArray)
+			{
+				currentType.transition(context, SchemaEventType.START_ARRAY_ENTRY, value);
+
+				// the current type should have been updated, so grab the new value
+				currentType = context.getCurrentType();
+			}
+
+			if (currentType instanceof SchemaObject)
+			{
+				if (currentType != null)
+				{
+					currentType.enter();
+					currentType.transition(context, event, value);
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException("Tried to start an object on a non-object type: " + currentType.getClass().getName());
+			}
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
+	}
+
+	/**
+	 * processStartParse
+	 * 
+	 * @param context
+	 * @param event
+	 * @param value
+	 */
+	protected void processStartParse(ISchemaContext context, SchemaEventType event, Object value)
+	{
+		if (this._currentState == SchemaState.READY)
+		{
+			// update internal state
+			this._currentState = SchemaState.IN_PARSE;
+
+			// push type onto context stack
+			context.pushType(this.getRootTypeName(), this.getRootType());
+
+			// fire type creation event
+			context.createType(this.getRootTypeName(), this.getRootType());
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported event type: " + event.name());
+		}
 	}
 
 	/**
@@ -219,157 +479,47 @@ public class Schema implements IState
 		switch (event)
 		{
 			case START_PARSE:
-				if (this._inParse)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				this._inParse = true;
-
-				// push type onto context stack
-				context.pushType(this.getRootType());
-
-				// fire type creation event
-				context.createType(this.getRootTypeName(), this.getRootType());
+				this.processStartParse(context, event, value);
 				break;
 
 			case START_OBJECT:
-			{
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType instanceof SchemaObject == false)
-				{
-					throw new IllegalArgumentException("Tried to start an object on a non-object type: " + currentType.getClass().getName());
-				}
-
-				if (currentType != null)
-				{
-					currentType.enter();
-					currentType.transition(context, event, value);
-				}
+				this.processStartObject(context, event, value);
 				break;
-			}
 
 			case START_ARRAY:
-			{
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType instanceof SchemaArray == false)
-				{
-					throw new IllegalArgumentException("Tried to start an array on a non-array type: " + currentType.getClass().getName());
-				}
-
-				if (currentType != null)
-				{
-					currentType.enter();
-					currentType.transition(context, event, value);
-				}
+				this.processStartArray(context, event, value);
 				break;
-			}
 
 			case PRIMITIVE:
-			{
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType instanceof SchemaPrimitive == false)
-				{
-					throw new IllegalArgumentException("Tried to process non-primitive type as a primitive: " + currentType.getClass().getName());
-				}
-
-				if (currentType != null)
-				{
-					currentType.enter();
-					currentType.transition(context, event, value);
-					currentType.exit();
-				}
-				break;
-			}
-
-			case END_PARSE:
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				this._inParse = false;
-				// TODO: indicate to context that we are done
+				this.processPrimitive(context, event, value);
 				break;
 
 			case END_OBJECT:
-			{
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType instanceof SchemaObject == false)
-				{
-					throw new IllegalArgumentException("Tried to end an object on a non-object type: " + currentType.getClass().getName());
-				}
-
-				if (currentType != null)
-				{
-					currentType.transition(context, event, value);
-					currentType.exit();
-				}
+				this.processEndObject(context, event, value);
 				break;
-			}
 
 			case END_ARRAY:
-			{
-				if (this._inParse == false)
-				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				// NOTE: Since we locked the top of the context's type stack, we need to remove that locked item
-				context.restoreTop();
-				context.popType();
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType instanceof SchemaArray == false)
-				{
-					throw new IllegalArgumentException("Tried to end an array on a non-array type: " + currentType.getClass().getName());
-				}
-
-				if (currentType != null)
-				{
-					currentType.transition(context, event, value);
-					currentType.exit();
-				}
+				this.processEndArray(context, event, value);
 				break;
-			}
+
+			case END_PARSE:
+				this.processEndParse(context, event, value);
+				break;
 
 			default:
-				if (this._inParse == false)
+				if (this._currentState == SchemaState.IN_PARSE)
+				{
+					IState currentType = context.getCurrentType();
+
+					if (currentType != null)
+					{
+						// delegate to model
+						currentType.transition(context, event, value);
+					}
+				}
+				else
 				{
 					throw new IllegalStateException("Unsupported event type: " + event.name());
-				}
-
-				IState currentType = context.getCurrentType();
-
-				if (currentType != null)
-				{
-					// delegate to model
-					currentType.transition(context, event, value);
 				}
 		}
 	}
