@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * ISchemaContext
  */
-public interface ISchemaContext
+public interface ISchemaContext extends IContextHandler
 {
 	/**
 	 * Return the type that is currently active in this context
