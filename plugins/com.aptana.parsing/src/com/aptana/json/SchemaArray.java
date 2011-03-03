@@ -12,9 +12,14 @@ package com.aptana.json;
  */
 public class SchemaArray implements IState
 {
+	private enum ArrayState
+	{
+		READY, IN_ARRAY, IN_ELEMENT, COMPLETE
+	}
+
 	private Schema _owningSchema;
 	private String _elementTypeName;
-	private boolean _inArray;
+	private ArrayState _currentState;
 
 	/**
 	 * SchemaArray
@@ -33,7 +38,7 @@ public class SchemaArray implements IState
 	 */
 	public void enter()
 	{
-		this._inArray = false;
+		this._currentState = ArrayState.READY;
 	}
 
 	/*
@@ -85,11 +90,11 @@ public class SchemaArray implements IState
 		switch (event)
 		{
 			case START_ARRAY:
-				result = this._inArray;
+				result = (this._currentState == ArrayState.READY);
 				break;
 
 			case END_ARRAY:
-				result = (this._inArray == false);
+				result = (this._currentState == ArrayState.IN_ARRAY);
 		}
 
 		return result;
@@ -104,37 +109,65 @@ public class SchemaArray implements IState
 		switch (event)
 		{
 			case START_ARRAY:
-				if (this._inArray)
+				if (this._currentState != ArrayState.READY)
 				{
 					throw new IllegalStateException("Attempted to start an array that has already been started");
 				}
 
-				this._inArray = true;
-
-				// Push element type into current context. Note that processing of that type will automatically remove
-				// itself from the stack
-				context.pushType(this.getElementType());
+				// update internal state
+				this._currentState = ArrayState.IN_ARRAY;
 
 				// fire list creation event
 				context.createList(this.getElementTypeName(), this.getElementType());
 
 				// fire element type creation event
-				context.createType(this.getElementTypeName(), this.getElementType());
+				// context.createType(this.getElementTypeName(), this.getElementType());
 
 				// lock stack top to leave element type as active type until we leave the array
-				context.saveTop();
+				// context.saveTop();
+				break;
+
+			case START_ARRAY_ENTRY:
+				if (this._currentState != ArrayState.IN_ARRAY)
+				{
+					throw new IllegalStateException("Attempted to start an array element in array that has not been started");
+				}
+
+				// update internal state
+				this._currentState = ArrayState.IN_ELEMENT;
+
+				// Push element type into current context. Note that processing of that type will automatically remove
+				// itself from the stack
+				context.pushType(this.getElementTypeName(), this.getElementType());
+
+				// fire element type creation event
+				context.createType(this.getElementTypeName(), this.getElementType());
 				break;
 
 			case END_ARRAY:
-				if (this._inArray == false)
+				if (this._currentState != ArrayState.IN_ARRAY)
 				{
 					throw new IllegalStateException("Attempted to end an array that has not been started");
 				}
 
-				this._inArray = false;
+				// update internal state
+				this._currentState = ArrayState.COMPLETE;
 
 				// Remove this type from the current context
 				context.popType();
+				break;
+
+			case END_ARRAY_ENTRY:
+				if (this._currentState != ArrayState.IN_ELEMENT)
+				{
+					throw new IllegalStateException("Attempted to end an array element in array that has not started and element");
+				}
+
+				// update internal state
+				this._currentState = ArrayState.IN_ARRAY;
+
+				// fire element type creation event
+				context.addElement(this.getElementTypeName(), this.getElementType());
 				break;
 
 			default:
