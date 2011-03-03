@@ -59,7 +59,7 @@ public class SchemaBuilder extends SchemaReader
 		property.addProperty("optional", "Boolean");
 		
 		// set root type
-		result.setRootType("SchemaDocument");
+		result.setRootTypeName("SchemaDocument");
 
 		return result;
 	}
