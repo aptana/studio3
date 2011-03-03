@@ -12,19 +12,21 @@ package com.aptana.json;
  */
 public class Property
 {
+	private Schema _owningSchema;
 	private String _name;
-	private IState _type;
+	private String _typeName;
 
 	/**
 	 * SchemaProperty
 	 * 
 	 * @param name
-	 * @param type
+	 * @param typeName
 	 */
-	public Property(String name, IState type)
+	Property(Schema owningSchema, String name, String typeName)
 	{
+		this._owningSchema = owningSchema;
 		this._name = name;
-		this._type = type;
+		this._typeName = typeName;
 	}
 
 	/**
@@ -38,12 +40,32 @@ public class Property
 	}
 
 	/**
+	 * getOwningSchema
+	 * 
+	 * @return
+	 */
+	public Schema getOwningSchema()
+	{
+		return this._owningSchema;
+	}
+
+	/**
 	 * getType
 	 * 
 	 * @return
 	 */
 	public IState getType()
 	{
-		return this._type;
+		return this._owningSchema.getType(this._typeName);
+	}
+
+	/**
+	 * getTypeName
+	 * 
+	 * @return
+	 */
+	public String getTypeName()
+	{
+		return this._typeName;
 	}
 }
