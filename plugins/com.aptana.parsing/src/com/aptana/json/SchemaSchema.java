@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * SchemaSchema
  */
-public class SchemaSchema extends SchemaDocument
+public class SchemaSchema extends Schema
 {
 	/**
 	 * SchemaSchema
