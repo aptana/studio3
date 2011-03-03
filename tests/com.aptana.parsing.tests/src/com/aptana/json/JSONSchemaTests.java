@@ -115,11 +115,41 @@ public class JSONSchemaTests extends TestCase
 		sReader.read(reader, context);
 	}
 
+	/**
+	 * testBooleanSchema
+	 */
+	public void testBooleanSchema()
+	{
+		this.validate("boolean-schema.json");
+	}
+
+	/**
+	 * testNumberSchema
+	 */
+	public void testNumberSchema()
+	{
+		this.validate("number-schema.json");
+	}
+
+	/**
+	 * testNullSchema
+	 */
+	public void testNullSchema()
+	{
+		this.validate("null-schema.json");
+	}
+
+	/**
+	 * testStringSchema
+	 */
 	public void testStringSchema()
 	{
 		this.validate("string-schema.json");
 	}
 
+	/**
+	 * testSampleSchema
+	 */
 	public void testSampleSchema()
 	{
 		this.validate("sample-schema.json");
