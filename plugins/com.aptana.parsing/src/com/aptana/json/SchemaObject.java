@@ -15,9 +15,26 @@ import java.util.Map;
  */
 public class SchemaObject implements IState
 {
+	private Schema _owningSchema;
 	private Map<String, Property> _properties;
 	private boolean _inObject;
 	private boolean _inProperty;
+
+	SchemaObject(Schema owningSchema)
+	{
+		this._owningSchema = owningSchema;
+	}
+
+	/**
+	 * addProperty
+	 * 
+	 * @param name
+	 * @param typeName
+	 */
+	public void addProperty(String name, String typeName)
+	{
+		this.addProperty(this._owningSchema.createProperty(name, typeName));
+	}
 
 	/**
 	 * addProperty
@@ -53,6 +70,16 @@ public class SchemaObject implements IState
 	}
 
 	/**
+	 * getOwningSchema
+	 * 
+	 * @return
+	 */
+	public Schema getOwningSchema()
+	{
+		return this._owningSchema;
+	}
+
+	/**
 	 * getProperty
 	 * 
 	 * @param name
@@ -70,13 +97,14 @@ public class SchemaObject implements IState
 		return result;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
 	public boolean isValidTransition(EventType event, Object value)
 	{
 		boolean result = false;
-		
+
 		switch (event)
 		{
 			case START_OBJECT:
@@ -85,7 +113,7 @@ public class SchemaObject implements IState
 
 			case START_OBJECT_ENTRY:
 				result = (this._inObject && this._inProperty == false && value != null && value.toString().length() > 0);
-				
+
 				// TODO: check property name?
 				break;
 
@@ -97,7 +125,7 @@ public class SchemaObject implements IState
 				result = (this._inObject && this._inProperty);
 				break;
 		}
-		
+
 		return result;
 	}
 
@@ -169,7 +197,6 @@ public class SchemaObject implements IState
 				}
 
 				this._inProperty = false;
-				context.popType();
 				break;
 
 			default:
