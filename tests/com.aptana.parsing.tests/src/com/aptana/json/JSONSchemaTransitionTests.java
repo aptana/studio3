@@ -80,7 +80,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * @param value
 	 * @return
 	 */
-	private List<EventResult> createGoodList(EnumSet<SchemaEventType> events, String value)
+	private List<EventResult> createGoodList(EnumSet<SchemaEventType> events, Object value)
 	{
 		List<EventResult> result = new ArrayList<EventResult>();
 
@@ -160,7 +160,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * @param goodValue
 	 * @param badValue
 	 */
-	protected void testPrimitive(Class<? extends IState> stateClass, String goodValue, String badValue)
+	protected void testPrimitive(Class<? extends IState> stateClass, Object goodValue, Object badValue)
 	{
 		try
 		{
@@ -193,8 +193,8 @@ public class JSONSchemaTransitionTests extends TestCase
 	 */
 	public void testBooleanStates()
 	{
-		this.testPrimitive(SchemaBoolean.class, "true", "TRUE");
-		this.testPrimitive(SchemaBoolean.class, "false", "FALSE");
+		this.testPrimitive(SchemaBoolean.class, true, "true");
+		this.testPrimitive(SchemaBoolean.class, false, "false");
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	 */
 	public void testNullStates()
 	{
-		this.testPrimitive(SchemaNull.class, "null", "NULL");
+		this.testPrimitive(SchemaNull.class, null, "null");
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	 */
 	public void testNumberStates()
 	{
-		this.testPrimitive(SchemaNumber.class, "10.1", "10g");
+		this.testPrimitive(SchemaNumber.class, 10.1, "10g");
 	}
 
 	/**
