@@ -14,31 +14,27 @@ public class SchemaNumber extends SchemaPrimitive
 {
 	public SchemaNumber()
 	{
-		super(null);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aptana.json.SchemaPrimitive#isValidTransition(com.aptana.json.EventType, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override
-	public boolean isValidTransition(EventType event, Object value)
+	protected boolean validValue(Object value)
 	{
 		boolean result = false;
-		
-		if (event == EventType.PRIMITIVE && value instanceof String)
+
+		try
 		{
-			try
-			{
-				Double.parseDouble((String) value);
-				
-				result = true;
-			}
-			catch (NumberFormatException e)
-			{
-			}
+			Double.parseDouble((String) value);
+
+			result = true;
 		}
-		
+		catch (NumberFormatException e)
+		{
+		}
+
 		return result;
 	}
-	
 }

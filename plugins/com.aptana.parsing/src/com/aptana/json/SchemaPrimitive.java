@@ -12,16 +12,13 @@ package com.aptana.json;
  */
 public class SchemaPrimitive implements IState
 {
-	private String _text;
-
 	/**
 	 * SchemaPrimitive
 	 * 
 	 * @param text
 	 */
-	public SchemaPrimitive(String text)
+	public SchemaPrimitive()
 	{
-		this._text = text;
 	}
 
 	/*
@@ -46,14 +43,18 @@ public class SchemaPrimitive implements IState
 	 */
 	public boolean isValidTransition(EventType event, Object value)
 	{
-		boolean result = false;
+		return (event == EventType.PRIMITIVE && this.validValue(value));
+	}
 
-		if (event == EventType.PRIMITIVE && value instanceof String)
-		{
-			result = value.toString().equals(this._text);
-		}
-
-		return result;
+	/**
+	 * Determine if the specified value is valid for the given primitive. Subclasses need to override this
+	 * 
+	 * @param value
+	 * @return
+	 */
+	protected boolean validValue(Object value)
+	{
+		return false;
 	}
 
 	/*
@@ -67,5 +68,7 @@ public class SchemaPrimitive implements IState
 		{
 			throw new IllegalStateException();
 		}
+
+		context.popType();
 	}
 }

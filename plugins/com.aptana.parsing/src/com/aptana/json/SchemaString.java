@@ -14,15 +14,15 @@ public class SchemaString extends SchemaPrimitive
 {
 	public SchemaString()
 	{
-		super(null);
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aptana.json.SchemaPrimitive#isValidTransition(com.aptana.json.EventType, java.lang.Object)
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override
-	public boolean isValidTransition(EventType event, Object value)
+	protected boolean validValue(Object value)
 	{
-		return (event == EventType.PRIMITIVE && value instanceof String);
+		return (value instanceof String);
 	}
 }

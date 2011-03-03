@@ -10,10 +10,19 @@ package com.aptana.json;
 /**
  * SchemaTrue
  */
-public class SchemaTrue extends SchemaPrimitive
+public class SchemaBoolean extends SchemaPrimitive
 {
-	public SchemaTrue()
+	public SchemaBoolean()
 	{
-		super("true");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
+	 */
+	@Override
+	protected boolean validValue(Object value)
+	{
+		return (value instanceof Boolean);
 	}
 }

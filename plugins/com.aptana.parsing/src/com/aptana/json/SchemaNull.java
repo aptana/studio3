@@ -14,6 +14,15 @@ public class SchemaNull extends SchemaPrimitive
 {
 	public SchemaNull()
 	{
-		super("null");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
+	 */
+	@Override
+	protected boolean validValue(Object value)
+	{
+		return ("null".equals(value));
 	}
 }
