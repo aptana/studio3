@@ -191,9 +191,10 @@ public class JSONSchemaTransitionTests extends TestCase
 	/**
 	 * testFalseStates
 	 */
-	public void testFalseStates()
+	public void testBooleanStates()
 	{
-		this.testPrimitive(SchemaFalse.class, "false", "FALSE");
+		this.testPrimitive(SchemaBoolean.class, "true", "TRUE");
+		this.testPrimitive(SchemaBoolean.class, "false", "FALSE");
 	}
 
 	/**
@@ -221,19 +222,12 @@ public class JSONSchemaTransitionTests extends TestCase
 	}
 
 	/**
-	 * testTrueStates
-	 */
-	public void testTrueStates()
-	{
-		this.testPrimitive(SchemaTrue.class, "true", "TRUE");
-	}
-
-	/**
 	 * testStartObjectStates
 	 */
 	public void testStartObjectStates()
 	{
-		SchemaObject state = new SchemaObject();
+		Schema schema = new Schema();
+		SchemaObject state = schema.createObject();
 		List<EventResult> goodList = this.createGoodList( //
 			EnumSet.of(EventType.START_OBJECT), //
 			"property" //
@@ -248,9 +242,10 @@ public class JSONSchemaTransitionTests extends TestCase
 	public void testStartObjectEntryStates()
 	{
 		// create object and configure it
-		SchemaObject state = new SchemaObject();
+		Schema schema = new Schema();
+		SchemaObject state = schema.createObject();
 		String propertyName = "myProperty";
-		state.addProperty(new Property(propertyName, new SchemaString()));
+		state.addProperty(propertyName, "String");
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
@@ -277,9 +272,10 @@ public class JSONSchemaTransitionTests extends TestCase
 	public void testEndObjectEntryStates()
 	{
 		// create object and configure it
-		SchemaObject state = new SchemaObject();
+		Schema schema = new Schema();
+		SchemaObject state = schema.createObject();
 		final String propertyName = "myProperty";
-		state.addProperty(new Property(propertyName, new SchemaString()));
+		state.addProperty(propertyName, "String");
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
@@ -307,9 +303,10 @@ public class JSONSchemaTransitionTests extends TestCase
 	public void testEndObjectStates()
 	{
 		// create object and configure it
-		SchemaObject state = new SchemaObject();
+		Schema schema = new Schema();
+		SchemaObject state = schema.createObject();
 		String propertyName = "myProperty";
-		state.addProperty(new Property(propertyName, new SchemaString()));
+		state.addProperty(propertyName, "String");
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
@@ -336,7 +333,8 @@ public class JSONSchemaTransitionTests extends TestCase
 	public void testStartArrayStates()
 	{
 		// create array and configure it
-		SchemaArray state = new SchemaArray(new SchemaString());
+		Schema schema = new Schema();
+		SchemaArray state = schema.createArray("String");
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
@@ -353,7 +351,8 @@ public class JSONSchemaTransitionTests extends TestCase
 	public void testEndArrayStates()
 	{
 		// create array and configure it
-		SchemaArray state = new SchemaArray(new SchemaString());
+		Schema schema = new Schema();
+		SchemaArray state = schema.createArray("String");
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
