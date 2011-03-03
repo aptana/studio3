@@ -7,7 +7,6 @@
  */
 package com.aptana.json;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
@@ -92,21 +91,29 @@ public class JSONSchemaTests extends TestCase
 	 * @param name
 	 * @return
 	 */
-	protected SchemaDocument loadSchema(String name)
+	protected Schema loadSchema(String name)
 	{
-		SchemaDocument doc = new SchemaDocument();
+		SchemaBuilder builder = new SchemaBuilder();
+		Schema schema = builder.getSchema();
+		SchemaReader sReader = new SchemaReader(schema);
 		IPath path = Path.fromPortableString("json-schema/" + name);
 		IFileStore store = getFileStore(path);
 		String source = this.getContent(store);
 		StringReader reader = new StringReader(source);
+		Context context = new Context();
 
-		doc.read(reader);
-		
-		return doc;
+		sReader.read(reader, context);
+
+		return schema;
 	}
-	
+
 	public void testStringSchema()
 	{
-		SchemaDocument doc = this.loadSchema("string-schema.json");
+		this.loadSchema("string-schema.json");
+	}
+
+	public void testSampleSchema()
+	{
+		this.loadSchema("sample-schema.json");
 	}
 }
