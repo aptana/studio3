@@ -15,10 +15,16 @@ import java.util.Map;
  */
 public class SchemaObject implements IState
 {
+	private enum ObjectState
+	{
+		READY, IN_OBJECT, IN_PROPERTY, COMPLETE
+	};
+
 	private Schema _owningSchema;
 	private Map<String, SchemaProperty> _properties;
-	private boolean _inObject;
-	private boolean _inProperty;
+	private ObjectState _currentState;
+	private String _currentPropertyName;
+	private IState _currentPropertyType;
 
 	SchemaObject(Schema owningSchema)
 	{
@@ -57,8 +63,7 @@ public class SchemaObject implements IState
 	 */
 	public void enter()
 	{
-		this._inObject = false;
-		this._inProperty = false;
+		this._currentState = ObjectState.READY;
 	}
 
 	/*
@@ -108,21 +113,21 @@ public class SchemaObject implements IState
 		switch (event)
 		{
 			case START_OBJECT:
-				result = (this._inObject == false);
+				result = (this._currentState == ObjectState.READY);
 				break;
 
 			case START_OBJECT_ENTRY:
-				result = (this._inObject && this._inProperty == false && value != null && value.toString().length() > 0);
+				result = (this._currentState == ObjectState.IN_OBJECT && value != null && value.toString().length() > 0);
 
 				// TODO: check property name?
 				break;
 
 			case END_OBJECT:
-				result = (this._inProperty == false && this._inObject);
+				result = (this._currentState == ObjectState.IN_OBJECT);
 				break;
 
 			case END_OBJECT_ENTRY:
-				result = (this._inObject && this._inProperty);
+				result = (this._currentState == ObjectState.IN_PROPERTY);
 				break;
 		}
 
@@ -138,22 +143,19 @@ public class SchemaObject implements IState
 		switch (event)
 		{
 			case START_OBJECT:
-				if (this._inObject)
+				if (this._currentState != ObjectState.READY)
 				{
 					throw new IllegalStateException("Attempted to start and object that has already been started");
 				}
 
-				this._inObject = true;
+				// update internal state
+				this._currentState = ObjectState.IN_OBJECT;
 				break;
 
 			case START_OBJECT_ENTRY:
-				if (this._inObject == false)
+				if (this._currentState != ObjectState.IN_OBJECT)
 				{
 					throw new IllegalStateException("Attempted to start an object entry in an object that has not been started");
-				}
-				if (this._inProperty)
-				{
-					throw new IllegalStateException("Attempted to start an object entry that has already been started");
 				}
 				if (value == null || value.toString().length() == 0)
 				{
@@ -168,35 +170,36 @@ public class SchemaObject implements IState
 					throw new IllegalStateException("Attempted to start an object entry that does not exist in this object: " + name);
 				}
 
-				this._inProperty = true;
-				context.pushType(property.getType());
+				// update internal state
+				this._currentState = ObjectState.IN_PROPERTY;
+				this._currentPropertyName = name;
+				this._currentPropertyType = property.getType();
+
+				// activate this type
+				context.pushType(this._currentPropertyType);
 				break;
 
 			case END_OBJECT:
-				if (this._inProperty)
+				if (this._currentState != ObjectState.IN_OBJECT)
 				{
 					throw new IllegalStateException("Attempted to end an object that has an open object entry");
 				}
-				if (this._inObject == false)
-				{
-					throw new IllegalStateException("Attempted to end an object that is already ended");
-				}
 
-				this._inObject = false;
+				// update internal state
+				this._currentState = ObjectState.COMPLETE;
+
+				// de-activate this type
 				context.popType();
 				break;
 
 			case END_OBJECT_ENTRY:
-				if (this._inObject == false)
+				if (this._currentState != ObjectState.IN_PROPERTY)
 				{
 					throw new IllegalStateException("Attempted to end an object entry in an object that has not been started");
 				}
-				if (this._inProperty == false)
-				{
-					throw new IllegalStateException("Attempted to end an object entry that has not been started");
-				}
 
-				this._inProperty = false;
+				// update internal state
+				this._currentState = ObjectState.IN_OBJECT;
 				break;
 
 			default:

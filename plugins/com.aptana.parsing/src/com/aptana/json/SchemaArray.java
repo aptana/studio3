@@ -114,6 +114,14 @@ public class SchemaArray implements IState
 				// Push element type into current context. Note that processing of that type will automatically remove
 				// itself from the stack
 				context.pushType(this.getElementType());
+
+				// fire list creation event
+				context.createList(this.getElementTypeName(), this.getElementType());
+
+				// fire element type creation event
+				context.createType(this.getElementTypeName(), this.getElementType());
+
+				// lock stack top to leave element type as active type until we leave the array
 				context.saveTop();
 				break;
 
