@@ -18,11 +18,12 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.ShellExecutable;
@@ -239,7 +240,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	public Map<Integer, String> runInBackground(IPath workingDir, String... args)
+	public IStatus runInBackground(IPath workingDir, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDir, args);
 	}
@@ -252,7 +253,7 @@ public class GitExecutable
 	 * @param args
 	 * @return
 	 */
-	protected Map<Integer, String> runInBackground(String input, IPath workingDirectory, String... args)
+	protected IStatus runInBackground(String input, IPath workingDirectory, String... args)
 	{
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}

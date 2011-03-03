@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -23,8 +22,8 @@ import org.eclipse.core.runtime.Status;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.ScriptLogger;
+import com.aptana.scripting.ScriptingActivator;
 
 public class CommandScriptRunner extends AbstractCommandRunner
 {
@@ -113,7 +112,7 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		String[] commandLine = this.getCommandLineArguments();
 		String resultText = null;
 		String input = IOUtil.read(this.getContext().getInputStream(), "UTF-8"); //$NON-NLS-1$			
-		Map<Integer, String> result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this
+		IStatus result = ProcessUtil.runInBackground(shell.toOSString(), this.getCommand().getWorkingDirectory(), input, this
 			.getContributedEnvironment(), commandLine);
 
 		if (result == null)
@@ -123,8 +122,8 @@ public class CommandScriptRunner extends AbstractCommandRunner
 		}
 		else
 		{
-			this._exitValue = result.keySet().iterator().next();
-			resultText = result.values().iterator().next();
+			this._exitValue = result.getCode();
+			resultText = result.getMessage();
 			this.setExecutedSuccessfully(this._exitValue == 0);
 		}
 		return resultText;

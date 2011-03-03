@@ -9,7 +9,6 @@ package com.aptana.workbench.commands;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -257,7 +256,7 @@ class EditBundleJob extends Job
 	private void grabCopyFromRepository(IPath workingDirectory, IPath destRuble) throws CoreException
 	{
 		String repoURI = bundle.getRepository();
-		Map<Integer, String> result = null;
+		IStatus result = null;
 		if (looksLikeGitURI(repoURI))
 		{
 			if (GitExecutable.instance() == null)
@@ -288,10 +287,10 @@ class EditBundleJob extends Job
 					destRuble.toOSString());
 		}
 		// Non-zero exit code, so we probably had an error...
-		if (result.keySet().iterator().next() != 0)
+		if (!result.isOK())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, ScriptingActivator.PLUGIN_ID,
-					Messages.EditBundleJob_GitCloneFailed_Error + result.values().iterator().next()));
+					Messages.EditBundleJob_GitCloneFailed_Error + result.getMessage()));
 		}
 	}
 

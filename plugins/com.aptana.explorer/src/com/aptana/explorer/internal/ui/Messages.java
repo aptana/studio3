@@ -13,10 +13,10 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.explorer.internal.ui.messages"; //$NON-NLS-1$
 
+	public static String CommandsActionProvider_TTP_Commands;
+
 	public static String FilteringProjectView_LBL_FilteringFor;
-
 	public static String FilteringProjectView_SearchByFilenameLabel;
-
 	public static String FilteringProjectView_SearchContentLabel;
 
 	public static String GitProjectView_BranchDirtyTooltipMessage;
@@ -32,15 +32,10 @@ public class Messages extends NLS
 	public static String SingleProjectView_DeploymentSubmenuLabel;
 	public static String SingleProjectView_SharingSubmenuLabel;
 	public static String SingleProjectView_DatabaseSubmenuLabel;
-	public static String SingleProjectView_DownloadItem;
 	public static String SingleProjectView_MaintenanceSubmenuLabel;
 	public static String SingleProjectView_RemoteSubmenuLabel;
 	public static String SingleProjectView_ConfigVarsSubmenuLabel;
-	public static String SingleProjectView_FTPSettingItem;
-	public static String SingleProjectView_TTP_Commands;
-	public static String SingleProjectView_TTP_Deploy;
-	public static String SingleProjectView_UploadItem;
-	
+
 	static
 	{
 		// initialize resource bundle

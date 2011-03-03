@@ -25,7 +25,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		IEclipsePreferences prefs = new DefaultScope().getNode(GitPlugin.getPluginId());
 		// turn on git pull indicator calculation on all non-win OSes
 		prefs.putBoolean(IPreferenceConstants.GIT_CALCULATE_PULL_INDICATOR, !Platform.getOS().equals(Platform.OS_WIN32));
-
+		// By default, auto-attach projects to our git support if they have a repo
+		prefs.putBoolean(IPreferenceConstants.AUTO_ATTACH_REPOS, true);
 		try
 		{
 			prefs.flush();

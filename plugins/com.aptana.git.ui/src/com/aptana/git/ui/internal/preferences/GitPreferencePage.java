@@ -22,13 +22,14 @@ import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 
-public class GitExecutableLocationPage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
+public class GitPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 
 	private FileFieldEditor fileEditor;
 	private BooleanFieldEditor pullIndicatorEditor;
+	private BooleanFieldEditor autoAttachEditor;
 
-	public GitExecutableLocationPage()
+	public GitPreferencePage()
 	{
 		super();
 	}
@@ -41,8 +42,9 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 	protected void createFieldEditors()
 	{
 		// Git Executable location
-		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH, Messages.GitExecutableLocationPage_LocationLabel, true,
-				FileFieldEditor.VALIDATE_ON_KEY_STROKE, getFieldEditorParent())
+		fileEditor = new FileFieldEditor(IPreferenceConstants.GIT_EXECUTABLE_PATH,
+				Messages.GitExecutableLocationPage_LocationLabel, true, FileFieldEditor.VALIDATE_ON_KEY_STROKE,
+				getFieldEditorParent())
 		{
 			@Override
 			protected boolean checkState()
@@ -72,6 +74,11 @@ public class GitExecutableLocationPage extends FieldEditorPreferencePage impleme
 				Messages.GitExecutableLocationPage_CalculatePullIndicatorLabel, getFieldEditorParent());
 		addField(fileEditor);
 		addField(pullIndicatorEditor);
+
+		// Auto-attach to projects
+		autoAttachEditor = new BooleanFieldEditor(IPreferenceConstants.AUTO_ATTACH_REPOS,
+				Messages.GitExecutableLocationPage_AutoAttachProjectsLabel, getFieldEditorParent());
+		addField(autoAttachEditor);
 	}
 
 	@Override
