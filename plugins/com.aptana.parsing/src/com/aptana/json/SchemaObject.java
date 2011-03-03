@@ -176,7 +176,7 @@ public class SchemaObject implements IState
 				this._currentPropertyType = property.getType();
 
 				// activate this type
-				context.pushType(this._currentPropertyType);
+				context.pushType(this._currentPropertyName, this._currentPropertyType);
 				break;
 
 			case END_OBJECT:
@@ -198,8 +198,13 @@ public class SchemaObject implements IState
 					throw new IllegalStateException("Attempted to end an object entry in an object that has not been started");
 				}
 
+				// fire property set event
+				context.setProperty(this._currentPropertyName, this._currentPropertyType);
+
 				// update internal state
 				this._currentState = ObjectState.IN_OBJECT;
+				this._currentPropertyName = null;
+				this._currentPropertyType = null;
 				break;
 
 			default:
