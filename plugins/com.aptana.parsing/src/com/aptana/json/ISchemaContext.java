@@ -8,24 +8,43 @@
 package com.aptana.json;
 
 /**
- * @author klindsey
- *
+ * ISchemaContext
  */
 public interface ISchemaContext
 {
+	/**
+	 * Return the type that is currently active in this context
+	 * 
+	 * @return
+	 */
+	IState getCurrentType();
 
 	/**
-	 * popType
+	 * Replace the currently active type with whatever type was pushed before it
 	 */
 	void popType();
 
 	/**
-	 * pushType
+	 * Replace the currently active type with the specified type after pushing the current type onto a stack for later
+	 * retrieval
 	 * 
 	 * @param type
 	 */
 	void pushType(IState type);
 
+	/**
+	 * Reset the context. This clears all state.
+	 */
 	void reset();
 
+	/**
+	 * Restore the stack top to the previously saved value
+	 */
+	void restoreTop();
+
+	/**
+	 * Set the current stack position as the bottom of the stack. This will prevent all items the currently exist on the
+	 * stack from being popped.
+	 */
+	void saveTop();
 }
