@@ -97,4 +97,18 @@ public final class SocketUtil {
 		}
 		return addrs.toArray(new InetAddress[addrs.size()]);
 	}
+	
+	/**
+	 * Returns list of machine assigned IP addresses excluding localhost/127.0.0.1
+	 * @return
+	 */
+	public static InetAddress[] getNonLoopbackLocalAdresses() {
+		List<InetAddress> addrs = new ArrayList<InetAddress>();
+		for (InetAddress inetAddr : getLocalAddresses()) {
+			if (!inetAddr.isLoopbackAddress()) {
+				addrs.add(inetAddr);
+			}
+		}
+		return addrs.toArray(new InetAddress[addrs.size()]);
+	}
 }
