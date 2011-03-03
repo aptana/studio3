@@ -12,25 +12,19 @@ package com.aptana.json;
  */
 public class SchemaArray implements IState
 {
-	private IState _elementType;
+	private Schema _owningSchema;
+	private String _elementTypeName;
 	private boolean _inArray;
-
-	/**
-	 * SchemaArray
-	 */
-	public SchemaArray()
-	{
-		this(null);
-	}
 
 	/**
 	 * SchemaArray
 	 * 
 	 * @param elementType
 	 */
-	public SchemaArray(IState elementType)
+	public SchemaArray(Schema owningSchema, String elementTypeName)
 	{
-		this._elementType = elementType;
+		this._owningSchema = owningSchema;
+		this._elementTypeName = elementTypeName;
 	}
 
 	/*
@@ -57,7 +51,27 @@ public class SchemaArray implements IState
 	 */
 	public IState getElementType()
 	{
-		return this._elementType;
+		return this._owningSchema.getType(this._elementTypeName);
+	}
+
+	/**
+	 * getElementTypeName
+	 * 
+	 * @return
+	 */
+	public String getElementTypeName()
+	{
+		return this._elementTypeName;
+	}
+
+	/**
+	 * getOwningSchema
+	 * 
+	 * @return
+	 */
+	public Schema getOwningSchema()
+	{
+		return this._owningSchema;
 	}
 
 	/*
@@ -81,16 +95,6 @@ public class SchemaArray implements IState
 		return result;
 	}
 
-	/**
-	 * setElementType
-	 * 
-	 * @param type
-	 */
-	public void setElementType(IState type)
-	{
-		this._elementType = type;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
@@ -109,13 +113,14 @@ public class SchemaArray implements IState
 
 				// Push element type into current context. Note that processing of that type will automatically remove
 				// itself from the stack
-				context.pushType(this._elementType);
+				context.pushType(this.getElementType());
+				context.saveTop();
 				break;
 
 			case END_ARRAY:
 				if (this._inArray == false)
 				{
-					throw new IllegalStateException("Attempted to end an araray that has not been started");
+					throw new IllegalStateException("Attempted to end an array that has not been started");
 				}
 
 				this._inArray = false;
