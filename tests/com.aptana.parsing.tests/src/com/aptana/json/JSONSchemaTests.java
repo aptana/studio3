@@ -86,34 +86,42 @@ public class JSONSchemaTests extends TestCase
 	}
 
 	/**
-	 * loadSchema
+	 * validate
 	 * 
 	 * @param name
 	 * @return
 	 */
-	protected Schema loadSchema(String name)
+	protected void validate(String name)
 	{
+		// create schema
 		SchemaBuilder builder = new SchemaBuilder();
 		Schema schema = builder.getSchema();
+
+		// create reader using this schema
 		SchemaReader sReader = new SchemaReader(schema);
+
+		// create reader resource's source
 		IPath path = Path.fromPortableString("json-schema/" + name);
 		IFileStore store = getFileStore(path);
 		String source = this.getContent(store);
 		StringReader reader = new StringReader(source);
+
+		// create handler and context
+		SchemaHandler handler = new SchemaHandler();
 		SchemaContext context = new SchemaContext();
+		context.setHandler(handler);
 
+		// validate source against schema, possibly firing events along the way
 		sReader.read(reader, context);
-
-		return schema;
 	}
 
 	public void testStringSchema()
 	{
-		this.loadSchema("string-schema.json");
+		this.validate("string-schema.json");
 	}
 
 	public void testSampleSchema()
 	{
-		this.loadSchema("sample-schema.json");
+		this.validate("sample-schema.json");
 	}
 }
