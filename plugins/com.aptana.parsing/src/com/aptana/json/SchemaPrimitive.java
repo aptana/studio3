@@ -41,9 +41,9 @@ public class SchemaPrimitive implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public boolean isValidTransition(EventType event, Object value)
+	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
-		return (event == EventType.PRIMITIVE && this.validValue(value));
+		return (event == SchemaEventType.PRIMITIVE && this.validValue(value));
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class SchemaPrimitive implements IState
 	 * @see com.aptana.json.IState#transition(com.aptana.json.ISchemaContext, com.aptana.json.EventType,
 	 * java.lang.Object)
 	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
+	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		if (this.isValidTransition(event, value) == false)
 		{

@@ -12,7 +12,7 @@ import java.util.Stack;
 /**
  * Context
  */
-public class Context implements ISchemaContext
+public class SchemaContext implements ISchemaContext
 {
 	private Stack<IState> _typeStack;
 	private IState _currentType;
@@ -21,7 +21,7 @@ public class Context implements ISchemaContext
 	/**
 	 * Context
 	 */
-	public Context()
+	public SchemaContext()
 	{
 	}
 

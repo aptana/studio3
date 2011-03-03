@@ -100,7 +100,7 @@ public class JSONSchemaTests extends TestCase
 		IFileStore store = getFileStore(path);
 		String source = this.getContent(store);
 		StringReader reader = new StringReader(source);
-		Context context = new Context();
+		SchemaContext context = new SchemaContext();
 
 		sReader.read(reader, context);
 

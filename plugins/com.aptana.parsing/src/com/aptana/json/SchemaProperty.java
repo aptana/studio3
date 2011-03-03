@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * SchemaProperty
  */
-public class Property
+public class SchemaProperty
 {
 	private Schema _owningSchema;
 	private String _name;
@@ -22,7 +22,7 @@ public class Property
 	 * @param name
 	 * @param typeName
 	 */
-	Property(Schema owningSchema, String name, String typeName)
+	SchemaProperty(Schema owningSchema, String name, String typeName)
 	{
 		this._owningSchema = owningSchema;
 		this._name = name;

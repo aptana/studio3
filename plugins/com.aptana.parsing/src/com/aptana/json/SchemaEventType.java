@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * EventType
  */
-public enum EventType
+public enum SchemaEventType
 {
 	START_PARSE,
 	START_OBJECT,

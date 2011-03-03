@@ -20,7 +20,7 @@ import org.json.simple.parser.ParseException;
 public class SchemaReader implements ContentHandler
 {
 	private Schema _schema;
-	private Context _context;
+	private SchemaContext _context;
 
 	/**
 	 * SchemaReader
@@ -48,7 +48,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("end array");
 
-		this._schema.transition(this._context, EventType.END_ARRAY, null);
+		this._schema.transition(this._context, SchemaEventType.END_ARRAY, null);
 
 		return true;
 	}
@@ -61,7 +61,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("end parse");
 
-		this._schema.transition(this._context, EventType.END_PARSE, null);
+		this._schema.transition(this._context, SchemaEventType.END_PARSE, null);
 		this._schema.exit();
 	}
 
@@ -73,7 +73,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("end object");
 
-		this._schema.transition(this._context, EventType.END_OBJECT, null);
+		this._schema.transition(this._context, SchemaEventType.END_OBJECT, null);
 
 		return true;
 	}
@@ -86,7 +86,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("end object entry");
 
-		this._schema.transition(this._context, EventType.END_OBJECT_ENTRY, null);
+		this._schema.transition(this._context, SchemaEventType.END_OBJECT_ENTRY, null);
 
 		return true;
 	}
@@ -96,7 +96,7 @@ public class SchemaReader implements ContentHandler
 	 * 
 	 * @return
 	 */
-	public Context getContext()
+	public SchemaContext getContext()
 	{
 		return this._context;
 	}
@@ -119,7 +119,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("primitive: " + value);
 
-		this._schema.transition(this._context, EventType.PRIMITIVE, value);
+		this._schema.transition(this._context, SchemaEventType.PRIMITIVE, value);
 
 		return true;
 	}
@@ -129,7 +129,7 @@ public class SchemaReader implements ContentHandler
 	 * 
 	 * @param input
 	 */
-	public void read(Reader input, Context context)
+	public void read(Reader input, SchemaContext context)
 	{
 		// save reference to context so we can use it in the event handlers
 		this._context = context;
@@ -171,7 +171,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("start array");
 
-		this._schema.transition(this._context, EventType.START_ARRAY, null);
+		this._schema.transition(this._context, SchemaEventType.START_ARRAY, null);
 
 		return true;
 	}
@@ -185,7 +185,7 @@ public class SchemaReader implements ContentHandler
 		System.out.println("start parse");
 
 		this._schema.enter();
-		this._schema.transition(this._context, EventType.START_PARSE, null);
+		this._schema.transition(this._context, SchemaEventType.START_PARSE, null);
 	}
 
 	/*
@@ -196,7 +196,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("start object");
 
-		this._schema.transition(this._context, EventType.START_OBJECT, null);
+		this._schema.transition(this._context, SchemaEventType.START_OBJECT, null);
 
 		return true;
 	}
@@ -209,7 +209,7 @@ public class SchemaReader implements ContentHandler
 	{
 		System.out.println("start object entry: " + key);
 
-		this._schema.transition(this._context, EventType.START_OBJECT_ENTRY, key);
+		this._schema.transition(this._context, SchemaEventType.START_OBJECT_ENTRY, key);
 
 		return true;
 	}

@@ -78,7 +78,7 @@ public class SchemaArray implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public boolean isValidTransition(EventType event, Object value)
+	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
 		boolean result = false;
 
@@ -99,7 +99,7 @@ public class SchemaArray implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
+	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		switch (event)
 		{

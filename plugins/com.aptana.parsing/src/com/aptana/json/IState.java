@@ -29,7 +29,7 @@ public interface IState
 	 * @param value
 	 * @return
 	 */
-	boolean isValidTransition(EventType event, Object value);
+	boolean isValidTransition(SchemaEventType event, Object value);
 
 	/**
 	 * Transition to a new state from this current state
@@ -38,5 +38,5 @@ public interface IState
 	 * @param event
 	 * @param value
 	 */
-	void transition(ISchemaContext context, EventType event, Object value);
+	void transition(ISchemaContext context, SchemaEventType event, Object value);
 }

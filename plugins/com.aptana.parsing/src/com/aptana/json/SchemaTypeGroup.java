@@ -35,7 +35,7 @@ public class SchemaTypeGroup implements IState
 	/* (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.ISchemaContext, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
+	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		// TODO Auto-generated method stub
 
@@ -44,7 +44,7 @@ public class SchemaTypeGroup implements IState
 	/* (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public boolean isValidTransition(EventType event, Object value)
+	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
 		// TODO Auto-generated method stub
 		return false;

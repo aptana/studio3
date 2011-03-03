@@ -20,11 +20,11 @@ public class JSONSchemaTransitionTests extends TestCase
 {
 	private static class EventResult
 	{
-		public final EventType event;
+		public final SchemaEventType event;
 		public final Object value;
 		public final boolean valid;
 
-		public EventResult(EventType event, Object value, boolean valid)
+		public EventResult(SchemaEventType event, Object value, boolean valid)
 		{
 			this.event = event;
 			this.value = value;
@@ -58,7 +58,7 @@ public class JSONSchemaTransitionTests extends TestCase
 	{
 		super.setUp();
 
-		this._context = new Context();
+		this._context = new SchemaContext();
 	}
 
 	/*
@@ -80,11 +80,11 @@ public class JSONSchemaTransitionTests extends TestCase
 	 * @param value
 	 * @return
 	 */
-	private List<EventResult> createGoodList(EnumSet<EventType> events, String value)
+	private List<EventResult> createGoodList(EnumSet<SchemaEventType> events, String value)
 	{
 		List<EventResult> result = new ArrayList<EventResult>();
 
-		for (EventType event : EnumSet.allOf(EventType.class))
+		for (SchemaEventType event : EnumSet.allOf(SchemaEventType.class))
 		{
 			boolean valid = events.contains(event);
 			EventResult er = new EventResult(event, value, valid);
@@ -166,11 +166,11 @@ public class JSONSchemaTransitionTests extends TestCase
 		{
 			IState state = stateClass.newInstance();
 			List<EventResult> testList = this.createGoodList( //
-				EnumSet.of(EventType.PRIMITIVE), //
+				EnumSet.of(SchemaEventType.PRIMITIVE), //
 				goodValue //
 				);
 
-			testList.add(new EventResult(EventType.PRIMITIVE, badValue, false));
+			testList.add(new EventResult(SchemaEventType.PRIMITIVE, badValue, false));
 
 			testStates( //
 				state, //
@@ -229,7 +229,7 @@ public class JSONSchemaTransitionTests extends TestCase
 		Schema schema = new Schema();
 		SchemaObject state = schema.createObject();
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.START_OBJECT), //
+			EnumSet.of(SchemaEventType.START_OBJECT), //
 			"property" //
 		);
 
@@ -249,7 +249,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.START_OBJECT_ENTRY, EventType.END_OBJECT), //
+			EnumSet.of(SchemaEventType.START_OBJECT_ENTRY, SchemaEventType.END_OBJECT), //
 			propertyName //
 			);
 
@@ -259,7 +259,7 @@ public class JSONSchemaTransitionTests extends TestCase
 			public void initialize(IState state)
 			{
 				state.enter();
-				state.transition(_context, EventType.START_OBJECT, null);
+				state.transition(_context, SchemaEventType.START_OBJECT, null);
 			}
 		};
 
@@ -279,7 +279,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.END_OBJECT_ENTRY), //
+			EnumSet.of(SchemaEventType.END_OBJECT_ENTRY), //
 			propertyName //
 			);
 
@@ -289,8 +289,8 @@ public class JSONSchemaTransitionTests extends TestCase
 			public void initialize(IState state)
 			{
 				state.enter();
-				state.transition(_context, EventType.START_OBJECT, null);
-				state.transition(_context, EventType.START_OBJECT_ENTRY, propertyName);
+				state.transition(_context, SchemaEventType.START_OBJECT, null);
+				state.transition(_context, SchemaEventType.START_OBJECT_ENTRY, propertyName);
 			}
 		};
 
@@ -310,7 +310,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.END_OBJECT, EventType.START_OBJECT_ENTRY), //
+			EnumSet.of(SchemaEventType.END_OBJECT, SchemaEventType.START_OBJECT_ENTRY), //
 			propertyName //
 			);
 
@@ -320,7 +320,7 @@ public class JSONSchemaTransitionTests extends TestCase
 			public void initialize(IState state)
 			{
 				state.enter();
-				state.transition(_context, EventType.START_OBJECT, null);
+				state.transition(_context, SchemaEventType.START_OBJECT, null);
 			}
 		};
 
@@ -338,7 +338,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.START_ARRAY), //
+			EnumSet.of(SchemaEventType.START_ARRAY), //
 			null //
 			);
 
@@ -356,7 +356,7 @@ public class JSONSchemaTransitionTests extends TestCase
 
 		// build tests
 		List<EventResult> goodList = this.createGoodList( //
-			EnumSet.of(EventType.END_ARRAY), //
+			EnumSet.of(SchemaEventType.END_ARRAY), //
 			null //
 			);
 
@@ -366,7 +366,7 @@ public class JSONSchemaTransitionTests extends TestCase
 			public void initialize(IState state)
 			{
 				state.enter();
-				state.transition(_context, EventType.START_ARRAY, null);
+				state.transition(_context, SchemaEventType.START_ARRAY, null);
 			}
 		};
 

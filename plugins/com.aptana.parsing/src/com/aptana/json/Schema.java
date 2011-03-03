@@ -94,9 +94,9 @@ public class Schema implements IState
 	 * @param typeName
 	 * @return
 	 */
-	public Property createProperty(String name, String typeName)
+	public SchemaProperty createProperty(String name, String typeName)
 	{
-		return new Property(this, name, typeName);
+		return new SchemaProperty(this, name, typeName);
 	}
 
 	/*
@@ -169,7 +169,7 @@ public class Schema implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public boolean isValidTransition(EventType event, Object value)
+	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
 		boolean result = false;
 
@@ -204,7 +204,7 @@ public class Schema implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaState#transition(com.aptana.json.EventType)
 	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
+	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		switch (event)
 		{

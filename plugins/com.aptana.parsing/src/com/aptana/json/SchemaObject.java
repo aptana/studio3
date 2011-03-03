@@ -16,7 +16,7 @@ import java.util.Map;
 public class SchemaObject implements IState
 {
 	private Schema _owningSchema;
-	private Map<String, Property> _properties;
+	private Map<String, SchemaProperty> _properties;
 	private boolean _inObject;
 	private boolean _inProperty;
 
@@ -41,11 +41,11 @@ public class SchemaObject implements IState
 	 * 
 	 * @param property
 	 */
-	public void addProperty(Property property)
+	public void addProperty(SchemaProperty property)
 	{
 		if (this._properties == null)
 		{
-			this._properties = new HashMap<String, Property>();
+			this._properties = new HashMap<String, SchemaProperty>();
 		}
 
 		this._properties.put(property.getName(), property);
@@ -85,9 +85,9 @@ public class SchemaObject implements IState
 	 * @param name
 	 * @return
 	 */
-	public Property getProperty(String name)
+	public SchemaProperty getProperty(String name)
 	{
-		Property result = null;
+		SchemaProperty result = null;
 
 		if (this._properties != null)
 		{
@@ -101,7 +101,7 @@ public class SchemaObject implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
-	public boolean isValidTransition(EventType event, Object value)
+	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
 		boolean result = false;
 
@@ -133,7 +133,7 @@ public class SchemaObject implements IState
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
 	 */
-	public void transition(ISchemaContext context, EventType event, Object value)
+	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		switch (event)
 		{
@@ -161,7 +161,7 @@ public class SchemaObject implements IState
 				}
 
 				String name = value.toString();
-				Property property = this.getProperty(name);
+				SchemaProperty property = this.getProperty(name);
 
 				if (property == null)
 				{
