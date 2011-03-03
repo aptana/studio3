@@ -23,18 +23,6 @@ public class SchemaNumber extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		boolean result = false;
-
-		try
-		{
-			Double.parseDouble((String) value);
-
-			result = true;
-		}
-		catch (NumberFormatException e)
-		{
-		}
-
-		return result;
+		return (value instanceof Double);
 	}
 }

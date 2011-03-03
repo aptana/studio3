@@ -23,6 +23,6 @@ public class SchemaNull extends SchemaPrimitive
 	@Override
 	protected boolean validValue(Object value)
 	{
-		return ("null".equals(value));
+		return (value == null);
 	}
 }
