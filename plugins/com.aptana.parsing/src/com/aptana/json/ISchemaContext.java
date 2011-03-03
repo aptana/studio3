@@ -28,23 +28,13 @@ public interface ISchemaContext extends IContextHandler
 	 * Replace the currently active type with the specified type after pushing the current type onto a stack for later
 	 * retrieval
 	 * 
+	 * @param typeName
 	 * @param type
 	 */
-	void pushType(IState type);
+	void pushType(String typeName, IState type);
 
 	/**
 	 * Reset the context. This clears all state.
 	 */
 	void reset();
-
-	/**
-	 * Restore the stack top to the previously saved value
-	 */
-	void restoreTop();
-
-	/**
-	 * Set the current stack position as the bottom of the stack. This will prevent all items the currently exist on the
-	 * stack from being popped.
-	 */
-	void saveTop();
 }
