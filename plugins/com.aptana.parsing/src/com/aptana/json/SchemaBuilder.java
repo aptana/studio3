@@ -10,6 +10,7 @@ package com.aptana.json;
 /**
  * SchemaBuilder
  */
+@SuppressWarnings("nls")
 public class SchemaBuilder extends SchemaReader
 {
 	/**
