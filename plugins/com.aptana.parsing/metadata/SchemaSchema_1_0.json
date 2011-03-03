@@ -1,7 +1,7 @@
 {
     "schema": {
         "name": "Schema Schema",
-        "version": "http://www.appcelerator/studio/content-assist/1.0",
+        "version": "http://www.appcelerator.com/studio/content-assist/1.0",
         "description": "A JSON schema that describes the structure of a JSON schema",
         "result": "SchemaDocument"
     },
@@ -91,13 +91,13 @@
                     "type": "String",
                     "optional": true,
                     "description": "A text description of the property"
-                },,
+                },
                 {
                     "name": "example",
                     "type": "String",
                     "optional": true,
                     "description": "An example of the property in use"
-                }
+                },
                 {
                     "name": "optional",
                     "type": "boolean",
