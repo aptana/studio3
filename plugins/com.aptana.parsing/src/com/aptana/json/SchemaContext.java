@@ -17,6 +17,7 @@ public class SchemaContext implements ISchemaContext
 	private Stack<IState> _typeStack;
 	private IState _currentType;
 	private Stack<Integer> _topStack;
+	private IContextHandler _handler;
 
 	/**
 	 * Context
@@ -27,11 +28,57 @@ public class SchemaContext implements ISchemaContext
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IContextAction#addElement(java.lang.String, com.aptana.json.IState)
+	 */
+	public void addElement(String elementTypeName, IState elementType)
+	{
+		if (this._handler != null)
+		{
+			this._handler.addElement(elementTypeName, elementType);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IContextAction#createList(java.lang.String, com.aptana.json.IState)
+	 */
+	public void createList(String elementTypeName, IState elementType)
+	{
+		if (this._handler != null)
+		{
+			this._handler.createList(elementTypeName, elementType);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IContextAction#createType(java.lang.String, com.aptana.json.IState)
+	 */
+	public void createType(String typeName, IState type)
+	{
+		if (this._handler != null)
+		{
+			this._handler.createType(typeName, type);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.ISchemaContext#getCurrentType()
 	 */
 	public IState getCurrentType()
 	{
 		return this._currentType;
+	}
+
+	/**
+	 * getHandler
+	 * 
+	 * @return
+	 */
+	public IContextHandler getHandler()
+	{
+		return this._handler;
 	}
 
 	/**
@@ -67,7 +114,7 @@ public class SchemaContext implements ISchemaContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.json.ISchemaContext#pushType(com.aptana.json.State)
+	 * @see com.aptana.json.ISchemaContext#pushType(java.lang.String, com.aptana.json.IState)
 	 */
 	public void pushType(IState type)
 	{
@@ -119,5 +166,27 @@ public class SchemaContext implements ISchemaContext
 		int top = (this._typeStack != null) ? this._typeStack.size() : 0;
 
 		this._topStack.push(top);
+	}
+
+	/**
+	 * setHandler
+	 * 
+	 * @param handler
+	 */
+	public void setHandler(IContextHandler handler)
+	{
+		this._handler = handler;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IContextAction#setProperty(java.lang.String, com.aptana.json.IState)
+	 */
+	public void setProperty(String propertyName, IState propertyType)
+	{
+		if (this._handler != null)
+		{
+			this._handler.setProperty(propertyName, propertyType);
+		}
 	}
 }
