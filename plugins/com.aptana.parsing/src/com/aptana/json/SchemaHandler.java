@@ -18,7 +18,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void addElement(String elementTypeName, IState elementType)
 	{
-		System.out.println("add element of type " + elementTypeName + " to list");
+		System.out.println("add element of type '" + elementTypeName + "' to list");
 	}
 
 	/*
@@ -27,7 +27,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createList(String elementTypeName, IState elementType)
 	{
-		System.out.println("create list of " + elementTypeName);
+		System.out.println("create list of '" + elementTypeName + "'");
 	}
 
 	/*
@@ -36,7 +36,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createType(String typeName, IState type)
 	{
-		System.out.println("create type " + typeName);
+		System.out.println("create type '" + typeName + "'");
 	}
 
 	/*
@@ -45,6 +45,6 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void setProperty(String propertyName, IState propertyType)
 	{
-		System.out.println("set property " + propertyName);
+		System.out.println("set property '" + propertyName + "'");
 	}
 }
