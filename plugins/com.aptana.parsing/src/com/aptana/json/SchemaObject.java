@@ -22,24 +22,21 @@ public class SchemaObject implements IState
 
 	private Schema _owningSchema;
 	private Map<String, SchemaProperty> _properties;
+	private String _description;
+
 	private ObjectState _currentState;
 	private String _currentPropertyName;
 	private IState _currentPropertyType;
-
-	SchemaObject(Schema owningSchema)
-	{
-		this._owningSchema = owningSchema;
-	}
+	private String _currentPropertyTypeName;
 
 	/**
-	 * addProperty
+	 * SchemaObject
 	 * 
-	 * @param name
-	 * @param typeName
+	 * @param owningSchema
 	 */
-	public void addProperty(String name, String typeName)
+	public SchemaObject(Schema owningSchema)
 	{
-		this.addProperty(this._owningSchema.createProperty(name, typeName));
+		this._owningSchema = owningSchema;
 	}
 
 	/**
@@ -57,6 +54,17 @@ public class SchemaObject implements IState
 		this._properties.put(property.getName(), property);
 	}
 
+	/**
+	 * addProperty
+	 * 
+	 * @param name
+	 * @param typeName
+	 */
+	public void addProperty(String name, String typeName)
+	{
+		this.addProperty(this._owningSchema.createProperty(name, typeName));
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#enter()
@@ -72,6 +80,16 @@ public class SchemaObject implements IState
 	 */
 	public void exit()
 	{
+	}
+
+	/**
+	 * getDescription
+	 * 
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return this._description;
 	}
 
 	/**
@@ -134,6 +152,17 @@ public class SchemaObject implements IState
 		return result;
 	}
 
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this._description = description;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.State#transition(com.aptana.json.Context, com.aptana.json.EventType, java.lang.Object)
@@ -174,9 +203,13 @@ public class SchemaObject implements IState
 				this._currentState = ObjectState.IN_PROPERTY;
 				this._currentPropertyName = name;
 				this._currentPropertyType = property.getType();
+				this._currentPropertyTypeName = property.getTypeName();
 
 				// activate this type
 				context.pushType(this._currentPropertyName, this._currentPropertyType);
+
+				// fire element type creation event
+				context.createType(this._currentPropertyTypeName, this._currentPropertyType);
 				break;
 
 			case END_OBJECT:
@@ -199,7 +232,7 @@ public class SchemaObject implements IState
 				}
 
 				// fire property set event
-				context.setProperty(this._currentPropertyName, this._currentPropertyType);
+				context.setProperty(this._currentPropertyName, this._currentPropertyTypeName, this._currentPropertyType);
 
 				// update internal state
 				this._currentState = ObjectState.IN_OBJECT;
