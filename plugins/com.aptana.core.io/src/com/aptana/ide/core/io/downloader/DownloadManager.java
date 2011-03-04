@@ -1,5 +1,6 @@
 package com.aptana.ide.core.io.downloader;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,6 +50,26 @@ public class DownloadManager
 		if (url != null)
 		{
 			this.downloads.add(new ContentDownloadRequest(url));
+		}
+	}
+
+	/**
+	 * Adds a URL for the pending downloads list.<br>
+	 * This method also accepts a {@link File} that the download process will write to.<br>
+	 * Note that this method should be called <b>before</b> the {@link #start(IProgressMonitor)} is called.
+	 * 
+	 * @param url
+	 *            A URL with a file-name to be downloaded.
+	 * @param saveTo
+	 *            The file to write to.
+	 * @throws CoreException
+	 *             In case the URL file name cannot be extracted from the URL.
+	 */
+	public void addURL(URL url, File saveTo) throws CoreException
+	{
+		if (url != null)
+		{
+			this.downloads.add(new ContentDownloadRequest(url, saveTo));
 		}
 	}
 

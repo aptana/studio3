@@ -34,10 +34,10 @@ import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
-import com.aptana.core.util.SocketUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
+import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
@@ -55,8 +55,6 @@ import com.aptana.webserver.core.WorkspaceResolvingURLMapper;
  * 
  */
 public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
-
-	protected static final int DEFAULT_PORT = 8999;
 
 	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 302, StringUtil.EMPTY, null);
 
@@ -248,20 +246,10 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 		if (debugAvailable) {
 
-			int port = SocketUtil.findFreePort(null);
-			if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-				port = 2525;
-			}
-			if (port == -1) {
-				port = DEFAULT_PORT;
-			}
-
+			int port = DebugUtil.getDebuggerPort();
 			ServerSocket listenSocket = null;
 			try {
-				listenSocket = new ServerSocket(port);
-				if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					listenSocket.setSoTimeout(DebugConnection.SOCKET_TIMEOUT);
-				}
+				listenSocket = DebugUtil.allocateServerSocket(port);
 			} catch (IOException e) {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));
