@@ -15,6 +15,8 @@ public class SchemaProperty
 	private Schema _owningSchema;
 	private String _name;
 	private String _typeName;
+	private String _description;
+	private boolean _optional;
 
 	/**
 	 * SchemaProperty
@@ -27,6 +29,16 @@ public class SchemaProperty
 		this._owningSchema = owningSchema;
 		this._name = name;
 		this._typeName = typeName;
+	}
+
+	/**
+	 * getDescription
+	 * 
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return this._description;
 	}
 
 	/**
@@ -67,5 +79,37 @@ public class SchemaProperty
 	public String getTypeName()
 	{
 		return this._typeName;
+	}
+
+	/**
+	 * isOptional
+	 * 
+	 * @return the optional
+	 */
+	public boolean isOptional()
+	{
+		return this._optional;
+	}
+
+	/**
+	 * setDescription
+	 * 
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this._description = description;
+	}
+
+	/**
+	 * setOptional
+	 * 
+	 * @param optional
+	 *            the optional to set
+	 */
+	public void setOptional(boolean optional)
+	{
+		this._optional = optional;
 	}
 }
