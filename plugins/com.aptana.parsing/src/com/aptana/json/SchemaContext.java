@@ -110,7 +110,7 @@ public class SchemaContext implements ISchemaContext
 			{
 				this._typeStack.pop();
 			}
-			else 
+			else
 			{
 				throw new IllegalArgumentException("Tried to pop an empty type stack");
 			}
@@ -154,11 +154,11 @@ public class SchemaContext implements ISchemaContext
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextAction#setProperty(java.lang.String, com.aptana.json.IState)
 	 */
-	public void setProperty(String propertyName, IState propertyType)
+	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
 		if (this._handler != null)
 		{
-			this._handler.setProperty(propertyName, propertyType);
+			this._handler.setProperty(propertyName, propertyTypeName, propertyType);
 		}
 	}
 }

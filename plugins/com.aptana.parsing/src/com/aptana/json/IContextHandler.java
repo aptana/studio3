@@ -39,7 +39,8 @@ public interface IContextHandler
 	 * setProperty
 	 * 
 	 * @param propertyName
+	 * @param propertyTypeName TODO
 	 * @param propertyType
 	 */
-	void setProperty(String propertyName, IState propertyType);
+	void setProperty(String propertyName, String propertyTypeName, IState propertyType);
 }
