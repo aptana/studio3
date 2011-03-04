@@ -30,6 +30,6 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 		IFolderLayout bottomArea = layout.createFolder(
 				"terminalArea", IPageLayout.BOTTOM, 0.75f, //$NON-NLS-1$
 				editorArea);
-		bottomArea.addView(IConsoleConstants.ID_CONSOLE_VIEW); //$NON-NLS-1$
+		bottomArea.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 	}
 }
