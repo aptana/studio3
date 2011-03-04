@@ -119,12 +119,6 @@ public class SchemaArray implements IState
 
 				// fire list creation event
 				context.createList(this.getElementTypeName(), this.getElementType());
-
-				// fire element type creation event
-				// context.createType(this.getElementTypeName(), this.getElementType());
-
-				// lock stack top to leave element type as active type until we leave the array
-				// context.saveTop();
 				break;
 
 			case START_ARRAY_ENTRY:
