@@ -452,7 +452,7 @@ public class Schema implements IState
 			context.pushType(this.getRootTypeName(), this.getRootType());
 
 			// fire type creation event
-			context.createType(this.getRootTypeName(), this.getRootType());
+			context.createType(this.getRootTypeName(), this.getRootType(), value);
 		}
 		else
 		{

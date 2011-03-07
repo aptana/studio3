@@ -116,9 +116,6 @@ public class SchemaArray implements IState
 
 				// update internal state
 				this._currentState = ArrayState.IN_ARRAY;
-
-				// fire list creation event
-				context.createList(this.getElementTypeName(), this.getElementType());
 				break;
 
 			case START_ARRAY_ENTRY:
@@ -135,7 +132,7 @@ public class SchemaArray implements IState
 				context.pushType(this.getElementTypeName(), this.getElementType());
 
 				// fire element type creation event
-				context.createType(this.getElementTypeName(), this.getElementType());
+				context.createType(this.getElementTypeName(), this.getElementType(), value);
 				break;
 
 			case END_ARRAY:

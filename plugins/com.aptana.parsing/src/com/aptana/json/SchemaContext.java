@@ -38,25 +38,13 @@ public class SchemaContext implements ISchemaContext
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.json.IContextAction#createList(java.lang.String, com.aptana.json.IState)
-	 */
-	public void createList(String elementTypeName, IState elementType)
-	{
-		if (this._handler != null)
-		{
-			this._handler.createList(elementTypeName, elementType);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextAction#createType(java.lang.String, com.aptana.json.IState)
 	 */
-	public void createType(String typeName, IState type)
+	public void createType(String typeName, IState type, Object value)
 	{
 		if (this._handler != null)
 		{
-			this._handler.createType(typeName, type);
+			this._handler.createType(typeName, type, value);
 		}
 	}
 

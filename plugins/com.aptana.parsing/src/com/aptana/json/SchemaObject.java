@@ -209,7 +209,7 @@ public class SchemaObject implements IState
 				context.pushType(this._currentPropertyName, this._currentPropertyType);
 
 				// fire element type creation event
-				context.createType(this._currentPropertyTypeName, this._currentPropertyType);
+				context.createType(this._currentPropertyTypeName, this._currentPropertyType, value);
 				break;
 
 			case END_OBJECT:

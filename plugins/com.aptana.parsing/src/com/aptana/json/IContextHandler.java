@@ -20,26 +20,19 @@ public interface IContextHandler
 	void addElement(String elementTypeName, IState elementType);
 
 	/**
-	 * createList
-	 * 
-	 * @param elementTypeName
-	 * @param elementType
-	 */
-	void createList(String elementTypeName, IState elementType);
-
-	/**
 	 * createType
 	 * 
 	 * @param typeName
 	 * @param type
+	 * @param value
 	 */
-	void createType(String typeName, IState type);
+	void createType(String typeName, IState type, Object value);
 
 	/**
 	 * setProperty
 	 * 
 	 * @param propertyName
-	 * @param propertyTypeName TODO
+	 * @param propertyTypeName
 	 * @param propertyType
 	 */
 	void setProperty(String propertyName, String propertyTypeName, IState propertyType);
