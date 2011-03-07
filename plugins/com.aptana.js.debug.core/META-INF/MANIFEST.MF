@@ -9,7 +9,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  com.aptana.core,
  com.aptana.core.io,
- com.aptana.webserver.core,
+ com.aptana.webserver.core;visibility:=reexport,
  com.aptana.debug.core;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy

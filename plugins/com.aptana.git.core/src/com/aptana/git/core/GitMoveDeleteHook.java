@@ -107,6 +107,14 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		}
 		else
 		{
+
+			String message = status.getMessage();
+			if (message.contains("did not match any files")) //$NON-NLS-1$
+			{
+				// No files underneath folder are in git, so git knows nothing about directory. Let normal handler delete this directory
+				return FINISH_FOR_ME;
+			}
+
 			tree.failed(status);
 		}
 		return true;

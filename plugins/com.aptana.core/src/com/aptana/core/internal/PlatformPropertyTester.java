@@ -21,14 +21,12 @@ public class PlatformPropertyTester extends PropertyTester {
 	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
 	 */
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-		if (Platform.class.equals(receiver)) {
-			if ("os".equals(property)) {
-				return Platform.getOS().equals(String.valueOf(expectedValue));
-			} else if ("ws".equals(property)) {
-				return Platform.getWS().equals(String.valueOf(expectedValue));
-			} else if ("arch".equals(property)) {
-				return Platform.getOSArch().equals(String.valueOf(expectedValue));				
-			}
+		if ("os".equals(property)) {
+			return Platform.getOS().equals(String.valueOf(expectedValue));
+		} else if ("ws".equals(property)) {
+			return Platform.getWS().equals(String.valueOf(expectedValue));
+		} else if ("arch".equals(property)) {
+			return Platform.getOSArch().equals(String.valueOf(expectedValue));				
 		}
 		return false;
 	}
