@@ -10,7 +10,7 @@ package com.aptana.json;
 /**
  * SchemaPrimitive
  */
-public class SchemaPrimitive implements IState
+public abstract class SchemaPrimitive implements IState
 {
 	/**
 	 * SchemaPrimitive
