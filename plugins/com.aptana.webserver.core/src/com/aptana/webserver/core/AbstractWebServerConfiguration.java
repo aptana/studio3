@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 
+import com.aptana.core.IURLMapper;
 import com.aptana.core.Identifiable;
 import com.aptana.core.epl.IMemento;
 

@@ -43,6 +43,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import com.aptana.core.IURLMapper;
 import com.aptana.ide.core.io.efs.EFSUtils;
 
 /**

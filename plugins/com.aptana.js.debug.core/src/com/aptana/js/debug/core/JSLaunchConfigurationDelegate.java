@@ -34,6 +34,7 @@ import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
+import com.aptana.core.IURLMapper;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
@@ -46,7 +47,6 @@ import com.aptana.js.debug.core.internal.model.DebugConnection;
 import com.aptana.js.debug.core.internal.model.JSDebugProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 import com.aptana.webserver.core.WorkspaceResolvingURLMapper;
 

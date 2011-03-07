@@ -53,6 +53,7 @@ import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.osgi.framework.Constants;
 
+import com.aptana.core.IURLMapper;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
@@ -74,7 +75,6 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 import com.aptana.js.debug.core.model.xhr.IXHRService;
-import com.aptana.webserver.core.IURLMapper;
 
 /**
  * @author Max Stepanov
@@ -84,6 +84,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String UPDATE = "update"; //$NON-NLS-1$
 	private static final String VERSION = "version"; //$NON-NLS-1$
 	private static final String JAVASCRIPT = "javascript"; //$NON-NLS-1$
+	private static final String APP = "app"; //$NON-NLS-1$
 	private static final String JAVASCRIPT_SCHEME = "javascript:"; //$NON-NLS-1$
 	private static final String OPENED = "opened"; //$NON-NLS-1$
 	private static final String HTTP = "http"; //$NON-NLS-1$
@@ -1580,6 +1581,11 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				if (fileStore != null) {
 					resolved = fileStore.toURI();
 				}
+			} else if (APP.equals(scheme) && urlMapper != null) {
+				IFileStore fileStore = urlMapper.resolve(uri.toURL());
+				if (fileStore != null) {
+					resolved = fileStore.toURI();
+				}				
 			} else if (JAVASCRIPT.equals(scheme)) {
 				if (mainFile != null) {
 					return mainFile;

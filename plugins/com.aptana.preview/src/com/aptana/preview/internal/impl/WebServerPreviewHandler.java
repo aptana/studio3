@@ -12,11 +12,11 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.core.IURLMapper;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.preview.SourceConfig;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 /**
