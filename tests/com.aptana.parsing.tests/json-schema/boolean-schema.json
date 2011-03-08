@@ -1,6 +1,4 @@
 {
-	"schema": {
-		"name": "boolean-schema",
-		"result": "Boolean"
-	}
+	"name": "boolean-schema",
+	"result": "Boolean"
 }

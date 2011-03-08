@@ -1,6 +1,4 @@
 {
-	"schema": {
-		"name": "number-schema",
-		"result": "Number"
-	}
+	"name": "number-schema",
+	"result": "Number"
 }

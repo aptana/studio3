@@ -1,6 +1,4 @@
 {
-	"schema": {
-		"name": "string-schema",
-		"result": "String"
-	}
+	"name": "string-schema",
+	"result": "String"
 }
