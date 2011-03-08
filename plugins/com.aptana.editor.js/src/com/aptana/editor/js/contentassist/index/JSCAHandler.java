@@ -26,7 +26,6 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
 import com.aptana.json.IContextHandler;
 import com.aptana.json.IState;
-import com.aptana.json.SchemaObject;
 
 /**
  * JSCAHandler
@@ -462,7 +461,7 @@ public class JSCAHandler implements IContextHandler
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextHandler#setProperty(java.lang.String, java.lang.String, com.aptana.json.IState)
 	 */
-	public void setProperty(SchemaObject owningType, String propertyName, String propertyTypeName, IState propertyType)
+	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
 		PropertyName p = PropertyName.get(propertyName);
 
