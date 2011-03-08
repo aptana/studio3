@@ -8,7 +8,7 @@
 package com.aptana.json;
 
 /**
- * IAction
+ * IContextHandler
  */
 public interface IContextHandler
 {
