@@ -8,7 +8,7 @@
 
 package com.aptana.core;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.core.filesystem.IFileStore;
 
@@ -17,7 +17,7 @@ import org.eclipse.core.filesystem.IFileStore;
  * @author Max Stepanov
  *
  */
-public interface IURLMapper {
+public interface IURIMapper {
 
 	/**
 	 * Resolve file store to URL
@@ -25,14 +25,14 @@ public interface IURLMapper {
 	 * @param file
 	 * @return
 	 */
-	public URL resolve(IFileStore file);
+	public URI resolve(IFileStore file);
 
 	/**
 	 * Resolve URL to file store
 	 * 
-	 * @param url
+	 * @param uri
 	 * @return
 	 */
-	public IFileStore resolve(URL url);
+	public IFileStore resolve(URI uri);
 
 }

@@ -8,11 +8,13 @@
 
 package com.aptana.preview.internal.impl;
 
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
 
 import org.eclipse.core.runtime.CoreException;
 
-import com.aptana.core.IURLMapper;
+import com.aptana.core.IURIMapper;
+import com.aptana.preview.Activator;
 import com.aptana.preview.IPreviewHandler;
 import com.aptana.preview.PreviewConfig;
 import com.aptana.preview.ProjectPreviewUtil;
@@ -30,19 +32,23 @@ public class WebServerPreviewHandler implements IPreviewHandler {
 	 * @see com.aptana.preview.IPreviewHandler#handle(com.aptana.preview.SourceConfig)
 	 */
 	public PreviewConfig handle(SourceConfig config) throws CoreException {
-		IURLMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
-		if (serverConfiguration != null) {
-			URL url = serverConfiguration.resolve(config.getFileStore());
-			if (url != null) {
-				return new PreviewConfig(url);
-			}
-		} else {
-			for (IURLMapper configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
-				URL url = configuration.resolve(config.getFileStore());
-				if (url != null) {
-					return new PreviewConfig(url);
+		IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(config.getProject());
+		try {
+			if (serverConfiguration != null) {
+				URI uri = serverConfiguration.resolve(config.getFileStore());
+				if (uri != null) {
+					return new PreviewConfig(uri.toURL());
+				}
+			} else {
+				for (IURIMapper configuration : WebServerCorePlugin.getDefault().getServerConfigurationManager().getServerConfigurations()) {
+					URI uri = configuration.resolve(config.getFileStore());
+					if (uri != null) {
+						return new PreviewConfig(uri.toURL());
+					}
 				}
 			}
+		} catch (MalformedURLException e) {
+			Activator.log(e);
 		}
 		return null;
 	}
