@@ -29,6 +29,13 @@ import com.aptana.terminal.editor.TerminalEditor;
 import com.aptana.terminal.hyperlink.IHyperlinkDetector;
 import com.aptana.terminal.views.TerminalView;
 
+/**
+ * Detects filepaths/patterns and generates hyperlinks for them. Can be used as a Terminal hyperlink detector, but we
+ * don't run git commands in the terminal too often. Is also re-used for the console line tracker so we detect
+ * hyperlinks in the console too.
+ * 
+ * @author cwilliams
+ */
 public class HyperlinkDetector implements IHyperlinkDetector
 {
 	private static Pattern GIT_FILEPATH_PATTERN = Pattern

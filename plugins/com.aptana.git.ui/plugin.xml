@@ -1848,6 +1848,14 @@
       </image>
    </extension>
    <extension
+         point="org.eclipse.debug.ui.consoleLineTrackers">
+      <consoleLineTracker
+            class="com.aptana.git.ui.hyperlink.GitConsoleLineTracker"
+            id="com.aptana.git.ui.consoleLineTracker"
+            processType="git">
+      </consoleLineTracker>
+   </extension>
+   <extension
          point="com.aptana.terminal.terminalHyperlinkDetectors">
       <detector
             class="com.aptana.git.ui.hyperlink.HyperlinkDetector">
