@@ -17,6 +17,7 @@ public class SchemaProperty
 	private String _typeName;
 	private String _description;
 	private boolean _optional;
+	private Object _value;
 
 	/**
 	 * SchemaProperty
@@ -82,6 +83,14 @@ public class SchemaProperty
 	}
 
 	/**
+	 * @return the value
+	 */
+	public Object getValue()
+	{
+		return this._value;
+	}
+
+	/**
 	 * isOptional
 	 * 
 	 * @return the optional
@@ -111,5 +120,33 @@ public class SchemaProperty
 	public void setOptional(boolean optional)
 	{
 		this._optional = optional;
+	}
+
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(Object value)
+	{
+		this._value = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		buffer.append(this.getTypeName()).append(" ").append(this.getName());
+
+		if (this._value != null)
+		{
+			buffer.append(" := ").append(this._value);
+		}
+
+		return buffer.toString();
 	}
 }
