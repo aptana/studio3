@@ -132,6 +132,10 @@ public final class Messages extends NLS
 
 	public static String Synchronizer_Uploading_Files;
 
+	public static String VirtualFileSyncPair_DestFileInfoErrror;
+
+	public static String VirtualFileSyncPair_SourceFileInfoError;
+
 	static
 	{
 		// initialize resource bundle

@@ -34,9 +34,11 @@ import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
+import com.aptana.core.IURIMapper;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
+import com.aptana.debug.core.internal.Util;
 import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
@@ -46,9 +48,8 @@ import com.aptana.js.debug.core.internal.model.DebugConnection;
 import com.aptana.js.debug.core.internal.model.JSDebugProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
-import com.aptana.webserver.core.WorkspaceResolvingURLMapper;
+import com.aptana.webserver.core.WorkspaceResolvingURIMapper;
 
 /**
  * @author Max Stepanov
@@ -128,7 +129,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
 
 		URL launchURL = null;
-		IURLMapper urlMapper = null;
+		IURIMapper urlMapper = null;
 		try {
 			IResource startResource = null;
 			IPath startPath = null;
@@ -180,7 +181,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
 				if (startResource != null) {
-					urlMapper = new WorkspaceResolvingURLMapper(urlMapper);
+					urlMapper = new WorkspaceResolvingURIMapper(urlMapper);
 				}
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 				String externalBaseUrl = configuration.getAttribute(
@@ -202,9 +203,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 			
 			if (urlMapper != null) {
 				if (startResource != null) {
-					launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+					launchURL = Util.toURL(urlMapper.resolve(EFSUtils.getFileStore(startResource)));
 				} else if (startPath != null) {
-					launchURL = urlMapper.resolve(EFSUtils.getLocalFileStore(startPath.toFile()));
+					launchURL = Util.toURL(urlMapper.resolve(EFSUtils.getLocalFileStore(startPath.toFile())));
 					if (launchURL == null) {
 						launchURL = startPath.toFile().toURI().toURL();
 					}

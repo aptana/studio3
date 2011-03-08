@@ -123,6 +123,7 @@ public class JSLaunchShortcut implements ILaunchShortcut {
 		ILaunchConfiguration config = null;
 		ILaunchConfigurationType configType = getLaunchConfigType();
 		try {
+			@SuppressWarnings("deprecation")
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(
 					null,
 					DebugPlugin.getDefault().getLaunchManager()

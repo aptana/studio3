@@ -939,15 +939,15 @@ public class Synchronizer implements ILoggable
 		{
 			final VirtualFileSyncPair item = fileList[i];
 			final IFileStore clientFile = item.getSourceFile();
-			final IFileInfo clientFileInfo = item.getSourceFileInfo();
 			final IFileStore serverFile = item.getDestinationFile();
-			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
 			SubMonitor childMonitor = subMonitor.newChild(1);
 			childMonitor.setTaskName(getSyncStatus(item));
 
 			try
 			{
+				final IFileInfo clientFileInfo = item.getSourceFileInfo(childMonitor);
+				final IFileInfo serverFileInfo = item.getDestinationFileInfo(childMonitor);
 
 				setSyncItemDirection(item, false, true);
 
