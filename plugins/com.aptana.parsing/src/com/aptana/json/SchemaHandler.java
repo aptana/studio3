@@ -8,6 +8,7 @@
 package com.aptana.json;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 /**
@@ -31,51 +32,51 @@ public class SchemaHandler implements IContextHandler
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextAction#addElement(java.lang.String, com.aptana.json.IState)
 	 */
+	@SuppressWarnings("unchecked")
 	public void addElement(String elementTypeName, IState elementType)
 	{
 		System.out.println("add element of type '" + elementTypeName + "' to list");
+
+		Object item = this._stack.pop();
+		Object list = this._stack.peek();
+
+		if (list instanceof List<?>)
+		{
+			((List<Object>) list).add(item);
+		}
+		else
+		{
+			System.out.println("Could not add " + item + " to non-list " + list);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.json.IContextAction#createList(java.lang.String, com.aptana.json.IState)
+	 * @see com.aptana.json.IContextHandler#createType(java.lang.String, com.aptana.json.IState, java.lang.Object)
 	 */
-	public void createList(String elementTypeName, IState elementType)
+	public void createType(String typeName, IState type, Object value)
 	{
-		System.out.println("create list of '" + elementTypeName + "'");
-		
-		this._stack.push(new ArrayList<Object>());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.json.IContextAction#createType(java.lang.String, com.aptana.json.IState)
-	 */
-	public void createType(String typeName, IState type)
-	{
-		System.out.println("create type '" + typeName + "'");
+		//System.out.println("create type '" + typeName + "': " + value);
 
 		Object instance = null;
 
-		if ("Schema".equals(typeName))
+		if (type instanceof SchemaPrimitive)
 		{
-			instance = this._schema.addType(typeName);
+			instance = value;
 		}
-		else if ("SchemaDocument".equals(typeName))
+		else if ("Schema".equals(typeName))
 		{
-			instance = this._schema.addType(typeName);
+			// return the internal schema instance
+			instance = this._schema;
 		}
-		else if ("Type".equals(typeName))
+		else if (typeName.startsWith("Array<"))
 		{
-			instance = this._schema.addType(typeName);
+			instance = new ArrayList<Object>();
 		}
-		else if ("Property".equals(typeName))
+		else
 		{
-			instance = this._schema.addType(typeName);
-		}
-		else if (typeName != null && typeName.startsWith("Array<"))
-		{
-			// do nothing as this will be handled by createList
+			// create a new container to hold type information
+			instance = this._schema.createObject();
 		}
 
 		if (instance == null)
@@ -92,16 +93,25 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
-		System.out.println("set property '" + propertyName + "'");
+		System.out.println("set property '" + propertyName + "' : " + propertyTypeName);
 
 		if (this._stack.isEmpty() == false)
 		{
-			/* Object value = */this._stack.pop();
+			Object value = this._stack.pop();
+			//Object name = this._stack.pop();
 			Object top = this._stack.peek();
 
-			if (top instanceof SchemaObject)
+			// TODO: verify value type and name type
+
+			if (top instanceof IPropertyContainer)
 			{
-				((SchemaObject) top).addProperty(propertyName, propertyTypeName);
+				IPropertyContainer container = (IPropertyContainer) top;
+
+				container.setProperty(propertyName, propertyTypeName, value);
+			}
+			else
+			{
+				// TODO: warn?
 			}
 		}
 	}
