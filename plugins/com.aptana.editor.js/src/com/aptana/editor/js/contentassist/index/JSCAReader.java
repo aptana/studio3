@@ -134,8 +134,7 @@ public class JSCAReader extends SchemaReader
 		// Parameter
 		SchemaObject parameter = (SchemaObject) result.addType("Parameter");
 		parameter.addProperty("name", "String");
-		//parameter.addProperty("type", "String");
-		parameter.addProperty("types", "Array<String>");	// NOTE: see previous commented line for correct schema
+		parameter.addProperty("type", "String");
 		parameter.addProperty("usage", "String");
 		parameter.addProperty("description", "String");
 
