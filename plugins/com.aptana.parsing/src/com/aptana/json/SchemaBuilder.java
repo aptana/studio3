@@ -13,6 +13,9 @@ package com.aptana.json;
 @SuppressWarnings("nls")
 public class SchemaBuilder extends SchemaReader
 {
+	private static final String SCHEMA_NAME = "Schema Schema";
+	private static final String SCHEMA_VERSION = "http://www.appcelerator.com/studio/content-assist/schema/1.0";
+	
 	/**
 	 * SchemaBuilder
 	 */
@@ -31,11 +34,10 @@ public class SchemaBuilder extends SchemaReader
 	private Schema createSchema()
 	{
 		Schema result = new Schema();
-		
-		// create SchemaDocument
-		SchemaObject document = (SchemaObject) result.addType("SchemaDocument");
-		document.addProperty("schema", "Schema");
-		document.addProperty("types", "Array<Type>");
+		result.setName(SCHEMA_NAME);
+		result.setVersion(SCHEMA_VERSION);
+		result.setDescription("A JSON schema that describes the structure of a JSON schema");
+		result.setResult("Schema");
 		
 		// create Schema
 		SchemaObject schema = (SchemaObject) result.addType("Schema");
@@ -43,6 +45,7 @@ public class SchemaBuilder extends SchemaReader
 		schema.addProperty("version", "String");
 		schema.addProperty("description", "String");
 		schema.addProperty("result", "String");
+		schema.addProperty("types", "Array<Type>");
 		
 		// create Type
 		SchemaObject type = (SchemaObject) result.addType("Type");
@@ -58,9 +61,6 @@ public class SchemaBuilder extends SchemaReader
 		property.addProperty("example", "String");
 		property.addProperty("optional", "Boolean");
 		
-		// set root type
-		result.setRootTypeName("SchemaDocument");
-
 		return result;
 	}
 }
