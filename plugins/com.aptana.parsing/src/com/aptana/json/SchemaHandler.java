@@ -56,7 +56,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createType(String typeName, IState type, Object value)
 	{
-		//System.out.println("create type '" + typeName + "': " + value);
+		System.out.println("create type '" + typeName + "': " + value);
 
 		Object instance = null;
 
