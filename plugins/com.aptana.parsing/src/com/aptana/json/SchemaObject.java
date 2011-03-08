@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * SchemaObject
  */
-public class SchemaObject implements IState
+public class SchemaObject implements IState, IPropertyContainer
 {
 	private enum ObjectState
 	{
@@ -60,9 +60,13 @@ public class SchemaObject implements IState
 	 * @param name
 	 * @param typeName
 	 */
-	public void addProperty(String name, String typeName)
+	public SchemaProperty addProperty(String name, String typeName)
 	{
-		this.addProperty(this._owningSchema.createProperty(name, typeName));
+		SchemaProperty result = this._owningSchema.createProperty(name, typeName);
+
+		this.addProperty(result);
+
+		return result;
 	}
 
 	/*
@@ -122,6 +126,26 @@ public class SchemaObject implements IState
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return this.getTypeName();
+	}
+
+	/**
+	 * hasProperty
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean hasProperty(String name)
+	{
+		return (this._properties != null && this._properties.containsKey(name));
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
 	 */
 	public boolean isValidTransition(SchemaEventType event, Object value)
@@ -161,6 +185,48 @@ public class SchemaObject implements IState
 	public void setDescription(String description)
 	{
 		this._description = description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IPropertyContainer#setProperty(java.lang.String, java.lang.Object)
+	 */
+	public void setProperty(String propertyName, String propertyTypeName, Object value)
+	{
+		SchemaProperty property = this.addProperty(propertyName, propertyTypeName);
+
+		property.setValue(value);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		StringBuilder buffer = new StringBuilder();
+
+		// open
+		buffer.append("{");
+
+		// emit properties
+		if (this._properties != null && this._properties.isEmpty() == false)
+		{
+			for (Map.Entry<String, SchemaProperty> entry : this._properties.entrySet())
+			{
+				SchemaProperty property = entry.getValue();
+
+				buffer.append("\n\t").append(property);
+			}
+
+			buffer.append("\n");
+		}
+
+		// close
+		buffer.append("}");
+
+		return buffer.toString();
 	}
 
 	/*
@@ -209,7 +275,10 @@ public class SchemaObject implements IState
 				context.pushType(this._currentPropertyName, this._currentPropertyType);
 
 				// fire element type creation event
-				context.createType(this._currentPropertyTypeName, this._currentPropertyType, value);
+				if (this._currentPropertyType instanceof SchemaPrimitive == false)
+				{
+					context.createType(this._currentPropertyTypeName, this._currentPropertyType, value);
+				}
 				break;
 
 			case END_OBJECT:

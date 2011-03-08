@@ -8,12 +8,13 @@
 package com.aptana.json;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Schema
  */
-public class Schema implements IState
+public class Schema implements IState, IPropertyContainer
 {
 	private static enum SchemaState
 	{
@@ -23,6 +24,9 @@ public class Schema implements IState
 	private static final IState EMPTY_TYPE = new SchemaObject(null);
 	private static final Map<String, IState> BUILTIN_TYPES;
 
+	/**
+	 * static initializer
+	 */
 	static
 	{
 		BUILTIN_TYPES = new HashMap<String, IState>();
@@ -32,6 +36,9 @@ public class Schema implements IState
 		BUILTIN_TYPES.put("String", new SchemaString());
 	}
 
+	private String _name;
+	private String _version;
+	private String _description;
 	private Map<String, IState> _typesByName;
 	private String _rootTypeName;
 	private SchemaState _currentState;
@@ -48,7 +55,10 @@ public class Schema implements IState
 
 		if (result == EMPTY_TYPE)
 		{
+			// type doesn't exist, so create it
 			result = this.createObject();
+
+			// and register it
 			this.addType(typeName, result);
 		}
 
@@ -123,6 +133,22 @@ public class Schema implements IState
 	}
 
 	/**
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return this._description;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return this._name;
+	}
+
+	/**
 	 * getRootType
 	 * 
 	 * @return
@@ -154,14 +180,13 @@ public class Schema implements IState
 
 		if (BUILTIN_TYPES.containsKey(typeName))
 		{
+			// grab built-in type
 			result = BUILTIN_TYPES.get(typeName);
 		}
-		else
+		else if (this._typesByName != null)
 		{
-			if (this._typesByName != null)
-			{
-				result = this._typesByName.get(typeName);
-			}
+			// grab registered type
+			result = this._typesByName.get(typeName);
 		}
 
 		if (result == null)
@@ -179,6 +204,23 @@ public class Schema implements IState
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return "Schema";
+	}
+
+	/**
+	 * @return the version
+	 */
+	public String getVersion()
+	{
+		return this._version;
 	}
 
 	/*
@@ -461,13 +503,93 @@ public class Schema implements IState
 	}
 
 	/**
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this._description = description;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name)
+	{
+		this._name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.IPropertyContainer#setProperty(java.lang.String, java.lang.Object)
+	 */
+	public void setProperty(String propertyName, String propertyTypeName, Object value)
+	{
+		if ("name".equals(propertyName))
+		{
+			this.setName((String) value);
+		}
+		else if ("version".equals(propertyName))
+		{
+			this.setVersion((String) value);
+		}
+		else if ("description".equals(propertyName))
+		{
+			this.setDescription((String) value);
+		}
+		else if ("result".equals(propertyName))
+		{
+			this.setResult((String) value);
+		}
+		else if ("types".equals(propertyName))
+		{
+			@SuppressWarnings("unchecked")
+			List<Object> types = (List<Object>) value;
+
+			for (Object typeObject : types)
+			{
+				if (typeObject instanceof SchemaObject)
+				{
+					SchemaObject object = (SchemaObject) typeObject;
+					SchemaProperty nameProperty = object.getProperty("name");
+
+					if (nameProperty != null)
+					{
+						String name = nameProperty.getValue().toString();
+
+						this.addType(name, object);
+					}
+					else
+					{
+						// TODO: warn?
+					}
+				}
+				else
+				{
+					// TODO: warn?
+				}
+			}
+		}
+	}
+
+	/**
 	 * setRootTypeName
 	 * 
 	 * @param typeName
 	 */
-	public void setRootTypeName(String typeName)
+	public void setResult(String typeName)
 	{
 		this._rootTypeName = typeName;
+	}
+
+	/**
+	 * @param version
+	 *            the version to set
+	 */
+	public void setVersion(String version)
+	{
+		this._version = version;
 	}
 
 	/*
