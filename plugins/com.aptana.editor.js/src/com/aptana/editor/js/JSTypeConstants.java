@@ -43,6 +43,7 @@ public class JSTypeConstants
 
 	public static final String FUNCTION_SIGNATURE_DELIMITER = ":"; //$NON-NLS-1$
 	public static final String PARAMETER_TYPE_DELIMITER = "|"; //$NON-NLS-1$
+	public static final String PARAMETER_DELIMITER = ","; //$NON-NLS-1$
 	public static final String RETURN_TYPE_DELIMITER = ","; //$NON-NLS-1$
 
 	public static final Pattern FUNCTION_PREFIX = Pattern.compile( //
