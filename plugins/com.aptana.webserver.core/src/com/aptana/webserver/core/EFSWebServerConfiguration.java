@@ -39,7 +39,7 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#resolve(org.eclipse.core.filesystem.IFileStore)
 	 */
 	@Override
-	public URL resolve(IFileStore file) {
+	public URI resolve(IFileStore file) {
 		if (!isValid()) {
 			return null;
 		}
@@ -47,11 +47,8 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 			IPath relativePath = EFSUtils.getRelativePath(EFS.getStore(documentRoot), file);
 			if (relativePath != null) {
 				try {
-					URI uri = URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
-					return uri.toURL();
+					return URIUtil.append(baseURL.toURI(), relativePath.toPortableString());
 				} catch (URISyntaxException e) {
-					WebServerCorePlugin.log(e);
-				} catch (MalformedURLException e) {
 					WebServerCorePlugin.log(e);
 				}
 			}
@@ -65,12 +62,12 @@ public class EFSWebServerConfiguration extends AbstractWebServerConfiguration {
 	 * @see com.aptana.webserver.core.AbstractWebServerConfiguration#resolve(java.net.URL)
 	 */
 	@Override
-	public IFileStore resolve(URL url) {
+	public IFileStore resolve(URI uri) {
 		if (!isValid()) {
 			return null;
 		}
 		try {
-			return resolve(Path.fromPortableString(baseURL.toURI().relativize(url.toURI()).getPath()));
+			return resolve(Path.fromPortableString(baseURL.toURI().relativize(uri).getPath()));
 		} catch (URISyntaxException e) {
 			WebServerCorePlugin.log(e);
 			return null;

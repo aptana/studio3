@@ -8,7 +8,6 @@
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +38,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.IURIMapper;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -65,7 +65,6 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -384,15 +383,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				IURLMapper serverConfiguration = ProjectPreviewUtil
+				IURIMapper serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (IURLMapper server : WebServerCorePlugin.getDefault()
+					for (IURIMapper server : WebServerCorePlugin.getDefault()
 							.getServerConfigurationManager().getServerConfigurations())
 					{
-						URL url = server.resolve(editorStore);
-						if (url != null)
+						if (server.resolve(editorStore) != null)
 						{
 							serverConfiguration = server;
 							break;
