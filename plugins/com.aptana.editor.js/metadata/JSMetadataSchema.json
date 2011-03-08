@@ -1,10 +1,8 @@
 {
-	"schema": {
-		"name": "JS Schema",
-		"version": "http://www.appcelerator/studio/content-assist/1.0",
-		"description": "A JSON schema describing the structure of JS Metadata used in Aptana Studio for content assist",
-		"result": "JSMetadata"
-	},
+	"name": "JS Schema",
+	"version": "http://www.appcelerator/studio/content-assist/1.0",
+	"description": "A JSON schema describing the structure of JS Metadata used in Aptana Studio for content assist",
+	"result": "JSMetadata",
 	"types": [
 		{
 			"name": "JSMetadata",
@@ -110,7 +108,7 @@
 				},
 				{
 					"name": "remarks",
-					"type": "List<String>",
+					"type": "Array<String>",
 					"description": "A list of remarks used to further clarify the use of the type",
 					"optional": true
 				}
