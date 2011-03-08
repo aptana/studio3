@@ -9,18 +9,16 @@ package com.aptana.json;
 
 /**
  * @author klindsey
- *
  */
 public class SchemaTypeGroup implements IState
 {
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.State#enter()
 	 */
 	public void enter()
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -30,7 +28,6 @@ public class SchemaTypeGroup implements IState
 	public void exit()
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -41,7 +38,6 @@ public class SchemaTypeGroup implements IState
 	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -53,5 +49,4 @@ public class SchemaTypeGroup implements IState
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }
