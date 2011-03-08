@@ -31,16 +31,36 @@ import com.aptana.terminal.views.TerminalView;
 
 public class HyperlinkDetector implements IHyperlinkDetector
 {
-	private static Pattern GIT_FILEPATH_PATTERN = Pattern.compile("^(\\S+)\\s+\\|\\s+\\d+\\s+\\+*\\-*"); //$NON-NLS-1$
+	private static Pattern GIT_FILEPATH_PATTERN = Pattern
+			.compile("^(\\s*(Auto-merging|Removing|(delete|create) mode \\d+) (\\S+))|((\\S+)\\s+\\|\\s+((\\d+\\s+\\+*\\-*)|(Bin \\d+ \\-> \\d+ bytes)))|(rename (.+?) \\(\\d+%\\))"); //$NON-NLS-1$
+
+	private static Pattern RENAME_PATTERN = Pattern.compile("(.+)\\{(.+?) => (.+?)\\}(.*)"); //$NON-NLS-1$
 
 	public IHyperlink[] detectHyperlinks(String contents)
 	{
 		Matcher m = GIT_FILEPATH_PATTERN.matcher(contents);
 		if (m.find())
 		{
-			String filepath = m.group(1);
-			int start = m.start(1);
-			int length = m.end(1) - start;
+			int groupNum = 4; // try the first version
+			String filepath = m.group(groupNum);
+			if (filepath == null) // matched second version
+			{
+				groupNum = 6;
+				filepath = m.group(groupNum);
+			}
+			if (filepath == null) // matched third version (rename)
+			{
+				groupNum = 11;
+				filepath = m.group(groupNum);
+				// Generate the renamed file
+				Matcher renameMatcher = RENAME_PATTERN.matcher(filepath);
+				if (renameMatcher.find())
+				{
+					filepath = renameMatcher.group(1) + renameMatcher.group(3) + renameMatcher.group(4);
+				}
+			}
+			int start = m.start(groupNum);
+			int length = m.end(groupNum) - start;
 			return new IHyperlink[] { new GitHyperlink(new Region(start, length), filepath) };
 		}
 		return new IHyperlink[0];
@@ -169,7 +189,7 @@ public class HyperlinkDetector implements IHyperlinkDetector
 			}
 
 			// FIXME Use GitRepositoryManager.getUnattachedExisting(URI) to handle files not in workspace
-			
+
 			// is the working dir in the workspace?
 			IContainer container = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(workingDir);
 			if (container == null)
