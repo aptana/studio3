@@ -362,6 +362,14 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		target.getConnection().sendCommand(command);
 	}
 	
+	/* package */ boolean isInSuspendState() {
+		return runningState == State.SUSPENDED || runningState == State.SUSPENDING;
+	}
+	
+	/* package */ int getThreadId() {
+		return threadId;
+	}
+	
 	private JSDebugTarget getJSDebugTarget() {
 		return (JSDebugTarget) getDebugTarget();
 	}
