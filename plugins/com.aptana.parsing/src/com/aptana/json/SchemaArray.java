@@ -165,4 +165,14 @@ public class SchemaArray implements IState
 				throw new IllegalStateException("Unsupported event type: " + event.name());
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return "Array<" + this._elementTypeName + ">";
+	}
 }
