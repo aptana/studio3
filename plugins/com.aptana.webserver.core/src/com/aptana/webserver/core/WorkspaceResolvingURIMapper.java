@@ -36,54 +36,54 @@
 package com.aptana.webserver.core;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import com.aptana.core.IURLMapper;
+import com.aptana.core.IURIMapper;
 import com.aptana.ide.core.io.efs.EFSUtils;
 
 /**
  * @author Max Stepanov
  *
  */
-public class WorkspaceResolvingURLMapper implements IURLMapper {
+public class WorkspaceResolvingURIMapper implements IURIMapper {
 
-	private IURLMapper baseMapper;
+	private IURIMapper baseMapper;
 	
 	/**
 	 * 
 	 */
-	public WorkspaceResolvingURLMapper(IURLMapper baseMapper) {
+	public WorkspaceResolvingURIMapper(IURIMapper baseMapper) {
 		this.baseMapper = baseMapper;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(org.eclipse.core.filesystem.IFileStore)
 	 */
-	public URL resolve(IFileStore fileStore) {
-		URL url =  baseMapper.resolve(fileStore);
-		if (url == null) {
+	public URI resolve(IFileStore fileStore) {
+		URI uri =  baseMapper.resolve(fileStore);
+		if (uri == null) {
 			try {
 				File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
 				if (file != null) {
-					url = baseMapper.resolve(EFSUtils.getLocalFileStore(file));
+					uri = baseMapper.resolve(EFSUtils.getLocalFileStore(file));
 				}
 			} catch (CoreException e) {
 				WebServerCorePlugin.log(e);
 			}
 		}
-		return url;
+		return uri;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(java.net.URL)
 	 */
-	public IFileStore resolve(URL url) {
-		IFileStore fileStore = baseMapper.resolve(url);
+	public IFileStore resolve(URI uri) {
+		IFileStore fileStore = baseMapper.resolve(uri);
 		if (fileStore != null && fileStore.getFileSystem() == EFS.getLocalFileSystem()) {
 			try {
 				fileStore = EFSUtils.fromLocalFile(fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor()));

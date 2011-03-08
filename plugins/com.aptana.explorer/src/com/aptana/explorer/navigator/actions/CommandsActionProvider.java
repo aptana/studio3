@@ -88,6 +88,11 @@ public class CommandsActionProvider extends DefaultNavigatorActionProvider
 
 	private IProject getSelectedProject()
 	{
-		return ((SingleProjectView) getPartSite().getPart()).getActiveProject();
+		SingleProjectView singleProjectView = ((SingleProjectView) getPartSite().getPart());
+		if (singleProjectView == null)
+		{
+			return null;
+		}
+		return singleProjectView.getActiveProject();
 	}
 }
