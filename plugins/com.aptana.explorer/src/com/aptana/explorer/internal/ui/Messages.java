@@ -35,6 +35,9 @@ public class Messages extends NLS
 	public static String SingleProjectView_MaintenanceSubmenuLabel;
 	public static String SingleProjectView_RemoteSubmenuLabel;
 	public static String SingleProjectView_ConfigVarsSubmenuLabel;
+	public static String SingleProjectView_CreateProjectButtonLabel;
+	public static String SingleProjectView_ImportProjectButtonLabel;
+	public static String SingleProjectView_NoProjectsDescription;
 
 	static
 	{
