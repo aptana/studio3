@@ -33,6 +33,13 @@
             name="%content-type.sdocml.name"
             priority="normal">
       </content-type>
+      <content-type
+            base-type="com.aptana.contenttype.json"
+            file-extensions="jsca"
+            id="com.aptana.contenttype.jsca"
+            name="JSCA Source"
+            priority="normal">
+      </content-type>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -52,6 +59,12 @@
             class="com.aptana.editor.js.contentassist.index.SDocMLFileIndexingParticipant">
          <contentTypeBinding
                contentTypeId="com.aptana.contenttype.sdocml">
+         </contentTypeBinding>
+      </fileIndexingParticipant>
+      <fileIndexingParticipant
+            class="com.aptana.editor.js.contentassist.index.JSCAFileIndexingParticipant">
+         <contentTypeBinding
+               contentTypeId="com.aptana.contenttype.jsca">
          </contentTypeBinding>
       </fileIndexingParticipant>
    </extension>
