@@ -70,4 +70,14 @@ public final class Util {
 	public static boolean checkVariable(String variableName) {
 		return CHECK_VARIABLE.matcher(variableName).matches();
 	}
+	
+	public static String[] removeArrayElement(String[] array, int index) {
+		if (array.length == 0 || index >= array.length) {
+			return array;
+		}
+		String[] result = new String[array.length-1];
+		System.arraycopy(array, 0, result, 0, index);
+		System.arraycopy(array, index+1, result, index, array.length-index-1);
+		return result;
+	}
 }

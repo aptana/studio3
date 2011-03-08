@@ -152,7 +152,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final char WATCHPOINT_FLAG_WRITE = 'w';
 
 	private static final int PROTOCOL_VERSION_MIN = 0;
-	private static final int PROTOCOL_VERSION_MAX = 1;
+	private static final int PROTOCOL_VERSION_MAX = 2;
 
 	/**
 	 * Step filter bit mask - indicates if step filters are enabled.
@@ -191,6 +191,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private IBreakpoint skipOperationOnBreakpoint = null;
 	private boolean ignoreBreakpointCreation = false;
 	private boolean contentChanged = false;
+	private int protocolVersion;
 
 	private Job updateContentJob = new Job("Debugger Content Update") { //$NON-NLS-1$
 		{
@@ -281,6 +282,10 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 	/* package */ DebugConnection getConnection() {
 		return connection;
+	}
+	
+	/* package */ int getProtocolVersion() {
+		return protocolVersion;
 	}
 
 	/**
@@ -932,7 +937,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		if (debugMode) {
 			fireCreationEvent();
 
-			JSDebugThread thread = new JSDebugThread(this);
+			JSDebugThread thread = new JSDebugThread(this, 0);
 			threads = new JSDebugThread[] { thread };
 			for (JSDebugThread i : threads) {
 				i.fireCreationEvent();
@@ -998,6 +1003,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					Integer.toString(protoVersion), Integer.toString(PROTOCOL_VERSION_MIN),
 							Integer.toString(PROTOCOL_VERSION_MAX)));
 		}
+		protocolVersion = protoVersion;
 		if (checkUpdate) {
 			boolean update = false;
 			if (version != null) {
@@ -1799,8 +1805,16 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				fireEvent(event);
 				return;
 			}
-			if (threads.length > 0) {
-				threads[0].handleMessage(args);
+			int threadId = 0;
+			if (protocolVersion >= 2) {
+				try {
+					threadId = Integer.parseInt(args[1]);
+					args = Util.removeArrayElement(args, 1);
+				} catch (NumberFormatException e) {
+				}
+			}
+			if (threadId < threads.length) {
+				threads[threadId].handleMessage(args);
 			}
 		}
 
