@@ -435,7 +435,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
 			getCommonViewer().setFilters(visibleFilters);
 
-			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.putBoolean(TURNED_OFF_DOT_STAR_FILE_FILTER, true);
 			try
 			{
@@ -672,7 +672,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.put(IPreferenceConstants.ACTIVE_PROJECT, selectedProject.getName());
 			prefs.flush();
 		}
@@ -686,7 +686,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		try
 		{
-			IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID);
+			IEclipsePreferences prefs = new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID);
 			prefs.remove(IPreferenceConstants.ACTIVE_PROJECT);
 			prefs.flush();
 		}
@@ -757,7 +757,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fActiveProjectPrefChangeListener != null)
 		{
-			InstanceScope.INSTANCE.getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
+			new InstanceScope().getNode(ExplorerPlugin.PLUGIN_ID).removePreferenceChangeListener(
 					fActiveProjectPrefChangeListener);
 		}
 		fActiveProjectPrefChangeListener = null;
