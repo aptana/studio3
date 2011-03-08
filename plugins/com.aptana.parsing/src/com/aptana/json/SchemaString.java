@@ -18,6 +18,15 @@ public class SchemaString extends SchemaPrimitive
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return "String";
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override

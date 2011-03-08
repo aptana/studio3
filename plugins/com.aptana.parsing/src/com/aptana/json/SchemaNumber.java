@@ -18,6 +18,15 @@ public class SchemaNumber extends SchemaPrimitive
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return "Number";
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override

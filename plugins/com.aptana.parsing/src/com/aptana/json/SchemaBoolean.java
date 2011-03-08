@@ -18,6 +18,15 @@ public class SchemaBoolean extends SchemaPrimitive
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return "Boolean";
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override

@@ -18,6 +18,15 @@ public class SchemaNull extends SchemaPrimitive
 
 	/*
 	 * (non-Javadoc)
+	 * @see com.aptana.json.IState#getTypeName()
+	 */
+	public String getTypeName()
+	{
+		return "null";
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see com.aptana.json.SchemaPrimitive#validValue(java.lang.Object)
 	 */
 	@Override
