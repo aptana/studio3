@@ -20,7 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="json"
+            file-extensions="json,jsca"
             id="com.aptana.contenttype.json"
             name="%content-type.name"
             priority="normal">
