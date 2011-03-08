@@ -1,11 +1,4 @@
-/**
- * Aptana Studio
- * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
- * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
- * Please see the license.html included with this distribution for details.
- * Any modifications to this file must keep this entire header intact.
- */
-package com.aptana.explorer.navigator.actions;
+package com.aptana.ui.actions;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
@@ -26,7 +19,7 @@ import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
-public abstract class ExplorerActionProvider extends CommonActionProvider
+public abstract class DefaultNavigatorActionProvider extends CommonActionProvider
 {
 
 	private IWorkbenchPartSite partSite;
@@ -36,7 +29,6 @@ public abstract class ExplorerActionProvider extends CommonActionProvider
 	public void init(ICommonActionExtensionSite aSite)
 	{
 		super.init(aSite);
-
 		partSite = ((ICommonViewerWorkbenchSite) aSite.getViewSite()).getSite();
 	}
 
@@ -53,7 +45,7 @@ public abstract class ExplorerActionProvider extends CommonActionProvider
 
 	protected abstract Image getImage();
 
-	protected abstract String getMenuID();
+	protected abstract String getMenuId();
 
 	protected IWorkbenchPartSite getPartSite()
 	{
@@ -63,6 +55,26 @@ public abstract class ExplorerActionProvider extends CommonActionProvider
 	protected String getToolTip()
 	{
 		return null;
+	}
+
+	/**
+	 * The default behavior is to show the same content as clicking the dropdown arrow. Subclass could override.
+	 * 
+	 * @param parent
+	 *            the parent toolbar
+	 */
+	protected void run(ToolBar parent)
+	{
+		Point toolbarLocation = parent.getLocation();
+		toolbarLocation = parent.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
+		Point toolbarSize = parent.getSize();
+		MenuManager menuManager = new MenuManager(null, getMenuId());
+		IMenuService menuService = (IMenuService) partSite.getService(IMenuService.class);
+		menuService.populateContributionManager(menuManager, MenuUtil.menuUri(menuManager.getId()));
+		fillMenu(menuManager);
+		Menu menu = menuManager.createContextMenu(parent);
+		menu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
+		menu.setVisible(true);
 	}
 
 	/**
@@ -93,17 +105,7 @@ public abstract class ExplorerActionProvider extends CommonActionProvider
 					@Override
 					public void widgetSelected(SelectionEvent selectionEvent)
 					{
-						// makes clicking on the icon show the same menu as clicking on the drop-down arrow
-						Point toolbarLocation = parent.getLocation();
-						toolbarLocation = parent.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
-						Point toolbarSize = parent.getSize();
-						MenuManager menuManager = new MenuManager(null, getMenuID());
-						IMenuService menuService = (IMenuService) partSite.getService(IMenuService.class);
-						menuService.populateContributionManager(menuManager, MenuUtil.menuUri(menuManager.getId()));
-						fillMenu(menuManager);
-						Menu menu = menuManager.createContextMenu(parent);
-						menu.setLocation(toolbarLocation.x, toolbarLocation.y + toolbarSize.y + 2);
-						menu.setVisible(true);
+						run(parent);
 					}
 				});
 			}

@@ -31,9 +31,13 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.FileTextSearchScope;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
@@ -51,19 +55,25 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.NewWizardAction;
+import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.dialogs.ImportExportWizard;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonFilterDescriptor;
 import org.eclipse.ui.navigator.INavigatorFilterService;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.swt.IFocusService;
 import org.eclipse.ui.wizards.IWizardDescriptor;
@@ -78,6 +88,7 @@ import com.aptana.explorer.IPreferenceConstants;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.ui.util.UIUtils;
 import com.aptana.ui.widgets.SearchComposite;
 
 /**
@@ -136,6 +147,17 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
+
+	/**
+	 * Composite holding the create project/import buttons
+	 */
+	private Composite noProjectButtonsComp;
+
+	/**
+	 * PageBook to swap between normal common viewer when there's at least one project, and composite containing buttons
+	 * to add/import projects
+	 */
+	private PageBook pageBook;
 
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
@@ -314,10 +336,82 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		viewer.setLayout(new FillLayout());
 		viewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		super.createPartControl(viewer);
+		pageBook = new PageBook(viewer, SWT.NONE);
+
+		super.createPartControl(pageBook);
 		turnOffDotStarFileFilterOnFirstStartup();
-		getCommonViewer().setInput(detectSelectedProject());
+		IProject selectedProject = detectSelectedProject();
+
+		getCommonViewer().setInput(selectedProject);
+
+		createNoProjectsComposite();
+
+		if (selectedProject != null && selectedProject.isAccessible())
+		{
+			pageBook.showPage(getCommonViewer().getControl());
+		}
+		else
+		{
+			pageBook.showPage(noProjectButtonsComp);
+		}
 		fixNavigatorManager();
+	}
+
+	protected Composite createNoProjectsComposite()
+	{
+		// Create a composite to add/import projects when there are none
+		noProjectButtonsComp = new Composite(pageBook, SWT.NONE);
+		noProjectButtonsComp.setBackground(ThemePlugin.getDefault().getColorManager()
+				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground()));
+
+		GridLayoutFactory.fillDefaults().applyTo(noProjectButtonsComp);
+		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(noProjectButtonsComp);
+
+		Label label = new Label(noProjectButtonsComp, SWT.WRAP);
+		label.setText(Messages.SingleProjectView_NoProjectsDescription);
+		label.setForeground(ThemePlugin.getDefault().getColorManager()
+				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground()));
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10).applyTo(label);
+
+		Button button = new Button(noProjectButtonsComp, SWT.FLAT | SWT.BORDER);
+		button.setText(Messages.SingleProjectView_CreateProjectButtonLabel);
+		button.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				NewWizardAction action = new NewWizardAction(UIUtils.getActiveWorkbenchWindow());
+				action.run();
+			}
+		});
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(0, 5).applyTo(button);
+
+		Button importButton = new Button(noProjectButtonsComp, SWT.FLAT | SWT.BORDER);
+		importButton.setText(Messages.SingleProjectView_ImportProjectButtonLabel);
+		importButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ImportExportWizard wizard = new ImportExportWizard(ImportExportWizard.IMPORT);
+				wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
+
+				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
+				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
+				if (wizardSettings == null)
+				{
+					wizardSettings = workbenchSettings.addNewSection("ImportExportAction"); //$NON-NLS-1$
+				}
+				wizard.setDialogSettings(wizardSettings);
+				wizard.setForcePreviousAndNextButtons(true);
+
+				WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
+				dialog.open();
+			}
+		});
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(importButton);
+
+		return noProjectButtonsComp;
 	}
 
 	private void turnOffDotStarFileFilterOnFirstStartup()
@@ -528,7 +622,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				{
 					return null;
 				}
-				project = projects[0];
+				for (IProject proj : projects)
+				{
+					if (proj.isAccessible())
+					{
+						project = proj;
+						break;
+					}
+				}
 			}
 		}
 		return project;
@@ -550,9 +651,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		}
 		IProject oldActiveProject = selectedProject;
 		selectedProject = newSelectedProject;
-		if (newSelectedProject != null)
+		if (newSelectedProject != null && newSelectedProject.isAccessible())
 		{
 			setActiveProject();
+			pageBook.showPage(getCommonViewer().getControl());
+		}
+		else
+		{
+			pageBook.showPage(noProjectButtonsComp);
 		}
 		projectChanged(oldActiveProject, newSelectedProject);
 	}
@@ -750,7 +856,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-											.isAccessible()))
+												.isAccessible()))
 							{
 								// Remove from menu and if it was the active
 								// project, switch away from it!

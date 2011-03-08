@@ -8,6 +8,9 @@
 package com.aptana.debug.core.internal;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.net.URLDecoder;
 
 /**
@@ -38,6 +41,13 @@ public final class Util {
 		} catch (UnsupportedEncodingException ignore) {
 		}
 		return url;
+	}
+	
+	public static URL toURL(URI uri) throws MalformedURLException {
+		if (uri != null) {
+			return uri.toURL();
+		}
+		return null;
 	}
 
 }

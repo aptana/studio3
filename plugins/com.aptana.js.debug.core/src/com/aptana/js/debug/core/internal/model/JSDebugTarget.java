@@ -53,13 +53,13 @@ import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.osgi.framework.Constants;
 
+import com.aptana.core.IURIMapper;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
 import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
-import com.aptana.debug.core.internal.DbgSourceURLStreamHandler;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
@@ -74,7 +74,6 @@ import com.aptana.js.debug.core.model.IJSScriptElement;
 import com.aptana.js.debug.core.model.JSDebugModel;
 import com.aptana.js.debug.core.model.provisional.IJSWatchpoint;
 import com.aptana.js.debug.core.model.xhr.IXHRService;
-import com.aptana.webserver.core.IURLMapper;
 
 /**
  * @author Max Stepanov
@@ -84,6 +83,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String UPDATE = "update"; //$NON-NLS-1$
 	private static final String VERSION = "version"; //$NON-NLS-1$
 	private static final String JAVASCRIPT = "javascript"; //$NON-NLS-1$
+	private static final String APP = "app"; //$NON-NLS-1$
 	private static final String JAVASCRIPT_SCHEME = "javascript:"; //$NON-NLS-1$
 	private static final String OPENED = "opened"; //$NON-NLS-1$
 	private static final String HTTP = "http"; //$NON-NLS-1$
@@ -179,7 +179,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private IProcess process;
 	private OutputStream out;
 	private OutputStream err;
-	private IURLMapper urlMapper;
+	private IURIMapper uriMapper;
 	private JSDebugThread[] threads = new JSDebugThread[0];
 	private IFileContentRetriever fileContentRetriever;
 	private XHRService xhrService;
@@ -236,8 +236,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, IProcess process, IURLMapper urlMapper, DebugConnection connection, boolean debugMode) throws CoreException {
-		this(launch, null, process, urlMapper, connection, debugMode);
+	public JSDebugTarget(ILaunch launch, IProcess process, IURIMapper uriMapper, DebugConnection connection, boolean debugMode) throws CoreException {
+		this(launch, null, process, uriMapper, connection, debugMode);
 	}
 
 	/**
@@ -252,13 +252,13 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @param debugMode
 	 * @throws CoreException
 	 */
-	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURLMapper urlMapper, DebugConnection connection, boolean debugMode) throws CoreException {
+	public JSDebugTarget(ILaunch launch, String label, IProcess process, IURIMapper uriMapper, DebugConnection connection, boolean debugMode) throws CoreException {
 		super(null);
 		this.launch = launch;
 		this.label = label;
 		this.process = process;
 		this.connection = connection;
-		this.urlMapper = urlMapper;
+		this.uriMapper = uriMapper;
 
 		try {
 			if (debugMode) {
@@ -1349,7 +1349,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 */
 	private void handleLineBreakpoint(IJSLineBreakpoint breakpoint, String operation) {
 		IMarker marker = breakpoint.getMarker();
-		URL url = null;
+		//URL url = null;
+		URI uri = null;
 		String properties = StringUtil.EMPTY;
 		try {
 			URI fileName = null;
@@ -1363,24 +1364,26 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					fileName = EFSUtils.getFileStore(resource).toURI();
 				}
 			}
-			if (fileName != null && urlMapper != null) {
-				url = urlMapper.resolve(EFS.getStore(fileName));
+			if (fileName != null && uriMapper != null) {
+				uri = uriMapper.resolve(EFS.getStore(fileName));
 			}
-			if (url == null && fileName != null) {
+			if (uri == null && fileName != null) {
 				try {
 					if ("dbgsource".equals(fileName.getScheme())) { //$NON-NLS-1$
-						url = new URL(null, fileName.toString(), DbgSourceURLStreamHandler.getDefault());
+						uri = fileName;
+						//url = new URL(null, fileName.toString(), DbgSourceURLStreamHandler.getDefault());
 					} else {
-						url = fileName.toURL();
+						uri = fileName.toURL().toURI();
 					}
 				} catch (MalformedURLException e) {
+				} catch (URISyntaxException e) {
 				}
 			}
 		} catch (CoreException e) {
 			JSDebugPlugin.log(e);
 		}
 		int lineNumber = marker.getAttribute(IMarker.LINE_NUMBER, -1);
-		if (lineNumber == -1 || url == null) {
+		if (lineNumber == -1 || uri == null) {
 			return;
 		}
 
@@ -1402,7 +1405,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		}
 		try {
 			String[] args = connection.sendCommandAndWait(MessageFormat.format(BREAKPOINT_0_1_2_3,
-					operation, Util.encodeData(url.toString()), Integer.toString(lineNumber), properties));
+					operation, Util.encodeData(uri.toString()), Integer.toString(lineNumber), properties));
 			if (!remove && (args == null || args.length < 2 || !(operation + 'd').equals(args[1]))) {
 				breakpoint.setEnabled(false);
 			}
@@ -1575,11 +1578,16 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (FILE.equals(scheme)) {
 				File osFile = new File(uri.getSchemeSpecificPart());
 				resolved = EFSUtils.getLocalFileStore(osFile).toURI();
-			} else if (HTTP.equals(scheme) && urlMapper != null) {
-				IFileStore fileStore = urlMapper.resolve(uri.toURL());
+			} else if (HTTP.equals(scheme) && uriMapper != null) {
+				IFileStore fileStore = uriMapper.resolve(uri);
 				if (fileStore != null) {
 					resolved = fileStore.toURI();
 				}
+			} else if (APP.equals(scheme) && uriMapper != null) {
+				IFileStore fileStore = uriMapper.resolve(uri);
+				if (fileStore != null) {
+					resolved = fileStore.toURI();
+				}				
 			} else if (JAVASCRIPT.equals(scheme)) {
 				if (mainFile != null) {
 					return mainFile;
@@ -1595,8 +1603,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 					return mainFile;
 				}
 			}
-			JSDebugPlugin.log(e);
-		} catch (MalformedURLException e) {
 			JSDebugPlugin.log(e);
 		}
 		try {
