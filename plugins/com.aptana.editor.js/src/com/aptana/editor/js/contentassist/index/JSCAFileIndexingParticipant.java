@@ -10,6 +10,7 @@ package com.aptana.editor.js.contentassist.index;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -20,18 +21,16 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
-import com.aptana.json.Schema;
 import com.aptana.json.SchemaContext;
-import com.aptana.json.SchemaHandler;
 
 /**
- * @author klindsey
+ * JSCAFileIndexingParticipant
  */
 public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 {
-
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.index.core.IFileStoreIndexingParticipant#index(java.util.Set, com.aptana.index.core.Index,
@@ -82,7 +81,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 			{
 				JSCAReader reader = new JSCAReader();
 				SchemaContext context = new SchemaContext();
-				SchemaHandler handler = new SchemaHandler();
+				JSCAHandler handler = new JSCAHandler();
 
 				context.setHandler(handler);
 
@@ -91,8 +90,16 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				// parse
 				reader.read(isr, context);
-				
-				Schema s = reader.getSchema();
+
+				// process results
+				JSIndexWriter indexer = new JSIndexWriter();
+				TypeElement[] types = handler.getTypes();
+				URI location = file.toURI();
+
+				for (TypeElement type : types)
+				{
+					indexer.writeType(index, type, location);
+				}
 			}
 			catch (Throwable e)
 			{
