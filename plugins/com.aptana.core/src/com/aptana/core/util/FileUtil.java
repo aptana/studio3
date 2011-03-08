@@ -93,7 +93,7 @@ public class FileUtil
 		}
 		return "..." + path.substring(lastSlash); //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Get the extension.
 	 * 
@@ -119,7 +119,7 @@ public class FileUtil
 			return StringUtil.EMPTY;
 		}
 		return fileName.substring(index + 1, fileName.length());
-	}	
+	}
 
 	/**
 	 * Creates a file name with a random integer number inserted between the prefix and suffix
@@ -136,10 +136,31 @@ public class FileUtil
 		{
 			return prefix + (long) (Integer.MAX_VALUE * Math.random());
 		}
-		else
+		return prefix + (long) (Integer.MAX_VALUE * Math.random()) + suffix;
+	}
+
+	/**
+	 * Deletes a file recursively. If it's a directory we delete depth first, then delete the directory. The result is
+	 * true only if the directory and all it's children are deleted.
+	 * 
+	 * @param dir
+	 * @return
+	 */
+	public static boolean deleteRecursively(File dir)
+	{
+		if (dir == null)
 		{
-			return prefix + (long) (Integer.MAX_VALUE * Math.random()) + suffix;
+			return false;
 		}
+		boolean result = true;
+		if (dir.isDirectory())
+		{
+			for (File child : dir.listFiles())
+			{
+				result = result && deleteRecursively(child);
+			}
+		}
+		return result && dir.delete();
 	}
 
 }

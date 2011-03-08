@@ -648,16 +648,8 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 
 		// Override JDT editor font
-		if (!revertToDefaults)
-		{
-			Font fFont = JFaceResources.getFontRegistry().get(IThemeManager.VIEW_FONT_NAME);
-			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
-		}
-		else
-		{
-			Font fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
-			JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
-		}
+		Font fFont = JFaceResources.getFontRegistry().get(JFaceResources.TEXT_FONT);
+		JFaceResources.getFontRegistry().put("org.eclipse.jdt.ui.editors.textfont", fFont.getFontData()); //$NON-NLS-1$
 	}
 
 	private void setGitAndMercurialValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
