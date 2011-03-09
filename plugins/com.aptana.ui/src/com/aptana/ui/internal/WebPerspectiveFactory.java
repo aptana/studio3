@@ -22,7 +22,7 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 	 */
 	public static final int VERSION = 100;
 
-	private static final String PROJECT_EXPLORER_ID = "org.eclipse.ui.navigator.ProjectExplorer"; //$NON-NLS-1$
+	private static final String APP_EXPLORER_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 
 	public void createInitialLayout(IPageLayout layout)
 	{
@@ -31,7 +31,7 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 
 		// Left
 		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, 0.20f, editorArea); //$NON-NLS-1$
-		left.addView(PROJECT_EXPLORER_ID);
+		left.addView(APP_EXPLORER_ID);
 
 		// Bottom right: Console. Had to leave this programmatic to get the Console appear in bottom right
 		IFolderLayout bottomArea = layout.createFolder("terminalArea", IPageLayout.BOTTOM, 0.75f, //$NON-NLS-1$

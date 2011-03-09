@@ -25,7 +25,9 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
  */
 public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 
-	private final IThread thread;
+	private static final String FRAME_0 = "frame[{0,number,integer}]"; //$NON-NLS-1$
+	
+	private final JSDebugThread thread;
 	private int frameId;
 	private final String function;
 	private final URI sourceFile;
@@ -47,7 +49,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 	 * @param pc
 	 * @param scriptTag
 	 */
-	public JSDebugStackFrame(IDebugTarget target, IThread thread, int frameId, String function, URI sourceFile,
+	public JSDebugStackFrame(IDebugTarget target, JSDebugThread thread, int frameId, String function, URI sourceFile,
 			int sourceLine, long pc, int scriptTag) {
 		super(target);
 		this.thread = thread;
@@ -195,7 +197,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 		if (isTopStackFrame()) {
 			thread.stepOver();
 		} else {
-			((JSDebugThread) thread).stepToFrame(this);
+			thread.stepToFrame(this);
 		}
 	}
 
@@ -212,7 +214,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 			IStackFrame[] frames = thread.getStackFrames();
 			for (int i = frames.length - 2; i > 0; --i) {
 				if (frames[i].equals(this)) {
-					((JSDebugThread) thread).stepToFrame(frames[i + 1]);
+					thread.stepToFrame(frames[i + 1]);
 				}
 			}
 		}
@@ -291,7 +293,7 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 				return var;
 			}
 		}
-		return ((JSDebugTarget) getDebugTarget()).findVariable(variableName, this);
+		return getJSDebugTarget().findVariable(variableName, this);
 	}
 
 	/* package */ int getFrameId() {
@@ -312,6 +314,14 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 		this.pc = pc;
 		variables = null;
 	}
+	
+	/* package */ int getThreadId() {
+		return thread.getThreadId();
+	}
+	
+	private JSDebugTarget getJSDebugTarget() {
+		return (JSDebugTarget) getDebugTarget();
+	}
 
 	private boolean isTopStackFrame() {
 		IStackFrame tos = null;
@@ -326,7 +336,9 @@ public class JSDebugStackFrame extends JSDebugElement implements IJSStackFrame {
 		if (variables != null || !isValid()) {
 			return;
 		}
-		variables = ((JSDebugTarget) getDebugTarget()).loadVariables(MessageFormat.format("frame[{0}]", frameId)); //$NON-NLS-1$
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(FRAME_0, frameId);
+		variables = target.loadVariables(thread.getThreadId(), command);
 		for (IVariable var : variables) {
 			((JSDebugVariable) var).flags |= JSDebugVariable.FLAGS_TOPLEVEL;
 		}

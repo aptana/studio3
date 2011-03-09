@@ -21,6 +21,7 @@ import com.aptana.js.debug.core.internal.model.JSDebugElement;
  */
 public class JSDebugValue extends JSDebugElement implements IValue {
 	
+	private final int threadId;
 	private final String qualifier;
 	private final String typeName;
 	private boolean hasVariables;
@@ -36,8 +37,9 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 	 * @param hasVariables
 	 * @param valueString
 	 */
-	public JSDebugValue(IDebugTarget target, String qualifier, String typeName, boolean hasVariables, String valueString) {
+	public JSDebugValue(IDebugTarget target, int threadId, String qualifier, String typeName, boolean hasVariables, String valueString) {
 		super(target);
+		this.threadId = threadId;
 		this.qualifier = qualifier;
 		this.typeName = typeName;
 		this.hasVariables = hasVariables;
@@ -86,9 +88,13 @@ public class JSDebugValue extends JSDebugElement implements IValue {
 		return qualifier;
 	}
 
+	/* package */ int getThreadId() {
+		return threadId;
+	}
+
 	private void getVariables0() throws DebugException {
 		if (variables == null) {
-			variables = ((JSDebugTarget) getDebugTarget()).loadVariables(qualifier);
+			variables = ((JSDebugTarget) getDebugTarget()).loadVariables(threadId, qualifier);
 			hasVariables = variables != null && variables.length > 0;
 		}
 	}
