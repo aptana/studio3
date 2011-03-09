@@ -6,7 +6,7 @@ module Gem
   module MavenUtils
     def maven_name?(name)
       name = name.source if Regexp === name
-      name =~ /^[^:.]{2,}[.:]/
+      name =~ /^[^:.\/!?#%]{2,}[.:][^:.\/!?#%]{2,}/
     end
 
     def maven_source_uri?(source_uri)
@@ -21,6 +21,8 @@ module Gem
       maven_name?(gemname) && maven_source_uri?(source_uri)
     end
   end
+
+  class Maven3NotFound < StandardError; end
 
   class RemoteFetcher
     include MavenUtils
@@ -38,7 +40,13 @@ module Gem
     alias orig_find_matching_with_errors find_matching_with_errors
     def find_matching_with_errors(dependency, all = false, matching_platform = true, prerelease = false)
       if maven_name? dependency.name
-        result = maven_find_matching_with_errors(dependency)
+        begin
+          result = maven_find_matching_with_errors(dependency)
+        rescue Gem::Maven3NotFound => e
+          raise e
+        rescue => e
+          warn "maven find dependency failed for #{dependency}: #{e.to_s}" if Gem::Maven::Gemify.verbose?
+        end
       end
       if result && !result.flatten.empty?
         result
@@ -191,7 +199,7 @@ module Gem
         else
           bin = nil
         end
-        raise "can not find maven3 installation. install ruby-maven with\n\n\tjruby -S gem install ruby-maven --pre\n\n" if bin.nil?
+        raise Gem::Maven3NotFound.new("can not find maven3 installation. install ruby-maven with\n\n\tjruby -S gem install ruby-maven --pre\n\n") if bin.nil?
 
         warn "Using Maven install at #{bin}" if verbose?
 
@@ -269,7 +277,7 @@ module Gem
         result = execute("#{BASE_GOAL}:versions", name, nil)
 
         if result =~ /#{name} \[/
-          result = result.gsub(/\n/, '').sub(/.*\[/, "").sub(/\]/, '').gsub(/ /, '').split(',')
+          result = result.gsub(/\r?\n/, '').sub(/.*\[/, "").sub(/\]/, '').gsub(/ /, '').split(',')
           puts "versions: #{result.inspect}" if verbose?
           result
         else
@@ -279,7 +287,7 @@ module Gem
 
       def generate_spec(gemname, version)
         result = execute("#{BASE_GOAL}:gemify", maven_name(gemname), version, "gemify.onlySpecs" => true)
-        path = result.gsub(/\n/, '')
+        path = result.gsub(/\r?\n/, '')
         if path =~ /gemspec: /
           path = path.sub(/.*gemspec: /, '')
           if path.size > 0
@@ -292,7 +300,7 @@ module Gem
 
       def generate_gem(gemname, version)
         result = execute("#{BASE_GOAL}:gemify", maven_name(gemname), version)
-        path = result.gsub(/\n/, '')
+        path = result.gsub(/\r?\n/, '')
         if path =~ /gem: /
 
           path = path.sub(/.*gem: /, '')

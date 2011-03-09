@@ -32,6 +32,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 
 	private static final String SUSPENDED = "suspended"; //$NON-NLS-1$
 	private static final String SUSPEND = "suspend"; //$NON-NLS-1$
+	private static final String SUSPEND_V2 = "suspend*{0,number,integer}"; //$NON-NLS-1$
 	private static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
 	private static final String KEYWORD = "keyword"; //$NON-NLS-1$
 	private static final String FIRST_LINE = "firstLine"; //$NON-NLS-1$
@@ -39,16 +40,22 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String WATCHPOINT = "watchpoint"; //$NON-NLS-1$
 	private static final String RESUMED = "resumed"; //$NON-NLS-1$
 	private static final String STEP_INTO = "stepInto"; //$NON-NLS-1$
+	private static final String STEP_INTO_V2 = "stepInto*{0,number,integer}"; //$NON-NLS-1$
 	private static final String STEP_OVER = "stepOver"; //$NON-NLS-1$
+	private static final String STEP_OVER_V2 = "stepOver*{0,number,integer}"; //$NON-NLS-1$
 	private static final String RESUME = "resume"; //$NON-NLS-1$
+	private static final String RESUME_V2 = "resume*{0,number,integer}"; //$NON-NLS-1$
 	private static final String ABORT = "abort"; //$NON-NLS-1$
 	private static final String START = "start"; //$NON-NLS-1$
 	private static final String STEP_RETURN = "stepReturn"; //$NON-NLS-1$
+	private static final String STEP_RETURN_V2 = "stepReturn*{0,number,integer}"; //$NON-NLS-1$
 	private static final String STEP_TO_FRAME = "stepToFrame"; //$NON-NLS-1$
 	private static final String STEP = "step"; //$NON-NLS-1$
 	private static final String FRAMES = "frames"; //$NON-NLS-1$
+	private static final String FRAMES_V2 = "frames*{0,number,integer}"; //$NON-NLS-1$
 	private static final String SUBARGS_SPLIT = "\\|"; //$NON-NLS-1$
-	private static final String STEP_TO_FRAME_0 = "stepToFrame*{0}"; //$NON-NLS-1$
+	private static final String STEP_TO_FRAME_0 = "stepToFrame*{1,number,integer}"; //$NON-NLS-1$
+	private static final String STEP_TO_FRAME_0_V2 = "stepToFrame*{0,number,integer}*{1,number,integer}"; //$NON-NLS-1$
 
 	private enum State {
 		STARTING,
@@ -61,6 +68,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final IStackFrame[] emptyStack = new IStackFrame[0];
 	private static final IBreakpoint[] emptyBreakpoints = new IBreakpoint[0];
 	
+	private final int threadId;
+	private final String label;
 	private IStackFrame[] stackFrames = emptyStack;
 	private IBreakpoint[] breakpoints = emptyBreakpoints;
 	private State runningState = State.STARTING;
@@ -71,8 +80,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * 
 	 * @param target
 	 */
-	public JSDebugThread(IDebugTarget target) {
+	public JSDebugThread(IDebugTarget target, int threadId, String label) {
 		super(target);
+		this.threadId = threadId;
+		this.label = label;
 	}
 
 	/*
@@ -119,9 +130,11 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		return MessageFormat.format(Messages.JSDebugThread_ThreadMain_0, (runningState == State.SUSPENDING ? MessageFormat
-				.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
-				: StringUtil.EMPTY));
+		String name = (label != null) ? label : (threadId == 0) ? Messages.JSDebugThread_main_label : Integer.toString(threadId);
+		return MessageFormat.format(Messages.JSDebugThread_Thread_Label, name,
+				(runningState == State.SUSPENDING
+						? MessageFormat.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
+						: StringUtil.EMPTY));
 	}
 
 	/*
@@ -161,7 +174,9 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(RESUME);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? RESUME_V2 : RESUME, threadId);
+		target.getConnection().sendCommand(command);
 	}
 
 	/*
@@ -173,7 +188,9 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 		runningState = State.SUSPENDING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(SUSPEND);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? SUSPEND_V2 : SUSPEND, threadId);
+		target.getConnection().sendCommand(command);
 	}
 
 	/*
@@ -213,7 +230,9 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_INTO);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_INTO_V2 : STEP_INTO, threadId);
+		target.getConnection().sendCommand(command);
 	}
 
 	/*
@@ -225,7 +244,9 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_OVER);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_OVER_V2 : STEP_OVER, threadId);
+		target.getConnection().sendCommand(command);
 	}
 
 	/*
@@ -237,7 +258,9 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(STEP_RETURN);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_RETURN_V2 : STEP_RETURN, threadId);
+		target.getConnection().sendCommand(command);
 	}
 
 	/*
@@ -274,7 +297,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				details = DebugEvent.BREAKPOINT;
 				stackFrames = null;
 				/* find breakpoint(s) */
-				URI sourceFile = ((JSDebugTarget) getDebugTarget()).resolveSourceFile(Util.decodeData(args[2]));
+				URI sourceFile = getJSDebugTarget().resolveSourceFile(Util.decodeData(args[2]));
 				try {
 					if (BREAKPOINT.equals(reason)) {
 						breakpointHit(sourceFile, Integer.parseInt(args[3]));
@@ -336,12 +359,25 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		int targetFrameId = ((JSDebugStackFrame) frame).getFrameId();
 		runningState = State.STEPPPING;
 		fireChangeEvent(DebugEvent.STATE);
-		((JSDebugTarget) getDebugTarget()).getConnection().sendCommand(
-				MessageFormat.format(STEP_TO_FRAME_0, targetFrameId));
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? STEP_TO_FRAME_0_V2 : STEP_TO_FRAME_0, threadId, targetFrameId);
+		target.getConnection().sendCommand(command);
+	}
+	
+	/* package */ boolean isInSuspendState() {
+		return runningState == State.SUSPENDED || runningState == State.SUSPENDING;
+	}
+	
+	/* package */ int getThreadId() {
+		return threadId;
+	}
+	
+	private JSDebugTarget getJSDebugTarget() {
+		return (JSDebugTarget) getDebugTarget();
 	}
 
 	private void breakpointHit(URI filename, int lineNumber) {
-		IBreakpoint breakpoint = ((JSDebugTarget) getDebugTarget()).findBreakpointAt(filename, lineNumber);
+		IBreakpoint breakpoint = getJSDebugTarget().findBreakpointAt(filename, lineNumber);
 		if (breakpoint != null && breakpoint instanceof IJSLineBreakpoint) {
 			try {
 				if (((IJSLineBreakpoint) breakpoint).getHitCount() > 0) {
@@ -364,10 +400,11 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		if (!validateFrames && stackFrames != null) {
 			return;
 		}
-		String[] args = ((JSDebugTarget) getDebugTarget()).getConnection().sendCommandAndWait(FRAMES);
+		JSDebugTarget target = getJSDebugTarget();
+		String command = MessageFormat.format(target.getProtocolVersion() >= 2 ? FRAMES_V2 : FRAMES, threadId);
+		String[] args = target.getConnection().sendCommandAndWait(command);
 		if (args != null) {
 			Vector<IStackFrame> frames = new Vector<IStackFrame>();
-			JSDebugTarget target = (JSDebugTarget) getDebugTarget();
 			int frameIndex = (stackFrames != null) ? stackFrames.length - 1 : -1;
 			for (int i = args.length - 1; i >= 1; --i) {
 				int j = 0;
