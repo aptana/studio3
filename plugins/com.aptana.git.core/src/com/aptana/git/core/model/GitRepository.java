@@ -54,12 +54,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitRef.TYPE;
+import com.aptana.index.core.ReadWriteMonitor;
 
 public class GitRepository
 {
@@ -113,6 +115,11 @@ public class GitRepository
 	static final String HEAD = "HEAD"; //$NON-NLS-1$
 
 	public static final String GIT_DIR = ".git"; //$NON-NLS-1$
+
+	/**
+	 * Monitor to allow simultaneous read processes, but only one "write" process which alters the repo/index.
+	 */
+	private ReadWriteMonitor monitor = new ReadWriteMonitor();
 
 	private List<GitRevSpecifier> branches;
 	Map<String, List<GitRef>> refs;
@@ -456,10 +463,14 @@ public class GitRepository
 	public IPath workingDirectory()
 	{
 		if (gitDirPath().lastSegment().equals(GIT_DIR))
+		{
 			return gitDirPath().removeLastSegments(1);
-		else if (GitExecutable.instance().outputForCommand(gitDirPath(), "rev-parse", "--is-inside-work-tree") //$NON-NLS-1$ //$NON-NLS-2$
-				.equals("true")) //$NON-NLS-1$
+		}
+		IStatus result = execute(ReadWrite.READ, "rev-parse", "--is-inside-work-tree"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result != null && result.isOK() && result.getMessage().trim().equals("true")) //$NON-NLS-1$
+		{
 			return GitExecutable.instance().path(); // FIXME This doesn't seem right....
+		}
 
 		return null;
 	}
@@ -491,7 +502,7 @@ public class GitRepository
 	 */
 	public Set<String> remotes()
 	{
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "remote"); //$NON-NLS-1$
+		IStatus result = execute(GitRepository.ReadWrite.READ, "remote"); //$NON-NLS-1$
 		if (result == null || !result.isOK())
 		{
 			return Collections.emptySet();
@@ -574,8 +585,7 @@ public class GitRepository
 			closeProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
 
 			String oldBranchName = currentBranch.simpleRef().shortName();
-			IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "checkout", //$NON-NLS-1$
-					branchName);
+			IStatus result = execute(GitRepository.ReadWrite.WRITE, "checkout", branchName); //$NON-NLS-1$
 			sub.worked(1);
 			if (result == null || !result.isOK())
 			{
@@ -658,13 +668,11 @@ public class GitRepository
 			if (other != null && other.equals(this))
 			{
 				// Check if the project exists on the other branch!
-				IStatus result = GitExecutable
-						.instance()
-						.runInBackground(
-								workingDirectory(),
-								"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
-								branchName
-										+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
+				IStatus result = execute(
+						GitRepository.ReadWrite.READ,
+						"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
+						branchName
+								+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
 				if (result == null || !result.isOK())
 				{
 					projectsNotExistingOnNewBranch.add(project);
@@ -686,8 +694,10 @@ public class GitRepository
 
 		refs = new HashMap<String, List<GitRef>>();
 
-		String output = GitExecutable.instance().outputForCommand(gitDirPath(), "for-each-ref", //$NON-NLS-1$
+		IStatus result = execute(ReadWrite.READ, "for-each-ref", //$NON-NLS-1$
 				"--format=%(refname) %(objecttype) %(objectname) %(*objectname)", "refs"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		String output = result.getMessage();
 		List<String> lines = StringUtil.tokenize(output, "\n"); //$NON-NLS-1$
 
 		for (String line : lines)
@@ -746,9 +756,16 @@ public class GitRepository
 
 	private String parseSymbolicReference(String reference)
 	{
-		String ref = GitExecutable.instance().outputForCommand(workingDirectory(), "symbolic-ref", "-q", reference); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = execute(ReadWrite.READ, "symbolic-ref", "-q", reference); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null || !result.isOK())
+		{
+			return null;
+		}
+		String ref = result.getMessage();
 		if (ref != null && ref.startsWith(GitRef.REFS))
+		{
 			return ref;
+		}
 
 		return null;
 	}
@@ -1027,12 +1044,13 @@ public class GitRepository
 		Set<String> remoteURLs = new HashSet<String>();
 		for (String string : remotes)
 		{
-			String output = GitExecutable.instance().outputForCommand(workingDirectory(), "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
+			IStatus result = execute(ReadWrite.READ, "config", "--get-regexp", //$NON-NLS-1$ //$NON-NLS-2$
 					"^remote\\." + string + "\\.url"); //$NON-NLS-1$ //$NON-NLS-2$
-			if (output == null || output.trim().length() == 0)
+			if (result == null || !result.isOK())
 			{
 				continue;
 			}
+			String output = result.getMessage();
 			remoteURLs.add(output.substring(output.indexOf(".url ") + 5)); //$NON-NLS-1$
 		}
 		return remoteURLs;
@@ -1060,9 +1078,7 @@ public class GitRepository
 		{
 			args.add(startPoint);
 		}
-
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
-				args.toArray(new String[args.size()]));
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, args.toArray(new String[args.size()]));
 		if (result == null || !result.isOK())
 		{
 			return false;
@@ -1092,8 +1108,7 @@ public class GitRepository
 		}
 		args.add(branchName);
 
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
-				args.toArray(new String[args.size()]));
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, args.toArray(new String[args.size()]));
 		if (!result.isOK())
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), result.getCode(), result.getMessage(), null);
@@ -1106,14 +1121,13 @@ public class GitRepository
 
 	public boolean validBranchName(String branchName)
 	{
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "check-ref-format", //$NON-NLS-1$
-				GitRef.REFS_HEADS + branchName);
+		IStatus result = execute(GitRepository.ReadWrite.READ, "check-ref-format", GitRef.REFS_HEADS + branchName); //$NON-NLS-1$
 		return result != null && result.isOK();
 	}
 
 	public IStatus deleteFile(String filePath)
 	{
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, "rm", "-f", filePath); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -f"); //$NON-NLS-1$
@@ -1126,10 +1140,84 @@ public class GitRepository
 		return Status.OK_STATUS;
 	}
 
+	/**
+	 * Enum used to denote if a git process reads or writes(modifies) the git index/repo.
+	 * 
+	 * @author cwilliams
+	 */
+	public enum ReadWrite
+	{
+		READ, WRITE
+	}
+
+	public IStatus execute(ReadWrite readOrWrite, String... args)
+	{
+		return execute(readOrWrite, null, args);
+	}
+
+	/**
+	 * Sets up the ENV so we can properly hit remotes over SSH.
+	 * 
+	 * @param readOrWrite
+	 * @param args
+	 * @return
+	 */
+	public IStatus executeWithGitSSH(ReadWrite readOrWrite, String... args)
+	{
+		return execute(readOrWrite, gitSSHEnv(), args);
+	}
+
+	private Map<String, String> gitSSHEnv()
+	{
+		// Set up GIT_SSH!
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null)
+		{
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		return env;
+	}
+
+	public IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
+	{
+		switch (readOrWrite)
+		{
+			case READ:
+				monitor.enterRead();
+				break;
+
+			case WRITE:
+				monitor.enterWrite();
+				break;
+		}
+		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), env, args);
+		switch (readOrWrite)
+		{
+			case READ:
+				monitor.exitRead();
+				break;
+
+			case WRITE:
+				monitor.exitWrite();
+				break;
+		}
+		return result;
+	}
+
+	IStatus executeWithInput(String input, String... args)
+	{
+		// All of these processes appear to be write, so just hard-code that
+		monitor.enterWrite();
+		IStatus result = GitExecutable.instance().runInBackground(input, workingDirectory(), args);
+		monitor.exitWrite();
+		return result;
+	}
+
 	public IStatus deleteFolder(IPath folderPath)
 	{
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "rm", "-rf", //$NON-NLS-1$ //$NON-NLS-2$
-				folderPath.toOSString());
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, "rm", "-rf", folderPath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null)
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), "Failed to execute git rm -rf"); //$NON-NLS-1$
@@ -1144,8 +1232,7 @@ public class GitRepository
 
 	public IStatus moveFile(IPath source, IPath dest)
 	{
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory(),
-				"mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
+		IStatus result = execute(GitRepository.ReadWrite.WRITE, "mv", source.toOSString(), dest.toOSString()); //$NON-NLS-1$
 		if (result == null || !result.isOK())
 		{
 			return new Status(IStatus.ERROR, GitPlugin.getPluginId(), (result == null) ? 0 : result.getCode(),
@@ -1532,8 +1619,8 @@ public class GitRepository
 				// Only do ls-remote once per remote
 				continue;
 			}
-			IStatus result = GitExecutable.instance().runInBackground(workingDirectory(), "ls-remote", "--heads", //$NON-NLS-1$ //$NON-NLS-2$
-					remote);
+
+			IStatus result = executeWithGitSSH(GitRepository.ReadWrite.READ, "ls-remote", "--heads", remote); //$NON-NLS-1$ //$NON-NLS-2$
 			if (result == null || !result.isOK())
 			{
 				// Failed to execute properly
@@ -1599,5 +1686,21 @@ public class GitRepository
 		}
 
 		return toPull;
+	}
+
+	/**
+	 * Not to be used by callers! This is for exiting write lock when we run git commands like push/pull in console!
+	 */
+	public void exitWriteProcess()
+	{
+		monitor.exitWrite();
+	}
+
+	/**
+	 * Not to be used by callers! This is for entering write lock when we run git commands like push/pull in console!
+	 */
+	public void enterWriteProcess()
+	{
+		monitor.enterWrite();
 	}
 }
