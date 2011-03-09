@@ -18,7 +18,6 @@ public class SchemaTypeGroup implements IState
 	 */
 	public void enter()
 	{
-		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -27,7 +26,6 @@ public class SchemaTypeGroup implements IState
 	 */
 	public void exit()
 	{
-		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -37,7 +35,6 @@ public class SchemaTypeGroup implements IState
 	 */
 	public void transition(ISchemaContext context, SchemaEventType event, Object value)
 	{
-		// TODO Auto-generated method stub
 	}
 
 	/*
@@ -46,7 +43,6 @@ public class SchemaTypeGroup implements IState
 	 */
 	public boolean isValidTransition(SchemaEventType event, Object value)
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

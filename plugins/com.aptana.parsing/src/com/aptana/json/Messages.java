@@ -28,14 +28,6 @@ public class Messages extends NLS
 	public static String SchemaArray_Cannot_Start_Started_Array_Element;
 	public static String SchemaArray_Unsupported_Event;
 	public static String SchemaContext_Popped_Empty_Stack;
-	public static String SchemaHandler_0;
-	public static String SchemaHandler_1;
-	public static String SchemaHandler_2;
-	public static String SchemaHandler_3;
-	public static String SchemaHandler_4;
-	public static String SchemaHandler_5;
-	public static String SchemaHandler_8;
-	public static String SchemaHandler_9;
 	public static String SchemaObject_Cannot_End_Unstarted_Object;
 	public static String SchemaObject_Cannot_End_Unstarted_Object_Entry;
 	public static String SchemaObject_Cannot_Start_Started_Object;

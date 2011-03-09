@@ -35,7 +35,7 @@ public class SchemaHandler implements IContextHandler
 	@SuppressWarnings("unchecked")
 	public void addElement(String elementTypeName, IState elementType)
 	{
-		System.out.println(Messages.SchemaHandler_0 + elementTypeName + Messages.SchemaHandler_1);
+		System.out.println("add element of type '" + elementTypeName + "' to list"); //$NON-NLS-1$ //$NON-NLS-1$
 
 		Object item = this._stack.pop();
 		Object list = this._stack.peek();
@@ -46,7 +46,7 @@ public class SchemaHandler implements IContextHandler
 		}
 		else
 		{
-			System.out.println(Messages.SchemaHandler_2 + item + Messages.SchemaHandler_3 + list);
+			System.out.println("Could not add " + item + " to non-list " + list); //$NON-NLS-1$ //$NON-NLS-1$
 		}
 	}
 
@@ -56,7 +56,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createType(String typeName, IState type, Object value)
 	{
-		System.out.println(Messages.SchemaHandler_4 + typeName + Messages.SchemaHandler_5 + value);
+		System.out.println("create type '" + typeName + "': " + value); //$NON-NLS-1$ //$NON-NLS-1$
 
 		Object instance = null;
 
@@ -93,7 +93,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
-		System.out.println(Messages.SchemaHandler_8 + propertyName + Messages.SchemaHandler_9 + propertyTypeName);
+		System.out.println("set property '" + propertyName + "' : " + propertyTypeName); //$NON-NLS-1$ //$NON-NLS-1$
 
 		if (this._stack.isEmpty() == false)
 		{

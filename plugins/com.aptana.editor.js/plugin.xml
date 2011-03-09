@@ -37,7 +37,7 @@
             base-type="com.aptana.contenttype.json"
             file-extensions="jsca"
             id="com.aptana.contenttype.jsca"
-            name="JSCA Source"
+            name="%jsca.content-type.name"
             priority="normal">
       </content-type>
    </extension>

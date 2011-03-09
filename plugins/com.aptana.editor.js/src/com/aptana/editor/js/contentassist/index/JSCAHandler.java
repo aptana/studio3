@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
 import com.aptana.editor.js.contentassist.model.EventPropertyElement;
@@ -799,8 +800,8 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				System.out.println(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
-				// warn
+				JSPlugin.logError(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName, null);
+				break;
 		}
 	}
 }
