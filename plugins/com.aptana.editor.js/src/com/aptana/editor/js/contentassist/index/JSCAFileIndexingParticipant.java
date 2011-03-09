@@ -21,7 +21,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.js.JSPlugin;
+import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.json.SchemaContext;
@@ -91,6 +94,16 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// parse
 				reader.read(isr, context);
 
+				// create new Window type for this file
+				JSIndexReader jsir = new JSIndexReader();
+				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
+
+				if (window == null)
+				{
+					window = new TypeElement();
+					window.setName(JSTypeConstants.WINDOW_TYPE);
+				}
+
 				// process results
 				JSIndexWriter indexer = new JSIndexWriter();
 				TypeElement[] types = handler.getTypes();
@@ -99,7 +112,29 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				for (TypeElement type : types)
 				{
 					indexer.writeType(index, type, location);
+
+					String typeName = type.getName();
+
+					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false) //$NON-NLS-1$
+					{
+						PropertyElement property = window.getProperty(typeName);
+
+						if (property == null)
+						{
+							property = new PropertyElement();
+
+							property.setName(typeName);
+							property.addType(typeName);
+
+							JSTypeUtil.addAllUserAgents(property);
+
+							window.addProperty(property);
+						}
+					}
 				}
+
+				// write global type info
+				indexer.writeType(index, window, location);
 			}
 			catch (Throwable e)
 			{
