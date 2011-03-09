@@ -231,6 +231,7 @@ public class ThemeManager implements IThemeManager
 		}
 
 		// Force font
+		// FIXME We need to run this in the UI thread(?)
 		final String[] fontIds = new String[] { IThemeManager.VIEW_FONT_NAME, JFaceResources.TEXT_FONT,
 				"org.eclipse.ui.workbench.texteditor.blockSelectionModeFont" }; //$NON-NLS-1$
 		for (String fontId : fontIds)
