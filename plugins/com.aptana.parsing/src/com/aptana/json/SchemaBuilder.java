@@ -15,7 +15,7 @@ public class SchemaBuilder extends SchemaReader
 {
 	private static final String SCHEMA_NAME = "Schema Schema";
 	private static final String SCHEMA_VERSION = "http://www.appcelerator.com/studio/content-assist/schema/1.0";
-	
+
 	/**
 	 * SchemaBuilder
 	 */
@@ -38,7 +38,7 @@ public class SchemaBuilder extends SchemaReader
 		result.setVersion(SCHEMA_VERSION);
 		result.setDescription("A JSON schema that describes the structure of a JSON schema");
 		result.setResult("Schema");
-		
+
 		// create Schema
 		SchemaObject schema = (SchemaObject) result.addType("Schema");
 		schema.addProperty("name", "String");
@@ -46,13 +46,13 @@ public class SchemaBuilder extends SchemaReader
 		schema.addProperty("description", "String");
 		schema.addProperty("result", "String");
 		schema.addProperty("types", "Array<Type>");
-		
+
 		// create Type
 		SchemaObject type = (SchemaObject) result.addType("Type");
 		type.addProperty("name", "String");
 		type.addProperty("description", "String");
 		type.addProperty("properties", "Array<Property>");
-		
+
 		// create Property
 		SchemaObject property = (SchemaObject) result.addType("Property");
 		property.addProperty("name", "String");
@@ -60,7 +60,7 @@ public class SchemaBuilder extends SchemaReader
 		property.addProperty("description", "String");
 		property.addProperty("example", "String");
 		property.addProperty("optional", "Boolean");
-		
+
 		return result;
 	}
 }

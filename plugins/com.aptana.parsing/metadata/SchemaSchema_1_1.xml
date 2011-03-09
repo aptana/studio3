@@ -8,14 +8,14 @@
 		responsibility of the developer who makes changes to the
 		programmatic schema to update this schema to reflect those changes
 	-->
-	
+
 	<sets>
 		<element-set id="use-element-set">
 			<element name="use-element-set" onEnter="startUseElementSetElement">
 				<attribute name="name"/>
 			</element>
 		</element-set>
-		
+
 		<element-set id="element-or-use-set">
 			<element name="element" onEnter="startElementElement" onExit="exitElementElement">
 				<attribute name="name" />
@@ -30,7 +30,7 @@
 			<use-element-set name="#use-element-set" />
 		</element-set>
 	</sets>
-	
+
 	<element name="schema">
 		<element name="sets">
 			<element name="element-set" onEnter="startElementSetElement" onExit="exitElementSetElement">

@@ -43,7 +43,7 @@ public abstract class SchemaPrimitive implements IState
 	 * @return
 	 */
 	public abstract String getTypeName();
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IState#isValidTransition(com.aptana.json.EventType, java.lang.Object)
@@ -78,7 +78,7 @@ public abstract class SchemaPrimitive implements IState
 
 		// TODO: verify popped type matches this type
 		context.popType();
-		
+
 		// push type's value onto stack
 		context.createType(this.getTypeName(), this, value);
 	}

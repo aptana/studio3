@@ -14,9 +14,9 @@
                     "description": "The name of the schema"
                 },
                 {
-                	"name": "version",
-                	"type": "String",
-                	"description": "The version number of the schema format as a URI"
+                    "name": "version",
+                    "type": "String",
+                    "description": "The version number of the schema format as a URI"
                 },
                 {
                     "name": "description",

@@ -71,7 +71,7 @@ public class EventPropertyElement extends BaseElement
 
 		out.add(TYPE_PROPERTY, this.getType());
 	}
-	
+
 	/**
 	 * toSource
 	 * 

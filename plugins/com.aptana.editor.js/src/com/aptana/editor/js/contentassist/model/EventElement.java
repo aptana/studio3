@@ -68,7 +68,8 @@ public class EventElement extends BaseElement
 
 		if (object.containsKey(PROPERTIES_PROPERTY))
 		{
-			List<EventPropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY), EventPropertyElement.class);
+			List<EventPropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY),
+					EventPropertyElement.class);
 
 			for (EventPropertyElement property : properties)
 			{
@@ -119,7 +120,7 @@ public class EventElement extends BaseElement
 		out.add(OWNING_TYPE_PROPERTY, this.getOwningType());
 		out.add(PROPERTIES_PROPERTY, this.getProperties());
 	}
-	
+
 	/**
 	 * toSource
 	 * 
@@ -143,17 +144,17 @@ public class EventElement extends BaseElement
 	{
 		printer.printIndent();
 		printer.print("event "); //$NON-NLS-1$
-		
+
 		printer.print(this.getName());
 		printer.println(" {"); //$NON-NLS-1$
 		printer.increaseIndent();
-		
+
 		for (EventPropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
 			printer.println(";"); //$NON-NLS-1$
 		}
-		
+
 		printer.decreaseIndent();
 		printer.printWithIndent("}"); //$NON-NLS-1$
 	}

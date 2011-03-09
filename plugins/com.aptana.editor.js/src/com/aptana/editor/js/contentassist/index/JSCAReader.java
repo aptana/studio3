@@ -63,7 +63,7 @@ public class JSCAReader extends SchemaReader
 		type.addProperty("functions", "Array<Function>");
 		type.addProperty("events", "Array<Event>");
 		type.addProperty("remarks", "Array<String>");
-		
+
 		// NOTE: These are not currently valid, but are being used here so we can find errors in the api.jsca file
 		type.addProperty("examples", "Array<Example>");
 		type.addProperty("userAgents", "Array<UserAgent>");
