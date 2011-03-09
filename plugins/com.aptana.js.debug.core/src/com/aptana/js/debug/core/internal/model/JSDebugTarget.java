@@ -134,6 +134,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String SRC = "src"; //$NON-NLS-1$
 	private static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
 	private static final String SCRIPTS = "scripts"; //$NON-NLS-1$
+	private static final String THREADS = "threads"; //$NON-NLS-1$
 	private static final String CLIENT = "client"; //$NON-NLS-1$
 	private static final String XHR = "xhr"; //$NON-NLS-1$
 	private static final String LOG = "log"; //$NON-NLS-1$
@@ -591,6 +592,35 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 
 		}
 	}
+	
+	/**
+	 * handleThreads
+	 * @param args
+	 */
+	private void handleThreads(String[] args) {
+		String action = args[1];
+		int threadId = -1;
+		try {
+			threadId = Integer.parseInt(args[2]);
+		} catch (NumberFormatException e) {
+		}
+
+		if (CREATED.equals(action)) {
+			if (threadId >= 0 && !threads.containsKey(threadId)) {
+				String label = args[3];
+				JSDebugThread thread = new JSDebugThread(this, threadId, label.length() > 0 ? label : null);
+				threads.put(0, thread);
+				thread.fireCreationEvent();
+				fireChangeEvent(DebugEvent.CONTENT);
+			}
+		} else if (DESTROYED.equals(action)) {
+			JSDebugThread thread = threads.get(threadId);
+			if (thread != null) {
+				thread.fireTerminateEvent();
+				fireChangeEvent(DebugEvent.CONTENT);				
+			}
+		}
+	}
 
 	/**
 	 * @see org.eclipse.debug.core.model.IDebugElement#getLaunch()
@@ -953,7 +983,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			fireCreationEvent();
 
 			if (protocolVersion < 2) {
-				JSDebugThread thread = new JSDebugThread(this, 0);
+				JSDebugThread thread = new JSDebugThread(this, 0, null);
 				threads.put(0, thread);
 				thread.fireCreationEvent();
 				fireChangeEvent(DebugEvent.CONTENT);
@@ -1733,6 +1763,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				return;
 			} else if (SCRIPTS.equals(action)) {
 				handleScripts(args);
+				return;
+			} else if (THREADS.equals(action)) {
+				handleThreads(args);
 				return;
 			} else if (BREAKPOINT.equals(action)) {
 				action = args[j++];

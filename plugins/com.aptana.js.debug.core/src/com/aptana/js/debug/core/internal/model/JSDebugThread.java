@@ -68,7 +68,8 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final IStackFrame[] emptyStack = new IStackFrame[0];
 	private static final IBreakpoint[] emptyBreakpoints = new IBreakpoint[0];
 	
-	private int threadId;
+	private final int threadId;
+	private final String label;
 	private IStackFrame[] stackFrames = emptyStack;
 	private IBreakpoint[] breakpoints = emptyBreakpoints;
 	private State runningState = State.STARTING;
@@ -79,9 +80,10 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * 
 	 * @param target
 	 */
-	public JSDebugThread(IDebugTarget target, int threadId) {
+	public JSDebugThread(IDebugTarget target, int threadId, String label) {
 		super(target);
 		this.threadId = threadId;
+		this.label = label;
 	}
 
 	/*
@@ -128,7 +130,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		String name = (threadId == 0) ? Messages.JSDebugThread_main_label : Integer.toString(threadId);
+		String name = (label != null) ? label : (threadId == 0) ? Messages.JSDebugThread_main_label : Integer.toString(threadId);
 		return MessageFormat.format(Messages.JSDebugThread_Thread_Label, name,
 				(runningState == State.SUSPENDING
 						? MessageFormat.format(" ({0})", Messages.JSDebugThread_Suspending) //$NON-NLS-1$
