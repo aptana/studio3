@@ -1150,6 +1150,15 @@ public class GitRepository
 		READ, WRITE
 	}
 
+	/**
+	 * Execute a git process, specifying the arguments and whether we should lock for read or write.
+	 * 
+	 * @param readOrWrite
+	 *            if the process modifies the index or repo, it should be marked WRITE (only one at a time, no READS
+	 *            concurrently either), otherwise use READ (which we can have multiple in parallel)
+	 * @param args
+	 * @return
+	 */
 	public IStatus execute(ReadWrite readOrWrite, String... args)
 	{
 		return execute(readOrWrite, null, args);
@@ -1159,10 +1168,12 @@ public class GitRepository
 	 * Sets up the ENV so we can properly hit remotes over SSH.
 	 * 
 	 * @param readOrWrite
+	 *            if the process modifies the index or repo, it should be marked WRITE (only one at a time, no READS
+	 *            concurrently either), otherwise use READ (which we can have multiple in parallel)
 	 * @param args
 	 * @return
 	 */
-	public IStatus executeWithGitSSH(ReadWrite readOrWrite, String... args)
+	IStatus executeWithGitSSH(ReadWrite readOrWrite, String... args)
 	{
 		return execute(readOrWrite, gitSSHEnv(), args);
 	}
@@ -1180,7 +1191,7 @@ public class GitRepository
 		return env;
 	}
 
-	public IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
+	private IStatus execute(ReadWrite readOrWrite, Map<String, String> env, String... args)
 	{
 		switch (readOrWrite)
 		{
