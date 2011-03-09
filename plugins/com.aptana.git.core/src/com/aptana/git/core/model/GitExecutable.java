@@ -280,9 +280,8 @@ public class GitExecutable
 	 * @throws IOException
 	 * @throws CoreException
 	 */
-	public Process run(IPath directory, String... arguments) throws IOException, CoreException
+	Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
-		// FIXME Remove!
 		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
 	}
 }

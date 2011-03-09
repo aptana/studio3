@@ -1703,4 +1703,20 @@ public class GitRepository
 	{
 		monitor.enterWrite();
 	}
+
+	/**
+	 * Not to be used by callers! This is for entering read lock when we run git commands outside this class!
+	 */
+	void enterRead()
+	{
+		monitor.enterRead();
+	}
+
+	/**
+	 * Not to be used by callers! This is for exiting read lock when we run git commands outside this class!
+	 */
+	void exitRead()
+	{
+		monitor.exitRead();
+	}
 }
