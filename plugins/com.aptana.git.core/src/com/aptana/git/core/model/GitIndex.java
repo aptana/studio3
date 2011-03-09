@@ -82,7 +82,7 @@ public class GitIndex
 	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come
 	 * rapid-fire.
 	 */
-	public void refreshAsync()
+	public synchronized void refreshAsync()
 	{
 		if (indexRefreshJob == null)
 		{
@@ -128,7 +128,9 @@ public class GitIndex
 	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
+		}
 		this.notify = notify;
 		refreshStatus = 0;
 
@@ -150,6 +152,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				// index vs working tree (HEAD?)
 				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
 						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (result != null && result.isOK())
@@ -165,6 +168,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				// index vs filesystem
 				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (result != null && result.isOK())
 				{
@@ -179,6 +183,7 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				// HEAD vs filesystem
 				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 						"-z", GitRepository.HEAD); //$NON-NLS-1$
 				if (result != null && result.isOK())
@@ -190,7 +195,9 @@ public class GitIndex
 		});
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
+		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
 		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
