@@ -8,10 +8,12 @@
 package com.aptana.editor.js.contentassist.index;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
@@ -157,8 +159,10 @@ public class JSCAHandler implements IContextHandler
 	}
 
 	private static final Map<String, String> TYPE_MAP;
+	private static final Pattern TYPE_DELIMITER = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
+	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 
-	private List<TypeElement> _types;
+	private Map<String, TypeElement> _typesByName;
 	private List<AliasElement> _aliases;
 
 	private AliasElement _currentAlias;
@@ -198,7 +202,7 @@ public class JSCAHandler implements IContextHandler
 	 */
 	public JSCAHandler()
 	{
-		this._types = new ArrayList<TypeElement>();
+		this._typesByName = new HashMap<String, TypeElement>();
 		this._aliases = new ArrayList<AliasElement>();
 	}
 
@@ -218,7 +222,8 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			case TYPE:
-				this._types.add(this._currentType);
+				// NOTE: Setting name on type already puts it into the typesByName hash, so we don't have
+				// to do anything here
 				this._currentType = null;
 				break;
 
@@ -425,23 +430,56 @@ public class JSCAHandler implements IContextHandler
 	}
 
 	/**
-	 * getMappedType
+	 * getMappedTypes
 	 * 
-	 * @param type
+	 * @param typeSpec
 	 * @return
 	 */
-	protected String getMappedType(String type)
+	protected List<String> getMappedTypes(String typeSpec)
 	{
-		String result = type;
+		List<String> result = new ArrayList<String>();
 
-		// map types
-		if (TYPE_MAP.containsKey(type))
+		if (typeSpec != null && typeSpec.length() > 0)
 		{
-			result = TYPE_MAP.get(this._currentString);
+			String[] types = TYPE_DELIMITER.split(typeSpec);
+
+			for (String type : types)
+			{
+				// map types
+				if (TYPE_MAP.containsKey(type))
+				{
+					result.add(TYPE_MAP.get(this._currentString));
+				}
+				else
+				{
+					result.add(type);
+
+					// TODO: Collect unmatched types in a set, remove built-ins, remove types in jsca file.
+					// Possibly warn on remaining types as possibly missing types
+				}
+			}
 		}
-		else
+
+		return result;
+	}
+
+	/**
+	 * getType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	private TypeElement getType(String typeName)
+	{
+		TypeElement result = this._typesByName.get(typeName);
+
+		if (result == null)
 		{
-			System.out.println(type);
+			result = new TypeElement();
+
+			result.setName(typeName);
+
+			// NOTE: type will be added in addElement
 		}
 
 		return result;
@@ -454,7 +492,9 @@ public class JSCAHandler implements IContextHandler
 	 */
 	public TypeElement[] getTypes()
 	{
-		return this._types.toArray(new TypeElement[this._types.size()]);
+		Collection<TypeElement> types = this._typesByName.values();
+
+		return types.toArray(new TypeElement[types.size()]);
 	}
 
 	/*
@@ -512,7 +552,46 @@ public class JSCAHandler implements IContextHandler
 				}
 				else if (this._currentType != null)
 				{
+
 					this._currentType.setName(this._currentString);
+					this._typesByName.put(this._currentString, this._currentType);
+
+					String[] parts = DOT_PATTERN.split(this._currentString);
+
+					if (parts.length > 1)
+					{
+						String accumulatedName = parts[0];
+						TypeElement type = this.getType(accumulatedName);
+
+						for (int i = 1; i < parts.length; i++)
+						{
+							// grab name part
+							String pName = parts[i];
+
+							// update accumulated type name
+							accumulatedName += "." + pName;
+
+							// try to grab the property off of the current type
+							PropertyElement property = type.getProperty(pName);
+
+							// create property, if we didn't have one
+							if (property == null)
+							{
+								property = new PropertyElement();
+
+								property.setName(pName);
+								property.setIsClassProperty(true);
+								property.addType(accumulatedName);
+
+								type.addProperty(property);
+							}
+
+							// make sure to save last type we visited
+							this._typesByName.put(type.getName(), type);
+
+							type = this.getType(accumulatedName);
+						}
+					}
 				}
 				this._currentString = null;
 				break;
@@ -562,31 +641,38 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			case TYPE:
-				this._currentString = this.getMappedType(this._currentString);
+				List<String> types = this.getMappedTypes(this._currentString);
 
-				if (this._currentException != null)
+				for (String type : types)
 				{
-					this._currentException.setType(this._currentString);
-				}
-				if (this._currentReturnType != null)
-				{
-					this._currentReturnType.setType(this._currentString);
-				}
-				else if (this._currentEventProperty != null)
-				{
-					this._currentEventProperty.setType(this._currentString);
-				}
-				else if (this._currentParameter != null)
-				{
-					this._currentParameter.addType(this._currentString);
-				}
-				else if (this._currentProperty != null)
-				{
-					this._currentProperty.addType(this._currentString);
-				}
-				else if (this._currentAlias != null)
-				{
-					this._currentAlias.setType(this._currentString);
+					if (this._currentException != null)
+					{
+						// last wins
+						this._currentException.setType(type);
+					}
+					if (this._currentReturnType != null)
+					{
+						// last wins
+						this._currentReturnType.setType(type);
+					}
+					else if (this._currentEventProperty != null)
+					{
+						// last wins, but may want to support multiple types here
+						this._currentEventProperty.setType(type);
+					}
+					else if (this._currentParameter != null)
+					{
+						this._currentParameter.addType(type);
+					}
+					else if (this._currentProperty != null)
+					{
+						this._currentProperty.addType(type);
+					}
+					else if (this._currentAlias != null)
+					{
+						// last wins
+						this._currentAlias.setType(type);
+					}
 				}
 				this._currentString = null;
 				break;
