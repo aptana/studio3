@@ -282,9 +282,9 @@ public class GitUIPlugin extends AbstractUIPlugin
 		getDefault().getLog().log(e.getStatus());
 	}
 
-	private static void logError(Exception e)
+	public static void logError(Exception e)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), "", e)); //$NON-NLS-1$
+		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginId(), e.getLocalizedMessage(), e));
 	}
 
 	public static void logWarning(String msg)
