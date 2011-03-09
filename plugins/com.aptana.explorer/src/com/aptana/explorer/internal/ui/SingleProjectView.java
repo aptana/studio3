@@ -65,9 +65,11 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.actions.NewWizardAction;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ImportExportWizard;
+import org.eclipse.ui.internal.navigator.CommonNavigatorActionGroup;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -477,6 +479,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				return sel;
 			}
 		};
+	}
+
+	@Override
+	protected ActionGroup createCommonActionGroup()
+	{
+		return new AppExplorerActionGroup(this, getCommonViewer(), getLinkHelperService());
 	}
 
 	private void fixNavigatorManager()
