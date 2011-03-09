@@ -30,10 +30,10 @@ public class Schema implements IState, IPropertyContainer
 	static
 	{
 		BUILTIN_TYPES = new HashMap<String, IState>();
-		BUILTIN_TYPES.put("Boolean", new SchemaBoolean());
-		BUILTIN_TYPES.put("null", new SchemaNull());
-		BUILTIN_TYPES.put("Number", new SchemaNumber());
-		BUILTIN_TYPES.put("String", new SchemaString());
+		BUILTIN_TYPES.put("Boolean", new SchemaBoolean()); //$NON-NLS-1$
+		BUILTIN_TYPES.put("null", new SchemaNull()); //$NON-NLS-1$
+		BUILTIN_TYPES.put("Number", new SchemaNumber()); //$NON-NLS-1$
+		BUILTIN_TYPES.put("String", new SchemaString()); //$NON-NLS-1$
 	}
 
 	private String _name;
@@ -191,7 +191,7 @@ public class Schema implements IState, IPropertyContainer
 
 		if (result == null)
 		{
-			if (typeName.startsWith("Array<"))
+			if (typeName.startsWith("Array<")) //$NON-NLS-1$
 			{
 				String elementType = typeName.substring(6, typeName.length() - 1);
 
@@ -212,7 +212,7 @@ public class Schema implements IState, IPropertyContainer
 	 */
 	public String getTypeName()
 	{
-		return "Schema";
+		return "Schema"; //$NON-NLS-1$
 	}
 
 	/**
@@ -279,12 +279,12 @@ public class Schema implements IState, IPropertyContainer
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to end an array on a non-array type: " + currentType.getClass().getName());
+				throw new IllegalArgumentException(Messages.Schema_Expected_End_Of_Array + currentType.getClass().getName());
 			}
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -319,12 +319,12 @@ public class Schema implements IState, IPropertyContainer
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to end an object on a non-object type: " + currentType.getClass().getName());
+				throw new IllegalArgumentException(Messages.Schema_Expected_End_Of_Object + currentType.getClass().getName());
 			}
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -343,7 +343,7 @@ public class Schema implements IState, IPropertyContainer
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -387,12 +387,12 @@ public class Schema implements IState, IPropertyContainer
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to process non-primitive type as a primitive: " + currentType.getClass().getName());
+				throw new IllegalArgumentException(Messages.Schema_Expected_Primitive + currentType.getClass().getName());
 			}
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -427,12 +427,12 @@ public class Schema implements IState, IPropertyContainer
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to start an array on a non-array type: " + currentType.getClass().getName());
+				throw new IllegalArgumentException(Messages.Schema_Expected_Start_Of_Array + currentType.getClass().getName());
 			}
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -467,12 +467,12 @@ public class Schema implements IState, IPropertyContainer
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to start an object on a non-object type: " + currentType.getClass().getName());
+				throw new IllegalArgumentException(Messages.Schema_Expected_Start_Of_Object + currentType.getClass().getName());
 			}
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -498,7 +498,7 @@ public class Schema implements IState, IPropertyContainer
 		}
 		else
 		{
-			throw new IllegalStateException("Unsupported event type: " + event.name());
+			throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 		}
 	}
 
@@ -526,23 +526,23 @@ public class Schema implements IState, IPropertyContainer
 	 */
 	public void setProperty(String propertyName, String propertyTypeName, Object value)
 	{
-		if ("name".equals(propertyName))
+		if ("name".equals(propertyName)) //$NON-NLS-1$
 		{
 			this.setName((String) value);
 		}
-		else if ("version".equals(propertyName))
+		else if ("version".equals(propertyName)) //$NON-NLS-1$
 		{
 			this.setVersion((String) value);
 		}
-		else if ("description".equals(propertyName))
+		else if ("description".equals(propertyName)) //$NON-NLS-1$
 		{
 			this.setDescription((String) value);
 		}
-		else if ("result".equals(propertyName))
+		else if ("result".equals(propertyName)) //$NON-NLS-1$
 		{
 			this.setResult((String) value);
 		}
-		else if ("types".equals(propertyName))
+		else if ("types".equals(propertyName)) //$NON-NLS-1$
 		{
 			@SuppressWarnings("unchecked")
 			List<Object> types = (List<Object>) value;
@@ -552,7 +552,7 @@ public class Schema implements IState, IPropertyContainer
 				if (typeObject instanceof SchemaObject)
 				{
 					SchemaObject object = (SchemaObject) typeObject;
-					SchemaProperty nameProperty = object.getProperty("name");
+					SchemaProperty nameProperty = object.getProperty("name"); //$NON-NLS-1$
 
 					if (nameProperty != null)
 					{
@@ -641,7 +641,7 @@ public class Schema implements IState, IPropertyContainer
 				}
 				else
 				{
-					throw new IllegalStateException("Unsupported event type: " + event.name());
+					throw new IllegalStateException(Messages.Schema_Unsupported_Event + event.name());
 				}
 		}
 	}

@@ -36,36 +36,36 @@ public class JSCAHandler implements IContextHandler
 {
 	private static enum PropertyName
 	{
-		UNDEFINED(""),
-		VERSION("version"),
-		ALIASES("aliases"),
-		TYPES("types"),
-		NAME("name"),
-		DESCRIPTION("description"),
-		TYPE("type"),
-		DEPRECATED("deprecated"),
-		USER_AGENTS("userAgents"),
-		SINCE("since"),
-		INHERITS("inherits"),
-		PROPERTIES("properties"),
-		FUNCTIONS("functions"),
-		EVENTS("events"),
-		REMARKS("remarks"),
-		PLATFORM("platform"),
-		OS("os"),
-		OS_VERSION("osVersion"),
-		IS_INSTANCE_PROPERTY("isInstanceProperty"),
-		IS_CLASS_PROPERTY("isClassProperty"),
-		IS_INTERNAL("isInternal"),
-		EXAMPLES("examples"),
-		PARAMETERS("parameters"),
-		REFERENCES("references"),
-		EXCEPTIONS("exceptions"),
-		RETURN_TYPES("returnTypes"),
-		IS_CONSTRUCTOR("isConstructor"),
-		IS_METHOD("isMethod"),
-		CODE("code"),
-		USAGE("usage");
+		UNDEFINED(""), //$NON-NLS-1$
+		VERSION("version"), //$NON-NLS-1$
+		ALIASES("aliases"), //$NON-NLS-1$
+		TYPES("types"), //$NON-NLS-1$
+		NAME("name"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		TYPE("type"), //$NON-NLS-1$
+		DEPRECATED("deprecated"), //$NON-NLS-1$
+		USER_AGENTS("userAgents"), //$NON-NLS-1$
+		SINCE("since"), //$NON-NLS-1$
+		INHERITS("inherits"), //$NON-NLS-1$
+		PROPERTIES("properties"), //$NON-NLS-1$
+		FUNCTIONS("functions"), //$NON-NLS-1$
+		EVENTS("events"), //$NON-NLS-1$
+		REMARKS("remarks"), //$NON-NLS-1$
+		PLATFORM("platform"), //$NON-NLS-1$
+		OS("os"), //$NON-NLS-1$
+		OS_VERSION("osVersion"), //$NON-NLS-1$
+		IS_INSTANCE_PROPERTY("isInstanceProperty"), //$NON-NLS-1$
+		IS_CLASS_PROPERTY("isClassProperty"), //$NON-NLS-1$
+		IS_INTERNAL("isInternal"), //$NON-NLS-1$
+		EXAMPLES("examples"), //$NON-NLS-1$
+		PARAMETERS("parameters"), //$NON-NLS-1$
+		REFERENCES("references"), //$NON-NLS-1$
+		EXCEPTIONS("exceptions"), //$NON-NLS-1$
+		RETURN_TYPES("returnTypes"), //$NON-NLS-1$
+		IS_CONSTRUCTOR("isConstructor"), //$NON-NLS-1$
+		IS_METHOD("isMethod"), //$NON-NLS-1$
+		CODE("code"), //$NON-NLS-1$
+		USAGE("usage"); //$NON-NLS-1$
 
 		private static Map<String, PropertyName> NAME_MAP;
 		private String _name;
@@ -183,18 +183,18 @@ public class JSCAHandler implements IContextHandler
 	static
 	{
 		TYPE_MAP = new HashMap<String, String>();
-		TYPE_MAP.put("array", "Array");
-		TYPE_MAP.put("bool", "Boolean");
-		TYPE_MAP.put("boolean", "Boolean");
-		TYPE_MAP.put("date", "Date");
-		TYPE_MAP.put("double", "Number");
-		TYPE_MAP.put("float", "Number");
-		TYPE_MAP.put("function", "Function");
-		TYPE_MAP.put("int", "Number");
-		TYPE_MAP.put("long", "Number");
-		TYPE_MAP.put("number", "Number");
-		TYPE_MAP.put("object", "Object");
-		TYPE_MAP.put("string", "String");
+		TYPE_MAP.put("array", "Array"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("bool", "Boolean"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("boolean", "Boolean"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("date", "Date"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("double", "Number"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("float", "Number"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("function", "Function"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("int", "Number"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("long", "Number"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("number", "Number"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("object", "Object"); //$NON-NLS-1$ //$NON-NLS-2$
+		TYPE_MAP.put("string", "String"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	/**
@@ -569,7 +569,7 @@ public class JSCAHandler implements IContextHandler
 							String pName = parts[i];
 
 							// update accumulated type name
-							accumulatedName += "." + pName;
+							accumulatedName += "." + pName; //$NON-NLS-1$
 
 							// try to grab the property off of the current type
 							PropertyElement property = type.getProperty(pName);
@@ -799,7 +799,7 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				System.out.println("unrecognized property: " + propertyName);
+				System.out.println(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
 				// warn
 		}
 	}

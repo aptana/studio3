@@ -31,6 +31,7 @@ public class JSCAReader extends SchemaReader
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("nls")
 	private Schema createSchema()
 	{
 		Schema result = new Schema();

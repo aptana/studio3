@@ -100,7 +100,7 @@ public class SchemaContext implements ISchemaContext
 			}
 			else
 			{
-				throw new IllegalArgumentException("Tried to pop an empty type stack");
+				throw new IllegalArgumentException(Messages.SchemaContext_Popped_Empty_Stack);
 			}
 		}
 	}

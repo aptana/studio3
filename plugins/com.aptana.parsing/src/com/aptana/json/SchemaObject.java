@@ -208,7 +208,7 @@ public class SchemaObject implements IState, IPropertyContainer
 		StringBuilder buffer = new StringBuilder();
 
 		// open
-		buffer.append("{");
+		buffer.append("{"); //$NON-NLS-1$
 
 		// emit properties
 		if (this._properties != null && this._properties.isEmpty() == false)
@@ -217,14 +217,14 @@ public class SchemaObject implements IState, IPropertyContainer
 			{
 				SchemaProperty property = entry.getValue();
 
-				buffer.append("\n\t").append(property);
+				buffer.append("\n\t").append(property); //$NON-NLS-1$
 			}
 
-			buffer.append("\n");
+			buffer.append("\n"); //$NON-NLS-1$
 		}
 
 		// close
-		buffer.append("}");
+		buffer.append("}"); //$NON-NLS-1$
 
 		return buffer.toString();
 	}
@@ -240,7 +240,7 @@ public class SchemaObject implements IState, IPropertyContainer
 			case START_OBJECT:
 				if (this._currentState != ObjectState.READY)
 				{
-					throw new IllegalStateException("Attempted to start and object that has already been started");
+					throw new IllegalStateException(Messages.SchemaObject_Cannot_Start_Started_Object);
 				}
 
 				// update internal state
@@ -250,11 +250,11 @@ public class SchemaObject implements IState, IPropertyContainer
 			case START_OBJECT_ENTRY:
 				if (this._currentState != ObjectState.IN_OBJECT)
 				{
-					throw new IllegalStateException("Attempted to start an object entry in an object that has not been started");
+					throw new IllegalStateException(Messages.SchemaObject_Cannot_Start_Started_Object_Entry);
 				}
 				if (value == null || value.toString().length() == 0)
 				{
-					throw new IllegalStateException("Attempted to start an object entry without providing its name");
+					throw new IllegalStateException(Messages.SchemaObject_Property_Must_Have_Name);
 				}
 
 				String name = value.toString();
@@ -262,7 +262,7 @@ public class SchemaObject implements IState, IPropertyContainer
 
 				if (property == null)
 				{
-					throw new IllegalStateException("Attempted to start an object entry that does not exist in this object: " + name);
+					throw new IllegalStateException(Messages.SchemaObject_Nonexistant_Property + name);
 				}
 
 				// update internal state
@@ -284,7 +284,7 @@ public class SchemaObject implements IState, IPropertyContainer
 			case END_OBJECT:
 				if (this._currentState != ObjectState.IN_OBJECT)
 				{
-					throw new IllegalStateException("Attempted to end an object that has an open object entry");
+					throw new IllegalStateException(Messages.SchemaObject_Cannot_End_Unstarted_Object);
 				}
 
 				// update internal state
@@ -297,7 +297,7 @@ public class SchemaObject implements IState, IPropertyContainer
 			case END_OBJECT_ENTRY:
 				if (this._currentState != ObjectState.IN_PROPERTY)
 				{
-					throw new IllegalStateException("Attempted to end an object entry in an object that has not been started");
+					throw new IllegalStateException(Messages.SchemaObject_Cannot_End_Unstarted_Object_Entry);
 				}
 
 				// fire property set event
@@ -310,7 +310,7 @@ public class SchemaObject implements IState, IPropertyContainer
 				break;
 
 			default:
-				throw new IllegalStateException("Unsupported event type: " + event.name());
+				throw new IllegalStateException(Messages.SchemaObject_Unsupported_Event + event.name());
 		}
 	}
 }

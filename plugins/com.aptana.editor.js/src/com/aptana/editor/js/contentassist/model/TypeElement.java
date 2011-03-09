@@ -440,7 +440,7 @@ public class TypeElement extends BaseElement
 		for (EventElement event : this.getEvents())
 		{
 			event.toSource(printer);
-			printer.println(";");
+			printer.println(";"); //$NON-NLS-1$
 		}
 
 		printer.decreaseIndent().println("}"); //$NON-NLS-1$

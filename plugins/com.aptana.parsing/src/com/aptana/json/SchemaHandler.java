@@ -35,7 +35,7 @@ public class SchemaHandler implements IContextHandler
 	@SuppressWarnings("unchecked")
 	public void addElement(String elementTypeName, IState elementType)
 	{
-		System.out.println("add element of type '" + elementTypeName + "' to list");
+		System.out.println(Messages.SchemaHandler_0 + elementTypeName + Messages.SchemaHandler_1);
 
 		Object item = this._stack.pop();
 		Object list = this._stack.peek();
@@ -46,7 +46,7 @@ public class SchemaHandler implements IContextHandler
 		}
 		else
 		{
-			System.out.println("Could not add " + item + " to non-list " + list);
+			System.out.println(Messages.SchemaHandler_2 + item + Messages.SchemaHandler_3 + list);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createType(String typeName, IState type, Object value)
 	{
-		System.out.println("create type '" + typeName + "': " + value);
+		System.out.println(Messages.SchemaHandler_4 + typeName + Messages.SchemaHandler_5 + value);
 
 		Object instance = null;
 
@@ -64,12 +64,12 @@ public class SchemaHandler implements IContextHandler
 		{
 			instance = value;
 		}
-		else if ("Schema".equals(typeName))
+		else if ("Schema".equals(typeName)) //$NON-NLS-1$
 		{
 			// return the internal schema instance
 			instance = this._schema;
 		}
-		else if (typeName.startsWith("Array<"))
+		else if (typeName.startsWith("Array<")) //$NON-NLS-1$
 		{
 			instance = new ArrayList<Object>();
 		}
@@ -93,7 +93,7 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
-		System.out.println("set property '" + propertyName + "' : " + propertyTypeName);
+		System.out.println(Messages.SchemaHandler_8 + propertyName + Messages.SchemaHandler_9 + propertyTypeName);
 
 		if (this._stack.isEmpty() == false)
 		{

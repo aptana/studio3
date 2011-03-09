@@ -142,7 +142,7 @@ public class EventElement extends BaseElement
 	public void toSource(SourcePrinter printer)
 	{
 		printer.printIndent();
-		printer.print("event ");
+		printer.print("event "); //$NON-NLS-1$
 		
 		printer.print(this.getName());
 		printer.println(" {"); //$NON-NLS-1$
@@ -151,10 +151,10 @@ public class EventElement extends BaseElement
 		for (EventPropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
-			printer.println(";");
+			printer.println(";"); //$NON-NLS-1$
 		}
 		
 		printer.decreaseIndent();
-		printer.printWithIndent("}");
+		printer.printWithIndent("}"); //$NON-NLS-1$
 	}
 }

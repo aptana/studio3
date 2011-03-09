@@ -22,7 +22,7 @@ public class SchemaNumber extends SchemaPrimitive
 	 */
 	public String getTypeName()
 	{
-		return "Number";
+		return "Number"; //$NON-NLS-1$
 	}
 
 	/*

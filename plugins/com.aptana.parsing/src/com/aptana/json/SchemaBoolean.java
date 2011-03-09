@@ -22,7 +22,7 @@ public class SchemaBoolean extends SchemaPrimitive
 	 */
 	public String getTypeName()
 	{
-		return "Boolean";
+		return "Boolean"; //$NON-NLS-1$
 	}
 
 	/*

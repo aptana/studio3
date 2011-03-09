@@ -111,7 +111,7 @@ public class SchemaArray implements IState
 			case START_ARRAY:
 				if (this._currentState != ArrayState.READY)
 				{
-					throw new IllegalStateException("Attempted to start an array that has already been started");
+					throw new IllegalStateException(Messages.SchemaArray_Cannot_Start_Started_Array);
 				}
 
 				// update internal state
@@ -121,7 +121,7 @@ public class SchemaArray implements IState
 			case START_ARRAY_ENTRY:
 				if (this._currentState != ArrayState.IN_ARRAY)
 				{
-					throw new IllegalStateException("Attempted to start an array element in array that has not been started");
+					throw new IllegalStateException(Messages.SchemaArray_Cannot_Start_Started_Array_Element);
 				}
 
 				// update internal state
@@ -138,7 +138,7 @@ public class SchemaArray implements IState
 			case END_ARRAY:
 				if (this._currentState != ArrayState.IN_ARRAY)
 				{
-					throw new IllegalStateException("Attempted to end an array that has not been started");
+					throw new IllegalStateException(Messages.SchemaArray_Cannot_End_Unstarted_Array);
 				}
 
 				// update internal state
@@ -151,7 +151,7 @@ public class SchemaArray implements IState
 			case END_ARRAY_ENTRY:
 				if (this._currentState != ArrayState.IN_ELEMENT)
 				{
-					throw new IllegalStateException("Attempted to end an array element in array that has not started and element");
+					throw new IllegalStateException(Messages.SchemaArray_Cannot_End_Unstarted_Array_Element);
 				}
 
 				// update internal state
@@ -162,7 +162,7 @@ public class SchemaArray implements IState
 				break;
 
 			default:
-				throw new IllegalStateException("Unsupported event type: " + event.name());
+				throw new IllegalStateException(Messages.SchemaArray_Unsupported_Event + event.name());
 		}
 	}
 
@@ -173,6 +173,6 @@ public class SchemaArray implements IState
 	@Override
 	public String toString()
 	{
-		return "Array<" + this._elementTypeName + ">";
+		return "Array<" + this._elementTypeName + ">"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 }

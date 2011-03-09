@@ -140,11 +140,11 @@ public class SchemaProperty
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		buffer.append(this.getTypeName()).append(" ").append(this.getName());
+		buffer.append(this.getTypeName()).append(" ").append(this.getName()); //$NON-NLS-1$
 
 		if (this._value != null)
 		{
-			buffer.append(" := ").append(this._value);
+			buffer.append(" := ").append(this._value); //$NON-NLS-1$
 		}
 
 		return buffer.toString();
