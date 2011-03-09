@@ -25,10 +25,10 @@ import com.aptana.editor.js.JSPlugin;
 public class JSTypeMapper
 {
 	private static JSTypeMapper INSTANCE;
-	private static final String TYPE_MAPS = "typeMaps";
-	private static final String TAG_TYPE_MAP = "typeMap";
-	private static final String ATTR_SRC_TYPE = "sourceType";
-	private static final String ATTR_DST_TYPE = "destinationType";
+	private static final String TYPE_MAPS = "typeMaps"; //$NON-NLS-1$
+	private static final String TAG_TYPE_MAP = "typeMap"; //$NON-NLS-1$
+	private static final String ATTR_SRC_TYPE = "sourceType"; //$NON-NLS-1$
+	private static final String ATTR_DST_TYPE = "destinationType"; //$NON-NLS-1$
 
 	/**
 	 * getInstance

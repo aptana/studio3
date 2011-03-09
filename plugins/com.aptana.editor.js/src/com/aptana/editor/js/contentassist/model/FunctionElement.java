@@ -409,7 +409,7 @@ public class FunctionElement extends PropertyElement
 		printer.print(this.getName());
 
 		// print parameter types
-		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_TYPE_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$
+		printer.print("(").print(StringUtil.join(JSTypeConstants.PARAMETER_DELIMITER, this.getParameterTypes())).print(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// print return types
 		List<String> returnTypes = this.getReturnTypeNames();

@@ -26,6 +26,7 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String JSCAHandler_Unrecognized_Property_Name;
 	public static String JSMetadataReader_Invalid_Exception_Name;
 	public static String JSMetadataReader_Invalid_Parameter_Type;
 	public static String JSMetadataReader_Invalid_Property_Type;
