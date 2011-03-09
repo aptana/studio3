@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.Platform;
+
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.EventElement;
@@ -164,6 +166,8 @@ public class JSCAHandler implements IContextHandler
 	private static final Pattern TYPE_DELIMITER = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
 	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
+	private static final Pattern EVENT_IDENTIFIER_PATTERN = Pattern
+			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?::[$_a-zA-Z][$_a-zA-Z0-9]*)?"); //$NON-NLS-1$
 	private static final Pattern TYPE_PATTERN = Pattern
 			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
@@ -467,7 +471,7 @@ public class JSCAHandler implements IContextHandler
 				}
 				else
 				{
-					JSPlugin.logError("Invalid type name: " + type, null);
+					JSPlugin.logError(Messages.JSCAHandler_Invalid_Type_Name + type, null);
 				}
 			}
 		}
@@ -510,6 +514,26 @@ public class JSCAHandler implements IContextHandler
 	}
 
 	/**
+	 * isValidEventIdentifier
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected boolean isValidEventIdentifier(String name)
+	{
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = EVENT_IDENTIFIER_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
+	}
+
+	/**
 	 * isValidIdentifier
 	 * 
 	 * @param name
@@ -547,6 +571,23 @@ public class JSCAHandler implements IContextHandler
 		}
 
 		return result;
+	}
+
+	/**
+	 * log
+	 * 
+	 * @param message
+	 */
+	protected void log(String message)
+	{
+		if (Platform.inDevelopmentMode())
+		{
+			System.out.println(message);
+		}
+		else
+		{
+			JSPlugin.logError(message, null);
+		}
 	}
 
 	/*
@@ -589,18 +630,18 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid event property name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Event_Property_Name + this._currentString);
 					}
 				}
 				else if (this._currentEvent != null)
 				{
-					if (isValidIdentifier(this._currentString))
+					if (isValidEventIdentifier(this._currentString))
 					{
 						this._currentEvent.setName(this._currentString);
 					}
 					else
 					{
-						JSPlugin.logError("Invalid event name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Event_Name + this._currentString);
 					}
 				}
 				else if (this._currentProperty != null)
@@ -611,7 +652,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid property name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Property_Name + this._currentString);
 					}
 				}
 				else if (this._currentParameter != null)
@@ -622,7 +663,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid parameter name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Parameter_Name + this._currentString);
 					}
 				}
 				else if (this._currentFunction != null)
@@ -633,7 +674,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid function name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Function_Name + this._currentString);
 					}
 				}
 				else if (this._currentAlias != null)
@@ -644,7 +685,7 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid alias: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Alias + this._currentString);
 					}
 				}
 				else if (this._currentType != null)
@@ -655,12 +696,12 @@ public class JSCAHandler implements IContextHandler
 					}
 					else
 					{
-						JSPlugin.logError("Invalid type name: " + this._currentString, null);
+						this.log(Messages.JSCAHandler_Invalid_Type_Name + this._currentString);
 					}
 				}
 				else
 				{
-					JSPlugin.logError("Unable to set a name property", null);
+					this.log(Messages.JSCAHandler_Unable_To_Set_Name_Property);
 				}
 
 				this._currentString = null;
@@ -869,7 +910,7 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				JSPlugin.logError(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName, null);
+				this.log(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
 				break;
 		}
 	}
