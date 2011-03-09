@@ -1,0 +1,417 @@
+body {
+	font-family: Verdana, sans-serif;
+	background-image: url('doc_background.gif');
+	background-repeat: repeat-x;
+	background-color: #FFFFFF;
+	padding-left: 0px;
+	padding-right: 0px;
+	margin: 0px;
+	font-size: 70%;
+}
+
+a {
+	color: #5E83C1;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #5E83C1;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #B7D4F3;
+	text-decoration: underline;
+}
+
+img {
+	border:0px;
+}
+
+h1 {
+	width: 100%;
+	font-weight: bold;
+	font-size: 130%;
+	color: #FFFFFF;
+	background-color: #636D84;
+	padding: 10px;
+	padding-left: 20px;
+	margin-top: 0px;
+}
+
+h1 a { color: #FFFFFF; }
+
+h1 a:visited { color: #FFFFFF; }
+
+pre {
+    font-size: 120%;
+    color: #1C1D1F; 
+    background: #f3f3f3;
+    padding: 1em 2em;
+    border-left: 3px solid #ccc;
+}
+
+.content {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.content h2 {
+	font-weight: bold;
+	font-size: 150%;
+	color: #959DAF;
+	margin-bottom: .5em;
+	padding-top: 6px;
+}
+
+/* content for the examples */
+.content h3 {
+	font-weight: bold;
+	font-size: 120%;
+	color: #555D6F;
+	margin-bottom: .5em;
+	padding-top: 6px;
+}
+
+.content p {
+}
+
+.content dd {
+	padding-bottom: 5px;
+}
+
+.content dt {
+	padding-bottom: 5px;
+}
+
+.content table {
+}
+
+.content th {
+	font-size: 60%;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #959DAF;
+	text-align: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.content td {
+	font-size: 60%;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+/* Lists are top-level lists for each class, i.e. constructors, methods, etc. */
+.list {
+	margin-left: 20px;
+}
+
+.list h3 {
+	font-weight: bold;
+	padding-top: 10px;
+	padding-left: 0px;
+}
+
+.list dd {
+	margin-left: 0px;
+}
+
+.list dt {
+}
+
+.details dt {
+	font-weight: bold;
+	font-size: 1em;
+	color: #000000;
+	padding-top: 12px;
+	padding-left: 0px;
+	padding-bottom:0px;
+	margin-bottom: 0px;
+}
+
+.details dd {
+	margin: 0px;
+}
+
+.details dd p
+{
+	margin:0px;
+	padding:0px;
+	padding-top:3px;
+}
+
+/* from the example documentation */
+.details h3 {
+	font-weight: bold;
+	font-size: 1em;
+	color: #000000;
+	padding-left: 0px;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+	background-image: none;
+}
+
+.parameters dt {
+	font-weight: bold;
+	font-size: 1em;
+	color: #000000;
+	margin-left: 15px;
+}
+
+.padded {
+	margin-top: 3px;
+	margin-bottom: 6px;
+}
+
+.parameter-table {
+	background-color: #F9F9F9;
+}
+
+.parameter-table td:first-child {
+	white-space: nowrap;
+}
+
+.parameters dd {
+	margin-left: 15px;
+	margin-bottom: 10px;
+}
+
+.navigator {
+	padding-top: 10px;
+	font-weight: bold;
+	font-size: 80%;
+	padding-bottom: 10px;
+}
+
+.classDescription {
+	font-size: 1.4em;
+	padding-bottom:10px;
+}
+
+DIV#catlinks {
+	CLEAR: both; BORDER-RIGHT: #bbb 1px solid; PADDING-RIGHT: 0px; BORDER-TOP: #bbb 1px solid; PADDING-LEFT: 0px; FONT-SIZE: 0.9em; BACKGROUND: #eee; PADDING-BOTTOM: 0px; MARGIN: 40px 0px 0px; BORDER-LEFT: #bbb 1px solid; PADDING-TOP: 0px; BORDER-BOTTOM: #bbb 1px solid
+}
+
+DIV#catlinks P {
+	PADDING-RIGHT: 5px; PADDING-LEFT: 5px; PADDING-BOTTOM: 2px; MARGIN: 0px; PADDING-TOP: 0px
+}
+
+.catlink-table {
+	WIDTH: 100%
+}
+
+.catlink-table TD {
+	PADDING-RIGHT: 8px; PADDING-LEFT: 8px; PADDING-BOTTOM: 8px; PADDING-TOP: 8px
+}
+
+.catlink-table TD H4 {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; FONT-WEIGHT: bold; FONT-SIZE: 1em; PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: #bbb 1px solid
+}
+
+.catlink-table UL {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 5px 0px; PADDING-TOP: 0px
+}
+
+.catlink-table LI {
+	MARGIN: 0px 0px 0px 2em; LINE-HEIGHT: 1.45em
+}
+
+#updatedContent {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding:10px;
+	border:1px solid #CCCCCC;
+	background-color:#FFFFE1;
+}
+
+ol { list-style-type: decimal; }
+ol ol { list-style-type: lower-alpha; }
+ol ol ol { list-style-type: lower-roman; }
+ol ol ol ol { list-style-type: decimal; }
+ol ol ol ol ol { list-style-type: lower-alpha; }
+ol ol ol ol ol ol { list-style-type: lower-roman; }
+ul { list-style-type: square; }
+ul ul { list-style-type: disc; }
+ul ul ul { list-style-type: circle; }
+ul ul ul ul { list-style-type: square; }
+ul ul ul ul ul { list-style-type: disc; }
+ul ul ul ul ul ul { list-style-type: circle; }
+
+
+/* COMPATIBILITY TABLES */
+
+tr.compheader {
+}
+
+tr.compheader th {
+	font-weight: normal;
+	font-size: 70%;
+	text-align:center;
+	border-top: 1px solid #CCCCCC;
+	background-color: #EEEEEE;
+	color: #454D5F;
+}
+
+td.header {
+	background-color: #F2F3EF;
+	padding: 0.3em;
+}
+
+td.header h3,td.header h4 {
+	margin-top: 0.5em;
+	text-align: center;
+}
+
+td.declaration {
+	background-color: #F2F3EF;
+	text-align: left;
+	vertical-align: top;
+	padding-right: 10px;
+	padding-left: 5px;
+	color: #666666;
+}
+
+td.declaration a {
+	text-decoration: none;
+}
+
+td.declaration .description {
+	font-size:120%;
+	padding-bottom:5px
+}
+
+div.name {
+	font-weight: bold;
+	margin-bottom: 1em;
+	margin-top: 1em;
+	font-size:140%;
+}
+
+b.warning {
+	display: block;
+	margin: 0.5em 0;
+}
+
+td.comparison {
+	font-family: verdana, sans-serif;
+	font-size: 80%;
+	text-transform: lowercase;
+	text-align: center;
+	height: 3em;
+	border: 1px solid;
+    border-collapse:separate;
+    width:8%;
+}
+
+td.yes {
+	background-color: #00882D;
+	border-color: #00882D; 
+	color: #65dd7a;
+}
+
+td.almost {
+	color: #00882D;
+	border-color: #00882D; 	
+	border-width: 3px;
+}
+
+td.incomplete {
+	color: #00882D;
+	border-color: #00882D;
+}
+
+td.alternative {
+	color: #006699;
+}
+
+td.untestable {
+	color: #006699;
+	border: none;
+}
+
+td.minimal {
+	color: #CB000F;
+	border-color: #CB000F; 	
+}
+
+td.incorrect {
+	color: #CB000F;
+	border-color: #CB000F; 	
+	border-width: 2px;
+}
+
+td.buggy {
+	color: #CB000F;
+	border-color: #CB000F;
+	border-width: 3px;
+}
+
+td.no {
+	background-color: #CB000F;
+	border-color: #CB000F; 	
+	color: #ff8452;
+}
+
+td.crash {
+	background-color: #535353;
+	border-color: #535353; 	
+	font-weight: bold;
+	text-transform: uppercase;
+	color: #ffffff;
+}
+
+.details-method, .details-property {
+	font-size:120%;
+}
+
+.advanced td.declaration {
+	background-image:url(advanced.gif);
+	background-position:top left;
+	background-repeat: repeat-y;
+	padding-left:30px;
+}
+
+.toggle-bar
+{
+	text-align:left;
+	padding:3px 0px;
+}
+
+td.show-details {
+	width:8%;
+	color:#FFFFFF;
+	background-color:#6c97cd;
+	text-align:center;
+	font-size:70%;
+	font-weight:bold	
+}
+
+td.no-details {
+	width:8%;
+	color:#999999;
+	background-color:#F2F3EF;
+	text-align:center;
+	font-size:70%;
+	font-weight:bold	
+}
+
+tr.details-property td, tr.details-method td
+{
+    background-image:url(toggle.gif);
+	background-repeat:repeat-x;
+}
+
+table.parameter-table {
+	background-color: #DDDDDD;
+}
+
+table.parameter-table td {
+	background-color: #F2F3EF;
+	background-image:none;
+}
