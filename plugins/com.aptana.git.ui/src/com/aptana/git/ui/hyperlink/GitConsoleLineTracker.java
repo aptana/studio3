@@ -43,7 +43,7 @@ public class GitConsoleLineTracker implements IConsoleLineTracker
 		}
 		catch (BadLocationException e)
 		{
-			GitUIPlugin.logError(e.getMessage(), e);
+			GitUIPlugin.logError(e);
 		}
 	}
 
