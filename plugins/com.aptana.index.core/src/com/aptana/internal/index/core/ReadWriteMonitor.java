@@ -20,8 +20,9 @@ public class ReadWriteMonitor implements IReadWriteMonitor
 {
 
 	/**
-	 * <0 : writing (cannot go beyond -1, i.e one concurrent writer) =0 : idle >0 : reading (number of concurrent
-	 * readers)
+	 * <0 : writing (cannot go beyond -1, i.e one concurrent writer) 
+	 * =0 : idle 
+	 * >0 : reading (number of concurrent readers)
 	 */
 	private int status = 0;
 
