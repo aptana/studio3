@@ -254,6 +254,7 @@ public class GitExecutable
 
 	IStatus runInBackground(IPath workingDir, Map<String, String> env, String... args)
 	{
+		// FIXME Inline into GitRepository.execute?
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDir, env, args);
 	}
 
@@ -267,7 +268,7 @@ public class GitExecutable
 	 */
 	IStatus runInBackground(String input, IPath workingDirectory, String... args)
 	{
-		// FIXME Inline into GitRepository.executeWithInput
+		// FIXME Inline into GitRepository.executeWithInput?
 		return ProcessUtil.runInBackground(gitPath.toOSString(), workingDirectory, input, null, args);
 	}
 
@@ -282,6 +283,7 @@ public class GitExecutable
 	 */
 	Process run(IPath directory, String... arguments) throws IOException, CoreException
 	{
+		// FIXME Inline into GitRevList.walkRevisionListWithSpecifier
 		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
 	}
 }
