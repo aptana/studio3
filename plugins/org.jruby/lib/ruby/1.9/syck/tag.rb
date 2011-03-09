@@ -1,11 +1,11 @@
 # -*- mode: ruby; ruby-indent-level: 4; tab-width: 4 -*- vim: sw=4 ts=4
-# $Id: tag.rb 22784 2009-03-06 03:56:38Z nobu $
+# $Id$
 #
 # = yaml/tag.rb: methods for associating a taguri to a class.
 #
 # Author:: why the lucky stiff
 #
-module YAML
+module Syck
     # A dictionary of taguris which map to
     # Ruby classes.
     @@tagged_classes = {}
@@ -32,7 +32,7 @@ module YAML
     #
     #  tag:why@ruby-lang.org,2004:notes/personal
     #
-    def YAML.tag_class( tag, cls )
+    def self.tag_class( tag, cls )
         if @@tagged_classes.has_key? tag
             warn "class #{ @@tagged_classes[tag] } held ownership of the #{ tag } tag"
         end
@@ -45,7 +45,7 @@ module YAML
     #
     #  YAML.tagged_classes["tag:yaml.org,2002:int"] => Integer
     #
-    def YAML.tagged_classes
+    def self.tagged_classes
         @@tagged_classes
     end
 end
@@ -56,28 +56,31 @@ class Module
     # Adds a taguri _tag_ to a class, used when dumping or loading the class
     # in YAML.  See YAML::tag_class for detailed information on typing and
     # taguris.
-    def yaml_as( tag, sc = true )
+    def syck_yaml_as( tag, sc = true )
         verbose, $VERBOSE = $VERBOSE, nil
-        class_eval <<-"end;", __FILE__, __LINE__+1
+        class_eval <<-"END", __FILE__, __LINE__+1
             attr_writer :taguri
             def taguri
                 if respond_to? :to_yaml_type
-                    YAML::tagurize( to_yaml_type[1..-1] )
+                    Syck.tagurize( to_yaml_type[1..-1] )
                 else
                     return @taguri if defined?(@taguri) and @taguri
                     tag = #{ tag.dump }
-                    if self.class.yaml_tag_subclasses? and self.class != YAML::tagged_classes[tag]
+                    if self.class.yaml_tag_subclasses? and self.class != Syck.tagged_classes[tag]
                         tag = "\#{ tag }:\#{ self.class.yaml_tag_class_name }"
                     end
                     tag
                 end
             end
             def self.yaml_tag_subclasses?; #{ sc ? 'true' : 'false' }; end
-        end;
-        YAML::tag_class tag, self
+        END
+        Syck.tag_class tag, self
     ensure
         $VERBOSE = verbose
     end
+    remove_method :yaml_as rescue nil
+    alias :yaml_as :syck_yaml_as
+
     # Transforms the subclass name into a name suitable for display
     # in a subclassed tag.
     def yaml_tag_class_name
@@ -88,4 +91,5 @@ class Module
     def yaml_tag_read_class( name )
         name
     end
+    # :startdoc:
 end
