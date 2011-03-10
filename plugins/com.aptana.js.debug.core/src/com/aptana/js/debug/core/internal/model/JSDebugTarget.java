@@ -1867,6 +1867,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 			int threadId = 0;
 			if (protocolVersion >= 2) {
+				if (args.length < 2) {
+					return;
+				}
 				try {
 					threadId = Integer.parseInt(args[1]);
 					args = Util.removeArrayElement(args, 1);
