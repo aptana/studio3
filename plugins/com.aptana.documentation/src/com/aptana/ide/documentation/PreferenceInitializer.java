@@ -1,17 +1,20 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ide.documentation;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
-
-	private static final String DEFAULT_GETTING_STARTED_URL = "http://content.aptana.com/aptana/tutorials/index.php"; //$NON-NLS-1$
-
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		new DefaultScope().getNode(DocumentationPlugin.PLUGIN_ID).put(DocumentationPlugin.GETTING_STARTED_CONTENT_URL, DEFAULT_GETTING_STARTED_URL);
+		// Empty ATM, but will be filled soon
 	}
 
 }

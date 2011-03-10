@@ -1,15 +1,11 @@
 /**
- * Copyright (c) 2005-2006 Aptana, Inc.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html. If redistributing this code,
- * this entire header must remain intact.
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the Eclipse Public License (EPL).
+ * Please see the license-epl.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
  */
 package com.aptana.ide.documentation;
-
-import java.util.Hashtable;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -21,20 +17,17 @@ import org.osgi.framework.BundleContext;
  */
 public class DocumentationPlugin extends AbstractUIPlugin
 {
-
-	private static Hashtable<String, Image> images = new Hashtable<String, Image>();
-
 	/**
 	 * PLUGIN_ID
 	 */
 	public static final String PLUGIN_ID = "com.aptana.ide.documentation"; //$NON-NLS-1$
 
 	public static final String GETTING_STARTED_CONTENT_URL = PLUGIN_ID + ".getting_started_url"; //$NON-NLS-1$
-    
+
 	/**
 	 * @since 2.0
 	 */
-    public static final String RELEASE_NOTES_URL_SYSTEM_PROPERTY = PLUGIN_ID + ".release_notes_url"; //$NON-NLS-1$
+	public static final String RELEASE_NOTES_URL_SYSTEM_PROPERTY = PLUGIN_ID + ".release_notes_url"; //$NON-NLS-1$
 
 	// The shared instance.
 	private static DocumentationPlugin plugin;
@@ -80,44 +73,30 @@ public class DocumentationPlugin extends AbstractUIPlugin
 		return plugin;
 	}
 
-	/**
-	 * getImage
-	 * 
-	 * @param path
-	 * @return Image
-	 */
-	public static Image getImage(String path)
+	public static Image getImage(String string)
 	{
-		if (images.get(path) == null)
+		if (getDefault().getImageRegistry().get(string) == null)
 		{
-			ImageDescriptor id = getImageDescriptor(path);
-
-			if (id == null)
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
 			{
-				return null;
+				getDefault().getImageRegistry().put(string, id);
 			}
-
-			Image i = id.createImage();
-
-			images.put(path, i);
-
-			return i;
 		}
-		else
-		{
-			return (Image) images.get(path);
-		}
+		return getDefault().getImageRegistry().get(string);
 	}
 
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in relative path.
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path)
+	public static ImageDescriptor getImageDescriptor(String string)
 	{
-		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
+		if (getDefault().getImageRegistry().getDescriptor(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+			{
+				getDefault().getImageRegistry().put(string, id);
+			}
+		}
+		return getDefault().getImageRegistry().getDescriptor(string);
 	}
+
 }
