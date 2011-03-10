@@ -73,7 +73,7 @@
 		<echo message="**  Building Reference Documentation  **" level="info" />
 		<echo message="****************************************" level="info" />
 
-		<antcall target="reference.docs.individual">
+		<!--<antcall target="reference.docs.individual">
 			<param name="reference.directory" value="../com.aptana.editor.html/metadata/" />
 			<param name="reference.original" value="../com.aptana.editor.html/metadata/html_metadata.xml" />
 			<param name="reference.name" value="HTML" />
@@ -85,7 +85,7 @@
 			<param name="reference.fieldnameplural" value="Attributes" />
 			<param name="reference.eventname" value="Event" />
 			<param name="reference.eventnameplural" value="Events" />
-			<param name="reference.xsl" value="metadata_documentation.xslt" />
+			<param name="reference.xsl" value="css_metadata_documentation.xslt" />
 			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
 		</antcall>
 
@@ -101,10 +101,11 @@
 			<param name="reference.fieldnameplural" value="Properties" />
 			<param name="reference.eventname" value="Event" />
 			<param name="reference.eventnameplural" value="Events" />
-			<param name="reference.xsl" value="metadata_documentation.xslt" />
+			<param name="reference.xsl" value="css_metadata_documentation.xslt" />
 			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
 		</antcall>
-
+		-->
+		
 		<!-- location of original XML files for core documentation -->
 		<!-- FIXME: This is fragile. Unsure it can be made much better. -->
 		<property name="reference.directory" value="../com.aptana.editor.js/metadata" />
@@ -149,6 +150,25 @@
 			<param name="reference.xsl" value="help_documentation.xslt" />
 			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
 		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.original" value="${reference.directory}/dom_3.xml" />
+			<param name="reference.name" value="HTMLDOM3" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 3" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.original" value="${reference.directory}/dom_5.xml" />
+			<param name="reference.name" value="HTMLDOM5" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 5" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
 	</target>
 
 	<target name="reference.docs.individual">

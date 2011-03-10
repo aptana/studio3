@@ -1,8 +1,7 @@
 body {
-	font-family: Verdana, sans-serif;
-	background-image: url('doc_background.gif');
-	background-repeat: repeat-x;
-	background-color: #FFFFFF;
+	color:#1d1d1d;
+	font-family:Trebuchet MS,Tahoma,Arial,sans-serif;
+	font-size:90%;
 	padding-left: 0px;
 	padding-right: 0px;
 	margin: 0px;
@@ -10,18 +9,11 @@ body {
 }
 
 a {
-	color: #5E83C1;
-	text-decoration: none;
+	color:#735537;
+	text-decoration:none;
 }
-
-a:visited {
-	color: #5E83C1;
-	text-decoration: none;
-}
-
 a:hover {
-	color: #B7D4F3;
-	text-decoration: underline;
+	text-decoration:underline;
 }
 
 img {

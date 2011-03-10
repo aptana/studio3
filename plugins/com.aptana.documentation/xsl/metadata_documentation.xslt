@@ -16,7 +16,7 @@
   <xsl:variable name="lcletters">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="ucletters">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   
-  <xsl:template match="/content-assist">
+  <xsl:template match="/javascript">
 
     Content for docs.xml.
     
