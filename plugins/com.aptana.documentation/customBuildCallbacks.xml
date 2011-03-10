@@ -74,8 +74,8 @@
 		<echo message="****************************************" level="info" />
 
 		<antcall target="reference.docs.individual">
-			<param name="reference.directory" value="../com.aptana.editor.html/src/com/aptana/ide/editor/html/resources/" />
-			<param name="reference.original" value="../com.aptana.editor.html/src/com/aptana/ide/editor/html/resources/HTML.xml" />
+			<param name="reference.directory" value="../com.aptana.editor.html/metadata/" />
+			<param name="reference.original" value="../com.aptana.editor.html/metadata/html_metadata.xml" />
 			<param name="reference.name" value="HTML" />
 			<param name="reference.displayname" value="HTML" />
 			<param name="reference.languagetype" value="text_html" />
@@ -90,8 +90,8 @@
 		</antcall>
 
 		<antcall target="reference.docs.individual">
-			<param name="reference.directory" value="../com.aptana.editor.css/src/com/aptana/editor/css/resources/" />
-			<param name="reference.original" value="../com.aptana.editor.css/src/com/aptana/editor/css/resources/css_metadata.xml" />
+			<param name="reference.directory" value="../com.aptana.editor.css/metadata/" />
+			<param name="reference.original" value="../com.aptana.editor.css/metadata/css_metadata.xml" />
 			<param name="reference.name" value="CSS" />
 			<param name="reference.displayname" value="CSS" />
 			<param name="reference.languagetype" value="text_css" />
@@ -107,8 +107,9 @@
 
 		<!-- location of original XML files for core documentation -->
 		<!-- FIXME: This is fragile. Unsure it can be made much better. -->
-		<property name="reference.directory" value="../com.aptana.ide.editor.js/src/com/aptana/ide/editor/js/resources" />
+		<property name="reference.directory" value="../com.aptana.editor.js/metadata" />
 
+		<!--
 		<antcall target="reference.docs.individual">
 			<param name="reference.directory" value="${reference.directory}" />
 			<param name="reference.original" value="${reference.directory}/js_keywords.xml" />
@@ -118,7 +119,8 @@
 			<param name="reference.xsl" value="keywords_documentation.xslt" />
 			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
 		</antcall>
-
+		-->
+		
 		<antcall target="reference.docs.individual">
 			<param name="reference.directory" value="${reference.directory}" />
 			<param name="reference.original" value="${reference.directory}/dom_0.xml" />

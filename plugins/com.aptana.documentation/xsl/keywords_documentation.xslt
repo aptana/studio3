@@ -35,11 +35,12 @@
     <html>
       <head>
         <title><xsl:value-of select="$ReferenceDisplayName" /> Reference Index</title>
-		<link rel="stylesheet" href="../../../content/shared.css" type="text/css" />        
+		<link rel="stylesheet" href="../../../content/shared.css" type="text/css" />
+		<link rel="stylesheet" href="../../../PRODUCT_PLUGIN/book.css" type="text/css"/>
+		<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" />
       </head>
       <body>
         <div class="classBlock">
-	    <a href="http://www.aptana.com/" target="_blank"><img src="../../../content/aptana.gif" border="0" hspace="21" vspace="7"></img></a>
 	    <h1><xsl:value-of select="$ReferenceDisplayName" /> Index</h1>
 	    <div class="content">
 		<div class="classDescription">Below is a listing of all <xsl:value-of select="$ReferenceDisplayName" /> language. Click on an item to visit its documentation.</div>

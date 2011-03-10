@@ -20,7 +20,7 @@
   <extension
         point="org.eclipse.core.runtime.preferences">
      <initializer
-           class="com.aptana.ide.documentation.PreferenceInitializer">
+           class="com.aptana.documentation.PreferenceInitializer">
      </initializer>
   </extension>
 </plugin>

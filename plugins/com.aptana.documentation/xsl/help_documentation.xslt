@@ -21,7 +21,7 @@
 	<xsl:template name="toc">
 		<xsl:result-document href="{$ReferenceName}.toc.xml" method="xml">
 			<xsl:processing-instruction name="NLS">TYPE="org.eclipse.help.toc"</xsl:processing-instruction>
-			<toc label="{$ReferenceDisplayName}" link_to="../com.aptana.ide.documentation/toc.xml#reference">
+			<toc label="{$ReferenceDisplayName}" link_to="../com.aptana.documentation/toc.xml#reference">
 				<topic label="{$ReferenceDisplayName}" href="html/reference/api/{$ReferenceName}.index.html">
 					<xsl:for-each select="class">
 						<topic label="{@type}" href="html/reference/api/{@type}.html">
@@ -167,14 +167,13 @@
 					<title><xsl:value-of select="$ReferenceDisplayName"/> Reference Index</title>
 					<meta http-equiv="cache-control" content="no-cache" />
 					<link rel="stylesheet" href="../../../content/shared.css" type="text/css"/>
+					<link rel="stylesheet" href="../../../PRODUCT_PLUGIN/book.css" type="text/css"/>
+					<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" />
 					<script src="../../../content/jquery.js" type="text/javascript"/>
 					<script src="../../../content/api.js" type="text/javascript"/>
 				</head>
 				<body>
 					<div class="classBlock">
-						<a href="http://www.aptana.com/" target="_blank">
-							<img src="../../../content/aptana.gif" border="0" hspace="21" vspace="7"/>
-						</a>
 						<h1><xsl:value-of select="$ReferenceDisplayName"/> Index</h1>
 						<div class="content">
 							<div class="classDescription">

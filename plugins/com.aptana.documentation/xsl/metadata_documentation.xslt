@@ -91,11 +91,12 @@
     <html>
       <head>
         <title><xsl:value-of select="$ReferenceDisplayName" /> Reference Index</title>
-		<link rel="stylesheet" href="../../../content/shared.css" type="text/css" />        
+		<link rel="stylesheet" href="../../../content/shared.css" type="text/css" />
+		<link rel="stylesheet" href="../../../PRODUCT_PLUGIN/book.css" type="text/css"/>
+		<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" />
       </head>
       <body>
         <div class="classBlock">
-	    <a href="http://www.aptana.com/" target="_blank"><img src="../../../content/aptana.gif" border="0" hspace="21" vspace="7"></img></a>
 	    <h1><xsl:value-of select="$ReferenceDisplayName" /> Reference</h1>
 	    <div class="content">
 		<div class="classDescription">Please select a <xsl:value-of select="$ReferenceDisplayName" /> item</div>
