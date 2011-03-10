@@ -157,6 +157,7 @@ public final class SourceDisplayUtil {
 				try {
 					provider.connect(textEditor.getEditorInput());
 				} catch (CoreException e) {
+					e.getCause();
 					return;
 				}
 				IDocument document = provider.getDocument(textEditor.getEditorInput());

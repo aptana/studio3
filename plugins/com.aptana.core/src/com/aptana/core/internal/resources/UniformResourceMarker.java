@@ -181,7 +181,7 @@ public class UniformResourceMarker extends PlatformObject implements IUniformRes
 	 * @see org.eclipse.core.resources.IMarker#setAttribute(java.lang.String, int)
 	 */
 	public void setAttribute(String attributeName, int value) throws CoreException {
-		setAttribute(attributeName, new Integer(value));
+		setAttribute(attributeName, Integer.valueOf(value));
 	}
 
 	/**

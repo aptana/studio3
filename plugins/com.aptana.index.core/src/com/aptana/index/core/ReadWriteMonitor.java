@@ -8,9 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.internal.index.core;
+package com.aptana.index.core;
 
-import com.aptana.index.core.IReadWriteMonitor;
 
 /**
  * Monitor ensuring no more than one writer working concurrently. Multiple readers are allowed to perform
@@ -20,8 +19,9 @@ public class ReadWriteMonitor implements IReadWriteMonitor
 {
 
 	/**
-	 * <0 : writing (cannot go beyond -1, i.e one concurrent writer) =0 : idle >0 : reading (number of concurrent
-	 * readers)
+	 * <0 : writing (cannot go beyond -1, i.e one concurrent writer) 
+	 * =0 : idle 
+	 * >0 : reading (number of concurrent readers)
 	 */
 	private int status = 0;
 

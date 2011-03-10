@@ -337,6 +337,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 				details = DebugEvent.CLIENT_REQUEST;
 				runningState = State.RUNNING;
 			} else if (ABORT.equals(reason) || START.equals(reason)) {
+				details = DebugEvent.UNSPECIFIED;
 				runningState = State.RUNNING;
 			} else {
 				runningState = State.RUNNING;
@@ -450,7 +451,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 		}
 	}
 
-	private void invalidateStackFrames() {
+	private synchronized void invalidateStackFrames() {
 		if (stackFrames != null) {
 			for (IStackFrame stackFrame : stackFrames) {
 				((JSDebugStackFrame) stackFrame).invalidate();

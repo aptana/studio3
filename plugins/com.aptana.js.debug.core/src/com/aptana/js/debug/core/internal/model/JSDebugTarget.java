@@ -547,7 +547,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				JSDebugScriptElement scriptElement = new JSDebugScriptElement(this, scriptName, baseLine, lineExtent);
 				topScriptElement.insertElement(scriptElement);
 				if (scriptTag > 0) {
-					scripts.put(new Integer(scriptTag), scriptElement);
+					scripts.put(Integer.valueOf(scriptTag), scriptElement);
 				}
 			}
 			synchronized (updateContentJob) {
@@ -565,7 +565,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			URI fileName = resolveSourceFile(Util.decodeData(subargs[j++]));
 			JSDebugScriptElement topScriptElement = (JSDebugScriptElement) topScriptElements.get(fileName);
 			if (scriptTag > 0) {
-				JSDebugScriptElement scriptElement = (JSDebugScriptElement) scripts.remove(new Integer(scriptTag));
+				JSDebugScriptElement scriptElement = (JSDebugScriptElement) scripts.remove(Integer.valueOf(scriptTag));
 				if (topScriptElement != null && scriptElement != null) {
 					topScriptElement.removeElement(scriptElement);
 				}
@@ -583,7 +583,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				if (scriptTag < 0 || scriptName.length() == 0) {
 					continue;
 				}
-				JSDebugScriptElement scriptElement = (JSDebugScriptElement) scripts.get(new Integer(scriptTag));
+				JSDebugScriptElement scriptElement = (JSDebugScriptElement) scripts.get(Integer.valueOf(scriptTag));
 				if (scriptElement != null) {
 					scriptElement.setName(scriptName);
 					scriptElement.fireChangeEvent(DebugEvent.STATE);
@@ -1795,7 +1795,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 							Map<String, Object> attributes = new HashMap<String, Object>();
 							attributes.put(IBreakpoint.ENABLED, Boolean.valueOf(enabled));
 							if (hitCount != -1) {
-								attributes.put(IJSDebugConstants.BREAKPOINT_HIT_COUNT, new Integer(hitCount));
+								attributes.put(IJSDebugConstants.BREAKPOINT_HIT_COUNT, Integer.valueOf(hitCount));
 							}
 							if (condition.length() != 0) {
 								attributes.put(IJSDebugConstants.BREAKPOINT_CONDITION, condition);
@@ -1813,7 +1813,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 								 */
 								try {
 									ignoreBreakpointCreation = true;
-									breakpoint = JSDebugModel.createLineBreakpoint((IResource) resource, lineNumber,
+									JSDebugModel.createLineBreakpoint((IResource) resource, lineNumber,
 											attributes, true);
 								} finally {
 									ignoreBreakpointCreation = false;
@@ -1821,7 +1821,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 							} else if (resource instanceof IUniformResource) {
 								try {
 									ignoreBreakpointCreation = true;
-									breakpoint = JSDebugModel.createLineBreakpoint((IUniformResource) resource, lineNumber,
+									JSDebugModel.createLineBreakpoint((IUniformResource) resource, lineNumber,
 											attributes, true);
 								} finally {
 									ignoreBreakpointCreation = false;

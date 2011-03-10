@@ -229,8 +229,12 @@ public class FileDeltaRefreshAdapter extends JNotifyAdapter
 			fileModified(wd, rootPath, oldName);
 		else
 		{
-			fileDeleted(wd, rootPath, oldName);
-			fileCreated(wd, rootPath, newName);
+			if (oldName != null) {
+				fileDeleted(wd, rootPath, oldName);
+			}
+			if (newName != null) {
+				fileCreated(wd, rootPath, newName);
+			}
 		}
 	}
 }

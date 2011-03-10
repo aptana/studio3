@@ -12,14 +12,16 @@ import com.aptana.core.util.KeepAliveObjectPool;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 
-public class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
+public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 {
 
 	private IPoolConnectionManager manager;
 
 	public FTPClientPool(IPoolConnectionManager manager)
 	{
+		super();
 		this.manager = manager;
+		start();
 	}
 
 	public FTPClientInterface create()

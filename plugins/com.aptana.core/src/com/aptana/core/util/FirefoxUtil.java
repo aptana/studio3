@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipFile;
@@ -156,9 +157,9 @@ public final class FirefoxUtil {
 						last.put(matcher.group(1), matcher.group(2));
 					}
 				}
-				for (String section : sections.keySet()) {
-					if (section.startsWith("Profile")) { //$NON-NLS-1$
-						Map<String, String> properties = sections.get(section);
+				for (Entry<String, Map<String, String>> entry : sections.entrySet()) {
+					if (entry.getKey().startsWith("Profile")) { //$NON-NLS-1$
+						Map<String, String> properties = entry.getValue();
 						String path = (String) properties.get("Path"); //$NON-NLS-1$
 						String isRelative = (String) properties.get("IsRelative"); //$NON-NLS-1$
 						File profile;
@@ -314,7 +315,9 @@ public final class FirefoxUtil {
 		} catch (IOException e) {
 			CorePlugin.log(e);
 			if (file != null) {
-				file.delete();
+				if (!file.delete()) {
+					file.deleteOnExit();
+				}
 			}
 			return false;
 		} finally {
@@ -338,7 +341,9 @@ public final class FirefoxUtil {
 			CorePlugin.log(e);
 			return false;
 		} finally {
-			file.delete();
+			if (!file.delete()) {
+				file.deleteOnExit();
+			}
 		}
 
 		return true;

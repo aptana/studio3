@@ -9,6 +9,7 @@ package com.aptana.js.debug.core.internal.model.xhr;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
@@ -156,7 +157,12 @@ public class XHRService implements IXHRService {
 	 */
 	public void remove(IXHRTransfer xhr) {
 		synchronized (transfers) {
-			transfers.remove(xhr);
+			for (Entry<String, IXHRTransfer> entry : transfers.entrySet()) {
+				if (entry.getValue() == xhr) {
+					transfers.remove(entry.getKey());
+					break;
+				}
+			}
 		}
 		fireChangeEvent(null);
 	}
