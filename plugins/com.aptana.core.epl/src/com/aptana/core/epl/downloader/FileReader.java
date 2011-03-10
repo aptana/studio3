@@ -391,7 +391,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 		}
 	}
 
-	protected void sendRetrieveRequest(URI uri, OutputStream outputStream, DownloadRange range,
+	protected synchronized void sendRetrieveRequest(URI uri, OutputStream outputStream, DownloadRange range,
 			boolean closeStreamOnFinish, //
 			IProgressMonitor monitor) throws CoreException, FileNotFoundException, ProtocolException
 	{
@@ -504,7 +504,7 @@ public final class FileReader extends FileTransferJob implements IFileTransferLi
 				}
 				catch (InterruptedException e)
 				{
-					/* ignore */
+					return false;
 				}
 			}
 			throw RepositoryStatusHelper.wrap(exception);

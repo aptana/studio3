@@ -312,7 +312,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
 	 */
 	@Override
-	public boolean isConnected() {
+	public synchronized boolean isConnected() {
 		return connectionFileManager != null && connectionFileManager.isConnected();
 	}
 

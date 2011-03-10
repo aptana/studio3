@@ -34,7 +34,11 @@ public class WorkspaceFileSystem extends FileSystem {
 	 */
 	public WorkspaceFileSystem() {
 		super();
-		instance = this;
+		setInstance(this);
+	}
+	
+	private static void setInstance(WorkspaceFileSystem object) {
+		instance = object;
 	}
 
 	public static IFileSystem getInstance() {
