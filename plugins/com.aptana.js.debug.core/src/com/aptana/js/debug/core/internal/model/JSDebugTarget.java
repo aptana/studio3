@@ -1864,21 +1864,19 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 				event.setData(mainFile);
 				fireEvent(event);
 				return;
-			}
-			int threadId = 0;
-			if (protocolVersion >= 2) {
-				if (args.length < 2) {
-					return;
+			} else if (JSDebugThread.SUSPENDED.equals(action) || JSDebugThread.RESUMED.equals(action)) {
+				int threadId = 0;
+				if (protocolVersion >= 2) {
+					try {
+						threadId = Integer.parseInt(args[1]);
+						args = Util.removeArrayElement(args, 1);
+					} catch (NumberFormatException e) {
+					}
 				}
-				try {
-					threadId = Integer.parseInt(args[1]);
-					args = Util.removeArrayElement(args, 1);
-				} catch (NumberFormatException e) {
+				JSDebugThread thread = threads.get(threadId);
+				if (thread != null) {
+					thread.handleMessage(args);
 				}
-			}
-			JSDebugThread thread = threads.get(threadId);
-			if (thread != null) {
-				thread.handleMessage(args);
 			}
 		}
 

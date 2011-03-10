@@ -30,7 +30,7 @@ import com.aptana.js.debug.core.model.IJSLineBreakpoint;
  */
 public class JSDebugThread extends JSDebugElement implements IThread {
 
-	private static final String SUSPENDED = "suspended"; //$NON-NLS-1$
+	protected static final String SUSPENDED = "suspended"; //$NON-NLS-1$
 	private static final String SUSPEND = "suspend"; //$NON-NLS-1$
 	private static final String SUSPEND_V2 = "suspend*{0,number,integer}"; //$NON-NLS-1$
 	private static final String BREAKPOINT = "breakpoint"; //$NON-NLS-1$
@@ -38,7 +38,7 @@ public class JSDebugThread extends JSDebugElement implements IThread {
 	private static final String FIRST_LINE = "firstLine"; //$NON-NLS-1$
 	private static final String EXCEPTION = "exception"; //$NON-NLS-1$
 	private static final String WATCHPOINT = "watchpoint"; //$NON-NLS-1$
-	private static final String RESUMED = "resumed"; //$NON-NLS-1$
+	protected static final String RESUMED = "resumed"; //$NON-NLS-1$
 	private static final String STEP_INTO = "stepInto"; //$NON-NLS-1$
 	private static final String STEP_INTO_V2 = "stepInto*{0,number,integer}"; //$NON-NLS-1$
 	private static final String STEP_OVER = "stepOver"; //$NON-NLS-1$
