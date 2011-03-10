@@ -22,6 +22,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -149,18 +150,23 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	// listen for external changes to active project
 	private IPreferenceChangeListener fActiveProjectPrefChangeListener;
 
+	private Label noProjectslabel;
 	/**
 	 * Composite holding the create project/import buttons
 	 */
 	private Composite noProjectButtonsComp;
+
+	private Label closedProjectlabel;
+	/**
+	 * Composite holding the create project/import buttons, plus button to open project
+	 */
+	private Composite closedProjectButtonsComp;
 
 	/**
 	 * PageBook to swap between normal common viewer when there's at least one project, and composite containing buttons
 	 * to add/import projects
 	 */
 	private PageBook pageBook;
-
-	private Label noProjectslabel;
 
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
@@ -209,11 +215,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getViewSite().getActionBars().getToolBarManager().remove("org.eclipse.ui.framelist.up"); //$NON-NLS-1$
 
 		addProjectResourceListener();
-		IProject project = detectSelectedProject();
-		if (project != null)
-		{
-			setActiveProject(project.getName());
-		}
+		setActiveProject(detectSelectedProject());
 
 		hookToThemes();
 	}
@@ -300,7 +302,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				{
 					String projectName = projectNameMenuItem.getText();
 					projectToolItem.setText(projectName);
-					setActiveProject(projectName);
+					setActiveProject(ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
 				}
 			});
 		}
@@ -348,10 +350,18 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getCommonViewer().setInput(selectedProject);
 
 		createNoProjectsComposite();
+		createClosedProjectComposite();
 
 		if (selectedProject != null && selectedProject.isAccessible())
 		{
-			pageBook.showPage(getCommonViewer().getControl());
+			if (selectedProject.isAccessible())
+			{
+				pageBook.showPage(getCommonViewer().getControl());
+			}
+			else
+			{
+				pageBook.showPage(closedProjectButtonsComp);
+			}
 		}
 		else
 		{
@@ -393,25 +403,75 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				ImportExportWizard wizard = new ImportExportWizard(ImportExportWizard.IMPORT);
-				wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
-
-				IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
-				IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
-				if (wizardSettings == null)
-				{
-					wizardSettings = workbenchSettings.addNewSection("ImportExportAction"); //$NON-NLS-1$
-				}
-				wizard.setDialogSettings(wizardSettings);
-				wizard.setForcePreviousAndNextButtons(true);
-
-				WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
-				dialog.open();
+				openImportWizard();
 			}
 		});
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(importButton);
 
 		return noProjectButtonsComp;
+	}
+
+	protected Composite createClosedProjectComposite()
+	{
+		// Create a composite to open closed project or create/import project
+		closedProjectButtonsComp = new Composite(pageBook, SWT.NONE);
+
+		GridLayoutFactory.fillDefaults().applyTo(closedProjectButtonsComp);
+		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(closedProjectButtonsComp);
+
+		closedProjectlabel = new Label(closedProjectButtonsComp, SWT.WRAP);
+		closedProjectlabel
+				.setText("The selected project is closed. Please open it to work with it, or add/import a new project.");
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10)
+				.applyTo(closedProjectlabel);
+
+		Button openProjectButton = new Button(closedProjectButtonsComp, SWT.FLAT | SWT.BORDER);
+		openProjectButton.setText("Open Project");
+		openProjectButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				try
+				{
+					selectedProject.open(new NullProgressMonitor());
+					pageBook.showPage(getCommonViewer().getControl());
+				}
+				catch (CoreException e1)
+				{
+					// ignore
+				}
+			}
+		});
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(0, 5)
+				.applyTo(openProjectButton);
+
+		Button createButton = new Button(closedProjectButtonsComp, SWT.FLAT | SWT.BORDER);
+		createButton.setText(Messages.SingleProjectView_CreateProjectButtonLabel);
+		createButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				NewWizardAction action = new NewWizardAction(UIUtils.getActiveWorkbenchWindow());
+				action.run();
+			}
+		});
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(createButton);
+
+		Button importButton = new Button(closedProjectButtonsComp, SWT.FLAT | SWT.BORDER);
+		importButton.setText(Messages.SingleProjectView_ImportProjectButtonLabel);
+		importButton.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				openImportWizard();
+			}
+		});
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(importButton);
+
+		return closedProjectButtonsComp;
 	}
 
 	private void turnOffDotStarFileFilterOnFirstStartup()
@@ -594,9 +654,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private void hookToThemes()
 	{
 		getControlThemerFactory().apply(getCommonViewer());
+
 		getControlThemerFactory().apply(noProjectButtonsComp);
 		// FIXME Why isn't this propagating down from noProjectButtonsComp?
 		getControlThemerFactory().apply(noProjectslabel);
+
+		getControlThemerFactory().apply(closedProjectButtonsComp);
+		// FIXME Why isn't this propagating down from closedProjectButtonsComp?
+		getControlThemerFactory().apply(closedProjectlabel);
 	}
 
 	protected IThemeManager getThemeManager()
@@ -644,37 +709,42 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		return project;
 	}
 
-	private void setActiveProject(String projectName)
+	public void setActiveProject(IProject newSelectedProject)
 	{
-		IProject newSelectedProject = null;
-		if (projectName != null && projectName.trim().length() > 0)
-			newSelectedProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		if (selectedProject != null && newSelectedProject != null && selectedProject.equals(newSelectedProject))
-		{
-			return;
-		}
+		// Project may be same but it may have been closed or opened...
+		boolean projectIsSame = (selectedProject != null && newSelectedProject != null && selectedProject
+				.equals(newSelectedProject));
 
-		if (selectedProject != null)
-		{
-			unsetActiveProject();
-		}
 		IProject oldActiveProject = selectedProject;
 		selectedProject = newSelectedProject;
-		if (newSelectedProject != null && newSelectedProject.isAccessible())
+		if (newSelectedProject != null)
 		{
-			setActiveProject();
-			pageBook.showPage(getCommonViewer().getControl());
+			// Save project in prefs
+			if (!projectIsSame)
+			{
+				setActiveProject();
+			}
+			if (newSelectedProject.isAccessible())
+			{
+				// An open project, show it's contents
+				pageBook.showPage(getCommonViewer().getControl());
+			}
+			else if (newSelectedProject.exists())
+			{
+				// Project exists, but is closed, show special page to allow opening
+				pageBook.showPage(closedProjectButtonsComp);
+			}
 		}
 		else
 		{
+			// A project that doesn't exist, remove from prefs and show page to create/import project
+			unsetActiveProject();
 			pageBook.showPage(noProjectButtonsComp);
 		}
-		projectChanged(oldActiveProject, newSelectedProject);
-	}
-
-	public void setActiveProject(IProject project)
-	{
-		setActiveProject(project.getName());
+		if (!projectIsSame)
+		{
+			projectChanged(oldActiveProject, newSelectedProject);
+		}
 	}
 
 	private void setActiveProject()
@@ -854,10 +924,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 											{
 												String projectName = projectNameMenuItem.getText();
 												projectToolItem.setText(projectName);
-												setActiveProject(projectName);
+												setActiveProject(ResourcesPlugin.getWorkspace().getRoot()
+														.getProject(projectName));
 											}
 										});
-										setActiveProject(projectName);
+										setActiveProject(ResourcesPlugin.getWorkspace().getRoot()
+												.getProject(projectName));
 										projectToolItem.getParent().pack(true);
 									}
 								});
@@ -889,12 +961,34 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 										{
 											IProject[] projects = ResourcesPlugin.getWorkspace().getRoot()
 													.getProjects();
-											String newActiveProject = ""; //$NON-NLS-1$
-											if (projects.length > 0 && projects[0].isAccessible())
+											boolean setProject = false;
+											// Set active project to first open/accessible one!
+											for (IProject p : projects)
 											{
-												newActiveProject = projects[0].getName();
+												if (p != null && p.isAccessible())
+												{
+													setActiveProject(p);
+													setProject = true;
+													break;
+												}
 											}
-											setActiveProject(newActiveProject);
+											// Failing that, set to first project that exists!
+											if (!setProject)
+											{
+												for (IProject p : projects)
+												{
+													if (p != null && p.exists())
+													{
+														setActiveProject(p);
+														setProject = true;
+														break;
+													}
+												}
+											}
+											if (!setProject)
+											{
+												setActiveProject(null);
+											}
 										}
 										projectToolItem.getParent().pack(true);
 									}
@@ -1052,5 +1146,23 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	public IProject getActiveProject()
 	{
 		return selectedProject;
+	}
+
+	protected void openImportWizard()
+	{
+		ImportExportWizard wizard = new ImportExportWizard(ImportExportWizard.IMPORT);
+		wizard.init(PlatformUI.getWorkbench(), StructuredSelection.EMPTY);
+
+		IDialogSettings workbenchSettings = WorkbenchPlugin.getDefault().getDialogSettings();
+		IDialogSettings wizardSettings = workbenchSettings.getSection("ImportExportAction"); //$NON-NLS-1$
+		if (wizardSettings == null)
+		{
+			wizardSettings = workbenchSettings.addNewSection("ImportExportAction"); //$NON-NLS-1$
+		}
+		wizard.setDialogSettings(wizardSettings);
+		wizard.setForcePreviousAndNextButtons(true);
+
+		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
+		dialog.open();
 	}
 }
