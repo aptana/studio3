@@ -100,7 +100,7 @@ public class DeferredTreeContentManager extends org.eclipse.ui.progress.Deferred
 		return super.getFetchJobName(parent, adapter);
 	}
 
-	private class CustomPendingUpdateAdapter extends PendingUpdateAdapter {
+	private static class CustomPendingUpdateAdapter extends PendingUpdateAdapter {
 
 		protected Object parent;
 		
