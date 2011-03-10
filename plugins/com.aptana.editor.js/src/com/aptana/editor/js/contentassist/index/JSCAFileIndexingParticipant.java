@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.json.SchemaContext;
@@ -107,6 +107,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// process results
 				JSIndexWriter indexer = new JSIndexWriter();
 				TypeElement[] types = handler.getTypes();
+				AliasElement[] aliases = handler.getAliases();
 				URI location = file.toURI();
 
 				for (TypeElement type : types)
@@ -126,11 +127,19 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 							property.setName(typeName);
 							property.addType(typeName);
 
-							JSTypeUtil.addAllUserAgents(property);
-
 							window.addProperty(property);
 						}
 					}
+				}
+
+				for (AliasElement alias : aliases)
+				{
+					PropertyElement property = new PropertyElement();
+
+					property.setName(alias.getName());
+					property.addType(alias.getType());
+
+					window.addProperty(property);
 				}
 
 				// write global type info

@@ -13,7 +13,10 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.eclipse.core.runtime.Platform;
 
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.contentassist.model.AliasElement;
@@ -162,6 +165,11 @@ public class JSCAHandler implements IContextHandler
 	private static final Map<String, String> TYPE_MAP;
 	private static final Pattern TYPE_DELIMITER = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
 	private static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
+	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
+	private static final Pattern EVENT_IDENTIFIER_PATTERN = Pattern
+			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?::[$_a-zA-Z][$_a-zA-Z0-9]*)?"); //$NON-NLS-1$
+	private static final Pattern TYPE_PATTERN = Pattern
+			.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
 	private Map<String, TypeElement> _typesByName;
 	private List<AliasElement> _aliases;
@@ -446,17 +454,24 @@ public class JSCAHandler implements IContextHandler
 
 			for (String type : types)
 			{
-				// map types
-				if (TYPE_MAP.containsKey(type))
+				if (isValidTypeIdentifier(type))
 				{
-					result.add(TYPE_MAP.get(this._currentString));
+					// map types
+					if (TYPE_MAP.containsKey(type))
+					{
+						result.add(TYPE_MAP.get(this._currentString));
+					}
+					else
+					{
+						result.add(type);
+
+						// TODO: Collect unmatched types in a set, remove built-ins, remove types in jsca file.
+						// Possibly warn on remaining types as possibly missing types
+					}
 				}
 				else
 				{
-					result.add(type);
-
-					// TODO: Collect unmatched types in a set, remove built-ins, remove types in jsca file.
-					// Possibly warn on remaining types as possibly missing types
+					JSPlugin.logError(Messages.JSCAHandler_Invalid_Type_Name + type, null);
 				}
 			}
 		}
@@ -498,6 +513,83 @@ public class JSCAHandler implements IContextHandler
 		return types.toArray(new TypeElement[types.size()]);
 	}
 
+	/**
+	 * isValidEventIdentifier
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected boolean isValidEventIdentifier(String name)
+	{
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = EVENT_IDENTIFIER_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
+	}
+
+	/**
+	 * isValidIdentifier
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected boolean isValidIdentifier(String name)
+	{
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = IDENTIFIER_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
+	}
+
+	/**
+	 * isValidTypeIdentifier
+	 * 
+	 * @param name
+	 * @return
+	 */
+	protected boolean isValidTypeIdentifier(String name)
+	{
+		boolean result = false;
+
+		if (name != null)
+		{
+			Matcher m = TYPE_PATTERN.matcher(name);
+
+			result = m.matches();
+		}
+
+		return result;
+	}
+
+	/**
+	 * log
+	 * 
+	 * @param message
+	 */
+	protected void log(String message)
+	{
+		if (Platform.inDevelopmentMode())
+		{
+			System.out.println(message);
+		}
+		else
+		{
+			JSPlugin.logError(message, null);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextHandler#setProperty(java.lang.String, java.lang.String, com.aptana.json.IState)
@@ -522,78 +614,96 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			case NAME:
-				// TODO: add ExampleElement to support for name+code
 				if (this._currentSince != null)
 				{
 					this._currentSince.setName(this._currentString);
 				}
+				else if (this._currentExample != null)
+				{
+					// TODO: add ExampleElement to support for name+code
+				}
 				else if (this._currentEventProperty != null)
 				{
-					this._currentEventProperty.setName(this._currentString);
+					if (isValidIdentifier(this._currentString))
+					{
+						this._currentEventProperty.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Event_Property_Name + this._currentString);
+					}
 				}
 				else if (this._currentEvent != null)
 				{
-					this._currentEvent.setName(this._currentString);
+					if (isValidEventIdentifier(this._currentString))
+					{
+						this._currentEvent.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Event_Name + this._currentString);
+					}
 				}
 				else if (this._currentProperty != null)
 				{
-					this._currentProperty.setName(this._currentString);
+					if (isValidIdentifier(this._currentString))
+					{
+						this._currentProperty.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Property_Name + this._currentString);
+					}
 				}
 				else if (this._currentParameter != null)
 				{
-					this._currentParameter.setName(this._currentString);
+					if (isValidIdentifier(this._currentString))
+					{
+						this._currentParameter.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Parameter_Name + this._currentString);
+					}
 				}
 				else if (this._currentFunction != null)
 				{
-					this._currentFunction.setName(this._currentString);
+					if (isValidIdentifier(this._currentString))
+					{
+						this._currentFunction.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Function_Name + this._currentString);
+					}
 				}
 				else if (this._currentAlias != null)
 				{
-					this._currentAlias.setName(this._currentString);
+					if (isValidIdentifier(this._currentString))
+					{
+						this._currentAlias.setName(this._currentString);
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Alias + this._currentString);
+					}
 				}
 				else if (this._currentType != null)
 				{
-
-					this._currentType.setName(this._currentString);
-					this._typesByName.put(this._currentString, this._currentType);
-
-					String[] parts = DOT_PATTERN.split(this._currentString);
-
-					if (parts.length > 1)
+					if (isValidTypeIdentifier(this._currentString))
 					{
-						String accumulatedName = parts[0];
-						TypeElement type = this.getType(accumulatedName);
-
-						for (int i = 1; i < parts.length; i++)
-						{
-							// grab name part
-							String pName = parts[i];
-
-							// update accumulated type name
-							accumulatedName += "." + pName; //$NON-NLS-1$
-
-							// try to grab the property off of the current type
-							PropertyElement property = type.getProperty(pName);
-
-							// create property, if we didn't have one
-							if (property == null)
-							{
-								property = new PropertyElement();
-
-								property.setName(pName);
-								property.setIsClassProperty(true);
-								property.addType(accumulatedName);
-
-								type.addProperty(property);
-							}
-
-							// make sure to save last type we visited
-							this._typesByName.put(type.getName(), type);
-
-							type = this.getType(accumulatedName);
-						}
+						this.createType();
+					}
+					else
+					{
+						this.log(Messages.JSCAHandler_Invalid_Type_Name + this._currentString);
 					}
 				}
+				else
+				{
+					this.log(Messages.JSCAHandler_Unable_To_Set_Name_Property);
+				}
+
 				this._currentString = null;
 				break;
 
@@ -800,8 +910,51 @@ public class JSCAHandler implements IContextHandler
 				break;
 
 			default:
-				JSPlugin.logError(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName, null);
+				this.log(Messages.JSCAHandler_Unrecognized_Property_Name + propertyName);
 				break;
+		}
+	}
+
+	protected void createType()
+	{
+		this._currentType.setName(this._currentString);
+		this._typesByName.put(this._currentString, this._currentType);
+
+		String[] parts = DOT_PATTERN.split(this._currentString);
+
+		if (parts.length > 1)
+		{
+			String accumulatedName = parts[0];
+			TypeElement type = this.getType(accumulatedName);
+
+			for (int i = 1; i < parts.length; i++)
+			{
+				// grab name part
+				String pName = parts[i];
+
+				// update accumulated type name
+				accumulatedName += "." + pName; //$NON-NLS-1$
+
+				// try to grab the property off of the current type
+				PropertyElement property = type.getProperty(pName);
+
+				// create property, if we didn't have one
+				if (property == null)
+				{
+					property = new PropertyElement();
+
+					property.setName(pName);
+					property.setIsClassProperty(true);
+					property.addType(accumulatedName);
+
+					type.addProperty(property);
+				}
+
+				// make sure to save last type we visited
+				this._typesByName.put(type.getName(), type);
+
+				type = this.getType(accumulatedName);
+			}
 		}
 	}
 }
