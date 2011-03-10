@@ -5,7 +5,7 @@
  * Please see the license-epl.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.index.core;
+package com.aptana.core.epl;
 
 public interface IReadWriteMonitor
 {

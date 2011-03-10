@@ -22,6 +22,8 @@ import java.util.zip.CRC32;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.aptana.core.epl.IReadWriteMonitor;
+import com.aptana.core.epl.ReadWriteMonitor;
 import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
 

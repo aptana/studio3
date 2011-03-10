@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package com.aptana.index.core;
+package com.aptana.core.epl;
 
 
 /**
