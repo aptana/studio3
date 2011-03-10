@@ -11,7 +11,7 @@ public enum LocationType
 {
 	UNKNOWN, //
 	NONE, //
-	
+
 	IN_GLOBAL, //
 	IN_PARAMETERS, //
 	IN_CONSTRUCTOR, //

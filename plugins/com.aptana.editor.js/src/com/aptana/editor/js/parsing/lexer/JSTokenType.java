@@ -98,7 +98,7 @@ public enum JSTokenType implements ITypePredicate
 	DEFAULT("default", Terminals.DEFAULT), //$NON-NLS-1$
 	FINALLY("finally", Terminals.FINALLY), //$NON-NLS-1$
 	CATCH("catch", Terminals.CATCH), //$NON-NLS-1$
-	
+
 	SINGLELINE_COMMENT("SINGLELINE_COMMENT", 1024), //$NON-NLS-1$
 	MULTILINE_COMMENT("MULTILINE_COMMENT", 1025), //$NON-NLS-1$
 	SDOC("SDOC", 1026), //$NON-NLS-1$
