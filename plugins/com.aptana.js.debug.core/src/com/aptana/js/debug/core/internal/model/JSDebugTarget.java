@@ -609,7 +609,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			if (threadId >= 0 && !threads.containsKey(threadId)) {
 				String label = args[3];
 				JSDebugThread thread = new JSDebugThread(this, threadId, label.length() > 0 ? label : null);
-				threads.put(0, thread);
+				threads.put(threadId, thread);
 				thread.fireCreationEvent();
 				fireChangeEvent(DebugEvent.CONTENT);
 			}

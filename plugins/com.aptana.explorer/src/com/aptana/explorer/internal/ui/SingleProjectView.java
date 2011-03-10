@@ -69,7 +69,6 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.actions.NewWizardAction;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ImportExportWizard;
-import org.eclipse.ui.internal.navigator.CommonNavigatorActionGroup;
 import org.eclipse.ui.internal.navigator.wizards.WizardShortcutAction;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -160,6 +159,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	 * to add/import projects
 	 */
 	private PageBook pageBook;
+
+	private Label noProjectslabel;
 
 	private static final String CLOSE_ICON = "icons/full/elcl16/close.png"; //$NON-NLS-1$
 
@@ -363,17 +364,14 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		// Create a composite to add/import projects when there are none
 		noProjectButtonsComp = new Composite(pageBook, SWT.NONE);
-		noProjectButtonsComp.setBackground(ThemePlugin.getDefault().getColorManager()
-				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getBackground()));
 
 		GridLayoutFactory.fillDefaults().applyTo(noProjectButtonsComp);
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(noProjectButtonsComp);
 
-		Label label = new Label(noProjectButtonsComp, SWT.WRAP);
-		label.setText(Messages.SingleProjectView_NoProjectsDescription);
-		label.setForeground(ThemePlugin.getDefault().getColorManager()
-				.getColor(ThemePlugin.getDefault().getThemeManager().getCurrentTheme().getForeground()));
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10).applyTo(label);
+		noProjectslabel = new Label(noProjectButtonsComp, SWT.WRAP);
+		noProjectslabel.setText(Messages.SingleProjectView_NoProjectsDescription);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10)
+				.applyTo(noProjectslabel);
 
 		Button button = new Button(noProjectButtonsComp, SWT.FLAT | SWT.BORDER);
 		button.setText(Messages.SingleProjectView_CreateProjectButtonLabel);
@@ -596,6 +594,9 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	private void hookToThemes()
 	{
 		getControlThemerFactory().apply(getCommonViewer());
+		getControlThemerFactory().apply(noProjectButtonsComp);
+		// FIXME Why isn't this propagating down from noProjectButtonsComp?
+		getControlThemerFactory().apply(noProjectslabel);
 	}
 
 	protected IThemeManager getThemeManager()
