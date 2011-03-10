@@ -1095,6 +1095,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 					case WHILE:
 						// and abort on some punctuation
 					case COLON:
+					case RCURLY:
 					case RPAREN:
 					case SEMICOLON:
 					case VAR:
