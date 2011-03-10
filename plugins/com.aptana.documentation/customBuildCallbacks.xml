@@ -68,6 +68,49 @@
 		<delete dir="${doc.output.dir}" />
 	</target>
 
+	<!-- unused at the moment until we replace with similar method for confluence wiki -->
+	<target name="wiki.docs">
+	  		<antcall target="echo.time"><param name="target.name" value="gather.docs" /></antcall>
+
+	  	    <!-- Checkout happens in source control client definition -->  	
+		    <echo message="**************************" level="info" />
+		    <echo message="**  Building Wiki Help  **" level="info" />
+		    <echo message="**************************" level="info" /> 	
+		 	<mkdir dir="output/documentation/html/gettingstarted" />  	
+
+	  	    <searchcrawler
+	  				startUrl="http://www.aptana.com/docs/"
+	  				savedirectory="${output.directory}/output/documentation/html/gettingstarted"
+		  			template="${documentation.project.directory}/documentation/wiki_help_template.html"
+	  				toctemplate="${documentation.project.directory}/documentation/wiki_toc_template.xml">
+		  		<request>
+		  			<requestproperty key="Cookie" value="aptana_auth=&quot;aptana=aptana123&quot;" />
+		  		</request>
+		  		<replacement stripregex="(?s)((^http://aptana.com/docs/index.php/)|((&quot;)/docs/index.php/))([a-zA-Z0-9%:\.\-_]+)" replaceregex="$4$5.html" />
+		  	 	<replacement stripregex="(?s)&quot;/docs/images" replaceregex="&quot;docs/images" />
+		  	  	<replacement stripregex="(?s)&quot;/docs/skins" replaceregex="&quot;docs/skins" />
+		  	  	<replacement stripregex="%28" replaceregex="(" />
+			  	<replacement stripregex="%29" replaceregex=")" />
+		  		<replacement stripregex="(?s)&quot;(/docs/index.php?)" replaceregex="&quot;http://www.aptana.com$1" />  		
+		  	</searchcrawler>
+		  	
+		  	<!-- Move the built installers -->
+		  	<antcall target="reference.docs" />
+
+		  	<!-- Grab the release notes -->
+		  	<get src="http://www.aptana.com/trac/query?status=closed&amp;group=component&amp;format=rss&amp;milestone=Aptana%20IDE%20Milestone%2010&amp;order=priority" dest="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.xml"/>
+		  	<!-- Add in RSS styling -->
+		  	<replace file="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.xml" token="&lt;rss version="
+		  			value="&lt;?xml-stylesheet href=&quot;release_notes.xsl&quot; type=&quot;text/xsl&quot; media=&quot;screen&quot;?&gt;&lt;notes version=" />
+		 	<replace file="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.xml" token="&lt;/rss&gt;"
+		  			value="&lt;/notes&gt;" />
+
+	  		<style in="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.xml" 
+	  			out="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.html"
+	  			style="${plugin.project.directory}plugins/com.aptana.ide.core.ui/content/release_notes/release_notes.xsl" />
+	  	
+	</target>
+
 	<target name="reference.docs">
 		<echo message="****************************************" level="info" />
 		<echo message="**  Building Reference Documentation  **" level="info" />
