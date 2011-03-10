@@ -496,7 +496,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	/**
 	 * Details evaluation job
 	 */
-	private final class DetailsJob extends Job {
+	private static class DetailsJob extends Job {
 
 		private IValue value;
 		private IValueDetailListener listener;

@@ -98,13 +98,8 @@ public class AJAXMonitorView extends AbstractDebugView implements IDebugEventSet
 		if (current != null) {
 			count = current.getTransfersCount();
 		}
-		setContentDescription(MessageFormat.format(Messages.AJAXMonitorView_items_0, new Integer(count))); // count
-																											// will
-																											// be
-																											// formatted
-																											// as
-																											// 1,234
-
+		setContentDescription(MessageFormat.format(Messages.AJAXMonitorView_items_0, Integer.valueOf(count)));
+		// count will be formatted as 1.234
 	}
 
 	/**

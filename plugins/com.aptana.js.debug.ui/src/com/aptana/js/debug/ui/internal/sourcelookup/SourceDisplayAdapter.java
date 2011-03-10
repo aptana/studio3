@@ -181,7 +181,7 @@ public class SourceDisplayAdapter implements ISourceDisplay {
 
 	}
 
-	private class SourceDisplayJob extends UIJob {
+	private static class SourceDisplayJob extends UIJob {
 
 		private ISourceLookupResult fResult;
 		private IWorkbenchPage fPage;

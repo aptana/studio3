@@ -30,6 +30,7 @@ public final class ServerConfigurationChangeEvent extends EventObject {
 	 */
 	public ServerConfigurationChangeEvent(Kind kind, AbstractWebServerConfiguration configuration) {
 		super(configuration);
+		this.kind = kind;
 	}
 
 	/**

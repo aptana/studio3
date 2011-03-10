@@ -9,6 +9,7 @@ package com.aptana.core.util;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.List;
@@ -195,10 +196,10 @@ public final class ExecutableUtil
 			{
 				return (Boolean) m.invoke(file);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (NoSuchMethodException e) {
 			// ignore, only available on Java 6+
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
 		}
 
 		// File.canExecute() doesn't exist; do our best to determine if file is executable...

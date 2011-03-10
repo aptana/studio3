@@ -254,7 +254,7 @@ public class CorePlugin extends Plugin
 	 * 
 	 * @author cwilliams
 	 */
-	private class ResourceListener implements IResourceChangeListener
+	private static class ResourceListener implements IResourceChangeListener
 	{
 
 		private Map<IProject, Integer> fWatchers;

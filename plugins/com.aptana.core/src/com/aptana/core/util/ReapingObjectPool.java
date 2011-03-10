@@ -17,7 +17,7 @@ class ConnectionReaper extends Thread
 {
 
 	private ReapingObjectPool<?> pool;
-	private final long delay = 300000;
+	private static final long delay = 300000;
 
 	boolean keepRunning = true;
 
@@ -74,8 +74,15 @@ public abstract class ReapingObjectPool<T> implements IObjectPool<T>
 		if (expirationTime != -1)
 		{
 			// no need to reap if the instances can never expire.
-			this.reaper = new ConnectionReaper(this);
-			reaper.start();
+			reaper = new ConnectionReaper(this);
+		}
+	}
+	
+	protected void start()
+	{
+		if (reaper != null)
+		{
+			reaper.start();			
 		}
 	}
 

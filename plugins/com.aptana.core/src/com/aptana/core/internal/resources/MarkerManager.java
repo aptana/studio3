@@ -55,8 +55,12 @@ public final class MarkerManager {
 	 * @return MarkerManager
 	 */
 	public static MarkerManager getInstance() {
-		if ( instance == null ) {
-			instance = new MarkerManager();
+		if (instance == null) {
+			synchronized (MarkerManager.class) {
+				if (instance == null) {
+					instance = new MarkerManager();	
+				}
+			}
 		}
 		return instance;
 	}
