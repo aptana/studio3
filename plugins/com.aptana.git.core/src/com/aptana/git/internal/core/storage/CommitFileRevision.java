@@ -8,7 +8,6 @@
 package com.aptana.git.internal.core.storage;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,15 +19,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.team.core.history.IFileRevision;
 import org.eclipse.team.core.history.ITag;
 import org.eclipse.team.core.history.provider.FileRevision;
 
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRef;
+import com.aptana.git.core.model.GitRepository;
 
 public class CommitFileRevision extends FileRevision
 {
@@ -75,16 +72,9 @@ public class CommitFileRevision extends FileRevision
 				{
 					return new ByteArrayInputStream(new byte[0]);
 				}
-				try
-				{
-					Process p = GitExecutable.instance().run(commit.repository().workingDirectory(), "show", //$NON-NLS-1$
-							commit.sha() + ":" + path); //$NON-NLS-1$
-					return p.getInputStream();
-				}
-				catch (IOException e)
-				{
-					throw new CoreException(new Status(IStatus.ERROR, GitPlugin.getPluginId(), e.getMessage(), e));
-				}
+				IStatus result = commit.repository().execute(GitRepository.ReadWrite.READ,
+						"show", commit.sha() + ":" + path); //$NON-NLS-1$ //$NON-NLS-2$
+				return new ByteArrayInputStream(result.getMessage().getBytes());
 			}
 		};
 	}

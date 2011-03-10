@@ -157,7 +157,11 @@ class GitResourceListener implements IResourceChangeListener
 				continue;
 			GitIndex index = repo.index();
 			if (index != null)
+			{
+				// FIXME This causes the whole index to refresh whenever any file/dir is changed in the workspace attached to the repo. 
+				// We already listen to changes to the git index file, so when do we need to refresh here? Can we do a refresh of only the diff?
 				index.refreshAsync(); // queue up a refresh
+			}
 		}
 	}
 

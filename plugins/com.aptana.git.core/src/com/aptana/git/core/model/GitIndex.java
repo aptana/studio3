@@ -49,7 +49,6 @@ public class GitIndex
 
 	private GitRepository repository;
 	private boolean amend;
-	private IPath workingDirectory;
 
 	/**
 	 * Temporary list of changed files that we build up on refreshes. TODO Don't make this a field here that is
@@ -74,10 +73,8 @@ public class GitIndex
 		super();
 
 		Assert.isNotNull(repository, "GitIndex requires a repository"); //$NON-NLS-1$
-		Assert.isNotNull(workingDirectory, "GitIndex requires a working directory"); //$NON-NLS-1$
 
 		this.repository = repository;
-		this.workingDirectory = workingDirectory;
 		this.changedFiles = new ArrayList<ChangedFile>();
 	}
 
@@ -85,7 +82,7 @@ public class GitIndex
 	 * Used by callers who don't need to wait for it to finish so we can squash together repeated calls when they come
 	 * rapid-fire.
 	 */
-	public void refreshAsync()
+	public synchronized void refreshAsync()
 	{
 		if (indexRefreshJob == null)
 		{
@@ -131,11 +128,13 @@ public class GitIndex
 	synchronized IStatus refresh(boolean notify, IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
+		}
 		this.notify = notify;
 		refreshStatus = 0;
 
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "update-index", "-q", //$NON-NLS-1$ //$NON-NLS-2$
 				"--unmerged", "--ignore-missing", "--refresh"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null) // couldn't even execute!
 		{
@@ -153,7 +152,8 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IStatus result = GitExecutable.instance().runInBackground(workingDirectory, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
+				// index vs working tree (HEAD?)
+				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "ls-files", "--others", //$NON-NLS-1$ //$NON-NLS-2$
 						"--exclude-standard", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (result != null && result.isOK())
 				{
@@ -168,7 +168,8 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IStatus result = GitExecutable.instance().runInBackground(workingDirectory, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
+				// index vs filesystem
+				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", "-z"); //$NON-NLS-1$ //$NON-NLS-2$
 				if (result != null && result.isOK())
 				{
 					readUnstagedFiles(result.getMessage());
@@ -182,7 +183,8 @@ public class GitIndex
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				IStatus result = GitExecutable.instance().runInBackground(workingDirectory, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+				// HEAD vs filesystem
+				IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 						"-z", GitRepository.HEAD); //$NON-NLS-1$
 				if (result != null && result.isOK())
 				{
@@ -193,7 +195,9 @@ public class GitIndex
 		});
 		// Last chance to cancel...
 		if (monitor != null && monitor.isCanceled())
+		{
 			return Status.CANCEL_STATUS;
+		}
 
 		// Copy the last full list of changed files we built up on refresh. Used to pass along the delta
 		Collection<ChangedFile> preRefreshFiles = new ArrayList<ChangedFile>(this.changedFiles.size());
@@ -479,8 +483,7 @@ public class GitIndex
 			input.append(file.getPath()).append('\n');
 		}
 
-		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
-				args.toArray(new String[args.size()]));
+		IStatus result = repository.executeWithInput(input.toString(), args.toArray(new String[args.size()]));
 		if (result == null)
 		{
 			return false;
@@ -516,8 +519,7 @@ public class GitIndex
 			input.append(file.indexInfo());
 		}
 
-		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory,
-				new String[] { "update-index", "-z", "--index-info" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		IStatus result = repository.executeWithInput(input.toString(), "update-index", "-z", "--index-info"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		if (result == null)
 		{
 			return false;
@@ -551,9 +553,8 @@ public class GitIndex
 			input.append(file.getPath()).append("\0"); //$NON-NLS-1$
 		}
 
-		String[] arguments = new String[] { "checkout-index", "--index", "--quiet", "--force", "-z", "--stdin" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-
-		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDirectory, arguments);
+		IStatus result = repository.executeWithInput(input.toString(),
+				"checkout-index", "--index", "--quiet", "--force", "-z", "--stdin"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		if (result == null || !result.isOK())
 		{
 			// postOperationFailed("Discarding changes failed with return value " + ret);
@@ -588,7 +589,7 @@ public class GitIndex
 	private boolean doCommit(String commitMessage)
 	{
 		commitMessage = commitMessage.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		IStatus result = GitExecutable.instance().runInBackground(workingDirectory, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.WRITE, "commit", "-m", commitMessage); //$NON-NLS-1$ //$NON-NLS-2$
 		return result != null && result.isOK();
 	}
 
@@ -616,12 +617,13 @@ public class GitIndex
 		{
 			return new String[0];
 		}
-
-		String result = GitExecutable.instance().outputForCommand(workingDirectory, "log", "--pretty=format:\"%s\"", //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus status = repository.execute(GitRepository.ReadWrite.READ, "log", "--pretty=format:\"%s\"", //$NON-NLS-1$ //$NON-NLS-2$
 				sha1 + ".." + sha2); //$NON-NLS-1$
-		if (result == null || result.trim().length() == 0)
+		if (status == null || !status.isOK() || status.getMessage().trim().length() == 0)
+		{
 			return new String[0];
-		return result.split("[\r\n]+"); //$NON-NLS-1$
+		}
+		return status.getMessage().split("[\r\n]+"); //$NON-NLS-1$
 	}
 
 	/**
@@ -644,10 +646,12 @@ public class GitIndex
 			String indexPath = ":0:" + file.path; //$NON-NLS-1$
 
 			if (file.status == ChangedFile.Status.NEW)
-				return GitExecutable.instance().outputForCommand(workingDirectory, "show", indexPath); //$NON-NLS-1$
+			{
+				IStatus status = repository.execute(GitRepository.ReadWrite.READ, "show", indexPath); //$NON-NLS-1$
+				return status.getMessage();
+			}
 
-			IStatus result = GitExecutable.instance().runInBackground(workingDirectory,
-					"diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
+			IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-index", parameter, "--cached", //$NON-NLS-1$ //$NON-NLS-2$
 					GitRepository.HEAD, "--", file.path); //$NON-NLS-1$
 			if (result == null || !result.isOK())
 			{
@@ -661,7 +665,7 @@ public class GitIndex
 		{
 			try
 			{
-				return IOUtil.read(new FileInputStream(workingDirectory.append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$
+				return IOUtil.read(new FileInputStream(workingDirectory().append(file.path).toFile()), "UTF-8"); //$NON-NLS-1$
 			}
 			catch (FileNotFoundException e)
 			{
@@ -669,25 +673,32 @@ public class GitIndex
 			}
 		}
 
-		return GitExecutable.instance().outputForCommand(workingDirectory, "diff-files", parameter, "--", file.path); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "diff-files", parameter, "--", file.path); //$NON-NLS-1$ //$NON-NLS-2$
+		return result.getMessage();
 	}
 
 	public boolean hasBinaryAttributes(ChangedFile file)
 	{
-		String output = GitExecutable.instance().outputForCommand(workingDirectory, "check-attr", "binary", //$NON-NLS-1$ //$NON-NLS-2$
-				file.getPath());
+		IStatus result = repository.execute(GitRepository.ReadWrite.READ, "check-attr", "binary", file.getPath()); //$NON-NLS-1$ //$NON-NLS-2$
+		String output = result.getMessage();
 		output = output.trim();
 		if (output.endsWith("binary: set")) //$NON-NLS-1$
+		{
 			return true;
+		}
 		if (output.endsWith("binary: unset")) //$NON-NLS-1$
+		{
 			return false;
+		}
 		if (output.endsWith("binary: unspecified")) //$NON-NLS-1$
 		{
 			// try common filename-extensions
 			for (String extension : BINARY_EXTENSIONS)
 			{
 				if (file.getPath().endsWith(extension))
+				{
 					return true;
+				}
 			}
 		}
 		return false;
@@ -705,7 +716,9 @@ public class GitIndex
 		synchronized (changedFiles)
 		{
 			if (changedFiles == null || changedFiles.isEmpty())
+			{
 				return false;
+			}
 
 			IPath workingDirectory = repository.workingDirectory();
 			IPath resourcePath = resource.getLocation();
@@ -713,7 +726,9 @@ public class GitIndex
 			{
 				IPath fullPath = workingDirectory.append(changedFile.getPath()).makeAbsolute();
 				if (resourcePath.isPrefixOf(fullPath))
+				{
 					return true;
+				}
 			}
 		}
 		return false;
@@ -760,7 +775,7 @@ public class GitIndex
 	IFile getResourceForChangedFile(ChangedFile changedFile)
 	{
 		return ResourcesPlugin.getWorkspace().getRoot()
-				.getFileForLocation(workingDirectory.append(changedFile.getPath()));
+				.getFileForLocation(workingDirectory().append(changedFile.getPath()));
 	}
 
 	protected ChangedFile getChangedFileForResource(IResource resource)
@@ -772,7 +787,7 @@ public class GitIndex
 		{
 			for (ChangedFile changedFile : changedFiles)
 			{
-				IPath fullPath = workingDirectory.append(changedFile.getPath());
+				IPath fullPath = workingDirectory().append(changedFile.getPath());
 				if (resourcePath.equals(fullPath))
 				{
 					return changedFile;
@@ -780,6 +795,11 @@ public class GitIndex
 			}
 		}
 		return null;
+	}
+
+	private IPath workingDirectory()
+	{
+		return repository.workingDirectory();
 	}
 
 	/**

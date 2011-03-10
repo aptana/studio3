@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -49,8 +48,7 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 	{
 		// Do a smarter diff and only refresh files that have changed between the two:
 		// git diff --name-only e.getOldBranchName() e.getNewBranchName()
-		IStatus result = GitExecutable.instance().runInBackground(e.getRepository().workingDirectory(), "diff", //$NON-NLS-1$
-				"--name-only", e.getOldBranchName(), e.getNewBranchName()); //$NON-NLS-1$
+		IStatus result = e.getRepository().execute(GitRepository.ReadWrite.READ, "diff", "--name-only", e.getOldBranchName(), e.getNewBranchName()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result != null && result.isOK())
 		{
 			Collection<IResource> files = new ArrayList<IResource>();

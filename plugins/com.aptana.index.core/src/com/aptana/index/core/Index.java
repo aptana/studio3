@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IPath;
 
 import com.aptana.internal.index.core.DiskIndex;
 import com.aptana.internal.index.core.MemoryIndex;
-import com.aptana.internal.index.core.ReadWriteMonitor;
 
 public class Index implements IReadWriteMonitor
 {
