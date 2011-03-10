@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -67,11 +66,10 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 						return Status.CANCEL_STATUS;
 					}
 
+					currentRepo.enterWriteProcess();
 					try
 					{
-						ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(),
-								currentRepo.workingDirectory(), command);
-						sub.worked(100);
+						ILaunch launch = Launcher.launch(currentRepo, sub.newChild(100), command);
 						while (!launch.isTerminated())
 						{
 							Thread.yield();
@@ -98,6 +96,10 @@ abstract class AbstractSimpleGitCommandHandler extends AbstractGitHandler
 					catch (Throwable e)
 					{
 						return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage(), e);
+					}
+					finally
+					{
+						currentRepo.exitWriteProcess();
 					}
 					sub.setWorkRemaining(1000);
 					postLaunch(currentRepo);

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.IStatus;
+
 import com.aptana.git.core.GitPlugin;
 
 public class Diff
@@ -152,7 +154,8 @@ public class Diff
 			}
 		}
 		files.add(new Diff(commit, binary, startname, endname));
-		log(MessageFormat.format("Took {0}ms to parse out {1} diffs", (System.currentTimeMillis() - start), files.size())); //$NON-NLS-1$
+		log(MessageFormat.format(
+				"Took {0}ms to parse out {1} diffs", (System.currentTimeMillis() - start), files.size())); //$NON-NLS-1$
 		return files;
 	}
 
@@ -206,9 +209,9 @@ public class Diff
 	{
 		try
 		{
-			String output = GitExecutable.instance().outputForCommand(gitCommit.repository().workingDirectory(),
+			IStatus result = gitCommit.repository().executeWithGitSSH(GitRepository.ReadWrite.READ,
 					"show", "--pretty=raw", "-M", "--no-color", gitCommit.sha()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			return parse(gitCommit, new StringReader(output));
+			return parse(gitCommit, new StringReader(result.getMessage()));
 		}
 		catch (IOException e)
 		{

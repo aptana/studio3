@@ -1,0 +1,294 @@
+/* 
+ * Set up general font colours, sizes, etc.  Some of these will override
+ * settings from the shared CSS 
+ */
+
+/*
+ * Set up the content for the root page.
+ */
+body {
+	background-position : top left;
+	background-color : #CFCFCD;
+	background-image : url(graphics/rootpage/background.gif);
+	background-repeat : repeat-x;
+	
+	font-family:Verdana;
+	margin:0px;
+	padding:10px;
+	line-height:120%;
+}
+
+a
+{
+	color:#5E83C1;
+	text-decoration:none;
+}
+
+a:visited
+{
+	color:#5E83C1;
+}
+
+a:hover
+{
+	text-decoration: underline;
+}
+
+.intro-header {
+	background-image : url(graphics/rootpage/welcome.gif);
+	background-repeat : no-repeat;
+	background-position : top left;
+	text-align: right;
+}
+
+.header-image
+{
+	background-image : url(graphics/rootpage/header_background.gif);
+	background-repeat : repeat-x;
+	background-position:top right;
+}
+
+.content
+{
+	background-color:#FFFFFF;
+	
+	/* since IE doesn't support min-width, use expression */
+	min-width: 190px;
+	width:expression(document.body.clientWidth < 190 ? "190px" : "auto" );	
+}
+
+.content-padded
+{
+	padding-left:15px;	
+	padding-right:15px;	
+	padding-bottom:10px;
+}
+
+.content-rounded
+{
+	background-image: url(graphics/rootpage/background_bottom_cap.png);
+	background-repeat: no-repeat;
+	background-position: bottom right;
+}
+
+.content-padded dt {
+	margin-bottom:7px;
+	font-size:110%;
+	font-family: "Georgia", "Times New Roman", Times, serif;
+}
+
+.content-padded dd {
+	font-size:70%;
+	margin-top:5px;
+	margin-left:0px;
+	margin-bottom:10px;
+}
+
+.content-padded-filtered
+{
+	overflow:auto;
+	padding-left:15px;	
+	padding-right:15px;	
+	padding-bottom:10px;	
+}
+
+.content-padded-filtered img
+{
+	display:none;
+}
+
+#request_form td
+{
+	font-size:70%;
+}
+
+#request_form input
+{
+	font-family:Verdana, sans-serif;
+	font-size:10px;
+}
+
+#request_form select
+{
+	font-family:Verdana, sans-serif;
+	font-size:10px;
+}
+
+#request_form textarea
+{
+	font-family:Verdana, sans-serif;
+	font-size:10px;
+}
+
+/*
+ * Set up the action links
+ */
+ .action-links
+ {
+ 	float:right;
+ 	text-align:center;
+ 	font-size:9px;
+ 	color:#666666;
+ 	margin-left:14px
+ }
+ 
+.action-links a {
+	border-bottom:none;
+}
+
+.action-links a:visited {
+	border-bottom:none;
+}
+
+.action-links a:hover {
+	text-decoration: underline;
+}
+
+#workbench_img {
+	border:0px;
+}
+
+#aptana_home_img {
+	border:0px;
+}
+
+#check_this_out {
+	font-size:120%;
+}
+
+/* Sets title style for News section of the Welcome page. */
+#rss dt {
+	margin-bottom:7px;
+	font-size:130%;
+	line-height:110%;
+	font-family: "Georgia", "Times New Roman", Times, serif;
+	font-weight:normal;
+}
+
+/* Sets body text style for News section of the Welcome page. */
+#rss dd {
+	font-size:70%;
+	margin-top:5px; 
+	margin-left:0px;
+	margin-bottom:20px;
+	padding-left:15px;
+	padding-right:10px;
+}
+
+#rss dd h1
+{
+	font-size:110%
+}
+
+#rss dd h2
+{
+	font-size:105%
+}
+
+#rss dt a
+{
+	color:#5E83C1;
+	text-decoration:none;
+}
+
+#rss dt a:visited
+{
+	color:#5E83C1;
+	text-decoration:none;
+}
+
+#rss dt a:hover
+{
+	text-decoration: underline;
+}
+
+#rss dd a
+{
+	color:#91ADDB;
+	text-decoration:none;
+}
+
+#rss dd a:visited
+{
+	color:#5E83C1;
+	text-decoration:none;
+}
+
+#rss dd a:hover
+{
+	text-decoration: underline;
+}
+
+#rss dd ol
+{
+	margin-left:20px;
+}
+
+#rss dd ul
+{
+	margin-left:20px;
+}
+
+/* Style that is causing nesting problems. */
+/* Clears the content around the toggle. */
+.post
+{
+	 clear:all; 
+}
+
+/* Workaround style for non-IE browsers. */
+/* Workaround source: http://positioniseverything.net/easyclearing.html */
+.post:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+/* Hides from IE-mac \*/
+* html .post {height: 1%;}
+/* End hide from IE-mac */
+
+.toggler
+{
+	cursor:hand;
+	width:12px;
+	height:30px;
+	float:left;
+	padding-top:6px;
+}
+
+#news #rss .toggler 
+{
+	display:none;
+}
+
+#news #rss dd 
+{
+	padding:0px;
+}
+
+.play
+{
+	width:76px;
+	font-size:11px;
+	background-image : url(graphics/rootpage/play.gif);
+	background-repeat : no-repeat;
+	background-position : top center;
+	float:right;
+	text-align: center;
+	padding-top:60px;
+	margin-left:10px;
+}
+
+.offline
+{
+	border:1px solid #EFEFEF;
+	background-color: #EEFFEE;
+	font-size:18px;
+	padding:10px;
+	margin-top:10px;
+	font-weight:normal;
+	color:#999999;
+}

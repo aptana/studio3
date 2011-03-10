@@ -97,9 +97,53 @@ public final class DetailFormatter implements Comparable<Object> {
 			if (detailFormatter.fTypeName == null) {
 				return 0;
 			}
-			return detailFormatter.fTypeName.compareTo(fTypeName);
+			return 1;
 		}
 		return fTypeName.compareTo(detailFormatter.fTypeName);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fSnippet == null) ? 0 : fSnippet.hashCode());
+		result = prime * result + ((fTypeName == null) ? 0 : fTypeName.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof DetailFormatter)) {
+			return false;
+		}
+		DetailFormatter other = (DetailFormatter) obj;
+		if (fSnippet == null) {
+			if (other.fSnippet != null) {
+				return false;
+			}
+		} else if (!fSnippet.equals(other.fSnippet)) {
+			return false;
+		}
+		if (fTypeName == null) {
+			if (other.fTypeName != null) {
+				return false;
+			}
+		} else if (!fTypeName.equals(other.fTypeName)) {
+			return false;
+		}
+		return true;
 	}
 
 }

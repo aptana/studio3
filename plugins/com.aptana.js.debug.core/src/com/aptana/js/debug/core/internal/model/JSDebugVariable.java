@@ -151,8 +151,6 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @see org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.debug.core.model.IValue)
 	 */
 	public void setValue(IValue value) throws DebugException {
-		// TODO Auto-generated method stub
-		value = null;
 		throwNotImplemented();
 	}
 

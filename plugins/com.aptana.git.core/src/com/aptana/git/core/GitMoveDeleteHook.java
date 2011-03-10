@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.git.core.model.ChangedFile;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
@@ -111,7 +110,8 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 			String message = status.getMessage();
 			if (message.contains("did not match any files")) //$NON-NLS-1$
 			{
-				// No files underneath folder are in git, so git knows nothing about directory. Let normal handler delete this directory
+				// No files underneath folder are in git, so git knows nothing about directory. Let normal handler
+				// delete this directory
 				return FINISH_FOR_ME;
 			}
 
@@ -269,8 +269,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 
 	protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 	{
-		IStatus result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "ls-tree", //$NON-NLS-1$
-				"-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
+		IStatus result = repo.execute(GitRepository.ReadWrite.READ, "ls-tree", "-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		return result != null && result.isOK();
 	}
 

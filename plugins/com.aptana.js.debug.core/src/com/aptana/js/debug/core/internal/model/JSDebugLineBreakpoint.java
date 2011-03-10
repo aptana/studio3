@@ -95,7 +95,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 				IMarker marker = resource.createMarker(IDebugCoreConstants.ID_LINE_BREAKPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
-				attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
+				attributes.put(IMarker.LINE_NUMBER, Integer.valueOf(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
 						resource.getFullPath().toString(), Integer.toString(lineNumber)));
@@ -123,7 +123,7 @@ public class JSDebugLineBreakpoint extends LineBreakpoint implements IJSLineBrea
 						IDebugCoreConstants.ID_LINE_BREAKPOINT_MARKER);
 				setMarker(marker);
 				attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
-				attributes.put(IMarker.LINE_NUMBER, new Integer(lineNumber));
+				attributes.put(IMarker.LINE_NUMBER, Integer.valueOf(lineNumber));
 				attributes.put(IBreakpoint.ID, getModelIdentifier());
 				attributes.put(IMarker.MESSAGE, MessageFormat.format(Messages.JSDebugLineBreakpoint_JSBreakpoint_0_1,
 						DebugUtil.getPath(resource), Integer.toString(lineNumber)));

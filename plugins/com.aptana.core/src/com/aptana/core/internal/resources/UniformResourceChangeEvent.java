@@ -24,8 +24,8 @@ public class UniformResourceChangeEvent extends EventObject implements IUniformR
 	private static final IMarkerDelta[] NO_MARKER_DELTAS = new IMarkerDelta[0];
 	private static final long serialVersionUID = 1L;
 	
-	private IUniformResource resource;
-	private IMarkerDelta[] deltas;
+	private transient IUniformResource resource;
+	private transient IMarkerDelta[] deltas;
 
 	/**
 	 * UniformResourceChangeEvent

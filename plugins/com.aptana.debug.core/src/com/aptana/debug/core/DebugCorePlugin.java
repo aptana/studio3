@@ -39,7 +39,6 @@ public class DebugCorePlugin extends Plugin {
 	 * The constructor.
 	 */
 	public DebugCorePlugin() {
-		plugin = this;
 	}
 
 	/**
@@ -50,6 +49,7 @@ public class DebugCorePlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		plugin = this;
 		breakpointHelper = new UniformResourceBreakpointChangeNotifier();
 		DebugPlugin.getDefault().addDebugEventListener(remoteSourceCacheManager = new RemoteSourceCacheManager());
 	}

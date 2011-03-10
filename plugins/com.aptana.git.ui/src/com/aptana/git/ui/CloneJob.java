@@ -137,13 +137,12 @@ public class CloneJob extends Job
 			ILaunch launch;
 			if (shallowClone)
 			{
-				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
-						"clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				launch = Launcher
+						.launch(null, subMonitor.newChild(100), "clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			else
 			{
-				launch = Launcher.launch(GitExecutable.instance().path().toOSString(), null, subMonitor.newChild(100),
-						"clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+				launch = Launcher.launch(null, subMonitor.newChild(100), "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (launch == null)
 			{

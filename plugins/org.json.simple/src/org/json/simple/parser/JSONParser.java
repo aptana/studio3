@@ -20,6 +20,7 @@ import org.json.simple.JSONObject;
  * 
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JSONParser {
 	public static final int S_INIT=0;
 	public static final int S_IN_FINISHED_VALUE=1;//string,number,boolean,null,object,array

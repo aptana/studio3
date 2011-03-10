@@ -224,7 +224,7 @@ public class JSLineBreakpointPropertyPage extends PropertyPage implements IWorkb
 		int hitCount = breakpoint.getHitCount();
 		String hitCountString = StringUtil.EMPTY;
 		if (hitCount > 0) {
-			hitCountString = new Integer(hitCount).toString();
+			hitCountString = Integer.toString(hitCount);
 			fHitCountButton.setSelection(true);
 		} else {
 			fHitCountButton.setSelection(false);

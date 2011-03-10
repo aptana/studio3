@@ -1,0 +1,297 @@
+<!-- ===================================================================== -->
+<!-- Custom targets called from a project's generated build.xml            -->
+<!-- Set customBuildCallbacks=<path/to/this/file> in your build.properties.-->
+<!-- ===================================================================== -->
+<project name="Build specific targets and properties" default="noDefault">
+
+	<!-- ===================================================================== -->
+	<!-- Default target                                                        -->
+	<!-- ===================================================================== -->
+	<target name="noDefault">
+		<echo message="This file must be called with explicit targets" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target build.jars                              -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder to contain the build results           -->
+	<!-- ===================================================================== -->
+	<target name="pre.build.jars">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target build.jars                               -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder to contain the build results           -->
+	<!-- ===================================================================== -->
+	<target name="post.build.jars">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target build.sources                           -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder to contain the build results           -->
+	<!-- ===================================================================== -->
+	<target name="pre.build.sources">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target build.sources                            -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder to contain the build results           -->
+	<!-- ===================================================================== -->
+	<target name="post.build.sources">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the compilation target <name>                      -->
+	<!-- Substitute "name" with the name of the compilation target, eg @dot    -->
+	<!-- Available parameters :                                                -->
+	<!--   source.foldern : n = 1 ... N, the source folders                    -->
+	<!--   target.folder  : where the results of the compilation go            -->
+	<!--   <name>.classpath : name = name of the compilation target. A         -->
+	<!--                      reference to the classpath structure.            -->
+	<!-- ===================================================================== -->
+	<target name="pre.name">
+	</target>
+
+	<target name="pre.@dot">
+		<property name="doc.output.dir" location="output/documentation/html" />
+		<mkdir dir="${doc.output.dir}" />
+		<mkdir dir="${doc.output.dir}/reference" />
+		<antcall target="reference.docs" />
+		<copy todir="html" overwrite="true">
+			<fileset dir="${doc.output.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<delete dir="${doc.output.dir}" />
+	</target>
+
+	<target name="reference.docs">
+		<echo message="****************************************" level="info" />
+		<echo message="**  Building Reference Documentation  **" level="info" />
+		<echo message="****************************************" level="info" />
+
+		<!--<antcall target="reference.docs.individual">
+			<param name="reference.directory" value="../com.aptana.editor.html/metadata/" />
+			<param name="reference.original" value="../com.aptana.editor.html/metadata/html_metadata.xml" />
+			<param name="reference.name" value="HTML" />
+			<param name="reference.displayname" value="HTML" />
+			<param name="reference.languagetype" value="text_html" />
+			<param name="reference.elementname" value="Tag" />
+			<param name="reference.elementnameplural" value="Tags" />
+			<param name="reference.fieldname" value="Attribute" />
+			<param name="reference.fieldnameplural" value="Attributes" />
+			<param name="reference.eventname" value="Event" />
+			<param name="reference.eventnameplural" value="Events" />
+			<param name="reference.xsl" value="css_metadata_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.directory" value="../com.aptana.editor.css/metadata/" />
+			<param name="reference.original" value="../com.aptana.editor.css/metadata/css_metadata.xml" />
+			<param name="reference.name" value="CSS" />
+			<param name="reference.displayname" value="CSS" />
+			<param name="reference.languagetype" value="text_css" />
+			<param name="reference.elementname" value="Element" />
+			<param name="reference.elementnameplural" value="Elements" />
+			<param name="reference.fieldname" value="Property" />
+			<param name="reference.fieldnameplural" value="Properties" />
+			<param name="reference.eventname" value="Event" />
+			<param name="reference.eventnameplural" value="Events" />
+			<param name="reference.xsl" value="css_metadata_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+		-->
+		
+		<!-- location of original XML files for core documentation -->
+		<!-- FIXME: This is fragile. Unsure it can be made much better. -->
+		<property name="reference.directory" value="../com.aptana.editor.js/metadata" />
+
+		<!--
+		<antcall target="reference.docs.individual">
+			<param name="reference.directory" value="${reference.directory}" />
+			<param name="reference.original" value="${reference.directory}/js_keywords.xml" />
+			<param name="reference.name" value="JSKeywords" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="JavaScript Keywords" />
+			<param name="reference.xsl" value="keywords_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+		-->
+		
+		<antcall target="reference.docs.individual">
+			<param name="reference.directory" value="${reference.directory}" />
+			<param name="reference.original" value="${reference.directory}/dom_0.xml" />
+			<param name="reference.name" value="HTMLDOM0" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 0" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.directory" value="${reference.directory}" />
+			<param name="reference.original" value="${reference.directory}/js_core.xml" />
+			<param name="reference.name" value="JSCore" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="JavaScript Core" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.original" value="${reference.directory}/dom_2.xml" />
+			<param name="reference.name" value="HTMLDOM2" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 2" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.original" value="${reference.directory}/dom_3.xml" />
+			<param name="reference.name" value="HTMLDOM3" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 3" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+		<antcall target="reference.docs.individual">
+			<param name="reference.original" value="${reference.directory}/dom_5.xml" />
+			<param name="reference.name" value="HTMLDOM5" />
+			<param name="reference.languagetype" value="text_javascript" />
+			<param name="reference.displayname" value="HTML DOM Level 5" />
+			<param name="reference.xsl" value="help_documentation.xslt" />
+			<param name="documentation.directory" value="${doc.output.dir}/reference/" />
+		</antcall>
+
+	</target>
+
+	<target name="reference.docs.individual">
+		<echo message="****************************************" level="info" />
+		<echo message="**  Building Reference ${reference.name} **" level="info" />
+		<echo message="****************************************" level="info" />
+
+		<mkdir dir="${documentation.directory}/api" />
+		<copy file="xsl/${reference.xsl}" tofile="${documentation.directory}/api/${reference.xsl}" />
+		<copy file="${reference.original}" tofile="${documentation.directory}/api/reference_${reference.name}.xml" />
+		<copy todir="${documentation.directory}/api">
+			<fileset dir="${reference.directory}">
+				<include name="*.html" />
+			</fileset>
+		</copy>
+
+		<!-- Regular XSLT task works on Windows, but not on Linux. On Linux,
+	  			 task will run, but no documents created via <xsl:result-document /> are written
+	  			 Shelling to Java is not ideal. Perhaps this could be switched to <java /> task
+	  			 but command-line args may need to be passed differently
+	  		-->
+		<exec executable="java" failonerror="true">
+			<arg line="-jar xsl/lib/saxon8.jar -o ${documentation.directory}/api/docs.xml ${documentation.directory}/api/reference_${reference.name}.xml ${documentation.directory}/api/${reference.xsl} ReferenceName=${reference.name} ReferenceDisplayName=&quot;${reference.displayname}&quot; ReferenceLanguageType=&quot;${reference.languagetype}&quot; ReferenceElementName=&quot;${reference.elementname}&quot; ReferenceFieldName=&quot;${reference.fieldname}&quot; ReferenceEventName=&quot;${reference.eventname}&quot; ReferenceElementNamePlural=&quot;${reference.elementnameplural}&quot; ReferenceFieldNamePlural=&quot;${reference.fieldnameplural}&quot; ReferenceEventNamePlural=&quot;${reference.eventnameplural}&quot;" />
+		</exec>
+		<delete file="${documentation.directory}/api/reference_${reference.name}.xml" />
+		<delete file="${documentation.directory}/api/${reference.xsl}" />
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do during the compilation target <name>, after the compile   -->
+	<!-- but before jaring.  Substitute "name" with the name of the compilation-->
+	<!-- target, eg @dot                                                       -->
+	<!-- Available parameters :                                                -->
+	<!--   source.foldern : n = 1 ... N, the source folders                    -->
+	<!--   target.folder  : where the results of the compilation go            -->
+	<!--   <name>.classpath : name = name of the compilation target. A         -->
+	<!--                      reference to the classpath structure.            -->
+	<!-- ===================================================================== -->
+	<target name="post.compile.name">
+	</target>
+
+	<target name="post.compile.@dot">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the compilation target <name>                       -->
+	<!-- Substitute "name" with the name of the compilation target, eg @dot    -->
+	<!-- Available parameters :                                                -->
+	<!--   jar.location - the location of the compilation results              -->
+	<!--   <name>.classpath : name = name of the compilation target. A         -->
+	<!--                      reference to the classpath structure.            -->
+	<!-- ===================================================================== -->
+	<target name="post.name">
+	</target>
+
+	<target name="post.@dot">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target gather.bin.parts                         -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder containing the build results           -->
+	<!--   target.folder - destination folder                                  -->
+	<!-- ===================================================================== -->
+	<target name="pre.gather.bin.parts">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target gather.bin.parts                         -->
+	<!-- Available parameters :                                                -->
+	<!--   build.result.folder - folder containing the build results           -->
+	<!--   target.folder - destination folder                                  -->
+	<!-- ===================================================================== -->
+	<target name="post.gather.bin.parts">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target gather.sources                          -->
+	<!-- Available parameters :                                                -->
+	<!--   destination.temp.folder - destination folder                        -->
+	<!-- ===================================================================== -->
+	<target name="pre.gather.sources">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target gather.sources                           -->
+	<!-- Available parameters :                                                -->
+	<!--   destination.temp.folder - destination folder                        -->
+	<!-- ===================================================================== -->
+	<target name="post.gather.sources">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target gather.logs                             -->
+	<!-- Available parameters :                                                -->
+	<!--   destination.temp.folder - destination folder                        -->
+	<!-- ===================================================================== -->
+	<target name="pre.gather.logs">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target gather.logs                              -->
+	<!-- Available parameters :                                                -->
+	<!--   destination.temp.folder - destination folder                        -->
+	<!-- ===================================================================== -->
+	<target name="post.gather.logs">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do before the target clean                                   -->
+	<!-- Available parameters :                                                -->
+	<!--   destination.temp.folder - destination folder                        -->
+	<!-- ===================================================================== -->
+	<target name="pre.clean">
+	</target>
+
+	<!-- ===================================================================== -->
+	<!-- Steps to do after the target clean                                    -->
+	<!-- Available parameters :                                                -->
+	<!--   plugin.destination - final destination of the build                 -->
+	<!--   build.result.folder - results of the compilation                    -->
+	<!--   temp.folder - temporary folder                                      -->
+	<!-- ===================================================================== -->
+	<target name="post.clean">
+	</target>
+</project>

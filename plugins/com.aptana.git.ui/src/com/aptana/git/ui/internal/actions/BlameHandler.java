@@ -30,7 +30,6 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.QuickDiffReferenceProvider;
@@ -115,8 +114,7 @@ public class BlameHandler extends AbstractGitHandler
 	private RevisionInformation createRevisionInformation(GitRepository repo, IPath relativePath)
 	{
 		// Run git blame on the file, parse out the output and turn it into revisions!
-		IStatus result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "blame", "-p", //$NON-NLS-1$ //$NON-NLS-2$
-				relativePath.toOSString());
+		IStatus result = repo.execute(GitRepository.ReadWrite.READ, "blame", "-p", relativePath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (result == null || !result.isOK())
 		{
 			return new RevisionInformation();
