@@ -352,7 +352,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		createNoProjectsComposite();
 		createClosedProjectComposite();
 
-		if (selectedProject != null && selectedProject.isAccessible())
+		if (selectedProject != null)
 		{
 			if (selectedProject.isAccessible())
 			{
