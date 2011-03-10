@@ -11,7 +11,6 @@ import com.aptana.parsing.IRecoveryStrategy;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
 import com.aptana.parsing.ast.ParseRootNode;
 import com.aptana.editor.js.parsing.ast.*;
-import java.util.Comparator;
 import beaver.*;
 import com.aptana.parsing.IParser;
 import com.aptana.parsing.ast.IParseNode;
