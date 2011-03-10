@@ -191,7 +191,7 @@ class XHRTransfer implements IXHRTransfer {
 	/*
 	 * Header implementation
 	 */
-	private class Header implements IHeader {
+	private static class Header implements IHeader {
 		private String name;
 		private String value;
 

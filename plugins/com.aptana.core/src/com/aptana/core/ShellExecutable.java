@@ -109,7 +109,7 @@ public final class ShellExecutable {
 		return null;
 	}
 	
-	public static IPath getShellRCPath() {
+	public static synchronized IPath getShellRCPath() {
 		if (shellRCPath == null) {
 			URL url = FileLocator.find(CorePlugin.getDefault().getBundle(), Path.fromPortableString(RCFILE), null);
 			if (url != null) {

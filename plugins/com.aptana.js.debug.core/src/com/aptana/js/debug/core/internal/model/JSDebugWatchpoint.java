@@ -239,7 +239,7 @@ public class JSDebugWatchpoint extends Breakpoint implements IJSWatchpoint {
 		boolean[] def = new boolean[] { false, true }; // getDefaultAccessAndModificationValues();
 		Object[] values = new Object[def.length];
 		for (int i = 0; i < def.length; i++) {
-			values[i] = new Boolean(def[i]);
+			values[i] = Boolean.valueOf(def[i]);
 		}
 		String[] attributes = new String[] { ACCESS, MODIFICATION };
 		setAttributes(attributes, values);

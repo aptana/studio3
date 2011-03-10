@@ -185,7 +185,7 @@ public class DetailFormatterDialog extends StatusDialog {
 		String name = typeName.getText().trim();
 		if (name.length() == 0) {
 			status.setError(Messages.DetailFormatterDialog_QualifiedTypeNameMustNotBeEmpty);
-		} else if (definedTypes != null && definedTypes.contains(typeName)) {
+		} else if (definedTypes != null && definedTypes.contains(name)) {
 			status.setError(Messages.DetailFormatterDialog_DetailFormatterIsDefinedForThisType);
 		} else if (snippetViewer.getDocument().get().trim().length() == 0) {
 			status.setError(Messages.DetailFormatterDialog_CodeSnippetMustNotBeEmpty);

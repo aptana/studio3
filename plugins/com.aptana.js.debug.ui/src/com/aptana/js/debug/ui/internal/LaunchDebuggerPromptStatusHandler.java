@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.ui.util.UIUtils;
@@ -31,6 +32,6 @@ public class LaunchDebuggerPromptStatusHandler implements IStatusHandler {
 
 		MessageDialog dlg = new MessageDialog(shell, title, null, message, MessageDialog.INFORMATION, new String[] {
 				Messages.LaunchDebuggerPromptStatusHandler_CloseActiveSession, IDialogConstants.CANCEL_LABEL }, 1);
-		return new Boolean(dlg.open() == 0);
+		return Boolean.valueOf(dlg.open() == Window.OK);
 	}
 }

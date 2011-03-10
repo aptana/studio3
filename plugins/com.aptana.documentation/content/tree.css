@@ -1,0 +1,88 @@
+h1, h2 { font-family: 'trebuchet ms', verdana, arial; padding: 10px; margin: 0 }
+
+.treeview ul {  }
+
+.treeview, .treeview ul { 
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+.treeview div.hitarea {
+	height: 15px;
+	width: 15px;
+	margin-left: -15px;
+	float: left;
+	cursor: pointer;
+}
+/* fix for IE6 */
+* html div.hitarea {
+	background: #fff;
+	filter: alpha(opacity=0);
+	display: inline;
+	float:none;
+}
+
+.treeview li { 
+	margin: 0;
+	padding: 3px 0pt 3px 16px;
+}
+
+.treeview a.selected {
+	background-color: #eee;
+}
+
+#treecontrol { margin: 1em 0; }
+
+.treeview .hover { color: red; cursor: pointer; }
+
+#black.treeview li { padding: 3px 0 1px 16px; }
+#black.treeview span.constructor, #black.treeview span.property,
+#black.treeview span.method { padding-left: 18px; display: block; height: 16px; font-size: 80% }
+
+#black.treeview span.constructor { background: url(class.gif) 0 0 no-repeat; }
+#black.treeview span.property { background: url(js_property.gif) 0 0 no-repeat; }
+#black.treeview span.method { background: url(js_function.gif) 0 0 no-repeat; }
+
+#black.treeview span.Array { background: url(array-literal.png) 0 0 no-repeat; }
+#black.treeview span.Boolean { background: url(boolean.png) 0 0 no-repeat; }
+#black.treeview span.Number { background: url(number.png) 0 0 no-repeat; }
+#black.treeview span.String { background: url(string.png) 0 0 no-repeat; }
+#black.treeview span.Regex { background: url(regex.png) 0 0 no-repeat; }
+
+/* Static methods */
+#black.treeview span.constructor-static { background: url(class-static.gif) 0 0 no-repeat; }
+#black.treeview span.property-static { background: url(js_property-static.gif) 0 0 no-repeat; }
+#black.treeview span.method-static { background: url(js_function-static.gif) 0 0 no-repeat; }
+
+#black.treeview span.Array-static { background: url(array-literal-static.png) 0 0 no-repeat; }
+#black.treeview span.Boolean-static { background: url(boolean-static.png) 0 0 no-repeat; }
+#black.treeview span.Number-static { background: url(number-static.png) 0 0 no-repeat; }
+#black.treeview span.String-static { background: url(string-static.png) 0 0 no-repeat; }
+#black.treeview span.Regex-static { background: url(regex-static.png) 0 0 no-repeat; }
+
+h2 { padding-bottom: 0px }
+#black.treeview { font-size:120%; padding-left:7px; }
+#black.treeview li { background: url(tv-item.gif) 0 0 no-repeat; }			
+#black.treeview .collapsable { background-image: url(tv-collapsable.gif); }
+#black.treeview .expandable { background-image: url(tv-expandable.gif); }
+#black.treeview .last { background-image: url(tv-item-last.gif); }
+#black.treeview .lastCollapsable { background-image: url(tv-collapsable-last.gif); }
+#black.treeview .lastExpandable { background-image: url(tv-expandable-last.gif); }
+	
+body {
+	background-image: url(toc_background.gif);
+	background-repeat: repeat-y;
+	background-position: top right;
+	padding-left:10px;
+}
+
+.visibility {
+	font-size:90%;
+	color:#AAAAAA;
+}
+
+.property
+{
+	
+}

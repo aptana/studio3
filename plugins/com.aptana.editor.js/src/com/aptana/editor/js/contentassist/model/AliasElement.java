@@ -13,12 +13,21 @@ public class AliasElement
 {
 	private String _name;
 	private String _type;
+	private String _description;
 
 	/**
 	 * AliasElement
 	 */
 	public AliasElement()
 	{
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription()
+	{
+		return this._description;
 	}
 
 	/**
@@ -39,6 +48,15 @@ public class AliasElement
 	public String getType()
 	{
 		return StringUtil.getStringValue(this._type);
+	}
+
+	/**
+	 * @param description
+	 *            the description to set
+	 */
+	public void setDescription(String description)
+	{
+		this._description = description;
 	}
 
 	/**

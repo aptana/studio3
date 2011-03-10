@@ -133,7 +133,7 @@ public final class MarkerUtils {
 	 * @param charEnd - char end.
 	 */
     public static void setCharEnd(Map attributes, int charEnd) {
-        attributes.put(IMarker.CHAR_END, new Integer(charEnd));
+        attributes.put(IMarker.CHAR_END, Integer.valueOf(charEnd));
     }
     
     /**
@@ -142,7 +142,7 @@ public final class MarkerUtils {
      * @param charEnd - char end.
      */
     public static void setCharStart(Map attributes, int charStart) {
-        attributes.put(IMarker.CHAR_START, new Integer(charStart));
+        attributes.put(IMarker.CHAR_START, Integer.valueOf(charStart));
     }
     
     /**
@@ -160,6 +160,6 @@ public final class MarkerUtils {
      * @param line - line number.
      */
 	public static void setLineNumber(Map attributes, int line) {
-        attributes.put(IMarker.LINE_NUMBER, new Integer(line));
+        attributes.put(IMarker.LINE_NUMBER, Integer.valueOf(line));
     }
 }

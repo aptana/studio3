@@ -8,7 +8,7 @@
 		responsibility of the developer who makes changes to the
 		programmatic schema to update this schema to reflect those changes
 	-->
-	
+
 	<element name="attribute" onEnter="startAttributeElement">
 		<attribute name="name" />
 		<attribute name="usage" usage="optional" />

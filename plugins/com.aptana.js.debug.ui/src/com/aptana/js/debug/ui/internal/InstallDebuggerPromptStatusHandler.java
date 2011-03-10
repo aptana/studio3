@@ -59,13 +59,13 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 			case 0:
 				WorkbenchBrowserUtil.launchExternalBrowser(
 						URL_INSTALL_PDM, "org.eclipse.ui.browser.ie"); //$NON-NLS-1$
-				/* continue */
+				return Boolean.TRUE;
 			case 1:
-				return new Boolean(true);
+				return Boolean.TRUE;
 			case 3:
 				WorkbenchBrowserUtil
 						.launchExternalBrowser(URL_DOCS_INSTALL_IE_DEBUGGER); 
-				return new Boolean(true);
+				return Boolean.TRUE;
 			default:
 				break;
 			}
@@ -104,7 +104,7 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 		String pref = store.getString(IJSDebugUIConstants.PREF_INSTALL_DEBUGGER);
 		if (pref != null) {
 			if (pref.equals(MessageDialogWithToggle.ALWAYS)) {
-				return new Boolean(true);
+				return Boolean.TRUE;
 			}
 		}
 		String message = MessageFormat.format(Messages.InstallDebuggerPromptStatusHandler_ExtensionNotInstalled,
@@ -119,9 +119,9 @@ public class InstallDebuggerPromptStatusHandler implements IStatusHandler {
 		while (true) {
 			switch (dialog.open()) {
 			case IDialogConstants.YES_ID:
-				return new Boolean(true);
+				return Boolean.TRUE;
 			case IDialogConstants.NO_ID:
-				return new Boolean(false);
+				return Boolean.FALSE;
 			default:
 				break;
 			}
