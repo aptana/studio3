@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -117,7 +118,7 @@ class GitResourceListener implements IResourceChangeListener
 			GitPlugin.logError(e);
 		}
 
-		if (!projectsToAttach.isEmpty())
+		if (autoAttachGitRepos() && !projectsToAttach.isEmpty())
 		{
 			Job job = new Job("Attaching Git repos") //$NON-NLS-1$
 			{
@@ -158,6 +159,12 @@ class GitResourceListener implements IResourceChangeListener
 			if (index != null)
 				index.refreshAsync(); // queue up a refresh
 		}
+	}
+
+	private boolean autoAttachGitRepos()
+	{
+		return Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.AUTO_ATTACH_REPOS, true, null);
 	}
 
 	private IGitRepositoryManager getGitRepositoryManager()

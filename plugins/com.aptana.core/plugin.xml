@@ -56,7 +56,7 @@
                id="com.aptana.core.platformPropertyTester"
                namespace="com.aptana.core.platform"
                properties="os,ws,arch"
-               type="org.eclipse.core.runtime.Platform">
+               type="java.lang.Object">
          </propertyTester>
       </extension>
 

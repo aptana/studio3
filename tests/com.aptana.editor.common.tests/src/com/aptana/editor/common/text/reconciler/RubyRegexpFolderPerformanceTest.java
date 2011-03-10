@@ -20,6 +20,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.test.performance.PerformanceTestCase;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
+import org.jruby.util.RegexpOptions;
 
 import com.aptana.core.util.IOUtil;
 
@@ -30,9 +31,9 @@ public class RubyRegexpFolderPerformanceTest extends PerformanceTestCase
 	public void testYUICSSFolding() throws Exception
 	{
 		Ruby runtime = Ruby.newInstance();
-		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", 0);
+		final RubyRegexp endFolding = RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
 		final RubyRegexp startFolding = RubyRegexp.newRegexp(runtime,
-				"\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", 0);
+				"\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", RegexpOptions.NULL_OPTIONS);
 
 		String src = readFile("yui.css");
 		IDocument document = new Document(src);

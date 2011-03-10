@@ -20,7 +20,6 @@ import com.aptana.ui.UIPlugin;
 
 /**
  * @author Max Stepanov
- *
  */
 public final class WorkbenchBrowserUtil {
 
@@ -55,7 +54,8 @@ public final class WorkbenchBrowserUtil {
 		IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
 		if (browserId != null) {
 			try {
-				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null, null);
+				IWebBrowser webBrowser = support.createBrowser(IWorkbenchBrowserSupport.AS_EXTERNAL, browserId, null,
+						null);
 				if (webBrowser != null) {
 					webBrowser.openURL(url);
 					return webBrowser;
@@ -69,6 +69,27 @@ public final class WorkbenchBrowserUtil {
 			webBrowser.openURL(url);
 			return webBrowser;
 		} catch (PartInitException e) {
+			UIPlugin.log(e);
+		}
+		return null;
+	}
+
+	/**
+	 * Opens an URl with the default settings (which will typically open in an
+	 * internal browser with no toolbar/url bar/etc).
+	 * 
+	 * @param url
+	 * @return
+	 */
+	public static IWebBrowser openURL(String url) {
+		try {
+			IWorkbenchBrowserSupport workbenchBrowserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+			IWebBrowser webBrowser = workbenchBrowserSupport.createBrowser(null);
+			if (webBrowser != null) {
+				webBrowser.openURL(new URL(url));
+			}
+			return webBrowser;
+		} catch (Exception e) {
 			UIPlugin.log(e);
 		}
 		return null;

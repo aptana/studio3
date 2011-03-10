@@ -14,7 +14,7 @@ import org.eclipse.osgi.util.NLS;
  */
 public final class Messages extends NLS
 {
-	private static final String BUNDLE_NAME = "com.aptana.ide.editor.scriptdoc.parsing.reader.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.editor.js.contentassist.index.messages"; //$NON-NLS-1$
 
 	private Messages()
 	{
@@ -26,6 +26,15 @@ public final class Messages extends NLS
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
 	}
 
+	public static String JSCAHandler_Invalid_Alias;
+	public static String JSCAHandler_Invalid_Event_Name;
+	public static String JSCAHandler_Invalid_Event_Property_Name;
+	public static String JSCAHandler_Invalid_Function_Name;
+	public static String JSCAHandler_Invalid_Parameter_Name;
+	public static String JSCAHandler_Invalid_Property_Name;
+	public static String JSCAHandler_Invalid_Type_Name;
+	public static String JSCAHandler_Unable_To_Set_Name_Property;
+	public static String JSCAHandler_Unrecognized_Property_Name;
 	public static String JSMetadataReader_Invalid_Exception_Name;
 	public static String JSMetadataReader_Invalid_Parameter_Type;
 	public static String JSMetadataReader_Invalid_Property_Type;

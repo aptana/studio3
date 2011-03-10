@@ -18,6 +18,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.jruby.Ruby;
 import org.jruby.RubyRegexp;
+import org.jruby.util.RegexpOptions;
 
 public class RubyRegexpFolderTest extends TestCase
 {
@@ -49,13 +50,13 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", 0);
+				return RubyRegexp.newRegexp(runtime, "(?<!\\*)\\*\\*\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", 0);
+				return RubyRegexp.newRegexp(runtime, "\\/\\*\\*(?!\\*)|\\{\\s*($|\\/\\*(?!.*?\\*\\/.*\\S))", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -80,13 +81,13 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", 0);
+				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", 0);
+				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -109,13 +110,13 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", 0);
+				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", 0);
+				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
@@ -146,13 +147,13 @@ public class RubyRegexpFolderTest extends TestCase
 			@Override
 			protected RubyRegexp getEndFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", 0);
+				return RubyRegexp.newRegexp(runtime, "\\*+\\/|^\\s*\\}", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override
 			protected RubyRegexp getStartFoldRegexp(String scope)
 			{
-				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", 0);
+				return RubyRegexp.newRegexp(runtime, "\\/\\*+|^.*\\bfunction\\s*(\\w+\\s*)?\\([^\\)]*\\)(\\s*\\{[^\\}]*)?\\s*$", RegexpOptions.NULL_OPTIONS);
 			}
 
 			@Override

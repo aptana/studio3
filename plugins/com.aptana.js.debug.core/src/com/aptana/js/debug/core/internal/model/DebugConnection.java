@@ -41,11 +41,6 @@ public class DebugConnection {
 	 */
 	protected static final int COMMAND_TIMEOUT = 20000;
 
-	/**
-	 * SOCKET_TIMEOUT
-	 */
-	public static final int SOCKET_TIMEOUT = 30000;
-
 	private static final String ARGS_SPLIT = "\\*"; //$NON-NLS-1$
 
 	private Socket socket;

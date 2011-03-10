@@ -634,7 +634,7 @@ public class ParseNode extends Node implements IParseNode
 			}
 			catch (Throwable t)
 			{
-				source = ""; //$NON-NLS-1
+				source = ""; //$NON-NLS-1$
 			}
 
 			String message = MessageFormat.format( //

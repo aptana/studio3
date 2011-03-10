@@ -28,6 +28,7 @@ public class AllTests
 		};
 		//$JUnit-BEGIN$
 		suite.addTest(com.aptana.parsing.ast.AllTests.suite());
+		suite.addTest(com.aptana.json.AllTests.suite());
 		//$JUnit-END$
 		return suite;
 	}

@@ -7,21 +7,29 @@
  */
 package com.aptana.debug.core.util;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IProcess;
 
 import com.aptana.core.resources.IUniformResource;
+import com.aptana.core.util.SocketUtil;
 
 /**
  * @author Max Stepanov
  */
 public final class DebugUtil {
+
+	private static final int DEFAULT_PORT = 8999;
+
+	private static final int SOCKET_TIMEOUT = 30000;
 
 	private DebugUtil() {
 	}
@@ -91,4 +99,24 @@ public final class DebugUtil {
 		}
 		return null;
 	}
+	
+	public static int getDebuggerPort() {
+		int port = SocketUtil.findFreePort(null);
+		if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			port = 2525;
+		}
+		if (port == -1) {
+			port = DEFAULT_PORT;
+		}
+		return port;
+	}
+	
+	public static ServerSocket allocateServerSocket(int port) throws IOException {
+		ServerSocket socket = new ServerSocket(port);
+		if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
+			socket.setSoTimeout(SOCKET_TIMEOUT);
+		}
+		return socket;
+	}
+
 }

@@ -201,6 +201,7 @@ public final class LaunchConfigurationsHelper {
 					return config;
 				}
 			}
+			@SuppressWarnings("deprecation")
 			ILaunchConfigurationWorkingCopy wc = configType.newInstance(null, DebugPlugin.getDefault()
 					.getLaunchManager().generateUniqueLaunchConfigurationNameFrom(nature + " - Internal Server")); //$NON-NLS-1$
 			JSLaunchConfigurationHelper.setDefaults(wc, nature);

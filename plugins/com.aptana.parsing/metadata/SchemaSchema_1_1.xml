@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2007/schema/1.1">
+	<!--
+		Please note this schema is for reference only. The purpose of this
+		file is to show how the Schema 1.1 schema is defined in the syntax
+		of the schema itself. This schema is actually created programtically
+		as part of the bootstrapping process. As such, it is the
+		responsibility of the developer who makes changes to the
+		programmatic schema to update this schema to reflect those changes
+	-->
+
+	<sets>
+		<element-set id="use-element-set">
+			<element name="use-element-set" onEnter="startUseElementSetElement">
+				<attribute name="name"/>
+			</element>
+		</element-set>
+
+		<element-set id="element-or-use-set">
+			<element name="element" onEnter="startElementElement" onExit="exitElementElement">
+				<attribute name="name" />
+				<attribute name="onEnter" usage="optional" />
+				<attribute name="onExit" usage="optional" />
+				<atttibute name="hasText" usage="optional"/>
+				<element name="attribute" onEnter="startAttributeElement">
+					<attribute name="name" />
+					<attribute name="usage" usage="optional" />
+				</element>
+			</element>
+			<use-element-set name="#use-element-set" />
+		</element-set>
+	</sets>
+
+	<element name="schema">
+		<element name="sets">
+			<element name="element-set" onEnter="startElementSetElement" onExit="exitElementSetElement">
+				<attribute name="id" />
+				<use-element-set name="#element-or-use-set" />
+			</element>
+		</element>
+		<use-element-set name="#element-or-use-set" />
+	</element>
+
+</schema>
