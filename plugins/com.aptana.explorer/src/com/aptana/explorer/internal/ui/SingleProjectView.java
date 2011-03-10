@@ -421,12 +421,12 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		closedProjectlabel = new Label(closedProjectButtonsComp, SWT.WRAP);
 		closedProjectlabel
-				.setText("The selected project is closed. Please open it to work with it, or add/import a new project.");
+				.setText(Messages.SingleProjectView_ClosedProjectSelectedLabel);
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10)
 				.applyTo(closedProjectlabel);
 
 		Button openProjectButton = new Button(closedProjectButtonsComp, SWT.FLAT | SWT.BORDER);
-		openProjectButton.setText("Open Project");
+		openProjectButton.setText(Messages.SingleProjectView_OpenProjectButton);
 		openProjectButton.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
