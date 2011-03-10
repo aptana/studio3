@@ -232,6 +232,8 @@
 						<title><xsl:value-of select="$ReferenceDisplayName"/> Reference: <xsl:value-of select="@type"/></title>
 						<meta http-equiv="cache-control" content="no-cache" />
 						<link rel="stylesheet" href="../../../content/shared.css" type="text/css"/>
+						<link rel="stylesheet" href="../../../PRODUCT_PLUGIN/book.css" type="text/css"/>
+						<link rel="stylesheet" href="PLUGINS_ROOT/PRODUCT_PLUGIN/book.css" />
 						<script src="../../../content/jquery.js" type="text/javascript"/>
 						<script src="../../../content/api.js" type="text/javascript"/>
 					</head>
@@ -245,7 +247,6 @@
 	</xsl:template>
 	<xsl:template match="class">
 		<xsl:variable name="superclass" select="@superclass" />
-		<img src="../../../content/aptana.gif" hspace="21" vspace="3"/>
 		<h1>
 			<xsl:value-of select="@type"/>
 			<xsl:if test="normalize-space(@superclass)"> : <a href="{@superclass}.html"><xsl:apply-templates select="@superclass"/></a></xsl:if>
