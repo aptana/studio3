@@ -48,6 +48,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
@@ -194,7 +195,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * addProposal
+	 * addProposal - The display name is used as the insertion text
 	 * 
 	 * @param proposals
 	 * @param name
@@ -204,11 +205,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @param fileLocation
 	 * @param offset
 	 */
-	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description, Image[] userAgents, String fileLocation,
-		int offset)
+	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
+			Image[] userAgents, String fileLocation, int offset)
 	{
-		String displayName = name;
-		int length = name.length();
+		this.addProposal(proposals, name, name, image, description, userAgents, fileLocation, offset);
+	}
+
+	/**
+	 * addProposal - The display name and insertion text are defined separately
+	 * 
+	 * @param proposals
+	 * @param displayName
+	 * @param insertionText
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 */
+	private void addProposal(Set<ICompletionProposal> proposals, String displayName, String insertionText, Image image,
+			String description, Image[] userAgents, String fileLocation, int offset)
+	{
+		int length = insertionText.length();
 
 		// calculate what text will be replaced
 		int replaceLength = 0;
@@ -222,7 +240,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		IContextInformation contextInfo = null;
 
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image, displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(insertionText, offset, replaceLength, length,
+				image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
@@ -333,11 +352,28 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			if (node != null)
 			{
-				String info = JSModelFormatter.getContextInfo(function);
-				List<String> lines = JSModelFormatter.getContextLines(function);
-				IContextInformation ci = new JSContextInformation(info, lines, node.getStartingOffset());
+				boolean inObjectLiteral = false;
 
-				result.add(ci);
+				// find argument we're in
+				for (IParseNode arg : node)
+				{
+					if (arg.contains(offset))
+					{
+						// Not foolproof, but this should cover 99% of the cases we're likely to encounter
+						inObjectLiteral = (arg instanceof JSObjectNode);
+						break;
+					}
+				}
+
+				// prevent context info popup from appearing and immediately disappearing
+				if (inObjectLiteral == false)
+				{
+					String info = JSModelFormatter.getContextInfo(function);
+					List<String> lines = JSModelFormatter.getContextLines(function);
+					IContextInformation ci = new JSContextInformation(info, lines, node.getStartingOffset());
+
+					result.add(ci);
+				}
 			}
 		}
 
@@ -374,7 +410,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * , int, char, boolean)
 	 */
 	@Override
-	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar, boolean autoActivated)
+	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
+			boolean autoActivated)
 	{
 		IDocument document = viewer.getDocument();
 		Set<ICompletionProposal> result = new HashSet<ICompletionProposal>();
@@ -573,7 +610,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// process arguments node as long as we're not to the left of the opening parenthesis
 		if (node != null)
 		{
-			// save current replace range. A bit hacky but better than adding a flag ito getLocation's signature
+			// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
 			IRange range = this._replaceRange;
 
 			// grab the content assist location type for the symbol before the arguments list
@@ -733,7 +770,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// NOTE: We can't simply grab the AST since this will fail with JS
 			// is embedded in other languages. In those cases, we'll get the
-			// root node for the host langauge and not for JS
+			// root node for the host language and not for JS
 
 			// find JS root node
 			IParseNode current = this._targetNode;
@@ -1014,8 +1051,62 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		return (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER);
-	}
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
+		boolean result = false;
 
+		// NOTE: This is not foolproof. Basically, we assume object literals in function invocations will not
+		// have function values. This should be a valid assumption since we only show non-function properties
+		// in object-literal CA. If assumption is true, then we can look for the opening curly or stop when he
+		// hit certain keywords or punctuation. A robust implementation would use the AST.
+		if (index != -1)
+		{
+			Lexeme<JSTokenType> currentLexeme = lexemeProvider.getLexeme(index);
+
+			boolean isIdentifier = (currentLexeme.getType() == JSTokenType.IDENTIFIER);
+			boolean inObjectLiteral = false;
+			index--;
+
+			LOOP: while (index >= 0)
+			{
+				currentLexeme = lexemeProvider.getLexeme(index);
+
+				switch (currentLexeme.getType())
+				{
+					case LCURLY:
+						inObjectLiteral = true;
+						break LOOP;
+
+					// abort on some keywords
+					case BREAK:
+					case CASE:
+					case CONTINUE:
+					case DEFAULT:
+					case DO:
+					case ELSE:
+					case FINALLY:
+					case FUNCTION:
+					case FOR:
+					case IF:
+					case IN:
+					case RETURN:
+					case SWITCH:
+					case THROW:
+					case TRY:
+					case WHILE:
+						// and abort on some punctuation
+					case COLON:
+					case RPAREN:
+					case SEMICOLON:
+					case VAR:
+						break LOOP;
+				}
+
+				index--;
+			}
+
+			result = (inObjectLiteral == false && isIdentifier);
+		}
+
+		return result;
+	}
 }
