@@ -154,6 +154,15 @@ public class SamplesView extends ViewPart
 				ISelection selection = treeViewer.getSelection();
 				Object firstElement = ((IStructuredSelection) selection).getFirstElement();
 
+				if (firstElement instanceof SamplesReference)
+				{
+					SamplesReference samplesRef = (SamplesReference) firstElement;
+					if (samplesRef.isRemote())
+					{
+						// imports from git
+						SampleProjectCreator.createSampleProject(samplesRef);
+					}
+				}
 				SampleEntry sample = null;
 				if (firstElement instanceof SampleEntry)
 				{
@@ -322,6 +331,11 @@ public class SamplesView extends ViewPart
 		if (element instanceof SamplesReference)
 		{
 			manager.add(viewHelpAction);
+			SamplesReference samplesRef = (SamplesReference) element;
+			if (samplesRef.isRemote())
+			{
+				manager.add(importAction);
+			}
 		}
 		else if (element instanceof SampleEntry)
 		{
@@ -400,7 +414,7 @@ public class SamplesView extends ViewPart
 			samplesRef = getParentSamplesRef(entry);
 		}
 
-		importAction.setEnabled(entry != null);
+		importAction.setEnabled(entry != null || samplesRef != null);
 		viewPreviewAction.setEnabled(entry != null && samplesRef != null && samplesRef.getPreviewHandler() != null);
 		viewHelpAction.setEnabled(samplesRef != null && samplesRef.getInfoFile() != null);
 	}

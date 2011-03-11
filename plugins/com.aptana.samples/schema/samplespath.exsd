@@ -19,6 +19,7 @@
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
             <element ref="samplesinfo"/>
+            <element ref="category"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -57,24 +58,28 @@
          <sequence>
             <element ref="nature" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="include" minOccurs="0" maxOccurs="unbounded"/>
+            <choice>
+               <element ref="local" minOccurs="0" maxOccurs="1"/>
+               <element ref="remote" minOccurs="0" maxOccurs="1"/>
+            </choice>
          </sequence>
-         <attribute name="name" type="string" use="required">
+         <attribute name="category" type="string">
             <annotation>
                <documentation>
-                  The name of these samples.
+                  
                </documentation>
                <appinfo>
-                  <meta.attribute translatable="true"/>
+                  <meta.attribute kind="identifier" basedOn="com.aptana.samples.samplespath/category/@id"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="directory" type="string" use="required">
+         <attribute name="name" type="string">
             <annotation>
                <documentation>
-                  The directory where the samples are located.
+                  
                </documentation>
                <appinfo>
-                  <meta.attribute kind="resource"/>
+                  <meta.attribute translatable="true"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -82,16 +87,6 @@
             <annotation>
                <documentation>
                   An optional HTML document to open to get more info on the samples.
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="resource"/>
-               </appinfo>
-            </annotation>
-         </attribute>
-         <attribute name="iconFile" type="string">
-            <annotation>
-               <documentation>
-                  An optional icon to use for the samples.
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
@@ -139,6 +134,65 @@
             <annotation>
                <documentation>
                   The path to the files and folders to include when this sample is created as a project or previewed.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="local">
+      <complexType>
+         <attribute name="directory" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="resource"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="remote">
+      <complexType>
+         <attribute name="url" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="category">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  An optional icon to use for the category.
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
