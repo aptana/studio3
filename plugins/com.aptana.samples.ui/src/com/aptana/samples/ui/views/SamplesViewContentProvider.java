@@ -7,11 +7,15 @@
  */
 package com.aptana.samples.ui.views;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.aptana.samples.ISamplesManager;
 import com.aptana.samples.SamplesPlugin;
+import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 
@@ -33,11 +37,28 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 	{
 		if (parentElement instanceof ISamplesManager)
 		{
-			return ((ISamplesManager) parentElement).getSamples();
+			List<SampleCategory> categories = ((ISamplesManager) parentElement).getCategories();
+			return categories.toArray(new SampleCategory[categories.size()]);
 		}
-		if (parentElement instanceof SamplesReference)
+		if (parentElement instanceof SampleCategory)
 		{
-			return ((SamplesReference) parentElement).getSamples();
+			List<SamplesReference> samplesRefs = SamplesPlugin.getDefault().getSamplesManager()
+					.getSamplesForCategory(((SampleCategory) parentElement).getId());
+			List<Object> children = new ArrayList<Object>();
+			for (SamplesReference ref : samplesRefs)
+			{
+				if (ref.isRemote())
+				{
+					// uses the reference directly
+					children.add(ref);
+				}
+				else
+				{
+					// uses the folders the root contains
+					children.addAll(ref.getSamples());
+				}
+			}
+			return children.toArray(new Object[children.size()]);
 		}
 		if (parentElement instanceof SampleEntry)
 		{
@@ -61,9 +82,18 @@ public class SamplesViewContentProvider implements ITreeContentProvider
 	{
 		if (element instanceof SampleEntry)
 		{
-			return ((SampleEntry) element).getParent();
+			Object parent = ((SampleEntry) element).getParent();
+			if (parent instanceof SamplesReference)
+			{
+				return ((SamplesReference) parent).getCategory();
+			}
+			return parent;
 		}
 		if (element instanceof SamplesReference)
+		{
+			return ((SamplesReference) element).getCategory();
+		}
+		if (element instanceof SampleCategory)
 		{
 			return SamplesPlugin.getDefault().getSamplesManager();
 		}

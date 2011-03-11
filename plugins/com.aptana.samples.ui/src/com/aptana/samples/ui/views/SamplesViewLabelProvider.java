@@ -18,6 +18,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
+import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 
@@ -50,9 +51,9 @@ public class SamplesViewLabelProvider extends LabelProvider
 	@Override
 	public Image getImage(Object element)
 	{
-		if (element instanceof SamplesReference)
+		if (element instanceof SampleCategory)
 		{
-			String iconFile = ((SamplesReference) element).getIconFile();
+			String iconFile = ((SampleCategory) element).getIconFile();
 			if (iconFile != null)
 			{
 				File file = new File(iconFile);
@@ -103,9 +104,15 @@ public class SamplesViewLabelProvider extends LabelProvider
 	@Override
 	public String getText(Object element)
 	{
+		if (element instanceof SampleCategory)
+		{
+			return ((SampleCategory) element).getName();
+		}
 		if (element instanceof SamplesReference)
 		{
-			return ((SamplesReference) element).getName();
+			SamplesReference samplesRef = (SamplesReference) element;
+			String name = samplesRef.getName();
+			return name == null ? samplesRef.getPath() : name;
 		}
 		if (element instanceof SampleEntry)
 		{

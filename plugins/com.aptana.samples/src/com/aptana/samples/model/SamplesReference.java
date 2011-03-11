@@ -9,6 +9,7 @@ package com.aptana.samples.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -23,12 +24,13 @@ public class SamplesReference
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
 
-	private final String name;
-	private final String directory;
+	private final SampleCategory category;
+	private final String path;
 	private final IConfigurationElement configElement;
 
+	private String name;
+	private boolean isRemote;
 	private String infoFile;
-	private String iconFile;
 	private ISampleProjectHandler projectHandler;
 	private ISamplePreviewHandler previewHandler;
 	private String[] natures;
@@ -36,16 +38,25 @@ public class SamplesReference
 
 	private List<SampleEntry> samples;
 
-	public SamplesReference(String name, String directory, IConfigurationElement element)
+	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element)
 	{
-		this.name = name;
-		this.directory = directory;
+		this.category = category;
+		this.path = path;
+		this.isRemote = isRemote;
 		configElement = element;
 		natures = new String[0];
 		includePaths = new String[0];
 		samples = new ArrayList<SampleEntry>();
 
-		loadSamples();
+		if (!isRemote)
+		{
+			loadSamples();
+		}
+	}
+
+	public SampleCategory getCategory()
+	{
+		return category;
 	}
 
 	public String getName()
@@ -53,19 +64,14 @@ public class SamplesReference
 		return name;
 	}
 
-	public String getDirectory()
+	public String getPath()
 	{
-		return directory;
+		return path;
 	}
 
 	public String getInfoFile()
 	{
 		return infoFile;
-	}
-
-	public String getIconFile()
-	{
-		return iconFile;
 	}
 
 	public ISampleProjectHandler getProjectHandler()
@@ -110,19 +116,24 @@ public class SamplesReference
 		return includePaths;
 	}
 
-	public SampleEntry[] getSamples()
+	public List<SampleEntry> getSamples()
 	{
-		return samples.toArray(new SampleEntry[samples.size()]);
+		return Collections.unmodifiableList(samples);
+	}
+
+	public boolean isRemote()
+	{
+		return isRemote;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 
 	public void setInfoFile(String infoFile)
 	{
 		this.infoFile = infoFile;
-	}
-
-	public void setIconFile(String iconFile)
-	{
-		this.iconFile = iconFile;
 	}
 
 	public void setNatures(String[] natures)
@@ -139,7 +150,7 @@ public class SamplesReference
 	{
 		samples.clear();
 
-		File samplesDirectory = new File(directory);
+		File samplesDirectory = new File(path);
 		File[] sampleFiles = samplesDirectory.listFiles();
 		if (sampleFiles != null)
 		{
