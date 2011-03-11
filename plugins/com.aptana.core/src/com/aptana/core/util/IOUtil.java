@@ -101,13 +101,11 @@ public abstract class IOUtil
 	}
 
 	/**
-	 * Recursively copy one directory to a new destination directory. If a file
-	 * is passed in instead of a directory, this method will delegate to
-	 * copyFile to perform the copy. Various tests for existence, readability,
-	 * and writability are performed before copying. If any of these tests fail,
-	 * the copy be aborted. Note that this means that if a failure occurs
-	 * somewhere in a descendant file/directory, all files up to that point will
-	 * exist, but no files after that point will be copied. 
+	 * Recursively copy one directory to a new destination directory. If a file is passed in instead of a directory,
+	 * this method will delegate to copyFile to perform the copy. Various tests for existence, readability, and
+	 * writability are performed before copying. If any of these tests fail, the copy be aborted. Note that this means
+	 * that if a failure occurs somewhere in a descendant file/directory, all files up to that point will exist, but no
+	 * files after that point will be copied.
 	 * 
 	 * @param source
 	 * @param destination
@@ -152,11 +150,11 @@ public abstract class IOUtil
 			else
 			{
 				String message = MessageFormat.format( //
-					Messages.IOUtil_Unable_To_Copy_Because, //
-					source, //
-					destination, //
-					error //
-				);
+						Messages.IOUtil_Unable_To_Copy_Because, //
+						source, //
+						destination, //
+						error //
+						);
 
 				CorePlugin.logError(message, null);
 			}
@@ -299,6 +297,23 @@ public abstract class IOUtil
 			{
 				// ignore
 			}
+		}
+	}
+
+	/**
+	 * Pipes from input stream to output stream. Uses a byte buffer of size 1024. Does no flushing or closing of
+	 * streams!
+	 * 
+	 * @param inputStream
+	 * @param outputStream
+	 * @throws IOException
+	 */
+	public static void pipe(InputStream input, OutputStream output) throws IOException
+	{
+		byte[] buffer = new byte[1024];
+		for (int bytes = input.read(buffer); bytes >= 0; bytes = input.read(buffer))
+		{
+			output.write(buffer, 0, bytes);
 		}
 	}
 

@@ -12,6 +12,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.internal.preferences.messages"; //$NON-NLS-1$
+	public static String GitExecutableLocationPage_AutoAttachProjectsLabel;
 	public static String GitExecutableLocationPage_CalculatePullIndicatorLabel;
 	public static String GitExecutableLocationPage_InvalidLocationErrorMessage;
 	public static String GitExecutableLocationPage_LocationLabel;

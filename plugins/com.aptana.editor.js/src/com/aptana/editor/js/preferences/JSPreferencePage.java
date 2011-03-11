@@ -43,7 +43,7 @@ public class JSPreferencePage extends CommonEditorPreferencePage
 	@Override
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
-		return JSSourceEditor.getChainedPrefereceStore();
+		return JSSourceEditor.getChainedPreferenceStore();
 	}
 
 }

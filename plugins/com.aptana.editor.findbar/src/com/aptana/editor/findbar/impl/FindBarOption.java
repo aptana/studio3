@@ -10,6 +10,9 @@ package com.aptana.editor.findbar.impl;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,7 +29,7 @@ import com.aptana.editor.findbar.FindBarPlugin;
  * 
  * @author Fabio Zadrozny
  */
-public abstract class FindBarOption extends SelectionAdapter implements SelectionListener
+abstract class FindBarOption extends SelectionAdapter implements SelectionListener
 {
 	/**
 	 * The image to be gotten for the item.
@@ -60,17 +63,36 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 	public final boolean initiallyEnabled;
 
 	/**
-	 * Is it a check button (or just a push button)?
-	 */
-	public boolean isCheckable = true;
-
-	/**
 	 * Should it appear as a menu item?
 	 */
-	public boolean createMenuItem = true;
+	boolean createMenuItem = true;
+
+	/**
+	 * The key used for it in the Find bar preferences (null means it's not checkable).
+	 */
+	public final String preferencesKey;
+
+	/**
+	 * if > 0, it means that we're updating the option from the preferences (so, no action should take place, only the
+	 * gui should be updated).
+	 */
+	private int internalUpdate = 0;
+
+	/**
+	 * Listener to update the gui (check state) when the property changes.
+	 */
+	private IPropertyChangeListener fPropertyChangeListener;
+
+	/**
+	 * Is it a check button (or just a push button)?
+	 */
+	boolean isCheckable()
+	{
+		return preferencesKey != null;
+	}
 
 	public FindBarOption(String fieldName, String image, String imageDisabled, String initialText,
-			FindBarDecorator findBarDecorator, boolean initiallyEnabled)
+			FindBarDecorator findBarDecorator, boolean initiallyEnabled, String preferencesKey)
 	{
 		this.fieldName = fieldName;
 		this.image = image;
@@ -78,15 +100,66 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 		this.initialText = initialText;
 		this.findBarDecorator = new WeakReference<FindBarDecorator>(findBarDecorator);
 		this.initiallyEnabled = initiallyEnabled;
+		this.preferencesKey = preferencesKey;
+		if (preferencesKey != null)
+		{
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			preferenceStore.addPropertyChangeListener(getPropertyChangeListener());
+		}
+	}
+
+	private IPropertyChangeListener getPropertyChangeListener()
+	{
+		if (fPropertyChangeListener == null)
+		{
+			fPropertyChangeListener = new IPropertyChangeListener()
+			{
+
+				public void propertyChange(PropertyChangeEvent event)
+				{
+					if (FindBarOption.this.preferencesKey.equals(event.getProperty()))
+					{
+						ToolItem item = getToolItemFromDecorator();
+						if (item != null)
+						{
+							boolean val = (Boolean) event.getNewValue();
+							if (val != item.getSelection())
+							{
+								startInternalUpdate();
+								try
+								{
+									item.setSelection(val);
+								}
+								finally
+								{
+									endInternalUpdate();
+								}
+							}
+						}
+					}
+				}
+			};
+		}
+		return fPropertyChangeListener;
+	}
+
+	private void endInternalUpdate()
+	{
+		internalUpdate -= 1;
+	}
+
+	private void startInternalUpdate()
+	{
+		internalUpdate += 1;
 	}
 
 	public FindBarOption(String fieldName, String image, String imageDisabled, String initialText,
-			FindBarDecorator findBarDecorator)
+			FindBarDecorator findBarDecorator, String preferencesKey)
 	{
-		this(fieldName, image, imageDisabled, initialText, findBarDecorator, true);
+		this(fieldName, image, imageDisabled, initialText, findBarDecorator, true, preferencesKey);
 	}
 
-	public void execute()
+	private void execute()
 	{
 		FindBarDecorator dec = this.findBarDecorator.get();
 		if (dec != null)
@@ -97,13 +170,22 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 
 	public void widgetSelected(SelectionEvent e)
 	{
+		if (internalUpdate > 0)
+		{
+			return; // Updating gui from a change in the preferences.
+		}
+		if (preferencesKey != null)
+		{
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			preferenceStore.setValue(preferencesKey, !preferenceStore.getBoolean(preferencesKey));
+		}
 		execute();
 	}
 
 	/**
 	 * Subclasses must override to execute the action related to it.
 	 */
-	public abstract void execute(FindBarDecorator dec);
+	protected abstract void execute(FindBarDecorator dec);
 
 	/**
 	 * Creates a menu item for this option (for a pop-up menu).
@@ -116,10 +198,11 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 		}
 		final ToolItem toolItem = (ToolItem) getToolItemFromDecorator();
 		MenuItem item;
-		if (isCheckable)
+		if (isCheckable())
 		{
 			item = new MenuItem(menu, SWT.CHECK);
-			item.setSelection(toolItem.getSelection());
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			item.setSelection(preferenceStore.getBoolean(preferencesKey));
 		}
 		else
 		{
@@ -129,9 +212,10 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 		{
 			public void widgetSelected(SelectionEvent e)
 			{
-				if (isCheckable)
+				if (isCheckable())
 				{
-					toolItem.setSelection(!toolItem.getSelection());
+					IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+					preferenceStore.setValue(preferencesKey, !preferenceStore.getBoolean(preferencesKey));
 				}
 				else
 				{
@@ -150,7 +234,8 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 		{
 			return null;
 		}
-		ToolItem item = isCheckable ? new ToolItem(optionsToolBar, SWT.CHECK) : new ToolItem(optionsToolBar, SWT.PUSH);
+		ToolItem item = isCheckable() ? new ToolItem(optionsToolBar, SWT.CHECK)
+				: new ToolItem(optionsToolBar, SWT.PUSH);
 
 		item.setImage(FindBarPlugin.getImage(this.image));
 		if (imageDisabled != null)
@@ -158,6 +243,11 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 			item.setDisabledImage(FindBarPlugin.getImage(this.imageDisabled));
 		}
 		item.setToolTipText(this.initialText);
+		if (preferencesKey != null)
+		{
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			item.setSelection(preferenceStore.getBoolean(preferencesKey));
+		}
 		item.addSelectionListener(this);
 		if (!this.initiallyEnabled)
 		{
@@ -220,6 +310,16 @@ public abstract class FindBarOption extends SelectionAdapter implements Selectio
 	protected boolean canCreateItem()
 	{
 		return true;
+	}
+
+	public void dispose()
+	{
+		if (fPropertyChangeListener != null)
+		{
+			IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
+			preferenceStore.removePropertyChangeListener(fPropertyChangeListener);
+			fPropertyChangeListener = null;
+		}
 	}
 
 }

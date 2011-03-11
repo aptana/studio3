@@ -17,13 +17,13 @@
       <perspectiveExtension
             targetID="com.aptana.ui.WebPerspective">
          <viewShortcut
-               id="org.eclipse.ui.navigator.ProjectExplorer">
+               id="com.aptana.explorer.view">
          </viewShortcut>
          <view
-               id="com.aptana.explorer.view"
+               id="org.eclipse.ui.navigator.ProjectExplorer"
                minimized="false"
                relationship="stack"
-               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               relative="com.aptana.explorer.view"
                visible="true">
          </view>
          <viewShortcut
@@ -33,7 +33,7 @@
                id="com.aptana.ui.io.remoteview"
                minimized="false"
                relationship="stack"
-               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               relative="com.aptana.explorer.view"
                visible="false">
          </view>
          <viewShortcut
@@ -43,7 +43,7 @@
                id="org.eclipse.ui.views.ContentOutline"
                ratio="0.75"
                relationship="bottom"
-               relative="org.eclipse.ui.navigator.ProjectExplorer"
+               relative="com.aptana.explorer.view"
                visible="true">
          </view>
          <viewShortcut
@@ -259,14 +259,11 @@
       </category>
    </extension>
    <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.eclipse.ui.ide.FileStoreEditorInput"
-            class="com.aptana.ui.internal.FileStoreEditorInputUniformResourceAdapterFactory">
-         <adapter
-               type="com.aptana.core.resources.IUniformResource">
-         </adapter>
-      </factory>
+         point="org.eclipse.ui.views">
+      <category
+            id="com.aptana"
+            name="%category.name">
+      </category>
    </extension>
 
 </plugin>

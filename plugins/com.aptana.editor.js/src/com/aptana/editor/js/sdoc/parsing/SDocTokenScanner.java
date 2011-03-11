@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.js.sdoc.parsing;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -126,7 +126,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 	@SuppressWarnings("nls")
 	public SDocTokenScanner()
 	{
-		List<IRule> rules = new LinkedList<IRule>();
+		List<IRule> rules = new ArrayList<IRule>();
 
 		rules.add(new WordRule(new WhitespaceDetector(), getToken(SDocTokenType.WHITESPACE)));
 		rules.add(createAlternateWhitespaceRule());
@@ -151,7 +151,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@see", getToken(SDocTokenType.SEE));
 		tagRules.addWord("@type", getToken(SDocTokenType.TYPE));
 		rules.add(tagRules);
-		
+
 		CharacterMapRule cmRule = new CharacterMapRule();
 		cmRule.add('#', getToken(SDocTokenType.POUND));
 		cmRule.add('[', getToken(SDocTokenType.LBRACKET));
@@ -159,9 +159,9 @@ public class SDocTokenScanner extends RuleBasedScanner
 		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
 		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE));
 		rules.add(cmRule);
-		
+
 		rules.add(new PatternRule("{", "}", getToken(SDocTokenType.TYPES), '\0', false));
-		
+
 		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.UNKNOWN));
 		operatorRules.addWord("/**", getToken(SDocTokenType.START_DOCUMENTATION));
 		operatorRules.addWord("*/", getToken(SDocTokenType.END_DOCUMENTATION));

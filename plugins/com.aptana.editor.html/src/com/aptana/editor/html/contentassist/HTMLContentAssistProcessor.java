@@ -8,7 +8,6 @@
 package com.aptana.editor.html.contentassist;
 
 import java.net.URI;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +38,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.IURIMapper;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
@@ -53,6 +53,7 @@ import com.aptana.editor.html.contentassist.index.HTMLIndexConstants;
 import com.aptana.editor.html.contentassist.model.AttributeElement;
 import com.aptana.editor.html.contentassist.model.ElementElement;
 import com.aptana.editor.html.contentassist.model.EntityElement;
+import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
@@ -64,7 +65,6 @@ import com.aptana.parsing.lexer.Lexeme;
 import com.aptana.parsing.lexer.Range;
 import com.aptana.preview.ProjectPreviewUtil;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
 
 public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
@@ -201,18 +201,41 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
-			for (String attribute : element.getAttributes())
+			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
-				proposals.add(createProposal(attribute, attribute + postfix, ATTRIBUTE_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, attribute.length() + length));
+				String name = attribute.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					ATTRIBUTE_ICON, //
+					attribute.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 
-			for (String event : element.getEvents())
+			for (EventElement event : this._queryHelper.getEvents(element))
 			{
-				proposals.add(createProposal(event, event + postfix, EVENT_ICON, null, userAgentIcons,
-						HTMLIndexConstants.CORE, offset, event.length() + length));
+				String name = event.getName();
+				CommonCompletionProposal p = this.createProposal( //
+					name, //
+					name + postfix, //
+					EVENT_ICON, //
+					event.getDescription(), //
+					userAgentIcons, //
+					HTMLIndexConstants.CORE, //
+					offset, //
+					name.length() + length //
+				);
+
+				proposals.add(p);
 			}
 		}
+
 		return proposals;
 	}
 
@@ -360,15 +383,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				IURLMapper serverConfiguration = ProjectPreviewUtil
+				IURIMapper serverConfiguration = ProjectPreviewUtil
 						.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (IURLMapper server : WebServerCorePlugin.getDefault()
+					for (IURIMapper server : WebServerCorePlugin.getDefault()
 							.getServerConfigurationManager().getServerConfigurations())
 					{
-						URL url = server.resolve(editorStore);
-						if (url != null)
+						if (server.resolve(editorStore) != null)
 						{
 							serverConfiguration = server;
 							break;

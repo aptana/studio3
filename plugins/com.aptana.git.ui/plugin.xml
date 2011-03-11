@@ -536,7 +536,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.team.ui.TeamPreferences"
-            class="com.aptana.git.ui.internal.preferences.GitExecutableLocationPage"
+            class="com.aptana.git.ui.internal.preferences.GitPreferencePage"
             id="com.aptana.git.ui.GitExecutableLocationPage"
             name="%page.git.name">
       </page>
@@ -1846,5 +1846,19 @@
             commandId="com.aptana.git.ui.command.unstash"
             icon="icons/elcl16/arrow_right.png">
       </image>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.consoleLineTrackers">
+      <consoleLineTracker
+            class="com.aptana.git.ui.hyperlink.GitConsoleLineTracker"
+            id="com.aptana.git.ui.consoleLineTracker"
+            processType="git">
+      </consoleLineTracker>
+   </extension>
+   <extension
+         point="com.aptana.terminal.terminalHyperlinkDetectors">
+      <detector
+            class="com.aptana.git.ui.hyperlink.HyperlinkDetector">
+      </detector>
    </extension>
 </plugin>

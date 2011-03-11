@@ -38,7 +38,7 @@ public final class ConnectionPointEvent extends EventObject {
     public static final int POST_CHANGE = 4;
 
     
-	private IConnectionPoint fConnectionPoint;
+	private transient IConnectionPoint fConnectionPoint;
 	private int fKind;
 	
 	public ConnectionPointEvent(Object source, int kind, IConnectionPoint connectionPoint) {

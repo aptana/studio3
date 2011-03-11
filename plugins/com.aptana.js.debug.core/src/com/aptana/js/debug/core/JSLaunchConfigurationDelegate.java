@@ -34,10 +34,12 @@ import org.eclipse.debug.core.IStatusHandler;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
-import com.aptana.core.util.SocketUtil;
+import com.aptana.core.IURIMapper;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
+import com.aptana.debug.core.internal.Util;
+import com.aptana.debug.core.util.DebugUtil;
 import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
@@ -46,16 +48,14 @@ import com.aptana.js.debug.core.internal.model.DebugConnection;
 import com.aptana.js.debug.core.internal.model.JSDebugProcess;
 import com.aptana.js.debug.core.internal.model.JSDebugTarget;
 import com.aptana.webserver.core.EFSWebServerConfiguration;
-import com.aptana.webserver.core.IURLMapper;
 import com.aptana.webserver.core.WebServerCorePlugin;
+import com.aptana.webserver.core.WorkspaceResolvingURIMapper;
 
 /**
  * @author Max Stepanov
  * 
  */
 public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
-
-	protected static final int DEFAULT_PORT = 8999;
 
 	protected static final IStatus launchBrowserPromptStatus = new Status(IStatus.INFO, JSDebugPlugin.PLUGIN_ID, 302, StringUtil.EMPTY, null);
 
@@ -129,21 +129,16 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				ILaunchConfigurationConstants.DEFAULT_START_ACTION_TYPE);
 
 		URL launchURL = null;
-		IURLMapper urlMapper = null;
+		IURIMapper urlMapper = null;
 		try {
 			IResource startResource = null;
+			IPath startPath = null;
 			switch (startActionType) {
 			case ILaunchConfigurationConstants.START_ACTION_CURRENT_PAGE:
 				startResource = getCurrentEditorResource();
 				if (startResource == null) {
-					IPath path = getCurrentEditorPath();
-					if (path != null) {
-						if (debug && InternetExplorer.isBrowserExecutable(browserExecutable)) {
-							throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, Status.ERROR,
-									Messages.JSLaunchConfigurationDelegate_Only_Project_Debugging_Supported, null));
-						}
-						launchURL = path.toFile().toURI().toURL();
-					} else {
+					startPath = getCurrentEditorPath();
+					if (startPath == null) {
 						launchURL = getCurrentEditorURL();
 						if (launchURL == null) {
 							monitor.setCanceled(true);
@@ -163,7 +158,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				break;
 			}
 			
-			if (startResource == null && launchURL == null) {
+			if (startResource == null && startPath == null && launchURL == null) {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
 			}
@@ -185,6 +180,9 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							MessageFormat.format(Messages.JSLaunchConfigurationDelegate_ServerNotFound0_Error, serverName), null));
 				}
+				if (startResource != null) {
+					urlMapper = new WorkspaceResolvingURIMapper(urlMapper);
+				}
 			} else if (serverType == ILaunchConfigurationConstants.SERVER_EXTERNAL) {
 				String externalBaseUrl = configuration.getAttribute(
 						ILaunchConfigurationConstants.CONFIGURATION_EXTERNAL_BASE_URL, StringUtil.EMPTY).trim();
@@ -195,16 +193,31 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				if (externalBaseUrl.charAt(externalBaseUrl.length() - 1) != '/') {
 					externalBaseUrl = externalBaseUrl + '/';
 				}
-				urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				if (startResource != null) {
+					urlMapper = EFSWebServerConfiguration.create(new URL(externalBaseUrl), EFSUtils.getFileStore(startResource.getProject()).toURI());
+				}
 			} else {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_No_Server_Type, null));
 			}
 			
 			if (urlMapper != null) {
-				launchURL = urlMapper.resolve(EFSUtils.getFileStore(startResource));
+				if (startResource != null) {
+					launchURL = Util.toURL(urlMapper.resolve(EFSUtils.getFileStore(startResource)));
+				} else if (startPath != null) {
+					launchURL = Util.toURL(urlMapper.resolve(EFSUtils.getLocalFileStore(startPath.toFile())));
+					if (launchURL == null) {
+						launchURL = startPath.toFile().toURI().toURL();
+					}
+				}
+			} else if (launchURL == null && startPath != null) {
+				launchURL = startPath.toFile().toURI().toURL();
 			}
 
+			if (launchURL == null) {
+				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
+						Messages.JSLaunchConfigurationDelegate_LaunchURLNotDefined, null));				
+			}
 			String httpGetQuery = configuration.getAttribute(ILaunchConfigurationConstants.CONFIGURATION_HTTP_GET_QUERY, StringUtil.EMPTY);
 			if (httpGetQuery != null && httpGetQuery.length() > 0 && launchURL.getQuery() == null && launchURL.getRef() == null) {
 				if (httpGetQuery.charAt(0) != '?') {
@@ -234,20 +247,10 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
 		if (debugAvailable) {
 
-			int port = SocketUtil.findFreePort(null);
-			if ("true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-				port = 2525;
-			}
-			if (port == -1) {
-				port = DEFAULT_PORT;
-			}
-
+			int port = DebugUtil.getDebuggerPort();
 			ServerSocket listenSocket = null;
 			try {
-				listenSocket = new ServerSocket(port);
-				if (!"true".equals(Platform.getDebugOption("com.aptana.debug.core/debugger_debug"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					listenSocket.setSoTimeout(DebugConnection.SOCKET_TIMEOUT);
-				}
+				listenSocket = DebugUtil.allocateServerSocket(port);
 			} catch (IOException e) {
 				throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 						Messages.JSLaunchConfigurationDelegate_SocketConnectionError, e));

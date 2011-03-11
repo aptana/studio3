@@ -194,7 +194,7 @@ public class EclipseUtil
 				}
 			}
 		}
-		if ( !launcher.toFile().exists() ) {
+		if (launcher == null || !launcher.toFile().exists() ) {
 			return null;
 		}
 		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {

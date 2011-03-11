@@ -382,7 +382,8 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.caseSensitive.setSelection(!dec.caseSensitive.getSelection());
+				FindBarConfiguration conf = dec.getConfiguration();
+				conf.setCaseSensitive(!conf.getCaseSensitive());
 			}
 			return null;
 		}
@@ -395,7 +396,8 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.wholeWord.setSelection(!dec.wholeWord.getSelection());
+				FindBarConfiguration conf = dec.getConfiguration();
+				conf.setWholeWord(!conf.getWholeWord());
 			}
 			return null;
 		}
@@ -406,9 +408,10 @@ public class FindBarActions
 		public Object execute(ExecutionEvent event) throws ExecutionException
 		{
 			FindBarDecorator dec = findBarDecorator.get();
-			if (dec != null && dec.regularExpression != null)
+			if (dec != null)
 			{
-				dec.regularExpression.setSelection(!dec.regularExpression.getSelection());
+				FindBarConfiguration conf = dec.getConfiguration();
+				conf.setRegularExpression(!conf.getRegularExpression());
 			}
 			return null;
 		}
@@ -421,7 +424,8 @@ public class FindBarActions
 			FindBarDecorator dec = findBarDecorator.get();
 			if (dec != null)
 			{
-				dec.searchBackward.setSelection(!dec.searchBackward.getSelection());
+				FindBarConfiguration conf = dec.getConfiguration();
+				conf.setSearchBackward(!conf.getSearchBackward());
 			}
 			return null;
 		}

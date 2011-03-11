@@ -6,10 +6,6 @@
 
    <extension
          point="org.eclipse.ui.views">
-      <category
-            name="%category.name"
-            id="com.aptana">
-      </category>
       <view
             allowMultiple="true"
             category="com.aptana"

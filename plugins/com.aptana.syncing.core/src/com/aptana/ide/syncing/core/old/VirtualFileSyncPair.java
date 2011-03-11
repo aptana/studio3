@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
  * @author Kevin Lindsey
@@ -74,6 +75,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
+			SyncingPlugin.logError(Messages.VirtualFileSyncPair_SourceFileInfoError, e);
 			return null;
 		}
 	}
@@ -152,6 +154,7 @@ public class VirtualFileSyncPair
 		}
 		catch (CoreException e)
 		{
+			SyncingPlugin.logError(Messages.VirtualFileSyncPair_DestFileInfoErrror, e);
 			return null;
 		}
 	}
@@ -284,10 +287,10 @@ public class VirtualFileSyncPair
 	 */
 	public String toString()
 	{
-		String text = "";
-		text += (this._sourceFile != null) ? this._sourceFile.toString() : "null";
-		text += " <-> ";
-		text += (this._destinationFile != null) ? this._destinationFile.toString() : "null";
+		String text = ""; //$NON-NLS-1$
+		text += (this._sourceFile != null) ? this._sourceFile.toString() : "null"; //$NON-NLS-1$
+		text += " <-> "; //$NON-NLS-1$
+		text += (this._destinationFile != null) ? this._destinationFile.toString() : "null"; //$NON-NLS-1$
 
 		return text;
 	}

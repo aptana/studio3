@@ -11,6 +11,7 @@ package com.aptana.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -108,7 +109,7 @@ public final class ShellExecutable {
 		return null;
 	}
 	
-	public static IPath getShellRCPath() {
+	public static synchronized IPath getShellRCPath() {
 		if (shellRCPath == null) {
 			URL url = FileLocator.find(CorePlugin.getDefault().getBundle(), Path.fromPortableString(RCFILE), null);
 			if (url != null) {
@@ -167,6 +168,7 @@ public final class ShellExecutable {
 		Map<String, String> env = new HashMap<String, String>();
 		try {
 			env.putAll(buildEnvironment(ProcessUtil.outputForProcess(run("env", workingDirectory, null)))); //$NON-NLS-1$
+			CorePlugin.logInfo(MessageFormat.format("ENV for {0}: {1}", workingDirectory, env)); //$NON-NLS-1$
 		} catch (Exception e) {
 			CorePlugin.logError("Get shell environment failed.", e); //$NON-NLS-1$
 		}

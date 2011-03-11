@@ -18,6 +18,7 @@ import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,10 +123,9 @@ public final class FirebugUtil {
 				doWrite = true;
 			}
 			if (!options.isEmpty()) {
-				for (String option : options.keySet()) {
-					String value = options.get(option);
-					if (value.length() > 0) {
-						lines.add(MessageFormat.format(PREF_FORMAT, '.' + id + '.' + option, value));
+				for (Entry<String, String> entry : options.entrySet()) {
+					if (entry.getValue().length() > 0) {
+						lines.add(MessageFormat.format(PREF_FORMAT, '.' + id + '.' + entry.getKey(), entry.getValue()));
 						doWrite = true;
 					}
 				}

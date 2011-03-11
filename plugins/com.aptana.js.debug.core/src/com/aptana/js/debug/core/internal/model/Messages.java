@@ -25,15 +25,14 @@ public final class Messages extends NLS {
 	 */
 	public static String WatchExpressionDelegate_ExpressionEvaluation;
 
-	/**
-	 * JSDebugThread_ThreadMain_0
-	 */
-	public static String JSDebugThread_ThreadMain_0;
+	public static String JSDebugThread_main_label;
 
 	/**
 	 * JSDebugThread_Suspending
 	 */
 	public static String JSDebugThread_Suspending;
+
+	public static String JSDebugThread_Thread_Label;
 
 	/**
 	 * JSDebugExceptionBreakpoint_JSExceptionBreakpoint_0_1

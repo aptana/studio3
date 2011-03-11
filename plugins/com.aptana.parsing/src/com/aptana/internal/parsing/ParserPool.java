@@ -23,6 +23,7 @@ public class ParserPool extends ReapingObjectPool<IParser> implements IParserPoo
 	{
 		super();
 		this.parserExtension = parserExtension;
+		start();
 	}
 
 	@Override

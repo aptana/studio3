@@ -8,6 +8,7 @@
 
 package com.aptana.webserver.core;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.eclipse.core.filesystem.IFileStore;
@@ -15,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 
+import com.aptana.core.IURIMapper;
 import com.aptana.core.Identifiable;
 import com.aptana.core.epl.IMemento;
 
@@ -22,7 +24,7 @@ import com.aptana.core.epl.IMemento;
  * @author Max Stepanov
  * 
  */
-public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURLMapper {
+public abstract class AbstractWebServerConfiguration implements IExecutableExtension, Identifiable, IURIMapper {
 
 	protected static final String ELEMENT_NAME = "name"; //$NON-NLS-1$
 
@@ -38,12 +40,12 @@ public abstract class AbstractWebServerConfiguration implements IExecutableExten
 	/* (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(org.eclipse.core.filesystem.IFileStore)
 	 */
-	public abstract URL resolve(IFileStore file);
+	public abstract URI resolve(IFileStore file);
 
 	/* (non-Javadoc)
 	 * @see com.aptana.webserver.core.IURLMapper#resolve(java.net.URL)
 	 */
-	public abstract IFileStore resolve(URL url);
+	public abstract IFileStore resolve(URI uri);
 
 	public abstract URL getBaseURL();
 	

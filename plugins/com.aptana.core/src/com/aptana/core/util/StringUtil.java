@@ -391,4 +391,15 @@ public abstract class StringUtil
 	{
 		return (object != null) ? object.toString() : EMPTY;
 	}
+
+	/**
+	 * Add single quotes around the given string.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static String quote(String string)
+	{
+		return '\'' + string + '\'';
+	}
 }

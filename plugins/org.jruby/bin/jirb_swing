@@ -39,26 +39,15 @@ frame.default_close_operation = JFrame::EXIT_ON_CLOSE
 frame.set_size(700, 600)
 frame.content_pane.add(pane)
 tar = org.jruby.demo.TextAreaReadline.new(text,
-      " Welcome to the JRuby IRB Console [#{JRUBY_VERSION}] \n\n")
+" Welcome to the JRuby IRB Console [#{JRUBY_VERSION} (#{RUBY_VERSION})]\n\n")
 JRuby.objectspace = true # useful for code completion
 tar.hook_into_runtime_with_streams(JRuby.runtime)
 
 # We need to show the frame on EDT,
 # to avoid deadlocks.
-
-# Once JRUBY-2449 is fixed,
-# the code will me simplifed.
-class FrameBringer
-  include java.lang.Runnable
-  def initialize(frame)
-    @frame = frame
-  end
-  def run
-    @frame.visible = true
-  end
-end
-
-EventQueue.invoke_later(FrameBringer.new(frame))
+EventQueue.invoke_later {
+  frame.visible = true
+}
 
 # From vanilla IRB
 if __FILE__ == $0

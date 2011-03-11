@@ -12,6 +12,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.internal.text.revisions.Colors;
 import org.eclipse.jface.text.revisions.Revision;
 import org.eclipse.jface.text.revisions.RevisionInformation;
@@ -29,7 +30,6 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditor;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitCommit;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.QuickDiffReferenceProvider;
@@ -114,14 +114,13 @@ public class BlameHandler extends AbstractGitHandler
 	private RevisionInformation createRevisionInformation(GitRepository repo, IPath relativePath)
 	{
 		// Run git blame on the file, parse out the output and turn it into revisions!
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(repo.workingDirectory(), "blame", "-p", //$NON-NLS-1$ //$NON-NLS-2$
-				relativePath.toOSString());
-		if (result == null || result.keySet().iterator().next() != 0)
+		IStatus result = repo.execute(GitRepository.ReadWrite.READ, "blame", "-p", relativePath.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null || !result.isOK())
 		{
 			return new RevisionInformation();
 		}
 
-		String output = result.values().iterator().next();
+		String output = result.getMessage();
 		Map<String, GitRevision> revisions = new HashMap<String, GitRevision>();
 
 		String[] lines = output.split("\r?\n|\r"); //$NON-NLS-1$

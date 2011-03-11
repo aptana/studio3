@@ -22,9 +22,17 @@ public class TypeElement extends BaseElement
 {
 	private static final String FUNCTIONS_PROPERTY = "functions"; //$NON-NLS-1$
 	private static final String PROPERTIES_PROPERTY = "properties"; //$NON-NLS-1$
+	private static final String EVENTS_PROPERTY = "events"; //$NON-NLS-1$
+	private static final String EXAMPLES_PROPERTY = "examples"; //$NON-NLS-1$
+	private static final String REMARKS_PROPERTY = "remarks"; //$NON-NLS-1$
+	private static final String DEPRECATED_PROPERTY = "deprecated"; //$NON-NLS-1$
 
 	private List<String> _parentTypes;
 	private List<PropertyElement> _properties;
+	private List<EventElement> _events;
+	private List<String> _examples;
+	private List<String> _remarks;
+	private boolean _deprecated;
 	private boolean _serializeProperties;
 
 	/**
@@ -32,6 +40,44 @@ public class TypeElement extends BaseElement
 	 */
 	public TypeElement()
 	{
+	}
+
+	/**
+	 * addEvent
+	 * 
+	 * @param event
+	 */
+	public void addEvent(EventElement event)
+	{
+		if (event != null)
+		{
+			if (this._events == null)
+			{
+				this._events = new ArrayList<EventElement>();
+			}
+
+			this._events.add(event);
+
+			event.setOwningType(this.getName());
+		}
+	}
+
+	/**
+	 * addExample
+	 * 
+	 * @param example
+	 */
+	public void addExample(String example)
+	{
+		if (example != null && example.length() > 0)
+		{
+			if (this._examples == null)
+			{
+				this._examples = new ArrayList<String>();
+			}
+
+			this._examples.add(example);
+		}
 	}
 
 	/**
@@ -84,6 +130,116 @@ public class TypeElement extends BaseElement
 
 			property.setOwningType(this.getName());
 		}
+	}
+
+	/**
+	 * addRemark
+	 * 
+	 * @param remark
+	 */
+	public void addRemark(String remark)
+	{
+		if (remark != null && remark.length() > 0)
+		{
+			if (this._remarks == null)
+			{
+				this._remarks = new ArrayList<String>();
+			}
+
+			this._remarks.add(remark);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.contentassist.model.BaseElement#fromJSON(java.util.Map)
+	 */
+	@SuppressWarnings("rawtypes")
+	public void fromJSON(Map object)
+	{
+		super.fromJSON(object);
+
+		if (object.containsKey(PROPERTIES_PROPERTY))
+		{
+			List<PropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY), PropertyElement.class);
+
+			for (PropertyElement property : properties)
+			{
+				this.addProperty(property);
+			}
+		}
+
+		if (object.containsKey(FUNCTIONS_PROPERTY))
+		{
+			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY), PropertyElement.class);
+
+			for (PropertyElement function : functions)
+			{
+				this.addProperty(function);
+			}
+		}
+
+		if (object.containsKey(EVENTS_PROPERTY))
+		{
+			List<EventElement> events = IndexUtil.createList(object.get(EVENTS_PROPERTY), EventElement.class);
+
+			for (EventElement event : events)
+			{
+				this.addEvent(event);
+			}
+		}
+
+		if (object.containsKey(EXAMPLES_PROPERTY))
+		{
+			List<String> examples = IndexUtil.createList(object.get(EXAMPLES_PROPERTY));
+
+			for (String example : examples)
+			{
+				this.addExample(example);
+			}
+		}
+
+		if (object.containsKey(REMARKS_PROPERTY))
+		{
+			List<String> remarks = IndexUtil.createList(object.get(REMARKS_PROPERTY));
+
+			for (String remark : remarks)
+			{
+				this.addRemark(remark);
+			}
+		}
+
+		this.setIsDeprecated(Boolean.TRUE == object.get(DEPRECATED_PROPERTY));
+	}
+
+	/**
+	 * getEvents
+	 * 
+	 * @return
+	 */
+	public List<EventElement> getEvents()
+	{
+		return CollectionsUtil.getListValue(this._events);
+	}
+
+	/**
+	 * getExamples
+	 * 
+	 * @return
+	 */
+	public List<String> getExamples()
+	{
+		return CollectionsUtil.getListValue(this._examples);
+	}
+
+	/**
+	 * getParentTypes
+	 * 
+	 * @return
+	 */
+	public List<String> getParentTypes()
+	{
+		return CollectionsUtil.getListValue(this._parentTypes);
 	}
 
 	/**
@@ -143,13 +299,13 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
-	 * getParentTypes
+	 * getRemarks
 	 * 
 	 * @return
 	 */
-	public List<String> getParentTypes()
+	public List<String> getRemarks()
 	{
-		return CollectionsUtil.getListValue(this._parentTypes);
+		return CollectionsUtil.getListValue(this._remarks);
 	}
 
 	/**
@@ -183,6 +339,26 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
+	 * isDeprecated
+	 * 
+	 * @return
+	 */
+	public boolean isDeprecated()
+	{
+		return this._deprecated;
+	}
+
+	/**
+	 * setIsDeprecated
+	 * 
+	 * @param value
+	 */
+	public void setIsDeprecated(boolean value)
+	{
+		this._deprecated = value;
+	}
+
+	/**
 	 * setSerializeProperties
 	 * 
 	 * @param value
@@ -190,36 +366,6 @@ public class TypeElement extends BaseElement
 	public void setSerializeProperties(boolean value)
 	{
 		this._serializeProperties = value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.js.contentassist.model.BaseElement#fromJSON(java.util.Map)
-	 */
-	@SuppressWarnings("rawtypes")
-	public void fromJSON(Map object)
-	{
-		super.fromJSON(object);
-
-		if (object.containsKey(PROPERTIES_PROPERTY))
-		{
-			List<PropertyElement> properties = IndexUtil.createList(object.get(PROPERTIES_PROPERTY), PropertyElement.class);
-
-			for (PropertyElement property : properties)
-			{
-				this.addProperty(property);
-			}
-		}
-
-		if (object.containsKey(FUNCTIONS_PROPERTY))
-		{
-			List<PropertyElement> functions = IndexUtil.createList(object.get(FUNCTIONS_PROPERTY), PropertyElement.class);
-
-			for (PropertyElement function : functions)
-			{
-				this.addProperty(function);
-			}
-		}
 	}
 
 	/*
@@ -248,6 +394,10 @@ public class TypeElement extends BaseElement
 
 			out.add(PROPERTIES_PROPERTY, properties);
 			out.add(FUNCTIONS_PROPERTY, functions);
+			out.add(EVENTS_PROPERTY, this.getEvents());
+			out.add(EXAMPLES_PROPERTY, this.getExamples());
+			out.add(REMARKS_PROPERTY, this.getRemarks());
+			out.add(DEPRECATED_PROPERTY, this.isDeprecated());
 		}
 	}
 
@@ -284,6 +434,12 @@ public class TypeElement extends BaseElement
 		for (PropertyElement property : this.getProperties())
 		{
 			property.toSource(printer);
+			printer.println(";"); //$NON-NLS-1$
+		}
+
+		for (EventElement event : this.getEvents())
+		{
+			event.toSource(printer);
 			printer.println(";"); //$NON-NLS-1$
 		}
 

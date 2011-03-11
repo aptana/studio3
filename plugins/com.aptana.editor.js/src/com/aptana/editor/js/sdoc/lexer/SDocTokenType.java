@@ -56,9 +56,9 @@ public enum SDocTokenType
 	ELLIPSIS(Terminals.ELLIPSIS),
 	START_DOCUMENTATION(Terminals.START_DOCUMENTATION),
 
-	WHITESPACE(42),
-	TYPES(43),
-	VALUE(44);
+	WHITESPACE(1024),
+	TYPES(1025),
+	VALUE(1026);
 
 	private short _index;
 

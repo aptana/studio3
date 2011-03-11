@@ -13,6 +13,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.PlatformObject;
@@ -34,7 +35,7 @@ import com.aptana.js.debug.core.model.xhr.IXHRService;
 /**
  * @author Max Stepanov
  */
-public class JSDebugProcess extends PlatformObject implements IProcess {
+public final class JSDebugProcess extends PlatformObject implements IProcess {
 
 	private static final int MAX_WAIT_FOR_DEATH_ATTEMPTS = 10;
 	private static final int TIME_TO_WAIT_FOR_THREAD_DEATH = 500; // ms
@@ -276,8 +277,8 @@ public class JSDebugProcess extends PlatformObject implements IProcess {
 	private void initializeAttributes(Map<String, Object> attributes) {
 		setAttribute(IProcess.ATTR_PROCESS_TYPE, "javascript"); //$NON-NLS-1$
 		if (attributes != null) {
-			for (Object key : attributes.keySet()) {
-				setAttribute((String) key, (String) attributes.get(key));
+			for (Entry<String, Object> entry : attributes.entrySet()) {
+				setAttribute(entry.getKey(), String.valueOf(entry.getValue()));
 			}
 		}
 	}

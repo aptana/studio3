@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.aptana.com/2005/schema/1.0">
+	<!--
+		Please note this schema is for reference only. The purpose of this
+		file is to show how the Schema 1.0 schema is defined in the syntax
+		of the schema itself. This schema is actually created programtically
+		as part of the bootstrapping process. As such, it is the
+		responsibility of the developer who makes changes to the
+		programmatic schema to update this schema to reflect those changes
+	-->
+
+	<element name="attribute" onEnter="startAttributeElement">
+		<attribute name="name" />
+		<attribute name="usage" usage="optional" />
+	</element>
+
+	<element name="child-element" onEnter="startChildElementElement">
+		<attribute name="name" />
+	</element>
+
+	<element name="element" onEnter="startElementElement" onExit="exitElementElement">
+		<attribute name="name" />
+		<attribute name="type" usage="optional" />
+		<attribute name="onEnter" usage="optional" />
+		<attribute name="onExit" usage="optional" />
+		<attribute name="hasText" usage="optional"/>
+		<child-element name="attribute" />
+		<child-element name="child-element" />
+	</element>
+
+	<element name="schema" type="root">
+		<child-element name="element" />
+	</element>
+
+</schema>

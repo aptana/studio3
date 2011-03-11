@@ -91,6 +91,8 @@ public class GitRevList
 			return Status.CANCEL_STATUS;
 		try
 		{
+			// FIXME Move this into GitRepository, so we can set up lock/monitor on it!
+			repository.enterRead();
 			Process p = GitExecutable.instance().run(directory, arguments.toArray(new String[arguments.size()]));
 			InputStream stream = p.getInputStream();
 
@@ -193,6 +195,7 @@ public class GitRevList
 		}
 		finally
 		{
+			repository.exitRead();
 			subMonitor.done();
 		}
 		return Status.OK_STATUS;

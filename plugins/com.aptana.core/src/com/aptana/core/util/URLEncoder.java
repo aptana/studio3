@@ -114,7 +114,7 @@ public final class URLEncoder
 			{
 				try
 				{
-					byte[] bytes = new Character(ch).toString().getBytes("UTF8"); //$NON-NLS-1$
+					byte[] bytes = Character.toString(ch).getBytes("UTF8"); //$NON-NLS-1$
 					for(int j = 0; j < bytes.length; ++j)
 					{
 						sb.append('%')

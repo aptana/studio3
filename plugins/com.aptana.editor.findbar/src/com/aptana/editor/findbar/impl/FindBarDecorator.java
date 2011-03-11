@@ -69,6 +69,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
+import com.aptana.editor.findbar.impl.FindBarEntriesHelper.EntriesControlHandle;
 import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 
 /**
@@ -78,6 +79,17 @@ import com.aptana.editor.findbar.preferences.IPreferencesConstants;
  */
 public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 {
+
+	/**
+	 * Yes, the configuration for the find bar is shared across all find bars (so, when some configuration changes in
+	 * one, all are updated)
+	 */
+	private static final FindBarConfiguration findBarConfiguration = new FindBarConfiguration();
+
+	/**
+	 * Yes, the entries in the combos are also always synchronized.
+	 */
+	private static final FindBarEntriesHelper findBarEntriesHelper = new FindBarEntriesHelper();
 
 	private static final String CLOSE = "icons/close.png"; //$NON-NLS-1$
 	private static final String CLOSE_ENTER = "icons/close_enter.png"; //$NON-NLS-1$
@@ -102,30 +114,73 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	private List<FindBarOption> fFindBarOptions = new ArrayList<FindBarOption>();
 
+	private Composite composite;
+
+	private Composite findBar;
+	private GridData findBarGridData;
+
+	/* default */Combo combo;
+	/* default */Combo comboReplace;
+	ToolItem caseSensitive;
+	ToolItem wholeWord;
+	ToolItem searchBackward;
+	ToolItem options;
+	ToolItem regularExpression;
+	private Label close;
+	private Button countTotal;
+	private Button findButton;
+	private Button replaceFind;
+	private Button replace;
+	private Button replaceAll;
+	private Button showFindReplaceDialog;
+	Button searchInOpenFiles;
+	private Control[] disableWhenHidden;
+
+	private FindBarActions findBarActions;
+
+	FindBarActions getFindBarActions()
+	{
+		return findBarActions;
+	}
+
+	private FindBarFinder findBarFinder;
+
+	private static final String EMPTY = ""; //$NON-NLS-1$
+
+	private SearchOnTextChangedModifyListener modifyListener = new SearchOnTextChangedModifyListener();
+
+	private final List<EntriesControlHandle> entriesControlHandles = new ArrayList<FindBarEntriesHelper.EntriesControlHandle>();
+
 	public FindBarDecorator(final ITextEditor textEditor)
 	{
 		this.textEditor = textEditor;
 		this.statusLineManager = (IEditorStatusLine) textEditor.getAdapter(IEditorStatusLine.class);
 		findBarActions = new FindBarActions(textEditor, this);
 
-		fFindBarOptions.add(new FindBarOption("caseSensitive",//$NON-NLS-1$ 
-				CASE_SENSITIVE, CASE_SENSITIVE_DISABLED, Messages.FindBarDecorator_LABEL_CaseSensitive, this)
+		fFindBarOptions.add(new FindBarOption(
+				"caseSensitive",//$NON-NLS-1$ 
+				CASE_SENSITIVE, CASE_SENSITIVE_DISABLED, Messages.FindBarDecorator_LABEL_CaseSensitive, this,
+				IPreferencesConstants.CASE_SENSITIVE_IN_FIND_BAR)
 		{
 			public void execute(FindBarDecorator dec)
 			{
 				dec.findNextOrprevAfterChangeOption();
 			}
 		});
-		fFindBarOptions.add(new FindBarOption("wholeWord", //$NON-NLS-1$
-				WHOLE_WORD, WHOLE_WORD_DISABLED, Messages.FindBarDecorator_LABEL_WholeWord, this, false)
+		fFindBarOptions.add(new FindBarOption(
+				"wholeWord", //$NON-NLS-1$
+				WHOLE_WORD, WHOLE_WORD_DISABLED, Messages.FindBarDecorator_LABEL_WholeWord, this, false,
+				IPreferencesConstants.WHOLE_WORD_IN_FIND_BAR)
 		{
 			public void execute(FindBarDecorator dec)
 			{
 				dec.findNextOrprevAfterChangeOption();
 			}
 		});
-		fFindBarOptions.add(new FindBarOption("regularExpression", //$NON-NLS-1$
-				REGEX, REGEX_DISABLED, Messages.FindBarDecorator_LABEL_RegularExpression, this)
+		fFindBarOptions.add(new FindBarOption(
+				"regularExpression", //$NON-NLS-1$
+				REGEX, REGEX_DISABLED, Messages.FindBarDecorator_LABEL_RegularExpression, this,
+				IPreferencesConstants.REGULAR_EXPRESSION_IN_FIND_BAR)
 		{
 
 			@Override
@@ -165,8 +220,10 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				dec.findNextOrprevAfterChangeOption();
 			}
 		});
-		fFindBarOptions.add(new FindBarOption("searchBackward", //$NON-NLS-1$
-				SEARCH_BACKWARD, null, Messages.FindBarDecorator_LABEL_SearchBackward, this)
+		fFindBarOptions.add(new FindBarOption(
+				"searchBackward", //$NON-NLS-1$
+				SEARCH_BACKWARD, null, Messages.FindBarDecorator_LABEL_SearchBackward, this,
+				IPreferencesConstants.SEARCH_BACKWARD_IN_FIND_BAR)
 		{
 			public void execute(FindBarDecorator dec)
 			{
@@ -174,14 +231,13 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			}
 		});
 		FindBarOption opt = new FindBarOption("options", //$NON-NLS-1$
-				OPTIONS, null, Messages.FindBarDecorator_LABEL_ShowOptions, this)
+				OPTIONS, null, Messages.FindBarDecorator_LABEL_ShowOptions, this, null)
 		{
 			public void execute(FindBarDecorator dec)
 			{
 				showOptions(true);
 			}
 		};
-		opt.isCheckable = false;
 		opt.createMenuItem = false;
 		fFindBarOptions.add(opt);
 
@@ -367,10 +423,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		comboGridData.minimumWidth = size.x;
 		combo.setLayoutData(comboGridData);
 
-		List<String> list = FindBarEntriesHelper.loadEntries(preferenceName);
-		list.add(0, EMPTY);
-		combo.setItems(list.toArray(new String[list.size()]));
-		combo.select(0);
+		entriesControlHandles.add(findBarEntriesHelper.register(combo, modifyListener, preferenceName));
 
 		combo.addFocusListener(findBarActions.createFocusListener(combo));
 		return combo;
@@ -407,7 +460,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	/**
 	 * Do searches when we're modifying the text in the combo -- i.e.: incremental search.
 	 */
-	private final class SearchOnTextChangedModifyListener implements ModifyListener, KeyListener
+	private final class SearchOnTextChangedModifyListener implements ModifyListener, KeyListener, IStartEndIgnore
 	{
 		private String lastText = EMPTY;
 
@@ -555,6 +608,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			fStringNotFoundColor.dispose();
 			fStringNotFoundColor = null;
 		}
+		for (FindBarOption opt : this.fFindBarOptions)
+		{
+			opt.dispose();
+		}
+		findBarEntriesHelper.unregister(entriesControlHandles);
+		entriesControlHandles.clear();
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e)
@@ -572,10 +631,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		if (source == close)
 		{
 			hideFindBar();
-		}
-		else if (source == caseSensitive || source == wholeWord || source == regularExpression)
-		{
-			findNextOrprevAfterChangeOption();
 		}
 		else if (source == countTotal)
 		{
@@ -601,16 +656,16 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			showFindReplaceDialog();
 		}
-		else if (source == options)
+		else
 		{
-			showOptions(true);
+			FindBarPlugin.log(new RuntimeException("Unhandled selection for widget: " + source));
 		}
 	}
 
 	private void findNextOrprevAfterChangeOption()
 	{
 		setFindText(combo.getText());
-		findBarFinder.find(!searchBackward.getSelection(), true);
+		findBarFinder.find(!getConfiguration().getSearchBackward(), true);
 		showCountTotal();
 	}
 
@@ -621,11 +676,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				statusLineManager);
 
 		setFindText(combo.getText());
-		setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
+		setFindTextOnReplace(comboReplace.getText());
 		PatternSyntaxException exception = null;
 		try
 		{
-			findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
+			findReplaceDialog.replaceSelection(comboReplace.getText(), getConfiguration().getRegularExpression());
 			showCountTotal();
 		}
 		catch (PatternSyntaxException e1)
@@ -639,7 +694,8 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			{
 				try
 				{
-					findReplaceDialog.replaceSelection(comboReplace.getText(), regularExpression.getSelection());
+					findReplaceDialog.replaceSelection(comboReplace.getText(), getConfiguration()
+							.getRegularExpression());
 					showCountTotal();
 				}
 				catch (IllegalStateException e2)
@@ -659,7 +715,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		if (newFind)
 		{
-			if (searchBackward.getSelection())
+			if (getConfiguration().getSearchBackward())
 			{
 				findBarFinder.find(false);
 			}
@@ -688,11 +744,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				statusLineManager);
 
 		setFindText(combo.getText());
-		setFindText(comboReplace.getText(), true, comboReplace, PREFERENCE_NAME_REPLACE);
+		setFindTextOnReplace(comboReplace.getText());
 		try
 		{
 			int replaced = findReplaceDialog.replaceAll(combo.getText(), comboReplace.getText(), true,
-					caseSensitive.getSelection(), getWholeWord(), regularExpression.getSelection());
+					getConfiguration().getCaseSensitive(), getWholeWord(), getConfiguration().getRegularExpression());
 			showCountTotal();
 			statusLineManager.setMessage(false, String.format(Messages.FindBarDecorator_MSG_Replaced, replaced), null);
 		}
@@ -707,41 +763,12 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		return isVisible() && (combo.getDisplay().getFocusControl() == combo);
 	}
 
-	private Composite composite;
-
-	private Composite findBar;
-	private GridData findBarGridData;
-
-	/* default */Combo combo;
-	/* default */Combo comboReplace;
-	ToolItem caseSensitive;
-	ToolItem wholeWord;
-	ToolItem searchBackward;
-	ToolItem options;
-	ToolItem regularExpression;
-	private Label close;
-	private Button countTotal;
-	private Button findButton;
-	private Button replaceFind;
-	private Button replace;
-	private Button replaceAll;
-	private Button showFindReplaceDialog;
-	Button searchInOpenFiles;
-	private Control[] disableWhenHidden;
-
-	private FindBarActions findBarActions;
-	private FindBarFinder findBarFinder;
-
-	private static final String EMPTY = ""; //$NON-NLS-1$
-
-	private SearchOnTextChangedModifyListener modifyListener = new SearchOnTextChangedModifyListener();
-
 	private void adjustEnablement()
 	{
 		String text = combo.getText();
 		findButton.setEnabled(!EMPTY.equals(text));
 		countTotal.setText(EMPTY);
-		wholeWord.setEnabled(!EMPTY.equals(text) && !regularExpression.getSelection() && isWord(text));
+		wholeWord.setEnabled(!EMPTY.equals(text) && !getConfiguration().getRegularExpression() && isWord(text));
 	}
 
 	/* default */void hideFindBar()
@@ -792,7 +819,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			findBarGridData.exclude = false;
 			composite.layout();
 		}
-		if (!findBarActions.isActivated())
+		if (wasExcluded)
 		{
 			// Only change the text if it is not activated (otherwise it means it was
 			// already activated and the user was in another control in the find bar and used Ctrl+F, in which case we
@@ -805,7 +832,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				ITextSelection textSelection = (ITextSelection) selection;
 				String text = textSelection.getText();
 				if (text.indexOf("\n") == -1 && text.indexOf("\r") == -1) { //$NON-NLS-1$ //$NON-NLS-2$
-					setFindText(text, !wasExcluded);
+					setFindText(text);
 				}
 			}
 		}
@@ -842,7 +869,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	/* default */void findNextOrPrev()
 	{
-		if (searchBackward.getSelection())
+		if (getConfiguration().getSearchBackward())
 		{
 			findPrevious();
 		}
@@ -855,44 +882,23 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	boolean getWholeWord()
 	{
-		return wholeWord.getEnabled() && wholeWord.getSelection() && !regularExpression.getSelection();
+		return wholeWord.getEnabled() && getConfiguration().getWholeWord()
+				&& !getConfiguration().getRegularExpression();
 	}
 
 	private void setFindText(String findText)
 	{
-		setFindText(findText, true);
+		setFindText(findText, combo, PREFERENCE_NAME_FIND);
 	}
 
-	private void setFindText(String findText, boolean removeAddListener)
+	private void setFindTextOnReplace(String findText)
 	{
-		setFindText(findText, removeAddListener, combo, PREFERENCE_NAME_FIND);
+		setFindText(findText, comboReplace, PREFERENCE_NAME_REPLACE);
 	}
 
-	private void setFindText(String findText, boolean removeAddListener, final Combo combo, String preferenceName)
+	private void setFindText(String findText, final Combo combo, String preferenceName)
 	{
-		if (findText.length() == 0)
-		{
-			return; // nothing to do in this case
-		}
-
-		List<String> items = FindBarEntriesHelper.addEntry(findText, preferenceName);
-
-		try
-		{
-			if (removeAddListener)
-			{
-				modifyListener.startIgnore();
-			}
-			combo.setItems(items.toArray(new String[0]));
-			combo.select(0);
-		}
-		finally
-		{
-			if (removeAddListener)
-			{
-				modifyListener.endIgnore();
-			}
-		}
+		findBarEntriesHelper.addEntry(findText, preferenceName);
 	}
 
 	private static final int TOO_MANY = Integer.getInteger(FindBarDecorator.class.getName() + ".TOO_MANY", 100); //$NON-NLS-1$
@@ -911,11 +917,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		{
 			String text = sourceViewer.getDocument().get();
 			int flags = 0;
-			if (!caseSensitive.getSelection())
+			if (!getConfiguration().getCaseSensitive())
 			{
 				flags |= Pattern.CASE_INSENSITIVE;
 			}
-			if (!regularExpression.getSelection())
+			if (!getConfiguration().getRegularExpression())
 			{
 				patternString = Pattern.quote(patternString);
 			}
@@ -978,9 +984,9 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		String searchText = combo.getText();
 		if (searchText.length() >= 0)
 		{
-			boolean isWholeWord = wholeWord.getSelection();
-			boolean isRegEx = regularExpression.getSelection();
-			boolean isCaseSensitive = caseSensitive.getSelection();
+			boolean isWholeWord = getConfiguration().getWholeWord();
+			boolean isRegEx = getConfiguration().getRegularExpression();
+			boolean isCaseSensitive = getConfiguration().getCaseSensitive();
 			if (isWholeWord && !isRegEx && isWord(searchText))
 			{
 				isRegEx = true;
@@ -1045,6 +1051,11 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 				return false;
 		}
 		return true;
+	}
+
+	public FindBarConfiguration getConfiguration()
+	{
+		return findBarConfiguration;
 	}
 
 }

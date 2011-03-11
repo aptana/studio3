@@ -24,6 +24,7 @@ import org.jruby.Ruby;
 import org.jruby.RubyProc;
 import org.jruby.RubyRegexp;
 import org.jruby.util.KCode;
+import org.jruby.util.RegexpOptions;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
@@ -536,7 +537,7 @@ public class BundleCacher
 			{
 				String val = (String) constructScalar((ScalarNode) node);
 				return RubyRegexp.newRegexp(ScriptingEngine.getInstance().getScriptingContainer().getProvider()
-						.getRuntime(), val, 0);
+						.getRuntime(), val, RegexpOptions.NULL_OPTIONS);
 			}
 		}
 

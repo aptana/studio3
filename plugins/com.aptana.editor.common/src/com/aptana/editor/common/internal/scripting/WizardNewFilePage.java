@@ -61,7 +61,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	@Override
 	public boolean canFlipToNextPage()
 	{
-		return templates != null && templates.length > 0;
+		return isPageComplete() && templates != null && templates.length > 0;
 	}
 
 	/*
@@ -73,11 +73,14 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 		IWizard wizard = getWizard();
 		TemplateSelectionPage templateSelectionPage = (TemplateSelectionPage) wizard
 				.getPage(NewFileWizard.TEMPLATE_PAGE_NAME);
-		String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate(),
-				getContainerFullPath().append(getFileName()));
-		if (templateContent != null)
+		if (wizard.getContainer().getCurrentPage() == templateSelectionPage)
 		{
-			return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+			String templateContent = NewFileWizard.getTemplateContent(templateSelectionPage.getSelectedTemplate(),
+					getContainerFullPath().append(getFileName()));
+			if (templateContent != null)
+			{
+				return new ReaderInputStream(new StringReader(templateContent), "UTF-8"); //$NON-NLS-1$
+			}
 		}
 		return super.getInitialContents();
 	}
@@ -87,7 +90,7 @@ public class WizardNewFilePage extends WizardNewFileCreationPage
 	{
 		if (ResourcesPlugin.getWorkspace().getRoot().getProjects().length == 0)
 		{
-			setErrorMessage("No project exists in the workspace.");
+			setErrorMessage(Messages.WizardNewFilePage_ERR_NoProject);
 			return false;
 		}
 		return super.validatePage();

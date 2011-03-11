@@ -245,6 +245,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbInternalServer.addListener(SWT.Selection, dirtyListener);
 			rbCustomServer.addListener(SWT.Selection, dirtyListener);
 			rbManagedServer.addListener(SWT.Selection, dirtyListener);
+			managedServersView.getControl().addListener(SWT.Selection, dirtyListener);
 		} else {
 			fBrowserExeText.removeListener(SWT.Modify, dirtyListener);
 			fCommandArgsText.removeListener(SWT.Modify, dirtyListener);
@@ -259,6 +260,7 @@ public class LaunchBrowserSettingsTab extends AbstractLaunchConfigurationTab {
 			rbInternalServer.removeListener(SWT.Selection, dirtyListener);
 			rbCustomServer.removeListener(SWT.Selection, dirtyListener);
 			rbManagedServer.removeListener(SWT.Selection, dirtyListener);
+			managedServersView.getControl().removeListener(SWT.Selection, dirtyListener);
 		}
 	}
 

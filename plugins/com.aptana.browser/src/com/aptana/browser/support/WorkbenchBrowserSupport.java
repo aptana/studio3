@@ -32,7 +32,11 @@ public class WorkbenchBrowserSupport extends DefaultBrowserSupport {
 	 */
 	public WorkbenchBrowserSupport() {
 		super();
-		instance = this;
+		setDefaultInstance(this);
+	}
+	
+	private static void setDefaultInstance(DefaultBrowserSupport object) {
+		instance = object;		
 	}
 
 	/* (non-Javadoc)

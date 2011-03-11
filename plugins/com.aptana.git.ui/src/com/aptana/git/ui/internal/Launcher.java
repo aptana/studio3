@@ -14,7 +14,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -27,6 +26,8 @@ import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 import com.aptana.console.process.ConsoleProcessFactory;
 import com.aptana.core.ShellExecutable;
 import com.aptana.git.core.GitPlugin;
+import com.aptana.git.core.model.GitExecutable;
+import com.aptana.git.core.model.GitRepository;
 
 /**
  * Launches a process through Eclipse's launching infrastructure, launching it into the console.
@@ -43,20 +44,22 @@ public abstract class Launcher
 			'\0' };
 
 	/**
-	 * @param command
-	 * @param workingDir
+	 * Launches a git process against the repository.
+	 * 
+	 * @param repo
+	 * @param monitor
 	 * @param args
 	 * @return
 	 */
-	public static ILaunch launch(String command, IPath workingDir, String... args) throws CoreException
+	public static ILaunch launch(GitRepository repo, IProgressMonitor monitor, String... args) throws CoreException
 	{
-		return launch(command, workingDir, new NullProgressMonitor(), args);
-	}
-
-	public static ILaunch launch(String command, IPath workingDir, IProgressMonitor monitor, String... args)
-			throws CoreException
-	{
-		ILaunchConfigurationWorkingCopy config = createLaunchConfig(command, workingDir, args);
+		IPath workingDir = null;
+		if (repo != null)
+		{
+			workingDir = repo.workingDirectory();
+		}
+		ILaunchConfigurationWorkingCopy config = createLaunchConfig(GitExecutable.instance().path().toOSString(),
+				workingDir, args);
 		return config.launch(ILaunchManager.RUN_MODE, monitor);
 	}
 
@@ -110,10 +113,33 @@ public abstract class Launcher
 		}
 		if (!env.isEmpty())
 		{
+			env = filterOutVariables(env);
 			config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
 			config.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
 		}
 		return config;
+	}
+
+	/**
+	 * Filter out any env vars that contain "${" in their value. Otherwise Eclipse will try to substitute and fail! TODO
+	 * Maybe we can escape the ${ to avoid the issue?
+	 * 
+	 * @param env
+	 * @return
+	 */
+	private static Map<String, String> filterOutVariables(Map<String, String> env)
+	{
+		Map<String, String> filtered = new HashMap<String, String>();
+		for (Map.Entry<String, String> entry : env.entrySet())
+		{
+			String value = entry.getValue();
+			if (value.contains("${")) //$NON-NLS-1$
+			{
+				continue;
+			}
+			filtered.put(entry.getKey(), value);
+		}
+		return filtered;
 	}
 
 	private static String getLastPortion(String command)

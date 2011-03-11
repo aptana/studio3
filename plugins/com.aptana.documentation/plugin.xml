@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true"/>
+      <toc file="tocgettingstarted.xml"/>
+      <toc file="html/gettingstarted/toc.xml"/> 
+      <toc file="tocreference.xml"/>
+      <!--<toc file="html/reference/api/CSS.toc.xml"/>
+      <toc file="html/reference/api/HTML.toc.xml"/>-->
+      <!--<toc file="html/reference/api/JSKeywords.toc.xml"/>-->
+      <toc file="html/reference/api/JSCore.toc.xml"/>-->
+      <toc file="html/reference/api/HTMLDOM0.toc.xml"/>
+      <toc file="html/reference/api/HTMLDOM2.toc.xml"/>
+      <toc file="html/reference/api/HTMLDOM3.toc.xml"/>
+      <toc file="html/reference/api/HTMLDOM5.toc.xml"/>
+   </extension>
+</plugin>

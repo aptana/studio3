@@ -92,8 +92,8 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		{
 			file.mkdirs();
 		}
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
-		if (result != null && !result.isEmpty() && result.keySet().iterator().next() == 0)
+		IStatus result = GitExecutable.instance().runInBackground(path, "init"); //$NON-NLS-1$
+		if (result != null && result.isOK())
 		{
 			GitRepository repo = getUnattachedExisting(path.toFile().toURI());
 			if (repo != null)
@@ -248,14 +248,10 @@ public class GitRepositoryManager implements IGitRepositoryManager
 		}
 
 		// Use rev-parse to find the .git dir for the repository being opened
-		Map<Integer, String> result = GitExecutable.instance()
-				.runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
-		if (result == null || result.isEmpty())
+		IStatus result = GitExecutable.instance().runInBackground(repositoryPath, "rev-parse", "--git-dir"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result == null || !result.isOK())
 			return null;
-		Integer exitCode = result.keySet().iterator().next();
-		if (exitCode != 0)
-			return null;
-		String newPath = result.values().iterator().next();
+		String newPath = result.getMessage();
 		if (newPath == null)
 			return null;
 		if (newPath.equals(GIT_DIR))

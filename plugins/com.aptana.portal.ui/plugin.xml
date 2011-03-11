@@ -116,6 +116,11 @@
             id="portal.browser"
             name="Browser Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.ViewActionController"
+            id="portal.views"
+            name="View Actions">
+      </actionController>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -123,6 +128,7 @@
             class="com.aptana.portal.ui.PortalPreferenceInitializer">
       </initializer>
    </extension>
+   <!-- Commenting out untill we integrate the Portal (Dev Toolbox) completely.
    <extension
          point="org.eclipse.ui.commands">
       <command
@@ -182,4 +188,5 @@
          </toolbar>
       </menuContribution>
    </extension>
+   END PORTAL COMMENT -->
 </plugin>

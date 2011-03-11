@@ -54,7 +54,7 @@ public final class ServerConfigurationManager {
 	private List<IMemento> unresolvedElements = new ArrayList<IMemento>();
 	private ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
-	public final class ConfigurationType {
+	public static final class ConfigurationType {
 		private String id;
 		private String name;
 

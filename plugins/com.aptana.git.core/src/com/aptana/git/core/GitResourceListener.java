@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -117,7 +118,7 @@ class GitResourceListener implements IResourceChangeListener
 			GitPlugin.logError(e);
 		}
 
-		if (!projectsToAttach.isEmpty())
+		if (autoAttachGitRepos() && !projectsToAttach.isEmpty())
 		{
 			Job job = new Job("Attaching Git repos") //$NON-NLS-1$
 			{
@@ -156,8 +157,18 @@ class GitResourceListener implements IResourceChangeListener
 				continue;
 			GitIndex index = repo.index();
 			if (index != null)
+			{
+				// FIXME This causes the whole index to refresh whenever any file/dir is changed in the workspace attached to the repo. 
+				// We already listen to changes to the git index file, so when do we need to refresh here? Can we do a refresh of only the diff?
 				index.refreshAsync(); // queue up a refresh
+			}
 		}
+	}
+
+	private boolean autoAttachGitRepos()
+	{
+		return Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.AUTO_ATTACH_REPOS, true, null);
 	}
 
 	private IGitRepositoryManager getGitRepositoryManager()

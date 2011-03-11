@@ -51,6 +51,7 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 */
 	protected static final int FLAGS_TOPLEVEL = 0x80;
 
+	private final int threadId;
 	private final String qualifier;
 	private final String name;
 	private IValue value;
@@ -64,8 +65,8 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param name
 	 * @param value
 	 */
-	public JSDebugVariable(IDebugTarget target, String qualifier, String name, IValue value) {
-		this(target, qualifier, name, value, 0);
+	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, IValue value) {
+		this(target, threadId, qualifier, name, value, 0);
 	}
 
 	/**
@@ -76,8 +77,8 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param name
 	 * @param flags
 	 */
-	public JSDebugVariable(IDebugTarget target, String qualifier, String name, int flags) {
-		this(target, qualifier, name, null, flags);
+	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, int flags) {
+		this(target, threadId, qualifier, name, null, flags);
 	}
 
 	/**
@@ -89,8 +90,9 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @param value
 	 * @param flags
 	 */
-	public JSDebugVariable(IDebugTarget target, String qualifier, String name, IValue value, int flags) {
+	public JSDebugVariable(IDebugTarget target, int threadId, String qualifier, String name, IValue value, int flags) {
 		super(target);
+		this.threadId = threadId;
 		this.qualifier = qualifier;
 		this.name = name;
 		this.value = value;
@@ -149,8 +151,6 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	 * @see org.eclipse.debug.core.model.IValueModification#setValue(org.eclipse.debug.core.model.IValue)
 	 */
 	public void setValue(IValue value) throws DebugException {
-		// TODO Auto-generated method stub
-		value = null;
 		throwNotImplemented();
 	}
 
@@ -232,6 +232,10 @@ public class JSDebugVariable extends JSDebugElement implements IJSVariable {
 	
 	/* package */ String getQualifier() {
 		return qualifier;
+	}
+	
+	/* package */ int getThreadId() {
+		return threadId;
 	}
 
 }

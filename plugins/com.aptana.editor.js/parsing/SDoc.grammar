@@ -31,9 +31,9 @@
 		{
 		}
 	}
-	
+
 	private SDocScanner fScanner;
-	
+
 	/**
 	 * parse
 	 *
@@ -43,7 +43,7 @@
 	{
 		return parse(source, 0);
 	}
-	
+
 	/**
 	 * parse
 	 *
@@ -54,8 +54,26 @@
 	{
 		fScanner.setOffset(offset);
 		fScanner.setSource(source);
-		
+
 		return parse(fScanner);
+	}
+
+	/**
+	 * parseType
+	 * 
+	 * @param source
+	 * @return
+	 * @throws java.lang.Exception
+	 */
+	public List<Type> parseType(String source) throws java.lang.Exception
+	{
+		fScanner.setOffset(0);
+		fScanner.setSource(source);
+		fScanner.queueTypeTokens(0, source.length());
+
+		Object result = parse(fScanner, AltGoals.Types);
+
+		return (result instanceof List) ? (List<Type>) result : null;
 	}
 :};
 %init {:
@@ -69,10 +87,10 @@
 %terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
 %terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
-%terminals TYPE,CLASS;
+%terminals TYPE, CLASS;
 
-%typeof IDENTIFIER,FUNCTION,ARRAY = "String";
-%typeof TEXT,LBRACKET,RBRACKET,LCURLY,RCURLY,POUND,COLON,ERROR,UNKNOWN = "String";
+%typeof IDENTIFIER, FUNCTION, ARRAY = "String";
+%typeof TEXT, LBRACKET, RBRACKET, LCURLY, RCURLY, POUND, COLON, ERROR, UNKNOWN = "String";
 
 %typeof Block = "Block";
 %typeof Namespace = "String";
@@ -81,6 +99,7 @@
 %typeof Type = "Type";
 
 %goal Grammar;
+%goal Types;
 
 Grammar
 	=	Block
@@ -125,15 +144,15 @@ Tags
 	=	Tags.tags Tag.tag
 		{:
 			((List<Tag>) tags.value).add(tag);
-			
+
 			return tags;
 		:}
 	|	Tag.tag
 		{:
 			List<Tag> tags = new ArrayList<Tag>();
-			
+
 			tags.add(tag);
-			
+
 			return new Symbol(tags);
 		:}
 	;
@@ -221,15 +240,15 @@ Types
 	=	Types.types TypeDelimiter Type.type
 		{:
 			((List<Type>) types.value).add(type);
-			
+
 			return types;
 		:}
 	|	Type.type
 		{:
 			List<Type> types = new ArrayList<Type>();
-			
+
 			types.add(type);
-			
+
 			return new Symbol(types);
 		:}
 	;
@@ -275,20 +294,20 @@ Type
 	|	FUNCTION ReturnDelimiter Type.returnType
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 		:}
 	|	FUNCTION ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 		:}
 	|	FUNCTION LPAREN RPAREN
@@ -298,60 +317,60 @@ Type
 	|	FUNCTION LPAREN RPAREN ReturnDelimiter Type.returnType
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 		:}
 	|	FUNCTION LPAREN RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 		:}
 	|	FUNCTION LPAREN Types.parameterTypes RPAREN
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			return function;
 		:}
 	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter Type.returnType
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			function.addReturnType(returnType);
-			
+
 			return function;
 		:}
 	|	FUNCTION LPAREN Types.parameterTypes RPAREN ReturnDelimiter LPAREN Types.returnTypes RPAREN
 		{:
 			FunctionType function = new FunctionType();
-			
+
 			for (Type parameterType : (List<Type>) parameterTypes.value)
 			{
 				function.addParameterType(parameterType);
 			}
-			
+
 			for (Type returnType : (List<Type>) returnTypes.value)
 			{
 				function.addReturnType(returnType);
 			}
-			
+
 			return function;
 		:}
 //	|	FUNCTION FunctionParameterTypes FunctionReturnTypes
@@ -403,25 +422,25 @@ ParamName
 	|	LBRACKET TEXT.name RBRACKET
 		{:
 			Parameter result = new Parameter(name);
-			
+
 			result.setUsage(Usage.OPTIONAL);
-			
+
 			return result;
 		:}
 	|	ELLIPSIS
 		{:
 			Parameter result = new Parameter("...");
-			
+
 			result.setUsage(Usage.ONE_OR_MORE);
-			
+
 			return result;
 		:}
 	|	LBRACKET ELLIPSIS RBRACKET
 		{:
 			Parameter result = new Parameter("...");
-			
+
 			result.setUsage(Usage.ZERO_OR_MORE);
-			
+
 			return result;
 		:}
 	;

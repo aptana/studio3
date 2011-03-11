@@ -10,12 +10,14 @@ package com.aptana.editor.js.vsdoc.parsing;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.xml.sax.Attributes;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.MetadataReader;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
@@ -30,6 +32,8 @@ import com.aptana.editor.js.sdoc.model.SeeTag;
 import com.aptana.editor.js.sdoc.model.Tag;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.Usage;
+import com.aptana.editor.js.sdoc.model.UserAgent;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
 
 public class VSDocReader extends MetadataReader
 {
@@ -37,11 +41,20 @@ public class VSDocReader extends MetadataReader
 
 	private String _summary;
 	private List<Tag> _tags;
-	private String _exceptionType;
+	private List<Type> _exceptionTypes;
 	private Parameter _currentParameter;
-	private String _currentType;
+	private List<Type> _currentTypes;
 
 	private DocumentationBlock _block;
+	private SDocParser _typeParser;
+
+	/**
+	 * VSDocReader
+	 */
+	public VSDocReader()
+	{
+		this._typeParser = new SDocParser();
+	}
 
 	/**
 	 * process docs element
@@ -66,7 +79,7 @@ public class VSDocReader extends MetadataReader
 	 */
 	public void enterException(String ns, String name, String qname, Attributes attributes)
 	{
-		this._exceptionType = attributes.getValue("cref"); //$NON-NLS-1$
+		this._exceptionTypes = this.parseTypes(attributes.getValue("cref")); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -112,7 +125,22 @@ public class VSDocReader extends MetadataReader
 		this._currentParameter = new Parameter(parameterName);
 		this._currentParameter.setUsage(usage);
 
-		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
+		this._currentTypes = this.parseTypes(attributes.getValue("type")); //$NON-NLS-1$
+
+		this.startTextBuffer();
+	}
+
+	/**
+	 * process returns element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterReturns(String ns, String name, String qname, Attributes attributes)
+	{
+		this._currentTypes = this.parseTypes(attributes.getValue("type")); //$NON-NLS-1$
 
 		this.startTextBuffer();
 	}
@@ -133,18 +161,23 @@ public class VSDocReader extends MetadataReader
 	}
 
 	/**
-	 * process returns element
+	 * process userAgent element
 	 * 
 	 * @param ns
 	 * @param name
 	 * @param qname
 	 * @param attributes
 	 */
-	public void enterReturns(String ns, String name, String qname, Attributes attributes)
+	public void enterUserAgent(String ns, String name, String qname, Attributes attributes)
 	{
-		this._currentType = attributes.getValue("type"); //$NON-NLS-1$
+		UserAgent ua = new UserAgent();
+		String uaName = attributes.getValue("name"); //$NON-NLS-1$
+		String version = attributes.getValue("version"); //$NON-NLS-1$
 
-		this.startTextBuffer();
+		ua.setName(uaName);
+		ua.setVersion(version);
+
+		this._tags.add(ua);
 	}
 
 	/**
@@ -187,14 +220,21 @@ public class VSDocReader extends MetadataReader
 	public void exitException(String ns, String name, String qname)
 	{
 		String text = this.getText();
-
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._exceptionType != null ? this._exceptionType : JSTypeConstants.OBJECT_TYPE));
+
+		if (this._exceptionTypes != null)
+		{
+			types.addAll(this._exceptionTypes);
+		}
+		else
+		{
+			types.add(new Type(JSTypeConstants.OBJECT_TYPE));
+		}
 
 		this._tags.add(new ExceptionTag(types, text));
 
 		// clean up
-		this._exceptionType = null;
+		this._exceptionTypes = null;
 	}
 
 	/**
@@ -207,15 +247,22 @@ public class VSDocReader extends MetadataReader
 	public void exitParam(String ns, String name, String qname)
 	{
 		String text = this.getText();
-
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : JSTypeConstants.OBJECT_TYPE));
+
+		if (this._currentTypes != null)
+		{
+			types.addAll(this._currentTypes);
+		}
+		else
+		{
+			types.add(new Type(JSTypeConstants.OBJECT_TYPE));
+		}
 
 		this._tags.add(new ParamTag(this._currentParameter, types, text));
 
 		// reset
 		this._currentParameter = null;
-		this._currentType = null;
+		this._currentTypes = null;
 	}
 
 	/**
@@ -243,14 +290,21 @@ public class VSDocReader extends MetadataReader
 	public void exitReturns(String ns, String name, String qname)
 	{
 		String text = this.getText();
-
 		List<Type> types = new ArrayList<Type>();
-		types.add(new Type(this._currentType != null ? this._currentType : "Object")); //$NON-NLS-1$
+
+		if (this._currentTypes != null)
+		{
+			types.addAll(this._currentTypes);
+		}
+		else
+		{
+			types.add(new Type(JSTypeConstants.OBJECT_TYPE));
+		}
 
 		this._tags.add(new ReturnTag(types, text));
 
 		// reset
-		this._currentType = null;
+		this._currentTypes = null;
 	}
 
 	/**
@@ -284,8 +338,7 @@ public class VSDocReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(JSPlugin.getDefault().getBundle(),
-					Path.fromPortableString(METADATA_SCHEMA_XML), false);
+			return FileLocator.openStream(JSPlugin.getDefault().getBundle(), Path.fromPortableString(METADATA_SCHEMA_XML), false);
 		}
 		catch (IOException e)
 		{
@@ -301,5 +354,35 @@ public class VSDocReader extends MetadataReader
 	protected String getText()
 	{
 		return this.normalizeText(super.getText());
+	}
+
+	/**
+	 * parseTypes
+	 * 
+	 * @param types
+	 */
+	protected List<Type> parseTypes(String types)
+	{
+		List<Type> result = Collections.emptyList();
+
+		if (StringUtil.isEmpty(types) == false)
+		{
+			try
+			{
+				result = this._typeParser.parseType(types);
+			}
+			catch (Exception e)
+			{
+				// default to Object if we couldn't parse the types
+				result.add(new Type(JSTypeConstants.OBJECT_TYPE));
+			}
+		}
+		else
+		{
+			// default to Object
+			result.add(new Type(JSTypeConstants.OBJECT_TYPE));
+		}
+
+		return result;
 	}
 }

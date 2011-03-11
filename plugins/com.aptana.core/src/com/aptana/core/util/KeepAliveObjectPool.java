@@ -30,7 +30,10 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 		unlocked = new LinkedHashMap<T, Long>();
 
 		reaper = new ConnectionReaper();
-		reaper.start();
+	}
+	
+	protected void start() {
+		reaper.start();		
 	}
 
 	public synchronized void checkIn(T t)
@@ -105,7 +108,7 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 	private class ConnectionReaper extends Thread
 	{
 
-		private final long INTERVAL = 15000; // 15 seconds
+		private static final long INTERVAL = 15000; // 15 seconds
 
 		private boolean isRunning;
 

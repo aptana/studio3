@@ -148,7 +148,9 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 		} catch (IOException e) {
 		}
 		if (file != null) {
-			file.delete();
+			if (!file.delete()) {
+				file.deleteOnExit();
+			}
 		}
 		return null;
 	}
@@ -158,7 +160,9 @@ class UniformResourceStorageLocationProvider implements ILocationProvider {
 		OutputStream out = null;
 		try {
 			if (!file.canWrite()) {
-				file.delete();
+				if (!file.delete()) {
+					file.deleteOnExit();
+				}
 			}
 			out = new FileOutputStream(file);
 			byte[] buffer = new byte[1024];

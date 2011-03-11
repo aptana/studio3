@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.osgi.util.NLS;
 
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.ui.GitUIPlugin;
 import com.aptana.git.ui.internal.Launcher;
@@ -63,17 +62,17 @@ public class MergeBranchHandler extends AbstractGitHandler
 			@Override
 			protected IStatus run(IProgressMonitor monitor)
 			{
+				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+
+				repo.enterWriteProcess();
 				try
 				{
-					SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-					ILaunch launch = Launcher.launch(GitExecutable.instance().path().toOSString(),
-							repo.workingDirectory(), subMonitor.newChild(75), "merge", //$NON-NLS-1$
+					ILaunch launch = Launcher.launch(repo, subMonitor.newChild(75), "merge", //$NON-NLS-1$
 							branchName);
 					while (!launch.isTerminated())
 					{
 						Thread.sleep(50);
 					}
-					repo.index().refresh(subMonitor.newChild(25));
 				}
 				catch (CoreException e)
 				{
@@ -85,6 +84,11 @@ public class MergeBranchHandler extends AbstractGitHandler
 					GitUIPlugin.logError(e.getMessage(), e);
 					return new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), e.getMessage());
 				}
+				finally
+				{
+					repo.exitWriteProcess();
+				}
+				repo.index().refresh(subMonitor.newChild(25));
 				return Status.OK_STATUS;
 			}
 		};

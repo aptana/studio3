@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -29,7 +28,6 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.git.core.model.AbstractGitRepositoryListener;
 import com.aptana.git.core.model.BranchChangedEvent;
-import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoriesListener;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -50,13 +48,11 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 	{
 		// Do a smarter diff and only refresh files that have changed between the two:
 		// git diff --name-only e.getOldBranchName() e.getNewBranchName()
-		Map<Integer, String> result = GitExecutable.instance().runInBackground(e.getRepository().workingDirectory(),
-				"diff", //$NON-NLS-1$
-				"--name-only", e.getOldBranchName(), e.getNewBranchName()); //$NON-NLS-1$
-		if (result != null && result.keySet().iterator().next() == 0)
+		IStatus result = e.getRepository().execute(GitRepository.ReadWrite.READ, "diff", "--name-only", e.getOldBranchName(), e.getNewBranchName()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (result != null && result.isOK())
 		{
 			Collection<IResource> files = new ArrayList<IResource>();
-			String output = result.values().iterator().next();
+			String output = result.getMessage();
 			String[] lines = output.split("\r\n?|\n"); //$NON-NLS-1$
 			for (String line : lines)
 			{
@@ -122,7 +118,13 @@ class GitProjectRefresher extends AbstractGitRepositoryListener implements IGitR
 				for (IResource resource : resources)
 				{
 					if (sub.isCanceled())
+					{
 						return Status.CANCEL_STATUS;
+					}
+					if (resource == null)
+					{
+						continue;
+					}
 					if (resource.getType() == IResource.PROJECT)
 					{
 						// Check to see if this project exists in the new branch! If not, auto-close the project, or

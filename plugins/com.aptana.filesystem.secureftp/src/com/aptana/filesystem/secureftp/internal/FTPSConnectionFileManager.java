@@ -163,6 +163,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 						}
 
 					} catch (Exception e) {
+						e.getCause();
 					}
 					if (securityMechanism != null) {
 						ftpsClient.auth(securityMechanism);

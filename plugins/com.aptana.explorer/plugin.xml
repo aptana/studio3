@@ -45,6 +45,9 @@
             <actionExtension
                   pattern="org\.eclipse\.ui\.navigator\.resources\.(?!WorkingSetActions).*">
             </actionExtension>
+            <actionExtension
+                  pattern="com.aptana.explorer.navigator.actions.*">
+            </actionExtension>
          </includes>
       </viewerActionBinding>
       <dragAssistant
@@ -132,6 +135,28 @@
             wizardId="com.aptana.ui.wizards.NewWebProject">
          <enablement></enablement>
       </commonWizard>
+      <actionProvider
+            class="com.aptana.explorer.navigator.actions.DeployActionProvider"
+            id="com.aptana.explorer.navigator.actions.DeployActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
+      <actionProvider
+            class="com.aptana.explorer.navigator.actions.CommandsActionProvider"
+            id="com.aptana.explorer.navigator.actions.CommandsActions">
+         <enablement>
+            <or>
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </or>
+         </enablement>
+      </actionProvider>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -355,6 +380,39 @@
       </menuContribution>
       <menuContribution
             locationURI="popup:com.aptana.explorer.view?before=additions">
+         <separator
+               name="git.group"
+               visible="true">
+         </separator>
+         <command
+               commandId="com.aptana.git.ui.command.commit"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false">
+                        <adapt
+                              type="org.eclipse.core.resources.IResource">
+                           <test
+                                 args="org.eclipse.team.core.repository,com.aptana.git.core.GitRepositoryProvider"
+                                 property="org.eclipse.core.resources.projectPersistentProperty"
+                                 value="true">
+                           </test>
+                        </adapt>
+                     </iterate>
+                  </with>
+                  <with
+                        variable="activePartId">
+                     <equals
+                           value="com.aptana.explorer.view">
+                     </equals>
+                  </with>
+               </and>
+            </visibleWhen>
+         </command>
          <command
                commandId="com.aptana.git.ui.command.stage"
                style="push">

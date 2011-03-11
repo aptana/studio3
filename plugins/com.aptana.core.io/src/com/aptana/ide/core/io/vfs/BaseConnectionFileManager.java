@@ -69,7 +69,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		}
 	}
 
-	protected final synchronized void setCaching(boolean enabled) {
+	protected final void setCaching(boolean enabled) {
 		if ((fileInfoCache != null) == enabled) {
 			return;
 		}

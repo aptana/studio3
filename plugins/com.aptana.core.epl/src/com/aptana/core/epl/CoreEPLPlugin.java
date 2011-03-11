@@ -42,21 +42,21 @@ public class CoreEPLPlugin extends Plugin
 	/**
 	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
-	public void start(BundleContext context) throws Exception
+	public void start(BundleContext bundleContext) throws Exception
 	{
-		CoreEPLPlugin.context = context;
-		CoreEPLPlugin.plugin = this;
-		super.start(context);
+		super.start(bundleContext);
+		context = bundleContext;
+		plugin = this;
 	}
 
 	/**
 	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
-	public void stop(BundleContext context) throws Exception
+	public void stop(BundleContext bundleContext) throws Exception
 	{
-		CoreEPLPlugin.plugin = null;
-		CoreEPLPlugin.context = null;
-		super.stop(context);
+		plugin = null;
+		context = null;
+		super.stop(bundleContext);
 	}
 
 	/**
@@ -66,12 +66,12 @@ public class CoreEPLPlugin extends Plugin
 	 */
 	public static CoreEPLPlugin getDefault()
 	{
-		return CoreEPLPlugin.plugin;
+		return plugin;
 	}
 
 	public static BundleContext getContext()
 	{
-		return CoreEPLPlugin.context;
+		return context;
 	}
 
 	/**

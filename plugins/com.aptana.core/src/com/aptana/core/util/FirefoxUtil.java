@@ -15,18 +15,16 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -159,9 +157,9 @@ public final class FirefoxUtil {
 						last.put(matcher.group(1), matcher.group(2));
 					}
 				}
-				for (String section : sections.keySet()) {
-					if (section.startsWith("Profile")) { //$NON-NLS-1$
-						Map<String, String> properties = sections.get(section);
+				for (Entry<String, Map<String, String>> entry : sections.entrySet()) {
+					if (entry.getKey().startsWith("Profile")) { //$NON-NLS-1$
+						Map<String, String> properties = entry.getValue();
 						String path = (String) properties.get("Path"); //$NON-NLS-1$
 						String isRelative = (String) properties.get("IsRelative"); //$NON-NLS-1$
 						File profile;
@@ -317,7 +315,9 @@ public final class FirefoxUtil {
 		} catch (IOException e) {
 			CorePlugin.log(e);
 			if (file != null) {
-				file.delete();
+				if (!file.delete()) {
+					file.deleteOnExit();
+				}
 			}
 			return false;
 		} finally {
@@ -336,47 +336,17 @@ public final class FirefoxUtil {
 		}
 
 		try {
-			extract(new ZipFile(file), dir);
+			ZipUtil.extract(new ZipFile(file), dir);
 		} catch (IOException e) {
 			CorePlugin.log(e);
 			return false;
 		} finally {
-			file.delete();
+			if (!file.delete()) {
+				file.deleteOnExit();
+			}
 		}
 
 		return true;
-	}
-
-	private static void extract(ZipFile zip, File path) throws IOException {
-		/* Create directories first */
-		for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) e.nextElement();
-			String name = entry.getName();
-			File file = new File(path, name);
-			if (entry.isDirectory() && !file.exists()) {
-				file.mkdirs();
-			}
-		}
-		byte[] buffer = new byte[0x1000];
-		int n;
-		/* Extract files */
-		for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) e.nextElement();
-			String name = entry.getName();
-			File file = new File(path, name);
-			if (!entry.isDirectory() && !file.exists()) {
-				if (!file.createNewFile()) {
-					continue;
-				}
-				OutputStream out = new FileOutputStream(file);
-				InputStream in = zip.getInputStream(entry);
-				while ((n = in.read(buffer)) > 0) {
-					out.write(buffer, 0, n);
-				}
-				in.close();
-				out.close();
-			}
-		}
 	}
 
 }

@@ -16,8 +16,11 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+@SuppressWarnings("restriction")
 public class HTMLEditorTest extends TestCase
 {
 
@@ -39,6 +42,25 @@ public class HTMLEditorTest extends TestCase
 		editor = (ITextEditor) page.openEditor(new FileStoreEditorInput(getFileStore()), getEditorId());
 		assertNotNull(editor);
 		assertEquals(getClassName(), editor.getClass().getName());
+	}
+
+	public void testEditorPreferences()
+	{
+		String spacesForTabs;
+
+		EditorsPlugin.getDefault().getPreferenceStore()
+				.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, false);
+
+		spacesForTabs = HTMLEditor.getChainedPreferenceStore().getString(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		assertEquals("false", spacesForTabs);
+
+		HTMLPlugin.getDefault().getPreferenceStore()
+				.setValue(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS, true);
+
+		spacesForTabs = HTMLEditor.getChainedPreferenceStore().getString(
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
+		assertEquals("true", spacesForTabs);
 	}
 
 	protected IFileStore getFileStore() throws Exception

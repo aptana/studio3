@@ -441,11 +441,14 @@ public class LocationTests extends EditorBasedTests
 			new LocationTypeRange(LocationType.IN_GLOBAL, 0),
 			new LocationTypeRange(LocationType.NONE, 1, 8),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 9, 10),
-			new LocationTypeRange(LocationType.NONE, 11, 17),
+			new LocationTypeRange(LocationType.IN_OBJECT_LITERAL_PROPERTY, 11, 17),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 18, 19),
-			new LocationTypeRange(LocationType.NONE, 20, 31),
+			new LocationTypeRange(LocationType.NONE, 20, 25),
+			new LocationTypeRange(LocationType.IN_OBJECT_LITERAL_PROPERTY, 26, 31),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 32, 33),
-			new LocationTypeRange(LocationType.NONE, 34, 37),
+			new LocationTypeRange(LocationType.NONE, 34, 35),
+			new LocationTypeRange(LocationType.IN_OBJECT_LITERAL_PROPERTY, 36),
+			new LocationTypeRange(LocationType.NONE, 37),
 			new LocationTypeRange(LocationType.IN_GLOBAL, 38, 39)
 		);
 	}

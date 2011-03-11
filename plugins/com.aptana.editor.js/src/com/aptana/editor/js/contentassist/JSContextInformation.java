@@ -7,36 +7,42 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.util.List;
+
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationExtension;
 import org.eclipse.swt.graphics.Image;
 
+import com.aptana.core.util.StringUtil;
+
 /**
  * @author klindsey
- *
  */
 public class JSContextInformation implements IContextInformation, IContextInformationExtension
 {
+	public static final String DESCRIPTION_DELIMITER = "\ufeff"; //$NON-NLS-1$
+	private static final String LINE_DELIMITER = "\n" + DESCRIPTION_DELIMITER; //$NON-NLS-1$
+
 	private String _contextString;
 	private String _infoString;
 	private int _offset;
-	
-	public JSContextInformation(String contextDisplayString, String informationDisplayString, int informationPosition)
+
+	/**
+	 * JSContextInformation
+	 * 
+	 * @param contextDisplayString
+	 * @param informationDisplayStrings
+	 * @param informationPosition
+	 */
+	public JSContextInformation(String contextDisplayString, List<String> informationDisplayStrings, int informationPosition)
 	{
 		this._contextString = contextDisplayString;
-		this._infoString = informationDisplayString;
+		this._infoString = StringUtil.join(LINE_DELIMITER, informationDisplayStrings);
 		this._offset = informationPosition;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.text.contentassist.IContextInformationExtension#getContextInformationPosition()
-	 */
-	public int getContextInformationPosition()
-	{
-		return this._offset;
-	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContextInformation#getContextDisplayString()
 	 */
 	public String getContextDisplayString()
@@ -44,7 +50,17 @@ public class JSContextInformation implements IContextInformation, IContextInform
 		return this._contextString;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.contentassist.IContextInformationExtension#getContextInformationPosition()
+	 */
+	public int getContextInformationPosition()
+	{
+		return this._offset;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContextInformation#getImage()
 	 */
 	public Image getImage()
@@ -52,7 +68,8 @@ public class JSContextInformation implements IContextInformation, IContextInform
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.contentassist.IContextInformation#getInformationDisplayString()
 	 */
 	public String getInformationDisplayString()
