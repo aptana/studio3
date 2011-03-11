@@ -34,7 +34,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -226,7 +228,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			if (remoteSample != null)
 			{
-				cloneFromGit(remoteSample.getPath(), description);
+				cloneFromGit(remoteSample.getPath(), newProjectHandle, description);
 			}
 			else
 			{
@@ -340,7 +342,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 	}
 
-	private void cloneFromGit(String gitURL, IProjectDescription projectDescription)
+	private void cloneFromGit(String gitURL, final IProject projectHandle, final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
 		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
@@ -350,6 +352,21 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			path = path.append(projectDescription.getName());
 		}
 		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
+		job.addJobChangeListener(new JobChangeAdapter()
+		{
+
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				try
+				{
+					projectHandle.setDescription(projectDescription, null);
+				}
+				catch (CoreException e)
+				{
+				}
+			}
+		});
 		job.schedule();
 	}
 
