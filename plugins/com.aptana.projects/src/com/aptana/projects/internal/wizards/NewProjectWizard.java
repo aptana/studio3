@@ -34,7 +34,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -104,15 +106,15 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			public boolean include(AbstractElement element)
 			{
 				boolean result = false;
-				
+
 				if (element instanceof ProjectTemplateElement)
 				{
 					ProjectTemplateElement template = (ProjectTemplateElement) element;
 					Type type = template.getType();
-					
+
 					result = type == Type.WEB || type == Type.ALL;
 				}
-				
+
 				return result;
 			}
 		});
@@ -139,7 +141,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		return true;
 	}
 
-	public void setInitializationData(IConfigurationElement config, String propertyName, Object data) throws CoreException
+	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
+			throws CoreException
 	{
 		configElement = config;
 	}
@@ -210,7 +213,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			{
 				// assumes to be creating the project from a git URL
 				fromGit = true;
-				doCloneFromGit(template, description);
+				doCloneFromGit(template, newProjectHandle, description);
 			}
 		}
 		if (!fromGit)
@@ -244,7 +247,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			public void run(IProgressMonitor monitor) throws InvocationTargetException
 			{
-				CreateProjectOperation op = new CreateProjectOperation(description, Messages.NewProjectWizard_CreateOp_Title);
+				CreateProjectOperation op = new CreateProjectOperation(description,
+						Messages.NewProjectWizard_CreateOp_Title);
 				try
 				{
 					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
@@ -279,20 +283,20 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				if (cause.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS)
 				{
 					status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, NLS.bind(
-						Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
+							Messages.NewProjectWizard_Warning_DirectoryExists, project.getName()), cause));
 				}
 				else
 				{
-					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID, Messages.NewProjectWizard_CreationProblem,
-						cause));
+					status = new StatusAdapter(new Status(cause.getStatus().getSeverity(), ProjectsPlugin.PLUGIN_ID,
+							Messages.NewProjectWizard_CreationProblem, cause));
 				}
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.BLOCK);
 			}
 			else
 			{
-				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0, NLS.bind(
-					Messages.NewProjectWizard_InternalError, t.getMessage()), t));
+				StatusAdapter status = new StatusAdapter(new Status(IStatus.WARNING, ProjectsPlugin.PLUGIN_ID, 0,
+						NLS.bind(Messages.NewProjectWizard_InternalError, t.getMessage()), t));
 				status.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, Messages.NewProjectWizard_CreationProblem);
 				StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
 			}
@@ -347,7 +351,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(ProjectTemplateElement template, IProjectDescription projectDescription)
+	private void doCloneFromGit(ProjectTemplateElement template, final IProject projectHandle,
+			final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
 		// when default is used, getLocationPath() only returns the workspace root, so needs to append the project name
@@ -357,6 +362,21 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			path = path.append(projectDescription.getName());
 		}
 		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
+		job.addJobChangeListener(new JobChangeAdapter()
+		{
+
+			@Override
+			public void done(IJobChangeEvent event)
+			{
+				try
+				{
+					projectHandle.setDescription(projectDescription, null);
+				}
+				catch (CoreException e)
+				{
+				}
+			}
+		});
 		job.schedule();
 	}
 
