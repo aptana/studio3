@@ -468,4 +468,21 @@ public class JSIndexQueryHelper
 
 		return result;
 	}
+
+	/**
+	 * getTypeProperties
+	 * 
+	 * @param index
+	 * @param typeName
+	 * @return
+	 */
+	public List<PropertyElement> getTypeProperties(Index index, String typeName)
+	{
+		List<PropertyElement> result = new ArrayList<PropertyElement>();
+
+		result.addAll(this.getProperties(getIndex(), typeName));
+		result.addAll(this.getProperties(index, typeName));
+
+		return result;
+	}
 }

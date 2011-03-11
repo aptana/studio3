@@ -845,7 +845,7 @@ public class JSLocationIdentifier extends JSTreeWalker
 
 			if (this._offset < colon.getStart())
 			{
-				this.setType(LocationType.NONE);
+				this.setType(LocationType.IN_OBJECT_LITERAL_PROPERTY);
 			}
 			else if (this._offset < value.getStartingOffset())
 			{
@@ -891,10 +891,9 @@ public class JSLocationIdentifier extends JSTreeWalker
 	@Override
 	public void visit(JSObjectNode node)
 	{
-		if (node.contains(this._offset))
+		if (node.contains(this._offset) && node.getEndingOffset() != this._offset)
 		{
-			// TODO: Need to track commas between name-value pairs
-			this.setType(LocationType.NONE);
+			this.setType(LocationType.IN_OBJECT_LITERAL_PROPERTY);
 			this.visitChildren(node);
 		}
 	}

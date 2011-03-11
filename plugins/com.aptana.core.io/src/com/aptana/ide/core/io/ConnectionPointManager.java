@@ -79,7 +79,11 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 */
 	public static ConnectionPointManager getInstance() {
 		if (instance == null) {
-			instance = new ConnectionPointManager();
+			synchronized (ConnectionPointManager.class) {
+				if (instance == null) {
+					instance = new ConnectionPointManager();
+				}
+			}
 		}
 		return instance;
 	}

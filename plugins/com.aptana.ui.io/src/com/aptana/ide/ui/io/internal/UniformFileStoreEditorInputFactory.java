@@ -99,12 +99,12 @@ public class UniformFileStoreEditorInputFactory implements IElementFactory
 		}
 		try
 		{
-			String prefix = fileStore.getFileSystem().getScheme();
+			StringBuilder prefix = new StringBuilder(fileStore.getFileSystem().getScheme());
 			while (prefix.length() < 3)
 			{
-				prefix += "_"; //$NON-NLS-1$
+				prefix.append('_');
 			}
-			file = File.createTempFile(prefix, fileStore.getName());
+			file = File.createTempFile(prefix.toString(), fileStore.getName());
 		}
 		catch (IOException e)
 		{

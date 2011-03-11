@@ -32,6 +32,7 @@ import com.aptana.editor.js.sdoc.model.SeeTag;
 import com.aptana.editor.js.sdoc.model.Tag;
 import com.aptana.editor.js.sdoc.model.Type;
 import com.aptana.editor.js.sdoc.model.Usage;
+import com.aptana.editor.js.sdoc.model.UserAgent;
 import com.aptana.editor.js.sdoc.parsing.SDocParser;
 
 public class VSDocReader extends MetadataReader
@@ -157,6 +158,26 @@ public class VSDocReader extends MetadataReader
 		String type = attributes.getValue("cref"); //$NON-NLS-1$
 
 		this._tags.add(new SeeTag(type));
+	}
+
+	/**
+	 * process userAgent element
+	 * 
+	 * @param ns
+	 * @param name
+	 * @param qname
+	 * @param attributes
+	 */
+	public void enterUserAgent(String ns, String name, String qname, Attributes attributes)
+	{
+		UserAgent ua = new UserAgent();
+		String uaName = attributes.getValue("name"); //$NON-NLS-1$
+		String version = attributes.getValue("version"); //$NON-NLS-1$
+
+		ua.setName(uaName);
+		ua.setVersion(version);
+
+		this._tags.add(ua);
 	}
 
 	/**

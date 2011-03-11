@@ -8,6 +8,7 @@
 package com.aptana.editor.js.contentassist;
 
 import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
+import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.ast.JSStringNode;
@@ -76,6 +77,24 @@ public class JSRangeFinder extends JSTreeWalker
 		if (node.contains(this._offset))
 		{
 			this.setRange(node.getStart(), this._offset);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNameValuePairNode)
+	 */
+	@Override
+	public void visit(JSNameValuePairNode node)
+	{
+		if (node.contains(this._offset))
+		{
+			IParseNode name = node.getName();
+
+			if (name.contains(this._offset) || name.getEndingOffset() == this._offset)
+			{
+				this.setRange(name);
+			}
 		}
 	}
 

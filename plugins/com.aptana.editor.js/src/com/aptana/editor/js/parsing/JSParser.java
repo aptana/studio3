@@ -22,7 +22,7 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
@@ -328,7 +328,7 @@ public class JSParser extends Parser implements IParser {
 		// create scanner and send source to it
 		fScanner = new JSScanner();
 		fScanner.setSource(source);
-	
+
 		try
 		{
 			// parse
@@ -339,46 +339,46 @@ public class JSParser extends Parser implements IParser {
 
 			// store results in the parse state
 			parseState.setParseResult(result);
-	
+
 			// TODO: We probably don't need documentation nodes in all cases. For
 			// example, the outline view probably doesn't rely on them. We should
 			// include a flag (maybe in the parseState) that makes this step
 			// optional.
-	
+
 			// attach documentation
 			if (result instanceof JSParseRootNode)
 			{
 				JSParseRootNode root = (JSParseRootNode) result;
-	
+
 				attachPreDocumentationBlocks(root, source);
 				attachPostDocumentationBlocks(root, source);
-				
+
 				// create a list of all comments and attach to root node
 				List<JSCommentNode> comments = new ArrayList<JSCommentNode>();
-				
+
 				for (Symbol symbol : fScanner.getSDocComments())
                 {
                     comments.add(new JSCommentNode(JSNodeTypes.SDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
-                
+
                 for (Symbol symbol : fScanner.getVSDocComments())
                 {
                     comments.add(new JSCommentNode(JSNodeTypes.VSDOC_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
-                
+
                 for (Symbol symbol : fScanner.getSingleLineComments())
                 {
                     comments.add(new JSCommentNode(JSNodeTypes.SINGLE_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
-                
+
                 for (Symbol symbol : fScanner.getMultiLineComments())
                 {
                     comments.add(new JSCommentNode(JSNodeTypes.MULTI_LINE_COMMENT, symbol.getStart(), symbol.getEnd()));
                 }
-                
+
                 root.setCommentNodes(comments.toArray(new IParseNode[comments.size()]));
 			}
-			
+
 			return result;
 		}
 		finally
@@ -634,6 +634,65 @@ public class JSParser extends Parser implements IParser {
 
 					return result;
 				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					int type = token.getId();
+					boolean result = false;
+
+					if (type == JSTokenType.RCURLY.getIndex())
+					{
+						Symbol term = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+						Simulator sim = new Simulator();
+
+						in.alloc(2);
+						in.insert(token);
+						in.insert(term);
+
+						if (sim.parse(in))
+						{
+							result = true;
+
+							in.rewind();
+
+							report.missingTokenInserted(term);
+						}
+					}
+
+					return result;
+				}
+			},
+			new IRecoveryStrategy() {
+				public boolean recover(IParser parser, Symbol token, TokenStream in) throws IOException
+				{
+					int type = token.getId();
+					boolean result = false;
+
+					if (type == JSTokenType.RCURLY.getIndex())
+					{
+						Symbol term1 = new Symbol(JSTokenType.COLON.getIndex(), token.getStart(), token.getStart() - 1, ":");
+						Symbol term2 = new Symbol(JSTokenType.IDENTIFIER.getIndex(), token.getStart(), token.getStart() - 1, "");
+						Simulator sim = new Simulator();
+
+						in.alloc(3);
+						in.insert(token);
+						in.insert(term2);
+						in.insert(term1);
+
+						if (sim.parse(in))
+						{
+							result = true;
+
+							in.rewind();
+
+							report.missingTokenInserted(term1);
+							report.missingTokenInserted(term2);
+						}
+					}
+
+					return result;
+				}
 			}
 		};
 	}
@@ -708,10 +767,10 @@ public class JSParser extends Parser implements IParser {
 					final Symbol ident = _symbols[offset + 3];
 					
 			JSNode identifier = new JSIdentifierNode(ident);
-			
+
 			// add identifier to existing list
 			list.addChild(identifier);
-			
+
 			return list;
 			}
 			case 11: // FormalParameterList = IDENTIFIER.ident
@@ -719,7 +778,7 @@ public class JSParser extends Parser implements IParser {
 					final Symbol ident = _symbols[offset + 1];
 					
 			JSNode identifier = new JSIdentifierNode(ident);
-			
+
 			return new JSParametersNode(identifier);
 			}
 			case 12: // FunctionBody = LCURLY RCURLY
@@ -1460,14 +1519,14 @@ public class JSParser extends Parser implements IParser {
 					final Symbol rc = _symbols[offset + 7];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
+
 			for (JSNode statement : c)
 			{
 				nodes.add(statement);
 			}
-			
+
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-			
+
 			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
 			case 103: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc DefaultClause.d RCURLY.rc
@@ -1498,16 +1557,16 @@ public class JSParser extends Parser implements IParser {
 					final Symbol rc = _symbols[offset + 8];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
+
 			nodes.add(d);
-			
+
 			for (JSNode statement : c)
 			{
 				nodes.add(statement);
 			}
-			
+
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-			
+
 			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
 			case 105: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c DefaultClause.d RCURLY.rc
@@ -1525,16 +1584,16 @@ public class JSParser extends Parser implements IParser {
 					final Symbol rc = _symbols[offset + 8];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
+
 			for (JSNode statement : c)
 			{
 				nodes.add(statement);
 			}
-			
+
 			nodes.add(d);
-			
+
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-			
+
 			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
 			case 106: // SwitchStatement = SWITCH LPAREN.lp Expression.e RPAREN.rp LCURLY.lc CaseClauses.c1 DefaultClause.d CaseClauses.c2 RCURLY.rc
@@ -1555,21 +1614,21 @@ public class JSParser extends Parser implements IParser {
 					final Symbol rc = _symbols[offset + 9];
 					
 			List<JSNode> nodes = new ArrayList<JSNode>();
-			
+
 			for (JSNode statement : c1)
 			{
 				nodes.add(statement);
 			}
-			
+
 			nodes.add(d);
-			
+
 			for (JSNode statement : c2)
 			{
 				nodes.add(statement);
 			}
-			
+
 			JSNode[] children = nodes.toArray(new JSNode[nodes.size()]);
-			
+
 			return new JSSwitchNode(lp, e, rp, lc, rc, children);
 			}
 			case 107: // CaseClauses = CaseClauses CaseClause
@@ -1623,7 +1682,7 @@ public class JSParser extends Parser implements IParser {
 					
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
-			
+
 			return new JSLabelledNode(id, c, s);
 			}
 			case 114: // LabelledStatement_NoIf = IDENTIFIER.i COLON.c Statement_NoIf.s
@@ -1635,7 +1694,7 @@ public class JSParser extends Parser implements IParser {
 					
 			JSNode id = new JSIdentifierNode(i);
 			id.setLocation(i.getStart(), i.getEnd());
-			
+
 			return new JSLabelledNode(id, c, s);
 			}
 			case 115: // ThrowStatement = THROW Expression.e SEMICOLON
@@ -1644,9 +1703,9 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			JSNode node = new JSThrowNode(e);
-			
+
 			node.setSemicolonIncluded(true);
-			
+
 			return node;
 			}
 			case 116: // TryStatement = TRY Block.b Catch.c
@@ -1685,7 +1744,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode b = (JSNode) _symbol_b.value;
 					
 			JSNode id = new JSIdentifierNode(i);
-			
+
 			return new JSCatchNode(id, b);
 			}
 			case 120: // Finally = FINALLY Block.b
@@ -1785,7 +1844,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			l.addChild(e);
-			
+
 			return l;
 			}
 			case 136: // ElementList = ElementList.l COMMA Elision.n AssignmentExpression.e
@@ -1799,7 +1858,7 @@ public class JSParser extends Parser implements IParser {
 					
 			l.addChild(n);
 			l.addChild(e);
-			
+
 			return l;
 			}
 			case 137: // Elision = Elision.e COMMA
@@ -1808,7 +1867,7 @@ public class JSParser extends Parser implements IParser {
 					final JSNode e = (JSNode) _symbol_e.value;
 					
 			e.addChild(new JSNullNode());
-			
+
 			return e;
 			}
 			case 138: // Elision = COMMA
