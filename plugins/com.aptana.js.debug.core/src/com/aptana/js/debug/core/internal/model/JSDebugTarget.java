@@ -95,7 +95,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String DETAILS_0_V2 = "details*{0,number,integer}*{1}"; //$NON-NLS-1$
 	private static final String SET_VALUE_0_1 = "setValue*{1}*{2}"; //$NON-NLS-1$
 	private static final String SET_VALUE_0_1_V2 = "setValue*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
-	private static final String EVAL_0 = "eval[{0,number,integer}]"; //$NON-NLS-1$
+	private static final String EVAL_0 = "eval[{0}]"; //$NON-NLS-1$
 	private static final String EVAL_0_1 = "eval*{1}*{2}"; //$NON-NLS-1$
 	private static final String EVAL_0_1_V2 = "eval*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
 	private static final String RESULT = "result"; //$NON-NLS-1$
