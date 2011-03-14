@@ -186,6 +186,8 @@ public class ThemeManager implements IThemeManager
 		prefs.putBoolean(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND_SYSTEM_DEFAULT, false);
 		prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
 				StringConverter.asString(theme.getForeground()));
+		prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
+				toString(theme.getLineHighlightAgainstBG()));
 
 		try
 		{
