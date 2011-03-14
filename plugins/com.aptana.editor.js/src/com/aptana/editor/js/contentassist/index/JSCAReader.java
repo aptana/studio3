@@ -32,7 +32,7 @@ public class JSCAReader extends SchemaReader
 {
 	private static class SchemaPool extends ObjectPool<Schema>
 	{
-		private static final String JSCA_METADATA_SCHEMA = "/metadata/JSMetadataSchema.json";
+		private static final String JSCA_METADATA_SCHEMA = "/metadata/JSMetadataSchema.json"; //$NON-NLS-1$
 
 		public SchemaPool()
 		{
