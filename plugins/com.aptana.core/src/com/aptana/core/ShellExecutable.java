@@ -63,7 +63,7 @@ public final class ShellExecutable
 	private static final String BASH = "bash"; //$NON-NLS-1$
 	private static final String RCFILE = "$os$/.aptanarc"; //$NON-NLS-1$
 
-	private static boolean initilizing = false;
+	private static boolean initializing = false;
 	private static IPath shellPath = null;
 	private static IPath shellRCPath = null;
 	private static Map<String, String> shellEnvironment;
@@ -79,10 +79,16 @@ public final class ShellExecutable
 	{
 		if (shellPath == null)
 		{
+			// Avoid infinite loops here. If we're trying to find the shell path recursively, return null.
+			// Chicken-and-egg problem with ExecutableUtil.find() asking for environment from shell.
+			if (initializing)
+			{
+				return null;
+			}
 			boolean isWin32 = Platform.OS_WIN32.equals(Platform.getOS());
 			try
 			{
-				initilizing = true;
+				initializing = true;
 				shellPath = getPreferenceShellPath();
 				if (shellPath == null)
 				{
@@ -91,7 +97,7 @@ public final class ShellExecutable
 			}
 			finally
 			{
-				initilizing = false;
+				initializing = false;
 			}
 			// FIXME Why is this throwing an exception instead of just returning null?!
 			if (shellPath == null)
@@ -186,7 +192,7 @@ public final class ShellExecutable
 	{
 		if (shellEnvironment == null)
 		{
-			// If we haven't set up a shell yet, return Java's env for now, but don't store it in field.
+			// If we haven't set up a shell yet, return Java's env for now.
 			try
 			{
 				// Force detection of shell. Must have one before we try "env"
@@ -195,13 +201,12 @@ public final class ShellExecutable
 				{
 					return System.getenv();
 				}
+				shellEnvironment = getEnvironment(null);
 			}
 			catch (CoreException e)
 			{
 				return System.getenv();
 			}
-
-			shellEnvironment = getEnvironment(null);
 		}
 		return shellEnvironment;
 	}
@@ -277,7 +282,7 @@ public final class ShellExecutable
 
 	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException
 	{
-		if (initilizing)
+		if (initializing)
 		{
 			return command;
 		}
@@ -296,7 +301,7 @@ public final class ShellExecutable
 
 	private synchronized static Map<String, String> toShellEnvironment(Map<String, String> environment)
 	{
-		if (initilizing)
+		if (initializing)
 		{
 			return environment;
 		}
