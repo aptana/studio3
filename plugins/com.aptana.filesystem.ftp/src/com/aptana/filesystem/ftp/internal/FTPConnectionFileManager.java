@@ -47,6 +47,7 @@ import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
@@ -882,6 +883,9 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			try {
 				ftpClient.delete(path.lastSegment());
 			} catch (FTPException e) {
+				if (e.getReplyCode() == 532) {
+					throw new PermissionDeniedException(path.toPortableString(), e);
+				}
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
@@ -900,7 +904,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	 * @see com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager#createFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
@@ -908,6 +912,9 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			try {
 				ftpClient.put(new ByteArrayInputStream(new byte[] {}), path.lastSegment());
 			} catch (FTPException e) {
+				if (e.getReplyCode() == 532) {
+					throw new PermissionDeniedException(path.toPortableString(), e);
+				}
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
@@ -958,7 +965,6 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				ftpClient.rename(sourcePath.toPortableString(), destinationPath.toPortableString());
 			} catch (FTPException e) {
 				throwFileNotFound(e, sourcePath);
-				System.out.println(e);
 				throw e;
 			}
 		} catch (FileNotFoundException e) {

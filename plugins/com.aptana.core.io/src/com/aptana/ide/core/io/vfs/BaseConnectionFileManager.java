@@ -409,7 +409,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract OutputStream writeFile(IPath path, boolean useTemporary, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
-	protected abstract void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
+	protected abstract void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException;
 	protected abstract void createDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void deleteFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
