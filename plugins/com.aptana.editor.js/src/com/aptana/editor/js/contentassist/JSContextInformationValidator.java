@@ -29,6 +29,89 @@ import com.aptana.theme.ThemePlugin;
 
 public class JSContextInformationValidator implements IContextInformationValidator, IContextInformationPresenter
 {
+	private class DelimiterCounter
+	{
+		public final int commaCount;
+		public final int parenCount;
+		public final int curlyCount;
+
+		public DelimiterCounter(int offset)
+		{
+			int commaCount = 0;
+			int parenCount = 0;
+			int curlyCount = 0;
+			int bracketCount = 0;
+
+			// grab lexemes
+			IDocument document = _viewer.getDocument();
+			LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, _startingOffset, new JSTokenScanner());
+
+			// get starting index based on the initial offset provided to this validator
+			int index = lexemeProvider.getLexemeFloorIndex(_startingOffset);
+
+			while (0 <= index && index < lexemeProvider.size())
+			{
+				Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
+
+				if (lexeme.getStartingOffset() < offset)
+				{
+					switch (lexeme.getType())
+					{
+						case COMMA:
+							if (bracketCount == 0 && curlyCount == 0 && parenCount == 1)
+							{
+								commaCount++;
+							}
+							break;
+
+						case RBRACKET:
+							bracketCount--;
+							break;
+
+						case RCURLY:
+							curlyCount--;
+							break;
+
+						case RPAREN:
+							parenCount--;
+							break;
+
+						case LBRACKET:
+							bracketCount++;
+							break;
+
+						case LCURLY:
+							curlyCount++;
+							break;
+
+						case LPAREN:
+							parenCount++;
+							break;
+
+						default:
+							break;
+					}
+
+					index++;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			// save results
+			this.commaCount = commaCount;
+			this.parenCount = parenCount;
+			this.curlyCount = curlyCount;
+		}
+
+		public int getArgumentIndex()
+		{
+			return (this.parenCount != 0) ? this.commaCount : -1;
+		}
+	}
+
 	private IContextInformation _contextInformation;
 	private ITextViewer _viewer;
 	private int _startingOffset;
@@ -78,52 +161,9 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	 */
 	protected int getArgumentIndex(int offset)
 	{
-		IDocument document = this._viewer.getDocument();
-		LexemeProvider<JSTokenType> lexemeProvider = new JSLexemeProvider(document, offset, this._startingOffset, new JSTokenScanner());
-		int index = lexemeProvider.getLexemeFloorIndex(offset - 1);
-		int commaCount = 0;
-		int parenCount = 0;
+		DelimiterCounter counter = new DelimiterCounter(offset);
 
-		while (0 <= index && index < lexemeProvider.size())
-		{
-			Lexeme<JSTokenType> lexeme = lexemeProvider.getLexeme(index);
-
-			// no need to keep backing up beyond where we started
-			if (lexeme.getStartingOffset() == this._startingOffset)
-			{
-				if (parenCount > 0)
-				{
-					commaCount = -1;
-				}
-
-				break;
-			}
-
-			switch (lexeme.getType())
-			{
-				case COMMA:
-					if (parenCount == 0)
-					{
-						commaCount++;
-					}
-					break;
-
-				case RPAREN:
-					parenCount++;
-					break;
-
-				case LPAREN:
-					parenCount--;
-					break;
-
-				default:
-					break;
-			}
-
-			index--;
-		}
-
-		return commaCount;
+		return counter.getArgumentIndex();
 	}
 
 	/**
@@ -183,7 +223,19 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	 */
 	public boolean isContextInformationValid(int offset)
 	{
-		return (offset > this._startingOffset && this.getArgumentIndex(offset) >= 0);
+		boolean result = false;
+
+		if (offset > this._startingOffset)
+		{
+			DelimiterCounter counter = new DelimiterCounter(offset);
+
+			if (counter.curlyCount == 0)
+			{
+				result = (this.getArgumentIndex(offset) >= 0);
+			}
+		}
+
+		return result;
 	}
 
 	/*
@@ -193,11 +245,9 @@ public class JSContextInformationValidator implements IContextInformationValidat
 	 */
 	public boolean updatePresentation(int offset, TextPresentation presentation)
 	{
-		boolean result = false;
-
 		// grab presentation text and split into separate lines
 		String info = this._contextInformation.getInformationDisplayString();
-		String[] lines = info.split("\ufeff"); //$NON-NLS-1$
+		String[] lines = info.split(JSContextInformation.DESCRIPTION_DELIMITER);
 
 		// determine which argument we are within
 		int argIndex = this.getArgumentIndex(offset);
@@ -268,10 +318,8 @@ public class JSContextInformationValidator implements IContextInformationValidat
 
 				runningLength += length + 1; // 1 for delimiter
 			}
-
-			result = true;
 		}
 
-		return result;
+		return true;
 	}
 }

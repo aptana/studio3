@@ -11,6 +11,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.samples.model.SampleEntry;
+import com.aptana.samples.model.SamplesReference;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -27,7 +28,22 @@ public class SampleProjectCreator
 	 */
 	public static void createSampleProject(SampleEntry sample)
 	{
-		NewSampleProjectWizard wizard = new NewSampleProjectWizard(sample);
+		openWizard(new NewSampleProjectWizard(sample));
+	}
+
+	/**
+	 * Opens a wizard for creating sample project from a remote URL.
+	 * 
+	 * @param remoteSample
+	 *            the remote sample
+	 */
+	public static void createSampleProject(SamplesReference remoteSample)
+	{
+		openWizard(new NewSampleProjectWizard(remoteSample));
+	}
+
+	private static void openWizard(NewSampleProjectWizard wizard)
+	{
 		wizard.init(PlatformUI.getWorkbench(), null);
 		WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 		dialog.create();

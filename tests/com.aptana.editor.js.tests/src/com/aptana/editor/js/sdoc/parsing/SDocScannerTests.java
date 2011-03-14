@@ -484,22 +484,4 @@ public class SDocScannerTests extends TestCase
 			SDocTokenType.END_DOCUMENTATION		// */
 		);
 	}
-	
-	/**
-	 * testProperties
-	 */
-	public void testProperties()
-	{
-		String source = "{Properties<String>}";
-	
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.PROPERTIES,
-			SDocTokenType.LESS_THAN,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.GREATER_THAN,
-			SDocTokenType.RCURLY
-		);
-	}
 }

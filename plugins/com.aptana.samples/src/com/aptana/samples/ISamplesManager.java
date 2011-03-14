@@ -7,15 +7,27 @@
  */
 package com.aptana.samples;
 
+import java.util.List;
+
+import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SamplesReference;
 
 public interface ISamplesManager
 {
 
 	/**
-	 * Returns the list of contributed samples.
+	 * Returns the list of contributed sample categories.
 	 * 
-	 * @return the list of samples
+	 * @return the list of sample categories
 	 */
-	public SamplesReference[] getSamples();
+	public List<SampleCategory> getCategories();
+
+	/**
+	 * Returns the list of samples belonging to a specific category.
+	 * 
+	 * @param categoryId
+	 *            the id of the category
+	 * @return the list of samples that belongs to the category
+	 */
+	public List<SamplesReference> getSamplesForCategory(String categoryId);
 }

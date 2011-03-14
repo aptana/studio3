@@ -27,6 +27,7 @@ public enum TagType
 	RETURN("@return"), //$NON-NLS-1$
 	SEE("@see"), //$NON-NLS-1$
 	TYPE("@type"), //$NON-NLS-1$
+	USER_AGENT("@userAgent"), //$NON-NLS-1$
 	UNKNOWN("@<???>"); //$NON-NLS-1$
 
 	private String _name;

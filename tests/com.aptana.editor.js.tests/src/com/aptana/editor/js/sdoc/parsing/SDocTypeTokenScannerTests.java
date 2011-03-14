@@ -401,22 +401,4 @@ public class SDocTypeTokenScannerTests extends SDocScannerTestBase
 			SDocTokenType.RCURLY
 		);
 	}
-	
-	/**
-	 * testPropertiesType
-	 */
-	public void testPropertiesType()
-	{
-		String source = "{Properties<String>}";
-		
-		lexemeTypeTests(
-			source,
-			SDocTokenType.LCURLY,
-			SDocTokenType.PROPERTIES,
-			SDocTokenType.LESS_THAN,
-			SDocTokenType.IDENTIFIER,
-			SDocTokenType.GREATER_THAN,
-			SDocTokenType.RCURLY
-		);
-	}
 }

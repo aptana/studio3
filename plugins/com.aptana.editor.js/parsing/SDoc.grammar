@@ -87,7 +87,7 @@
 %terminals ADVANCED, ALIAS, AUTHOR, CLASS_DESCRIPTION, CONSTRUCTOR, EXAMPLE, EXCEPTION;
 %terminals EXTENDS, INTERNAL, METHOD, NAMESPACE, OVERVIEW, PARAM, RETURN, SEE, UNKNOWN;
 %terminals IDENTIFIER, ARRAY, FUNCTION, PRIVATE, PROPERTY;
-%terminals TYPE, CLASS, PROPERTIES;
+%terminals TYPE, CLASS;
 
 %typeof IDENTIFIER, FUNCTION, ARRAY = "String";
 %typeof TEXT, LBRACKET, RBRACKET, LCURLY, RCURLY, POUND, COLON, ERROR, UNKNOWN = "String";
@@ -372,10 +372,6 @@ Type
 			}
 
 			return function;
-		:}
-	|	PROPERTIES LESS_THAN Type.memberType GREATER_THAN
-		{:
-			return new PropertiesType(memberType);
 		:}
 //	|	FUNCTION FunctionParameterTypes FunctionReturnTypes
 //		{:

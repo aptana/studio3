@@ -82,7 +82,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 			IHyperlink[] oldLinks = fLinks.remove(line);
 			IHyperlink[] newLinks = list.toArray(new IHyperlink[0]);
 			// Update map
-			fLinks.put(new Integer(line), newLinks);
+			fLinks.put(Integer.valueOf(line), newLinks);
 			// Only modify underlines if regions changed in any way...
 			if (regionsChanged(oldLinks, newLinks)) {
 				// Remove links that were on this line before...
@@ -144,6 +144,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 				}
 			}
 		} catch (Exception ignore) {
+			ignore.getCause();
 		}
 	}
 
@@ -193,7 +194,7 @@ public class TextCanvas extends org.eclipse.tm.internal.terminal.textcanvas.Text
 			IHyperlink link = newLinks[i];
 			IRegion region = link.getHyperlinkRegion();
 			for (int x = 0; x < region.getLength(); x++) {
-				Integer integ = new Integer(region.getOffset() + x);
+				Integer integ = Integer.valueOf(region.getOffset() + x);
 				if (oldUnderlines.contains(integ)) {
 					oldUnderlines.remove(integ);
 				} else {

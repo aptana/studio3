@@ -47,7 +47,11 @@ public class VirtualFileSystem extends FileSystem {
 	 */
 	public VirtualFileSystem() {
 		super();
-		instance = this;
+		setInstance(this);
+	}
+	
+	private static void setInstance(VirtualFileSystem object) {
+		instance = object;
 	}
 
 	public static IFileSystem getInstance() {

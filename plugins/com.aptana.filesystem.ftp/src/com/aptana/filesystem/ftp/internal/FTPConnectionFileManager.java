@@ -298,6 +298,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				}
 			}
 		} catch (Exception e) {
+			e.getCause();
 		}
 		try {
 	        String[] validCodes = {"214"}; //$NON-NLS-1$
@@ -315,6 +316,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				serverFeatures.add(MessageFormat.format("SITE {0}", cmd)); //$NON-NLS-1$
 			}
 		} catch (Exception e) {
+			e.getCause();
 		}
 		
 		Policy.checkCanceled(monitor);
@@ -1092,7 +1094,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 
 	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
 		FTPFile[] ftpFiles = null;
-		if (statSupported != Boolean.FALSE) {
+		if (!Boolean.FALSE.equals(statSupported)) {
 			try {
 				ftpFiles = ftpSTAT(dirPath.addTrailingSeparator().toPortableString());
 			} catch (MalformedReplyException e) {

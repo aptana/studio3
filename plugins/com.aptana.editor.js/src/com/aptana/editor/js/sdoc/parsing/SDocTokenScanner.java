@@ -151,7 +151,7 @@ public class SDocTokenScanner extends RuleBasedScanner
 		tagRules.addWord("@see", getToken(SDocTokenType.SEE));
 		tagRules.addWord("@type", getToken(SDocTokenType.TYPE));
 		rules.add(tagRules);
-		
+
 		CharacterMapRule cmRule = new CharacterMapRule();
 		cmRule.add('#', getToken(SDocTokenType.POUND));
 		cmRule.add('[', getToken(SDocTokenType.LBRACKET));
@@ -159,9 +159,9 @@ public class SDocTokenScanner extends RuleBasedScanner
 		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
 		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE));
 		rules.add(cmRule);
-		
+
 		rules.add(new PatternRule("{", "}", getToken(SDocTokenType.TYPES), '\0', false));
-		
+
 		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.UNKNOWN));
 		operatorRules.addWord("/**", getToken(SDocTokenType.START_DOCUMENTATION));
 		operatorRules.addWord("*/", getToken(SDocTokenType.END_DOCUMENTATION));

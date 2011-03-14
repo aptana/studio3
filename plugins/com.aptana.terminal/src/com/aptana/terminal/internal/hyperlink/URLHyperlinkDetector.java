@@ -58,7 +58,7 @@ public class URLHyperlinkDetector implements IHyperlinkDetector
 		int start = 0;
 		while (m.find(start))
 		{
-			String urlString = new String(m.group().trim());
+			String urlString = m.group().trim();
 			start = m.end();
 			IRegion region = new Region(m.start(), urlString.length());
 			if (!urlString.startsWith("http://")) //$NON-NLS-1$

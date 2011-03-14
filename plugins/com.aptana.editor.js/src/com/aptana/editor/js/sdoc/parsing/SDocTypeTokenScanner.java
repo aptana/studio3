@@ -121,7 +121,7 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		List<IRule> rules = new LinkedList<IRule>();
 
 		rules.add(new WordRule(new WhitespaceDetector(), getToken(SDocTokenType.WHITESPACE)));
-		
+
 		CharacterMapRule cmRule = new CharacterMapRule();
 		cmRule.add('(', getToken(SDocTokenType.LPAREN));
 		cmRule.add(')', getToken(SDocTokenType.RPAREN));
@@ -137,14 +137,13 @@ public class SDocTypeTokenScanner extends RuleBasedScanner
 		cmRule.add('\r', getToken(SDocTokenType.WHITESPACE));
 		cmRule.add('\n', getToken(SDocTokenType.WHITESPACE));
 		rules.add(cmRule);
-		
+
 		WordRule keywordRules = new WordRule(new IdentifierDetector(), getToken(SDocTokenType.IDENTIFIER));
 		keywordRules.addWord("Array", getToken(SDocTokenType.ARRAY)); //$NON-NLS-1$
 		keywordRules.addWord("Function", getToken(SDocTokenType.FUNCTION)); //$NON-NLS-1$
 		keywordRules.addWord("Class", getToken(SDocTokenType.CLASS)); //$NON-NLS-1$
-		keywordRules.addWord("Properties", getToken(SDocTokenType.PROPERTIES)); //$NON-NLS-1$
 		rules.add(keywordRules);
-		
+
 		WordRule operatorRules = new WordRule(new OperatorDetector(), getToken(SDocTokenType.ERROR));
 		operatorRules.addWord("...", getToken(SDocTokenType.ELLIPSIS)); //$NON-NLS-1$
 		operatorRules.addWord("->", getToken(SDocTokenType.ARROW)); //$NON-NLS-1$

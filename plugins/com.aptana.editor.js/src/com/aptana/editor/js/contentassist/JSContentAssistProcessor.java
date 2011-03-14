@@ -35,6 +35,7 @@ import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.index.JSIndexConstants;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.inferencing.JSNodeTypeInferrer;
 import com.aptana.editor.js.inferencing.JSPropertyCollection;
@@ -42,10 +43,12 @@ import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.editor.js.parsing.JSTokenScanner;
+import com.aptana.editor.js.parsing.ast.JSArgumentsNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGetPropertyNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
 import com.aptana.editor.js.parsing.lexer.JSLexemeProvider;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
@@ -107,6 +110,45 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
+	 * addObjectLiteralProperties
+	 * 
+	 * @param proposals
+	 * @param offset
+	 */
+	protected void addObjectLiteralProperties(Set<ICompletionProposal> proposals, ITextViewer viewer, int offset)
+	{
+		FunctionElement function = this.getFunctionElement(viewer, offset);
+
+		if (function != null)
+		{
+			List<ParameterElement> params = function.getParameters();
+			int index = this.getArgumentIndex(offset);
+
+			if (0 <= index && index < params.size())
+			{
+				ParameterElement param = params.get(index);
+
+				for (String type : param.getTypes())
+				{
+					List<PropertyElement> properties = this._indexHelper.getTypeProperties(this.getIndex(), type);
+
+					for (PropertyElement property : properties)
+					{
+						String name = property.getName();
+						String description = JSModelFormatter.getDescription(property, this.getProjectURI());
+						Image image = JSModelFormatter.getImage(property);
+						List<String> userAgentNames = property.getUserAgentNames();
+						Image[] userAgents = getUserAgentImages(userAgentNames);
+						String owningType = JSModelFormatter.getTypeDisplayName(property.getOwningType());
+
+						this.addProposal(proposals, name, image, description, userAgents, owningType, offset);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * addProjectGlobalFunctions
 	 * 
 	 * @param proposals
@@ -127,8 +169,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				String description = JSModelFormatter.getDescription(property, projectURI);
 				Image image = JSModelFormatter.getImage(property);
 				List<String> documents = property.getDocuments();
-				String location = (documents != null && documents.size() > 0) ? JSModelFormatter
-						.getDocumentDisplayName(documents.get(0)) : null;
+				String location = (documents != null && documents.size() > 0) ? JSModelFormatter.getDocumentDisplayName(documents.get(0)) : null;
 
 				this.addProposal(proposals, name, image, description, userAgents, location, offset);
 			}
@@ -154,7 +195,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	}
 
 	/**
-	 * addProposal
+	 * addProposal - The display name is used as the insertion text
 	 * 
 	 * @param proposals
 	 * @param name
@@ -167,8 +208,25 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private void addProposal(Set<ICompletionProposal> proposals, String name, Image image, String description,
 			Image[] userAgents, String fileLocation, int offset)
 	{
-		String displayName = name;
-		int length = name.length();
+		this.addProposal(proposals, name, name, image, description, userAgents, fileLocation, offset);
+	}
+
+	/**
+	 * addProposal - The display name and insertion text are defined separately
+	 * 
+	 * @param proposals
+	 * @param displayName
+	 * @param insertionText
+	 * @param image
+	 * @param description
+	 * @param userAgents
+	 * @param fileLocation
+	 * @param offset
+	 */
+	private void addProposal(Set<ICompletionProposal> proposals, String displayName, String insertionText, Image image,
+			String description, Image[] userAgents, String fileLocation, int offset)
+	{
+		int length = insertionText.length();
 
 		// calculate what text will be replaced
 		int replaceLength = 0;
@@ -182,8 +240,8 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// build proposal
 		IContextInformation contextInfo = null;
 
-		CommonCompletionProposal proposal = new CommonCompletionProposal(name, offset, replaceLength, length, image,
-				displayName, contextInfo, description);
+		CommonCompletionProposal proposal = new CommonCompletionProposal(insertionText, offset, replaceLength, length,
+				image, displayName, contextInfo, description);
 		proposal.setFileLocation(fileLocation);
 		proposal.setUserAgentImages(userAgents);
 
@@ -285,88 +343,41 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	@Override
 	public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset)
 	{
-		IParseNode node = this.getActiveASTNode(offset);
 		List<IContextInformation> result = new ArrayList<IContextInformation>();
+		FunctionElement function = this.getFunctionElement(viewer, offset);
 
-		// work a way up the AST to determine if we're in an arguments node
-		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		if (function != null)
 		{
-			node = node.getParent();
-		}
+			JSArgumentsNode node = this.getArgumentsNode(offset);
 
-		// process arguments node as long as we're not to the left of the opening parenthesis
-		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
-		{
-			// grab the content assist location type for the symbol before the arguments list
-			int functionOffset = node.getStartingOffset();
-			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
-
-			// process variables and properties
-			switch (location)
+			if (node != null)
 			{
-				case IN_VARIABLE_NAME:
-				{
-					String name = node.getParent().getFirstChild().getText();
-					IContextInformation ci = this.createContextInformation(JSTypeConstants.WINDOW_TYPE, name,
-							functionOffset);
+				boolean inObjectLiteral = false;
 
-					if (ci != null)
+				// find argument we're in
+				for (IParseNode arg : node)
+				{
+					if (arg.contains(offset))
 					{
-						result.add(ci);
+						// Not foolproof, but this should cover 99% of the cases we're likely to encounter
+						inObjectLiteral = (arg instanceof JSObjectNode);
+						break;
 					}
-					break;
 				}
 
-				case IN_PROPERTY_NAME:
+				// prevent context info popup from appearing and immediately disappearing
+				if (inObjectLiteral == false)
 				{
-					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node,
-							((JSNode) node).getContainingStatementNode());
-					List<String> types = this.getParentObjectTypes(propertyNode, offset);
+					String info = JSModelFormatter.getContextInfo(function);
+					List<String> lines = JSModelFormatter.getContextLines(function);
+					IContextInformation ci = new JSContextInformation(info, lines, node.getStartingOffset());
 
-					if (types.size() > 0)
-					{
-						String typeName = types.get(0);
-						String methodName = propertyNode.getLastChild().getText();
-						IContextInformation ci = this.createContextInformation(typeName, methodName, functionOffset);
-
-						if (ci != null)
-						{
-							result.add(ci);
-						}
-					}
-					break;
+					result.add(ci);
 				}
-
-				default:
-					break;
 			}
 		}
 
 		return result.toArray(new IContextInformation[result.size()]);
-	}
-
-	/**
-	 * createContextInformation
-	 * 
-	 * @param typeName
-	 * @param functionName
-	 * @param startingOffset
-	 * @return
-	 */
-	private IContextInformation createContextInformation(String typeName, String functionName, int startingOffset)
-	{
-		PropertyElement function = this._indexHelper.getTypeMember(this.getIndex(), typeName, functionName);
-		IContextInformation result = null;
-
-		if (function instanceof FunctionElement)
-		{
-			String info = JSModelFormatter.getContextInfo((FunctionElement) function);
-			List<String> lines = JSModelFormatter.getContextLines((FunctionElement) function);
-
-			result = new JSContextInformation(info, StringUtil.join("\n\ufeff", lines), startingOffset); //$NON-NLS-1$
-		}
-
-		return result;
 	}
 
 	/**
@@ -420,6 +431,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 				this.addCoreGlobals(result, offset);
 				this.addProjectGlobals(result, offset);
 				this.addSymbolsInScope(result, offset);
+				break;
+
+			case IN_OBJECT_LITERAL_PROPERTY:
+				this.addObjectLiteralProperties(result, viewer, offset);
 				break;
 
 			default:
@@ -491,6 +506,58 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		return result;
 	}
 
+	/**
+	 * getArgumentIndex
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	private int getArgumentIndex(int offset)
+	{
+		JSArgumentsNode arguments = this.getArgumentsNode(offset);
+		int result = -1;
+
+		if (arguments != null)
+		{
+			for (IParseNode child : arguments)
+			{
+				if (child.contains(offset))
+				{
+					result = child.getIndex();
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getArgumentsNode
+	 * 
+	 * @param offset
+	 * @return
+	 */
+	private JSArgumentsNode getArgumentsNode(int offset)
+	{
+		IParseNode node = this.getActiveASTNode(offset);
+		JSArgumentsNode result = null;
+
+		// work a way up the AST to determine if we're in an arguments node
+		while (node instanceof JSNode && node.getNodeType() != JSNodeTypes.ARGUMENTS)
+		{
+			node = node.getParent();
+		}
+
+		// process arguments node as long as we're not to the left of the opening parenthesis
+		if (node instanceof JSNode && node.getNodeType() == JSNodeTypes.ARGUMENTS && node.getStartingOffset() != offset)
+		{
+			result = (JSArgumentsNode) node;
+		}
+
+		return result;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
@@ -499,11 +566,11 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public char[] getCompletionProposalAutoActivationCharacters()
 	{
 		String chars = Platform.getPreferencesService().getString( //
-				JSPlugin.PLUGIN_ID, //
-				IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
-				"", //$NON-NLS-1$
-				null //
-				);
+			JSPlugin.PLUGIN_ID, //
+			IPreferenceConstants.JS_ACTIVATION_CHARACTERS, //
+			"", //$NON-NLS-1$
+			null //
+			);
 
 		return (chars != null) ? chars.toCharArray() : null;
 	}
@@ -526,6 +593,75 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public IContextInformationValidator getContextInformationValidator()
 	{
 		return new JSContextInformationValidator();
+	}
+
+	/**
+	 * getFunctionElement
+	 * 
+	 * @param viewer
+	 * @param offset
+	 * @return
+	 */
+	private FunctionElement getFunctionElement(ITextViewer viewer, int offset)
+	{
+		JSArgumentsNode node = this.getArgumentsNode(offset);
+		FunctionElement result = null;
+
+		// process arguments node as long as we're not to the left of the opening parenthesis
+		if (node != null)
+		{
+			// save current replace range. A bit hacky but better than adding a flag into getLocation's signature
+			IRange range = this._replaceRange;
+
+			// grab the content assist location type for the symbol before the arguments list
+			int functionOffset = node.getStartingOffset();
+			LocationType location = this.getLocation(viewer.getDocument(), functionOffset);
+
+			// restore replace range
+			this._replaceRange = range;
+
+			// init type and method names
+			String typeName = null;
+			String methodName = null;
+
+			switch (location)
+			{
+				case IN_VARIABLE_NAME:
+				{
+					typeName = JSTypeConstants.WINDOW_TYPE;
+					methodName = node.getParent().getFirstChild().getText();
+					break;
+				}
+
+				case IN_PROPERTY_NAME:
+				{
+					JSGetPropertyNode propertyNode = this.getGetPropertyNode(node, ((JSNode) node).getContainingStatementNode());
+					List<String> types = this.getParentObjectTypes(propertyNode, offset);
+
+					if (types.size() > 0)
+					{
+						typeName = types.get(0);
+						methodName = propertyNode.getLastChild().getText();
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+
+			if (typeName != null && methodName != null)
+			{
+				PropertyElement property = this._indexHelper.getTypeMember(this.getIndex(), typeName, methodName);
+
+				if (property instanceof FunctionElement)
+				{
+					result = (FunctionElement) property;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -634,7 +770,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 
 			// NOTE: We can't simply grab the AST since this will fail with JS
 			// is embedded in other languages. In those cases, we'll get the
-			// root node for the host langauge and not for JS
+			// root node for the host language and not for JS
 
 			// find JS root node
 			IParseNode current = this._targetNode;
@@ -915,8 +1051,63 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
-		Lexeme<JSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
-		return (lexeme != null && lexeme.getType() == JSTokenType.IDENTIFIER);
-	}
+		int index = lexemeProvider.getLexemeFloorIndex(offset);
+		boolean result = false;
 
+		// NOTE: This is not foolproof. Basically, we assume object literals in function invocations will not
+		// have function values. This should be a valid assumption since we only show non-function properties
+		// in object-literal CA. If assumption is true, then we can look for the opening curly or stop when he
+		// hit certain keywords or punctuation. A robust implementation would use the AST.
+		if (index != -1)
+		{
+			Lexeme<JSTokenType> currentLexeme = lexemeProvider.getLexeme(index);
+
+			boolean isIdentifier = (currentLexeme.getType() == JSTokenType.IDENTIFIER);
+			boolean inObjectLiteral = false;
+			index--;
+
+			LOOP: while (index >= 0)
+			{
+				currentLexeme = lexemeProvider.getLexeme(index);
+
+				switch (currentLexeme.getType())
+				{
+					case LCURLY:
+						inObjectLiteral = true;
+						break LOOP;
+
+					// abort on some keywords
+					case BREAK:
+					case CASE:
+					case CONTINUE:
+					case DEFAULT:
+					case DO:
+					case ELSE:
+					case FINALLY:
+					case FUNCTION:
+					case FOR:
+					case IF:
+					case IN:
+					case RETURN:
+					case SWITCH:
+					case THROW:
+					case TRY:
+					case WHILE:
+						// and abort on some punctuation
+					case COLON:
+					case RCURLY:
+					case RPAREN:
+					case SEMICOLON:
+					case VAR:
+						break LOOP;
+				}
+
+				index--;
+			}
+
+			result = (inObjectLiteral == false && isIdentifier);
+		}
+
+		return result;
+	}
 }
