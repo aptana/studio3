@@ -7,8 +7,22 @@
  */
 package com.aptana.editor.js.contentassist.index;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.osgi.framework.Bundle;
+
+import com.aptana.core.util.ObjectPool;
+import com.aptana.editor.js.JSPlugin;
 import com.aptana.json.Schema;
-import com.aptana.json.SchemaObject;
+import com.aptana.json.SchemaBuilder;
+import com.aptana.json.SchemaContext;
+import com.aptana.json.SchemaHandler;
 import com.aptana.json.SchemaReader;
 
 /**
@@ -16,134 +30,113 @@ import com.aptana.json.SchemaReader;
  */
 public class JSCAReader extends SchemaReader
 {
-	/**
-	 * JSCAReader
-	 */
-	public JSCAReader()
+	private static class SchemaPool extends ObjectPool<Schema>
 	{
-		super();
+		private static final String JSCA_METADATA_SCHEMA = "/metadata/JSMetadataSchema.json";
 
-		this.setSchema(this.createSchema());
+		public SchemaPool()
+		{
+			// No need for schemas to expire
+			super(-1);
+		}
+
+		public Schema create()
+		{
+			InputStreamReader isr = null;
+			Schema result = null;
+
+			try
+			{
+				// grab the JSCA schema's URL
+				Bundle bundle = JSPlugin.getDefault().getBundle();
+				Path path = new Path(JSCA_METADATA_SCHEMA);
+				URL url = FileLocator.find(bundle, path, null);
+
+				// create input stream reader for the schema
+				InputStream is = url.openStream();
+				isr = new InputStreamReader(is);
+
+				// create a schema context and associate a handler with it
+				SchemaContext context = new SchemaContext();
+				SchemaHandler handler = new SchemaHandler();
+				context.setHandler(handler);
+
+				// read the JSCA schema and build a Schema as a side-effect
+				SchemaBuilder reader = new SchemaBuilder();
+				reader.read(isr, context);
+
+				// grab the resulting JSCA Schema
+				result = handler.getSchema();
+			}
+			catch (Throwable t)
+			{
+				JSPlugin.logError(t.getMessage(), t);
+			}
+			finally
+			{
+				if (isr != null)
+				{
+					try
+					{
+						isr.close();
+					}
+					catch (IOException e)
+					{
+					}
+				}
+			}
+
+			return result;
+		}
+
+		public void expire(Schema o)
+		{
+			// do nothing
+		}
+
+		public boolean validate(Schema o)
+		{
+			return (o != null);
+		}
 	}
 
+	private static SchemaPool SCHEMA_POOL;
+
 	/**
-	 * createSchema
+	 * NOTE: The chances of multiple threads grabbing the schema pool is very rare, so there's no need to optimize this
+	 * method's lock
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("nls")
-	private Schema createSchema()
+	protected static synchronized SchemaPool getSchemaPool()
 	{
-		Schema result = new Schema();
-		result.setName("JSCA Schema");
-		result.setVersion("http://www.appcelerator.com/studio/content-assist/jsca/1.0");
-		result.setDescription("A JSON schema describing the structure of JS Metadata used in Aptana Studio for content assist");
-		result.setResult("JSMetadata");
+		// NOTE: The chances of multiple threads grabbing the schema pool is very rare, so there's no need
+		// to optimize this method's lock
+		if (SCHEMA_POOL == null)
+		{
+			SCHEMA_POOL = new SchemaPool();
+		}
 
-		// JSMetadata
-		SchemaObject jsMetadata = (SchemaObject) result.addType("JSMetadata");
-		jsMetadata.addProperty("version", "Number");
-		jsMetadata.addProperty("aliases", "Array<Alias>");
-		jsMetadata.addProperty("types", "Array<Type>");
+		return SCHEMA_POOL;
+	}
 
-		// Alias
-		SchemaObject alias = (SchemaObject) result.addType("Alias");
-		alias.addProperty("name", "String");
-		alias.addProperty("description", "String");
-		alias.addProperty("type", "String");
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.json.SchemaReader#read(java.io.Reader, com.aptana.json.SchemaContext)
+	 */
+	@Override
+	public void read(Reader input, SchemaContext context)
+	{
+		// grab schema
+		SchemaPool schemaPool = getSchemaPool();
+		Schema schema = schemaPool.checkOut();
 
-		// Type
-		SchemaObject type = (SchemaObject) result.addType("Type");
-		type.addProperty("name", "String");
-		type.addProperty("description", "String");
-		type.addProperty("deprecated", "Boolean");
-		type.addProperty("since", "Array<Since>");
-		type.addProperty("inherits", "String");
-		type.addProperty("properties", "Array<Property>");
-		type.addProperty("functions", "Array<Function>");
-		type.addProperty("events", "Array<Event>");
-		type.addProperty("remarks", "Array<String>");
+		this.setSchema(schema);
 
-		// NOTE: These are not currently valid, but are being used here so we can find errors in the api.jsca file
-		type.addProperty("examples", "Array<Example>");
-		type.addProperty("userAgents", "Array<UserAgent>");
+		// process input
+		super.read(input, context);
 
-		// UserAgent
-		SchemaObject userAgent = (SchemaObject) result.addType("UserAgent");
-		userAgent.addProperty("platform", "String");
-		userAgent.addProperty("version", "String");
-		userAgent.addProperty("os", "String");
-		userAgent.addProperty("osVersion", "String");
-		userAgent.addProperty("description", "String");
-
-		// Since
-		SchemaObject since = (SchemaObject) result.addType("Since");
-		since.addProperty("name", "String");
-		since.addProperty("version", "String");
-
-		// Property
-		SchemaObject property = (SchemaObject) result.addType("Property");
-		property.addProperty("name", "String");
-		property.addProperty("description", "String");
-		property.addProperty("userAgents", "Array<UserAgent>");
-		property.addProperty("since", "Array<Since>");
-		property.addProperty("isInstanceProperty", "Boolean");
-		property.addProperty("isClassProperty", "Boolean");
-		property.addProperty("isInternal", "Boolean");
-		property.addProperty("type", "String");
-		property.addProperty("examples", "Array<Example>");
-
-		// Function
-		SchemaObject function = (SchemaObject) result.addType("Function");
-		function.addProperty("name", "String");
-		function.addProperty("description", "String");
-		function.addProperty("userAgents", "Array<UserAgent>");
-		function.addProperty("since", "Array<Since>");
-		function.addProperty("isInstanceProperty", "Boolean");
-		function.addProperty("isClassProperty", "Boolean");
-		function.addProperty("isInternal", "Boolean");
-		function.addProperty("examples", "Array<Example>");
-		function.addProperty("parameters", "Array<Parameter>");
-		function.addProperty("references", "Array<Reference>");
-		function.addProperty("exceptions", "Array<Exceptions>");
-		function.addProperty("returnTypes", "Array<ReturnType>");
-		function.addProperty("isConstructor", "Boolean");
-		function.addProperty("isMethod", "Boolean");
-
-		// Event
-		SchemaObject event = (SchemaObject) result.addType("Event");
-		event.addProperty("name", "String");
-		event.addProperty("description", "String");
-		event.addProperty("properties", "Array<EventProperty>");
-
-		// EventProperty
-		SchemaObject eventProperty = (SchemaObject) result.addType("EventProperty");
-		eventProperty.addProperty("name", "String");
-		eventProperty.addProperty("description", "String");
-		eventProperty.addProperty("type", "String");
-
-		// ReturnType
-		SchemaObject returnType = (SchemaObject) result.addType("ReturnType");
-		returnType.addProperty("type", "String");
-		returnType.addProperty("description", "String");
-
-		// Example
-		SchemaObject example = (SchemaObject) result.addType("Example");
-		example.addProperty("name", "String");
-		example.addProperty("code", "String");
-
-		// Parameter
-		SchemaObject parameter = (SchemaObject) result.addType("Parameter");
-		parameter.addProperty("name", "String");
-		parameter.addProperty("type", "String");
-		parameter.addProperty("usage", "String");
-		parameter.addProperty("description", "String");
-
-		// Exception
-		SchemaObject exception = (SchemaObject) result.addType("Exception");
-		exception.addProperty("type", "String");
-		exception.addProperty("description", "String");
-
-		return result;
+		// free schema
+		schemaPool.checkIn(schema);
 	}
 }
