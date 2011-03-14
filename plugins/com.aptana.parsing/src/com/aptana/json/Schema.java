@@ -105,6 +105,16 @@ public class Schema implements IState, IPropertyContainer
 	/**
 	 * createProperty
 	 * 
+	 * @return
+	 */
+	public SchemaProperty createProperty()
+	{
+		return new SchemaProperty(this);
+	}
+
+	/**
+	 * createProperty
+	 * 
 	 * @param name
 	 * @param typeName
 	 * @return
