@@ -17,6 +17,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.theme.ThemePlugin;
 
@@ -24,7 +25,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 {
 
 	private TextAttribute lastAttribute;
-	private String scope;
+	private String scope = StringUtil.EMPTY;
 	private IRegion fLastLine;
 	private int fCountForLine;
 
@@ -42,6 +43,10 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			fCountForLine = 0;
 			int offset = region.getOffset();
 			scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(fDocument, offset);
+			if (scope == null)
+			{
+				scope = StringUtil.EMPTY;
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -51,9 +56,9 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 		{
 			synchronized (getLockObject(fDocument))
 			{
-				super.createPresentation(presentation, region);				
+				super.createPresentation(presentation, region);
 			}
-			scope = null;
+			scope = StringUtil.EMPTY;
 			fLastLine = null;
 			fCountForLine = 0;
 		}
@@ -83,7 +88,7 @@ public class ThemeingDamagerRepairer extends DefaultDamagerRepairer
 			{
 				last = scope;
 			}
-			else if (!scope.endsWith(last))
+			else if (scope.length() > 0 && !scope.endsWith(last))
 			{
 				last = scope + " " + last; //$NON-NLS-1$
 			}
