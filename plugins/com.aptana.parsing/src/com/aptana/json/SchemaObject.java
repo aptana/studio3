@@ -10,6 +10,8 @@ package com.aptana.json;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.aptana.core.util.SourcePrinter;
+
 /**
  * SchemaObject
  */
@@ -198,18 +200,27 @@ public class SchemaObject implements IState, IPropertyContainer
 		property.setValue(value);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * toSource
+	 * 
+	 * @return
 	 */
-	@Override
-	public String toString()
+	public String toSource()
 	{
-		StringBuilder buffer = new StringBuilder();
+		SourcePrinter writer = new SourcePrinter();
 
-		// open
-		buffer.append("{"); //$NON-NLS-1$
+		this.toSource(writer);
 
+		return writer.toString();
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @param writer
+	 */
+	public void toSource(SourcePrinter writer)
+	{
 		// emit properties
 		if (this._properties != null && this._properties.isEmpty() == false)
 		{
@@ -217,16 +228,9 @@ public class SchemaObject implements IState, IPropertyContainer
 			{
 				SchemaProperty property = entry.getValue();
 
-				buffer.append("\n\t").append(property); //$NON-NLS-1$
+				property.toSource(writer);
 			}
-
-			buffer.append("\n"); //$NON-NLS-1$
 		}
-
-		// close
-		buffer.append("}"); //$NON-NLS-1$
-
-		return buffer.toString();
 	}
 
 	/*

@@ -7,46 +7,150 @@
  */
 package com.aptana.json;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * SchemaHandler
  */
 public class SchemaHandler implements IContextHandler
 {
-	private Stack<Object> _stack;
-	private Schema _schema;
+	private static enum PropertyName
+	{
+		UNDEFINED(""), //$NON-NLS-1$
+		NAME("name"), //$NON-NLS-1$
+		VERSION("version"), //$NON-NLS-1$
+		DESCRIPTION("description"), //$NON-NLS-1$
+		RESULT("result"), //$NON-NLS-1$
+		TYPES("types"), //$NON-NLS-1$
+		PROPERTIES("properties"), //$NON-NLS-1$
+		TYPE("type"), //$NON-NLS-1$
+		EXAMPLE("example"), //$NON-NLS-1$
+		OPTIONAL("optional"); //$NON-NLS-1$
+
+		private static Map<String, PropertyName> NAME_MAP;
+		private String _name;
+
+		static
+		{
+			NAME_MAP = new HashMap<String, PropertyName>();
+
+			for (PropertyName property : EnumSet.allOf(PropertyName.class))
+			{
+				NAME_MAP.put(property.getName(), property);
+			}
+		}
+
+		public static PropertyName get(String name)
+		{
+			PropertyName result = UNDEFINED;
+
+			if (NAME_MAP.containsKey(name))
+			{
+				result = NAME_MAP.get(name);
+			}
+
+			return result;
+		}
+
+		private PropertyName(String name)
+		{
+			this._name = name;
+		}
+
+		public String getName()
+		{
+			return this._name;
+		}
+	}
+
+	private static enum TypeName
+	{
+		UNDEFINED(""), //$NON-NLS-1$
+		SCHEMA("Schema"), //$NON-NLS-1$
+		TYPE("Type"), //$NON-NLS-1$
+		PROPERTY("Property"), //$NON-NLS-1$
+		STRING("String"), //$NON-NLS-1$
+		BOOLEAN("Boolean"); //$NON-NLS-1$
+
+		private static Map<String, TypeName> NAME_MAP;
+		private String _name;
+
+		static
+		{
+			NAME_MAP = new HashMap<String, TypeName>();
+
+			for (TypeName type : EnumSet.allOf(TypeName.class))
+			{
+				NAME_MAP.put(type.getName(), type);
+			}
+		}
+
+		public static TypeName get(String name)
+		{
+			TypeName result = UNDEFINED;
+
+			if (NAME_MAP.containsKey(name))
+			{
+				result = NAME_MAP.get(name);
+			}
+
+			return result;
+		}
+
+		private TypeName(String name)
+		{
+			this._name = name;
+		}
+
+		public String getName()
+		{
+			return this._name;
+		}
+	}
+
+	private Schema _currentSchema;
+	private SchemaObject _currentType;
+	private String _currentTypeName;
+	private SchemaProperty _currentProperty;
+	private String _currentString;
+	private Boolean _currentBoolean;
 
 	/**
 	 * SchemaHandler
 	 */
 	public SchemaHandler()
 	{
-		this._stack = new Stack<Object>();
-		this._schema = new Schema();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.json.IContextAction#addElement(java.lang.String, com.aptana.json.IState)
 	 */
-	@SuppressWarnings("unchecked")
 	public void addElement(String elementTypeName, IState elementType)
 	{
-		System.out.println("add element of type '" + elementTypeName + "' to list"); //$NON-NLS-1$ //$NON-NLS-1$
+		TypeName t = TypeName.get(elementTypeName);
 
-		Object item = this._stack.pop();
-		Object list = this._stack.peek();
+		switch (t)
+		{
+			case SCHEMA:
+				// n/a
+				break;
 
-		if (list instanceof List<?>)
-		{
-			((List<Object>) list).add(item);
-		}
-		else
-		{
-			System.out.println("Could not add " + item + " to non-list " + list); //$NON-NLS-1$ //$NON-NLS-1$
+			case TYPE:
+				this._currentSchema.addType(this._currentTypeName, this._currentType);
+				this._currentTypeName = null;
+				this._currentType = null;
+				break;
+
+			case PROPERTY:
+				this._currentType.addProperty(this._currentProperty);
+				this._currentProperty = null;
+				break;
+
+			default:
+				// warn
 		}
 	}
 
@@ -56,35 +160,43 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void createType(String typeName, IState type, Object value)
 	{
-		System.out.println("create type '" + typeName + "': " + value); //$NON-NLS-1$ //$NON-NLS-1$
+		TypeName t = TypeName.get(typeName);
 
-		Object instance = null;
+		switch (t)
+		{
+			case SCHEMA:
+				this._currentSchema = new Schema();
+				break;
 
-		if (type instanceof SchemaPrimitive)
-		{
-			instance = value;
-		}
-		else if ("Schema".equals(typeName)) //$NON-NLS-1$
-		{
-			// return the internal schema instance
-			instance = this._schema;
-		}
-		else if (typeName.startsWith("Array<")) //$NON-NLS-1$
-		{
-			instance = new ArrayList<Object>();
-		}
-		else
-		{
-			// create a new container to hold type information
-			instance = this._schema.createObject();
-		}
+			case TYPE:
+				this._currentType = this._currentSchema.createObject();
+				break;
 
-		if (instance == null)
-		{
-			// throw exception
-		}
+			case PROPERTY:
+				this._currentProperty = this._currentSchema.createProperty();
+				break;
 
-		this._stack.push(instance);
+			case STRING:
+				this._currentString = (String) value;
+				break;
+
+			case BOOLEAN:
+				this._currentBoolean = (Boolean) value;
+				break;
+
+			default:
+				// warn
+		}
+	}
+
+	/**
+	 * getSchema
+	 * 
+	 * @return
+	 */
+	public Schema getSchema()
+	{
+		return this._currentSchema;
 	}
 
 	/*
@@ -93,26 +205,89 @@ public class SchemaHandler implements IContextHandler
 	 */
 	public void setProperty(String propertyName, String propertyTypeName, IState propertyType)
 	{
-		System.out.println("set property '" + propertyName + "' : " + propertyTypeName); //$NON-NLS-1$ //$NON-NLS-1$
+		PropertyName p = PropertyName.get(propertyName);
 
-		if (this._stack.isEmpty() == false)
+		switch (p)
 		{
-			Object value = this._stack.pop();
-			//Object name = this._stack.pop();
-			Object top = this._stack.peek();
+			case NAME:
+				if (this._currentProperty != null)
+				{
+					this._currentProperty.setName(this._currentString);
+				}
+				else if (this._currentType != null)
+				{
+					this._currentTypeName = this._currentString;
+				}
+				else if (this._currentSchema != null)
+				{
+					this._currentSchema.setName(this._currentString);
+				}
+				this._currentString = null;
+				break;
 
-			// TODO: verify value type and name type
+			case VERSION:
+				if (this._currentSchema != null)
+				{
+					this._currentSchema.setVersion(this._currentString);
+				}
+				this._currentString = null;
+				break;
 
-			if (top instanceof IPropertyContainer)
-			{
-				IPropertyContainer container = (IPropertyContainer) top;
+			case DESCRIPTION:
+				if (this._currentProperty != null)
+				{
+					this._currentProperty.setDescription(this._currentString);
+				}
+				else if (this._currentType != null)
+				{
+					this._currentType.setDescription(this._currentString);
+				}
+				else if (this._currentSchema != null)
+				{
+					this._currentSchema.setDescription(this._currentString);
+				}
+				this._currentString = null;
+				break;
 
-				container.setProperty(propertyName, propertyTypeName, value);
-			}
-			else
-			{
-				// TODO: warn?
-			}
+			case RESULT:
+				if (this._currentSchema != null)
+				{
+					this._currentSchema.setResult(this._currentString);
+				}
+				this._currentString = null;
+				break;
+
+			case TYPE:
+				if (this._currentProperty != null)
+				{
+					this._currentProperty.setTypeName(this._currentString);
+				}
+				this._currentString = null;
+				break;
+
+			case EXAMPLE:
+				if (this._currentProperty != null)
+				{
+					this._currentProperty.setExample(this._currentString);
+				}
+				this._currentString = null;
+				break;
+
+			case OPTIONAL:
+				if (this._currentProperty != null)
+				{
+					this._currentProperty.setOptional(this._currentBoolean);
+				}
+				this._currentBoolean = null;
+				break;
+
+			case TYPES:
+			case PROPERTIES:
+				// implicitly handled in addElement
+				break;
+
+			default:
+				// warn
 		}
 	}
 }

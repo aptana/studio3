@@ -7,9 +7,13 @@
  */
 package com.aptana.json;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.aptana.core.util.SourcePrinter;
 
 /**
  * Schema
@@ -100,6 +104,16 @@ public class Schema implements IState, IPropertyContainer
 	public SchemaObject createObject()
 	{
 		return new SchemaObject(this);
+	}
+
+	/**
+	 * createProperty
+	 * 
+	 * @return
+	 */
+	public SchemaProperty createProperty()
+	{
+		return new SchemaProperty(this);
 	}
 
 	/**
@@ -590,6 +604,50 @@ public class Schema implements IState, IPropertyContainer
 	public void setVersion(String version)
 	{
 		this._version = version;
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @return
+	 */
+	public String toSource()
+	{
+		SourcePrinter writer = new SourcePrinter();
+
+		this.toSource(writer);
+
+		return writer.toString();
+	}
+
+	/**
+	 * toSource
+	 * 
+	 * @param writer
+	 */
+	public void toSource(SourcePrinter writer)
+	{
+		writer.printWithIndent("schema ").print("\"").print(this.getName()).println("\"").increaseIndent(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		writer.printWithIndent("version := ").println(this._version); //$NON-NLS-1$
+		writer.printWithIndent("result  := ").println(this._rootTypeName); //$NON-NLS-1$
+
+		List<String> typeNames = new ArrayList<String>(this._typesByName.keySet());
+		Collections.sort(typeNames);
+
+		for (String typeName : typeNames)
+		{
+			writer.printWithIndent("type ").println(typeName).increaseIndent(); //$NON-NLS-1$
+
+			SchemaObject type = (SchemaObject) this._typesByName.get(typeName);
+			type.toSource(writer);
+
+			writer.decreaseIndent();
+			writer.printlnWithIndent("end type"); //$NON-NLS-1$
+		}
+
+		writer.decreaseIndent();
+		writer.printlnWithIndent("end schema"); //$NON-NLS-1$
 	}
 
 	/*
