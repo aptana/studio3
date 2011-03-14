@@ -310,6 +310,7 @@ public class CloneJob extends Job
 	private boolean createExistingProject(final File existingDotProjectFile, IProgressMonitor monitor)
 			throws CoreException
 	{
+		SubMonitor sub = SubMonitor.convert(monitor, 100);
 		try
 		{
 			ProjectRecord record = new ProjectRecord(existingDotProjectFile);
@@ -321,7 +322,7 @@ public class CloneJob extends Job
 			{
 				// error case
 				record.description = workspace.newProjectDescription(projectName);
-				IPath locationPath = new Path(record.projectSystemFile.getAbsolutePath());
+				IPath locationPath = new Path(record.projectSystemFile.getParent());
 
 				// If it is under the root use the default location
 				if (Platform.getLocation().isPrefixOf(locationPath))
@@ -337,16 +338,19 @@ public class CloneJob extends Job
 			{
 				record.description.setName(projectName);
 			}
+			sub.worked(5);
 
-			doCreateProject(project, record.description, new SubProgressMonitor(monitor, 80));
+			doCreateProject(project, record.description, sub.newChild(75));
 
 			ConnectProviderOperation connectProviderOperation = new ConnectProviderOperation(project);
-			connectProviderOperation.run(new SubProgressMonitor(monitor, 20));
+			connectProviderOperation.run(sub.newChild(20));
 		}
 		finally
 		{
-			if (monitor != null)
-				monitor.done();
+			if (sub != null)
+			{
+				sub.done();
+			}
 		}
 		return true;
 	}
@@ -411,7 +415,8 @@ public class CloneJob extends Job
 				}
 				catch (CoreException e)
 				{
-					// couldn't get project name
+					// couldn't get project name, use parent directory name
+					projectName = projectSystemFile.getParentFile().getName();
 				}
 			}
 		}
