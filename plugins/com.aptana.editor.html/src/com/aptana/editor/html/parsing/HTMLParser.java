@@ -365,7 +365,10 @@ public class HTMLParser implements IParser
 		{
 			language = IJSParserConstants.LANGUAGE;
 		}
-		processLanguage(language, HTMLTokens.STYLE_END);
+		if (language != null)
+		{
+			processLanguage(language, HTMLTokens.STYLE_END);
+		}
 	}
 
 	private void processScriptTag() throws IOException, Exception
@@ -377,7 +380,10 @@ public class HTMLParser implements IParser
 		{
 			language = IJSParserConstants.LANGUAGE;
 		}
-		processLanguage(language, HTMLTokens.SCRIPT_END);
+		if (language != null)
+		{
+			processLanguage(language, HTMLTokens.SCRIPT_END);
+		}
 	}
 
 	private void parseAttribute(HTMLElementNode element, Symbol tagSymbol)
