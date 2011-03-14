@@ -1,6 +1,6 @@
 {
-	"name": "JS Schema",
-	"version": "http://www.appcelerator/studio/content-assist/1.0",
+	"name": "JSCA Schema",
+	"version": "http://www.appcelerator.com/studio/content-assist/json/1.0",
 	"description": "A JSON schema describing the structure of JS Metadata used in Aptana Studio for content assist",
 	"result": "JSMetadata",
 	"types": [
@@ -39,13 +39,13 @@
 				{
 					"name": "description",
 					"type": "String",
-					"desciption": "A description of the alias",
+					"description": "A description of the alias",
 					"optional": true
 				},
 				{
 					"name": "type",
 					"type": "String",
-					"desciption": "The name of the type the alias references"
+					"description": "The name of the type the alias references"
 				}
 			]
 		},
@@ -110,6 +110,12 @@
 					"name": "remarks",
 					"type": "Array<String>",
 					"description": "A list of remarks used to further clarify the use of the type",
+					"optional": true
+				},
+				{
+					"name": "examples",
+					"type": "Array<Example>",
+					"description": "A list of examples used to demonstrate this type in use",
 					"optional": true
 				}
 			]
@@ -328,7 +334,7 @@
 				},
 				{
 					"name": "properties",
-					"type": "List<EventProperty>",
+					"type": "Array<EventProperty>",
 					"description": "A list of properties describing this event"
 				}
 			]
