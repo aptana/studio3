@@ -167,8 +167,6 @@ public class CloneJob extends Job
 			if (existingProjects.isEmpty())
 			{
 				// No projects found. Turn the root of the repo into a project!
-				// FIXME what if there is no .project file?
-
 				createExistingProject(new File(dest, IProjectDescription.DESCRIPTION_FILE_NAME),
 						subMonitor.newChild(75));
 			}
