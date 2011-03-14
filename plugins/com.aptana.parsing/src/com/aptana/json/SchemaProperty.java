@@ -16,8 +16,19 @@ public class SchemaProperty
 	private String _name;
 	private String _typeName;
 	private String _description;
+	private String _example;
 	private boolean _optional;
 	private Object _value;
+
+	/**
+	 * SchemaProperty
+	 * 
+	 * @param owningSchema
+	 */
+	SchemaProperty(Schema owningSchema)
+	{
+		this(owningSchema, null, null);
+	}
 
 	/**
 	 * SchemaProperty
@@ -40,6 +51,14 @@ public class SchemaProperty
 	public String getDescription()
 	{
 		return this._description;
+	}
+
+	/**
+	 * @return the example
+	 */
+	public String getExample()
+	{
+		return this._example;
 	}
 
 	/**
@@ -112,6 +131,25 @@ public class SchemaProperty
 	}
 
 	/**
+	 * @param example
+	 *            the example to set
+	 */
+	public void setExample(String example)
+	{
+		this._example = example;
+	}
+
+	/**
+	 * setName
+	 * 
+	 * @param name
+	 */
+	public void setName(String name)
+	{
+		this._name = name;
+	}
+
+	/**
 	 * setOptional
 	 * 
 	 * @param optional
@@ -120,6 +158,16 @@ public class SchemaProperty
 	public void setOptional(boolean optional)
 	{
 		this._optional = optional;
+	}
+
+	/**
+	 * setTypeName
+	 * 
+	 * @param typeName
+	 */
+	public void setTypeName(String typeName)
+	{
+		this._typeName = typeName;
 	}
 
 	/**
