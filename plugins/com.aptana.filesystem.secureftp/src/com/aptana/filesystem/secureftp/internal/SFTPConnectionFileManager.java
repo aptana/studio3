@@ -556,7 +556,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	 * @see com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager#createFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
@@ -564,12 +564,14 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.put(new ByteArrayInputStream(new byte[] {}), path.lastSegment());
 			} catch (FTPException e) {
-			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_CreateFile0Failed, path.toPortableString()), e));
+				throwWrappedException(e, path);
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
+			throw e;
+		} catch (PermissionDeniedException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID,
@@ -591,7 +593,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.delete(path.lastSegment());
 			} catch (FTPException e) {
-			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDeleteFile + path.toString(), e));
+				throwWrappedException(e, path);
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
@@ -739,7 +741,11 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			try {
+				ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			} catch (FTPException e) {
+				throwWrappedException(e, path);
+			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
@@ -763,6 +769,8 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				int gid = Integer.parseInt(group);
 				ftpClient.changeGroup(gid, path.lastSegment());
+			} catch (FTPException e) {
+				throwWrappedException(e, path);
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException(Messages.SFTPConnectionFileManager_InvalidGroup);
 			}
