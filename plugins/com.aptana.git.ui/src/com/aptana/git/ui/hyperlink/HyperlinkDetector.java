@@ -75,9 +75,13 @@ public class HyperlinkDetector implements IHyperlinkDetector
 					filepath = renameMatcher.group(1) + renameMatcher.group(3) + renameMatcher.group(4);
 				}
 			}
-			int start = m.start(groupNum);
-			int length = m.end(groupNum) - start;
-			return new IHyperlink[] { new GitHyperlink(new Region(start, length), filepath) };
+
+			if (filepath != null && !filepath.startsWith("..")) //$NON-NLS-1$
+			{
+				int start = m.start(groupNum);
+				int length = m.end(groupNum) - start;
+				return new IHyperlink[] { new GitHyperlink(new Region(start, length), filepath) };
+			}
 		}
 		return NO_HYPERLINKS;
 	}

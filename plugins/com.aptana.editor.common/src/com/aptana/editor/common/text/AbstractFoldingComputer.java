@@ -22,7 +22,7 @@ import com.aptana.parsing.ast.ParseRootNode;
  * 
  * @author cwilliams
  */
-public abstract class AbstractFoldingComputer
+public abstract class AbstractFoldingComputer implements IFoldingComputer
 {
 
 	private IDocument fDocument;

@@ -26,6 +26,8 @@ public class Messages extends NLS
 	public static String GitProjectView_PushChangesTooltipMessage;
 
 	public static String SingleProjectView_OpenBrowserItem;
+
+	public static String SingleProjectView_OpenProjectButton;
 	public static String SingleProjectView_OpenSSHSubmenuLabel;
 	public static String SingleProjectView_RecipesSubmenuLabel;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;
@@ -34,6 +36,8 @@ public class Messages extends NLS
 	public static String SingleProjectView_DatabaseSubmenuLabel;
 	public static String SingleProjectView_MaintenanceSubmenuLabel;
 	public static String SingleProjectView_RemoteSubmenuLabel;
+	public static String SingleProjectView_ClosedProjectSelectedLabel;
+
 	public static String SingleProjectView_ConfigVarsSubmenuLabel;
 	public static String SingleProjectView_CreateProjectButtonLabel;
 	public static String SingleProjectView_ImportProjectButtonLabel;
