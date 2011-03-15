@@ -389,8 +389,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 							// align to minutes
 							serverTimeZoneShift = (lastModifiedLocalTZ.getTime() - lastModifiedLocalTZ.getTime() % 60000) - (lastModifiedServerInLocalTZ.getTime() - lastModifiedServerInLocalTZ.getTime() % 60000);
 							Calendar calendar = (Calendar) Calendar.getInstance().clone();
-							calendar.setTime(lastModifiedLocalTZ);
-							serverTimeZoneShift -= calendar.get(Calendar.DST_OFFSET);
+							calendar.setTime(new Date());
+							serverTimeZoneShift += calendar.get(Calendar.DST_OFFSET);
 						}
 					}
 					if (serverTimeZoneShift == Integer.MIN_VALUE) {
