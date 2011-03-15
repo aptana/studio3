@@ -31,7 +31,7 @@ public class JSONArray extends ArrayList implements List, JSONAware, JSONStreamA
      */
 	public static void writeJSONString(List list, Writer out) throws IOException{
 		if(list == null){
-			out.write("null");
+			out.write("null"); //$NON-NLS-1$
 			return;
 		}
 		
@@ -47,7 +47,7 @@ public class JSONArray extends ArrayList implements List, JSONAware, JSONStreamA
             
 			Object value=iter.next();
 			if(value == null){
-				out.write("null");
+				out.write("null"); //$NON-NLS-1$
 				continue;
 			}
 			
@@ -71,7 +71,7 @@ public class JSONArray extends ArrayList implements List, JSONAware, JSONStreamA
 	 */
 	public static String toJSONString(List list){
 		if(list == null)
-			return "null";
+			return "null"; //$NON-NLS-1$
 		
         boolean first = true;
         StringBuffer sb = new StringBuffer();
@@ -86,7 +86,7 @@ public class JSONArray extends ArrayList implements List, JSONAware, JSONStreamA
             
 			Object value=iter.next();
 			if(value == null){
-				sb.append("null");
+				sb.append("null"); //$NON-NLS-1$
 				continue;
 			}
 			sb.append(JSONValue.toJSONString(value));

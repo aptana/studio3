@@ -32,11 +32,11 @@ public class Messages extends NLS
 	public static String CommitDialog_EnterMessage_Error;
 	public static String CommitDialog_MessageLabel;
 	public static String CommitDialog_PathColumnLabel;
-
 	public static String CommitDialog_RevertLabel;
 	public static String CommitDialog_StageFilesFirst_Error;
 	public static String CommitDialog_StageSelected;
 	public static String CommitDialog_StageSelectedMarker;
+	public static String DisconnectHandler_Job_Title;
 	public static String DisconnectProviderOperation_DisconnectJob_Title;
 	public static String PullAction_RefreshJob_Title;
 	public static String RevertAction_Label;
@@ -45,10 +45,9 @@ public class Messages extends NLS
 	public static String DeleteBranchAction_BranchDelete_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Msg;
 	public static String DeleteBranchAction_BranchDeletionFailed_Title;
-
 	public static String DeleteBranchHandler_JobName;
-
 	public static String GithubNetworkHandler_ViewName;
+
 	static
 	{
 		// initialize resource bundle

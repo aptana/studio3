@@ -161,7 +161,7 @@ public class HttpFileStore extends FileStore
 		if (!cached.getParentFile().mkdirs())
 		{
 			throw new CoreException(new Status(IStatus.ERROR, HttpFilesystemPlugin.PLUGIN_ID, EFS.ERROR_INTERNAL,
-					"Unable to create directory structure for local cached copy", null));
+					"Unable to create directory structure for local cached copy", null)); //$NON-NLS-1$
 		}
 
 		// Download to some filename we can associate and pull back up based on URL! (used above)

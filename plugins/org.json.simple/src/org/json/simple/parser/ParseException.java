@@ -68,6 +68,7 @@ public class ParseException extends Exception {
 		this.unexpectedObject = unexpectedObject;
 	}
 	
+	@SuppressWarnings("nls")
 	public String toString(){
 		StringBuffer sb = new StringBuffer();
 		

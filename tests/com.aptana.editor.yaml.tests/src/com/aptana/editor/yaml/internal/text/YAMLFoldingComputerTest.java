@@ -35,7 +35,7 @@ public class YAMLFoldingComputerTest extends TestCase
 
 	public void testBasicYAMLFolding() throws Exception
 	{
-		String src = "development:\n  adapter: mysql\n\ntest:\n  adapter: sqlite3\n";
+		String src = "development:\n  adapter: mysql\n\ntest:\n  adapter: sqlite3\n"; //$NON-NLS-1$
 		folder = new YAMLFoldingComputer(null, new Document(src))
 		{
 			protected IParseNode getAST()

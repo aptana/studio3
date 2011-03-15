@@ -73,7 +73,7 @@ public class ProjectTemplateElement extends AbstractBundleElement
 	 */
 	public String getElementName()
 	{
-		return "project_template";
+		return "project_template"; //$NON-NLS-1$
 	}
 
 	/**
@@ -112,12 +112,12 @@ public class ProjectTemplateElement extends AbstractBundleElement
 	protected void printBody(SourcePrinter printer)
 	{
 		printer.printWithIndent("path: ").println(this.getPath()); //$NON-NLS-1$
-		printer.printWithIndent("name: ").println(this.getDisplayName());
-		printer.printWithIndent("location: ").println(this.getLocation());
+		printer.printWithIndent("name: ").println(this.getDisplayName()); //$NON-NLS-1$
+		printer.printWithIndent("location: ").println(this.getLocation()); //$NON-NLS-1$
 
 		if (this.getDescription() != null)
 		{
-			printer.printWithIndent("description: ").println(this.getDescription());
+			printer.printWithIndent("description: ").println(this.getDescription()); //$NON-NLS-1$
 		}
 	}
 

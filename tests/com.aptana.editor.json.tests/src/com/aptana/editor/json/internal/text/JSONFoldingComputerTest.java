@@ -21,6 +21,7 @@ import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
 import com.aptana.parsing.ast.IParseNode;
 
+@SuppressWarnings("nls")
 public class JSONFoldingComputerTest extends TestCase
 {
 

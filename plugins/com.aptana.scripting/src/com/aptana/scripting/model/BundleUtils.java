@@ -60,7 +60,7 @@ public class BundleUtils
 
 			try
 			{
-				fr = new InputStreamReader(new FileInputStream(bundleFile), "UTF-8");
+				fr = new InputStreamReader(new FileInputStream(bundleFile), "UTF-8"); //$NON-NLS-1$
 				reader = new BufferedReader(fr);
 				String line;
 

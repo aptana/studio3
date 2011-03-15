@@ -21,5 +21,5 @@ public interface IPreferenceConstants
 	 * The value is a string where each character in the string will be used as an auto-activation character in
 	 * CSSContentAssistProcessor
 	 */
-	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS";
+	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
 }

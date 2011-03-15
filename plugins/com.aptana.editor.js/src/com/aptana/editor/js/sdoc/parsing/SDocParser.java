@@ -10,7 +10,7 @@ import beaver.*;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "SDoc.grammar".
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "nls" })
 public class SDocParser extends Parser {
 	static public class AltGoals {
 		static public final short Types = 42;

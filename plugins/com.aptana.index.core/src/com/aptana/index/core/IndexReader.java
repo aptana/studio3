@@ -139,7 +139,7 @@ public abstract class IndexReader
 			catch (Throwable t)
 			{
 				String message = MessageFormat.format( //
-					"An error occurred while processing the following JSON string\n{0}", //
+					"An error occurred while processing the following JSON string\n{0}", // //$NON-NLS-1$
 					value //
 					);
 

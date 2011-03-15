@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  */
 public final class VersionUtil
 {
-	private static Pattern versionPattern = Pattern.compile("\\.");
+	private static Pattern versionPattern = Pattern.compile("\\."); //$NON-NLS-1$
 
 	/**
 	 * 
@@ -35,8 +35,8 @@ public final class VersionUtil
 	public static int compareVersions(String left, String right)
 	{
 		int result;
-		String[] lparts = versionPattern.split(left); //$NON-NLS-1$
-		String[] rparts = versionPattern.split(right); //$NON-NLS-1$
+		String[] lparts = versionPattern.split(left);
+		String[] rparts = versionPattern.split(right);
 		for (int i = 0; i < lparts.length && i < rparts.length; ++i)
 		{
 			try

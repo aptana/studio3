@@ -46,7 +46,7 @@ public class RebuildHandler extends AbstractHandler
 	{
 		for (final IProject p : this._projects)
 		{
-			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName()))
+			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName())) //$NON-NLS-1$
 			{
 				@Override
 				protected IStatus run(IProgressMonitor monitor)

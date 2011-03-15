@@ -180,12 +180,12 @@ public class CSSRuleNode extends CSSNode
 
 			if (combinator != null && combinator.length() > 0)
 			{
-				if (",".equals(combinator) == false)
+				if (",".equals(combinator) == false) //$NON-NLS-1$
 				{
-					text.append(" ");
+					text.append(" "); //$NON-NLS-1$
 				}
 
-				text.append(combinator).append(" ");
+				text.append(combinator).append(" "); //$NON-NLS-1$
 			}
 		}
 

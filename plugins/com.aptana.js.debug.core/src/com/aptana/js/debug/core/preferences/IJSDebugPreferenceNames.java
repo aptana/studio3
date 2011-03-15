@@ -45,6 +45,6 @@ public interface IJSDebugPreferenceNames {
 	 * list of fully qualified type names, the associated code snippet and an
 	 * 'enabled' flag.
 	 */
-	String PREF_DETAIL_FORMATTERS_LIST = PREFIX + IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST; //$NON-NLS-1$
+	String PREF_DETAIL_FORMATTERS_LIST = PREFIX + IDebugCorePreferenceNames.SUFFIX_DETAIL_FORMATTERS_LIST;
 
 }

@@ -35,7 +35,7 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		store.putBoolean(XMLFormatterConstants.WRAP_COMMENTS, false);
 		store.putInt(XMLFormatterConstants.WRAP_COMMENTS_LENGTH, 80);
 		// No excluded tags by default
-		store.put(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, StringUtil.EMPTY); //$NON-NLS-1$
+		store.put(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, StringUtil.EMPTY);
 		store.put(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, StringUtil.EMPTY);
 		store.putInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
 		store.putInt(XMLFormatterConstants.LINES_AFTER_NON_XML_ELEMENTS, 1);

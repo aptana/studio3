@@ -34,7 +34,7 @@ public class FTPLargeSampleSyncingTests extends LargeSampleSyncingTests
 		ftpcp.setLogin(getConfig().getProperty("ftp.username", "ftpuser")); //$NON-NLS-1$ //$NON-NLS-2$
 		ftpcp.setPassword(getConfig().getProperty("ftp.password",	//$NON-NLS-1$
 				String.valueOf(new char[] { 'l', 'e', 't', 'm', 'e', 'i', 'n'})).toCharArray());
-		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path", "/home/ftpuser"))); 
+		ftpcp.setPath(new Path(getConfig().getProperty("ftp.path", "/home/ftpuser")));  //$NON-NLS-1$ //$NON-NLS-2$
 		serverManager = ftpcp;
 
 		super.setUp();		

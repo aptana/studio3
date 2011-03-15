@@ -165,7 +165,7 @@ public class IndexFilterManager
 		// update project indexes that were affected by our changes
 		for (final IProject p : projects)
 		{
-			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName()))
+			Job job = new Job(MessageFormat.format("Rebuilding {0}", p.getName())) //$NON-NLS-1$
 			{
 				@Override
 				protected IStatus run(IProgressMonitor monitor)

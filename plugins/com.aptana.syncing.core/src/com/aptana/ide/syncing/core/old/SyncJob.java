@@ -119,7 +119,7 @@ public class SyncJob extends Job implements ISyncEventHandler
 	public SyncJob(Synchronizer syncer, List<VirtualFileSyncPair> pairs, int direction, boolean deleteRemote,
 			boolean deleteLocal, Client client, String name)
 	{
-		super(MessageFormat.format("Synchronizing {0}", name));
+		super(MessageFormat.format("Synchronizing {0}", name)); //$NON-NLS-1$
 		fSyncer = syncer;
 		fPairs = pairs;
 		fDirection = direction;

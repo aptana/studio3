@@ -35,7 +35,7 @@ class GitRevision extends Revision
 	@Override
 	public Object getHoverInfo()
 	{
-		return MessageFormat.format("{0}<br />Author: {1}, Committer: {2}", this.summary, this.author, this.committer);
+		return MessageFormat.format("{0}<br />Author: {1}, Committer: {2}", this.summary, this.author, this.committer); //$NON-NLS-1$
 	}
 
 	@Override

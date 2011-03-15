@@ -52,7 +52,7 @@ public class OpenURLAction implements IWorkbenchWindowActionDelegate {
 	 */
 	public void run(IAction action) {
 		InputURLDialog dlg = new InputURLDialog(fWindow.getShell(), Messages.OpenURLAction_Open_URL,
-				Messages.OpenURLAction_Specify_URL_To_Open, "http://"); //$NON-NLS-3$ //$NON-NLS-1$ //$NON-NLS-1$
+				Messages.OpenURLAction_Specify_URL_To_Open, "http://"); //$NON-NLS-1$
 		if (dlg.open() == Window.OK) {
 			SourceDisplayUtil.displaySource(JSDebugModel.createSourceLink(URI.create(dlg.getValue())), fWindow.getActivePage(),
 					true);

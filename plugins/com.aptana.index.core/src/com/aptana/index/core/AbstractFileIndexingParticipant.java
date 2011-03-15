@@ -125,7 +125,7 @@ public abstract class AbstractFileIndexingParticipant implements IFileStoreIndex
 	 */
 	protected String getIndexingMessage(Index index, IFileStore file)
 	{
-		return MessageFormat.format("Indexing {0}", index.getRelativeDocumentPath(file.toURI()).toString());
+		return MessageFormat.format("Indexing {0}", index.getRelativeDocumentPath(file.toURI()).toString()); //$NON-NLS-1$
 	}
 
 }
