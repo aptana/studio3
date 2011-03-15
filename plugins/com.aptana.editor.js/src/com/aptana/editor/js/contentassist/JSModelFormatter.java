@@ -258,10 +258,16 @@ public class JSModelFormatter
 			// line 2..n: one line for each argument description
 			for (ParameterElement parameter : function.getParameters())
 			{
-				buffer.setLength(0);
+				String description = parameter.getDescription();
 
-				buffer.append(BULLET).append("\t").append(parameter.getName()).append(":\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				buffer.append(" \t").append(parameter.getDescription()); //$NON-NLS-1$
+				buffer.setLength(0);
+				buffer.append(" ").append(BULLET).append("\t").append(parameter.getName()); //$NON-NLS-1$ //$NON-NLS-2$
+
+				if (StringUtil.isEmpty(description) == false)
+				{
+					buffer.append(":\n").append(" \t").append(description); //$NON-NLS-1$
+				}
+
 				result.add(buffer.toString());
 			}
 		}
