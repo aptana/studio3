@@ -91,8 +91,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	};
 
 	static final Image ELEMENT_ICON = HTMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
+	static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+	static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 	private static final Map<String, String> DOCTYPES;
 
@@ -168,7 +168,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (element != null)
 		{
-			int length = 2;
 			String postfix = "=\"\""; //$NON-NLS-1$
 			switch (this._currentLexeme.getType())
 			{
@@ -179,7 +178,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 
@@ -193,45 +191,52 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (nextlexeme != null && nextlexeme.getType() == HTMLTokenType.EQUAL)
 					{
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 			}
 
+			int replaceLength = 0;
+			if (this._replaceRange != null)
+			{
+				offset = this._replaceRange.getStartingOffset();
+				replaceLength = this._replaceRange.getLength();
+			}
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
 				String name = attribute.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					ATTRIBUTE_ICON, //
-					attribute.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLAttributeProposal p = new HTMLAttributeProposal(attribute, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 
 			for (EventElement event : this._queryHelper.getEvents(element))
 			{
 				String name = event.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					EVENT_ICON, //
-					event.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLEventProposal p = new HTMLEventProposal(event, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 		}
@@ -383,12 +388,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				IURIMapper serverConfiguration = ProjectPreviewUtil
-						.getServerConfiguration(getProject());
+				IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (IURIMapper server : WebServerCorePlugin.getDefault()
-							.getServerConfigurationManager().getServerConfigurations())
+					for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
+							.getServerConfigurations())
 					{
 						if (server.resolve(editorStore) != null)
 						{
@@ -1299,9 +1303,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									else
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
-										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
-										
-										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
+										String src = document.get(previousPartition.getOffset(),
+												previousPartition.getLength()).trim();
+
+										if (src.length() == 0 || src.charAt(src.length() - 1) == '>'
+												|| (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
 										}
