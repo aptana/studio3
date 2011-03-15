@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.syncing.core.internal;
+package com.aptana.ide.core.io.efs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,9 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
  * @author Max Stepanov
@@ -44,8 +45,9 @@ public final class SyncUtils {
 	 * 3. it does not delete destination file on failure
 	 *   (FTP implementation always uploads to a temporary file first and always cleans up afterwards)
 	 * 4. it does not ignore exceptions on output stream close (FTP implementation finalizes transfer on close)
-	 * 5. it always works as it EFS.SHALLOW would be set
-	 * 6. EFS implementation prevent concurrent copying of FileStores due static synchronized buffer (see org.eclipse.core.filesystem.provider.FileStore.transferStreams)
+	 * 5. it ignores permission exceptions on transferring attributes
+	 * 6. it always works as it EFS.SHALLOW would be set
+	 * 7. EFS implementation prevent concurrent copying of FileStores due static synchronized buffer (see org.eclipse.core.filesystem.provider.FileStore.transferStreams)
 	 * 
 	 * @param source
 	 * @param sourceInfo
@@ -103,8 +105,15 @@ public final class SyncUtils {
 					safeClose(out);
 				}
 			}
-			destination.putInfo(sourceInfo, EFS.SET_ATTRIBUTES | EFS.SET_LAST_MODIFIED | options, subMonitorFor(
-					monitor, 1));
+			try {
+				destination.putInfo(sourceInfo, EFS.SET_ATTRIBUTES | EFS.SET_LAST_MODIFIED | options,
+						subMonitorFor(monitor, 1));
+			} catch (CoreException e) {
+				// happens when ftp user is not an owner of the file, but still has read/write permissions
+				if (!(e.getCause() instanceof PermissionDeniedException)) {
+					throw e;
+				}
+			}
 		} finally {
 			monitor.done();
 		}
@@ -126,7 +135,7 @@ public final class SyncUtils {
 	}
 
 	private static void error(String message, Exception e) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, message, e));
+		throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, message, e));
 	}
 
 	private static void safeClose(InputStream in) {
@@ -144,7 +153,7 @@ public final class SyncUtils {
 				out.close();
 			}
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, Messages.SyncUtils_ERR_FailToClose, e));
+			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, Messages.SyncUtils_ERR_FailToClose, e));
 		}
 	}
 

@@ -14,6 +14,7 @@ import org.eclipse.jface.text.rules.Token;
 
 import com.aptana.editor.common.tests.AbstractTokenScannerTestCase;
 
+@SuppressWarnings("nls")
 public class YAMLCodeScannerTest extends AbstractTokenScannerTestCase
 {
 	@Override

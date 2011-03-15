@@ -7,6 +7,7 @@ package org.json.simple.parser;
 /**
  * @author FangYidong<fangyidong@yahoo.com.cn>
  */
+@SuppressWarnings("nls")
 public class Yytoken {
 	public static final int TYPE_VALUE=0;//JSON primitive value: string,number,boolean,null
 	public static final int TYPE_LEFT_BRACE=1;

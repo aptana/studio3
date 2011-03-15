@@ -104,15 +104,15 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 						((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
 					}
 				} catch (FTPException e) {
-					if (e.getReplyCode() == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
-						throw new IOException(new PermissionDeniedException(filename, e));
-					} else {
+					if (e.getReplyCode() != SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
 						throw e;
 					}
 				}
 			} catch (FTPException e) {
 				safeClose(true);
-				throw new IOException(e); 
+				IOException io = new IOException();
+				io.initCause(e);
+				throw io; 
 			}
 		} finally {
 			safeClose(false);

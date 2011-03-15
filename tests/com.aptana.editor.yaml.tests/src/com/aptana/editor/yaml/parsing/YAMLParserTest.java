@@ -23,7 +23,7 @@ public class YAMLParserTest extends TestCase
 	public void testParseSimpleYAML() throws Exception
 	{
 		YAMLParser parser = new YAMLParser();
-		String src = "development:\n  adapter: mysql\n  pool: 5\n  timeout: 5000\n\ntest:\n  adapter: sqlite3\n\n";
+		String src = "development:\n  adapter: mysql\n  pool: 5\n  timeout: 5000\n\ntest:\n  adapter: sqlite3\n\n"; //$NON-NLS-1$
 		IParseState parseState = new ParseState();
 		parseState.setEditState(src, null, 0, 0);
 		IParseRootNode rootNode = parser.parse(parseState);

@@ -27,13 +27,14 @@ import junit.framework.TestCase;
  * 
  */
 public class LocalWebServerTest extends TestCase {
-	private static final String PAGE_CONTENTS = "<html><head><title>Test</title></head><body><h1>Test Page</h1></body>";
+
+	private static final String PAGE_CONTENTS = "<html><head><title>Test</title></head><body><h1>Test Page</h1></body>"; //$NON-NLS-1$
 
 	public void testBasicGet() throws IOException, CoreException {
-		File dir = File.createTempFile(getClass().getSimpleName(), "temp");
+		File dir = File.createTempFile(getClass().getSimpleName(), "temp"); //$NON-NLS-1$
 		assertTrue(dir.delete());
 		assertTrue(dir.mkdir());
-		File file = new File(dir, "index.html");
+		File file = new File(dir, "index.html"); //$NON-NLS-1$
 		assertTrue(file.createNewFile());
 		OutputStreamWriter w = new OutputStreamWriter(new FileOutputStream(file));
 		w.write(PAGE_CONTENTS);

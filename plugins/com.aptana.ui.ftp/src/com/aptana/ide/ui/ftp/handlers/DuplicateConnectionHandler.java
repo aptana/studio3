@@ -39,7 +39,7 @@ public class DuplicateConnectionHandler extends AbstractHandler
 				}
 				catch (CoreException e)
 				{
-					FTPUIPlugin.logError("Failed to duplicate the connection", e);
+					FTPUIPlugin.logError("Failed to duplicate the connection", e); //$NON-NLS-1$
 				}
 			}
 		}

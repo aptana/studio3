@@ -21,7 +21,7 @@ public class AllTests
 			@Override
 			public void runTest(Test test, TestResult result)
 			{
-				System.out.println("Running test: " + test.toString());
+				System.out.println("Running test: " + test.toString()); //$NON-NLS-1$
 				super.runTest(test, result);
 			}
 		};

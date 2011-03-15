@@ -860,7 +860,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			stepFilterMask = stepFilterMask & (FLAG_STEP_FILTERS_ENABLED ^ XOR_MASK);
 		}
 		try {
-			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled())); //$NON-NLS-1$
+			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
 		} catch (DebugException e) {
 			JSDebugPlugin.log(e);
 		}
@@ -994,8 +994,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS);
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS);
 
-			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors())); //$NON-NLS-1$
-			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled())); //$NON-NLS-1$
+			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors()));
+			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
 			if (stepFilters != null && stepFilters.length > 0) {
 				StringBuffer sb = new StringBuffer(STEP_FILTERS);
 				for (int i = 0; i < stepFilters.length; ++i) {

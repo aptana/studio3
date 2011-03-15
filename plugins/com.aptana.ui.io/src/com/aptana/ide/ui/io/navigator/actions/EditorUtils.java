@@ -26,6 +26,8 @@ import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.ide.core.io.efs.SyncUtils;
+import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.internal.UniformFileStoreEditorInputFactory;
 import com.aptana.ui.util.UIUtils;
@@ -150,15 +152,20 @@ public class EditorUtils
 										return Status.CANCEL_STATUS;
 									}
 								}
-								localCacheFile.copy(originalFile, EFS.OVERWRITE, monitor);
-								// update cached remote file info
-								input.setFileInfo(originalFile.fetchInfo(EFS.NONE, monitor));
+								SyncUtils.copy(localCacheFile, null, originalFile, EFS.NONE, monitor);
 							}
 							catch (CoreException e)
 							{
 								UIUtils.showErrorMessage(
 										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
 												originalFile.getName()), e);
+							} finally {
+								// update cached remote file info
+								try {
+									input.setFileInfo(originalFile.fetchInfo(EFS.NONE, monitor));
+								} catch (CoreException e) {
+									IOUIPlugin.logError(e);
+								}
 							}
 							return Status.OK_STATUS;
 						}

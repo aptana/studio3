@@ -16,6 +16,7 @@ import junit.framework.TestCase;
 /**
  * JSONSchemaTransitionTests
  */
+@SuppressWarnings("nls")
 public class JSONSchemaTransitionTests extends TestCase
 {
 	private static class EventResult

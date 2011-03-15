@@ -178,7 +178,7 @@ public class EclipseUtil
 							name = path.removeFileExtension().lastSegment();
 							String ext = path.getFileExtension();
 							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-								if (!"app".equals(ext)) {
+								if (!"app".equals(ext)) { //$NON-NLS-1$
 									return false;
 								}
 							}

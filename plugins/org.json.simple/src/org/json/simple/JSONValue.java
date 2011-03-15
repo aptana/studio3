@@ -95,7 +95,7 @@ public class JSONValue {
      */
 	public static void writeJSONString(Object value, Writer out) throws IOException {
 		if(value == null){
-			out.write("null");
+			out.write("null"); //$NON-NLS-1$
 			return;
 		}
 		
@@ -108,7 +108,7 @@ public class JSONValue {
 		
 		if(value instanceof Double){
 			if(((Double)value).isInfinite() || ((Double)value).isNaN())
-				out.write("null");
+				out.write("null"); //$NON-NLS-1$
 			else
 				out.write(value.toString());
 			return;
@@ -116,7 +116,7 @@ public class JSONValue {
 		
 		if(value instanceof Float){
 			if(((Float)value).isInfinite() || ((Float)value).isNaN())
-				out.write("null");
+				out.write("null"); //$NON-NLS-1$
 			else
 				out.write(value.toString());
 			return;
@@ -171,21 +171,21 @@ public class JSONValue {
 	 */
 	public static String toJSONString(Object value){
 		if(value == null)
-			return "null";
+			return "null"; //$NON-NLS-1$
 		
 		if(value instanceof String)
-			return "\""+escape((String)value)+"\"";
+			return "\""+escape((String)value)+"\""; //$NON-NLS-1$ //$NON-NLS-2$
 		
 		if(value instanceof Double){
 			if(((Double)value).isInfinite() || ((Double)value).isNaN())
-				return "null";
+				return "null"; //$NON-NLS-1$
 			else
 				return value.toString();
 		}
 		
 		if(value instanceof Float){
 			if(((Float)value).isInfinite() || ((Float)value).isNaN())
-				return "null";
+				return "null"; //$NON-NLS-1$
 			else
 				return value.toString();
 		}		
@@ -230,34 +230,34 @@ public class JSONValue {
 			char ch=s.charAt(i);
 			switch(ch){
 			case '"':
-				sb.append("\\\"");
+				sb.append("\\\""); //$NON-NLS-1$
 				break;
 			case '\\':
-				sb.append("\\\\");
+				sb.append("\\\\"); //$NON-NLS-1$
 				break;
 			case '\b':
-				sb.append("\\b");
+				sb.append("\\b"); //$NON-NLS-1$
 				break;
 			case '\f':
-				sb.append("\\f");
+				sb.append("\\f"); //$NON-NLS-1$
 				break;
 			case '\n':
-				sb.append("\\n");
+				sb.append("\\n"); //$NON-NLS-1$
 				break;
 			case '\r':
-				sb.append("\\r");
+				sb.append("\\r"); //$NON-NLS-1$
 				break;
 			case '\t':
-				sb.append("\\t");
+				sb.append("\\t"); //$NON-NLS-1$
 				break;
 			case '/':
-				sb.append("\\/");
+				sb.append("\\/"); //$NON-NLS-1$
 				break;
 			default:
                 //Reference: http://www.unicode.org/versions/Unicode5.1.0/
 				if((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F' && ch<='\u009F') || (ch>='\u2000' && ch<='\u20FF')){
 					String ss=Integer.toHexString(ch);
-					sb.append("\\u");
+					sb.append("\\u"); //$NON-NLS-1$
 					for(int k=0;k<4-ss.length();k++){
 						sb.append('0');
 					}

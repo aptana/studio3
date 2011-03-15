@@ -5563,7 +5563,7 @@
                 </browsers>
             </property>
             
-            <property name="Math" type="Math" access="read-write" visibility="basic">
+            <property name="Math" type="Class&lt;Math&gt;" access="read-write" visibility="basic">
                 <references>
                     <reference name="Math"/>
                 </references>

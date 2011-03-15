@@ -658,7 +658,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		}
 		else
 		{
-			FindBarPlugin.log(new RuntimeException("Unhandled selection for widget: " + source));
+			FindBarPlugin.log(new RuntimeException("Unhandled selection for widget: " + source)); //$NON-NLS-1$
 		}
 	}
 
@@ -990,7 +990,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			if (isWholeWord && !isRegEx && isWord(searchText))
 			{
 				isRegEx = true;
-				searchText = "\\b" + searchText + "\\b";
+				searchText = "\\b" + searchText + "\\b"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			IStatusLineManager statusLineManager = (IStatusLineManager) textEditor.getAdapter(IStatusLineManager.class);

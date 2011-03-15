@@ -40,6 +40,7 @@ import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -315,6 +316,11 @@ public class IOUIPlugin extends AbstractUIPlugin
 	public static void logError(String msg, Exception e)
 	{
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
+	}
+
+	public static void logError(Exception e)
+	{
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
 	}
 
 	public static void logImportant(String msg, Exception e)

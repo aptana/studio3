@@ -22,7 +22,7 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
 public class JSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(

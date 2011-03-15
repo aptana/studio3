@@ -31,6 +31,7 @@ import com.aptana.parsing.ParsingPlugin;
 /**
  * JSONSchemaTests
  */
+@SuppressWarnings("nls")
 public class JSONSchemaTests extends TestCase
 {
 	/**

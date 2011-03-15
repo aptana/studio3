@@ -336,7 +336,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 			} else {
 				DebugPlugin.newProcess(launch, process, browserExecutable);
 			}
-		} else if (ILaunchManager.RUN_MODE.equals(mode)) { //$NON-NLS-1$
+		} else if (ILaunchManager.RUN_MODE.equals(mode)) {
 			try {
 				String launchPage = launchURL.toExternalForm();
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {

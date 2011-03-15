@@ -7,6 +7,8 @@
  */
 package com.aptana.editor.json;
 
+import java.text.MessageFormat;
+
 import junit.framework.TestCase;
 
 import org.eclipse.jface.text.Document;
@@ -44,7 +46,8 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 			expectedContentType = IDocument.DEFAULT_CONTENT_TYPE;
 		}
 
-		assertEquals("Content types do not match: " + c + "(" + offset + ")", expectedContentType, actualContentType);
+		assertEquals(
+				MessageFormat.format("Content types do not match: {0}({1})", c, offset), expectedContentType, actualContentType); //$NON-NLS-1$
 	}
 
 	/**
@@ -104,7 +107,7 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	 */
 	public void testDefaultPartition()
 	{
-		String source = "{ } [ ] , : true false null 10";
+		String source = "{ } [ ] , : true false null 10"; //$NON-NLS-1$
 
 		this.assertContentType(JSONSourceConfiguration.DEFAULT, source, 0, source.length() - 1);
 	}
@@ -114,18 +117,18 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	 */
 	public void testDoubleQuotedStringPartition()
 	{
-		String source = "\"hello\"";
+		String source = "\"hello\""; //$NON-NLS-1$
 
 		this.assertContentType(JSONSourceConfiguration.STRING_DOUBLE, source, 0, source.length() - 1);
 	}
-	
+
 	/**
 	 * testSingleQuotedStringPartition
 	 */
 	public void testSingleQuotedStringPartition()
 	{
-		String source = "'hello'";
-		
+		String source = "'hello'"; //$NON-NLS-1$
+
 		this.assertContentType(JSONSourceConfiguration.STRING_SINGLE, source, 0, source.length() - 1);
 	}
 
@@ -134,7 +137,7 @@ public class JSONSourcePartitionerScannerTest extends TestCase
 	 */
 	public void testPropertyPartition()
 	{
-		String source = "'hello':";
+		String source = "'hello':"; //$NON-NLS-1$
 
 		this.assertContentType(JSONSourceConfiguration.PROPERTY, source, 0, source.length() - 2);
 		this.assertContentType(JSONSourceConfiguration.DEFAULT, source, source.length() - 1);

@@ -2,7 +2,7 @@
 
 package org.json.simple.parser;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "nls" })
 class Yylex {
 
   /** This character denotes the end of file */

@@ -156,7 +156,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 				}
 				catch (TemplateException e1)
 				{
-					CommonEditorPlugin.logWarning(MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e1.getMessage()));
+					CommonEditorPlugin.logWarning(MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e1.getMessage())); //$NON-NLS-1$
 					fSelectedRegion = fRegion;
 					return;
 				}

@@ -35,9 +35,9 @@ import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.ide.core.io.efs.SyncUtils;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.SyncingPlugin;
-import com.aptana.syncing.core.internal.SyncUtils;
 
 /**
  * @author Kevin Lindsey
