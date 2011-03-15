@@ -287,9 +287,19 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			addNodes(node.getChildren());
 
 			int endNodeStartingOffset = endNode.getNameRange().getStartingOffset();
+			// In case one or more spaces exist left or right to the text, we have to maintain them in order to
+			// keep the HTML output the same. The browser will treat multiple spaces as one space, so we can trim down
+			// to one.
 			int textStartOffset = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endNodeStartingOffset - 1, document);
-
+			if (textStartOffset > 0 && document.charAt(textStartOffset - 1) == ' ')
+			{
+				textStartOffset--;
+			}
+			if (textEndOffset < document.getLength() - 1 && document.charAt(textEndOffset + 1) == ' ')
+			{
+				textEndOffset++;
+			}
 			// Create content node when the HTMLElementNode does not have any children
 			if (!node.hasChildren())
 			{

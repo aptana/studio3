@@ -502,11 +502,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected URI getURI()
 	{
-		IEditorInput editorInput = editor.getEditorInput();
-		if (editorInput instanceof IURIEditorInput)
+		if (editor != null)
 		{
-			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-			return fileEditorInput.getURI();
+			IEditorInput editorInput = editor.getEditorInput();
+			if (editorInput instanceof IURIEditorInput)
+			{
+				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+				return fileEditorInput.getURI();
+			}
 		}
 		return null;
 	}
