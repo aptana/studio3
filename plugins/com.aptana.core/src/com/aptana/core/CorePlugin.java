@@ -186,7 +186,10 @@ public class CorePlugin extends Plugin
 
 	public static void log(IStatus status)
 	{
-		getDefault().getLog().log(status);
+		if (status.getSeverity() > IStatus.INFO)
+		{
+			getDefault().getLog().log(status);
+		}
 	}
 
 	/**
@@ -207,7 +210,7 @@ public class CorePlugin extends Plugin
 	 */
 	public static void logInfo(String string)
 	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
 	}
 
 	/**
