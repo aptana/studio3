@@ -37,6 +37,7 @@ public class XMLFormatterPreferenceInitializer extends AbstractPreferenceInitial
 		// No excluded tags by default
 		store.put(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, StringUtil.EMPTY);
 		store.put(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, StringUtil.EMPTY);
+		store.putBoolean(XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES, true);
 		store.putInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, 0);
 		store.putInt(XMLFormatterConstants.LINES_AFTER_NON_XML_ELEMENTS, 1);
 		store.putInt(XMLFormatterConstants.LINES_BEFORE_NON_XML_ELEMENTS, 1);

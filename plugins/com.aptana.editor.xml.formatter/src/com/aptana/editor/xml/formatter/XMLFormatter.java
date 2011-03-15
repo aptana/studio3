@@ -147,9 +147,9 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -252,11 +252,13 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(XMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(XMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(XMLFormatterConstants.WRAP_COMMENTS, getBoolean(XMLFormatterConstants.WRAP_COMMENTS));
+		document.setBoolean(XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES,
+				getBoolean(XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES));
 		document.setInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS, getInt(XMLFormatterConstants.LINES_AFTER_ELEMENTS));
-		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-				IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
-				XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		document.setInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET, offset);
 
 		return document;

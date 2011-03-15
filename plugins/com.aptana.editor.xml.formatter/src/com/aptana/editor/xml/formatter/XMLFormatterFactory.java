@@ -33,11 +33,11 @@ public class XMLFormatterFactory extends AbstractScriptFormatterFactory
 
 	private static final String FORMATTER_PREVIEW_FILE = "formatterPreview.xml"; //$NON-NLS-1$
 
-	private static final String[] KEYS = {
-			XMLFormatterConstants.FORMATTER_INDENTATION_SIZE, XMLFormatterConstants.FORMATTER_TAB_CHAR,
-			XMLFormatterConstants.FORMATTER_TAB_SIZE, XMLFormatterConstants.WRAP_COMMENTS,
-			XMLFormatterConstants.WRAP_COMMENTS_LENGTH, XMLFormatterConstants.INDENT_EXCLUDED_TAGS,
-			XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, XMLFormatterConstants.LINES_AFTER_ELEMENTS,
+	private static final String[] KEYS = { XMLFormatterConstants.FORMATTER_INDENTATION_SIZE,
+			XMLFormatterConstants.FORMATTER_TAB_CHAR, XMLFormatterConstants.FORMATTER_TAB_SIZE,
+			XMLFormatterConstants.WRAP_COMMENTS, XMLFormatterConstants.WRAP_COMMENTS_LENGTH,
+			XMLFormatterConstants.INDENT_EXCLUDED_TAGS, XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+			XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES, XMLFormatterConstants.LINES_AFTER_ELEMENTS,
 			XMLFormatterConstants.LINES_AFTER_NON_XML_ELEMENTS, XMLFormatterConstants.LINES_BEFORE_NON_XML_ELEMENTS,
 			XMLFormatterConstants.PRESERVED_LINES };
 
