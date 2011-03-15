@@ -87,7 +87,7 @@ public final class FirefoxUtil {
 				if (!dir.isDirectory()) {
 					continue;
 				}
-				CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
+				// CorePlugin.log(MessageFormat.format("Check location {0} for default profile", location)); //$NON-NLS-1$
 
 				File[] profiles = readProfiles(dir);
 				if (profiles.length == 0) {
@@ -110,13 +110,13 @@ public final class FirefoxUtil {
 					}
 					sb.append(profiles[j].toString());
 				}
-				CorePlugin.log(MessageFormat.format("Profiles found: {0}", sb.toString())); //$NON-NLS-1$
+				// CorePlugin.log(MessageFormat.format("Profiles found: {0}", sb.toString())); //$NON-NLS-1$
 				// End of Debug output
 
 				for (int j = 0; j < profiles.length; ++j) {
 					File profile = profiles[j];
 					if (profile.isDirectory()) {
-						CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
+						// CorePlugin.log(MessageFormat.format("Default profile was found at {0}", profile.toString())); //$NON-NLS-1$
 						return Path.fromOSString(profile.getAbsolutePath());
 					}
 				}
