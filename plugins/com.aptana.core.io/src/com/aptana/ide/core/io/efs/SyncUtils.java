@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.syncing.core.internal;
+package com.aptana.ide.core.io.efs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
  * @author Max Stepanov
@@ -126,7 +126,7 @@ public final class SyncUtils {
 	}
 
 	private static void error(String message, Exception e) throws CoreException {
-		throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, message, e));
+		throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, message, e));
 	}
 
 	private static void safeClose(InputStream in) {
@@ -144,7 +144,7 @@ public final class SyncUtils {
 				out.close();
 			}
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID, Messages.SyncUtils_ERR_FailToClose, e));
+			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID, Messages.SyncUtils_ERR_FailToClose, e));
 		}
 	}
 

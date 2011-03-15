@@ -16,6 +16,10 @@ public class Messages extends NLS // NO_UCD
 
 	public static String VirtualFile_ListingDirectory; // NO_UCD
 	public static String VirtualFileSystem_ERR_FetchFileTree; // NO_UCD
+	public static String SyncUtils_Copying;
+	public static String SyncUtils_ERR_FailToClose;
+	public static String SyncUtils_ERR_Reading;
+	public static String SyncUtils_ERR_Writing;
 
 	static
 	{
