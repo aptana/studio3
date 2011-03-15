@@ -383,12 +383,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				IURIMapper serverConfiguration = ProjectPreviewUtil
-						.getServerConfiguration(getProject());
+				IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (IURIMapper server : WebServerCorePlugin.getDefault()
-							.getServerConfigurationManager().getServerConfigurations())
+					for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
+							.getServerConfigurations())
 					{
 						if (server.resolve(editorStore) != null)
 						{
