@@ -177,6 +177,22 @@ public class SWTUtils
 	}
 
 	/**
+	 * Makes a font italic.
+	 * 
+	 * @param font
+	 * @return italicized font data
+	 */
+	public static FontData[] italicizedFont(Font font)
+	{
+		FontData[] datas = font.getFontData();
+		for (FontData data : datas)
+		{
+			data.setStyle(data.getStyle() | SWT.ITALIC);
+		}
+		return datas;
+	}
+
+	/**
 	 * Tests if the Combo value is empty. If so, it adds an error color to the background of the cell.
 	 * 
 	 * @param combo

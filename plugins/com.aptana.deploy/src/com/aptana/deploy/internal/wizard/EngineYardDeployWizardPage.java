@@ -16,6 +16,8 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -31,6 +33,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.wizard.DeployWizard;
+import com.aptana.ui.util.SWTUtils;
 
 public class EngineYardDeployWizardPage extends WizardPage
 {
@@ -62,13 +65,19 @@ public class EngineYardDeployWizardPage extends WizardPage
 
 		Label note = new Label(composite, SWT.WRAP);
 		Font dialogFont = JFaceResources.getDialogFont();
-		FontData[] data = dialogFont.getFontData();
-		for (FontData dataElement : data)
-		{
-			dataElement.setStyle(dataElement.getStyle() | SWT.ITALIC);
-		}
-		Font italic = new Font(dialogFont.getDevice(), data);
+		FontData[] data = SWTUtils.italicizedFont(JFaceResources.getDialogFont());
+		final Font italic = new Font(dialogFont.getDevice(), data);
 		note.setFont(italic);
+		note.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
+				if (italic != null && !italic.isDisposed())
+				{
+					italic.dispose();
+				}
+			}
+		});
 		note.setLayoutData(new GridData(400, SWT.DEFAULT));
 		note.setText(Messages.EngineYardDeployWizardPage_ApplicationNoteLabel);
 
