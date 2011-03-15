@@ -35,6 +35,7 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSScopeScanner;
+import com.aptana.editor.css.CSSSourceEditor;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -559,8 +560,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// CA context is fine-tuned below
 		this._replaceRange = this._currentLexeme;
 
-		// first step is to determine if we're inside our outside of a rule
-		LocationType location = this.getCoarseLocationType(lexemeProvider, offset);
+		// NOTE: we're sniffing editor type as a cheap hack to determine if the CSS is nested in another language
+		// @formatter:off
+		LocationType location = (this.editor instanceof CSSSourceEditor) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
+		// @formatter:on
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
