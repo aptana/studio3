@@ -7,11 +7,15 @@
  */
 package com.aptana.editor.html.contentassist;
 
+import java.util.List;
+
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
+import org.eclipse.jface.text.link.LinkedModeModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
@@ -30,6 +34,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	private static final int CLOSE_TAG_PROPOSALS_COUNT = 119;
 
 	private HTMLContentAssistProcessor fProcessor;
+	private IDocument fDocument;
 
 	@Override
 	protected void setUp() throws Exception
@@ -47,6 +52,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 	protected void tearDown() throws Exception
 	{
 		fProcessor = null;
+		fDocument = null;
 		super.tearDown();
 	}
 
@@ -173,6 +179,44 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n\"http://www.w3.org/TR/html4/strict.dtd\"", null); //$NON-NLS-1$
 	}
 
+	public void testStyleAttributeProposalHasExitTabstopAfterQuotes()
+	{
+		assertCompletionCorrect("<div |>", '\t', 64, "style", "<div style=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Now test that we have two tabstops. One inside the quotes, one just after
+		LinkedModeModel model = LinkedModeModel.getModel(fDocument, 12);
+		assertNotNull(model);
+		List list = model.getTabStopSequence();
+		assertNotNull(list);
+		assertEquals(2, list.size());
+		Position pos = (Position) list.get(0);
+		assertEquals(12, pos.getOffset());
+		assertEquals(0, pos.getLength());
+
+		pos = (Position) list.get(1);
+		assertEquals(13, pos.getOffset());
+		assertEquals(0, pos.getLength());
+	}
+
+	public void testEventProposalHasExitTabstopAfterQuotes()
+	{
+		assertCompletionCorrect("<div |>", '\t', 64, "onmouseenter", "<div onmouseenter=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		// Now test that we have two tabstops. One inside the quotes, one just after
+		LinkedModeModel model = LinkedModeModel.getModel(fDocument, 19);
+		assertNotNull(model);
+		List list = model.getTabStopSequence();
+		assertNotNull(list);
+		assertEquals(2, list.size());
+		Position pos = (Position) list.get(0);
+		assertEquals(19, pos.getOffset());
+		assertEquals(0, pos.getLength());
+
+		pos = (Position) list.get(1);
+		assertEquals(20, pos.getOffset());
+		assertEquals(0, pos.getLength());
+	}
+
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
 	{
 		for (ICompletionProposal proposal : proposals)
@@ -208,7 +252,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 			String postCompletion, Point point)
 	{
 		int offset = HTMLTestUtil.findCursorOffset(document);
-		IDocument fDocument = HTMLTestUtil.createDocument(document, true);
+		fDocument = HTMLTestUtil.createDocument(document, true);
 		ITextViewer viewer = createTextViewer(fDocument);
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, trigger, false);

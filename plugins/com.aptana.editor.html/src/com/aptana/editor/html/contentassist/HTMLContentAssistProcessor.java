@@ -168,7 +168,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (element != null)
 		{
-			int length = 2;
 			String postfix = "=\"\""; //$NON-NLS-1$
 			switch (this._currentLexeme.getType())
 			{
@@ -179,7 +178,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 
@@ -193,7 +191,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (nextlexeme != null && nextlexeme.getType() == HTMLTokenType.EQUAL)
 					{
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 			}
