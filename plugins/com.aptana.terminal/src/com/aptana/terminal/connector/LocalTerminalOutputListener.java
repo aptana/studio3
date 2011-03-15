@@ -23,6 +23,7 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 
 	private PrintStream printStream;
 	private IOutputFilter outputFilter;
+	private boolean hasOutput = false;
 
 	/**
 	 * @throws UnsupportedEncodingException 
@@ -38,10 +39,17 @@ import org.eclipse.tm.internal.terminal.provisional.api.ITerminalControl;
 	 */
 	public void streamAppended(String text, IStreamMonitor monitor) {
 		if (outputFilter != null) {
-			printStream.print(outputFilter.filterOutput(text.toCharArray()));
+			printStream.print(text = String.valueOf(outputFilter.filterOutput(text.toCharArray())));
 		} else {
 			printStream.print(text);
 		}
+		if (!hasOutput) {
+			hasOutput = text.length() > 0;
+		}
+	}
+	
+	/* package */ boolean hasOutput() {
+		return hasOutput;
 	}
 
 }

@@ -87,14 +87,19 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 	}
 
 	@Override
-	public void connect(ITerminalControl control) {
+	public void connect(final ITerminalControl control) {
 		super.connect(control);
 		control.setState(TerminalState.CONNECTING);
-		if (startProcess(control)) {
-			control.setState(TerminalState.CONNECTED);
-		} else {
-			control.setState(TerminalState.CLOSED);			
-		}
+		new Thread("Terminal Process Launcher") { //$NON-NLS-1$
+			@Override
+			public void run() {
+				if (startProcess(control)) {
+					control.setState(TerminalState.CONNECTED);
+				} else {
+					control.setState(TerminalState.CLOSED);			
+				}
+			}
+		}.start();
 	}
 	
 	/* (non-Javadoc)
@@ -221,7 +226,10 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			LocalTerminalOutputListener errorListener = new LocalTerminalOutputListener(control, null);
 			errorMonitor.addListener(errorListener);
 			errorListener.streamAppended(errorMonitor.getContents(), errorMonitor);
-			return true;
+			while (streamsProxy != null && !outputListener.hasOutput()) {
+				Thread.sleep(250);
+			}
+			return streamsProxy != null;
 		} catch (Exception e) {
 			Activator.log("Starting terminal process failed.", e); //$NON-NLS-1$
 		}
