@@ -129,7 +129,7 @@ public final class ExecutableUtil
 				IPath whichPath = Path.fromOSString(whichResult.trim());
 				if (isExecutable(whichPath) && (filter == null || filter.accept(whichPath.toFile())))
 				{
-					// CorePlugin.logInfo(MessageFormat.format("Found executable via 'which': {0}", whichPath)); //$NON-NLS-1$
+					CorePlugin.logInfo(MessageFormat.format("Found executable via 'which': {0}", whichPath)); //$NON-NLS-1$
 					return whichPath;
 				}
 			}
@@ -143,7 +143,7 @@ public final class ExecutableUtil
 				IPath result = findExecutable(location.append(executableName), appendExtension);
 				if (result != null && (filter == null || filter.accept(result.toFile())))
 				{
-					// CorePlugin.logInfo(MessageFormat.format("Found executable at common location: {0}", result)); //$NON-NLS-1$
+					CorePlugin.logInfo(MessageFormat.format("Found executable at common location: {0}", result)); //$NON-NLS-1$
 					return result;
 				}
 			}

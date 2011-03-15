@@ -176,7 +176,7 @@ public class CorePlugin extends Plugin
 
 	public static void log(String msg)
 	{
-		log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
+		// log(new Status(IStatus.INFO, PLUGIN_ID, IStatus.OK, msg, null));
 	}
 
 	public static void log(String msg, Throwable e)
