@@ -23,6 +23,7 @@ import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
 import com.aptana.editor.js.contentassist.index.JSIndexWriter;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
+import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
@@ -159,6 +160,21 @@ public class JSSymbolTypeInferrer
 					{
 						JSTypeUtil.applyDocumentation(property, docs);
 						break;
+					}
+					else if (property instanceof FunctionElement && node instanceof JSFunctionNode)
+					{
+						FunctionElement functionElement = (FunctionElement) property;
+						JSFunctionNode functionNode = (JSFunctionNode) node;
+
+						for (IParseNode parameterNode : functionNode.getParameters())
+						{
+							ParameterElement parameterElement = new ParameterElement();
+
+							parameterElement.setName(parameterNode.getText());
+							parameterElement.addType(JSTypeConstants.OBJECT_TYPE);
+
+							functionElement.addParameter(parameterElement);
+						}
 					}
 					else if (node instanceof JSIdentifierNode)
 					{
