@@ -289,6 +289,7 @@ public final class ShellExecutable
 		List<String> shellCommand = new ArrayList<String>();
 		shellCommand.add(getPath().toOSString());
 		shellCommand.add("--login"); //$NON-NLS-1$
+		shellCommand.add("--noprofile"); //$NON-NLS-1$
 		shellCommand.add("-c"); //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
 		for (String arg : command)
