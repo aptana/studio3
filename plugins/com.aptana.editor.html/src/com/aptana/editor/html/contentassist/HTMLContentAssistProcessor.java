@@ -45,6 +45,7 @@ import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
@@ -56,9 +57,11 @@ import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -1070,6 +1073,27 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			case IN_OPEN_TAG:
 				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
+
+				// NOTE: The following is an ugly hack to get CA for JS and CSS inside of certain attributes. Ideally,
+				// at some point in the future we will get JS and CSS partitions in these cases so we won't have to
+				// rely on this code.
+				if (fineLocation == LocationType.IN_ATTRIBUTE_VALUE)
+				{
+					String elementName = this.getElementName(lexemeProvider, offset);
+					String attributeName = this.getAttributeName(lexemeProvider, offset);
+
+					if (HTMLUtils.isCSSAttribute(attributeName))
+					{
+						return new CSSContentAssistProcessor(this.editor).computeCompletionProposals(viewer, offset,
+								activationChar, autoActivated);
+					}
+					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
+					{
+						return new JSContentAssistProcessor(this.editor).computeCompletionProposals(viewer, offset,
+								activationChar, autoActivated);
+					}
+				}
+
 				this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
 				this.addOpenTagProposals(fineLocation, result, lexemeProvider, offset);
 				break;
