@@ -310,8 +310,14 @@ public class LocalTerminalConnector extends TerminalConnectorImpl implements IPr
 			if (Platform.OS_WIN32.equals(Platform.getOS())) {
 				String processName = map.get(list[0]);
 				Map<String, String> env = System.getenv();
-				if (env != null && processName != null && processName.equals(env.get("ComSpec"))) { //$NON-NLS-1$
-					map.remove(list[0]);
+				if (env != null && processName != null) {
+					String comSpec = env.get("ComSpec"); //$NON-NLS-1$
+					if (comSpec == null) {
+						comSpec = env.get("COMSPEC"); //$NON-NLS-1$
+					}
+					if (processName.equals(comSpec)) { 
+						map.remove(list[0]);
+					}
 				}
 			}
 			for (int pid : list) {

@@ -108,6 +108,7 @@ public class WebBrowserViewer extends Composite
 			{
 				if (currentImage != null)
 				{
+					// FIXME Why not use e.gc?
 					GC gc = new GC(backgroundArea);
 					gc.drawImage(currentImage, 0, 0);
 					gc.dispose();

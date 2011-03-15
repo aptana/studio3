@@ -80,7 +80,7 @@ public class ScriptingActivator extends Plugin
 	 */
 	public static void logInfo(String string)
 	{
-		getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
+		// getDefault().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, string));
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ScriptingActivator extends Plugin
 	 */
 	public static void trace(String string)
 	{
-		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
+		// getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
 	private FileTypeAssociationListener fileTypeListener;
