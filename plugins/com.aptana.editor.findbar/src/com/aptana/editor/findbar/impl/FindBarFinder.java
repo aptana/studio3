@@ -163,7 +163,7 @@ public class FindBarFinder
 					}
 					else
 					{
-						dec.statusLineManager.setMessage(false, "", null);
+						dec.statusLineManager.setMessage(false, "", null); //$NON-NLS-1$
 					}
 				}
 				else
