@@ -23,7 +23,8 @@ public interface JSIndexConstants
 	// 0.20 - Added Error class as a property of Window
 	// 0.21 - Using JSON for property and function content assist model elements
 	// 0.22 - Add events, examples, remarks, and a deprecated flag to type elements
-	public static final double INDEX_VERSION = 0.22;
+	// 0.23 - Fix Window.Math property
+	public static final double INDEX_VERSION = 0.23;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
