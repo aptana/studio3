@@ -371,6 +371,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			valuePrefix = valuePrefix.substring(0, length);
 
 			URI editorStoreURI = getURI();
+			if (editorStoreURI == null)
+			{
+				return proposals;
+			}
 			IFileStore editorStore = EFS.getStore(editorStoreURI);
 
 			// Strip the quotes off the value prefix!
@@ -1075,7 +1079,17 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			case IN_OPEN_TAG:
 				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-				this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+
+				switch (fineLocation)
+				{
+					case IN_ELEMENT_NAME:
+						this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+						break;
+					case IN_ATTRIBUTE_NAME:
+					case IN_ATTRIBUTE_VALUE:
+					default:
+						break;
+				}
 				this.addOpenTagProposals(fineLocation, result, lexemeProvider, offset);
 				break;
 

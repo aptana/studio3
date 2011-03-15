@@ -232,6 +232,18 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(0, pos.getLength());
 	}
 
+	// https://aptana.lighthouseapp.com/projects/35272/tickets/1719-html-code-completion-for-tag-attributes-goes-wrong
+	public void testIMGSrcContentAssistDoesntAutoInsertCloseTag()
+	{
+		String document = "<div><img src='|' />";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertEquals(0, proposals.length);
+	}
+
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
 	{
 		for (ICompletionProposal proposal : proposals)
@@ -253,9 +265,8 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 	protected void assertLocation(String document, LocationType location)
 	{
-
 		int offset = HTMLTestUtil.findCursorOffset(document);
-		IDocument fDocument = HTMLTestUtil.createDocument(document, true);
+		fDocument = HTMLTestUtil.createDocument(document, true);
 
 		LexemeProvider<HTMLTokenType> lexemeProvider = HTMLTestUtil.createLexemeProvider(fDocument, offset);
 		LocationType l = fProcessor.getOpenTagLocationType(lexemeProvider, offset);
