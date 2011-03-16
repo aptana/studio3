@@ -117,7 +117,15 @@ public class FormatterTestFile
 		return formatter;
 	}
 
-	public void generateFormattedContent() throws IOException
+	/**
+	 * Re-generate the test content by reading the existing content and writing it back with the formatted content.
+	 * 
+	 * @param overwriteFormattedBlock
+	 *            In case 'true', the ==FORMATTED== part will be overwritten with the output from the formatter; In case
+	 *            'false', we will only add a content in case the ==FORMATTED== tag is missing.
+	 * @throws IOException
+	 */
+	public void generateFormattedContent(boolean overwriteFormattedBlock) throws IOException
 	{
 		if (formattedContent.length() > 0)
 		{
@@ -129,14 +137,21 @@ public class FormatterTestFile
 		StringBuilder fileContentBuilder = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
+		boolean foundFormattedBlock = false;
 		while ((line = reader.readLine()) != null)
 		{
 			if ("==FORMATTED==".equals(line.trim()))
 			{
+				foundFormattedBlock = true;
 				break;
 			}
 			fileContentBuilder.append(line);
 			fileContentBuilder.append('\n');
+		}
+		// Return in case we are not allowed to overwrite the block
+		if (foundFormattedBlock && !overwriteFormattedBlock)
+		{
+			return;
 		}
 		trimTrailingWhitespaces(fileContentBuilder);
 		FileWriter formattedStream = new FileWriter(file);
