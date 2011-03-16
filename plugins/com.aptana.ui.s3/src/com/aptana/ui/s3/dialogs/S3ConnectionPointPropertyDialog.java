@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.core.io.ConnectionPointType;
 import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.filesystem.s3.S3ConnectionPoint;
+import com.aptana.filesystem.s3.S3ConnectionPoint;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.s3.S3UIPlugin;
 import com.aptana.ui.s3.internal.S3ConnectionPropertyComposite;

@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.filesystem.s3;
+package com.aptana.filesystem.s3;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -20,7 +20,7 @@ public class S3FileSystemPlugin extends Plugin
 {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "com.aptana.ide.filesystem.s3"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "com.aptana.filesystem.s3"; //$NON-NLS-1$
 
 	// The shared instance
 	private static S3FileSystemPlugin plugin;

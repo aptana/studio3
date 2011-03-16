@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.filesystem.s3;
+package com.aptana.filesystem.s3;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

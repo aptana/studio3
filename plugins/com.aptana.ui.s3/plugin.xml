@@ -5,11 +5,11 @@
          point="com.aptana.ui.imageAssociations">
       <image
             icon="icons/full/obj16/s3.png"
-            id="com.aptana.ide.filesystem.s3.s3Category">
+            id="com.aptana.filesystem.s3.s3Category">
       </image>
       <objectImage
             icon="icons/full/obj16/s3.png"
-            objectClass="com.aptana.ide.filesystem.s3.S3ConnectionPoint">
+            objectClass="com.aptana.filesystem.s3.S3ConnectionPoint">
       </objectImage>
    </extension>
    <extension
@@ -17,7 +17,7 @@
       <dialog
             class="com.aptana.ui.s3.internal.S3PropertyDialogProvider"
             id="com.aptana.ide.ui.s3.dialog"
-            objectClass="com.aptana.ide.filesystem.s3.S3ConnectionPoint">
+            objectClass="com.aptana.filesystem.s3.S3ConnectionPoint">
       </dialog>
    </extension>
    <extension

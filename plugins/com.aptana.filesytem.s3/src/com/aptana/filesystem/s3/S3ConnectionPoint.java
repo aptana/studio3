@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.filesystem.s3;
+package com.aptana.filesystem.s3;
 
 import java.net.URI;
 import java.net.URISyntaxException;
