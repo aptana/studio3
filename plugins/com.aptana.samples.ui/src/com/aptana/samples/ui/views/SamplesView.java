@@ -235,7 +235,7 @@ public class SamplesView extends ViewPart
 						String infoFile = samplesRef.getInfoFile();
 						if (infoFile != null)
 						{
-							URL url = (new File(infoFile)).toURL();
+							URL url = (new File(infoFile)).toURI().toURL();
 							WebBrowserEditorInput input = new WebBrowserEditorInput(url);
 							IWorkbenchPage page = UIUtils.getActivePage();
 							if (page != null)

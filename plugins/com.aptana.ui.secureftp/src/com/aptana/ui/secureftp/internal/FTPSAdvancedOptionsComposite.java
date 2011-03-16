@@ -40,7 +40,6 @@ import com.aptana.ui.ftp.internal.NumberVerifyListener;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsComposite {
 	
 	private static final String EMPTY = ""; //$NON-NLS-1$

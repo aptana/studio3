@@ -23,7 +23,6 @@ import com.aptana.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPropertyDialog {
 
 	private ConnectionPointType connectionType;

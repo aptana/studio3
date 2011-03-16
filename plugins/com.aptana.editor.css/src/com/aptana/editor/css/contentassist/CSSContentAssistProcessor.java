@@ -35,7 +35,6 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSScopeScanner;
-import com.aptana.editor.css.CSSSourceEditor;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
