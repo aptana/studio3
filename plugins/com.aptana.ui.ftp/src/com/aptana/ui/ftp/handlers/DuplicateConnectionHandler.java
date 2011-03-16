@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.ui.ftp.handlers;
+package com.aptana.ui.ftp.handlers;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -18,7 +18,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.IConnectionPointManager;
-import com.aptana.ide.ui.ftp.FTPUIPlugin;
+import com.aptana.ui.ftp.FTPUIPlugin;
 
 public class DuplicateConnectionHandler extends AbstractHandler
 {

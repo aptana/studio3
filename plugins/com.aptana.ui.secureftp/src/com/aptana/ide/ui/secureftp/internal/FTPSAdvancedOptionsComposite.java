@@ -32,9 +32,9 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TimeZoneUtil;
 import com.aptana.filesystem.secureftp.IFTPSConnectionPoint;
 import com.aptana.filesystem.secureftp.IFTPSConstants;
-import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
-import com.aptana.ide.ui.ftp.internal.NumberVerifyListener;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
+import com.aptana.ui.ftp.internal.IOptionsComposite;
+import com.aptana.ui.ftp.internal.NumberVerifyListener;
 
 /**
  * @author Max Stepanov
@@ -253,7 +253,7 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#isValid()
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#isValid()
 	 */
 	public String isValid() {
 		int port = 0;
@@ -268,14 +268,14 @@ public class FTPSAdvancedOptionsComposite extends Composite implements IOptionsC
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#setValid(boolean)
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#setValid(boolean)
 	 */
 	public void setValid(boolean valid) {
 		detectButton.setEnabled(valid);
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#lockUI(boolean)
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#lockUI(boolean)
 	 */
 	public void lockUI(boolean lock) {
 		securityMethodCombo.setEnabled(!lock);

@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.actions;
+package com.aptana.ui.ftp.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.Dialog;
@@ -15,8 +15,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.io.CoreIOPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
 import com.aptana.ui.IPropertyDialog;
+import com.aptana.ui.ftp.internal.FTPPropertyDialogProvider;
 
 /**
  * @author Max Stepanov

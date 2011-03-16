@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.internal;
+package com.aptana.ui.ftp.internal;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -206,7 +206,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#isValid()
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#isValid()
 	 */
 	public String isValid() {
 		int port = 0;
@@ -221,14 +221,14 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#setValid(boolean)
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#setValid(boolean)
 	 */
 	public void setValid(boolean valid) {
 		detectButton.setEnabled(valid);
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.internal.IOptionsComposite#lockUI(boolean)
+	 * @see com.aptana.ui.ftp.internal.IOptionsComposite#lockUI(boolean)
 	 */
 	public void lockUI(boolean lock) {
 		modeCombo.setEnabled(!lock);

@@ -19,11 +19,11 @@ import com.aptana.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.syncing.core.SiteConnectionUtils;
 import com.aptana.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
 public class FTPDeployWizardPage extends WizardPage implements FTPConnectionPropertyComposite.Listener

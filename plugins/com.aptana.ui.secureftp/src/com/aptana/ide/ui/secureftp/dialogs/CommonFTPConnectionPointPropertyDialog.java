@@ -15,9 +15,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.io.ConnectionPointType;
 import com.aptana.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
+import com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 /**
  * @author Max Stepanov
@@ -36,7 +36,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#getConnectionPointType()
+	 * @see com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#getConnectionPointType()
 	 */
 	@Override
 	protected ConnectionPointType getConnectionPointType() {
@@ -51,7 +51,7 @@ public class CommonFTPConnectionPointPropertyDialog extends FTPConnectionPointPr
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#setPropertySource(java.lang.Object)
+	 * @see com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog#setPropertySource(java.lang.Object)
 	 */
 	@Override
 	public void setPropertySource(Object element) {
