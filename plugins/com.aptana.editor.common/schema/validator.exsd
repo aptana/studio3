@@ -60,6 +60,13 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="language" type="string" use="required">
             <annotation>
                <documentation>

@@ -21,12 +21,14 @@ public class ValidatorReference
 
 	private final String name;
 	private final ValidatorLanguage language;
+	private final String type;
 	private final IConfigurationElement configElement;
 	private IValidator validator;
 
-	public ValidatorReference(String name, ValidatorLanguage language, IConfigurationElement configElement)
+	public ValidatorReference(String name, String type, ValidatorLanguage language, IConfigurationElement configElement)
 	{
 		this.name = name;
+		this.type = type;
 		this.language = language;
 		this.configElement = configElement;
 	}
@@ -34,6 +36,11 @@ public class ValidatorReference
 	public String getName()
 	{
 		return name;
+	}
+
+	public String getType()
+	{
+		return type;
 	}
 
 	public ValidatorLanguage getLanguage()

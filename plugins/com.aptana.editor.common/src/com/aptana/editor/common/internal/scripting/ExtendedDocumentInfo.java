@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.scripting.model.BundleManager;
@@ -51,6 +52,16 @@ import com.aptana.scripting.model.BundleManager;
 		QualifiedContentType result = new QualifiedContentType(defaultContentType);
 		try
 		{
+			// If we're at the end of the document, back up one char to grab partition when we have bogus zero length
+			// partition at EOF.
+			if (offset == document.getLength())
+			{
+				ITypedRegion region = document.getPartition(offset);
+				if (region.getLength() == 0)
+				{
+					offset = offset - 1;
+				}
+			}
 			// get partition at offset
 			String contentType = document.getContentType(offset);
 			// grab the top level document type that this partition is a subtype of
