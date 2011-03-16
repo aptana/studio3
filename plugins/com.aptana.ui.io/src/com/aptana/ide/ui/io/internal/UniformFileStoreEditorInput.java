@@ -16,9 +16,10 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.preferences.FTPPreferenceUtil;
 
-public class UniformFileStoreEditorInput extends FileStoreEditorInput
+public class UniformFileStoreEditorInput extends FileStoreEditorInput implements IUniformFileStoreEditorInput
 {
 
 	private IFileStore fLocalFileStore;
