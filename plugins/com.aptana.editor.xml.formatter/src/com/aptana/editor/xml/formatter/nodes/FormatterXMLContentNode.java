@@ -43,7 +43,9 @@ public class FormatterXMLContentNode extends FormatterTextNode
 	public boolean shouldConsumePreviousWhiteSpaces()
 	{
 		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return set.contains(parentElement);
+		boolean excludeNewLineOnTextNodes = getDocument().getBoolean(
+				XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES);
+		return set.contains(parentElement) || excludeNewLineOnTextNodes;
 	}
 
 }

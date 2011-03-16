@@ -41,6 +41,7 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
@@ -501,11 +502,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected URI getURI()
 	{
-		IEditorInput editorInput = editor.getEditorInput();
-		if (editorInput instanceof IURIEditorInput)
+		if (editor != null)
 		{
-			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-			return fileEditorInput.getURI();
+			IEditorInput editorInput = editor.getEditorInput();
+			if (editorInput instanceof IURIEditorInput)
+			{
+				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+				return fileEditorInput.getURI();
+			}
 		}
 		return null;
 	}
@@ -544,6 +548,11 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	{
 		ICompletionProposal caseSensitiveProposal = null;
 		ICompletionProposal caseInsensitiveProposal = null;
+
+		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		{
+			return;
+		}
 
 		for (ICompletionProposal proposal : proposals)
 		{

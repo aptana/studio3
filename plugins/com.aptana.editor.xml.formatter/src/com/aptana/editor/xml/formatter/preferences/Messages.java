@@ -21,6 +21,7 @@ public class Messages extends NLS
 	public static String XMLFormatterModifyDialog_BlankLinesTabName;
 	public static String XMLFormatterModifyDialog_indentationTabName;
 	public static String XMLFormatterModifyDialog_newLinesTabName;
+	public static String XMLFormatterNewLinesPage_exclude_text_node_label;
 	public static String XMLFormatterNewLinesPage_exclusionsGroupLabel;
 	public static String XMLFormatterNewLinesPage_exclusionsMessageLabel;
 

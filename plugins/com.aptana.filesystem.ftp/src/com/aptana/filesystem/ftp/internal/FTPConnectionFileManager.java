@@ -88,6 +88,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	protected IPath cwd;
 	private FTPFileFactory fileFactory;
 	private Boolean statSupported = null;
+	private Boolean listASupported = null;
 	private int utimeFormat = -1;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 	private long serverTimeZoneShift = Integer.MIN_VALUE;
@@ -389,8 +390,8 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 							// align to minutes
 							serverTimeZoneShift = (lastModifiedLocalTZ.getTime() - lastModifiedLocalTZ.getTime() % 60000) - (lastModifiedServerInLocalTZ.getTime() - lastModifiedServerInLocalTZ.getTime() % 60000);
 							Calendar calendar = (Calendar) Calendar.getInstance().clone();
-							calendar.setTime(lastModifiedLocalTZ);
-							serverTimeZoneShift -= calendar.get(Calendar.DST_OFFSET);
+							calendar.setTime(new Date());
+							serverTimeZoneShift += calendar.get(Calendar.DST_OFFSET);
 						}
 					}
 					if (serverTimeZoneShift == Integer.MIN_VALUE) {
@@ -1069,16 +1070,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 
 	private FTPFile[] ftpSTAT(String dirname) throws IOException, FTPException, ParseException {
-        if (fileFactory == null) {
-            try {
-                fileFactory = new FTPFileFactory(ftpClient.system());
-            }
-            catch (FTPException ex) {
-                fileFactory = new FTPFileFactory(""); //$NON-NLS-1$
-            }
-            fileFactory.setLocales(FTPClient.DEFAULT_LISTING_LOCALES);
-        }
-
+		setupFileFactory();
         String[] validCodes = {"211", "212", "213"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		FTPReply reply = ftpClient.sendCommand("STAT "+dirname); //$NON-NLS-1$
 		ftpClient.validateReply(reply, validCodes);
@@ -1091,11 +1083,37 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 		return fileFactory.parse(data);
 	}
-
+	
 	private FTPFile[] ftpLIST(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
+		setupFileFactory();
 		changeCurrentDir(dirPath);
 		Policy.checkCanceled(monitor);
-		return ftpClient.dirDetails("-a"); //$NON-NLS-1$
+		if (!Boolean.FALSE.equals(listASupported)) {
+			try {
+				FTPFile[] ftpFiles = fileFactory.parse(ftpClient.dir("-a", true)); //$NON-NLS-1$
+				listASupported = Boolean.TRUE;
+				return ftpFiles;
+			} catch (FTPException e) {
+				if (listASupported == null && e.getReplyCode() >= 500) {
+					listASupported = Boolean.FALSE;
+				} else {
+					throw e;
+				}
+			}
+		}
+		return fileFactory.parse(ftpClient.dir(".", true)); //$NON-NLS-1$
+	}
+
+	private void setupFileFactory() throws IOException, FTPException {
+		if (fileFactory == null) {
+			try {
+				fileFactory = new FTPFileFactory(ftpClient.system());
+			}
+			catch (FTPException ex) {
+				fileFactory = new FTPFileFactory("UNIX"); //$NON-NLS-1$
+			}
+			fileFactory.setLocales(FTPClient.DEFAULT_LISTING_LOCALES);
+		}
 	}
 
 	private FTPFile[] listFiles(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {

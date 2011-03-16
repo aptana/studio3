@@ -94,8 +94,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	};
 
 	static final Image ELEMENT_ICON = HTMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
+	static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+	static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 	private static final Map<String, String> DOCTYPES;
 
@@ -171,7 +171,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (element != null)
 		{
-			int length = 2;
 			String postfix = "=\"\""; //$NON-NLS-1$
 			switch (this._currentLexeme.getType())
 			{
@@ -182,7 +181,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 
@@ -196,45 +194,52 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (nextlexeme != null && nextlexeme.getType() == HTMLTokenType.EQUAL)
 					{
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 			}
 
+			int replaceLength = 0;
+			if (this._replaceRange != null)
+			{
+				offset = this._replaceRange.getStartingOffset();
+				replaceLength = this._replaceRange.getLength();
+			}
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
 				String name = attribute.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					ATTRIBUTE_ICON, //
-					attribute.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLAttributeProposal p = new HTMLAttributeProposal(attribute, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 
 			for (EventElement event : this._queryHelper.getEvents(element))
 			{
 				String name = event.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					EVENT_ICON, //
-					event.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLEventProposal p = new HTMLEventProposal(event, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 		}
@@ -369,6 +374,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			valuePrefix = valuePrefix.substring(0, length);
 
 			URI editorStoreURI = getURI();
+			if (editorStoreURI == null)
+			{
+				return proposals;
+			}
 			IFileStore editorStore = EFS.getStore(editorStoreURI);
 
 			// Strip the quotes off the value prefix!
@@ -1074,10 +1083,14 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			case IN_OPEN_TAG:
 				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
 
+				if (fineLocation == LocationType.IN_ELEMENT_NAME)
+				{
+					this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+				}
 				// NOTE: The following is an ugly hack to get CA for JS and CSS inside of certain attributes. Ideally,
 				// at some point in the future we will get JS and CSS partitions in these cases so we won't have to
 				// rely on this code.
-				if (fineLocation == LocationType.IN_ATTRIBUTE_VALUE)
+				else if (fineLocation == LocationType.IN_ATTRIBUTE_VALUE)
 				{
 					String elementName = this.getElementName(lexemeProvider, offset);
 					String attributeName = this.getAttributeName(lexemeProvider, offset);
@@ -1094,7 +1107,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					}
 				}
 
-				this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
 				this.addOpenTagProposals(fineLocation, result, lexemeProvider, offset);
 				break;
 

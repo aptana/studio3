@@ -203,7 +203,12 @@ public class BundleCacher
 				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
-				be = (BundleElement) yaml.load(reader);
+
+				synchronized (this)
+				{
+					be = (BundleElement) yaml.load(reader);
+				}
+
 				sub.worked(80);
 
 				// If any file has been deleted, ignore the cache, it'll get rewritten

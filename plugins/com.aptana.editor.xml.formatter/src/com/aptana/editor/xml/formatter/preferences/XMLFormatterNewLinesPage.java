@@ -50,6 +50,9 @@ public class XMLFormatterNewLinesPage extends FormatterModifyTabPage
 		Label exclutionLabel = new Label(group, SWT.WRAP);
 		exclutionLabel.setText(Messages.XMLFormatterNewLinesPage_exclusionsMessageLabel);
 		manager.createManagedList(group, XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		manager.createCheckbox(group, XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES,
+				Messages.XMLFormatterNewLinesPage_exclude_text_node_label);
+
 	}
 
 	/*

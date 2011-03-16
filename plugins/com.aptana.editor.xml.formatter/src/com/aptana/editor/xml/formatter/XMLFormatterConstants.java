@@ -36,6 +36,7 @@ public interface XMLFormatterConstants
 
 	// New lines
 	public static final String NEW_LINES_EXCLUDED_TAGS = FORMATTER_ID + ".newline.excluded"; //$NON-NLS-1$
+	public static final String NEW_LINES_EXCLUDED_ON_TEXT_NODES = FORMATTER_ID + ".newline.excluded.on.text.nodes"; //$NON-NLS-1$
 
 	// Empty lines
 	public static final String LINES_AFTER_ELEMENTS = FORMATTER_ID + ".line.after.element"; //$NON-NLS-1$
