@@ -37,12 +37,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.io.ConnectionContext;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.vfs.ExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Max Stepanov

@@ -54,6 +54,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.osgi.framework.Constants;
 
 import com.aptana.core.IURIMapper;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
@@ -61,7 +62,6 @@ import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;

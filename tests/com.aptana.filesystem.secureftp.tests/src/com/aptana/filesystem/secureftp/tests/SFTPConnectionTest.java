@@ -44,7 +44,7 @@ public class SFTPConnectionTest extends CommonConnectionTest
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
 	protected boolean supportsChangeGroup()
@@ -54,7 +54,7 @@ public class SFTPConnectionTest extends CommonConnectionTest
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
 	protected boolean supportsChangePermissions()

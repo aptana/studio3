@@ -50,6 +50,7 @@ public class TitaniumUpdatePopup extends PopupDialog
 			public void mouseDown(MouseEvent e)
 			{
 				updateAction.run();
+				close();
 			}
 		};
 

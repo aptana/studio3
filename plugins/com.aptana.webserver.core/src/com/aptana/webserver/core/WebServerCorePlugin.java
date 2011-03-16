@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.webserver.core.builtin.LocalWebServer;
 
 /**

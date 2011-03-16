@@ -13,13 +13,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.PlatformUI;
 
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.deploy.dialogs.FTPDeployPropertyDialog;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
-import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ResourceSynchronizationUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
+import com.aptana.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ui.util.UIUtils;
 
 public class DeploySettingsHandler extends AbstractHandler

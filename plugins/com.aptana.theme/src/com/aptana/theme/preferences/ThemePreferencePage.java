@@ -1271,6 +1271,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			return;
 		}
+		Font oldFont = fFont;
 		fFont = font;
 		fFontText.setFont(fFont);
 		fFontText.setText(ThemePreferencePage.toString(fFont));
@@ -1280,5 +1281,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			fFonts.clear();
 		}
 		tableViewer.refresh();
+
+		if (oldFont != null && !oldFont.isDisposed())
+		{
+			oldFont.dispose();
+		}
 	}
 }

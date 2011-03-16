@@ -6,7 +6,7 @@
       <filesystem
             scheme="s3">
          <run
-               class="com.aptana.ide.filesystem.s3.S3FileSystem">
+               class="com.aptana.filesystem.s3.S3FileSystem">
          </run>
       </filesystem>
    </extension>
@@ -20,7 +20,7 @@
       </connectionPointCategory>
       <connectionPointType
             category="com.aptana.ide.filesystem.s3.s3Category"
-            class="com.aptana.ide.filesystem.s3.S3ConnectionPoint"
+            class="com.aptana.filesystem.s3.S3ConnectionPoint"
             id="s3"
             name="%connectionPointType.s3.name">
       </connectionPointType>

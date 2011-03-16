@@ -185,6 +185,7 @@ public class GitExecutable
 				fgLocations.add(Path.fromOSString(PlatformUtil.expandEnvironmentStrings("%PROGRAMFILES%\\Git\\bin"))); //$NON-NLS-1$
 				fgLocations.add(Path.fromOSString(PlatformUtil
 						.expandEnvironmentStrings("%PROGRAMFILES(X86)%\\Git\\bin"))); //$NON-NLS-1$
+				fgLocations.add(Path.fromOSString("C:\\RailsInstaller\\Git\\bin")); //$NON-NLS-1$
 			}
 			else
 			{
