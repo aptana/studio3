@@ -67,12 +67,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
-import com.aptana.ide.syncing.ui.actions.BaseSyncAction;
-import com.aptana.ide.syncing.ui.actions.DownloadAction;
-import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
-import com.aptana.ide.syncing.ui.actions.UploadAction;
-import com.aptana.ide.syncing.ui.internal.SyncUtils;
-import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
@@ -81,6 +75,12 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.syncing.core.SiteConnectionUtils;
 import com.aptana.syncing.core.SyncingPlugin;
+import com.aptana.syncing.ui.actions.BaseSyncAction;
+import com.aptana.syncing.ui.actions.DownloadAction;
+import com.aptana.syncing.ui.actions.SynchronizeProjectAction;
+import com.aptana.syncing.ui.actions.UploadAction;
+import com.aptana.syncing.ui.internal.SyncUtils;
+import com.aptana.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.usage.PingStartup;
 
 @SuppressWarnings("restriction")
