@@ -7054,7 +7054,6 @@ dojo.declare("dojo._Animation", null, {
 })();
 
 }
-
 ==FORMATTED==
 /*
  Copyright (c) 2004-2007, The Dojo Foundation
@@ -14078,4 +14077,3 @@ if(!dojo._hasResource["dojo._base.fx"]) { //_hasResource checks added by build. 
         }
     })();
 }
-

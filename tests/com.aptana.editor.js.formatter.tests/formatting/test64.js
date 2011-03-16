@@ -27,11 +27,9 @@ js.formatter.formatter.tabulation.char=space
 			//format
 //format
 					var i;
-
 ==FORMATTED==
 //noformat
 //noformat
 //format
 //format
 var i;
-

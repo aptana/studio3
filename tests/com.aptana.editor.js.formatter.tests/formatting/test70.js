@@ -31,7 +31,6 @@ js.formatter.formatter.tabulation.char=space
 /*
  * 
  */
-
 ==FORMATTED==
 //noformat
 //format
@@ -42,4 +41,3 @@ var i;
 /*
  *
  */
-

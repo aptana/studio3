@@ -11,7 +11,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 	// To generate formatted files, place xml files under the 'formatting' folder and run these tests from the
 	// com.aptana.editor.xml.formatter.tests plugin
 	// NOTE: Ensure that the contents section ends with a newline, or the generation may not work.
-	private static boolean INITIALIZE_MODE = true;
+	private static boolean INITIALIZE_MODE = false;
 
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.xml.formatterFactory"; //$NON-NLS-1$
 	private static String FORMATTER_ID = "com.aptana.editor.xml.formatter.tests"; //$NON-NLS-1$

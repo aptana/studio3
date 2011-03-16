@@ -29,7 +29,6 @@ function test(){
             b();
     }
 }
-
 ==FORMATTED==
 function test() {
     switch (z/* comment 1*/) {
@@ -38,4 +37,3 @@ function test() {
             b();
     }
 }
-

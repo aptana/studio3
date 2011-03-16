@@ -10,10 +10,7 @@ css.formatter.wrap.comments=false
 css.formatter.formatter.tabulation.char=space
 ==CONTENT==
 ul li :hover li :hover ul { visiblity: visible; }
-
-
 ==FORMATTED==
 ul li :hover li :hover ul {
     visiblity: visible;
 }
-

@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -16,6 +16,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
@@ -70,7 +71,9 @@ public class FormatterTestFile
 
 		InputStream stream = FileLocator.openStream(Platform.getBundle(formatterId), Path.fromPortableString(filename),
 				false);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
+		String contentStr = IOUtil.read(stream);
+		BufferedReader reader = new BufferedReader(new StringReader(contentStr));
 		String lineRead = null;
 
 		// We assume the first tag is the preference tag
@@ -87,13 +90,13 @@ public class FormatterTestFile
 				storeLineByState(lineRead, tag);
 			}
 		}
-		if (formattedContent.length() > 0)
-		{
-			formattedContent.deleteCharAt(formattedContent.length() - 1);
-		}
 		if (content.length() > 0)
 		{
 			content.deleteCharAt(content.length() - 1);
+		}
+		if (formattedContent.length() > 0 && !contentStr.endsWith("\n"))
+		{
+			formattedContent.deleteCharAt(formattedContent.length() - 1);
 		}
 
 		reader.close();

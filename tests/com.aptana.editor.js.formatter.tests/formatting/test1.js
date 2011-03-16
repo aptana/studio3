@@ -28,7 +28,6 @@ var myFunc = function(){
         publicVar: someVar
     };
 }(); // inline execution
-
 ==FORMATTED==
 var myFunc = function() {
     var someVar = "value";
@@ -36,4 +35,3 @@ var myFunc = function() {
         publicVar: someVar
     };
 }(); // inline execution
-

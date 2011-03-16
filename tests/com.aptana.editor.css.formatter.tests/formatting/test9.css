@@ -23,7 +23,6 @@ input:before {
     background-color: #B4C8E3;
     height: 10px;
   }
-
 ==FORMATTED==
 input[type=checkbox] {
     background-color: #B4C8E3;
@@ -39,4 +38,3 @@ input:before {
     background-color: #B4C8E3;
     height: 10px;
 }
-

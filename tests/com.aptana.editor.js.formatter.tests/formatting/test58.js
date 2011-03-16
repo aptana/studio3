@@ -2487,7 +2487,6 @@ jQuery.extend({
 	}
 });
 }
-
 ==FORMATTED==
 /** @namespace jQuery-1.1.3.1 */
 
@@ -4872,4 +4871,3 @@ else if ( m[1] == "@" ) {
         }
     });
 }
-

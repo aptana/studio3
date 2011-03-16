@@ -17,9 +17,6 @@ xml.formatter.formatter.tabulation.char=space
     <a>
     </a>
 </test>
-
-
-
 ==FORMATTED==
 <test
 
@@ -27,4 +24,3 @@ test="test">
     <a>
     </a>
 </test>
-

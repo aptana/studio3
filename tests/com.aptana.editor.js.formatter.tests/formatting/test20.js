@@ -25,9 +25,7 @@ js.formatter.formatter.tabulation.char=space
 function test123(){
     var x = j + 1/**3*//*4*/;
 }
-
 ==FORMATTED==
 function test123() {
     var x = j + 1/**3*//*4*/;
 }
-
