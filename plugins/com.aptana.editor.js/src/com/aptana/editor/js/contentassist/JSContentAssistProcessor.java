@@ -69,7 +69,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IParseNode _targetNode;
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
-	
+
 	// NOTE: temp (I hope) until we get proper partitions for JS inside of HTML
 	private IRange _activeRange;
 
@@ -82,10 +82,10 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	public JSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
 	{
 		this(editor);
-		
+
 		this._activeRange = activeRange;
 	}
-	
+
 	/**
 	 * JSIndexContentAssitProcessor
 	 * 

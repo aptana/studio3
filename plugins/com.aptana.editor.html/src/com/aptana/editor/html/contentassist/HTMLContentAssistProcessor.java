@@ -1334,7 +1334,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
 										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
-										
+
 										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
