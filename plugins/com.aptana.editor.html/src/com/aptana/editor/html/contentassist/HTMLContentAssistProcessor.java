@@ -307,6 +307,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					this._replaceRange = new Range(offset, offset - 1);
 					break;
 
+				// https://aptana.lighthouseapp.com/projects/35272/tickets/1640-coosing-attribute-value-in-html-ca-can-overwrite-part-of-open-tag
+				case TAG_END:
+				case TAG_SELF_CLOSE:
+					this._replaceRange = new Range(offset, offset - 1);
+					break;
+
 				default:
 					break;
 			}

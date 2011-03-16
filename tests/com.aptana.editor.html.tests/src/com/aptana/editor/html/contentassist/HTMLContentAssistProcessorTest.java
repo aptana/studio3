@@ -194,6 +194,12 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div sty|=\"\"></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testDontOverwriteTagEnd()
+	{
+		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
 	@SuppressWarnings("rawtypes")
 	public void testStyleAttributeProposalHasExitTabstopAfterQuotes()
 	{
