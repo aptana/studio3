@@ -498,18 +498,29 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	 * @param output
 	 * @param lineSeparator
 	 * @param indentSufix
+	 * @param isBottomSourceBlock
+	 *            Indicates that the source block is the top one in the script.
+	 * @param isTopSourceBlock
+	 *            Indicates that the source block is the bottom one in the script.
 	 * @return A processed output string.
 	 */
-	protected String processNestedOutput(String output, String lineSeparator, String indentSufix)
+	protected String processNestedOutput(String output, String lineSeparator, String indentSufix,
+			boolean isTopSourceBlock, boolean isBottomSourceBlock)
 	{
 		// In case the output contains multiple lines, make sure it starts and ends with a new-line char
 		if (output.split(lineSeparator, 2).length > 1)
 		{
 			StringBuilder wrappedOutput = new StringBuilder(output);
-			wrappedOutput.insert(0, lineSeparator);
-			wrappedOutput.append(lineSeparator);
-			// Add the indentSufix that we may have.
-			wrappedOutput.append(indentSufix);
+			if (!isTopSourceBlock)
+			{
+				wrappedOutput.insert(0, lineSeparator);
+			}
+			if (!isBottomSourceBlock)
+			{
+				wrappedOutput.append(lineSeparator);
+				// Add the indentSufix that we may have.
+				wrappedOutput.append(indentSufix);
+			}
 			output = wrappedOutput.toString();
 		}
 		else

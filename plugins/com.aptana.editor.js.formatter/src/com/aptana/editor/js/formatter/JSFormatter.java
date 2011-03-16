@@ -156,7 +156,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,
-						indentSufix);
+						indentSufix, offset == 0, length == source.length());
 				if (output != null)
 				{
 					if (!originalText.equals(output))
@@ -301,11 +301,16 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @param indentSufix
+	 * @param isBottomSourceBlock
+	 *            Indicates that the source block is the top one in the script.
+	 * @param isTopSourceBlock
+	 *            Indicates that the source block is the bottom one in the script.
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
-			boolean isSelection, String indentSufix) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int inputOffset,
+			boolean isSelection, String indentSufix, boolean isTopSourceBlock, boolean isBottomSourceBlock)
+			throws Exception
 	{
 		int spacesCount = -1;
 		if (isSelection)
@@ -313,7 +318,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			spacesCount = countLeftWhitespaceChars(input);
 		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
-		final FormatterDocument document = createFormatterDocument(input, offset);
+		final FormatterDocument document = createFormatterDocument(input, inputOffset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new JSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new JSFormatterContext(indentationLevel);
@@ -336,7 +341,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		else
 		{
-			output = processNestedOutput(output, lineSeparator, indentSufix);
+			output = processNestedOutput(output, lineSeparator, indentSufix, isTopSourceBlock, isBottomSourceBlock);
 		}
 		return output;
 	}

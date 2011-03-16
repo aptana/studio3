@@ -41,7 +41,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 			assertNotNull("Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
 			formattedTextEdit.apply(document);
 			assertTrue("Formatted contents of " + filename + " do not match expected contents", //$NON-NLS-1$ //$NON-NLS-2$
-					compareWithWhiteSpace(document.get(), expectedResult));
+					compareWithWhiteSpace(document.get().replaceAll("\r\n", "\n"), expectedResult));//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		catch (MalformedTreeException e)
 		{
@@ -76,6 +76,6 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		return (String[]) filePaths.toArray(new String[filePaths.size()]);
 	}
 
-	protected abstract boolean compareWithWhiteSpace(String original, String formattedText);
+	protected abstract boolean compareWithWhiteSpace(String formattedText, String expectedResult);
 
 }
