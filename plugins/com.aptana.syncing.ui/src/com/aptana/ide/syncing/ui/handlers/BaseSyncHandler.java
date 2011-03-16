@@ -26,6 +26,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 
 public abstract class BaseSyncHandler extends AbstractHandler
 {
@@ -92,6 +93,18 @@ public abstract class BaseSyncHandler extends AbstractHandler
 						if (editorInput instanceof IFileEditorInput)
 						{
 							resource = ((IFileEditorInput) editorInput).getFile();
+						}
+						else if (editorInput instanceof IUniformFileStoreEditorInput)
+						{
+							try
+							{
+								resource = EFS.getStore(((IUniformFileStoreEditorInput) editorInput).getFileStore()
+										.toURI());
+							}
+							catch (CoreException e)
+							{
+								// ignores
+							}
 						}
 						else if (editorInput instanceof IURIEditorInput)
 						{

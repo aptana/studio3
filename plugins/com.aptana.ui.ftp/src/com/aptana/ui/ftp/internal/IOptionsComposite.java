@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.internal;
+package com.aptana.ui.ftp.internal;
 
 import com.aptana.ide.core.io.ConnectionContext;
 

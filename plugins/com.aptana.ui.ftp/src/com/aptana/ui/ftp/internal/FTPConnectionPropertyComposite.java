@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.internal;
+package com.aptana.ui.ftp.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -57,11 +57,11 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
-import com.aptana.ide.ui.ftp.FTPUIPlugin;
-import com.aptana.ide.ui.ftp.dialogs.Messages;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
+import com.aptana.ui.ftp.FTPUIPlugin;
+import com.aptana.ui.ftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
 
 /**

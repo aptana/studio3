@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp;
+package com.aptana.ui.ftp;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;

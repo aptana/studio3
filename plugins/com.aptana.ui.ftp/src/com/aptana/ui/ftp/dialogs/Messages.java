@@ -6,13 +6,13 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.dialogs;
+package com.aptana.ui.ftp.dialogs;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-    private static final String BUNDLE_NAME = "com.aptana.ide.ui.ftp.dialogs.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME = "com.aptana.ui.ftp.dialogs.messages"; //$NON-NLS-1$
 
     public static String FTPConnectionPointPropertyDialog_ConfirmMessage;
     public static String FTPConnectionPointPropertyDialog_ConfirmTitle;

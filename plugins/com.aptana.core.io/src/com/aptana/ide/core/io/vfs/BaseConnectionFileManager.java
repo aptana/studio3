@@ -175,11 +175,11 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
 			if (!fileInfo.exists()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-						Messages.BaseConnectionFileManager_no_such_file, new FileNotFoundException(path.toPortableString())));
+						Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, null)));
 			}
 			if (fileInfo.isDirectory()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-						Messages.BaseConnectionFileManager_file_is_directory, new FileNotFoundException(path.toPortableString())));				
+						Messages.BaseConnectionFileManager_file_is_directory, initFileNotFoundException(path, null)));
 			}
 			if (fileInfo.getLength() == 0) {
 				return new ByteArrayInputStream(new byte[0]);
@@ -187,7 +187,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			return readFile(basePath.append(path), Policy.subMonitorFor(monitor, 1));			
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					Messages.BaseConnectionFileManager_no_such_file, new FileNotFoundException(path.toPortableString())));
+					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
 			setLastOperationTime();
 			monitor.done();
@@ -205,7 +205,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
 			if (fileInfo.exists() && fileInfo.isDirectory()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-						Messages.BaseConnectionFileManager_file_is_directory, new FileNotFoundException(path.toPortableString())));				
+						Messages.BaseConnectionFileManager_file_is_directory, initFileNotFoundException(path, null)));
 			}
 			long permissions = -1;
 			boolean useTemporary = canUseTemporaryFile(path, fileInfo, Policy.subMonitorFor(monitor, 1));
@@ -221,7 +221,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			return writeFile(basePath.append(path), useTemporary, permissions, Policy.subMonitorFor(monitor, 1));
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					Messages.BaseConnectionFileManager_parent_doesnt_exist, new FileNotFoundException(path.toPortableString())));
+					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e.getCause())));
 		} finally {
 			setLastOperationTime();
 			monitor.done();
@@ -273,7 +273,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (fileInfo.exists()) {
 				if (!fileInfo.isDirectory()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_file_already_exists, new FileNotFoundException(path.toPortableString())));				
+							Messages.BaseConnectionFileManager_file_already_exists, initFileNotFoundException(path, null)));
 				}
 				return;
 			}
@@ -281,11 +281,11 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				fileInfo = fetchAndCacheFileInfo(path.removeLastSegments(1), Policy.subMonitorFor(monitor, 1));
 				if (!fileInfo.exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_parent_doesnt_exist, new FileNotFoundException(path.toPortableString())));					
+							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, null)));
 				}
 				if (!fileInfo.isDirectory()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_parent_is_not_directory, new FileNotFoundException(path.toPortableString())));				
+							Messages.BaseConnectionFileManager_parent_is_not_directory, initFileNotFoundException(path, null)));
 				}
 				createDirectory(basePath.append(path), Policy.subMonitorFor(monitor, 1));
 			} else if (path.segmentCount() == 1) {
@@ -301,7 +301,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					Messages.BaseConnectionFileManager_parent_doesnt_exist, e));
+					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e).getCause()));
 		} finally {
 			setLastOperationTime();
 			monitor.done();
@@ -347,7 +347,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					Messages.BaseConnectionFileManager_no_such_file, new FileNotFoundException(path.toPortableString())));
+					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
 			clearCache(path);
 			setLastOperationTime();
@@ -366,14 +366,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(sourcePath, Policy.subMonitorFor(monitor, 1));
 			if (!fileInfo.exists()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-						Messages.BaseConnectionFileManager_no_such_file, new FileNotFoundException(sourcePath.toPortableString())));
+						Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, null)));
 			}
 			boolean isDirectory = fileInfo.isDirectory();
 			fileInfo = fetchAndCacheFileInfo(destinationPath, Policy.subMonitorFor(monitor, 1));
 			if (fileInfo.exists()) {
 				if ((options & EFS.OVERWRITE) == 0) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_file_already_exists, new FileNotFoundException(destinationPath.toPortableString())));
+							Messages.BaseConnectionFileManager_file_already_exists, initFileNotFoundException(destinationPath, null)));
 				}
 				if (fileInfo.isDirectory() != isDirectory) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
@@ -383,7 +383,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				fileInfo = fetchAndCacheFileInfo(destinationPath.removeLastSegments(1), Policy.subMonitorFor(monitor, 1));
 				if (!fileInfo.exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_parent_doesnt_exist, new FileNotFoundException(destinationPath.toPortableString())));					
+							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(destinationPath, null)));
 				}
 			}
 			clearCache(sourcePath);
@@ -391,7 +391,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			renameFile(basePath.append(sourcePath), basePath.append(destinationPath), Policy.subMonitorFor(monitor, 2));
 		} catch (FileNotFoundException e) {
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-					Messages.BaseConnectionFileManager_no_such_file, new FileNotFoundException(sourcePath.toPortableString())));
+					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, e.getCause())));
 		} finally {
 			setLastOperationTime();
 			monitor.done();
@@ -493,7 +493,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
 				} catch (PermissionDeniedException e) {
 					// permission denied is like file not found for the case of symlink resolving
-					throw new FileNotFoundException(targetPath.toPortableString());
+					throw initFileNotFoundException(targetPath, e);
 				}
 			}
 			cache(targetPath, targetFileInfo);
@@ -566,6 +566,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			connect(Policy.subMonitorFor(monitor, 1));
 			Policy.checkCanceled(monitor);
 		}
+	}
+
+	protected static FileNotFoundException initFileNotFoundException(IPath path, Throwable cause) {
+		FileNotFoundException e = new FileNotFoundException(path.toPortableString());
+		if (cause != null) {
+			e.initCause(cause);
+		}
+		return e;
 	}
 
 }

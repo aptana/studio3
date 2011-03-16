@@ -6,14 +6,14 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.internal;
+package com.aptana.ui.ftp.internal;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.IShellProvider;
 
 import com.aptana.ui.IPropertyDialogProvider;
-import com.aptana.ide.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
+import com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
 
 /**
  * @author Max Stepanov

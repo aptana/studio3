@@ -8,6 +8,8 @@
 package com.aptana.terminal.internal.emulator;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -32,6 +34,14 @@ import com.aptana.theme.ThemePlugin;
 
 public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl {
 
+	private static final Set<Character> IGNORE_ALT_WITH_KEYS = new HashSet<Character>();
+	
+	static {
+		for (char c : "@#\\|[]{}".toCharArray()) {
+			IGNORE_ALT_WITH_KEYS.add(c);
+		}
+	}
+	
 	private IPreferenceChangeListener preferenceChangeListener;
 	private IPropertyChangeListener propertyChangeListener;
 	
@@ -79,6 +89,17 @@ public class VT100TerminalControl extends org.eclipse.tm.internal.terminal.emula
 			encoding = "UTF-8"; //$NON-NLS-1$
 		}
 		super.setEncoding(encoding);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.tm.internal.terminal.emulator.VT100TerminalControl#sendChar(char, boolean)
+	 */
+	@Override
+	protected void sendChar(char chKey, boolean altKeyPressed) {
+		if (altKeyPressed && IGNORE_ALT_WITH_KEYS.contains(chKey)) {
+			altKeyPressed = false;
+		}
+		super.sendChar(chKey, altKeyPressed);
 	}
 
 	/* (non-Javadoc)
