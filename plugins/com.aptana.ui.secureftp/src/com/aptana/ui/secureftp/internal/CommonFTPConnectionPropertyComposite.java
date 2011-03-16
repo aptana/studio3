@@ -51,7 +51,6 @@ import com.aptana.ui.util.UIUtils;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 public class CommonFTPConnectionPropertyComposite extends FTPConnectionPropertyComposite
 {
 

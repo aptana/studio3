@@ -33,7 +33,6 @@ import com.aptana.ui.ftp.internal.NumberVerifyListener;
  * @author Max Stepanov
  *
  */
-@SuppressWarnings("restriction")
 public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsComposite {
 	
 	private Listener listener;
