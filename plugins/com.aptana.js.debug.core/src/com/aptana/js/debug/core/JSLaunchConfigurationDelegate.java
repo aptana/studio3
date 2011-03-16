@@ -83,6 +83,13 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				Object result = prompter.handleStatus(launchBrowserPromptStatus, null);
 				if ((result instanceof Boolean) && (((Boolean) result).booleanValue())) {
 					activeSession.terminate();
+					while (!monitor.isCanceled() && !activeSession.isTerminated()) {
+						try {
+							Thread.sleep(250);
+						} catch (InterruptedException ignore) {
+						}
+					}
+					
 				} else {
 					String errorMessage = Messages.JSLaunchConfigurationDelegate_MultipleJavaScriptDebugNotSupported
 							+ Messages.JSLaunchConfigurationDelegate_PleaseTerminateActiveSession;
