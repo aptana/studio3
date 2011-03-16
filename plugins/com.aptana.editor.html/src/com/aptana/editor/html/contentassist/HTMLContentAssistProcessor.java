@@ -1065,7 +1065,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			boolean autoActivated)
 	{
 		// tokenize the current document
-		_document = viewer.getDocument();
+		this._document = viewer.getDocument();
 
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
 
@@ -1094,16 +1094,15 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				{
 					String elementName = this.getElementName(lexemeProvider, offset);
 					String attributeName = this.getAttributeName(lexemeProvider, offset);
+					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1, this._currentLexeme.getEndingOffset() - 1);
 
 					if (HTMLUtils.isCSSAttribute(attributeName))
 					{
-						return new CSSContentAssistProcessor(this.editor).computeCompletionProposals(viewer, offset,
-								activationChar, autoActivated);
+						return new CSSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
 					}
 					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
 					{
-						return new JSContentAssistProcessor(this.editor).computeCompletionProposals(viewer, offset,
-								activationChar, autoActivated);
+						return new JSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
 					}
 				}
 
