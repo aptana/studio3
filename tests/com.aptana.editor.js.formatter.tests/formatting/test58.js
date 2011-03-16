@@ -3183,8 +3183,7 @@ else if (document.defaultView && document.defaultView.getComputedStyle) {
      * @type Boolean
      * @cat JavaScript
      */
-    new
-    function() {
+    new function() {
         var b = navigator.userAgent.toLowerCase();
 
         // Figure out what browser is being used
@@ -3219,7 +3218,6 @@ else if (document.defaultView && document.defaultView.getComputedStyle) {
             maxlength: "maxLength"
         };
     };
-
     jQuery.each({
         parent: "a.parentNode",
         parents: "jQuery.parents(a)",
@@ -4097,8 +4095,7 @@ else if ( m[1] == "@" ) {
         }
     });
 
-    new
-    function() {
+    new function() {
 
         jQuery.each( ("blur,focus,load,resize,scroll,unload,click,dblclick," +
             "mousedown,mouseup,mousemove,mouseover,mouseout,change,select," +
@@ -4155,7 +4152,6 @@ else if ( m[1] == "@" ) {
         jQuery.event.add( window, "load", jQuery.ready );
 
     };
-
     // Clean up after IE to avoid memory leaks
     if (jQuery.browser.msie)
         jQuery(window).one("unload", function() {
