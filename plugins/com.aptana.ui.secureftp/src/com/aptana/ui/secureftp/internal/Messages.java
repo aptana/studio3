@@ -5,14 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.ui.secureftp.internal;
+package com.aptana.ui.secureftp.internal;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.ui.secureftp.internal.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ui.secureftp.internal.messages"; //$NON-NLS-1$
 
 	public static String FTPSAdvancedOptionsComposite_ConnectMode;
 	public static String FTPSAdvancedOptionsComposite_Detect;
