@@ -106,15 +106,6 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 		}
 		else
 		{
-
-			String message = status.getMessage();
-			if (message.contains("did not match any files")) //$NON-NLS-1$
-			{
-				// No files underneath folder are in git, so git knows nothing about directory. Let normal handler
-				// delete this directory
-				return FINISH_FOR_ME;
-			}
-
 			tree.failed(status);
 		}
 		return true;
@@ -270,7 +261,7 @@ class GitMoveDeleteHook implements IMoveDeleteHook
 	protected boolean hasNoCommittedFiles(IPath source, GitRepository repo)
 	{
 		IStatus result = repo.execute(GitRepository.ReadWrite.READ, "ls-tree", "-r", "HEAD:" + source.toOSString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		return result != null && result.isOK();
+		return result == null || !result.isOK();
 	}
 
 	public boolean moveProject(final IResourceTree tree, final IProject source, final IProjectDescription description,

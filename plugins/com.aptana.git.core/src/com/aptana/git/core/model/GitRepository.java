@@ -648,35 +648,53 @@ public class GitRepository
 
 	private Set<IProject> getProjectsThatDontExistOnBranch(final String branchName, IProgressMonitor monitor)
 	{
-		Set<IProject> projectsNotExistingOnNewBranch = new HashSet<IProject>();
+		IPath workingDir = workingDirectory();
+		// If root of git is root of a project, no need to check.
+		IContainer c = ResourcesPlugin.getWorkspace().getRoot().getContainerForLocation(workingDir);
+		if (c instanceof IProject)
+		{
+			return Collections.emptySet();
+		}
+		// Now filter down to projects underneath the repo!
+		List<IProject> beneathRepo = new ArrayList<IProject>();
 		for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects())
 		{
-			if (!project.isAccessible())
+			if (workingDir.isPrefixOf(project.getLocation()))
 			{
-				// TODO What if we have a closed project because it doesn't exist here, but it does on the new
-				// branch. Auto-open after switch?
-				continue;
+				beneathRepo.add(project);
 			}
-			// If the git repo location is the project root, just return that it's ok!
-			if (project.getLocation().equals(workingDirectory()))
-			{
-				continue;
-			}
+		}
+		// Unlikely this woudl ever happen, but if there are no projects under this repo, bail
+		if (beneathRepo.isEmpty())
+		{
+			return Collections.emptySet();
+		}
 
-			// TODO Is there a way to use diff to get the list of projects that don't exist on branch?
-			GitRepository other = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
-			if (other != null && other.equals(this))
+		// Now do a batch check against all the projects underneath our repo
+		Set<IProject> projectsNotExistingOnNewBranch = new HashSet<IProject>();
+		StringBuilder input = new StringBuilder();
+		for (IProject project : beneathRepo)
+		{
+			input.append(branchName).append(':')
+					.append(relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString())
+					.append('\n');
+		}
+		this.monitor.enterRead();
+		IStatus result = GitExecutable.instance().runInBackground(input.toString(), workingDir,
+				"cat-file", "--batch-check"); //$NON-NLS-1$ //$NON-NLS-2$
+		this.monitor.exitRead();
+		if (result.isOK())
+		{
+			String output = result.getMessage();
+			String[] lines = output.split("\r?\n|\r"); //$NON-NLS-1$
+			int lineNum = 0;
+			for (String line : lines)
 			{
-				// Check if the project exists on the other branch!
-				IStatus result = execute(
-						GitRepository.ReadWrite.READ,
-						"cat-file", "-e", //$NON-NLS-1$ //$NON-NLS-2$
-						branchName
-								+ ":" + relativePath(project).append(IProjectDescription.DESCRIPTION_FILE_NAME).toPortableString()); //$NON-NLS-1$
-				if (result == null || !result.isOK())
+				if (line.endsWith(" missing")) //$NON-NLS-1$
 				{
-					projectsNotExistingOnNewBranch.add(project);
+					projectsNotExistingOnNewBranch.add(beneathRepo.get(lineNum));
 				}
+				lineNum++;
 			}
 		}
 		return projectsNotExistingOnNewBranch;
