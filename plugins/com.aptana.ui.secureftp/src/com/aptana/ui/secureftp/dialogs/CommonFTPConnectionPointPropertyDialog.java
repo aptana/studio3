@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.secureftp.dialogs;
+package com.aptana.ui.secureftp.dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -15,9 +15,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.core.io.ConnectionPointType;
 import com.aptana.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 import com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
+import com.aptana.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 
 /**
  * @author Max Stepanov

@@ -5,14 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.ui.secureftp.dialogs;
+package com.aptana.ui.secureftp.dialogs;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.ui.secureftp.dialogs.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.ui.secureftp.dialogs.messages"; //$NON-NLS-1$
 
 	public static String CommonFTPConnectionPointPropertyDialog_ERR_PrivateKey;
 	public static String CommonFTPConnectionPointPropertyDialog_IncorrectPassphrase;

@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.secureftp.internal;
+package com.aptana.ui.secureftp.internal;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,11 +39,11 @@ import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.SecureUtils;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.filesystem.ftp.Policy;
-import com.aptana.ide.ui.secureftp.dialogs.Messages;
 import com.aptana.ui.ftp.internal.FTPAdvancedOptionsComposite;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ui.io.dialogs.IDialogConstants;
+import com.aptana.ui.secureftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
 
 /**

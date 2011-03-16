@@ -6,14 +6,14 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.secureftp.internal;
+package com.aptana.ui.secureftp.internal;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.window.IShellProvider;
 
 import com.aptana.ui.IPropertyDialogProvider;
-import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
+import com.aptana.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 
 /**
  * @author Max Stepanov
