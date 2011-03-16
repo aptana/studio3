@@ -29,20 +29,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.core.io.ConnectionPointType;
-import com.aptana.core.io.CoreIOPlugin;
-import com.aptana.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.IFTPSConnectionPoint;
 import com.aptana.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.SFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.SecureUtils;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.filesystem.ftp.Policy;
+import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.ftp.internal.FTPAdvancedOptionsComposite;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.ftp.internal.IOptionsComposite;
-import com.aptana.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.secureftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
 

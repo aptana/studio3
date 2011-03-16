@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.syncing.ui;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.syncing.ui.SyncingUIPlugin
+Bundle-Activator: com.aptana.ide.syncing.ui.SyncingUIPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -25,14 +25,14 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.syncing.ui,
- com.aptana.syncing.ui.actions,
- com.aptana.syncing.ui.dialogs,
- com.aptana.syncing.ui.editors,
- com.aptana.syncing.ui.internal,
- com.aptana.syncing.ui.navigator,
- com.aptana.syncing.ui.navigator.actions,
- com.aptana.syncing.ui.preferences,
- com.aptana.syncing.ui.properties,
- com.aptana.syncing.ui.views
+Export-Package: com.aptana.ide.syncing.ui,
+ com.aptana.ide.syncing.ui.actions,
+ com.aptana.ide.syncing.ui.dialogs,
+ com.aptana.ide.syncing.ui.editors,
+ com.aptana.ide.syncing.ui.internal,
+ com.aptana.ide.syncing.ui.navigator,
+ com.aptana.ide.syncing.ui.navigator.actions,
+ com.aptana.ide.syncing.ui.preferences,
+ com.aptana.ide.syncing.ui.properties,
+ com.aptana.ide.syncing.ui.views
 Eclipse-ExtensibleAPI: true

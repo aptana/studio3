@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.filesystem.s3;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.filesystem.s3.S3FileSystemPlugin
+Bundle-Activator: com.aptana.ide.filesystem.s3.S3FileSystemPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.filesystem,
@@ -13,5 +13,5 @@ Require-Bundle: org.eclipse.core.runtime,
  com.amazon.s3;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.filesystem.s3
+Export-Package: com.aptana.ide.filesystem.s3
 Eclipse-ExtensibleAPI: true

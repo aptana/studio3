@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.core.io;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.core.io.CoreIOPlugin
+Bundle-Activator: com.aptana.ide.core.io.CoreIOPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -17,11 +17,11 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core.epl
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.core.io,
- com.aptana.core.io.auth,
- com.aptana.core.io.downloader,
- com.aptana.core.io.efs,
- com.aptana.core.io.events,
- com.aptana.core.io.preferences,
- com.aptana.core.io.vfs
+Export-Package: com.aptana.ide.core.io,
+ com.aptana.ide.core.io.auth,
+ com.aptana.ide.core.io.downloader,
+ com.aptana.ide.core.io.efs,
+ com.aptana.ide.core.io.events,
+ com.aptana.ide.core.io.preferences,
+ com.aptana.ide.core.io.vfs
 Eclipse-ExtensibleAPI: true

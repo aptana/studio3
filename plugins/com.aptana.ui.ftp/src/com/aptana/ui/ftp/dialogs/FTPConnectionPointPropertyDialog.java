@@ -23,9 +23,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.io.ConnectionPointType;
-import com.aptana.core.io.CoreIOPlugin;
-import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.ui.IPropertyDialog;
 import com.aptana.ui.ftp.FTPUIPlugin;
@@ -57,7 +57,7 @@ public class FTPConnectionPointPropertyDialog extends TitleAreaDialog implements
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ui.IPropertyDialog#setPropertyElement(java.lang.Object)
+	 * @see com.aptana.ide.core.io.ui.IPropertyDialog#setPropertyElement(java.lang.Object)
 	 */
 	public void setPropertySource(Object element) {
 		ftpConnectionPoint = null;

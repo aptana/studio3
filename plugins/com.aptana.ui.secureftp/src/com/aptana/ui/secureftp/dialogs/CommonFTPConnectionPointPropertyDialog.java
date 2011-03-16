@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.core.io.ConnectionPointType;
-import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.core.io.ConnectionPointType;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ui.ftp.dialogs.FTPConnectionPointPropertyDialog;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;

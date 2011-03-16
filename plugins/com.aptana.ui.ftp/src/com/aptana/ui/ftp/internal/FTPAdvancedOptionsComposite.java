@@ -27,11 +27,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.core.io.ConnectionContext;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TimeZoneUtil;
+import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
-import com.aptana.ui.io.dialogs.IDialogConstants;
+import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 
 /**
  * @author Max Stepanov
@@ -146,7 +146,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ui.io.IPropertiesEditor#loadPropertiesFrom(java.lang.Object)
+	 * @see com.aptana.ide.ui.io.IPropertiesEditor#loadPropertiesFrom(java.lang.Object)
 	 */
 	public void loadPropertiesFrom(Object element) {
 		Assert.isLegal(element instanceof IBaseFTPConnectionPoint);
@@ -172,7 +172,7 @@ public class FTPAdvancedOptionsComposite extends Composite implements IOptionsCo
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ui.io.IPropertiesEditor#savePropertiesTo(java.lang.Object)
+	 * @see com.aptana.ide.ui.io.IPropertiesEditor#savePropertiesTo(java.lang.Object)
 	 */
 	public boolean savePropertiesTo(Object element) {
 		Assert.isLegal(element instanceof IBaseFTPConnectionPoint);

@@ -68,7 +68,8 @@
       <validator
             class="com.aptana.editor.css.validator.CSSValidator"
             language="text/css"
-            name="%validator.css.name">
+            name="%validator.css.name"
+            type="com.aptana.editor.css.problem">
       </validator>
    </extension>
    <extension
@@ -77,7 +78,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.css.preferences.CSSPreferencePage"
             id="com.aptana.editor.html.preferences.CSSPreferencePage"
-            name="CSS">
+            name="%page.css.name">
       </page>
    </extension>
    <extension
@@ -86,6 +87,29 @@
             class="com.aptana.editor.common.ExternalFileAnnotationModelFactory"
             contentTypeId="com.aptana.contenttype.css">
       </factory>
+   </extension>
+   <extension
+         id="problem"
+         name="%marker.css.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+      <attribute
+            name="id">
+      </attribute>
+      <attribute
+            name="flags">
+      </attribute>
+      <attribute
+            name="arguments">
+      </attribute>
    </extension>
 
 </plugin>

@@ -9116,7 +9116,7 @@ The character at index 4 is e &lt;/pre&gt;
         </remarks>
       </method>
       
-	  <method name="charCodeAt">
+	  <method name="charCodeAt" scope="static">
         <description>Returns the the Unicode value of the character at the specified index.</description>
 		<browsers>
 			<browser platform="IE" version="5.5+"/>

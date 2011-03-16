@@ -4,13 +4,13 @@
    <extension
          point="com.aptana.core.io.connectionPoint">
       <connectionPointCategory
-            id="com.aptana.ide.filesystem.ftp.ftpCategory"
+            id="com.aptana.filesystem.ftp.ftpCategory"
             name="%connectionPointCategory.name.ftp"
             order="100"
             remote="true">
       </connectionPointCategory>
       <connectionPointType
-            category="com.aptana.ide.filesystem.ftp.ftpCategory"
+            category="com.aptana.filesystem.ftp.ftpCategory"
             class="com.aptana.filesystem.ftp.FTPConnectionPoint"
             id="ftp"
             name="%connectionPointType.name.ftp">

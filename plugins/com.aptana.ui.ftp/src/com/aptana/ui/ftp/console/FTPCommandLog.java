@@ -21,7 +21,7 @@ import com.aptana.filesystem.ftp.IFTPCommandLog;
 public class FTPCommandLog implements IFTPCommandLog {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.ftp.IFTPCommandLog#getOutputStream()
+	 * @see com.aptana.filesystem.ftp.IFTPCommandLog#getOutputStream()
 	 */
 	public OutputStream getOutputStream() {
 		return FTPConsoleFactory.newConsoleOutputStream();

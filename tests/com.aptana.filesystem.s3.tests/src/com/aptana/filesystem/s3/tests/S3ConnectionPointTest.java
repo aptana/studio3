@@ -3,7 +3,7 @@ package com.aptana.filesystem.s3.tests;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.io.tests.CommonConnectionTest;
-import com.aptana.filesystem.s3.S3ConnectionPoint;
+import com.aptana.ide.filesystem.s3.S3ConnectionPoint;
 
 public class S3ConnectionPointTest extends CommonConnectionTest
 {

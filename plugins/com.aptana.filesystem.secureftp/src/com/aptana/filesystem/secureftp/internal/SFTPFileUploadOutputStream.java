@@ -14,7 +14,7 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.io.PermissionDeniedException;
+import com.aptana.ide.core.io.PermissionDeniedException;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
 import com.enterprisedt.net.ftp.ssh.SSHFTPClient;

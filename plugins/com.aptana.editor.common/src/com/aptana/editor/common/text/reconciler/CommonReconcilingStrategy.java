@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Display;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.parsing.FileService;
 
 public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension
 {
@@ -96,11 +97,22 @@ public class CommonReconcilingStrategy implements IReconcilingStrategy, IReconci
 	protected void calculatePositions(IProgressMonitor monitor)
 	{
 		if (monitor != null && monitor.isCanceled())
+		{
 			return;
+		}
+
+		FileService fileService = fEditor.getFileService();
 		// doing a full parse at the moment
-		fEditor.getFileService().parse();
-		if (monitor != null && monitor.isCanceled())
+		fileService.parse();
+		// abort if parse failed
+		if (!fileService.hasValidParseResult())
+		{
 			return;
+		}
+		if (monitor != null && monitor.isCanceled())
+		{
+			return;
+		}
 		// Folding...
 		fPositions.clear();
 		try

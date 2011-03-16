@@ -8,7 +8,7 @@
 
 package com.aptana.ui.ftp.internal;
 
-import com.aptana.core.io.ConnectionContext;
+import com.aptana.ide.core.io.ConnectionContext;
 
 /**
  * @author Max Stepanov

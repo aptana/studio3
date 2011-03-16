@@ -25,9 +25,9 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.secureftp.ISFTPConnectionPoint;
 import com.aptana.filesystem.secureftp.ISFTPConstants;
+import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ui.ftp.internal.NumberVerifyListener;
-import com.aptana.ui.io.dialogs.IDialogConstants;
 
 /**
  * @author Max Stepanov
@@ -105,7 +105,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ui.io.IPropertiesEditor#loadPropertiesFrom(java.lang.Object)
+	 * @see com.aptana.ide.ui.io.IPropertiesEditor#loadPropertiesFrom(java.lang.Object)
 	 */
 	public void loadPropertiesFrom(Object element) {
 		Assert.isLegal(element instanceof ISFTPConnectionPoint);
@@ -128,7 +128,7 @@ public class SFTPAdvancedOptionsComposite extends Composite implements IOptionsC
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ui.io.IPropertiesEditor#savePropertiesTo(java.lang.Object)
+	 * @see com.aptana.ide.ui.io.IPropertiesEditor#savePropertiesTo(java.lang.Object)
 	 */
 	public boolean savePropertiesTo(Object element) {
 		Assert.isLegal(element instanceof ISFTPConnectionPoint);

@@ -5,12 +5,12 @@
          point="com.aptana.ui.propertyDialogs">
       <dialog
             class="com.aptana.ui.ftp.internal.FTPPropertyDialogProvider"
-            id="com.aptana.ide.ui.secureftp.sftpDialog"
+            id="com.aptana.ui.secureftp.sftpDialog"
             objectClass="com.aptana.filesystem.secureftp.SFTPConnectionPoint">
       </dialog>
       <dialog
             class="com.aptana.ui.ftp.internal.FTPPropertyDialogProvider"
-            id="com.aptana.ide.ui.secureftp.ftpsDialog"
+            id="com.aptana.ui.secureftp.ftpsDialog"
             objectClass="com.aptana.filesystem.secureftp.FTPSConnectionPoint">
       </dialog>
    </extension>

@@ -194,6 +194,13 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div sty|=\"\"></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	public void testDontOverwriteTagEnd()
+	{
+		assertCompletionCorrect("<div dir=\"|></div>", '\t', 2, "ltr", "<div dir=\"ltr></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		assertCompletionCorrect("<br dir=\"|/>", '\t', 2, "ltr", "<br dir=\"ltr/>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+	}
+
+	@SuppressWarnings("rawtypes")
 	public void testStyleAttributeProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "style", "<div style=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -213,6 +220,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(0, pos.getLength());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void testEventProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "onmouseenter", "<div onmouseenter=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -242,6 +250,28 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 
 		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
 		assertEquals(0, proposals.length);
+	}
+
+	public void testAttributeAfterElementName()
+	{
+		String document = "<body s|></body>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+
+		boolean foundScroll = false;
+		for (ICompletionProposal proposal : proposals)
+		{
+			if ("scroll".equals(proposal.getDisplayString()))
+			{
+				foundScroll = true;
+				break;
+			}
+		}
+		assertTrue(foundScroll);
 	}
 
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)

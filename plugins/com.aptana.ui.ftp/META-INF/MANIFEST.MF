@@ -20,5 +20,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.ui.ftp.actions,
  com.aptana.ui.ftp.dialogs,
- com.aptana.ui.ftp.internal;x-friends:="com.aptana.ide.ui.secureftp"
+ com.aptana.ui.ftp.internal;x-friends:="com.aptana.ui.secureftp"
 Eclipse-ExtensibleAPI: true
