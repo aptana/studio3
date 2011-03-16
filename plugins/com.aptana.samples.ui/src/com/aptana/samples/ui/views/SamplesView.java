@@ -41,6 +41,7 @@ import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
+import com.aptana.ide.ui.io.navigator.actions.EditorUtils;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
 import com.aptana.samples.model.SampleEntry;
@@ -51,7 +52,6 @@ import com.aptana.theme.ColorManager;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
-import com.aptana.ui.io.navigator.actions.EditorUtils;
 import com.aptana.ui.util.UIUtils;
 
 /**

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.syncing.core;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.syncing.core.SyncingPlugin
+Bundle-Activator: com.aptana.ide.syncing.core.SyncingPlugin
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -12,8 +12,8 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.core.io
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.syncing.core,
- com.aptana.syncing.core.events,
- com.aptana.syncing.core.old,
- com.aptana.syncing.core.old.handlers
+Export-Package: com.aptana.ide.syncing.core,
+ com.aptana.ide.syncing.core.events,
+ com.aptana.ide.syncing.core.old,
+ com.aptana.ide.syncing.core.old.handlers
 Eclipse-ExtensibleAPI: true

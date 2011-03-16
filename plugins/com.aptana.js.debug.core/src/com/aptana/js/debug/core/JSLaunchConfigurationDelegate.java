@@ -35,12 +35,12 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
 import com.aptana.core.IURIMapper;
-import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
 import com.aptana.debug.core.internal.Util;
 import com.aptana.debug.core.util.DebugUtil;
+import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;

@@ -28,9 +28,9 @@ import org.osgi.framework.Version;
 
 import com.aptana.configurations.processor.AbstractConfigurationProcessor;
 import com.aptana.configurations.processor.ConfigurationStatus;
-import com.aptana.core.io.downloader.DownloadManager;
 import com.aptana.core.util.InputStreamGobbler;
 import com.aptana.core.util.StringUtil;
+import com.aptana.ide.core.io.downloader.DownloadManager;
 import com.aptana.portal.ui.IPortalPreferences;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.processorDelegates.BaseVersionProcessor;

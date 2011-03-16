@@ -21,19 +21,19 @@
       </connectionPointCategory>
       <connectionPointType
             category="com.aptana.ide.core.io.localShortcuts"
-            class="com.aptana.core.io.LocalConnectionPoint"
+            class="com.aptana.ide.core.io.LocalConnectionPoint"
             id="local"
             name="%connectionPointType.local.name">
       </connectionPointType>
       <connectionPointType
             category="com.aptana.ide.core.io.projectShortcuts"
-            class="com.aptana.core.io.WorkspaceConnectionPoint"
+            class="com.aptana.ide.core.io.WorkspaceConnectionPoint"
             id="workspace"
             name="%connectionPointType.project.name">
       </connectionPointType>
       <connectionPointType
             category="com.aptana.ide.core.io.generic"
-            class="com.aptana.core.io.GenericConnectionPoint"
+            class="com.aptana.ide.core.io.GenericConnectionPoint"
             id="generic"
             name="%connectionPointType.generic.name">
       </connectionPointType>
@@ -43,7 +43,7 @@
       <filesystem
             scheme="workspace">
          <run
-               class="com.aptana.core.io.efs.WorkspaceFileSystem">
+               class="com.aptana.ide.core.io.efs.WorkspaceFileSystem">
          </run>
       </filesystem>
    </extension>
@@ -52,32 +52,32 @@
       <filesystem
             scheme="aptanavfs">
          <run
-               class="com.aptana.core.io.efs.VirtualFileSystem">
+               class="com.aptana.ide.core.io.efs.VirtualFileSystem">
          </run>
       </filesystem>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="com.aptana.core.io.internal.ConnectionPropertyTester"
+            class="com.aptana.ide.core.io.internal.ConnectionPropertyTester"
             id="com.aptana.ide.core.io.connectionPropertyTester"
             namespace="com.aptana.ide.core.io.connection"
             properties="isConnected,canDisconnect"
-            type="com.aptana.core.io.IConnectionPoint">
+            type="com.aptana.ide.core.io.IConnectionPoint">
       </propertyTester>
       <propertyTester
-            class="com.aptana.core.io.internal.ConnectionCategoryPropertyTester"
+            class="com.aptana.ide.core.io.internal.ConnectionCategoryPropertyTester"
             id="com.aptana.ide.core.io.connectionCategoryPropertyTester"
             namespace="com.aptana.ide.core.io.connection.category"
             properties="id"
-            type="com.aptana.core.io.IConnectionPointCategory">
+            type="com.aptana.ide.core.io.IConnectionPointCategory">
       </propertyTester>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.internal.filesystem.local.LocalFile"
-            class="com.aptana.core.io.internal.LocalFileAdapterFactory">
+            class="com.aptana.ide.core.io.internal.LocalFileAdapterFactory">
          <adapter
                type="java.io.File">
          </adapter>
@@ -86,7 +86,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.core.io.preferences.PreferenceInitializer">
+            class="com.aptana.ide.core.io.preferences.PreferenceInitializer">
       </initializer>
    </extension>
 

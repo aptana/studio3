@@ -21,7 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.core.io.efs.WorkspaceFileSystem;
+import com.aptana.ide.core.io.efs.WorkspaceFileSystem;
 
 public class WorkspaceFileSystemTest extends TestCase {
 

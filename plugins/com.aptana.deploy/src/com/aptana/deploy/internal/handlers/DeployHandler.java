@@ -24,10 +24,10 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.syncing.core.ISiteConnection;
-import com.aptana.syncing.core.ResourceSynchronizationUtils;
-import com.aptana.syncing.core.SiteConnectionUtils;
-import com.aptana.syncing.ui.actions.SynchronizeProjectAction;
+import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
+import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 import com.aptana.terminal.views.TerminalView;
 
 public class DeployHandler extends AbstractHandler

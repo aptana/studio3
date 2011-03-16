@@ -34,16 +34,16 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.core.io.ConnectionContext;
-import com.aptana.core.io.CoreIOPlugin;
-import com.aptana.core.io.PermissionDeniedException;
-import com.aptana.core.io.preferences.PreferenceUtils;
-import com.aptana.core.io.vfs.ExtendedFileInfo;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
 import com.aptana.filesystem.secureftp.ISFTPConnectionFileManager;
 import com.aptana.filesystem.secureftp.ISFTPConstants;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.PermissionDeniedException;
+import com.aptana.ide.core.io.preferences.PreferenceUtils;
+import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -120,7 +120,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void connect(IProgressMonitor monitor) throws CoreException {
 		Assert.isTrue(ftpClient != null, Messages.SFTPConnectionFileManager_ConnectionNotInitialized);
@@ -268,7 +268,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void disconnect(IProgressMonitor monitor) throws CoreException {
 		try {
@@ -296,7 +296,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.vfs.IConnectionFileManager#isConnected()
+	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#isConnected()
 	 */
 	public boolean isConnected() {
 		return ftpClient != null && ftpClient.connected();

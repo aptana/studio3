@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.ui.io;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.ui.io.IOUIPlugin
+Bundle-Activator: com.aptana.ide.ui.io.IOUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -20,12 +20,12 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.ui.io,
- com.aptana.ui.io.actions,
- com.aptana.ui.io.dialogs,
- com.aptana.ui.io.navigator,
- com.aptana.ui.io.navigator.actions,
- com.aptana.ui.io.navigator.resources,
- com.aptana.ui.io.preferences,
- com.aptana.ui.io.properties
+Export-Package: com.aptana.ide.ui.io,
+ com.aptana.ide.ui.io.actions,
+ com.aptana.ide.ui.io.dialogs,
+ com.aptana.ide.ui.io.navigator,
+ com.aptana.ide.ui.io.navigator.actions,
+ com.aptana.ide.ui.io.navigator.resources,
+ com.aptana.ide.ui.io.preferences,
+ com.aptana.ide.ui.io.properties
 Eclipse-ExtensibleAPI: true

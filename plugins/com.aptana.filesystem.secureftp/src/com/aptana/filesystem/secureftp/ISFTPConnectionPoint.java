@@ -10,7 +10,7 @@ package com.aptana.filesystem.secureftp;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 
 /**

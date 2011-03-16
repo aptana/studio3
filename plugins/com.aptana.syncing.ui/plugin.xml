@@ -5,10 +5,10 @@
          point="org.eclipse.ui.navigator.navigatorContent">
       <navigatorContent
             activeByDefault="true"
-            contentProvider="com.aptana.syncing.ui.navigator.SiteConnectionsContentProvider"
+            contentProvider="com.aptana.ide.syncing.ui.navigator.SiteConnectionsContentProvider"
             icon="icons/full/obj16/ftp.png"
             id="com.aptana.ide.syncing.ui.navigatorContent"
-            labelProvider="com.aptana.syncing.ui.navigator.SitesLabelProvider"
+            labelProvider="com.aptana.ide.syncing.ui.navigator.SitesLabelProvider"
             name="%navigatorContent.site.name"
             priority="lowest">
          <enablement>
@@ -20,83 +20,83 @@
                      value="org.eclipse.core.resources.IResource">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="com.aptana.ui.io.navigator.FileSystemObject">
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
             </or>
          </enablement>
          <dropAssistant
-               class="com.aptana.ui.io.navigator.resources.FileDropAdapterAssistant"
+               class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
                id="com.aptana.ide.syncing.ui.navigator.resources.ProjectSiteDropAdapterAssistant">
             <possibleDropTargets>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
             </possibleDropTargets>
          </dropAssistant>
       </navigatorContent>
       <navigatorContent
             activeByDefault="true"
-            appearsBefore="com.aptana.ui.io.navigatorContent"
+            appearsBefore="com.aptana.ide.ui.io.navigatorContent"
             id="com.aptana.ide.syncing.ui.navigatorContent.sorter"
             name="%navigatorContent.site.sorter.name"
             priority="lowest"
             sortOnly="true">
          <commonSorter
-               class="com.aptana.syncing.ui.navigator.SiteTreeNameSorter">
+               class="com.aptana.ide.syncing.ui.navigator.SiteTreeNameSorter">
             <parentExpression>
                <or>
                   <instanceof
                         value="org.eclipse.core.resources.IProject">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                        value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                   </instanceof>
                </or>
             </parentExpression>
          </commonSorter>
       </navigatorContent>
       <actionProvider
-            class="com.aptana.syncing.ui.navigator.actions.ExtendedActionProvider"
+            class="com.aptana.ide.syncing.ui.navigator.actions.ExtendedActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.ExtendedActions">
          <enablement>
             <or>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
             </or></enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.ui.io.navigator.actions.RemoteNewActionProvider"
+            class="com.aptana.ide.ui.io.navigator.actions.RemoteNewActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.RemoteNewActions"
-            overrides="com.aptana.ui.io.navigator.actions.FileSystemNewActions">
+            overrides="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActions">
          <enablement>
             <instanceof
-                  value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                  value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
             </instanceof>
          </enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.ui.io.navigator.actions.FileSystemMgmtActionProvider"
+            class="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.FileSystemMgmtActions">
          <enablement>
             <or>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
             </or>
          </enablement>
@@ -107,16 +107,16 @@
          <enablement>
             <or>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
             </or>
          </enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.syncing.ui.navigator.actions.SyncingActionProvider"
+            class="com.aptana.ide.syncing.ui.navigator.actions.SyncingActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.SyncingActions">
          <enablement>
             <or>
@@ -124,13 +124,13 @@
                      value="org.eclipse.core.resources.IResource">
                </instanceof>
                <instanceof
-                     value="com.aptana.ui.io.navigator.FileSystemObject">
+                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+                     value="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
                </instanceof>
             </or>
          </enablement>
@@ -159,9 +159,9 @@
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             id="com.aptana.ide.syncing.ui.projectSitesContribution"
-            objectClass="com.aptana.syncing.ui.navigator.ProjectSiteConnections">
+            objectClass="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnections">
          <action
-               class="com.aptana.syncing.ui.actions.NewSiteAction"
+               class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                label="%Action.NewConnection.name"
@@ -169,7 +169,7 @@
                tooltip="%Action.NewConnection.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.ConnectionManagerAction"
+               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
                label="%Action.ConnectionManager.name"
@@ -179,9 +179,9 @@
       </objectContribution>
       <objectContribution
             id="com.aptana.ide.syncing.ui.projectSiteConnectionContribution"
-            objectClass="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
+            objectClass="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection">
          <action
-               class="com.aptana.syncing.ui.actions.OpenProjectConnectionAction"
+               class="com.aptana.ide.syncing.ui.actions.OpenProjectConnectionAction"
                enablesFor="1"
                icon="icons/full/obj16/transfer_files.png"
                id="com.aptana.ide.syncing.ui.actions.OpenConnectionExplorerAction"
@@ -190,7 +190,7 @@
                tooltip="%action.openConnection.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.old.actions.SiteConnectionSynchronizeAction"
+               class="com.aptana.ide.syncing.ui.old.actions.SiteConnectionSynchronizeAction"
                enablesFor="1"
                icon="icons/full/elcl16/arrow_up_down.png"
                id="com.aptana.ide.syncing.ui.actions.SiteConnectionSynchronizeAction"
@@ -199,23 +199,23 @@
                tooltip="%action.siteConnectionSynchronize.tooltip">
          </action>
          <action
-               class="com.aptana.ui.io.actions.ConnectionPropertiesAction"
+               class="com.aptana.ide.ui.io.actions.ConnectionPropertiesAction"
                enablesFor="1"
-               id="com.aptana.ui.io.actions.connectionProperties"
+               id="com.aptana.ide.ui.io.actions.connectionProperties"
                label="%connectionPropertiesAction.label"
                menubarPath="group.properties">
          </action>
          <action
-               class="com.aptana.ui.io.actions.DeleteConnectionAction"
+               class="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
                definitionId="org.eclipse.ui.edit.delete"
                enablesFor="+"
                icon="icons/full/etool16/delete.png"
-               id="com.aptana.ui.io.actions.DeleteConnectionAction"
+               id="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
                label="%deleteAction.label"
                menubarPath="group.edit">
          </action>
          <action
-               class="com.aptana.syncing.ui.navigator.actions.ProjectConnectionDisconnectAction"
+               class="com.aptana.ide.syncing.ui.navigator.actions.ProjectConnectionDisconnectAction"
                enablesFor="1"
                icon="icons/full/etool16/disconnect.png"
                id="com.aptana.ide.syncing.ui.navigator.actions.ProjectConnectionDisconnectAction"
@@ -255,7 +255,7 @@
             </separator>
          </menu>
          <action
-               class="com.aptana.syncing.ui.actions.DownloadAction"
+               class="com.aptana.ide.syncing.ui.actions.DownloadAction"
                icon="icons/full/elcl16/arrow_down.png"
                id="com.aptana.ide.syncing.ui.actions.ResourceDownloadAction"
                label="%Action.Download.name"
@@ -263,7 +263,7 @@
                tooltip="%Action.Download.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.UploadAction"
+               class="com.aptana.ide.syncing.ui.actions.UploadAction"
                icon="icons/full/elcl16/arrow_up.png"
                id="com.aptana.ide.syncing.ui.actions.ResourceUploadAction"
                label="%Action.Upload.name"
@@ -271,7 +271,7 @@
                tooltip="%Action.Upload.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.SynchronizeFilesAction"
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
                icon="icons/full/elcl16/arrow_up_down.png"
                id="com.aptana.ide.syncing.ui.actions.ResourceSynchronizeNewAction"
                label="%Action.SynchronizeNew.name"
@@ -279,7 +279,7 @@
                tooltip="%Action.SynchronizeNew.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.SynchronizeAction"
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeAction"
                enablesFor="1"
                icon="icons/full/obj16/transfer_files.png"
                id="com.aptana.ide.syncing.ui.actions.ResourceSynchronizeAction"
@@ -288,7 +288,7 @@
                tooltip="%Action.Synchronize.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.NewSiteAction"
+               class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.ResourceNewSiteAction"
                label="%Action.NewConnection.name"
@@ -296,7 +296,7 @@
                tooltip="%Action.NewConnection.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.ConnectionManagerAction"
+               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.ResourceConnectionManagerAction"
                label="%Action.ConnectionManager.name"
@@ -304,14 +304,14 @@
                tooltip="%Action.ConnectionManager.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.UncloakAction"
+               class="com.aptana.ide.syncing.ui.actions.UncloakAction"
                id="com.aptana.ide.syncing.ui.actions.ResourceUncloakAction"
                label="%Action.Uncloak.name"
                menubarPath="aptanasynchronize/cloakingGroup"
                tooltip="%Action.Uncloak.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.CloakAction"
+               class="com.aptana.ide.syncing.ui.actions.CloakAction"
                id="com.aptana.ide.syncing.ui.actions.ResourceCloakAction"
                label="%Action.Cloak.name"
                menubarPath="aptanasynchronize/cloakingGroup"
@@ -344,7 +344,7 @@
       <objectContribution
             adaptable="true"
             id="com.aptana.ide.syncing.ui.filesystemObjectContribution"
-            objectClass="com.aptana.ui.io.navigator.FileSystemObject">
+            objectClass="com.aptana.ide.ui.io.navigator.FileSystemObject">
          <menu
                icon="icons/full/elcl16/arrow_up_down.png"
                id="aptanasynchronize"
@@ -373,7 +373,7 @@
             </separator>
          </menu>
          <action
-               class="com.aptana.syncing.ui.actions.DownloadAction"
+               class="com.aptana.ide.syncing.ui.actions.DownloadAction"
                icon="icons/full/elcl16/arrow_down.png"
                id="com.aptana.ide.syncing.ui.actions.FileSystemDownloadAction"
                label="%Action.Download.name"
@@ -381,7 +381,7 @@
                tooltip="%Action.Download.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.UploadAction"
+               class="com.aptana.ide.syncing.ui.actions.UploadAction"
                icon="icons/full/elcl16/arrow_up.png"
                id="com.aptana.ide.syncing.ui.actions.FileSystemUploadAction"
                label="%Action.Upload.name"
@@ -389,7 +389,7 @@
                tooltip="%Action.Upload.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.SynchronizeFilesAction"
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
                icon="icons/full/elcl16/arrow_up_down.png"
                id="com.aptana.ide.syncing.ui.actions.FileSystemSynchronizeNewAction"
                label="%Action.SynchronizeNew.name"
@@ -397,7 +397,7 @@
                tooltip="%Action.SynchronizeNew.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.SynchronizeAction"
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeAction"
                enablesFor="1"
                icon="icons/full/obj16/transfer_files.png"
                id="com.aptana.ide.syncing.ui.actions.FileSystemSynchronizeAction"
@@ -406,7 +406,7 @@
                tooltip="%Action.Synchronize.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.NewSiteAction"
+               class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.FileSystemNewSiteAction"
                label="%Action.NewConnection.name"
@@ -414,7 +414,7 @@
                tooltip="%Action.NewConnection.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.ConnectionManagerAction"
+               class="com.aptana.ide.syncing.ui.actions.ConnectionManagerAction"
                enablesFor="1"
                id="com.aptana.ide.syncing.ui.actions.FileSystemConnectionManagerAction"
                label="%Action.ConnectionManager.name"
@@ -422,14 +422,14 @@
                tooltip="%Action.ConnectionManager.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.UncloakAction"
+               class="com.aptana.ide.syncing.ui.actions.UncloakAction"
                id="com.aptana.ide.syncing.ui.actions.FileSystemUncloakAction"
                label="%Action.Uncloak.name"
                menubarPath="aptanasynchronize/cloakingGroup"
                tooltip="%Action.Uncloak.tooltip">
          </action>
          <action
-               class="com.aptana.syncing.ui.actions.CloakAction"
+               class="com.aptana.ide.syncing.ui.actions.CloakAction"
                id="com.aptana.ide.syncing.ui.actions.FileSystemCloakAction"
                label="%Action.Cloak.name"
                menubarPath="aptanasynchronize/cloakingGroup"
@@ -439,9 +439,9 @@
       <objectContribution
             adaptable="false"
             id="com.aptana.ide.syncing.ui.ftpConnectionPointContribution"
-            objectClass="com.aptana.core.io.IConnectionPoint">
+            objectClass="com.aptana.ide.core.io.IConnectionPoint">
          <action
-               class="com.aptana.syncing.ui.actions.OpenDefaultConnectionAction"
+               class="com.aptana.ide.syncing.ui.actions.OpenDefaultConnectionAction"
                enablesFor="1"
                icon="icons/full/elcl16/arrow_up_down.png"
                id="com.aptana.ide.syncing.ui.actions.OpenConnectionExplorerAction"
@@ -451,7 +451,7 @@
          </action>
          <visibility>
             <objectClass
-                  name="com.aptana.core.io.IBaseRemoteConnectionPoint">
+                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
             </objectClass>
          </visibility>
       </objectContribution>
@@ -465,55 +465,55 @@
       </category>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.SynchronizeHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeHandler"
             id="com.aptana.ide.syncing.ui.commands.synchronize"
             name="%Action.Synchronize.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.SynchronizeFilesHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeFilesHandler"
             id="com.aptana.ide.syncing.ui.commands.synchronize.files"
             name="%Action.SynchronizeNew.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.SynchronizeProjectHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.SynchronizeProjectHandler"
             id="com.aptana.ide.syncing.ui.commands.synchronize.project"
             name="%Action.SynchronizeProject.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.CloakHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.CloakHandler"
             id="com.aptana.ide.syncing.ui.commands.cloak"
             name="%Action.Cloak.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.UncloakHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.UncloakHandler"
             id="com.aptana.ide.syncing.ui.commands.uncloak"
             name="%Action.Uncloak.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.UploadHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.UploadHandler"
             id="com.aptana.ide.syncing.ui.commands.upload"
             name="%Action.Upload.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.DownloadHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.DownloadHandler"
             id="com.aptana.ide.syncing.ui.commands.download"
             name="%Action.Download.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.NewSiteHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.NewSiteHandler"
             id="com.aptana.ide.syncing.ui.commands.newconnection"
             name="%Action.NewConnection.name">
       </command>
       <command
             categoryId="com.aptana.ide.syncing.ui.commands.category"
-            defaultHandler="com.aptana.syncing.ui.handlers.ConnectionManagerHandler"
+            defaultHandler="com.aptana.ide.syncing.ui.handlers.ConnectionManagerHandler"
             id="com.aptana.ide.syncing.ui.commands.connectionmanager"
             name="%Action.ConnectionManager.name">
       </command>
@@ -522,7 +522,7 @@
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
-            class="com.aptana.syncing.ui.decorators.CloakedLabelDecorator"
+            class="com.aptana.ide.syncing.ui.decorators.CloakedLabelDecorator"
             icon="icons/full/obj16/cloaked_decorator.gif"
             id="com.aptana.ide.syncing.ui.decorators.CloakedLabelDecorator"
             label="%Decorator.CloakedResource.name"
@@ -535,14 +535,14 @@
                      name="org.eclipse.core.resources.IResource">
                </objectClass>
                <objectClass
-                     name="com.aptana.ui.io.navigator.FileSystemObject">
+                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </objectClass>
             </or>
          </enablement>
       </decorator>
       <decorator
             adaptable="true"
-            class="com.aptana.syncing.ui.decorators.SiteSourceDecorator"
+            class="com.aptana.ide.syncing.ui.decorators.SiteSourceDecorator"
             icon="icons/full/obj16/sync_decorator.gif"
             id="com.aptana.ide.syncing.ui.decorators.ResourceSiteDecorator"
             label="%Decorator.ResourceSite.name"
@@ -557,7 +557,7 @@
       </decorator>
       <decorator
             adaptable="true"
-            class="com.aptana.syncing.ui.decorators.SiteSourceDecorator"
+            class="com.aptana.ide.syncing.ui.decorators.SiteSourceDecorator"
             icon="icons/full/obj16/sync_decorator.gif"
             id="com.aptana.ide.syncing.ui.decorators.FileSiteDecorator"
             label="%Decorator.FileSite.name"
@@ -567,7 +567,7 @@
          <enablement>
             <and>
                <objectClass
-                     name="com.aptana.ui.io.navigator.FileSystemObject">
+                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </objectClass>
                <objectState
                      name="isLocal"
@@ -580,7 +580,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="com.aptana.syncing.ui.properties.SynchronizationPropertyPage"
+            class="com.aptana.ide.syncing.ui.properties.SynchronizationPropertyPage"
             id="com.aptana.ide.syncing.ui.SyncPropertyPage"
             name="%Propertypage.Synchronization.name">
          <enabledWhen>
@@ -593,7 +593,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="com.aptana.syncing.ui.editors.ConnectionEditor"
+            class="com.aptana.ide.syncing.ui.editors.ConnectionEditor"
             default="false"
             icon="icons/full/obj16/ftp.png"
             id="com.aptana.ide.syncing.ui.editors.ConnectionEditor"
@@ -603,22 +603,22 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.syncing.core.ISiteConnectionManager"
-            class="com.aptana.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
+            adaptableType="com.aptana.ide.syncing.core.ISiteConnectionManager"
+            class="com.aptana.ide.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.syncing.core.ISiteConnection"
-            class="com.aptana.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
+            adaptableType="com.aptana.ide.syncing.core.ISiteConnection"
+            class="com.aptana.ide.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.syncing.ui.navigator.ProjectSiteConnection"
-            class="com.aptana.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
+            adaptableType="com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection"
+            class="com.aptana.ide.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
@@ -643,7 +643,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="com.aptana.syncing.ui.preferences.PreferenceInitializer">
+            class="com.aptana.ide.syncing.ui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
 

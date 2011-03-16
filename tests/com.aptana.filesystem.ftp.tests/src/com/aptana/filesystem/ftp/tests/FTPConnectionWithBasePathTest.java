@@ -13,10 +13,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.io.ConnectionContext;
-import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.io.tests.CommonConnectionTest;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
@@ -104,7 +104,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangeGroup()
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangeGroup()
 	 */
 	@Override
 	protected boolean supportsChangeGroup()
@@ -114,7 +114,7 @@ public class FTPConnectionWithBasePathTest extends CommonConnectionTest
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.io.tests.CommonConnectionTest#supportsChangePermissions()
+	 * @see com.aptana.ide.core.io.tests.CommonConnectionTest#supportsChangePermissions()
 	 */
 	@Override
 	protected boolean supportsChangePermissions()

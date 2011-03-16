@@ -8,7 +8,7 @@
 
 package com.aptana.filesystem.ftp;
 
-import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov

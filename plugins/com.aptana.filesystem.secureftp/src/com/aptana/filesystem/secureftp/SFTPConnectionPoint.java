@@ -17,12 +17,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.core.io.ConnectionContext;
-import com.aptana.core.io.ConnectionPoint;
-import com.aptana.core.io.CoreIOPlugin;
-import com.aptana.core.io.IConnectionPoint15Constants;
-import com.aptana.core.io.vfs.IConnectionFileManager;
 import com.aptana.filesystem.secureftp.internal.SFTPConnectionFileManager;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.ConnectionPoint;
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IConnectionPoint15Constants;
+import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov
@@ -61,7 +61,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#loadState(com.aptana.core.io.epl.IMemento)
+	 * @see com.aptana.ide.core.io.ConnectionPoint#loadState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
 	protected void loadState(IMemento memento) {
@@ -110,7 +110,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#saveState(com.aptana.core.io.epl.IMemento)
+	 * @see com.aptana.ide.core.io.ConnectionPoint#saveState(com.aptana.ide.core.io.epl.IMemento)
 	 */
 	@Override
 	protected void saveState(IMemento memento) {
@@ -284,7 +284,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.ide.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void connect(boolean force, IProgressMonitor monitor) throws CoreException {
@@ -299,7 +299,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.ide.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void disconnect(IProgressMonitor monitor) throws CoreException {
@@ -309,7 +309,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#isConnected()
+	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
 	 */
 	@Override
 	public synchronized boolean isConnected() {
@@ -317,7 +317,7 @@ public class SFTPConnectionPoint extends ConnectionPoint implements ISFTPConnect
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.core.io.ConnectionPoint#canDisconnect()
+	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
 	 */
 	@Override
 	public boolean canDisconnect() {

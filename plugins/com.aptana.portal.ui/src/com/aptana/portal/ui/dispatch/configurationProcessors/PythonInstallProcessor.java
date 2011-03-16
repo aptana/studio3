@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.configurations.processor.ConfigurationStatus;
-import com.aptana.core.io.LockUtils;
+import com.aptana.ide.core.io.LockUtils;
 import com.aptana.portal.ui.PortalUIPlugin;
 import com.aptana.portal.ui.dispatch.configurationProcessors.installer.InstallerOptionsDialog;
 
