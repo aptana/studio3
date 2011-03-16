@@ -27,6 +27,7 @@ public class FileService
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
 	private String fLanguage;
 	private ValidationManager fValidationManager;
+	private boolean fHasValidParseResult;
 
 	public FileService(String language)
 	{
@@ -79,6 +80,17 @@ public class FileService
 	}
 
 	/**
+	 * Return a flag indicating if the last parse was successful. If it was, then the parse result represents the result
+	 * of that parse. If it was not, then the parse result is the result of the last successful parse
+	 * 
+	 * @return
+	 */
+	public boolean hasValidParseResult()
+	{
+		return fHasValidParseResult;
+	}
+
+	/**
 	 * Parse.<br>
 	 * This call is just like calling {@link #parse(boolean)} with false.
 	 */
@@ -94,6 +106,9 @@ public class FileService
 	 */
 	public synchronized void parse(boolean force)
 	{
+		// assume parse failure
+		this.fHasValidParseResult = false;
+
 		if (fLanguage != null && fDocument != null)
 		{
 			String source = fDocument.get();
@@ -108,6 +123,10 @@ public class FileService
 				{
 					ParserPoolFactory.parse(fLanguage, fParseState);
 
+					// indicate current parse result is valid
+					this.fHasValidParseResult = true;
+
+					// fire listeners
 					for (IParseListener listener : listeners)
 					{
 						listener.parseFinished();
