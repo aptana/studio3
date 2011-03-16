@@ -21,11 +21,20 @@ public interface IFormatterWriter
 	void write(IFormatterContext context, int startOffset, int endOffset);
 
 	/**
-	 * Writes specified text at the current position. Ideally text should not contain line breaks characters.
+	 * Writes specified text at the current position. Ideally text should not contain line breaks characters.<br>
+	 * This call will remove any previous spaces.
 	 * 
 	 * @param text
 	 */
 	void writeText(IFormatterContext context, String text);
+
+	/**
+	 * Writes specified text at the current position. Ideally text should not contain line breaks characters.
+	 * 
+	 * @param text
+	 * @param removePreviousSpaces
+	 */
+	void writeText(IFormatterContext context, String text, boolean removePreviousSpaces);
 
 	/**
 	 * Writes line break at the current position.
@@ -59,7 +68,8 @@ public interface IFormatterWriter
 	void setPreserveSpaces(boolean preserve);
 
 	/**
-	 * @return true if the visitor is currently in a line that contains only whitespace characters (till the new line chars).
+	 * @return true if the visitor is currently in a line that contains only whitespace characters (till the new line
+	 *         chars).
 	 */
 	boolean isInBlankLine();
 

@@ -15,12 +15,12 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
 
 /**
  * FormatterTestFile <br>
- * 
  * This class provides the basic functionality that should be used for all formatting test files. A formatting test file
  * is divided into different sections using tags surrounded by "==" (These tags need to be in its own separate tag). The
  * first tag should be "==PREFS==", followed by the preferences for that particular test. The second tag should be
@@ -116,7 +116,8 @@ public class FormatterTestFile
 			FileWriter formattedStream;
 
 			formattedStream = new FileWriter(new File(filename), true);
-			TextEdit formattedTextEdit = formatter.format(content, 0, content.length(), 0, false, null);
+			TextEdit formattedTextEdit = formatter.format(content, 0, content.length(), 0, false, null,
+					StringUtil.EMPTY);
 
 			formattedStream.write("==FORMATTED==\n"); //$NON-NLS-1$
 

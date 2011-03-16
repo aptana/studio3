@@ -123,4 +123,12 @@ public interface IScriptFormatterFactory extends IContributedExtension
 	 * @return True, if this formatter factory appears in the preferences; False, otherwise.
 	 */
 	boolean isContributingToUI();
+
+	/**
+	 * Return true if this formatter may consume previous indentation that was introduced by a 'master' formatter.<br>
+	 * This returned value will be used only when this formatter is acting as a 'slave'.
+	 * 
+	 * @return True, if this formatter may consume indentation; False, otherwise.
+	 */
+	boolean canConsumePreviousIndent();
 }

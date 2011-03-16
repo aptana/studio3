@@ -107,8 +107,13 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		return indent;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IScriptFormatter#format(java.lang.String, int, int, int, boolean,
+	 * org.eclipse.jface.text.formatter.IFormattingContext, java.lang.String)
+	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException
+			IFormattingContext context, String indentSufix) throws FormatterException
 	{
 		if (!ScriptFormatterManager.hasFormatterFor(getMainContentType()))
 		{
@@ -157,9 +162,9 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		}
 		catch (beaver.Parser.Exception e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 			if (FormatterPlugin.DEBUG)
 			{
 				FormatterPlugin.logError(e);
@@ -262,10 +267,10 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 		FormatterDocument document = new FormatterDocument(input);
 		document.setInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE, getInt(HTMLFormatterConstants.FORMATTER_TAB_SIZE));
 		document.setBoolean(HTMLFormatterConstants.WRAP_COMMENTS, getBoolean(HTMLFormatterConstants.WRAP_COMMENTS));
-		document.setSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, getSet(
-				HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
-		document.setSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, getSet(
-				HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS,
+				getSet(HTMLFormatterConstants.INDENT_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
+		document.setSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS,
+				getSet(HTMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS, IPreferenceDelegate.PREFERECE_DELIMITER));
 		for (int i = 0; i < BLANK_LINES.length; i++)
 		{
 			document.setInt(BLANK_LINES[i], getInt(BLANK_LINES[i]));

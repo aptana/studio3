@@ -10,6 +10,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
 
@@ -30,7 +31,7 @@ public abstract class AbstractFormatterTestCase extends TestCase
 	{
 		IScriptFormatter formatter = file.getFormatter();
 		String source = file.getContent();
-		TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null);
+		TextEdit formattedTextEdit = formatter.format(source, 0, source.length(), 0, false, null, StringUtil.EMPTY);
 
 		String expectedResult = file.getFormattedContent();
 		IDocument document = new org.eclipse.jface.text.Document(source);

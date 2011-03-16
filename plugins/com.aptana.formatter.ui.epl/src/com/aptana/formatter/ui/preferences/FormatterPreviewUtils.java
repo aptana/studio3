@@ -69,7 +69,7 @@ public class FormatterPreviewUtils
 			viewer.getTextWidget().setEnabled(true);
 			try
 			{
-				TextEdit textEdit = formatter.format(content, 0, content.length(), 0, false, null);
+				TextEdit textEdit = formatter.format(content, 0, content.length(), 0, false, null, ""); //$NON-NLS-1$
 				if (textEdit != null)
 				{
 					IDocument document = new Document(content);

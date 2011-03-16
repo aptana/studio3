@@ -85,15 +85,26 @@ public class FormatterWriter implements IFormatterWriter
 	}
 
 	/*
-	 * @see IFormatterWriter#writeText(IFormatterContext, String)
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#writeText(com.aptana.formatter.IFormatterContext, java.lang.String)
 	 */
 	public void writeText(IFormatterContext context, String text)
+	{
+		writeText(context, text, true);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#writeText(com.aptana.formatter.IFormatterContext, java.lang.String,
+	 * boolean)
+	 */
+	public void writeText(IFormatterContext context, String text, boolean removePreviousSpaces)
 	{
 		if (text.length() != 0)
 		{
 			skipNextNewLine = false;
 		}
-		if (lineStarted)
+		if (lineStarted && removePreviousSpaces)
 		{
 			trimTrailingSpaces();
 		}
@@ -225,8 +236,8 @@ public class FormatterWriter implements IFormatterWriter
 						{
 							StringBuilder tempIndentBuffer = new StringBuilder();
 							indentGenerator.generateIndent(context.getIndent(), tempIndentBuffer);
-							writer.replace(prevWordEnd, wordBegin, lineDelimiter + tempIndentBuffer
-									+ context.getWrappingCommentPrefix(text));
+							writer.replace(prevWordEnd, wordBegin,
+									lineDelimiter + tempIndentBuffer + context.getWrappingCommentPrefix(text));
 							start = prevWordEnd + lineDelimiter.length();
 							offset = calculateOffset(start);
 						}

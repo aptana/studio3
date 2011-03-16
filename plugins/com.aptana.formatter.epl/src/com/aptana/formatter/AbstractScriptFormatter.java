@@ -409,16 +409,22 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 					// treat the whitespace-chars as tabs
 					return (spaceChars / tabSize) + tabChars + 1;
 				}
-				else if (indentSize > 0)
+				if (CodeFormatterConstants.EDITOR.equals(indentType))
 				{
-					if (CodeFormatterConstants.SPACE.equals(indentType))
+					tabSize = getEditorSpecificTabWidth();
+					indentSize = tabSize;
+				}
+				if (indentSize > 0)
+				{
+					if (CodeFormatterConstants.SPACE.equals(indentType)
+							|| (CodeFormatterConstants.EDITOR.equals(indentType)))
 					{
 						// treat the tabs as spaces
 						return (spaceChars + (tabSize * tabChars)) / indentSize + 1;
 					}
 					else
 					{
-						// it's Mixed
+						// it's 'Mixed'
 						return (spaceChars + tabChars) / indentSize + 1;
 					}
 				}
@@ -483,5 +489,34 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 			i++;
 		}
 		return i;
+	}
+
+	/**
+	 * Process an output string to determine if it needs wrapping new-line chars, indent-suffix addition, or just
+	 * trimming.
+	 * 
+	 * @param output
+	 * @param lineSeparator
+	 * @param indentSufix
+	 * @return A processed output string.
+	 */
+	protected String processNestedOutput(String output, String lineSeparator, String indentSufix)
+	{
+		// In case the output contains multiple lines, make sure it starts and ends with a new-line char
+		if (output.split(lineSeparator, 2).length > 1)
+		{
+			StringBuilder wrappedOutput = new StringBuilder(output);
+			wrappedOutput.insert(0, lineSeparator);
+			wrappedOutput.append(lineSeparator);
+			// Add the indentSufix that we may have.
+			wrappedOutput.append(indentSufix);
+			output = wrappedOutput.toString();
+		}
+		else
+		{
+			// Trim the output. Disregard any indentSufix that we have.
+			output = output.trim();
+		}
+		return output;
 	}
 }

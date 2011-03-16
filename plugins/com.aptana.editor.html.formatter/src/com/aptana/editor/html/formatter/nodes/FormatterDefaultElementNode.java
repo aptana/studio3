@@ -70,9 +70,9 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 
 		// We only want to add a newline at the end if the last child is not in the exclusion list
 		IParseNode child = children[children.length - 1];
-		
-		return !(set.contains(element) && set.contains(child.getNameNode().getName()) && HTMLFormatterNodeBuilder.VOID_ELEMENTS.contains(child.getNameNode().getName()));
-		
+
+		return !(set.contains(element) && set.contains(child.getNameNode().getName()) && HTMLFormatterNodeBuilder.VOID_ELEMENTS
+				.contains(child.getNameNode().getName()));
 	}
 
 	/*

@@ -7,14 +7,8 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
-import java.util.List;
-
-import com.aptana.formatter.IFormatterContext;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.IFormatterWriter;
 import com.aptana.formatter.nodes.FormatterBlockNode;
-import com.aptana.formatter.nodes.IFormatterNode;
-import com.aptana.formatter.ui.ScriptFormattingContextProperties;
 
 /**
  * A JavaScript formatter root node.<br>
@@ -32,27 +26,5 @@ public class FormatterJSRootNode extends FormatterBlockNode
 	public FormatterJSRootNode(IFormatterDocument document)
 	{
 		super(document);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#acceptNodes(java.util.List,
-	 * com.aptana.formatter.IFormatterContext, com.aptana.formatter.IFormatterWriter)
-	 */
-	protected void acceptNodes(final List<IFormatterNode> nodes, IFormatterContext context, IFormatterWriter visitor)
-			throws Exception
-	{
-		int indent = context.getIndent();
-		if (!visitor.endsWithNewLine()
-				&& getDocument().getInt(ScriptFormattingContextProperties.CONTEXT_ORIGINAL_OFFSET) > 0)
-		{
-			visitor.ensureLineStarted(context);
-			visitor.writeLineBreak(context);
-		}
-		super.acceptNodes(nodes, context, visitor);
-		if (indent > 0)
-		{
-			context.decIndent();
-		}
 	}
 }

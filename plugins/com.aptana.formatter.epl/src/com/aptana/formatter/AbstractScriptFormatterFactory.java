@@ -142,4 +142,15 @@ public abstract class AbstractScriptFormatterFactory extends ContributedExtensio
 	{
 		return true;
 	}
+
+	/**
+	 * By default, return true.<br>
+	 * Subclasses may override.
+	 * 
+	 * @see com.aptana.formatter.IScriptFormatterFactory#canConsumePreviousIndent()
+	 */
+	public boolean canConsumePreviousIndent()
+	{
+		return true;
+	}
 }

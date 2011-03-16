@@ -96,8 +96,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		try
 		{
 			// detect the indentation offset with the parser, only if the given offset is not the first one in the
-			// current
-			// partition.
+			// current partition.
 			ITypedRegion partition = document.getPartition(offset);
 			if (partition != null && partition.getOffset() == offset)
 			{
@@ -138,12 +137,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
+	 * @see com.aptana.formatter.IScriptFormatter#format(java.lang.String, int, int, int, boolean,
+	 * org.eclipse.jface.text.formatter.IFormattingContext, java.lang.String)
 	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException
+			IFormattingContext context, String indentSufix) throws FormatterException
 	{
-		String input = source.substring(offset, offset + length);
+		String originalText = source.substring(offset, offset + length);
+		String input = originalText.trim();
+		int inputOffset = offset + countLeftWhitespaceChars(originalText);
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
@@ -153,18 +155,19 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
+				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,
+						indentSufix);
 				if (output != null)
 				{
-					if (!input.equals(output))
+					if (!originalText.equals(output))
 					{
-						if (equalContent(input, output))
+						if (equalContent(originalText, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
 						else
 						{
-							logError(input, output);
+							logError(originalText, output);
 						}
 					}
 					else
@@ -176,9 +179,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (FormatterException e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 		}
 		catch (Exception e)
 		{
@@ -297,11 +300,12 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 *            A JavaScript parser result - {@link com.aptana.parsing.ast.IParseNode}
 	 * @param indentationLevel
 	 *            The indentation level to start from
+	 * @param indentSufix
 	 * @return A formatted string
 	 * @throws Exception
 	 */
 	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
-			boolean isSelection) throws Exception
+			boolean isSelection, String indentSufix) throws Exception
 	{
 		int spacesCount = -1;
 		if (isSelection)
@@ -329,6 +333,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
+		}
+		else
+		{
+			output = processNestedOutput(output, lineSeparator, indentSufix);
 		}
 		return output;
 	}
