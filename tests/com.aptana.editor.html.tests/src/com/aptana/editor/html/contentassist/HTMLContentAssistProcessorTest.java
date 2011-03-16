@@ -194,6 +194,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertCompletionCorrect("<div sty|=\"\"></div>", '\t', 64, "style", "<div style=\"\"></div>", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void testStyleAttributeProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "style", "<div style=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -213,6 +214,7 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(0, pos.getLength());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void testEventProposalHasExitTabstopAfterQuotes()
 	{
 		assertCompletionCorrect("<div |>", '\t', 64, "onmouseenter", "<div onmouseenter=\"\">", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
