@@ -246,6 +246,28 @@ public class HTMLContentAssistProcessorTest extends LocationTestCase
 		assertEquals(0, proposals.length);
 	}
 
+	public void testAttributeAfterElementName()
+	{
+		String document = "<body s|></body>";
+		int offset = HTMLTestUtil.findCursorOffset(document);
+		fDocument = HTMLTestUtil.createDocument(document, true);
+		ITextViewer viewer = createTextViewer(fDocument);
+
+		ICompletionProposal[] proposals = fProcessor.doComputeCompletionProposals(viewer, offset, '\t', false);
+		assertTrue(proposals.length > 0);
+
+		boolean foundScroll = false;
+		for (ICompletionProposal proposal : proposals)
+		{
+			if ("scroll".equals(proposal.getDisplayString()))
+			{
+				foundScroll = true;
+				break;
+			}
+		}
+		assertTrue(foundScroll);
+	}
+
 	private ICompletionProposal findProposal(String string, ICompletionProposal[] proposals)
 	{
 		for (ICompletionProposal proposal : proposals)
