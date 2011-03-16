@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.console;
+package com.aptana.ui.ftp.console;
 
 import java.io.OutputStream;
 
@@ -21,7 +21,7 @@ import com.aptana.filesystem.ftp.IFTPCommandLog;
 public class FTPCommandLog implements IFTPCommandLog {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.ftp.IFTPCommandLog#getOutputStream()
+	 * @see com.aptana.filesystem.ftp.IFTPCommandLog#getOutputStream()
 	 */
 	public OutputStream getOutputStream() {
 		return FTPConsoleFactory.newConsoleOutputStream();

@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.console;
+package com.aptana.ui.ftp.console;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +21,9 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import com.aptana.ide.ui.ftp.FTPUIPlugin;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.extensions.ConsoleThemePageParticipant;
+import com.aptana.ui.ftp.FTPUIPlugin;
 
 /**
  * @author Max Stepanov

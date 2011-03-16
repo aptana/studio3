@@ -23,7 +23,7 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
 public class FTPDeployWizardPage extends WizardPage implements FTPConnectionPropertyComposite.Listener

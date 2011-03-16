@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.ftp.dialogs;
+package com.aptana.ui.ftp.dialogs;
 
 import java.text.MessageFormat;
 
@@ -27,9 +27,9 @@ import com.aptana.ide.core.io.ConnectionPointType;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
-import com.aptana.ide.ui.ftp.FTPUIPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
 import com.aptana.ui.IPropertyDialog;
+import com.aptana.ui.ftp.FTPUIPlugin;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
 
 /**
  * @author Max Stepanov

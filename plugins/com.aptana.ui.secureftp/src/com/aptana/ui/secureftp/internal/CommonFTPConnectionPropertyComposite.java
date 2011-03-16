@@ -39,10 +39,10 @@ import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.filesystem.ftp.Policy;
-import com.aptana.ide.ui.ftp.internal.FTPAdvancedOptionsComposite;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
-import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;
+import com.aptana.ui.ftp.internal.FTPAdvancedOptionsComposite;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
+import com.aptana.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ui.secureftp.dialogs.Messages;
 import com.aptana.ui.util.UIUtils;
 
