@@ -955,10 +955,13 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (oldProposal instanceof ICompletionProposalExtension2 && fViewer != null)
 				((ICompletionProposalExtension2) oldProposal).unselected(fViewer);
 
+			boolean noProposal = false;
+
 			if (proposals == null || proposals.length == 0) {
 				fEmptyProposal.fOffset= fFilterOffset;
 				fEmptyProposal.fDisplayString= fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
 				proposals= new ICompletionProposal[] { fEmptyProposal };
+				noProposal = true;
 			}
 
 			fFilteredProposals= proposals;
@@ -1023,7 +1026,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 				}
 			}
 			// no default or suggested and only one proposal, just make it default
-			if (defaultIndex == -1 && suggestedIndex == -1 && proposals.length == 1)
+			if (defaultIndex == -1 && suggestedIndex == -1 && proposals.length == 1 && noProposal == false)
 			{
 				defaultIndex = 0;
 			}
