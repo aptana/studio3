@@ -70,6 +70,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
 
+	// NOTE: temp (I hope) until we get proper partitions for JS inside of HTML
+	private IRange _activeRange;
+
+	/**
+	 * JSContentAssistProcessor
+	 * 
+	 * @param editor
+	 * @param activeRange
+	 */
+	public JSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
+	{
+		this(editor);
+
+		this._activeRange = activeRange;
+	}
+
 	/**
 	 * JSIndexContentAssitProcessor
 	 * 
@@ -391,7 +407,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LexemeProvider<JSTokenType> result;
 
-		if (this._statementNode != null)
+		// NOTE: temp until we get proper partitions for JS inside of HTML
+		if (this._activeRange != null)
+		{
+			result = new JSLexemeProvider(document, this._activeRange, new JSTokenScanner());
+		}
+		else if (this._statementNode != null)
 		{
 			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
 		}

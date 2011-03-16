@@ -283,6 +283,17 @@ public class HTMLIndexQueryHelper
 	/**
 	 * getEvents
 	 * 
+	 * @param elementName
+	 * @return
+	 */
+	public List<EventElement> getEvents(String elementName)
+	{
+		return this.getEvents(this.getElement(elementName));
+	}
+
+	/**
+	 * getEvents
+	 * 
 	 * @param element
 	 * @return
 	 */

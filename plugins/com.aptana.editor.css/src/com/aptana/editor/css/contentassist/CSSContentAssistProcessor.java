@@ -35,6 +35,7 @@ import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSPlugin;
 import com.aptana.editor.css.CSSScopeScanner;
+import com.aptana.editor.css.CSSSourceEditor;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
 import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
@@ -56,6 +57,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private CSSIndexQueryHelper _queryHelper;
 	private Lexeme<CSSTokenType> _currentLexeme;
 	private IRange _replaceRange;
+
+	// NOTE: temp (I hope) until we get proper partitions for CSS inside of HTML
+	private IRange _activeRange;
+
+	/**
+	 * CSSContentAssistProcessor
+	 * 
+	 * @param editor
+	 */
+	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
+	{
+		this(editor);
+
+		this._activeRange = activeRange;
+	}
 
 	/**
 	 * CSSContentAssistProcessor
@@ -559,8 +575,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// CA context is fine-tuned below
 		this._replaceRange = this._currentLexeme;
 
-		// first step is to determine if we're inside our outside of a rule
-		LocationType location = this.getCoarseLocationType(lexemeProvider, offset);
+		// NOTE: Temp until we get proper partitions for CSS inside of HTML
+		// @formatter:off
+		LocationType location = (this._activeRange == null) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
+		// @formatter:on
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
@@ -611,14 +629,29 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+		// NOTE: temp until we get proper partitions for CSS inside of HTML
+		if (this._activeRange != null)
 		{
-			@Override
-			protected CSSTokenType getTypeFromData(Object data)
+			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSScopeScanner())
 			{
-				return (CSSTokenType) data;
-			}
-		};
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
+		else
+		{
+			return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+			{
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
 	}
 
 	/*
