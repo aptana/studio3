@@ -1266,18 +1266,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		String result = null;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
 
-		LOOP: for (int i = index; i >= 0; i--)
+		for (int i = index; i >= 0; i--)
 		{
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
 
-			switch (lexeme.getType())
+			if (lexeme.getType() == HTMLTokenType.TAG_START)
 			{
-				case BLOCK_TAG:
-				case INLINE_TAG:
-				case STRUCTURE_TAG:
-				case TAG_START:
-					result = lexeme.getText();
-					break LOOP;
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(i + 1);
+
+				if (nextLexeme != null)
+				{
+					result = nextLexeme.getText();
+				}
+
+				break;
 			}
 		}
 
