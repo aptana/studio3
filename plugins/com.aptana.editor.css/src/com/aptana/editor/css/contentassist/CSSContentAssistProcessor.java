@@ -575,10 +575,9 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// CA context is fine-tuned below
 		this._replaceRange = this._currentLexeme;
 
-		// NOTE: sniffing editor type as a cheap hack to determine if the CSS is nested in another language. Temp until
-		// we get proper partitions for CSS inside of HTML
+		// NOTE: Temp until we get proper partitions for CSS inside of HTML
 		// @formatter:off
-		LocationType location = (this.editor instanceof CSSSourceEditor) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
+		LocationType location = (this._activeRange == null) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
 		// @formatter:on
 
 		// create proposal container
