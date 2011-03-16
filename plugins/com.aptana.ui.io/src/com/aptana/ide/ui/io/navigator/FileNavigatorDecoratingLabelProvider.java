@@ -13,8 +13,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.ui.internal.navigator.NavigatorDecoratingLabelProvider;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * A custom label provider for file navigator to provide additional features such as tooltip support.

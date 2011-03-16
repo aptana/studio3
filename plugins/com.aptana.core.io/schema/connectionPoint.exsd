@@ -73,7 +73,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="com.aptana.ide.core.io.ConnectionPoint:"/>
+                  <meta.attribute kind="java" basedOn="com.aptana.core.io.ConnectionPoint:"/>
                </appinfo>
             </annotation>
          </attribute>

@@ -7,7 +7,7 @@
  */
 package com.aptana.ide.syncing.core.old;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 
 
 /**

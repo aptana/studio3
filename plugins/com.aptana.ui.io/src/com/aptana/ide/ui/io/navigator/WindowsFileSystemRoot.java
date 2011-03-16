@@ -14,7 +14,7 @@ import javax.swing.filechooser.FileSystemView;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import com.aptana.ide.core.io.LocalRoot;
+import com.aptana.core.io.LocalRoot;
 import com.aptana.ide.ui.io.CoreIOImages;
 import com.aptana.ide.ui.io.ImageUtils;
 

@@ -13,7 +13,7 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov

@@ -10,7 +10,7 @@ package com.aptana.ide.filesystem.s3;
 
 import java.text.MessageFormat;
 
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov

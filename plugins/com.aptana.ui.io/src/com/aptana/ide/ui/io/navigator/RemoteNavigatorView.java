@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.core.io.IConnectionPointCategory;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
 

@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.GenericConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.GenericConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.IPropertyDialog;
 

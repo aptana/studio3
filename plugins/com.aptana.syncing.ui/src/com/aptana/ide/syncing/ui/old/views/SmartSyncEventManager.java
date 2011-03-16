@@ -10,7 +10,7 @@ package com.aptana.ide.syncing.ui.old.views;
 import org.eclipse.core.runtime.ListenerList;
 
 import com.aptana.core.CorePlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.ISmartSyncListener;
 import com.aptana.ide.syncing.core.old.SmartSyncEvent;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;

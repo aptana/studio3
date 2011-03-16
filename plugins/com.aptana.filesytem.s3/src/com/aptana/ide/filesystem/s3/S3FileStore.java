@@ -42,8 +42,8 @@ import com.amazon.s3.ListAllMyBucketsResponse;
 import com.amazon.s3.ListBucketResponse;
 import com.amazon.s3.ListEntry;
 import com.amazon.s3.Response;
+import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.util.IOUtil;
-import com.aptana.ide.core.io.CoreIOPlugin;
 
 class S3FileStore extends FileStore
 {

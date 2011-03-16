@@ -11,7 +11,7 @@ package com.aptana.ide.ui.ftp.internal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * @author Max Stepanov

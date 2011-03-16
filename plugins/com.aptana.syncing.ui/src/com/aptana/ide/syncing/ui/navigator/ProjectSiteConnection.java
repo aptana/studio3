@@ -12,7 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.PlatformObject;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
 
 /**

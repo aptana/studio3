@@ -17,8 +17,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.XMLMemento;
-import com.aptana.ide.core.io.ConnectionPointUtils;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.ConnectionPointUtils;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * A singleton for defining the default connection available to users.

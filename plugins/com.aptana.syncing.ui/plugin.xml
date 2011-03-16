@@ -439,7 +439,7 @@
       <objectContribution
             adaptable="false"
             id="com.aptana.ide.syncing.ui.ftpConnectionPointContribution"
-            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+            objectClass="com.aptana.core.io.IConnectionPoint">
          <action
                class="com.aptana.ide.syncing.ui.actions.OpenDefaultConnectionAction"
                enablesFor="1"
@@ -451,7 +451,7 @@
          </action>
          <visibility>
             <objectClass
-                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
+                  name="com.aptana.core.io.IBaseRemoteConnectionPoint">
             </objectClass>
          </visibility>
       </objectContribution>

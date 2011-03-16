@@ -71,7 +71,7 @@
                      value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
             </or>
          </enablement>
@@ -92,7 +92,7 @@
                         value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.core.io.LocalRoot">
+                        value="com.aptana.core.io.LocalRoot">
                   </instanceof></or>
             </parentExpression>
          </commonSorter>
@@ -108,7 +108,7 @@
                      value="com.aptana.ide.ui.io.navigator.WindowsFileSystemRoot">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
             </or>
          </possibleChildren>
@@ -127,7 +127,7 @@
                         type="org.eclipse.core.resources.IProject">
                   </adapt>
                   <instanceof
-                        value="com.aptana.ide.core.io.LocalRoot">
+                        value="com.aptana.core.io.LocalRoot">
                   </instanceof>
                </or></possibleDropTargets>
          </dropAssistant>
@@ -154,7 +154,7 @@
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
             </or>
          </enablement>
@@ -168,7 +168,7 @@
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
             </or>
          </enablement>
@@ -191,13 +191,13 @@
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPoint">
+                     value="com.aptana.core.io.IConnectionPoint">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+                     value="com.aptana.core.io.IConnectionPointCategory">
                </instanceof>
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
@@ -227,13 +227,13 @@
                   </test>
                </and>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPoint">
+                     value="com.aptana.core.io.IConnectionPoint">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+                     value="com.aptana.core.io.IConnectionPointCategory">
                </instanceof>
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.LocalFileSystems">
@@ -261,10 +261,10 @@
                </and>
                <and>
                   <instanceof
-                        value="com.aptana.ide.core.io.IConnectionPoint">
+                        value="com.aptana.core.io.IConnectionPoint">
                   </instanceof>
                   <test
-                        property="com.aptana.ide.core.io.connection.canDisconnect"
+                        property="com.aptana.core.io.connection.canDisconnect"
                         value="true">
                   </test>
                </and>
@@ -276,7 +276,7 @@
             id="com.aptana.ide.ui.io.navigator.actions.ConnectionPointEditActions">
          <enablement>
             <instanceof
-                  value="com.aptana.ide.core.io.IConnectionPoint">
+                  value="com.aptana.core.io.IConnectionPoint">
             </instanceof>
          </enablement>
       </actionProvider>
@@ -302,21 +302,21 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.ide.core.io.IConnectionPointManager"
+            adaptableType="com.aptana.core.io.IConnectionPointManager"
             class="com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.core.io.IConnectionPointCategory"
+            adaptableType="com.aptana.core.io.IConnectionPointCategory"
             class="com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.core.io.IConnectionPoint"
+            adaptableType="com.aptana.core.io.IConnectionPoint"
             class="com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
@@ -326,7 +326,7 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.core.io.LocalRoot"
+            adaptableType="com.aptana.core.io.LocalRoot"
             class="com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
@@ -343,14 +343,14 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.ide.core.io.IConnectionPointCategory"
+            adaptableType="com.aptana.core.io.IConnectionPointCategory"
             class="com.aptana.ide.ui.io.actions.ConnectionActionFilter$Factory">
          <adapter
                type="org.eclipse.ui.IActionFilter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.core.io.IConnectionPoint"
+            adaptableType="com.aptana.core.io.IConnectionPoint"
             class="com.aptana.ide.ui.io.actions.ConnectionActionFilter$Factory">
          <adapter
                type="org.eclipse.ui.IActionFilter">
@@ -364,10 +364,10 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.core.io.auth.AuthenticationManager"
+            adaptableType="com.aptana.core.io.auth.AuthenticationManager"
             class="com.aptana.ide.ui.io.auth.AuthenticationPrompt$Factory">
          <adapter
-               type="com.aptana.ide.core.io.auth.IAuthenticationPrompt">
+               type="com.aptana.core.io.auth.IAuthenticationPrompt">
          </adapter>
       </factory>
    </extension>
@@ -380,7 +380,7 @@
          <enabledWhen>
             <or>
                <instanceof
-                     value="com.aptana.ide.core.io.LocalRoot">
+                     value="com.aptana.core.io.LocalRoot">
                </instanceof>
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
@@ -445,7 +445,7 @@
             state="true">
          <enablement>
             <objectClass
-                  name="com.aptana.ide.core.io.IBaseRemoteConnectionPoint">
+                  name="com.aptana.core.io.IBaseRemoteConnectionPoint">
             </objectClass>
          </enablement>
       </decorator>
@@ -552,10 +552,10 @@
                      value="org.eclipse.core.resources.IWorkspaceRoot">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+                     value="com.aptana.core.io.IConnectionPointCategory">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPoint">
+                     value="com.aptana.core.io.IConnectionPoint">
                </instanceof>
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
@@ -573,10 +573,10 @@
                         value="org.eclipse.core.resources.IWorkspaceRoot">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.core.io.IConnectionPointCategory">
+                        value="com.aptana.core.io.IConnectionPointCategory">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.core.io.IConnectionPoint">
+                        value="com.aptana.core.io.IConnectionPoint">
                   </instanceof>
                   <instanceof
                         value="com.aptana.ide.ui.io.navigator.FileSystemObject">
@@ -587,10 +587,10 @@
          <possibleChildren>
             <or>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+                     value="com.aptana.core.io.IConnectionPointCategory">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.core.io.IConnectionPoint">
+                     value="com.aptana.core.io.IConnectionPoint">
                </instanceof>
                <instanceof
                      value="com.aptana.ide.ui.io.navigator.FileSystemObject">
@@ -606,7 +606,7 @@
                         value="com.aptana.ide.ui.io.navigator.FileSystemObject">
                   </instanceof>
                   <instanceof
-                        value="com.aptana.ide.core.io.IConnectionPoint">
+                        value="com.aptana.core.io.IConnectionPoint">
                   </instanceof>
                </or>
             </possibleDropTargets>
@@ -618,7 +618,7 @@
       <objectContribution
             adaptable="false"
             id="com.aptana.ide.ui.io.connectionPointContribution"
-            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+            objectClass="com.aptana.core.io.IConnectionPoint">
          <action
                class="com.aptana.ide.ui.io.actions.ConnectionPropertiesAction"
                enablesFor="1"
@@ -630,7 +630,7 @@
       <objectContribution
             adaptable="false"
             id="com.aptana.ide.ui.io.disconnectableConnectionPointContribution"
-            objectClass="com.aptana.ide.core.io.IConnectionPoint">
+            objectClass="com.aptana.core.io.IConnectionPoint">
          <action
                class="com.aptana.ide.ui.io.actions.DisconnectAction"
                enablesFor="1"

@@ -15,9 +15,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPointManager;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPointManager;
 import com.aptana.ide.ui.ftp.FTPUIPlugin;
 
 public class DuplicateConnectionHandler extends AbstractHandler

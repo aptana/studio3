@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.Status;
 import com.amazon.s3.AWSAuthConnection;
 import com.amazon.s3.ListAllMyBucketsResponse;
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.io.ConnectionPoint;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.ConnectionPoint;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 
 /**
  * @author Max Stepanov
@@ -58,7 +58,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#loadState(com.aptana.ide.core.io.epl.IMemento)
+	 * @see com.aptana.core.io.ConnectionPoint#loadState(com.aptana.core.io.epl.IMemento)
 	 */
 	@Override
 	protected void loadState(IMemento memento)
@@ -89,7 +89,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#saveState(com.aptana.ide.core.io.epl.IMemento)
+	 * @see com.aptana.core.io.ConnectionPoint#saveState(com.aptana.core.io.epl.IMemento)
 	 */
 	@Override
 	protected void saveState(IMemento memento)
@@ -120,7 +120,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#getLogin()
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#getLogin()
 	 */
 	public String getLogin()
 	{
@@ -129,7 +129,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#setLogin(java.lang.String)
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#setLogin(java.lang.String)
 	 */
 	public void setLogin(String login)
 	{
@@ -193,7 +193,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#getHost()
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#getHost()
 	 */
 	public String getHost()
 	{
@@ -202,7 +202,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#getPort()
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#getPort()
 	 */
 	public int getPort()
 	{
@@ -211,7 +211,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#setHost(java.lang.String)
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#setHost(java.lang.String)
 	 */
 	public void setHost(String host)
 	{
@@ -221,7 +221,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.IBaseRemoteConnectionPoint#setPort(int)
+	 * @see com.aptana.core.io.IBaseRemoteConnectionPoint#setPort(int)
 	 */
 	public void setPort(int port)
 	{
@@ -230,7 +230,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.ConnectionPoint#connect(boolean, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void connect(boolean force, IProgressMonitor monitor) throws CoreException
@@ -258,7 +258,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public void disconnect(IProgressMonitor monitor) throws CoreException
@@ -269,7 +269,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
+	 * @see com.aptana.core.io.ConnectionPoint#isConnected()
 	 */
 	@Override
 	public boolean isConnected()
@@ -279,7 +279,7 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
+	 * @see com.aptana.core.io.ConnectionPoint#canDisconnect()
 	 */
 	@Override
 	public boolean canDisconnect()

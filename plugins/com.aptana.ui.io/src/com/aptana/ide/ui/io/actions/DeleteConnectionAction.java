@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**

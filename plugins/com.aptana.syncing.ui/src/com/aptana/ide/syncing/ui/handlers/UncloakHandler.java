@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.core.io.preferences.CloakingUtils;
 import com.aptana.ide.syncing.ui.actions.UncloakAction;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 

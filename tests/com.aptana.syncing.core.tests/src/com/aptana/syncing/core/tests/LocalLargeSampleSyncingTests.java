@@ -11,7 +11,7 @@ import java.io.File;
 
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.ide.core.io.LocalConnectionPoint;
+import com.aptana.core.io.LocalConnectionPoint;
 
 public class LocalLargeSampleSyncingTests extends LargeSampleSyncingTests
 {

@@ -29,7 +29,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.Utils;
 import com.aptana.ide.ui.io.preferences.IPreferenceConstants;

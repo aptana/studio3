@@ -11,7 +11,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.index.core.ui.IndexFilterManager;
 
 public class FilterTester extends PropertyTester

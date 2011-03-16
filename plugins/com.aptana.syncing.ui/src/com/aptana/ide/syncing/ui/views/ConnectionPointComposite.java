@@ -63,9 +63,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.FileUtil;
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;

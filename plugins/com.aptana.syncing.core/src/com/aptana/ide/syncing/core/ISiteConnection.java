@@ -11,7 +11,7 @@ package com.aptana.ide.syncing.core;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * @author Max Stepanov

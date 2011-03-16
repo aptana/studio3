@@ -10,7 +10,7 @@ package com.aptana.ide.ui.io.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.aptana.ide.core.io.preferences.IPreferenceConstants;
+import com.aptana.core.io.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
@@ -19,6 +19,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IPreferenceStore store = IOUIPlugin.getDefault().getPreferenceStore();
         store.setDefault(IPreferenceConstants.GLOBAL_CLOAKING_EXTENSIONS,
-                com.aptana.ide.core.io.preferences.PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS);
+                com.aptana.core.io.preferences.PreferenceInitializer.DEFAULT_CLOAK_EXPRESSIONS);
     }
 }

@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.IActionFilter;
 
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPointCategory;
 
 /**
  * @author Max Stepanov

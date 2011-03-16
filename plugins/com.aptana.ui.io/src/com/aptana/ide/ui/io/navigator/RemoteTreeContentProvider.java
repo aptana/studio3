@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPointCategory;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPointCategory;
 
 public class RemoteTreeContentProvider extends FileTreeContentProvider
 {

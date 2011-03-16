@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.LocalConnectionPoint;
-import com.aptana.ide.core.io.WorkspaceConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.LocalConnectionPoint;
+import com.aptana.core.io.WorkspaceConnectionPoint;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.ui.io.navigator.FileSystemObject;
 import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;

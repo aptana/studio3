@@ -24,9 +24,9 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.ide.core.io.ConnectionPointUtils;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.ConnectionPointUtils;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.ui.io.FileSystemUtils;
 

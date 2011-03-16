@@ -9,8 +9,8 @@ package com.aptana.ide.syncing.core.old;
 
 import org.eclipse.core.runtime.CoreException;
 
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.IConnectionPoint;
 
 /**
  * @author Kevin Lindsey

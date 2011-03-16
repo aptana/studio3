@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
-import com.aptana.ide.core.io.IConnectionPointCategory;
-import com.aptana.ide.core.io.LocalRoot;
+import com.aptana.core.io.IConnectionPointCategory;
+import com.aptana.core.io.LocalRoot;
 import com.aptana.ide.ui.io.FileSystemUtils;
 
 /**

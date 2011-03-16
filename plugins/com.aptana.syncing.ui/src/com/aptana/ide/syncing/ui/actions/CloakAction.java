@@ -20,7 +20,7 @@ import org.eclipse.ui.IViewActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.core.io.preferences.CloakingUtils;
 import com.aptana.ide.syncing.ui.decorators.DecoratorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 

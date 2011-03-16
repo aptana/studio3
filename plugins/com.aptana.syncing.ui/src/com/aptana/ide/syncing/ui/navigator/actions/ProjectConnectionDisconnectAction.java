@@ -25,7 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
 
 public class ProjectConnectionDisconnectAction implements IObjectActionDelegate

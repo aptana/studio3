@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
 import com.aptana.ui.IPropertyDialog;
 

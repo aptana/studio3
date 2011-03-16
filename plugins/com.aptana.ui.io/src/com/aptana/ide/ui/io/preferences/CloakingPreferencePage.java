@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.dialogs.CloakExpressionDialog;
 

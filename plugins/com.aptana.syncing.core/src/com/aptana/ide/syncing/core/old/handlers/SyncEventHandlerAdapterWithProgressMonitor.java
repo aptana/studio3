@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.FileUtil;
-import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 
 /**
@@ -39,7 +39,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#getFilesEvent(com.aptana.ide.core.io.IVirtualFileManager, java.lang.String)
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#getFilesEvent(com.aptana.core.io.IVirtualFileManager, java.lang.String)
 	 */
 	@Override
 	public boolean getFilesEvent(IConnectionPoint manager, String path) {
@@ -48,7 +48,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncContinue()
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#syncContinue()
 	 */
 	@Override
 	public boolean syncContinue(IProgressMonitor monitor) {
@@ -56,7 +56,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncDone(com.aptana.ide.core.io.sync.VirtualFileSyncPair)
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#syncDone(com.aptana.core.io.sync.VirtualFileSyncPair)
 	 */
 	@Override
 	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor) {
@@ -70,7 +70,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncErrorEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair, java.lang.Exception)
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#syncErrorEvent(com.aptana.core.io.sync.VirtualFileSyncPair, java.lang.Exception)
 	 */
 	@Override
 	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor) {
@@ -84,7 +84,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncEvent(com.aptana.ide.core.io.sync.VirtualFileSyncPair, int, int)
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#syncEvent(com.aptana.core.io.sync.VirtualFileSyncPair, int, int)
 	 */
 	@Override
 	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor) {
@@ -100,7 +100,7 @@ public class SyncEventHandlerAdapterWithProgressMonitor extends SyncEventHandler
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.sync.SyncEventHandlerAdapter#syncTransferring(com.aptana.ide.core.io.sync.VirtualFileSyncPair, long)
+	 * @see com.aptana.core.io.sync.SyncEventHandlerAdapter#syncTransferring(com.aptana.core.io.sync.VirtualFileSyncPair, long)
 	 */
 	@Override
 	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor) {

@@ -25,11 +25,11 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.ConnectionContext;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.FileUtil;
-import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.SyncState;
 import com.aptana.ide.syncing.core.old.Synchronizer;

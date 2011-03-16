@@ -27,11 +27,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.aptana.core.io.ConnectionContext;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.TimeZoneUtil;
 import com.aptana.filesystem.secureftp.IFTPSConnectionPoint;
 import com.aptana.filesystem.secureftp.IFTPSConstants;
-import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.ui.ftp.internal.IOptionsComposite;
 import com.aptana.ide.ui.ftp.internal.NumberVerifyListener;
 import com.aptana.ide.ui.io.dialogs.IDialogConstants;

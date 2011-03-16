@@ -28,11 +28,11 @@ import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.epl.IMemento;
 import com.aptana.core.epl.XMLMemento;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint15Constants;
+import com.aptana.core.io.IConnectionPointManager;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPoint15Constants;
-import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
 import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 

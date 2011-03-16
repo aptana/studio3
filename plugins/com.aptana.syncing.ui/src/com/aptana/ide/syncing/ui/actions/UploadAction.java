@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;

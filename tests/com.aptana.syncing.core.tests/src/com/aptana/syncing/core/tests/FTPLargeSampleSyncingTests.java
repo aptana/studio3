@@ -11,8 +11,8 @@ import java.io.File;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.LocalConnectionPoint;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
-import com.aptana.ide.core.io.LocalConnectionPoint;
 
 public class FTPLargeSampleSyncingTests extends LargeSampleSyncingTests
 {

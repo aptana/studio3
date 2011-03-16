@@ -11,10 +11,10 @@ import java.io.File;
 
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.ConnectionContext;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.LocalConnectionPoint;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
-import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.LocalConnectionPoint;
 
 public class FTPSyncingTests extends SyncingTests
 {

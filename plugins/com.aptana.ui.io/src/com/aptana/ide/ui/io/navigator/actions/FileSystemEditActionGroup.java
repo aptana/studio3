@@ -24,8 +24,8 @@ import org.eclipse.ui.actions.ActionGroup;
 import org.eclipse.ui.actions.TextActionHandler;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 
-import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.LocalRoot;
+import com.aptana.core.io.IConnectionPoint;
+import com.aptana.core.io.LocalRoot;
 
 public class FileSystemEditActionGroup extends ActionGroup {
 

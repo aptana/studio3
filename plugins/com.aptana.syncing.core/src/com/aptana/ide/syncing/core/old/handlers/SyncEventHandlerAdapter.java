@@ -9,7 +9,7 @@ package com.aptana.ide.syncing.core.old.handlers;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.old.ISyncEventHandler;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 
@@ -28,7 +28,7 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair, IProgressMonitor)
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncDone(com.aptana.core.io.syncing.sync.VirtualFileSyncPair, IProgressMonitor)
 	 */
 	public void syncDone(VirtualFileSyncPair item, IProgressMonitor monitor)
 	{
@@ -36,7 +36,7 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncErrorEvent(com.aptana.core.io.syncing.sync.VirtualFileSyncPair,
 	 *      java.lang.Exception, IProgressMonitor)
 	 */
 	public boolean syncErrorEvent(VirtualFileSyncPair item, Exception e, IProgressMonitor monitor)
@@ -46,7 +46,7 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncEvent(com.aptana.core.io.syncing.sync.VirtualFileSyncPair,
 	 *      int, int, IProgressMonitor)
 	 */
 	public boolean syncEvent(VirtualFileSyncPair item, int index, int totalItems, IProgressMonitor monitor)
@@ -56,7 +56,7 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(com.aptana.ide.core.io.syncing.sync.VirtualFileSyncPair,
+	 * @see com.aptana.ide.syncing.core.events.sync.ISyncEventHandler#syncTransferring(com.aptana.core.io.syncing.sync.VirtualFileSyncPair,
 	 *      long, IProgressMonitor)
 	 */
 	public void syncTransferring(VirtualFileSyncPair item, long bytes, IProgressMonitor monitor)
@@ -65,7 +65,7 @@ public abstract class SyncEventHandlerAdapter implements ISyncEventHandler
 	}
 
 	/**
-	 * @see com.aptana.ide.core.io.IConnectionPointEventHandler#getFilesEvent(com.aptana.ide.core.io.IVirtualFileManager,
+	 * @see com.aptana.core.io.IConnectionPointEventHandler#getFilesEvent(com.aptana.core.io.IVirtualFileManager,
 	 *      java.lang.String)
 	 */
 	public boolean getFilesEvent(IConnectionPoint manager, String path)

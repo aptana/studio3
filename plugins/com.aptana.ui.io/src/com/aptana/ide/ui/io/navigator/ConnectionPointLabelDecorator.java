@@ -15,9 +15,9 @@ import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IBaseRemoteConnectionPoint;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

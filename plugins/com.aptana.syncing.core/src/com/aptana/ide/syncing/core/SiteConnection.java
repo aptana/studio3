@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.ide.core.io.ConnectionPointType;
-import com.aptana.ide.core.io.ConnectionPointUtils;
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.ConnectionPointType;
+import com.aptana.core.io.ConnectionPointUtils;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * @author Max Stepanov

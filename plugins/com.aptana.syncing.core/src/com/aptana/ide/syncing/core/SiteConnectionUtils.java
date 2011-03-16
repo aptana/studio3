@@ -17,8 +17,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
-import com.aptana.ide.core.io.ConnectionPointUtils;
-import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.core.io.ConnectionPointUtils;
+import com.aptana.core.io.IConnectionPoint;
 
 /**
  * @author Max Stepanov

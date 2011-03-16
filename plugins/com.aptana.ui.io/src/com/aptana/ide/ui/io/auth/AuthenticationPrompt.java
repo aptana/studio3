@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.core.io.auth.IAuthenticationManager;
-import com.aptana.ide.core.io.auth.IAuthenticationPrompt;
+import com.aptana.core.io.auth.IAuthenticationManager;
+import com.aptana.core.io.auth.IAuthenticationPrompt;
 
 /**
  * @author Max Stepanov
@@ -22,7 +22,7 @@ import com.aptana.ide.core.io.auth.IAuthenticationPrompt;
 public class AuthenticationPrompt implements IAuthenticationPrompt {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.auth.IAuthenticationPrompt#promptPassword(com.aptana.ide.core.io.auth.IAuthenticationManager, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see com.aptana.core.io.auth.IAuthenticationPrompt#promptPassword(com.aptana.core.io.auth.IAuthenticationManager, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	public boolean promptPassword(final IAuthenticationManager authManager, final String authId, final String login, final String title, final String message) {
 		final boolean[] result = new boolean[] { false };

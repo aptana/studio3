@@ -29,10 +29,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.io.ConnectionContext;
+import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.filesystem.ftp.internal.FTPClientPool;
 import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
-import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;

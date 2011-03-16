@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.ui.s3.internal.S3PropertyDialogProvider;
 import com.aptana.ui.IPropertyDialog;
 

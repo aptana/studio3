@@ -19,9 +19,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.preferences.IPreferenceConstants;
-import com.aptana.ide.core.io.preferences.PreferenceUtils;
+import com.aptana.core.io.CoreIOPlugin;
+import com.aptana.core.io.preferences.IPreferenceConstants;
+import com.aptana.core.io.preferences.PreferenceUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -92,9 +92,9 @@ public class PermissionPreferencePage extends PreferencePage implements IWorkben
 	protected void performDefaults()
 	{
 		fFilePermissions
-				.setPermissions(com.aptana.ide.core.io.preferences.PreferenceInitializer.DEFAULT_FILE_PERMISSIONS);
+				.setPermissions(com.aptana.core.io.preferences.PreferenceInitializer.DEFAULT_FILE_PERMISSIONS);
 		fDirectoryPermissions
-				.setPermissions(com.aptana.ide.core.io.preferences.PreferenceInitializer.DEFAULT_DIRECTORY_PERMISSIONS);
+				.setPermissions(com.aptana.core.io.preferences.PreferenceInitializer.DEFAULT_DIRECTORY_PERMISSIONS);
 		super.performDefaults();
 	}
 }
