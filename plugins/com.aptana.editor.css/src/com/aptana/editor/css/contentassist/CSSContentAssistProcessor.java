@@ -58,6 +58,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Lexeme<CSSTokenType> _currentLexeme;
 	private IRange _replaceRange;
 
+	// NOTE: temp (I hope) until we get proper partitions for CSS inside of HTML
+	private IRange _activeRange;
+
+	/**
+	 * CSSContentAssistProcessor
+	 * 
+	 * @param editor
+	 */
+	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
+	{
+		this(editor);
+
+		this._activeRange = activeRange;
+	}
+
 	/**
 	 * CSSContentAssistProcessor
 	 * 
@@ -560,7 +575,8 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// CA context is fine-tuned below
 		this._replaceRange = this._currentLexeme;
 
-		// NOTE: we're sniffing editor type as a cheap hack to determine if the CSS is nested in another language
+		// NOTE: sniffing editor type as a cheap hack to determine if the CSS is nested in another language. Temp until
+		// we get proper partitions for CSS inside of HTML
 		// @formatter:off
 		LocationType location = (this.editor instanceof CSSSourceEditor) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
 		// @formatter:on
@@ -614,14 +630,29 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+		// NOTE: temp until we get proper partitions for CSS inside of HTML
+		if (this._activeRange != null)
 		{
-			@Override
-			protected CSSTokenType getTypeFromData(Object data)
+			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSScopeScanner())
 			{
-				return (CSSTokenType) data;
-			}
-		};
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
+		else
+		{
+			return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+			{
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
 	}
 
 	/*
