@@ -22,7 +22,7 @@ import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialo
 public class CommonFTPPropertyDialogProvider implements IPropertyDialogProvider {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.io.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
+	 * @see com.aptana.ui.io.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
 	 */
 	public Dialog createPropertyDialog(IShellProvider shellProvider) {
 		return new CommonFTPConnectionPointPropertyDialog(shellProvider.getShell());

@@ -27,8 +27,8 @@ import org.eclipse.core.runtime.Path;
 import com.aptana.core.io.ConnectionPointUtils;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.efs.EFSUtils;
-import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.ui.io.FileSystemUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

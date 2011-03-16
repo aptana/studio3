@@ -26,12 +26,12 @@
                      value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     value="com.aptana.ui.io.navigator.FileSystemObject">
                </instanceof>
             </or>
          </enablement>
          <dropAssistant
-               class="com.aptana.ide.ui.io.navigator.resources.FileDropAdapterAssistant"
+               class="com.aptana.ui.io.navigator.resources.FileDropAdapterAssistant"
                id="com.aptana.ide.syncing.ui.navigator.resources.ProjectSiteDropAdapterAssistant">
             <possibleDropTargets>
                <instanceof
@@ -42,7 +42,7 @@
       </navigatorContent>
       <navigatorContent
             activeByDefault="true"
-            appearsBefore="com.aptana.ide.ui.io.navigatorContent"
+            appearsBefore="com.aptana.ui.io.navigatorContent"
             id="com.aptana.ide.syncing.ui.navigatorContent.sorter"
             name="%navigatorContent.site.sorter.name"
             priority="lowest"
@@ -78,9 +78,9 @@
             </or></enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.ide.ui.io.navigator.actions.RemoteNewActionProvider"
+            class="com.aptana.ui.io.navigator.actions.RemoteNewActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.RemoteNewActions"
-            overrides="com.aptana.ide.ui.io.navigator.actions.FileSystemNewActions">
+            overrides="com.aptana.ui.io.navigator.actions.FileSystemNewActions">
          <enablement>
             <instanceof
                   value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
@@ -88,7 +88,7 @@
          </enablement>
       </actionProvider>
       <actionProvider
-            class="com.aptana.ide.ui.io.navigator.actions.FileSystemMgmtActionProvider"
+            class="com.aptana.ui.io.navigator.actions.FileSystemMgmtActionProvider"
             id="com.aptana.ide.syncing.ui.navigator.actions.FileSystemMgmtActions">
          <enablement>
             <or>
@@ -124,7 +124,7 @@
                      value="org.eclipse.core.resources.IResource">
                </instanceof>
                <instanceof
-                     value="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     value="com.aptana.ui.io.navigator.FileSystemObject">
                </instanceof>
                <instanceof
                      value="com.aptana.syncing.ui.navigator.ProjectSiteConnection">
@@ -199,18 +199,18 @@
                tooltip="%action.siteConnectionSynchronize.tooltip">
          </action>
          <action
-               class="com.aptana.ide.ui.io.actions.ConnectionPropertiesAction"
+               class="com.aptana.ui.io.actions.ConnectionPropertiesAction"
                enablesFor="1"
-               id="com.aptana.ide.ui.io.actions.connectionProperties"
+               id="com.aptana.ui.io.actions.connectionProperties"
                label="%connectionPropertiesAction.label"
                menubarPath="group.properties">
          </action>
          <action
-               class="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
+               class="com.aptana.ui.io.actions.DeleteConnectionAction"
                definitionId="org.eclipse.ui.edit.delete"
                enablesFor="+"
                icon="icons/full/etool16/delete.png"
-               id="com.aptana.ide.ui.io.actions.DeleteConnectionAction"
+               id="com.aptana.ui.io.actions.DeleteConnectionAction"
                label="%deleteAction.label"
                menubarPath="group.edit">
          </action>
@@ -344,7 +344,7 @@
       <objectContribution
             adaptable="true"
             id="com.aptana.ide.syncing.ui.filesystemObjectContribution"
-            objectClass="com.aptana.ide.ui.io.navigator.FileSystemObject">
+            objectClass="com.aptana.ui.io.navigator.FileSystemObject">
          <menu
                icon="icons/full/elcl16/arrow_up_down.png"
                id="aptanasynchronize"
@@ -535,7 +535,7 @@
                      name="org.eclipse.core.resources.IResource">
                </objectClass>
                <objectClass
-                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     name="com.aptana.ui.io.navigator.FileSystemObject">
                </objectClass>
             </or>
          </enablement>
@@ -567,7 +567,7 @@
          <enablement>
             <and>
                <objectClass
-                     name="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                     name="com.aptana.ui.io.navigator.FileSystemObject">
                </objectClass>
                <objectState
                      name="isLocal"

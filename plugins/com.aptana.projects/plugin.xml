@@ -125,7 +125,7 @@
                   <iterate
                         ifEmpty="false">
                      <adapt
-                           type="com.aptana.ide.ui.io.navigator.FileSystemObject">
+                           type="com.aptana.ui.io.navigator.FileSystemObject">
                      </adapt>
                   </iterate>
                </with>

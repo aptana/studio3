@@ -84,7 +84,7 @@ public class SiteConnectionWorkbenchAdapter implements IWorkbenchAdapter, IDefer
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter#getChildren(java.lang.Object)
+	 * @see com.aptana.ui.io.navigator.FileSystemWorkbenchAdapter#getChildren(java.lang.Object)
 	 */
 	public Object[] getChildren(Object object) {
 		return EMPTY;
@@ -115,7 +115,7 @@ public class SiteConnectionWorkbenchAdapter implements IWorkbenchAdapter, IDefer
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.io.navigator.FileSystemWorkbenchAdapter#fetchDeferredChildren(java.lang.Object, org.eclipse.ui.progress.IElementCollector, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.ui.io.navigator.FileSystemWorkbenchAdapter#fetchDeferredChildren(java.lang.Object, org.eclipse.ui.progress.IElementCollector, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void fetchDeferredChildren(Object object, IElementCollector collector, IProgressMonitor monitor) {
 		if (object instanceof ProjectSiteConnection) {

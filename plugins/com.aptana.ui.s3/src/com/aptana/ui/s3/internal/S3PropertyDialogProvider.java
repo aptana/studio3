@@ -22,7 +22,7 @@ import com.aptana.ui.s3.dialogs.S3ConnectionPointPropertyDialog;
 public class S3PropertyDialogProvider implements IPropertyDialogProvider {
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.ui.io.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
+	 * @see com.aptana.ui.io.IPropertyDialogProvider#createPropertyDialog(org.eclipse.jface.window.IShellProvider)
 	 */
 	public Dialog createPropertyDialog(IShellProvider shellProvider) {
 		IPropertyDialogProvider contributedPropertyDialogProvider = (IPropertyDialogProvider) Platform.getAdapterManager()

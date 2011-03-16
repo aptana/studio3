@@ -47,7 +47,6 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.syncing.core.DefaultSiteConnection;
 import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.syncing.core.SyncingPlugin;
@@ -63,6 +62,7 @@ import com.aptana.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.syncing.ui.editors.EditorUtils;
 import com.aptana.syncing.ui.internal.SyncUtils;
 import com.aptana.syncing.ui.old.views.SmartSyncDialog;
+import com.aptana.ui.io.IOUIPlugin;
 import com.aptana.ui.util.UIUtils;
 
 /**

@@ -8,7 +8,7 @@
 
 package com.aptana.syncing.ui.navigator;
 
-import com.aptana.ide.ui.io.navigator.FileTreeLabelProvider;
+import com.aptana.ui.io.navigator.FileTreeLabelProvider;
 
 /**
  * @author Max Stepanov

@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.syncing.core.old.Synchronizer;
 import com.aptana.syncing.core.old.VirtualFileSyncPair;
@@ -30,6 +29,7 @@ import com.aptana.syncing.ui.SyncingUIPlugin;
 import com.aptana.syncing.ui.internal.SyncUtils;
 import com.aptana.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ui.DialogUtils;
+import com.aptana.ui.io.IOUIPlugin;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

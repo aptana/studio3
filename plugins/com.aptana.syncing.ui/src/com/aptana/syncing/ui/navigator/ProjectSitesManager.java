@@ -17,7 +17,7 @@ import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.events.ConnectionPointEvent;
 import com.aptana.core.io.events.IConnectionPointListener;
-import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ui.io.IOUIPlugin;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

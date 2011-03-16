@@ -57,11 +57,11 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.IBaseFTPConnectionPoint;
 import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
-import com.aptana.ide.ui.io.FileSystemUtils;
-import com.aptana.ide.ui.io.dialogs.FileTreeSelectionDialog;
-import com.aptana.ide.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.ftp.FTPUIPlugin;
 import com.aptana.ui.ftp.dialogs.Messages;
+import com.aptana.ui.io.FileSystemUtils;
+import com.aptana.ui.io.dialogs.FileTreeSelectionDialog;
+import com.aptana.ui.io.dialogs.IDialogConstants;
 import com.aptana.ui.util.UIUtils;
 
 /**

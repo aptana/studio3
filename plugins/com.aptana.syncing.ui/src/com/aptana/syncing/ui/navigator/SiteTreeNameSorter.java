@@ -7,7 +7,7 @@
  */
 package com.aptana.syncing.ui.navigator;
 
-import com.aptana.ide.ui.io.navigator.FileTreeNameSorter;
+import com.aptana.ui.io.navigator.FileTreeNameSorter;
 
 public class SiteTreeNameSorter extends FileTreeNameSorter {
     @Override
