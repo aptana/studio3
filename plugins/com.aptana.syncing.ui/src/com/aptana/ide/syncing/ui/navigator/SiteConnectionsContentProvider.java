@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.LocalConnectionPoint;
 import com.aptana.core.io.WorkspaceConnectionPoint;
-import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.ui.io.navigator.FileSystemObject;
 import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;
+import com.aptana.syncing.core.SyncingPlugin;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

@@ -59,10 +59,10 @@ import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
-import com.aptana.ide.syncing.core.DefaultSiteConnection;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SyncingPlugin;
 import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
+import com.aptana.syncing.core.DefaultSiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SyncingPlugin;
 import com.aptana.ui.IPropertyDialog;
 
 /**

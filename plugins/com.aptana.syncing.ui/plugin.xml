@@ -603,14 +603,14 @@
    <extension
          point="org.eclipse.core.runtime.adapters">
       <factory
-            adaptableType="com.aptana.ide.syncing.core.ISiteConnectionManager"
+            adaptableType="com.aptana.syncing.core.ISiteConnectionManager"
             class="com.aptana.ide.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">
          </adapter>
       </factory>
       <factory
-            adaptableType="com.aptana.ide.syncing.core.ISiteConnection"
+            adaptableType="com.aptana.syncing.core.ISiteConnection"
             class="com.aptana.ide.syncing.ui.navigator.SiteConnectionWorkbenchAdapter$Factory">
          <adapter
                type="org.eclipse.ui.model.IWorkbenchAdapter">

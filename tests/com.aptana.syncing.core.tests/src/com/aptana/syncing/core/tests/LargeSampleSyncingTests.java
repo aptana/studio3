@@ -29,9 +29,9 @@ import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.ide.syncing.core.old.ILogger;
-import com.aptana.ide.syncing.core.old.Synchronizer;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.ILogger;
+import com.aptana.syncing.core.old.Synchronizer;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Ingo Muschenetz

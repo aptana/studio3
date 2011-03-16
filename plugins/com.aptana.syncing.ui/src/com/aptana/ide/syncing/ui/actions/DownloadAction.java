@@ -22,13 +22,13 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.old.Synchronizer;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.old.Synchronizer;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ui.DialogUtils;
 
 /**

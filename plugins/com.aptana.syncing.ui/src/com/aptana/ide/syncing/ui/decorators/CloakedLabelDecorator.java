@@ -15,9 +15,9 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 
 import com.aptana.core.io.preferences.CloakingUtils;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 /**
  * A class to decorate which objects are cloaked from synchronization.

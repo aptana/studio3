@@ -13,9 +13,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
 
 /**
  * Opens the file transfer editor with the project as the source and the selected FTP site as the destination.

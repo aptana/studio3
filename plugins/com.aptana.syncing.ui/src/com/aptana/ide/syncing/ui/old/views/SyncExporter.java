@@ -16,9 +16,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.aptana.core.util.FileUtil;
-import com.aptana.ide.syncing.core.old.ISyncResource;
-import com.aptana.ide.syncing.core.old.SyncState;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.syncing.core.old.ISyncResource;
+import com.aptana.syncing.core.old.SyncState;
 
 public class SyncExporter
 {

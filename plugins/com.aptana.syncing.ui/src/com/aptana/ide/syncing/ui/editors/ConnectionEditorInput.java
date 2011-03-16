@@ -11,7 +11,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

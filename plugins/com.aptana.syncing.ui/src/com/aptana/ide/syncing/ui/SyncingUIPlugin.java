@@ -30,16 +30,16 @@ import com.aptana.core.io.CoreIOPlugin;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.io.events.ConnectionPointEvent;
 import com.aptana.core.io.events.IConnectionPointListener;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SyncingPlugin;
-import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
-import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 import com.aptana.ide.syncing.ui.actions.Sync;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSitesManager;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SyncingPlugin;
+import com.aptana.syncing.core.events.ISiteConnectionListener;
+import com.aptana.syncing.core.events.SiteConnectionEvent;
 import com.aptana.ui.util.UIUtils;
 
 /**

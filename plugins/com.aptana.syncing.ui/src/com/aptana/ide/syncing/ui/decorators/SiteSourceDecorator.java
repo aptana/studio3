@@ -13,9 +13,9 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 public class SiteSourceDecorator implements ILightweightLabelDecorator {
 

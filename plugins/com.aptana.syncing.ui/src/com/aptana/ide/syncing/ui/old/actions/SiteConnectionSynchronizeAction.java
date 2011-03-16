@@ -20,11 +20,11 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ui.util.UIUtils;
 
 /**

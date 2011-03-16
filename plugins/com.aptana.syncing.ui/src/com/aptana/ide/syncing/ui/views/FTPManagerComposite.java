@@ -47,14 +47,6 @@ import org.eclipse.ui.PlatformUI;
 import com.aptana.core.CoreStrings;
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.syncing.core.DefaultSiteConnection;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SyncingPlugin;
-import com.aptana.ide.syncing.core.events.ISiteConnectionListener;
-import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
-import com.aptana.ide.syncing.core.old.ConnectionPointSyncPair;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.actions.DownloadAction;
 import com.aptana.ide.syncing.ui.actions.UploadAction;
@@ -63,6 +55,14 @@ import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.syncing.core.DefaultSiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SyncingPlugin;
+import com.aptana.syncing.core.events.ISiteConnectionListener;
+import com.aptana.syncing.core.events.SiteConnectionEvent;
+import com.aptana.syncing.core.old.ConnectionPointSyncPair;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -193,7 +193,7 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 	/*
 	 * (non-Javadoc)
 	 * @see
-	 * com.aptana.ide.syncing.core.events.ISiteConnectionListener#siteConnectionChanged(com.aptana.ide.syncing.core.
+	 * com.aptana.syncing.core.events.ISiteConnectionListener#siteConnectionChanged(com.aptana.syncing.core.
 	 * events.SiteConnectionEvent)
 	 */
 	public void siteConnectionChanged(final SiteConnectionEvent event)

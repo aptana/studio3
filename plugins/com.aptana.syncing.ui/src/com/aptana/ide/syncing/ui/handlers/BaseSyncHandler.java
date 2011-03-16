@@ -25,7 +25,7 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IURIEditorInput;
 
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 public abstract class BaseSyncHandler extends AbstractHandler
 {

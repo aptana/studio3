@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 /**
  * Contains a list of available sites that have the specific project as the

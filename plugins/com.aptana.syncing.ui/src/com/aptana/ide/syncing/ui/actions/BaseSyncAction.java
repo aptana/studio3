@@ -30,12 +30,12 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.dialogs.ChooseSiteConnectionDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ResourceSynchronizationUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

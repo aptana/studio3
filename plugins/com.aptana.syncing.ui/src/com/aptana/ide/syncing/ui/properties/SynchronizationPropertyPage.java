@@ -21,9 +21,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ResourceSynchronizationUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 public class SynchronizationPropertyPage extends PreferencePage implements IWorkbenchPropertyPage {
 

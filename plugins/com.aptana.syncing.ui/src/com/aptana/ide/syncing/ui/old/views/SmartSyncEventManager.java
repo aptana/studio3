@@ -11,9 +11,9 @@ import org.eclipse.core.runtime.ListenerList;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.old.ISmartSyncListener;
-import com.aptana.ide.syncing.core.old.SmartSyncEvent;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.ISmartSyncListener;
+import com.aptana.syncing.core.old.SmartSyncEvent;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

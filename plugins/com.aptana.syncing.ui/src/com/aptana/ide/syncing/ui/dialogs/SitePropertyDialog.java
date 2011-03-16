@@ -9,7 +9,7 @@ package com.aptana.ide.syncing.ui.dialogs;
 
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.ui.IPropertyDialog;
 
 /**

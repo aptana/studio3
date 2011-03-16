@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.ISiteConnection;
 
 public class SynchronizeAction extends BaseSyncAction {
 

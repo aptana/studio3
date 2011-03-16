@@ -12,7 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 public class NavigatorBaseSyncAction extends BaseSelectionListenerAction
 {

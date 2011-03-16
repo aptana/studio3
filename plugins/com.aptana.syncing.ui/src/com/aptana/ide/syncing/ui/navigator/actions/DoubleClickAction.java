@@ -12,11 +12,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.dialogs.SiteConnectionsEditorDialog;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.navigator.ProjectSiteConnection;
 import com.aptana.ide.ui.io.navigator.actions.BaseDoubleClickAction;
+import com.aptana.syncing.core.ISiteConnection;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

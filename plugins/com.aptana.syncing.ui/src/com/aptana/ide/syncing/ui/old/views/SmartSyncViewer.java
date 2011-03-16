@@ -44,13 +44,13 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.syncing.core.old.ISyncResource;
-import com.aptana.ide.syncing.core.old.SyncFile;
-import com.aptana.ide.syncing.core.old.SyncFolder;
-import com.aptana.ide.syncing.core.old.SyncState;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.old.editors.FileCompareEditorInput;
+import com.aptana.syncing.core.old.ISyncResource;
+import com.aptana.syncing.core.old.SyncFile;
+import com.aptana.syncing.core.old.SyncFolder;
+import com.aptana.syncing.core.old.SyncState;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

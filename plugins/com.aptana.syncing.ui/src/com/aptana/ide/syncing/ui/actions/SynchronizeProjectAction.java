@@ -16,10 +16,10 @@ import org.eclipse.swt.widgets.MessageBox;
 
 import com.aptana.core.io.IConnectionPoint;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.handlers.SyncEventHandlerAdapter;
 import com.aptana.ui.util.UIUtils;
 
 public class SynchronizeProjectAction extends BaseSyncAction

@@ -14,8 +14,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.views.FTPManagerComposite;
+import com.aptana.syncing.core.ISiteConnection;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

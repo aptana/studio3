@@ -15,8 +15,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
+import com.aptana.syncing.core.ISiteConnection;
 import com.aptana.ui.util.UIUtils;
 
 /**

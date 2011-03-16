@@ -14,8 +14,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.ui.editors.EditorUtils;
+import com.aptana.syncing.core.DefaultSiteConnection;
 
 /**
  * Opens the editor for the default connection with the selected FTP site as the destination.

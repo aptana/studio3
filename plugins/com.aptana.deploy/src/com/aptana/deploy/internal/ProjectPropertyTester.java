@@ -17,8 +17,8 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
+import com.aptana.syncing.core.ISiteConnection;
+import com.aptana.syncing.core.SiteConnectionUtils;
 
 public class ProjectPropertyTester extends PropertyTester
 {

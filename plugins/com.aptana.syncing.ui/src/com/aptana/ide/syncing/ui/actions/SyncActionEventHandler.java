@@ -14,8 +14,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import com.aptana.core.CoreStrings;
 import com.aptana.core.io.IConnectionPoint;
-import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
-import com.aptana.ide.syncing.core.old.handlers.SyncEventHandlerAdapterWithProgressMonitor;
+import com.aptana.syncing.core.old.VirtualFileSyncPair;
+import com.aptana.syncing.core.old.handlers.SyncEventHandlerAdapterWithProgressMonitor;
 import com.aptana.ui.util.UIUtils;
 
 class SyncActionEventHandler extends SyncEventHandlerAdapterWithProgressMonitor
