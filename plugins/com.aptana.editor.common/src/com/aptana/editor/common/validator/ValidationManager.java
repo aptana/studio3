@@ -104,6 +104,7 @@ public class ValidationManager implements IValidationManager
 		fItems.clear();
 		fCurrentLanguage = language;
 
+		ValidatorReference validatorRef = null;
 		if (fResourceUri != null)
 		{
 			List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
@@ -114,7 +115,8 @@ public class ValidationManager implements IValidationManager
 				// by default use the first validator that supports the language
 				if (validatorRefs.size() > 0)
 				{
-					validatorRefs.get(0).getValidator().validate(source, fResourceUri, this);
+					validatorRef = validatorRefs.get(0);
+					validatorRef.getValidator().validate(source, fResourceUri, this);
 				}
 			}
 			else
@@ -126,14 +128,16 @@ public class ValidationManager implements IValidationManager
 					{
 						if (validator.getName().equals(name))
 						{
-							validator.getValidator().validate(source, fResourceUri, this);
+							validatorRef = validator;
+							validatorRef.getValidator().validate(source, fResourceUri, this);
 							break;
 						}
 					}
 				}
 			}
 		}
-		update(fItems.toArray(new IValidationItem[fItems.size()]));
+		String markerType = validatorRef == null ? IMarkerConstants.PROBLEM_MARKER : validatorRef.getType();
+		update(fItems.toArray(new IValidationItem[fItems.size()]), markerType);
 	}
 
 	public void addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
@@ -186,7 +190,7 @@ public class ValidationManager implements IValidationManager
 		fItems.add(new ValidationItem(severity, message, offset, length, lineNumber, sourcePath.toString()));
 	}
 
-	private void update(final IValidationItem[] items)
+	private void update(final IValidationItem[] items, final String markerType)
 	{
 		// Performance fix: schedules the error handling as a single workspace update so that we don't trigger a
 		// bunch of resource updated events while problem markers are being added to the file.
@@ -195,7 +199,7 @@ public class ValidationManager implements IValidationManager
 
 			public void run(IProgressMonitor monitor)
 			{
-				updateValidation(items);
+				updateValidation(items, markerType);
 			}
 		};
 
@@ -210,7 +214,7 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	private synchronized void updateValidation(IValidationItem[] items)
+	private synchronized void updateValidation(IValidationItem[] items, String markerType)
 	{
 		if (fResource == null)
 		{
@@ -237,15 +241,24 @@ public class ValidationManager implements IValidationManager
 
 		try
 		{
-			String markerType = IMarkerConstants.PROBLEM_MARKER;
 			// deletes the old markers
 			if (isExternal)
 			{
 				MarkerUtils.deleteMarkers(externalResource, markerType, true);
+				// this is to remove "Aptana Problem" markers
+				if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
+				{
+					MarkerUtils.deleteMarkers(externalResource, IMarkerConstants.PROBLEM_MARKER, true);
+				}
 			}
 			else
 			{
 				workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+				// this is to remove "Aptana Problem" markers
+				if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
+				{
+					workspaceResource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
+				}
 			}
 
 			// adds the new ones

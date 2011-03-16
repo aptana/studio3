@@ -11,9 +11,6 @@
       <super
             type="org.eclipse.core.resources.textmarker">
       </super>
-      <persistent
-            value="true">
-      </persistent>
       <attribute
             name="id">
       </attribute>

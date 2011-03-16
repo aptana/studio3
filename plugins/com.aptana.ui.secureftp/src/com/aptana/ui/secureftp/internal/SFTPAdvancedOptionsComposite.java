@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.ui.secureftp.internal;
+package com.aptana.ui.secureftp.internal;
 
 import java.nio.charset.Charset;
 

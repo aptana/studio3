@@ -109,13 +109,18 @@ public class ValidatorLoader
 				{
 					continue;
 				}
+				String type = element.getAttribute(ATTR_TYPE);
+				if (StringUtil.isEmpty(type))
+				{
+					continue;
+				}
 				String languageType = element.getAttribute(ATTR_LANGUAGE);
 				ValidatorLanguage language = languages.get(languageType);
 				if (language == null)
 				{
 					continue;
 				}
-				ValidatorReference validator = new ValidatorReference(name, language, element);
+				ValidatorReference validator = new ValidatorReference(name, type, language, element);
 				List<ValidatorReference> list = validators.get(languageType);
 				if (list == null)
 				{

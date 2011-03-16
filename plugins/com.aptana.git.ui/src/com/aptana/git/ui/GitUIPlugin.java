@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -38,6 +39,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.git.core.IPreferenceConstants;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.PortableGit;
 import com.aptana.git.ui.internal.GitColors;
@@ -135,6 +137,9 @@ public class GitUIPlugin extends AbstractUIPlugin
 
 	private void checkHasGit()
 	{
+		if (getPreferenceStore().getBoolean(IPreferenceConstants.IGNORE_NO_GIT)) {
+			return;
+		}
 		if (Platform.WS_WIN32.equals(Platform.getOS()))
 		{
 			if (GitExecutable.instance() == null)
@@ -146,21 +151,23 @@ public class GitUIPlugin extends AbstractUIPlugin
 					{
 						while (true)
 						{
-							MessageDialog dlg = new MessageDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+							MessageDialogWithToggle dlg = new MessageDialogWithToggle(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
 									.getShell(), Messages.GitUIPlugin_1, null, Messages.GitUIPlugin_2,
 									MessageDialog.WARNING, new String[] { IDialogConstants.SKIP_LABEL,
-											Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, 2);
+											Messages.GitUIPlugin_3, IDialogConstants.BROWSE_LABEL }, IDialogConstants.INTERNAL_ID+1,
+									"Check this if you do not want to be asked again", false);
 							switch (dlg.open())
 							{
-								case 0:
+								case 5:
+									getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
 									return Status.OK_STATUS;
-								case 1:
+								case IDialogConstants.INTERNAL_ID:
 									if (installPortableGit(monitor))
 									{
 										return Status.OK_STATUS;
 									}
 									break;
-								case 2:
+								case IDialogConstants.INTERNAL_ID+1:
 									if (browseGitLocation())
 									{
 										return Status.OK_STATUS;

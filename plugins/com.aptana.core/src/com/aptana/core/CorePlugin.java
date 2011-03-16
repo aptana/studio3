@@ -7,14 +7,17 @@
  */
 package com.aptana.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import net.contentobjects.jnotify.IJNotify;
 import net.contentobjects.jnotify.JNotifyException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -86,7 +89,15 @@ public class CorePlugin extends Plugin
 			{
 				MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
 				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				SubMonitor sub = SubMonitor.convert(monitor, projects.length);
+				Map<String, String> oldToNewNatures = new HashMap<String, String>();
+				oldToNewNatures.put("com.aptana.ide.project.nature.web", "com.aptana.projects.webnature"); //$NON-NLS-1$ //$NON-NLS-2$
+				// oldToNewNatures.put("com.aptana.ide.project.remote.nature",
+				// "com.aptana.ruby.core.rubynature"); // There is no remote nature now
+				oldToNewNatures.put("com.aptana.ide.editor.php.phpnature", "com.aptana.editor.php.phpNature"); //$NON-NLS-1$ //$NON-NLS-2$
+				// oldToNewNatures.put("org.radrails.rails.core.railsnature",
+				// "org.radrails.rails.core.railsnature"); // Same id
+				oldToNewNatures.put("org.rubypeople.rdt.core.rubynature", "com.aptana.ruby.core.rubynature"); //$NON-NLS-1$ //$NON-NLS-2$
+				SubMonitor sub = SubMonitor.convert(monitor, 10 * projects.length);
 				for (IProject p : projects)
 				{
 					if (sub.isCanceled())
@@ -102,7 +113,23 @@ public class CorePlugin extends Plugin
 						}
 						sub.subTask(p.getName());
 
-						String[] natureIds = p.getDescription().getNatureIds();
+						// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
+						IProjectDescription desc = p.getDescription();
+						List<String> newNatures = new ArrayList<String>();
+						for (String nature : desc.getNatureIds())
+						{
+							String newNature = oldToNewNatures.get(nature);
+							if (newNature != null)
+							{
+								newNatures.add(newNature);
+							}
+							newNatures.add(nature);
+						}
+						desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
+						p.setDescription(desc, sub.newChild(5));
+
+						// Attach builders in case nature was already on project, but before we created the builder
+						String[] natureIds = desc.getNatureIds();
 						for (int i = 0; i < natureIds.length; i++)
 						{
 							String natureId = natureIds[i];
@@ -113,14 +140,11 @@ public class CorePlugin extends Plugin
 							}
 						}
 						status.add(Status.OK_STATUS);
+						sub.worked(5);
 					}
 					catch (CoreException e)
 					{
 						status.add(e.getStatus());
-					}
-					finally
-					{
-						sub.worked(1);
 					}
 				}
 				sub.done();

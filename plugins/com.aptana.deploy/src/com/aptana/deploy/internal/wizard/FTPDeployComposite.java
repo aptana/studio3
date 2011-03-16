@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
-import com.aptana.ide.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
+import com.aptana.ui.secureftp.internal.CommonFTPConnectionPropertyComposite;
 
 @SuppressWarnings("restriction")
 public class FTPDeployComposite extends CommonFTPConnectionPropertyComposite implements SelectionListener
