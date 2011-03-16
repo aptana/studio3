@@ -62,6 +62,16 @@ public class FormatterIndentDetector implements IFormatterWriter
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterWriter#writeText(com.aptana.formatter.IFormatterContext, java.lang.String,
+	 * boolean)
+	 */
+	public void writeText(IFormatterContext context, String text, boolean removePreviousSpaces)
+	{
+		// empty
+	}
+
+	/*
 	 * @see IFormatterWriter#writeLineBreak(IFormatterContext)
 	 */
 	public void writeLineBreak(IFormatterContext context)
