@@ -180,6 +180,7 @@ public class HTMLOpenTagCloserTest extends TestCase
 		assertTrue(event.doit);
 	}
 
+	// https://aptana.lighthouseapp.com/projects/35272/tickets/1592-cursor-moves-back-one-column-when-auto-inserting-closing-tag-in-html
 	public void testDoesStickCursorBetweenAutoClosedTagPair()
 	{
 		IDocument document = setDocument("<html>");
