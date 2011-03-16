@@ -106,9 +106,6 @@ public class FileService
 	 */
 	public synchronized void parse(boolean force)
 	{
-		// assume parse failure
-		this.fHasValidParseResult = false;
-
 		if (fLanguage != null && fDocument != null)
 		{
 			String source = fDocument.get();
@@ -116,6 +113,9 @@ public class FileService
 
 			if (force || sourceHash != fLastSourceHash)
 			{
+				// assume failure
+				this.fHasValidParseResult = false;
+
 				fLastSourceHash = sourceHash;
 				fParseState.setEditState(source, null, 0, 0);
 
@@ -123,7 +123,7 @@ public class FileService
 				{
 					ParserPoolFactory.parse(fLanguage, fParseState);
 
-					// indicate current parse result is valid
+					// indicate current parse result is now valid
 					this.fHasValidParseResult = true;
 
 					// fire listeners
@@ -134,11 +134,18 @@ public class FileService
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					// not logging the parsing error here since the source could be in an intermediate state of being
 					// edited by the user
 				}
+
 				fValidationManager.validate(source, fLanguage);
 			}
+		}
+		else
+		{
+			// indicate failure
+			this.fHasValidParseResult = false;
 		}
 	}
 

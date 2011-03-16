@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="com.aptana.editor.js.typeMaps" name="typeMaps" schema="schema/typeMaps.exsd"/>
+   <extension-point id="com.aptana.editor.js.typeMaps" name="%extension-point.typemaps.name" schema="schema/typeMaps.exsd"/>
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -85,12 +85,14 @@
       <validator
             class="com.aptana.editor.js.validator.MozillaJsValidator"
             language="text/javascript"
-            name="%validator.mozilla.name">
+            name="%validator.mozilla.name"
+            type="com.aptana.editor.js.problem">
       </validator>
       <validator
             class="com.aptana.editor.js.validator.JSLintValidator"
             language="text/javascript"
-            name="%validator.jslint.name">
+            name="%validator.jslint.name"
+            type="com.aptana.editor.js.problem">
       </validator>
    </extension>
    <extension
@@ -109,7 +111,7 @@
       <command
             defaultHandler="com.aptana.editor.js.outline.QuickOutlineHandler"
             id="com.aptana.editor.js.quick_outline"
-            name="Quick Outline">
+            name="%command.quickoutline.name">
       </command>
    </extension>
    <extension
@@ -127,7 +129,7 @@
             category="com.aptana.editor.common.preferences.EditorsPreferencePage"
             class="com.aptana.editor.js.preferences.JSPreferencePage"
             id="com.aptana.editor.js.preferences.JSPreferencePage"
-            name="JavaScript">
+            name="%page.js.name">
       </page>
    </extension>
    <extension
@@ -144,6 +146,29 @@
             name="jQuery Map"
             sourceType="jQuery">
       </typeMap>
+   </extension>
+   <extension
+         id="problem"
+         name="%marker.js.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+      <attribute
+            name="id">
+      </attribute>
+      <attribute
+            name="flags">
+      </attribute>
+      <attribute
+            name="arguments">
+      </attribute>
    </extension>
 
 </plugin>
