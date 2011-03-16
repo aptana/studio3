@@ -505,7 +505,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	private static void throwFileNotFound(FTPException e, IPath path) throws FileNotFoundException, FTPException {
 		int code = e.getReplyCode();
 		if (code == 550 || code == 450) {
-			throw new FileNotFoundException(path.toPortableString());
+			throw initFileNotFoundException(path, e);
 		}
 		throw e;		
 	}
@@ -834,7 +834,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 				throw (FileNotFoundException) e;
 			} else if (e instanceof FTPException) {
 				if (((FTPException)e).getReplyCode() == 553) {
-					throw (FileNotFoundException) new FileNotFoundException(path.toPortableString()).initCause(e);
+					throw initFileNotFoundException(path, e);
 				}
 			}
 			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_opening_file_write_failed, e));			

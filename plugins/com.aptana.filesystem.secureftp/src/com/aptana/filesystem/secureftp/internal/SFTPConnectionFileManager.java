@@ -325,7 +325,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			reply = ((FTPException) e.getCause()).getReplyCode();
 		}
 		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
-			throw new FileNotFoundException(path.toPortableString());
+			throw initFileNotFoundException(path, e);
 		}
         if (reply == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
 			throw new PermissionDeniedException(path.toPortableString(), e);
