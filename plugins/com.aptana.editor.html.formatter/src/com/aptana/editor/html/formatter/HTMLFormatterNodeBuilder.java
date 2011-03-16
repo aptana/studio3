@@ -256,7 +256,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		IRange beginNodeRange = node.getNameNode().getNameRange();
 		INameNode endNode = node.getEndNode();
 		int endOffset = node.getEndingOffset() + 1;
-		if (endNode != null)
+		IRange endNameRange = endNode.getNameRange();
+		if (endNode != null && !endNameRange.isEmpty() && endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
 		{
 			IRange endNodeRange = endNode.getNameRange();
 			endOffset = endNodeRange.getStartingOffset();
