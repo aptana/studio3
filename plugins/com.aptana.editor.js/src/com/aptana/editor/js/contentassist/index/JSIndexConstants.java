@@ -24,7 +24,8 @@ public interface JSIndexConstants
 	// 0.21 - Using JSON for property and function content assist model elements
 	// 0.22 - Add events, examples, remarks, and a deprecated flag to type elements
 	// 0.23 - Fix Window.Math property
-	public static final double INDEX_VERSION = 0.23;
+	// 0.24 - Fix String.fromCharCode
+	public static final double INDEX_VERSION = 0.24;
 
 	// for debugging, comment the line above, and uncomment the following
 	// public static final double INDEX_VERSION = new Random().nextDouble() * 1e6;
