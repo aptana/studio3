@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.js.contentassist;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -20,23 +23,69 @@ import com.aptana.editor.js.tests.EditorBasedTests;
  */
 public class JSContentAssistProposalTests extends EditorBasedTests
 {
-	public void testStringCharCodeAt()
+	protected void checkProposals(String resource, String... displayNames)
 	{
-		TestContext context = this.getTestContext("contentAssist/string-charCodeAt.js");
+		TestContext context = this.getTestContext(resource);
 		int offset = context.source.length();
 		ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
 		viewer.setDocument(context.document);
 		ICompletionProposal[] proposals = context.processor.doComputeCompletionProposals(viewer, offset, '\0', false);
-		boolean foundCharCodeAt = false;
-		
+		Set<String> names = new HashSet<String>();
+
 		for (ICompletionProposal proposal : proposals)
 		{
-			if ("charCodeAt".equals(proposal.getDisplayString()))
-			{
-				foundCharCodeAt = true;
-				break;
-			}
+			names.add(proposal.getDisplayString());
 		}
-		assertTrue(foundCharCodeAt);
+
+		for (String displayName : displayNames)
+		{
+			assertTrue(names.contains(displayName));
+		}
+	}
+
+	/**
+	 * testStringCharCodeAt
+	 */
+	public void testStringCharCodeAt()
+	{
+		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
+	}
+
+	/**
+	 * testMath
+	 */
+	public void testMath()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/math.js",
+			"E",
+			"LN10",
+			"LN2",
+			"LOG10E",
+			"LOG2E",
+			"PI",
+			"SQRT1_2",
+			"SQRT2",
+			"abs",
+			"acos",
+			"asin",
+			"atan",
+			"atan2",
+			"ceil",
+			"cos",
+			"exp",
+			"floor",
+			"log",
+			"max",
+			"min",
+			"pow",
+			"random",
+			"round",
+			"sin",
+			"sqrt",
+			"tan"
+		);
+		// @formatter:on
 	}
 }
