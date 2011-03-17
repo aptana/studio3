@@ -23,23 +23,34 @@ public class LocationTests extends EditorBasedTests
 	{
 		// setup everything for the test
 		TestContext context = this.getTestContext(resource);
-		
-		for (LocationTypeRange range : ranges)
+
+		try
 		{
-			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+			for (LocationTypeRange range : ranges)
 			{
-				LocationType location = context.processor.getLocation(context.document, offset);
-				String message = MessageFormat.format(
-					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
-					range.location.toString(),
-					Integer.toString(offset),
-					context.source,
-					(offset < context.source.length()) ? context.source.charAt(offset) : '\0'
-				);
-				assertEquals(message, range.location, location);
+				for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
+				{
+					LocationType location = context.processor.getLocation(context.document, offset);
+					// @formatter:off
+					String message = MessageFormat.format(
+						"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
+						range.location.toString(),
+						Integer.toString(offset),
+						context.source,
+						(offset < context.source.length()) ? context.source.charAt(offset) : '\0'
+					);
+					// @formatter:on
+					assertEquals(message, range.location, location);
+				}
 			}
 		}
+		finally
+		{
+			context.editor.close(false);
+		}
 	}
+
+	// @formatter:off
 	
 	/**
 	 * testInvokeWithoutParams

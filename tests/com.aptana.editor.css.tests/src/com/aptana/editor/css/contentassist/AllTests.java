@@ -21,6 +21,7 @@ public class AllTests
 		suite.addTestSuite(CoarseLocationTests.class);
 		suite.addTestSuite(RangeTests.class);
 		suite.addTestSuite(MetadataTests.class);
+		suite.addTestSuite(CSSContentAssistProposalTests.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.tests;
+package com.aptana.editor.css.tests;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,8 +32,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.AbstractThemeableEditor;
-import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
+import com.aptana.editor.css.CSSPlugin;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 
 public class EditorBasedTests extends TestCase
 {
@@ -47,10 +47,10 @@ public class EditorBasedTests extends TestCase
 		public final ITextEditor editor;
 		public final IDocument document;
 		public final String source;
-		public final JSContentAssistProcessor processor;
+		public final CSSContentAssistProcessor processor;
 		public final List<Integer> cursorOffsets;
 
-		public TestContext(ITextEditor editor, IDocument document, String source, JSContentAssistProcessor processor,
+		public TestContext(ITextEditor editor, IDocument document, String source, CSSContentAssistProcessor processor,
 				List<Integer> cursorOffsets)
 		{
 			this.editor = editor;
@@ -64,8 +64,8 @@ public class EditorBasedTests extends TestCase
 	/**
 	 * createEditor
 	 * 
+	 * @param file
 	 * @return
-	 * @throws PartInitException
 	 */
 	protected ITextEditor createEditor(IFileStore file)
 	{
@@ -75,7 +75,7 @@ public class EditorBasedTests extends TestCase
 
 		try
 		{
-			editor = (ITextEditor) page.openEditor(editorInput, JSPlugin.PLUGIN_ID);
+			editor = (ITextEditor) page.openEditor(editorInput, CSSPlugin.PLUGIN_ID);
 		}
 		catch (PartInitException e)
 		{
@@ -99,7 +99,7 @@ public class EditorBasedTests extends TestCase
 		ITextEditor editor = this.createEditor(file);
 		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		String source = document.get();
-		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) editor);
+		CSSContentAssistProcessor processor = new CSSContentAssistProcessor((AbstractThemeableEditor) editor);
 
 		// find offsets
 		List<Integer> offsets = new ArrayList<Integer>();
@@ -134,7 +134,7 @@ public class EditorBasedTests extends TestCase
 
 		try
 		{
-			URL url = FileLocator.find(JSPlugin.getDefault().getBundle(), path, null);
+			URL url = FileLocator.find(CSSPlugin.getDefault().getBundle(), path, null);
 			URL fileURL = FileLocator.toFileURL(url);
 			URI fileURI = ResourceUtil.toURI(fileURL);
 

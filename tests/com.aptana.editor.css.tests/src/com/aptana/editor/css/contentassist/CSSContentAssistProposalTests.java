@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.editor.js.contentassist;
+package com.aptana.editor.css.contentassist;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,12 +16,12 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.editor.js.tests.EditorBasedTests;
+import com.aptana.editor.css.tests.EditorBasedTests;
 
 /**
  * JSContentAssistProposalTests
  */
-public class JSContentAssistProposalTests extends EditorBasedTests
+public class CSSContentAssistProposalTests extends EditorBasedTests
 {
 	protected void checkProposals(String resource, String... displayNames)
 	{
@@ -60,47 +60,18 @@ public class JSContentAssistProposalTests extends EditorBasedTests
 	}
 
 	/**
-	 * testStringCharCodeAt
+	 * testFailureAfterColon
 	 */
-	public void testStringCharCodeAt()
-	{
-		this.checkProposals("contentAssist/string-charCodeAt.js", "charCodeAt");
-	}
-
-	/**
-	 * testMath
-	 */
-	public void testMath()
+	public void testFailureAfterColon()
 	{
 		// @formatter:off
 		this.checkProposals(
-			"contentAssist/math.js",
-			"E",
-			"LN10",
-			"LN2",
-			"LOG10E",
-			"LOG2E",
-			"PI",
-			"SQRT1_2",
-			"SQRT2",
-			"abs",
-			"acos",
-			"asin",
-			"atan",
-			"atan2",
-			"ceil",
-			"cos",
-			"exp",
-			"floor",
-			"log",
-			"max",
-			"min",
-			"pow",
-			"random",
-			"round",
-			"sin",
-			"sqrt",
-			"tan"
+			"contentAssist/failure-after-colon.css",
+			"center",
+			"inherit",
+			"justify",
+			"left",
+			"right"
 		);
 		// @formatter:on
 	}

@@ -868,15 +868,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> previousLexeme = (i > 0) ? lexemeProvider.getLexeme(i - 1) : null;
 
-				if (this.isValueDelimiter(currentLexeme))
+				if (this.isValueDelimiter(currentLexeme) || previousLexeme.isContiguousWith(currentLexeme) == false)
 				{
-					index = i + 1;
-					break;
-				}
-				else if (previousLexeme.isContiguousWith(currentLexeme) == false)
-				{
-					// there's a space between this lexeme and the previous lexeme
-					// treat the previous lexeme like it is the delimiter
+					// the current lexeme is a natural delimiter or there's a space between this lexeme and the previous
+					// lexeme, so treat the previous lexeme like it is the delimiter
 					index = i;
 					break;
 				}
