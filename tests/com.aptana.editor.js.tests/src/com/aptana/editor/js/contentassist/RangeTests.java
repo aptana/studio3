@@ -12,11 +12,11 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
-import com.aptana.editor.js.tests.EditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTests;
 import com.aptana.editor.js.tests.TextViewer;
 import com.aptana.parsing.lexer.Range;
 
-public class RangeTests extends EditorBasedTests
+public class RangeTests extends JSEditorBasedTests
 {
 	static class OffsetSelection
 	{
@@ -30,7 +30,7 @@ public class RangeTests extends EditorBasedTests
 			this.endingOffset = offset;
 			this.range = range;
 		}
-		
+
 		public OffsetSelection(int startingOffset, int endingOffset, Range range)
 		{
 			this.startingOffset = startingOffset;
@@ -47,22 +47,23 @@ public class RangeTests extends EditorBasedTests
 	 */
 	protected void rangeTests(String resource, OffsetSelection... selections)
 	{
-		TestContext context = this.getTestContext(resource);
-		ITextViewer viewer = new TextViewer(context.document);
-		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) context.editor);
+		this.setupTestContext(resource);
+
+		ITextViewer viewer = new TextViewer(this.document);
+		JSContentAssistProcessor processor = new JSContentAssistProcessor((AbstractThemeableEditor) this.editor);
 
 		for (OffsetSelection selection : selections)
 		{
 			for (int offset = selection.startingOffset; offset <= selection.endingOffset; offset++)
 			{
 				ICompletionProposal[] proposals = processor.computeCompletionProposals(viewer, offset, '\0', false);
-	
+
 				if (proposals != null && proposals.length > 0)
 				{
 					if (selection.range != null)
 					{
 						CommonCompletionProposal proposal = (CommonCompletionProposal) proposals[0];
-						
+
 						if (selection.range.isEmpty())
 						{
 							assertEquals(offset, proposal.getReplaceRange().getStartingOffset());
@@ -87,6 +88,8 @@ public class RangeTests extends EditorBasedTests
 			}
 		}
 	}
+
+	// @formatter:off
 	
 	/**
 	 * testFunctionWithoutArgs
