@@ -136,7 +136,13 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				boolean isDefaultType = fType.equals(type);
 				QualifiedContentType qualifiedContentType = documentScopeManager.getContentType(document,
 						partition.getOffset());
-				String contentType = extractContentType(qualifiedContentType);
+				// Verify that this content type is one of the supported slave types before we assign it as one.
+				String contentType = null;
+				String extractedContentType = extractContentType(qualifiedContentType);
+				if (slaveContentTypes.contains(extractedContentType))
+				{
+					contentType = extractedContentType;
+				}
 				if (!isDefaultType && contentType != null && !contentType.equals(masterContentType))
 				{
 					if (lastContentType == null || lastContentType.equals(contentType))
