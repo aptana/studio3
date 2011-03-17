@@ -7,58 +7,13 @@
  */
 package com.aptana.editor.js.contentassist;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
-
-import com.aptana.editor.js.tests.EditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTests;
 
 /**
  * JSContentAssistProposalTests
  */
-public class JSContentAssistProposalTests extends EditorBasedTests
+public class JSContentAssistProposalTests extends JSEditorBasedTests
 {
-	protected void checkProposals(String resource, String... displayNames)
-	{
-		TestContext context = this.getTestContext(resource);
-
-		try
-		{
-			ITextViewer viewer = new TextViewer(new Shell(), SWT.NONE);
-			viewer.setDocument(context.document);
-
-			for (int offset : context.cursorOffsets)
-			{
-				// get proposals
-				ICompletionProposal[] proposals = context.processor.doComputeCompletionProposals(viewer, offset, '\0',
-						false);
-
-				// build a list of display names
-				Set<String> names = new HashSet<String>();
-
-				for (ICompletionProposal proposal : proposals)
-				{
-					names.add(proposal.getDisplayString());
-				}
-
-				// verify each specified name is in the resulting proposal list
-				for (String displayName : displayNames)
-				{
-					assertTrue(names.contains(displayName));
-				}
-			}
-		}
-		finally
-		{
-			context.editor.close(false);
-		}
-	}
-
 	/**
 	 * testStringCharCodeAt
 	 */
