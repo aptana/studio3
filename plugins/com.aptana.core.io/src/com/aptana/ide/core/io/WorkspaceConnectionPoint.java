@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.ide.core.io.efs.WorkspaceFileSystem;
+import com.aptana.core.io.efs.WorkspaceFileSystem;
 
 
 /**

@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
+import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 
 /**
  * @author Max Stepanov

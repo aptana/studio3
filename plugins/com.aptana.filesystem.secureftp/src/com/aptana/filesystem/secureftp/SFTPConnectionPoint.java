@@ -17,12 +17,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
 import com.aptana.core.epl.IMemento;
+import com.aptana.core.io.vfs.IConnectionFileManager;
 import com.aptana.filesystem.secureftp.internal.SFTPConnectionFileManager;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.ConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint15Constants;
-import com.aptana.ide.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov

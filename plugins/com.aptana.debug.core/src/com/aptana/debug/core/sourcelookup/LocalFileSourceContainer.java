@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.sourcelookup.ISourceContainerType;
 import org.eclipse.debug.core.sourcelookup.containers.AbstractSourceContainer;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.EFSUtils;
 
 /**
  * @author Max Stepanov

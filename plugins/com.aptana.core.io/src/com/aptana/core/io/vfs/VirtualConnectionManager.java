@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.vfs;
+package com.aptana.core.io.vfs;
 
 import java.lang.ref.WeakReference;
 import java.net.URI;

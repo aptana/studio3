@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.EFSUtils;
 
 /**
  * @author Max Stepanov

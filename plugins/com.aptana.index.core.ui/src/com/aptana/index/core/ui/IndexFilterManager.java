@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.index.core.ui.preferences.IPreferenceConstants;
 
 public class IndexFilterManager

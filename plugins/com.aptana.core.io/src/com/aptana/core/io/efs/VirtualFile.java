@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.efs;
+package com.aptana.core.io.efs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,12 +25,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import com.aptana.core.io.vfs.IConnectionFileManager;
+import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.io.vfs.IFileTreeVisitor;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
-import com.aptana.ide.core.io.vfs.IConnectionFileManager;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.core.io.vfs.IFileTreeVisitor;
 
 /**
  * @author Max Stepanov

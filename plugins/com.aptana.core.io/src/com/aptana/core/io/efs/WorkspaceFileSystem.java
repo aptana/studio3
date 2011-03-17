@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.efs;
+package com.aptana.core.io.efs;
 
 import java.io.File;
 import java.net.URI;

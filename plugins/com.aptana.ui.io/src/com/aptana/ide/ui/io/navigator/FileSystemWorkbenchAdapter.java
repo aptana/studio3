@@ -29,6 +29,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.progress.IDeferredWorkbenchAdapter;
 import org.eclipse.ui.progress.IElementCollector;
 
+import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.ide.core.io.IConnectionPointManager;
@@ -36,7 +37,6 @@ import com.aptana.ide.core.io.LocalConnectionPoint;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.ui.io.CoreIOImages;
 import com.aptana.ide.ui.io.FileSystemUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;

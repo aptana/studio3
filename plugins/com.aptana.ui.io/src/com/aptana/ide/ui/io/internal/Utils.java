@@ -12,7 +12,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 
-import com.aptana.ide.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.ide.ui.io.FileSystemUtils;
 
 /**

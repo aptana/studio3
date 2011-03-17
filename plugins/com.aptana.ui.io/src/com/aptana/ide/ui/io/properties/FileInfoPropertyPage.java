@@ -36,10 +36,10 @@ import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
+import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.internal.Utils;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;

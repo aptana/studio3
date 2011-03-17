@@ -43,7 +43,7 @@
       <filesystem
             scheme="workspace">
          <run
-               class="com.aptana.ide.core.io.efs.WorkspaceFileSystem">
+               class="com.aptana.core.io.efs.WorkspaceFileSystem">
          </run>
       </filesystem>
    </extension>
@@ -52,7 +52,7 @@
       <filesystem
             scheme="aptanavfs">
          <run
-               class="com.aptana.ide.core.io.efs.VirtualFileSystem">
+               class="com.aptana.core.io.efs.VirtualFileSystem">
          </run>
       </filesystem>
    </extension>

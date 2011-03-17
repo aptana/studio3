@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.efs;
+package com.aptana.core.io.efs;
 
 import java.net.URI;
 
@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.io.vfs.IConnectionFileManager;
+import com.aptana.core.io.vfs.VirtualConnectionManager;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.vfs.IConnectionFileManager;
-import com.aptana.ide.core.io.vfs.VirtualConnectionManager;
 
 /**
  * @author Max Stepanov

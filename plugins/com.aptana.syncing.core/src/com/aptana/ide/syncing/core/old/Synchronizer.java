@@ -31,12 +31,12 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.efs.SyncUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.SyncingPlugin;
 
 /**
