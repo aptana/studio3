@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.core.io.efs;
+package com.aptana.core.io.efs;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +23,9 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Max Stepanov

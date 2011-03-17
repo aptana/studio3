@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.vfs;
+package com.aptana.core.io.vfs;
 
 import org.eclipse.core.filesystem.provider.FileInfo;
 
@@ -34,42 +34,42 @@ public class ExtendedFileInfo extends FileInfo implements IExtendedFileInfo {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#getGroup()
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#getGroup()
 	 */
 	public String getGroup() {
 		return group;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#getOwner()
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#getOwner()
 	 */
 	public String getOwner() {
 		return owner;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#getPermissions()
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#getPermissions()
 	 */
 	public long getPermissions() {
 		return permissions;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#setGroup(java.lang.String)
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#setGroup(java.lang.String)
 	 */
 	public void setGroup(String group) {
 		this.group = group;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#setOwner(java.lang.String)
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#setOwner(java.lang.String)
 	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IExtendedFileInfo#setPermissions(long)
+	 * @see com.aptana.core.io.vfs.IExtendedFileInfo#setPermissions(long)
 	 */
 	public void setPermissions(long permissions) {
 		this.permissions = permissions;

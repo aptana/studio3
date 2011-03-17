@@ -42,6 +42,9 @@ import com.aptana.core.util.StringUtil;
  */
 public final class ShellExecutable {
 
+	private static final String APTANA_VERSION = "APTANA_VERSION"; //$NON-NLS-1$
+	private static final String BASH_ENV = "BASH_ENV"; //$NON-NLS-1$
+
 	private static final String[] POSSIBLE_SHELL_LOCATIONS_WIN32 = new String[] {
 			"%PROGRAMW6432%\\Git\\bin", //$NON-NLS-1$
 			"%PROGRAMFILES%\\Git\\bin", //$NON-NLS-1$
@@ -50,8 +53,8 @@ public final class ShellExecutable {
 	};
 
 	private static final String[] ENV_FILTER = new String[] { "_", //$NON-NLS-1$
+			BASH_ENV,
 			"TMP", //$NON-NLS-1$
-			"BASH_ENV", //$NON-NLS-1$
 			"APP_ICON*", //$NON-NLS-1$
 			"JAVA_MAIN_CLASS*", //$NON-NLS-1$
 			"JAVA_STARTED_ON_FIRST_THREAD*" //$NON-NLS-1$
@@ -94,8 +97,6 @@ public final class ShellExecutable {
 			} finally {
 				initializing = false;
 			}
-			// FIXME Why is this throwing an exception instead of just returning
-			// null?!
 			if (shellPath == null) {
 				throw new CoreException(new Status(Status.ERROR,
 						CorePlugin.PLUGIN_ID,
@@ -247,8 +248,7 @@ public final class ShellExecutable {
 		return env;
 	}
 
-	private synchronized static List<String> toShellCommand(List<String> command)
-			throws CoreException {
+	private synchronized static List<String> toShellCommand(List<String> command) throws CoreException {
 		if (initializing) {
 			return command;
 		}
@@ -266,12 +266,13 @@ public final class ShellExecutable {
 	}
 
 	private synchronized static Map<String, String> toShellEnvironment(Map<String, String> environment) {
+		environment.put(APTANA_VERSION, CorePlugin.getAptanaStudioVersion());
 		if (initializing) {
 			return environment;
 		}
 		IPath rcPath = getShellRCPath();
 		if (rcPath != null) {
-			environment.put("BASH_ENV", rcPath.toOSString()); //$NON-NLS-1$
+			environment.put(BASH_ENV, rcPath.toOSString());
 		}
 		return environment;
 	}
@@ -296,13 +297,6 @@ public final class ShellExecutable {
 		return processBuilder.start();
 	}
 
-	public static Process run(List<String> command, IPath workingDirectory, String[] envp) throws IOException, CoreException {
-		command = toShellCommand(command);
-		return Runtime.getRuntime().exec(
-				command.toArray(new String[command.size()]), envp,
-				workingDirectory.toFile());
-	}
-
 	public static Process run(String command, IPath workingDirectory, Map<String, String> environment, String... arguments) throws IOException, CoreException {
 		List<String> commands = new ArrayList<String>(Arrays.asList(arguments));
 		commands.add(0, command);
@@ -310,8 +304,7 @@ public final class ShellExecutable {
 	}
 
 	public static Process run(IPath executablePath, IPath workingDirectory, Map<String, String> environment, String... arguments) throws IOException, CoreException {
-		return run(executablePath.toOSString(), workingDirectory, environment,
-				arguments);
+		return run(executablePath.toOSString(), workingDirectory, environment, arguments);
 	}
 
 }

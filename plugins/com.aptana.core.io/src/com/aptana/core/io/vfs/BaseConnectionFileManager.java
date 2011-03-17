@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.vfs;
+package com.aptana.core.io.vfs;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
@@ -83,7 +83,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#fetchInfo(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#fetchInfo(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized IExtendedFileInfo fetchInfo(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -105,7 +105,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#childNames(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#childNames(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized String[] childNames(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -133,7 +133,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#childInfos(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#childInfos(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized IExtendedFileInfo[] childInfos(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -165,7 +165,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#openInputStream(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#openInputStream(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized InputStream openInputStream(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -195,7 +195,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#openOutputStream(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#openOutputStream(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized OutputStream openOutputStream(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -229,7 +229,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#delete(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#delete(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized void delete(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -262,7 +262,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#mkdir(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#mkdir(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized void mkdir(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -309,7 +309,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#putInfo(org.eclipse.core.runtime.IPath, org.eclipse.core.filesystem.IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#putInfo(org.eclipse.core.runtime.IPath, org.eclipse.core.filesystem.IFileInfo, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized void putInfo(IPath path, IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);
@@ -356,7 +356,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#move(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#move(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public final synchronized void move(IPath sourcePath, IPath destinationPath, int options, IProgressMonitor monitor) throws CoreException {
 		monitor = Policy.monitorFor(monitor);

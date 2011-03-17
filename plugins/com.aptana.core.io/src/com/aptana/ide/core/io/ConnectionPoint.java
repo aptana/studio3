@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.PlatformObject;
 
 import com.aptana.core.epl.IMemento;
-import com.aptana.ide.core.io.vfs.VirtualConnectionManager;
+import com.aptana.core.io.vfs.VirtualConnectionManager;
 
 /**
  * Base class for all connection points

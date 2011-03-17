@@ -6,7 +6,7 @@
  * Any modifications to this file must keep this entire header intact.
  */
 
-package com.aptana.ide.core.io.vfs;
+package com.aptana.core.io.vfs;
 
 import java.lang.ref.WeakReference;
 import java.net.URI;
@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.io.efs.VirtualFileSystem;
 import com.aptana.ide.core.io.ConnectionPoint;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.VirtualFileSystem;
 
 /**
  * @author Max Stepanov

@@ -5,14 +5,14 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.core.io.efs;
+package com.aptana.core.io.efs;
 
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS // NO_UCD
 {
 
-	private static final String BUNDLE_NAME = "com.aptana.ide.core.io.efs.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "com.aptana.core.io.efs.messages"; //$NON-NLS-1$
 
 	public static String VirtualFile_ListingDirectory; // NO_UCD
 	public static String VirtualFileSystem_ERR_FetchFileTree; // NO_UCD

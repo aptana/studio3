@@ -15,7 +15,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
 import com.aptana.ide.ui.io.preferences.FTPPreferenceUtil;
 

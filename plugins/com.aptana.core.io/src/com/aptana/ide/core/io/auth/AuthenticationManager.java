@@ -27,7 +27,7 @@ import com.aptana.ide.core.io.CoreIOPlugin;
  */
 public final class AuthenticationManager implements IAuthenticationManager {
 
-	private static final String SECURITY_NODE = "com.aptana.ide.core.io.auth"; //$NON-NLS-1$
+	private static final String SECURITY_NODE = "com.aptana.core.io.auth"; //$NON-NLS-1$
 	private static final String PROP_PASSWORD = "password"; //$NON-NLS-1$
 	
 	private static AuthenticationManager instance;

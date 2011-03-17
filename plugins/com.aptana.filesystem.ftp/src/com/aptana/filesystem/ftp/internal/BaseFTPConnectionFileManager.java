@@ -17,13 +17,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.io.vfs.BaseConnectionFileManager;
+import com.aptana.core.io.vfs.ExtendedFileInfo;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.vfs.BaseConnectionFileManager;
-import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 
 /**
  * @author Max Stepanov
@@ -48,7 +48,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 	protected String defaultGroup;
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.BaseConnectionFileManager#canUseTemporaryFile(org.eclipse.core.runtime.IPath, com.aptana.ide.core.io.vfs.ExtendedFileInfo, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#canUseTemporaryFile(org.eclipse.core.runtime.IPath, com.aptana.core.io.vfs.ExtendedFileInfo, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor) {
@@ -93,7 +93,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#getCanonicalURI(org.eclipse.core.runtime.IPath)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#getCanonicalURI(org.eclipse.core.runtime.IPath)
 	 */
 	public URI getCanonicalURI(IPath path) {
 		// TODO:max - trace links here
@@ -104,7 +104,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 	protected abstract URI getRootCanonicalURI();
 			
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.BaseConnectionFileManager#testConnection()
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#testConnection()
 	 */
 	@Override
 	protected void testConnection() {
@@ -124,7 +124,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.BaseConnectionFileManager#setLastOperationTime()
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#setLastOperationTime()
 	 */
 	@Override
 	protected void setLastOperationTime() {

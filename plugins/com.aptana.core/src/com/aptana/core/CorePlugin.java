@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.filewatcher.FileWatcher;
 
@@ -273,6 +274,17 @@ public class CorePlugin extends Plugin
 		fProjectsListener.start();
 		// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
+	}
+	
+	public static String getAptanaStudioVersion() {
+		String version = EclipseUtil.getPluginVersion(EclipseUtil.STANDALONE_PLUGIN_ID);
+		if (version == null) {
+			version = EclipseUtil.getPluginVersion(PLUGIN_ID);
+		}
+		if (version == null) {
+			version = EclipseUtil.getProductVersion();
+		}
+		return version;
 	}
 
 	/**
