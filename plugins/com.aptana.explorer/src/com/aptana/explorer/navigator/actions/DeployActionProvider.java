@@ -16,6 +16,14 @@ import com.aptana.ui.actions.DefaultNavigatorActionProvider;
 public class DeployActionProvider extends DefaultNavigatorActionProvider
 {
 
+	public static final String ID = "com.aptana.explorer.navigator.actions.DeployActions"; //$NON-NLS-1$
+
+	@Override
+	public String getActionId()
+	{
+		return ID;
+	}
+
 	@Override
 	protected Image getImage()
 	{

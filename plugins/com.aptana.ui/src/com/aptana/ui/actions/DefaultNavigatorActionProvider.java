@@ -1,16 +1,18 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.ui.actions;
 
-import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.menus.IMenuService;
@@ -42,6 +44,8 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 			isToolbarFilled = true;
 		}
 	}
+
+	public abstract String getActionId();
 
 	protected abstract Image getImage();
 
@@ -89,26 +93,6 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 
 	private void fillToolBar(IToolBarManager toolbarManager)
 	{
-		toolbarManager.add(new ContributionItem()
-		{
-
-			@Override
-			public void fill(final ToolBar parent, int index)
-			{
-				ToolItem toolItem = new ToolItem(parent, SWT.DROP_DOWN);
-				toolItem.setImage(getImage());
-				toolItem.setToolTipText(getToolTip());
-
-				toolItem.addSelectionListener(new SelectionAdapter()
-				{
-
-					@Override
-					public void widgetSelected(SelectionEvent selectionEvent)
-					{
-						run(parent);
-					}
-				});
-			}
-		});
+		toolbarManager.add(new DefaultNavigatorContributionItem(this));
 	}
 }
