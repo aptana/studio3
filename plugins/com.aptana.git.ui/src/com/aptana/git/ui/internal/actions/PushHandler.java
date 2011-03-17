@@ -29,8 +29,9 @@ public class PushHandler extends AbstractSimpleGitCommandHandler
 			{
 				continue;
 			}
-			String[] commits = repo.commitsAhead(repo.currentBranch());
-			if (commits != null && commits.length > 0)
+			// TODO Explicitly check if there's any remote tracking branches?
+			// Just check if we have any remotes to push to
+			if (!repo.remotes().isEmpty())
 			{
 				return true;
 			}
