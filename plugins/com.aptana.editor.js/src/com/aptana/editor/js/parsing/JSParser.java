@@ -22,7 +22,7 @@ import com.aptana.parsing.IParseState;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class JSParser extends Parser implements IParser {
 
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
@@ -794,15 +794,16 @@ public class JSParser extends Parser implements IParser {
 					
 			return new JSStatementsNode(s);
 			}
-			case 16: // Statement = VAR.v VariableDeclarationList.l SEMICOLON
+			case 16: // Statement = VAR.v VariableDeclarationList.l SEMICOLON.s
 			{
 					final Symbol v = _symbols[offset + 1];
 					final Symbol _symbol_l = _symbols[offset + 2];
 					final ArrayList _list_l = (ArrayList) _symbol_l.value;
 					final JSNode[] l = _list_l == null ? new JSNode[0] : (JSNode[]) _list_l.toArray(new JSNode[_list_l.size()]);
+					final Symbol s = _symbols[offset + 3];
 					
 			JSNode node = new JSVarNode(v, l);
-			node.setSemicolonIncluded(true);
+			node.setSemicolonIncluded(s.getEnd() >= s.getStart());
 			return node;
 			}
 			case 17: // Statement = Expression_NoLBF.e SEMICOLON

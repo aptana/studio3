@@ -686,10 +686,10 @@ FunctionBody
 Statement
 	=	Block
 	|	FunctionDeclaration
-	|	VAR.v VariableDeclarationList.l SEMICOLON
+	|	VAR.v VariableDeclarationList.l SEMICOLON.s
 		{:
 			JSNode node = new JSVarNode(v, l);
-			node.setSemicolonIncluded(true);
+			node.setSemicolonIncluded(s.getEnd() >= s.getStart());
 			return node;
 		:}
 	|	Expression_NoLBF.e SEMICOLON
