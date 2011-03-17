@@ -15,17 +15,21 @@ import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.UndoEdit;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.scripting.commands.CommandExecutionUtils;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.InvocationType;
+import com.aptana.scripting.model.OutputType;
 
 public class CommandProposal extends SnippetTemplateProposal
 {
@@ -38,6 +42,8 @@ public class CommandProposal extends SnippetTemplateProposal
 	@Override
 	protected void doApply(ITextViewer viewer, char trigger, int stateMask, int offset)
 	{
+		UndoEdit edit = null;
+		Point selection = null;
 		Template template = getTemplate();
 		if (template instanceof CommandTemplate)
 		{
@@ -62,7 +68,9 @@ public class CommandProposal extends SnippetTemplateProposal
 						replacement = "\n"; //$NON-NLS-1$
 					}
 				}
-				document.replace(start, end - start, replacement);
+				ReplaceEdit replaceEdit = new ReplaceEdit(start, end - start, replacement);
+				selection = viewer.getSelectedRange();
+				edit = replaceEdit.apply(document);
 			}
 			catch (BadLocationException e)
 			{
@@ -84,7 +92,33 @@ public class CommandProposal extends SnippetTemplateProposal
 				}
 			}
 			CommandResult commandResult = CommandExecutionUtils.executeCommand(commandElement, InvocationType.TRIGGER, viewer, textEditor);
+			if (!commandResult.executedSuccessfully() || restorePrefix(commandResult.getOutputType()))
+			{
+				// Undo our wiping of prefix!
+				try
+				{
+					edit.apply(viewer.getDocument());
+					viewer.setSelectedRange(selection.x, selection.y);
+				}
+				catch (Exception e)
+				{
+					CommonEditorPlugin.logError(e);
+				}
+			}
 			CommandExecutionUtils.processCommandResult(commandElement, commandResult, viewer);
+		}
+	}
+
+	private boolean restorePrefix(OutputType outputType)
+	{
+		switch (outputType)
+		{
+			case INSERT_AS_SNIPPET:
+			case INSERT_AS_TEXT:
+				return false;
+
+			default:
+				return true;
 		}
 	}
 
