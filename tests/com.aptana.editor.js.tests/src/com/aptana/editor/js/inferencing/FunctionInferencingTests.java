@@ -84,14 +84,6 @@ public class FunctionInferencingTests extends InferencingTestsBase
 	 */
 	public void testReturnsUserObject()
 	{
-		List<String> types = this.getLastStatementTypes(Path.fromPortableString("inferencing/function-returns-user-object.js"));
-
-		assertNotNull(types);
-		assertEquals(1, types.size());
-
-		String type = types.get(0);
-		assertTrue(type + " is not a user type", type.startsWith(JSTypeConstants.DYNAMIC_CLASS_PREFIX));
-
-		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-user-object.js"), JSTypeConstants.DYNAMIC_CLASS_PREFIX);
+		this.lastStatementTypeTests(Path.fromPortableString("inferencing/function-returns-user-object.js"), "foo");
 	}
 }
