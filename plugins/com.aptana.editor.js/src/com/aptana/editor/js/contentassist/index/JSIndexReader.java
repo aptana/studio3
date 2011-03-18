@@ -259,7 +259,7 @@ public class JSIndexReader extends IndexReader
 	 */
 	private String getMemberPattern(String typeName, String memberName)
 	{
-		return MessageFormat.format("{1}{0}{2}", new Object[] { this.getDelimiter(), typeName, memberName }); //$NON-NLS-1$
+		return MessageFormat.format("{1}{0}{2}{0}", new Object[] { this.getDelimiter(), typeName, memberName }); //$NON-NLS-1$
 	}
 
 	/**
