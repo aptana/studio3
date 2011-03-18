@@ -7,11 +7,7 @@
  */
 package com.aptana.editor.js.inferencing;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Path;
-
-import com.aptana.editor.js.JSTypeConstants;
 
 public class FunctionInferencingTests extends InferencingTestsBase
 {
