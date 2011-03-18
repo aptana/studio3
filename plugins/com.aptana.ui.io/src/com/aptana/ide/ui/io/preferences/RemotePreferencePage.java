@@ -36,7 +36,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.dialogs.CloakExpressionDialog;
 
-public class CloakingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
+public class RemotePreferencePage extends PreferencePage implements IWorkbenchPreferencePage
 {
 
 	private static final String ADD_ICON = "icons/full/etool16/add.png"; //$NON-NLS-1$
@@ -44,22 +44,59 @@ public class CloakingPreferencePage extends PreferencePage implements IWorkbench
 
 	private Button removeButton;
 	private TableViewer tableViewer;
+	private Button fReopenButton;
 
 	private Set<String> expressions;
 
-	public CloakingPreferencePage()
+	public RemotePreferencePage()
 	{
 		expressions = new HashSet<String>();
 	}
 
 	public void init(IWorkbench workbench)
 	{
-		setDescription(Messages.CloakingPreferencePage_LBL_Description);
+		setDescription(Messages.RemotePreferencePage_LBL_Description);
 		loadCloakingExpressions();
 	}
 
 	@Override
 	protected Control createContents(Composite parent)
+	{
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.swtDefaults().create());
+
+		Composite cloaking = createCloakingComposite(main);
+		cloaking.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+
+		fReopenButton = new Button(main, SWT.CHECK);
+		fReopenButton.setText(Messages.RemotePreferencePage_LBL_ReopenRemote);
+		fReopenButton.setSelection(RemotePreferenceUtil.getReopenRemoteOnStartup());
+		fReopenButton.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
+
+		return main;
+	}
+
+	@Override
+	protected void performDefaults()
+	{
+		expressions.clear();
+		expressions.addAll(Arrays.asList(CloakingUtils.getDefaultCloakedFileTypes()));
+		tableViewer.refresh();
+		fReopenButton.setSelection(false);
+
+		super.performDefaults();
+	}
+
+	@Override
+	public boolean performOk()
+	{
+		saveCloakingExpressions();
+		RemotePreferenceUtil.setReopenRemoteOnStartup(fReopenButton.getSelection());
+
+		return super.performOk();
+	}
+
+	private Composite createCloakingComposite(Composite parent)
 	{
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.fillDefaults().numColumns(2).create());
@@ -107,23 +144,6 @@ public class CloakingPreferencePage extends PreferencePage implements IWorkbench
 		updateButtonState();
 
 		return main;
-	}
-
-	@Override
-	protected void performDefaults()
-	{
-		expressions.clear();
-		expressions.addAll(Arrays.asList(CloakingUtils.getDefaultCloakedFileTypes()));
-		tableViewer.refresh();
-
-		super.performDefaults();
-	}
-
-	@Override
-	public boolean performOk()
-	{
-		saveCloakingExpressions();
-		return super.performOk();
 	}
 
 	private void add()

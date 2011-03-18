@@ -651,21 +651,15 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="com.aptana.ui.AptanaPreferencePage"
+            class="com.aptana.ide.ui.io.preferences.RemotePreferencePage"
+            id="com.aptana.ui.io.preferences.RemotePreferencePage"
+            name="%PreferencePage.remote.name">
+      </page>
+      <page
+            category="com.aptana.ui.io.preferences.RemotePreferencePage"
             class="com.aptana.ide.ui.io.preferences.FTPPreferencePage"
             id="com.aptana.ui.io.preferences.FTPPreferencePage"
-            name="%PreferencePage.ftp.name">
-      </page>
-      <page
-            category="com.aptana.ui.io.preferences.FTPPreferencePage"
-            class="com.aptana.ide.ui.io.preferences.PermissionPreferencePage"
-            id="com.aptana.ui.io.preferences.PermissionPreferencePage"
-            name="%PreferencePage.permissions.label">
-      </page>
-      <page
-            category="com.aptana.ui.io.preferences.FTPPreferencePage"
-            class="com.aptana.ide.ui.io.preferences.CloakingPreferencePage"
-            id="com.aptana.ui.io.preferences.cloakingPreferencePage"
-            name="%page.cloaking.name">
+            name="%PreferencePage.ftp.label">
       </page>
    </extension>
    <extension
