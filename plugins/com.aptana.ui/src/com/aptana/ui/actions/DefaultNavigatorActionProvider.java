@@ -8,6 +8,7 @@
 package com.aptana.ui.actions;
 
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -42,8 +43,7 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 			if (toolbarItem == null)
 			{
 				// adds the item
-				toolbarItem = new DefaultNavigatorContributionItem(this);
-				actionBars.getToolBarManager().add(toolbarItem);
+				toolbarItem = fillToolbar(actionBars.getToolBarManager());
 				actionBars.updateActionBars();
 			}
 		}
@@ -108,5 +108,12 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 	 */
 	protected void fillMenu(MenuManager menuManager)
 	{
+	}
+
+	protected IContributionItem fillToolbar(IToolBarManager toolBarManager)
+	{
+		IContributionItem item = new DefaultNavigatorContributionItem(this);
+		toolBarManager.add(item);
+		return item;
 	}
 }
