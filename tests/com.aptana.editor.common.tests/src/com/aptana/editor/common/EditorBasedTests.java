@@ -79,7 +79,7 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 			// verify each specified name is in the resulting proposal list
 			for (String displayName : displayNames)
 			{
-				assertTrue(names.contains(displayName));
+				assertTrue("Did not find " + displayName + " in the proposal list", names.contains(displayName));
 			}
 		}
 	}
@@ -195,11 +195,19 @@ public abstract class EditorBasedTests<T extends CommonContentAssistProcessor> e
 			offset = this.source.indexOf('|', offset + 1);
 		}
 
-		// clean source
-		this.source = CURSOR.matcher(this.source).replaceAll(StringUtil.EMPTY);
+		if (this.cursorOffsets.isEmpty())
+		{
+			// use last position if we didn't find any cursors
+			this.cursorOffsets.add(source.length());
+		}
+		else
+		{
+			// clean source
+			this.source = CURSOR.matcher(this.source).replaceAll(StringUtil.EMPTY);
 
-		// update document
-		document.set(this.source);
+			// update document
+			document.set(this.source);
+		}
 	}
 
 	/*

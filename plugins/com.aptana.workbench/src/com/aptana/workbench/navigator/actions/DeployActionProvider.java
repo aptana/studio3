@@ -31,6 +31,8 @@ import com.aptana.explorer.IExplorerUIConstants;
 public class DeployActionProvider extends CommonActionProvider
 {
 
+	public static final String ID = "com.aptana.workbench.navigator.actions.DeployActions"; //$NON-NLS-1$
+
 	private IWorkbenchPartSite partSite;
 	private boolean isToolbarFilled;
 
@@ -55,7 +57,7 @@ public class DeployActionProvider extends CommonActionProvider
 
 	private void fillToolBar(IToolBarManager toolbarManager)
 	{
-		toolbarManager.add(new ContributionItem()
+		toolbarManager.add(new ContributionItem(ID)
 		{
 
 			@Override

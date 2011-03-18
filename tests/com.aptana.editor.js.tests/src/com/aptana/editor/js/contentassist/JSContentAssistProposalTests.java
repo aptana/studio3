@@ -23,9 +23,9 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	}
 
 	/**
-	 * testMath
+	 * testBug_Math
 	 */
-	public void testMath()
+	public void testBug_Math()
 	{
 		// @formatter:off
 		this.checkProposals(
@@ -56,6 +56,44 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 			"sin",
 			"sqrt",
 			"tan"
+		);
+		// @formatter:on
+	}
+
+	/**
+	 * testBug_VarAssignWithEndingDot
+	 */
+	public void testBug_VarAssignWithEndingDot()
+	{
+		// @formatter:off
+		this.checkProposals(
+				"contentAssist/var-assign-with-ending-dot.js",
+				"E",
+				"LN10",
+				"LN2",
+				"LOG10E",
+				"LOG2E",
+				"PI",
+				"SQRT1_2",
+				"SQRT2",
+				"abs",
+				"acos",
+				"asin",
+				"atan",
+				"atan2",
+				"ceil",
+				"cos",
+				"exp",
+				"floor",
+				"log",
+				"max",
+				"min",
+				"pow",
+				"random",
+				"round",
+				"sin",
+				"sqrt",
+				"tan"
 		);
 		// @formatter:on
 	}
