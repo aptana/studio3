@@ -54,6 +54,14 @@
             class="org.eclipse.ui.navigator.resources.ResourceDragAdapterAssistant"
             viewerId="com.aptana.explorer.view">
       </dragAssistant>
+      <viewerActionBinding
+            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <actionExtension
+                  pattern="com.aptana.explorer.navigator.actions.DeployActions">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
 	</extension>
    <extension
          point="com.aptana.scripting.contextContributors">
@@ -139,22 +147,18 @@
             class="com.aptana.explorer.navigator.actions.DeployActionProvider"
             id="com.aptana.explorer.navigator.actions.DeployActions">
          <enablement>
-            <or>
-               <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-            </or>
+            <instanceof
+                  value="org.eclipse.core.resources.IResource">
+            </instanceof>
          </enablement>
       </actionProvider>
       <actionProvider
             class="com.aptana.explorer.navigator.actions.CommandsActionProvider"
             id="com.aptana.explorer.navigator.actions.CommandsActions">
          <enablement>
-            <or>
-               <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-            </or>
+            <instanceof
+                  value="org.eclipse.core.resources.IResource">
+            </instanceof>
          </enablement>
       </actionProvider>
    </extension>
