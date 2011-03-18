@@ -14,7 +14,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.ide.ui.io.IOUIPlugin;
 
-public class FTPPreferenceUtil
+public class RemotePreferenceUtil
 {
 	public static boolean getReopenRemoteOnStartup()
 	{

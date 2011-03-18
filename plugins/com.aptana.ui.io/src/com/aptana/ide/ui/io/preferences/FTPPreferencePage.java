@@ -7,49 +7,93 @@
  */
 package com.aptana.ide.ui.io.preferences;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.osgi.service.prefs.BackingStoreException;
 
-public class FTPPreferencePage extends PreferencePage implements IWorkbenchPreferencePage
-{
+import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.preferences.IPreferenceConstants;
+import com.aptana.ide.core.io.preferences.PreferenceUtils;
 
-	private Button fReopenButton;
+/**
+ * @author Michael Xia (mxia@aptana.com)
+ */
+public class FTPPreferencePage extends PreferencePage implements
+		IWorkbenchPreferencePage {
 
-	public void init(IWorkbench workbench)
-	{
+	private PermissionsGroup fFilePermissions;
+	private PermissionsGroup fDirectoryPermissions;
+
+	/**
+	 * Constructor.
+	 */
+	public FTPPreferencePage() {
 	}
 
-	@Override
-	protected Control createContents(Composite parent)
-	{
-		Composite main = new Composite(parent, SWT.NONE);
-		main.setLayout(GridLayoutFactory.swtDefaults().create());
+	/**
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
+	public void init(IWorkbench workbench) {
+		setDescription(Messages.FTPPreferencePage_Notes);
+	}
 
-		fReopenButton = new Button(main, SWT.CHECK);
-		fReopenButton.setText(Messages.FTPPreferencePage_LBL_ReopenRemote);
-		fReopenButton.setSelection(FTPPreferenceUtil.getReopenRemoteOnStartup());
+	/**
+	 * @see org.eclipse.jface.preference.PreferencePage#performOk()
+	 */
+	public boolean performOk() {
+		IEclipsePreferences prefs = (new InstanceScope())
+				.getNode(CoreIOPlugin.PLUGIN_ID);
+		prefs.putLong(IPreferenceConstants.FILE_PERMISSION,
+				fFilePermissions.getPermissions());
+		prefs.putLong(IPreferenceConstants.DIRECTORY_PERMISSION,
+				fDirectoryPermissions.getPermissions());
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+		}
+		return super.performOk();
+	}
+
+	/**
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
+	protected Control createContents(Composite parent) {
+		Composite main = new Composite(parent, SWT.NONE);
+		main.setLayout(GridLayoutFactory.fillDefaults().create());
+
+		fFilePermissions = new PermissionsGroup(main);
+		fFilePermissions.setText(Messages.FTPPreferencePage_FileGroupTitle);
+		fFilePermissions.setPermissions(PreferenceUtils.getFilePermissions());
+		fFilePermissions.getControl().setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		fDirectoryPermissions = new PermissionsGroup(main);
+		fDirectoryPermissions
+				.setText(Messages.FTPPreferencePage_DirectoryGroupTitle);
+		fDirectoryPermissions.setPermissions(PreferenceUtils
+				.getDirectoryPermissions());
+		fDirectoryPermissions.getControl().setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		return main;
 	}
 
-	@Override
-	protected void performDefaults()
-	{
-		fReopenButton.setSelection(false);
+	/**
+	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+	 */
+	protected void performDefaults() {
+		fFilePermissions
+				.setPermissions(com.aptana.ide.core.io.preferences.PreferenceInitializer.DEFAULT_FILE_PERMISSIONS);
+		fDirectoryPermissions
+				.setPermissions(com.aptana.ide.core.io.preferences.PreferenceInitializer.DEFAULT_DIRECTORY_PERMISSIONS);
 		super.performDefaults();
-	}
-
-	@Override
-	public boolean performOk()
-	{
-		FTPPreferenceUtil.setReopenRemoteOnStartup(fReopenButton.getSelection());
-
-		return super.performOk();
 	}
 }
