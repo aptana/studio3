@@ -13,9 +13,9 @@ import java.util.List;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -122,13 +122,19 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 		addField(new BooleanFieldEditor(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT,
 				Messages.EditorsPreferencePage_Content_Assist_Auto_Insert, caGroup));
-		addField(new RadioGroupFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
-				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, 3, new String[][] {
+
+		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
+				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, new String[][] {
 						{ "On", Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) }, //$NON-NLS-1$
 						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
 								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
 						{ "Off", "-1" } }, //$NON-NLS-1$ //$NON-NLS-2$
-				caGroup, false));
+				caGroup));
+
+		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_HOVER,
+				Messages.EditorsPreferencePage_Content_Assist_Hover, new String[][] { { "On", Boolean.toString(true) }, //$NON-NLS-1$
+						{ "Off", Boolean.toString(false) } }, //$NON-NLS-1$
+				caGroup));
 
 		createUserAgentCategoryArea(caGroup);
 		createUserAgentButtons(caGroup);
@@ -143,11 +149,11 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	{
 		Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.UserAgentPreferencePage_Select_User_Agents);
-		label.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
+		label.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).grab(true, true).create());
 
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(GridLayoutFactory.fillDefaults().create());
-		composite.setLayoutData(GridDataFactory.fillDefaults().hint(400, 120).grab(true, true).create());
+		composite.setLayoutData(GridDataFactory.fillDefaults().span(2, 0).hint(400, 120).grab(true, true).create());
 
 		Table table = new Table(composite, SWT.CHECK | SWT.BORDER | SWT.SINGLE);
 		table.setFont(parent.getFont());
