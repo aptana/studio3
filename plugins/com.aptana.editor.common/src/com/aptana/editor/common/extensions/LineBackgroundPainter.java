@@ -524,6 +524,11 @@ public class LineBackgroundPainter implements IPainter, LineBackgroundListener, 
 	 */
 	public void paintControl(PaintEvent e)
 	{
+		// if highlight current line is disabled, don't draw!
+		if (!fEnabled)
+		{
+			return;
+		}
 		// If there's no alpha value for the line highlight, then we need to force the bg color of the whole line
 		// to the rgb value!
 		RGBa lineHighlight = getCurrentTheme().getLineHighlight();
