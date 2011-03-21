@@ -686,6 +686,7 @@ public class JSNodeTypeInferrer extends JSTreeWalker
 			JSPropertyCollector collector = new JSPropertyCollector(symbol);
 
 			collector.visit(node);
+			symbol.addValue(node);
 
 			// infer type
 			JSSymbolTypeInferrer inferrer = new JSSymbolTypeInferrer(this._scope, this._index, this._location);

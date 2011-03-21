@@ -17,7 +17,7 @@ import org.eclipse.ui.ide.FileStoreEditorInput;
 
 import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
-import com.aptana.ide.ui.io.preferences.FTPPreferenceUtil;
+import com.aptana.ide.ui.io.preferences.RemotePreferenceUtil;
 
 public class UniformFileStoreEditorInput extends FileStoreEditorInput implements IUniformFileStoreEditorInput
 {
@@ -83,7 +83,7 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput implements
 	@Override
 	public IPersistableElement getPersistable()
 	{
-		boolean reopen = FTPPreferenceUtil.getReopenRemoteOnStartup();
+		boolean reopen = RemotePreferenceUtil.getReopenRemoteOnStartup();
 		return reopen ? this : null;
 	}
 

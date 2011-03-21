@@ -1,1 +1,1 @@
-var m = Math.|
+var m = Math.

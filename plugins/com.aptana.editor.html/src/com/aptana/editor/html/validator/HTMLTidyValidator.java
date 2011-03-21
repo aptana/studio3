@@ -37,8 +37,8 @@ public class HTMLTidyValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
-			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "ruby>", "section>", "source>",
-			"summary>", "time>", "video>", "wbr>" };
+			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
+			"source>", "summary>", "time>", "video>", "wbr>" };
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
