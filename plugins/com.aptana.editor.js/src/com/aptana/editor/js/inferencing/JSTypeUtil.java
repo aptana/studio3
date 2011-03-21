@@ -26,8 +26,10 @@ import com.aptana.editor.js.contentassist.model.ParameterElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
+import com.aptana.editor.js.parsing.ast.JSIdentifierNode;
 import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
@@ -379,6 +381,16 @@ public class JSTypeUtil
 						IParseNode declarationName = declaration.getIdentifier();
 
 						parts.add(declarationName.getText());
+						break;
+
+					case JSNodeTypes.ASSIGN:
+						JSAssignmentNode assignment = (JSAssignmentNode) current;
+						IParseNode lhs = assignment.getLeftHandSide();
+
+						if (lhs instanceof JSIdentifierNode)
+						{
+							parts.add(lhs.getText());
+						}
 						break;
 
 					default:

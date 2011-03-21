@@ -26,6 +26,7 @@ import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.html.parsing.ast.HTMLTextNode;
 import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.parsing.IParseState;
@@ -227,7 +228,14 @@ public class HTMLParser implements IParser
 		{
 			String text = fScanner.getSource().get(start, end - start + 1);
 			IParseNode node = ParserPoolFactory.parse(language, text);
-			addOffset(node, start);
+			if (node == null)
+			{
+				node = new HTMLTextNode(text, start, end);
+			}
+			else
+			{
+				addOffset(node, start);
+			}
 			return new IParseNode[] { node };
 		}
 		catch (java.lang.Exception e)
