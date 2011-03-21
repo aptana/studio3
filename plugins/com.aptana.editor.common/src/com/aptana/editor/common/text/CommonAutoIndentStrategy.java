@@ -167,6 +167,11 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
+			else if (buf.length() != 0 && trimmedLine.endsWith("*/") && buf.charAt(buf.length()-1) == ' ')
+			{
+				//We want to delete an extra space when closing block comments
+				buf.deleteCharAt(buf.length() -1);
+			}
 		}
 		catch (BadLocationException e)
 		{

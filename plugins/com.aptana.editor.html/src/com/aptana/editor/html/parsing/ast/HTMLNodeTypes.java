@@ -23,4 +23,6 @@ public interface HTMLNodeTypes
 	public static final short SPECIAL = 3;
 
 	public static final short COMMENT = 4;
+
+	public static final short TEXT = 5;
 }

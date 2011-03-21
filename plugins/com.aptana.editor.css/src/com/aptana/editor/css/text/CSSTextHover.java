@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.css.CSSColors;
@@ -40,7 +41,7 @@ import com.aptana.theme.ColorManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
-public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
+public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
 	private static final String RGB = "rgb"; //$NON-NLS-1$
 
@@ -139,6 +140,9 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
+		if (!isHoverEnabled())
+			return null;
+
 		int offset = hoverRegion.getOffset();
 		LexemeProvider<CSSTokenType> lexemeProvider = getLexemeProvider(textViewer, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
