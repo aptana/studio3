@@ -187,7 +187,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	}
 
 	/**
-	 * Create any extra "Mark Occurrence" options if necessary.
+	 * Create the Mark Occurrences group and options if there are any for this language/editor.
 	 * 
 	 * @param parent
 	 */
