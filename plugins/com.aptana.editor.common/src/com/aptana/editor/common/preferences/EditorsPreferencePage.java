@@ -35,6 +35,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
+import com.aptana.core.CoreStrings;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.CommonSourceViewerConfiguration;
@@ -125,15 +126,16 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 
 		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				Messages.EditorsPreferencePage_Content_Assist_Auto_Display, new String[][] {
-						{ "On", Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) }, //$NON-NLS-1$
+						{ CoreStrings.ON,
+								Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) },
 						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
 								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
-						{ "Off", "-1" } }, //$NON-NLS-1$ //$NON-NLS-2$
+						{ CoreStrings.OFF, "-1" } }, //$NON-NLS-1$
 				caGroup));
 
 		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_HOVER,
-				Messages.EditorsPreferencePage_Content_Assist_Hover, new String[][] { { "On", Boolean.toString(true) }, //$NON-NLS-1$
-						{ "Off", Boolean.toString(false) } }, //$NON-NLS-1$
+				Messages.EditorsPreferencePage_Content_Assist_Hover, new String[][] {
+						{ CoreStrings.ON, Boolean.toString(true) }, { CoreStrings.OFF, Boolean.toString(false) } },
 				caGroup));
 
 		createUserAgentCategoryArea(caGroup);

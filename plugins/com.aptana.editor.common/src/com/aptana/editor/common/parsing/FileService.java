@@ -13,6 +13,7 @@ import java.util.Set;
 import org.eclipse.jface.text.IDocument;
 
 import com.aptana.editor.common.outline.IParseListener;
+import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.ValidationManager;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ParseState;
@@ -38,7 +39,7 @@ public class FileService
 	{
 		this.fLanguage = language;
 		this.fParseState = parseState;
-		fValidationManager = new ValidationManager();
+		fValidationManager = new ValidationManager(this);
 	}
 
 	public void dispose()
@@ -77,6 +78,11 @@ public class FileService
 	public IParseState getParseState()
 	{
 		return fParseState;
+	}
+
+	public IValidationManager getValidationManager()
+	{
+		return fValidationManager;
 	}
 
 	/**
@@ -134,7 +140,6 @@ public class FileService
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
 					// not logging the parsing error here since the source could be in an intermediate state of being
 					// edited by the user
 				}

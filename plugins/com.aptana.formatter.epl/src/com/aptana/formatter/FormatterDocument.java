@@ -35,7 +35,8 @@ public class FormatterDocument implements IFormatterDocument
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterDocument#getText()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterDocument#getText()
 	 */
 	public String getText()
 	{
@@ -43,7 +44,8 @@ public class FormatterDocument implements IFormatterDocument
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterDocument#getLength()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterDocument#getLength()
 	 */
 	public int getLength()
 	{

@@ -10,32 +10,68 @@ package com.aptana.editor.common.contentassist;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 
-public interface ICommonCompletionProposal extends ICompletionProposal
+public interface ICommonCompletionProposal extends ICompletionProposal, Comparable<ICompletionProposal>
 {
+	/**
+	 * The proposal is an exact match
+	 */
+	public static int RELEVANCE_EXACT = 100;
+
+	/**
+	 * The proposal is highly relevant
+	 */
+	public static int RELEVANCE_HIGH = 90;
+
+	/**
+	 * The proposal is somewhat relevant
+	 */
+	public static int RELEVANCE_MEDIUM = 50;
+
+	/**
+	 * The proposal is slightly relevant
+	 */
+	public static int RELEVANCE_LOW = 10;
+
 	/**
 	 * getFileLocation
 	 * 
 	 * @return
 	 */
 	String getFileLocation();
-	
+
 	/**
 	 * getUserAgentImages
 	 * 
 	 * @return
 	 */
 	Image[] getUserAgentImages();
-	
+
+	/**
+	 * Value from 0-100 indicating the value of this particular proposal. Default is 0.
+	 * 
+	 * @return
+	 */
+	int getRelevance();
+
+	/**
+	 * Value from 0-100 indicating the relevance of this particular proposal. Default is 0.
+	 * 
+	 * @param relevance
+	 */
+	void setRelevance(int relevance);
+
 	/**
 	 * isDefaultSelection
 	 * 
 	 * @return
+	 * @deprecated Use getRelevance instead
 	 */
 	boolean isDefaultSelection();
-	
+
 	/**
 	 * isSuggestedSelection
 	 * 
+	 * @deprecated Use getRelevance instead
 	 * @return
 	 */
 	boolean isSuggestedSelection();
@@ -44,6 +80,7 @@ public interface ICommonCompletionProposal extends ICompletionProposal
 	 * Set this proposal as the default selection.
 	 * 
 	 * @param isDefault
+	 * @deprecated Use setRelevance instead
 	 */
 	void setIsDefaultSelection(boolean isDefault);
 
@@ -51,6 +88,7 @@ public interface ICommonCompletionProposal extends ICompletionProposal
 	 * Set this proposal as the suggested selection.
 	 * 
 	 * @param isSuggested
+	 * @deprecated Use setRelevance instead
 	 */
 	void setIsSuggestedSelection(boolean isSuggested);
 }

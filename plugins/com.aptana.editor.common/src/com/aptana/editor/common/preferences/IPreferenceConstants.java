@@ -85,7 +85,7 @@ public interface IPreferenceConstants
 	public static final String FILTER_EXPRESSIONS = CommonEditorPlugin.PLUGIN_ID + ".filterExpressions"; //$NON-NLS-1$
 
 	/**
-	 * How long do we wait before displaying code assist hovers
+	 * Do we display code assist hovers
 	 */
 	public static final String CONTENT_ASSIST_HOVER = CommonEditorPlugin.PLUGIN_ID + ".contentAssistHover";
 }

@@ -59,7 +59,8 @@ public class FormatterBlockNode extends AbstractFormatterNode implements IFormat
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getEndOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getEndOffset()
 	 */
 	public int getEndOffset()
 	{
@@ -74,7 +75,8 @@ public class FormatterBlockNode extends AbstractFormatterNode implements IFormat
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getStartOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getStartOffset()
 	 */
 	public int getStartOffset()
 	{
@@ -89,7 +91,8 @@ public class FormatterBlockNode extends AbstractFormatterNode implements IFormat
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContainerNode#isEmpty()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#isEmpty()
 	 */
 	public boolean isEmpty()
 	{

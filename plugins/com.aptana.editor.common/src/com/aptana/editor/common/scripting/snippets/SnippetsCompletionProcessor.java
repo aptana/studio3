@@ -159,7 +159,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		{
 			public int compare(Template template1, Template template2)
 			{
-				return template1.getDescription().compareTo(template2.getDescription());
+				return template1.getName().compareTo(template2.getName());
 			}
 		});
 		return templatesList.toArray(new Template[0]);
