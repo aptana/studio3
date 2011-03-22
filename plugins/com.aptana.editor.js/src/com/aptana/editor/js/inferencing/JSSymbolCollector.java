@@ -329,6 +329,12 @@ public class JSSymbolCollector extends JSTreeWalker
 			{
 				processed = processor.processInvocation(this._scope, node);
 			}
+			else
+			{
+				JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
+
+				collector.visit(node);
+			}
 		}
 
 		if (processed == false)
