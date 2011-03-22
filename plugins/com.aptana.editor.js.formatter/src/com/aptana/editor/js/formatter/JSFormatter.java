@@ -150,7 +150,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			if (parseResult != null)
 			{
 				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,
-						indentSufix, offset == 0, length == source.length());
+						indentSufix, offset != 0, length != source.length());
 				if (output != null)
 				{
 					if (!originalText.equals(output))
@@ -276,15 +276,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 * @param indentationLevel
 	 *            The indentation level to start from
 	 * @param indentSufix
-	 * @param isBottomSourceBlock
-	 *            Indicates that the source block is the top one in the script.
-	 * @param isTopSourceBlock
-	 *            Indicates that the source block is the bottom one in the script.
+	 * @param prefixWithNewLine
+	 *            Prefix the output with a line terminator
+	 * @param postfixWithNewLine
+	 *            Terminate the output with a line terminator and append the 'indentSuffix' to it.
 	 * @return A formatted string
 	 * @throws Exception
 	 */
 	private String format(String input, IParseRootNode parseResult, int indentationLevel, int inputOffset,
-			boolean isSelection, String indentSufix, boolean isTopSourceBlock, boolean isBottomSourceBlock)
+			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
 			throws Exception
 	{
 		int spacesCount = -1;
@@ -316,7 +316,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		else
 		{
-			output = processNestedOutput(output, lineSeparator, indentSufix, isTopSourceBlock, isBottomSourceBlock);
+			output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
 		}
 		return output;
 	}

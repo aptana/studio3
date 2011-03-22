@@ -59,9 +59,12 @@
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <count
-                     value="1">
-               </count>
+               <iterate
+                     ifEmpty="false">
+                  <instanceof
+                        value="com.aptana.ide.core.io.IConnectionPoint">
+                  </instanceof>
+               </iterate>
             </visibleWhen>
          </command>
       </menuContribution>
