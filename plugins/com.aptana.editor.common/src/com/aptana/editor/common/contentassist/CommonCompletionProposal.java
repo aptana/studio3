@@ -12,6 +12,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -22,7 +23,7 @@ import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
 public class CommonCompletionProposal implements ICommonCompletionProposal, ICompletionProposalExtension2,
-		ICompletionProposalExtension3
+		ICompletionProposalExtension3, Comparable<ICompletionProposal>
 {
 	private String _additionalProposalInformation;
 	private IContextInformation _contextInformation;
@@ -35,6 +36,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	private String _fileLocation;
 	protected boolean _isDefaultSelection;
 	private boolean _isSuggestedSelection;
+	private int _relevance;
 	private Image[] _userAgentImages;
 	private int _hash;
 
@@ -194,6 +196,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isDefaultSelection()
+	 * @deprecated Use getRelevance instead
 	 */
 	public boolean isDefaultSelection()
 	{
@@ -203,6 +206,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	/*
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isSuggestedSelection()
+	 * @deprecated Use getRelevance instead
 	 */
 	public boolean isSuggestedSelection()
 	{
@@ -223,6 +227,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * setIsDefaultSelection
 	 * 
 	 * @param value
+	 * @deprecated Use getRelevance instead
 	 */
 	public void setIsDefaultSelection(boolean value)
 	{
@@ -233,6 +238,7 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	 * setIsSuggstedSelection
 	 * 
 	 * @param value
+	 * @deprecated Use getRelevance instead
 	 */
 	public void setIsSuggestedSelection(boolean value)
 	{
@@ -392,5 +398,45 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 		{
 			return start.equals(prefix);
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getExtraInfo()
+	 */
+	public String getExtraInfo()
+	{
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(ICompletionProposal o)
+	{
+		if (this == o)
+			return 0;
+
+		// not yet sorting on relevance
+		return this.getDisplayString().compareToIgnoreCase(o.getDisplayString());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getRelevance()
+	 */
+	public int getRelevance()
+	{
+		return _relevance;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#setRelevance(int)
+	 */
+	public void setRelevance(int relevance)
+	{
+		_relevance = relevance;
 	}
 }

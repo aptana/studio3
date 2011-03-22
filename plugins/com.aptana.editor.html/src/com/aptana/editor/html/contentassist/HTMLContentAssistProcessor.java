@@ -751,8 +751,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					HTMLIndexConstants.CORE, offset, src.length());
 			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
 			{
-				proposal.setIsSuggestedSelection(true);
-				proposal.setIsDefaultSelection(true);
+				proposal.setRelevance(1);
 			}
 			proposals.add(proposal);
 		}

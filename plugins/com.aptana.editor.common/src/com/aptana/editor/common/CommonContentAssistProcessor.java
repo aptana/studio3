@@ -159,11 +159,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		if (others == null || others.length == 0)
 		{
 			// Pre-select the first ruble-contributed proposal/snippet
-			ICompletionProposal proposal = proposals.get(0);
-			if (proposal instanceof CommonCompletionProposal)
-			{
-				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
-			}
 			return proposals.toArray(new ICompletionProposal[proposals.size()]);
 		}
 
@@ -577,11 +572,11 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (caseSensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseSensitiveProposal).setIsDefaultSelection(true);
+			((CommonCompletionProposal) caseSensitiveProposal).setRelevance(3);
 		}
 		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
+			((CommonCompletionProposal) caseInsensitiveProposal).setRelevance(2);
 		}
 		else
 		{
@@ -591,7 +586,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 				if (proposal instanceof CommonCompletionProposal)
 				{
-					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
+					((CommonCompletionProposal) proposal).setRelevance(1);
 				}
 			}
 		}
