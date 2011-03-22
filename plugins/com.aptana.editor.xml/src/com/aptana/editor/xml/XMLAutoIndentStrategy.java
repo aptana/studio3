@@ -7,24 +7,63 @@
  */
 package com.aptana.editor.xml;
 
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.xml.preferences.IPreferenceConstants;
 
 public class XMLAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 {
+	private static boolean shouldAutoIndent;
+	private static IPreferenceChangeListener autoIndentPrefChangeListener;
+
+	static
+	{
+		XMLAutoIndentStrategy.autoIndentPrefChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (IPreferenceConstants.XML_AUTO_INDENT.equals(event.getKey()))
+					updateAutoIndentPreference();
+			}
+		};
+		new InstanceScope().getNode(XMLPlugin.PLUGIN_ID).addPreferenceChangeListener(autoIndentPrefChangeListener);
+
+		XMLPlugin.getDefault().getBundle().getBundleContext().addBundleListener(new BundleListener()
+		{
+
+			public void bundleChanged(BundleEvent event)
+			{
+				if (event.getType() == BundleEvent.STOPPING)
+					new InstanceScope().getNode(XMLPlugin.PLUGIN_ID).removePreferenceChangeListener(
+							autoIndentPrefChangeListener);
+			}
+		});
+
+	}
 
 	public XMLAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration, ISourceViewer sourceViewer)
 	{
 		super(contentType, configuration, sourceViewer);
+		updateAutoIndentPreference();
 	}
 
 	@Override
 	protected boolean shouldAutoIndent()
 	{
-		return XMLPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.XML_AUTO_INDENT);
+		return shouldAutoIndent;
+	}
+
+	private static void updateAutoIndentPreference()
+	{
+		shouldAutoIndent = XMLPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.XML_AUTO_INDENT);
 	}
 
 }

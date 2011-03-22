@@ -7,24 +7,64 @@
  */
 package com.aptana.editor.js;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.js.preferences.IPreferenceConstants;
 
 public class JSAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 {
+	private static boolean shouldAutoIndent;
+	private static IPreferenceChangeListener autoIndentPrefChangeListener;
+
+	static
+	{
+		JSAutoIndentStrategy.autoIndentPrefChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (IPreferenceConstants.JS_AUTO_INDENT.equals(event.getKey()))
+					updateAutoIndentPreference();
+			}
+		};
+		new InstanceScope().getNode(JSPlugin.PLUGIN_ID).addPreferenceChangeListener(autoIndentPrefChangeListener);
+
+		JSPlugin.getDefault().getBundle().getBundleContext().addBundleListener(new BundleListener()
+		{
+
+			public void bundleChanged(BundleEvent event)
+			{
+				if (event.getType() == BundleEvent.STOPPING)
+					new InstanceScope().getNode(JSPlugin.PLUGIN_ID).removePreferenceChangeListener(
+							autoIndentPrefChangeListener);
+
+			}
+		});
+	}
 
 	public JSAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration, ISourceViewer sourceViewer)
 	{
 		super(contentType, configuration, sourceViewer);
+		updateAutoIndentPreference();
+
 	}
 
 	@Override
 	protected boolean shouldAutoIndent()
 	{
-		return JSPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.JS_AUTO_INDENT);
+		return shouldAutoIndent;
 	}
 
+	private static void updateAutoIndentPreference()
+	{
+		shouldAutoIndent = JSPlugin.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.JS_AUTO_INDENT);
+		;
+	}
 }
