@@ -76,13 +76,15 @@ public class CSSValidator implements IValidator
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = getReport(source, path);
-		processErrorsInReport(report, path, manager);
-		processWarningsInReport(report, path, manager);
-		return manager.getItems();
+		processErrorsInReport(report, path, manager, items);
+		processWarningsInReport(report, path, manager, items);
+		return items;
 	}
 
-	private void processErrorsInReport(String report, URI sourceUri, IValidationManager manager)
+	private void processErrorsInReport(String report, URI sourceUri, IValidationManager manager,
+			List<IValidationItem> items)
 	{
 		int offset = 0;
 		String elementName = "errorlist"; //$NON-NLS-1$
@@ -117,7 +119,7 @@ public class CSSValidator implements IValidator
 				// finds the errors
 				String[] errors = getContent(ERROR_PATTERN, listString);
 				// add errors
-				addErrors(errors, sourceUri, manager);
+				addErrors(errors, sourceUri, manager, items);
 			}
 
 			// advances past the current error list
@@ -125,7 +127,8 @@ public class CSSValidator implements IValidator
 		}
 	}
 
-	private void processWarningsInReport(String report, URI sourceUri, IValidationManager manager)
+	private void processWarningsInReport(String report, URI sourceUri, IValidationManager manager,
+			List<IValidationItem> items)
 	{
 		int offset = 0;
 		String elementName = "warninglist"; //$NON-NLS-1$
@@ -159,7 +162,7 @@ public class CSSValidator implements IValidator
 				// finds the warnings
 				String[] warnings = getContent(WARNING_PATTERN, listString);
 				// adds errors
-				addWarnings(warnings, sourceUri, manager);
+				addWarnings(warnings, sourceUri, manager, items);
 			}
 
 			// advance past the current warning list
@@ -223,8 +226,11 @@ public class CSSValidator implements IValidator
 	 *            the source path
 	 * @param manager
 	 *            the validation manager
+	 * @param items
+	 *            the list that stores the added validation items
 	 */
-	private static void addErrors(String[] errors, URI sourcePath, IValidationManager manager)
+	private static void addErrors(String[] errors, URI sourcePath, IValidationManager manager,
+			List<IValidationItem> items)
 	{
 		Map<String, String> map;
 		for (String error : errors)
@@ -256,7 +262,7 @@ public class CSSValidator implements IValidator
 			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE) && !containsCSS3Property(message))
 			{
 				// there is no info on the line offset or the length of the errored text
-				manager.addError(message, lineNumber, 0, 0, sourcePath);
+				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
 			}
 		}
 	}
@@ -270,8 +276,11 @@ public class CSSValidator implements IValidator
 	 *            the source path
 	 * @param manager
 	 *            the validation manager
+	 * @param items
+	 *            the list that stores the added validation items
 	 */
-	private static void addWarnings(String[] warnings, URI sourcePath, IValidationManager manager)
+	private static void addWarnings(String[] warnings, URI sourcePath, IValidationManager manager,
+			List<IValidationItem> items)
 	{
 		Map<String, String> map;
 		String last = ""; //$NON-NLS-1$
@@ -288,7 +297,7 @@ public class CSSValidator implements IValidator
 			// guards against duplicate warnings
 			if (!last.equals(hash) && !manager.isIgnored(message, ICSSParserConstants.LANGUAGE))
 			{
-				manager.addWarning(message, lineNumber, 0, 0, sourcePath);
+				items.add(manager.addWarning(message, lineNumber, 0, 0, sourcePath));
 			}
 
 			last = hash;

@@ -139,7 +139,7 @@ public class HTMLParser implements IParser
 		advance();
 
 		int start = fCurrentSymbol.getStart();
-		int end = start;
+		int end = start - 1;
 		short id = fCurrentSymbol.getId();
 		while (id != endToken && id != HTMLTokens.EOF)
 		{
@@ -224,22 +224,25 @@ public class HTMLParser implements IParser
 
 	private IParseNode[] getParseResult(String language, int start, int end)
 	{
-		try
+		if (start <= end)
 		{
-			String text = fScanner.getSource().get(start, end - start + 1);
-			IParseNode node = ParserPoolFactory.parse(language, text);
-			if (node == null)
+			try
 			{
-				node = new HTMLTextNode(text, start, end);
+				String text = fScanner.getSource().get(start, end - start + 1);
+				IParseNode node = ParserPoolFactory.parse(language, text);
+				if (node == null)
+				{
+					node = new HTMLTextNode(text, start, end);
+				}
+				else
+				{
+					addOffset(node, start);
+				}
+				return new IParseNode[] { node };
 			}
-			else
+			catch (java.lang.Exception e)
 			{
-				addOffset(node, start);
 			}
-			return new IParseNode[] { node };
-		}
-		catch (java.lang.Exception e)
-		{
 		}
 		return new IParseNode[0];
 	}

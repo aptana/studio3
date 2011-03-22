@@ -62,7 +62,8 @@ public class FormatterTextNode extends AbstractFormatterNode implements IFormatt
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getEndOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getEndOffset()
 	 */
 	public int getEndOffset()
 	{
@@ -70,7 +71,8 @@ public class FormatterTextNode extends AbstractFormatterNode implements IFormatt
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getStartOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getStartOffset()
 	 */
 	public int getStartOffset()
 	{
