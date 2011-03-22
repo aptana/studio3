@@ -8,6 +8,7 @@
 package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -58,4 +59,11 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 	{
 		return JSSourceConfiguration.getDefault();
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new JSAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
+
 }

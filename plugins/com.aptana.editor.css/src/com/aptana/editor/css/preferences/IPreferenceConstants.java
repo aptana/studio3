@@ -22,4 +22,10 @@ public interface IPreferenceConstants
 	 * CSSContentAssistProcessor
 	 */
 	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to enable and disable auto indent.
+	 */
+
+	String CSS_AUTO_INDENT = "CSS_AUTO_INDENT"; //$NON-NLS-1$
 }

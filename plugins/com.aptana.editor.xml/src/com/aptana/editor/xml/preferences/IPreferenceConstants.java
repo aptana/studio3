@@ -7,19 +7,12 @@
  */
 package com.aptana.editor.xml.preferences;
 
-import org.eclipse.osgi.util.NLS;
-
-public class Messages extends NLS
+public interface IPreferenceConstants
 {
-	private static final String BUNDLE_NAME = "com.aptana.editor.xml.preferences.messages"; //$NON-NLS-1$
-	public static String XMLPreferencePage_XML_Page_Title;
-	static
-	{
-		// initialize resource bundle
-		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
-	}
-
-	private Messages()
-	{
-	}
+	/**
+	 * The preference key used to enable and disable auto indent.
+	 */
+	
+	String XML_AUTO_INDENT = "XML_AUTO_INDENT"; //$NON-NLS-1$
+	
 }

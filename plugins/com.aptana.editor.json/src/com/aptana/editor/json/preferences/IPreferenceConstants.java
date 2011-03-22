@@ -26,4 +26,10 @@ public interface IPreferenceConstants
 	// wrapping
 	public static final String WRAP_COMMENTS = FORMATTER_ID + ".wrap.comments"; //$NON-NLS-1$
 	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
+	
+	/**
+	 * The preference key used to enable and disable auto indent.
+	 */
+	
+	String JSON_AUTO_INDENT = "JSON_AUTO_INDENT"; //$NON-NLS-1$
 }

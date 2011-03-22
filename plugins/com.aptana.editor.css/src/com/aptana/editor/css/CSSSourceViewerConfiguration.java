@@ -8,6 +8,7 @@
 package com.aptana.editor.css;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
@@ -72,4 +73,11 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	{
 		return new CSSTextHover();
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
+
 }

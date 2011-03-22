@@ -9,7 +9,11 @@ package com.aptana.editor.yaml.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
 import com.aptana.editor.yaml.YAMLEditor;
@@ -44,6 +48,18 @@ public class YAMLPreferencePage extends CommonEditorPreferencePage
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
 		return YAMLEditor.getChainedPreferenceStore();
+	}
+
+	@Override
+	protected void createAutoIndentOptions(Composite parent)
+	{
+		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
+		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+
+		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.YAML_AUTO_INDENT,
+				com.aptana.editor.common.preferences.Messages.CommonEditorPreferencePage_auto_indent_label,
+				autoIndentGroup);
+		addField(autoIndentTag);
 	}
 
 }

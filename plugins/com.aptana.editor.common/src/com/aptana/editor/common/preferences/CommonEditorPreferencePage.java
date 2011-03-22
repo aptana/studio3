@@ -97,6 +97,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
 		setPreferenceStore(originalPref);
+
 	}
 
 	/**
@@ -134,7 +135,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		Label label = new Label(group, SWT.NONE);
 		label.setText(Messages.CommonEditorPreferencePage_LBL_TabPolicy);
-		label.setLayoutData(GridDataFactory.swtDefaults().create());
+		label.setLayoutData(GridDataFactory.fillDefaults().create());
 
 		tabSpaceCombo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseSpacesOption);
@@ -164,8 +165,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 				Object source = e.getSource();
 				if (source == tabSpaceCombo)
 				{
-					tabSize.setEnabled(!tabSpaceCombo.getText().equals(
-							Messages.CommonEditorPreferencePage_UseDefaultOption), fildEditorGroup);
+					tabSize.setEnabled(
+							!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
+							fildEditorGroup);
 				}
 			}
 
@@ -239,6 +241,9 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		tabSize.setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
 				fildEditorGroup);
 		addField(tabSize);
+
+		createAutoIndentOptions(group);
+
 	}
 
 	/**
@@ -249,6 +254,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected abstract void createMarkOccurrenceOptions(Composite parent);
 
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
+	
+	protected abstract void createAutoIndentOptions(Composite parent);
 
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
 

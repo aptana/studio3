@@ -8,6 +8,8 @@
 package com.aptana.editor.yaml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
@@ -35,4 +37,12 @@ public class YAMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	{
 		return YAMLSourceConfiguration.getDefault();
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new YAMLAutoIndentStrategy(contentType, this, sourceViewer) };
+	}
+	
+	
 }
