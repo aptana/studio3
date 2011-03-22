@@ -8,11 +8,14 @@
 
 package com.aptana.core.io.efs;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +23,15 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileInfo;
 import org.eclipse.core.filesystem.provider.FileStore;
 import org.eclipse.core.internal.filesystem.Messages;
 import org.eclipse.core.internal.filesystem.Policy;
 import org.eclipse.core.internal.filesystem.local.LocalFile;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
@@ -40,8 +46,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
+import com.aptana.core.io.vfs.IFileTreeVisitor;
+import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
-import com.aptana.ide.core.io.preferences.CloakingUtils;
+import com.aptana.ide.core.io.InfiniteProgressMonitor;
 
 /**
  * @author Max Stepanov
@@ -54,7 +62,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	
 	private IResource resource;
 	private final IPath path;
-	private IFileStore localFileStore;
+	private LocalFile localFileStore;
 
 	/**
 	 * 
@@ -129,7 +137,11 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	public IFileInfo fetchInfo(int options, IProgressMonitor monitor) throws CoreException {
 		ensureLocalFileStore();
 		if (localFileStore != null) {
-			return localFileStore.fetchInfo(options, monitor);
+			FileInfo fileInfo = (FileInfo) localFileStore.fetchInfo(options, monitor);
+			if (path.isRoot()) {
+				fileInfo.setName(path.toPortableString());
+			}
+			return fileInfo;
 		}
 		FileInfo info = new FileInfo(path.lastSegment());
 		info.setExists(false);
@@ -168,11 +180,11 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public InputStream openInputStream(int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore();
-		if (localFileStore != null) {
-			return localFileStore.openInputStream(options, monitor);
+		ensureResource();
+		if (resource instanceof IFile) {
+			return ((IFile) resource).getContents(true);
 		}
-		Policy.error(EFS.ERROR_READ, NLS.bind(Messages.fileNotFound, path));
+		Policy.error(EFS.ERROR_READ, NLS.bind(Messages.fileNotFound, path), new FileNotFoundException(path.toPortableString()));
 		return null;
 	}
 
@@ -194,13 +206,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void copy(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException {
-	    if (CloakingUtils.isFileCloaked(this)) {
-	        // this file is cloaked from transferring
-	        return;
-	    }
-		ensureLocalFileStore();
-		if (localFileStore != null) {
-			localFileStore.copy(destination, options, monitor);
+		ensureResource();
+		if (resource != null && destination instanceof WorkspaceFile) {
+			resource.copy(((WorkspaceFile) destination).path, IResource.FORCE | IResource.SHALLOW, monitor);
 		} else {
 			super.copy(destination, options, monitor);
 		}
@@ -211,9 +219,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void delete(int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore();
-		if (localFileStore != null) {
-			localFileStore.delete(options, monitor);
+		ensureResource();
+		if (resource != null) {
+			resource.delete(IResource.FORCE | IResource.KEEP_HISTORY, monitor);
 		}
 	}
 
@@ -257,12 +265,19 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public IFileStore mkdir(int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore(true);
-		if (localFileStore != null) {
+		ensureLocalFileStore(IFolder.class);
+		if (resource != null && !resource.exists()) {
+			monitor = Policy.monitorFor(monitor);
+			monitor.beginTask(StringUtil.EMPTY, 100);
 			try {
-				localFileStore.mkdir(options, monitor);
-			} finally {
-				localFileStore = null;
+				if ((options & EFS.SHALLOW) == 0) {
+					createParentsRecursive(resource, Policy.subMonitorFor(monitor, 80));
+				} else {
+					Policy.subMonitorFor(monitor, 80).done();
+				}
+				((IFolder) resource).create(IResource.FORCE, true, Policy.subMonitorFor(monitor, 20));
+			} catch (CoreException e) {
+				fileNotFoundError(e, path);
 			}
 		}
 		return this;
@@ -274,12 +289,12 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	@Override
 	public void move(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException {
 		if (!(destination instanceof WorkspaceFile)) {
-			ensureLocalFileStore();
-			if (localFileStore != null) {
-				localFileStore.move(destination, options, monitor);
+			ensureResource();
+			if (resource != null && resource.exists()) {
+				super.move(destination, options, monitor);
 				return;
 			}
-			Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, path));
+			Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, path), new FileNotFoundException(path.toPortableString()));
 		}
 		monitor = Policy.monitorFor(monitor);
 		monitor.beginTask(NLS.bind(Messages.moving, destination.toString()), 100);
@@ -287,9 +302,9 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		try {
 			ensureResource();
 			if (resource == null) {
-				Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, path));
+				Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, path), new FileNotFoundException(path.toPortableString()));
 			}
-			IResource destinationResource = (IResource) destinationFile.getAdapter(IResource.class);
+			IResource destinationResource = destinationFile.ensureResource();
 			if (destinationResource == null) {
 			    if (resource instanceof IContainer) {
 			        destinationResource = workspaceRoot.getFolder(destinationFile.path);
@@ -300,10 +315,20 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 			boolean sourceEqualsDest = resource.equals(destinationResource);
 			boolean overwrite = (options & EFS.OVERWRITE) != 0;
 			if (!sourceEqualsDest && !overwrite && destinationResource.exists()) {
-				Policy.error(EFS.ERROR_EXISTS,  NLS.bind(Messages.fileExists, destinationResource.getFullPath()));
+				Policy.error(EFS.ERROR_EXISTS,  NLS.bind(Messages.fileExists, destinationResource.getFullPath()), new FileNotFoundException(destinationFile.path.toPortableString()));
 			}
 			try {
-				resource.move(destinationResource.getFullPath(), true, Policy.subMonitorFor(monitor, 100));
+				if (destinationResource.exists()) {
+					destinationResource.delete(IResource.FORCE, Policy.subMonitorFor(monitor, 20));
+				}
+			} catch (CoreException e) {
+				Policy.error(EFS.ERROR_DELETE, NLS.bind(Messages.couldnotDelete, toString(), destination.toString()), new FileNotFoundException(destinationFile.path.toPortableString()));
+			}
+			if (!destinationResource.getParent().exists()) {
+				Policy.error(EFS.ERROR_NOT_EXISTS, NLS.bind(Messages.fileNotFound, toString(), destination.toString()), new FileNotFoundException(destinationFile.path.toPortableString()));
+			}
+			try {
+				resource.move(destinationResource.getFullPath(), true, Policy.subMonitorFor(monitor, 80));
 			} catch (CoreException e) {
 				Policy.error(EFS.ERROR_WRITE, NLS.bind(Messages.failedMove, toString(), destination.toString()), e);
 			}
@@ -317,8 +342,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void putInfo(IFileInfo info, int options, IProgressMonitor monitor) throws CoreException {
-		// passing "true" because the file store doesn't need to be physically exist when doing putInfo()
-		ensureLocalFileStore(true);
+		ensureLocalFileStore();
 		if (localFileStore != null) {
 			localFileStore.putInfo(info, options, monitor);
 		} else {
@@ -334,7 +358,7 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		if (localFileStore != null) {
 			return localFileStore.toLocalFile(options, monitor);
 		}
-		return new LocalFile(workspaceRoot.getFile(path).getLocation().toFile()).toLocalFile(options, monitor);
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -342,9 +366,19 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public OutputStream openOutputStream(int options, IProgressMonitor monitor) throws CoreException {
-		ensureLocalFileStore(true);
+		ensureLocalFileStore(IFile.class);
+		monitor = Policy.monitorFor(monitor);
+		monitor.beginTask(StringUtil.EMPTY, 100);
+		if (localFileStore == null) {
+			try {
+				((IFile) resource).create(new ByteArrayInputStream(new byte[0]), IResource.FORCE, Policy.subMonitorFor(monitor, 50));
+			} catch (CoreException e) {
+				fileNotFoundError(e, path);
+			}
+			ensureLocalFileStore();
+		}
 		if (localFileStore != null) {
-			return localFileStore.openOutputStream(options, monitor);
+			return localFileStore.openOutputStream(options, Policy.subMonitorFor(monitor, 50));
 		}
 		return null;
 	}
@@ -357,7 +391,11 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		return path.toString();
 	}
 	
-	private void ensureResource() throws CoreException {
+	private IResource ensureResource() throws CoreException {
+		return ensureResource(null);
+	}
+
+	private IResource ensureResource(Class<? extends IResource> resourceClass) throws CoreException {
 		if (resource != null && (
 				!resource.isSynchronized(IResource.DEPTH_ZERO)
 				|| !resource.exists())) {
@@ -365,52 +403,64 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 			localFileStore = null;
 		}
 		if (resource == null) {
-			IResource res = workspaceRoot;
-			for (String name : path.segments()) {
-				if (res instanceof IContainer) {
-					IContainer container = (IContainer) res;
-					res = container.findMember(name);
-				} else {
-					res = null;
-					break;
+			IContainer container = workspaceRoot;
+			if (path.segmentCount() > 2) {
+				container = workspaceRoot.getFolder(path.removeLastSegments(1));
+			} else if (path.segmentCount() == 2) {
+				container = workspaceRoot.getProject(path.segment(0));
+			}
+			if (path.isRoot()) {
+				resource = workspaceRoot;
+			} else {
+				resource = container.findMember(path.lastSegment());
+			}
+			if (resource == null) {
+				if (resourceClass == IFile.class) {
+					resource = workspaceRoot.getFile(path);
+				} else if (resourceClass == IFolder.class) {
+					resource = workspaceRoot.getFolder(path);
 				}
 			}
-			resource = res;
-		}		
-	}
-
-	private void ensureLocalFileStore() throws CoreException {
-		ensureLocalFileStore(false);
-	}
-
-	private void ensureLocalFileStore(boolean force) throws CoreException {
-		ensureResource();
-		if (localFileStore == null) {
-			if (resource != null && resource.exists()) {
-				localFileStore = new LocalFile(resource.getLocation().toFile());
-			} else if (force) {
-				IResource parent = workspaceRoot;
-				IPath relativePath = null;
-				for (int i = 0; i < path.segmentCount(); ++i) {
-					if (parent instanceof IContainer) {
-						IResource member = ((IContainer) parent).findMember(path.segment(i));
-						if (member != null) {
-							parent = member;
-						} else {
-							relativePath = path.removeFirstSegments(i);
-							break;
-						}
-					} else {
-						parent = null;
-						break;
-					}
-				}
-				if (parent != null & relativePath != null) {
-					localFileStore = new LocalFile(parent.getLocation().toFile()).getFileStore(relativePath);
-				}
-				
+			if (resourceClass != null && !resourceClass.isInstance(resource)) {
+				resource = null;
+				Policy.error(EFS.ERROR_WRONG_TYPE, NLS.bind(Messages.failedCreateWrongType, path));
 			}
 		}
+		return resource;
+	}
+
+	private LocalFile ensureLocalFileStore() throws CoreException {
+		return ensureLocalFileStore(null);
+	}
+
+	private LocalFile ensureLocalFileStore(Class<? extends IResource> resourceClass) throws CoreException {
+		ensureResource(resourceClass);
+		if (localFileStore == null) {
+			if (resource != null && resource.exists() && resource.getLocation() != null) {
+				localFileStore = new LocalFile(resource.getLocation().toFile());
+			}
+		}
+		return localFileStore;
+	}
+	
+	private static void createParentsRecursive(IResource resource, IProgressMonitor monitor) throws CoreException {
+		if (resource == null) {
+			return;
+		}
+		IContainer parent = resource.getParent();
+		if (parent.exists()) {
+			return;
+		}
+		monitor.beginTask(StringUtil.EMPTY, 100);
+		createParentsRecursive(parent, Policy.subMonitorFor(monitor, 80));
+		if (parent instanceof IFolder) {
+			((IFolder) parent).create(IResource.FORCE, true, Policy.subMonitorFor(monitor, 20));
+		}
+	}
+	
+	private static void fileNotFoundError(CoreException cause, IPath path) throws CoreException {
+		IStatus status = cause.getStatus();
+		throw new CoreException(new Status(status.getSeverity(), status.getPlugin(), status.getCode(), status.getMessage(), new FileNotFoundException(path.toPortableString())));		
 	}
 
 	public static IFileStore fromLocalFile(File file) {
@@ -425,4 +475,38 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 		}
 		return null;
 	}
+
+	public IFileTree fetchFileTree(IFileTreeVisitor visitor, IProgressMonitor monitor) throws CoreException {
+		monitor = Policy.monitorFor(monitor);
+		try {
+			FileTree fileTree = new FileTree(this);
+			buildFileTree(fileTree, this, visitor, new InfiniteProgressMonitor(monitor));
+			return fileTree;
+			} finally {
+				monitor.done();
+			}
+	}
+
+	private static void buildFileTree(FileTree fileTree, WorkspaceFile parent, IFileTreeVisitor visitor, IProgressMonitor monitor) throws CoreException {
+		monitor.beginTask(MessageFormat.format("Listing directory {0}", parent.path), 20); //$NON-NLS-1$s
+		IFileInfo[] infos = parent.childInfos(EFS.NONE, monitor);
+		List<IFileStore> stores = new ArrayList<IFileStore>();
+		List<IFileStore> dirs = new ArrayList<IFileStore>();
+		for (IFileInfo fileInfo : infos) {
+			IFileStore store = parent.getChild(fileInfo.getName());
+			if (visitor != null && !visitor.include(store)) {
+				continue;
+			}
+			stores.add(store);
+			if (fileInfo.isDirectory()) {
+				dirs.add(store);
+			}
+		}
+		fileTree.addChildren(parent, stores.toArray(new IFileStore[stores.size()]), infos);
+		monitor.worked(1);
+		for (IFileStore store : dirs) {
+			buildFileTree(fileTree, (WorkspaceFile) store, visitor, monitor);
+		}
+	}
+
 }

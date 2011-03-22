@@ -14,10 +14,16 @@ import java.net.URI;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileSystem;
+import org.eclipse.core.filesystem.IFileTree;
 import org.eclipse.core.filesystem.provider.FileSystem;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+
+import com.aptana.ide.core.io.CoreIOPlugin;
 
 /**
  * @author Max Stepanov
@@ -98,6 +104,23 @@ public class WorkspaceFileSystem extends FileSystem {
 	@Override
 	public IFileStore getStore(URI uri) {
 		return new WorkspaceFile(new Path(uri.getPath()));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.filesystem.provider.FileSystem#fetchFileTree(org.eclipse.core.filesystem.IFileStore, org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	@Override
+	public IFileTree fetchFileTree(IFileStore root, IProgressMonitor monitor) {
+		if (root instanceof WorkspaceFile) {
+			try {
+				return ((WorkspaceFile) root).fetchFileTree(null, monitor);
+			} catch (CoreException e) {
+				// TODO: this exception could be thrown after 3.6M1
+				// https://bugs.eclipse.org/bugs/show_bug.cgi?id=280944
+				CoreIOPlugin.log(new Status(IStatus.WARNING, CoreIOPlugin.PLUGIN_ID, Messages.WorkspaceFileSystem_FetchingTreeError, e));
+			}
+		}
+		return null;
 	}
 
 	/* (non-Javadoc)
