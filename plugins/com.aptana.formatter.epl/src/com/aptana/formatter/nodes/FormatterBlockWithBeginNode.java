@@ -106,7 +106,8 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.FormatterBlockNode#getStartOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#getStartOffset()
 	 */
 	public int getStartOffset()
 	{
@@ -118,7 +119,8 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.FormatterBlockNode#getEndOffset()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#getEndOffset()
 	 */
 	public int getEndOffset()
 	{
@@ -134,7 +136,8 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.FormatterBlockNode#isEmpty()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isEmpty()
 	 */
 	public boolean isEmpty()
 	{
@@ -142,7 +145,8 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.formatter.nodes.FormatterBlockNode#getChildren()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#getChildren()
 	 */
 	public List<IFormatterNode> getChildren()
 	{
@@ -163,7 +167,8 @@ public abstract class FormatterBlockWithBeginNode extends FormatterBlockNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.FormatterBlockNode#toString()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.FormatterBlockNode#toString()
 	 */
 	public String toString()
 	{

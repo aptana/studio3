@@ -30,7 +30,8 @@ public abstract class AbstractFormatterNode implements IFormatterNode
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterNode#getDocument()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.nodes.IFormatterNode#getDocument()
 	 */
 	public IFormatterDocument getDocument()
 	{

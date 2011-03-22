@@ -231,7 +231,8 @@ public class ProfileManager implements IProfileManager
 			boolean forceBundleLoading)
 	{
 		List<PreferenceKey> result = new ArrayList<PreferenceKey>();
-		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions(forceBundleLoading);
+		IContributedExtension[] extensions = ScriptFormatterManager.getInstance().getAllContributions(
+				forceBundleLoading);
 		Set<Class<? extends IScriptFormatterFactory>> factoriesClasses = new HashSet<Class<? extends IScriptFormatterFactory>>();
 		for (IContributedExtension extension : extensions)
 		{
@@ -429,7 +430,8 @@ public class ProfileManager implements IProfileManager
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#isDirty()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.profile.IProfileManager#isDirty()
 	 */
 	public boolean isDirty()
 	{
@@ -437,7 +439,8 @@ public class ProfileManager implements IProfileManager
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#markDirty()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.profile.IProfileManager#markDirty()
 	 */
 	public void markDirty()
 	{
@@ -445,7 +448,8 @@ public class ProfileManager implements IProfileManager
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ui.formatter.IProfileManager#clearDirty()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.preferences.profile.IProfileManager#clearDirty()
 	 */
 	public void clearDirty()
 	{
