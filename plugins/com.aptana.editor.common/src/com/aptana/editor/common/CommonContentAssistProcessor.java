@@ -45,6 +45,7 @@ import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -209,8 +210,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, offset);
-			List<ContentAssistElement> commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
+			String scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
+			List<ContentAssistElement> commands = getBundleManager().getContentAssists(new ScopeFilter(scope));
 			if (commands != null && commands.size() > 0)
 			{
 				Ruby ruby = Ruby.newInstance();
@@ -336,6 +337,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			CommonEditorPlugin.logError(e.getMessage(), e);
 		}
 		return proposals;
+	}
+
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
