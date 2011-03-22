@@ -51,7 +51,7 @@ public class HTMLParserTypeAttributeTest extends TestCase
 	public void testStyleWithInvalidType() throws Exception
 	{
 		String source = "<html><head><style type=\"css\">html {color: red;}</style></head></html>\n";
-		parseTest(source, "<html><head><style type=\"css\"></style></head></html>\n");
+		parseTest(source);
 	}
 
 	public void testScriptWithTypeEmpty() throws Exception
@@ -123,7 +123,7 @@ public class HTMLParserTypeAttributeTest extends TestCase
 	public void testScriptWithInvalidType() throws Exception
 	{
 		String source = "<html><head><script type=\"javascript\">var one = 1;</script></head></html>\n";
-		parseTest(source, "<html><head><script type=\"javascript\"></script></head></html>\n");
+		parseTest(source);
 	}
 
 	protected void parseTest(String source) throws Exception

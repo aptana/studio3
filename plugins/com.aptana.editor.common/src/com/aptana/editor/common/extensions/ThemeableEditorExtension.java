@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -121,6 +122,10 @@ public class ThemeableEditorExtension
 				boolean on = (Boolean) newValue;
 				fFullLineBackgroundPainter.setHighlightLineEnabled(on);
 			}
+		}
+		else if (event.getProperty().equals(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND_SYSTEM_DEFAULT))
+		{
+			overrideRulerColors();
 		}
 	}
 

@@ -9,27 +9,19 @@ package com.aptana.editor.common.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.editors.text.EditorsPlugin;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.ChainedPreferenceStore;
@@ -49,8 +41,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	 * Button for enabling occurrence highlighting
 	 */
 	private Composite appearanceComposite;
-	private Composite advancedOptions;
-	private BooleanFieldEditor markOccurences;
 	private IntegerFieldEditor tabSize;
 	private Combo tabSpaceCombo;
 	private IPreferenceStore originalPref;
@@ -73,58 +63,12 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		originalPref = getPreferenceStore();
 		setPreferenceStore(getChainedEditorPreferenceStore());
 		appearanceComposite = getFieldEditorParent();
-		Composite group = AptanaPreferencePage.createGroup(appearanceComposite,
-				Messages.EditorsPreferencePage_Formatting);
 
-		markOccurences = new BooleanFieldEditor(IPreferenceConstants.EDITOR_MARK_OCCURRENCES,
-				Messages.EditorsPreferencePage_MarkOccurrences, group);
-
-		addField(markOccurences);
-
-		// Perhaps need expand/collapse arrows
-		advancedOptions = createAdvancedOccurrenceSection(group);
-
-		// Link to general text annotation prefs from Eclipse
-		Link link = new Link(group, SWT.NONE);
-		link.setText(Messages.CommonEditorPreferencePage_Default_Editor_Preference_Link);
-		link.addSelectionListener(new SelectionAdapter()
-		{
-			public void widgetSelected(SelectionEvent e)
-			{
-				PreferencesUtil.createPreferenceDialogOn(Display.getDefault().getActiveShell(), e.text, null, null);
-			}
-		});
+		createMarkOccurrenceOptions(appearanceComposite);
 
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
 		setPreferenceStore(originalPref);
 
-	}
-
-	/**
-	 * Creates the advanced group of occurrence options. If there are no options, we just delete the group.
-	 * 
-	 * @param parent
-	 * @return
-	 */
-	private Composite createAdvancedOccurrenceSection(Composite parent)
-	{
-		Composite aOptions = new Composite(parent, SWT.NONE);
-
-		aOptions.setLayout(GridLayoutFactory.fillDefaults().create());
-		aOptions.setLayoutData(GridDataFactory.fillDefaults().indent(18, 0).create());
-
-		createMarkOccurrenceOptions(aOptions);
-
-		aOptions.setVisible(false);
-
-		// Perhaps better way?
-		if (aOptions.getChildren().length == 0)
-		{
-			aOptions.dispose();
-			return null;
-		}
-		else
-			return aOptions;
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -247,7 +191,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	}
 
 	/**
-	 * Create any extra "Mark Occurrence" options if necessary.
+	 * Create the Mark Occurrences group and options if there are any for this language/editor.
 	 * 
 	 * @param parent
 	 */
@@ -259,47 +203,8 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
 
-	/**
-	 * Listens for changes in showing/hiding advanced options
-	 */
-	public void propertyChange(PropertyChangeEvent event)
-	{
-		if (event.getSource() == markOccurences && advancedOptions != null)
-		{
-			if (!(Boolean) event.getNewValue())
-			{
-				toggleAdvancedOccurrenceSection(false);
-			}
-			else
-			{
-				toggleAdvancedOccurrenceSection(true);
-			}
-		}
-	}
-
-	private void toggleAdvancedOccurrenceSection(boolean show)
-	{
-		advancedOptions.setVisible(show);
-		if (advancedOptions.getLayoutData() != null)
-		{
-			((GridData) advancedOptions.getLayoutData()).exclude = !show;
-		}
-		appearanceComposite.layout(true, true);
-	}
-
 	public void init(IWorkbench workbench)
 	{
-	}
-
-	protected void initialize()
-	{
-		super.initialize();
-
-		if (advancedOptions != null)
-		{
-			boolean markOccurrences = getPreferenceStore().getBoolean(IPreferenceConstants.EDITOR_MARK_OCCURRENCES);
-			toggleAdvancedOccurrenceSection(markOccurrences);
-		}
 	}
 
 	public boolean performOk()

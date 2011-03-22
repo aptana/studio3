@@ -8,8 +8,6 @@
 package com.aptana.editor.js.formatter;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
@@ -19,7 +17,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -69,9 +66,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	protected static final String[] INDENTATIONS = { JSFormatterConstants.INDENT_BLOCKS,
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
-
-	private static final Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
-	private static final Pattern COMMENTS_STRIPPING_PATTERN = Pattern.compile("\\s|\\*|//"); //$NON-NLS-1$
 
 	private String lineSeparator;
 
@@ -161,7 +155,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 				{
 					if (!originalText.equals(output))
 					{
-						if (equalContent(originalText, output))
+						if (equalContent(parseResult, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
@@ -193,57 +187,38 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	}
 
 	/**
-	 * @param input
+	 * @param inputParseResult
 	 * @param output
 	 * @return
 	 */
-	private boolean equalContent(String input, String output)
+	private boolean equalContent(IParseRootNode inputParseResult, String output)
 	{
-		// first, strip out all the comments from the input and the output.
-		// save those comments for later comparison.
-		int inputLength = input.length();
-		int outputLength = output.length();
-		StringBuilder inputBuffer = new StringBuilder(inputLength);
-		StringBuilder outputBuffer = new StringBuilder(outputLength);
-		StringBuilder inputComments = new StringBuilder();
-		StringBuilder outputComments = new StringBuilder();
-		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
-		Matcher outputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(output);
-		int inputOffset = 0;
-		int outputOffset = 0;
-		while (inputCommentsMatcher.find())
+		if (output == null)
 		{
-			inputComments.append(inputCommentsMatcher.group());
-			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
-			inputOffset = inputCommentsMatcher.end();
+			return false;
 		}
-		if (inputOffset < inputLength)
+		output = output.trim();
+		IParser parser = checkoutParser();
+		IParseState parseState = new ParseState();
+		parseState.setEditState(output, null, 0, 0);
+		IParseRootNode outputParseResult = null;
+		try
 		{
-			inputBuffer.append(input.subSequence(inputOffset, inputLength));
+			outputParseResult = parser.parse(parseState);
 		}
-		while (outputCommentsMatcher.find())
+		catch (Exception e)
 		{
-			outputComments.append(outputCommentsMatcher.group());
-			outputBuffer.append(output.subSequence(outputOffset, outputCommentsMatcher.start()));
-			outputOffset = outputCommentsMatcher.end();
-
+			return false;
 		}
-		if (outputOffset < outputLength)
+		checkinParser(parser);
+		if (outputParseResult == null)
 		{
-			outputBuffer.append(output.subSequence(outputOffset, outputLength));
+			return false;
 		}
-		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
-				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
-	}
-
-	/**
-	 * Remove any whitespace, '*' or '//' from a comment string
-	 * 
-	 * @param inputComment
-	 */
-	private String stripComment(String comment)
-	{
-		return COMMENTS_STRIPPING_PATTERN.matcher(comment).replaceAll(StringUtil.EMPTY);
+		// Flatten the AST's and do a string compare
+		// The toString() of the JSParseRootNode calls the JSFormatWalker,
+		// which should generate the same string for the input and the output.
+		return outputParseResult.toString().equals(inputParseResult.toString());
 	}
 
 	/*

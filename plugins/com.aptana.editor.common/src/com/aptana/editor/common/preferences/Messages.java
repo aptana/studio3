@@ -42,6 +42,7 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_Close_Matching_Character_Pairs;
 	public static String EditorsPreferencePage_Colorize_Matching_Character_Pairs;
 	public static String EditorsPreferencePage_Content_Assist;
+	public static String EditorsPreferencePage_Content_Assist_Hover;
 	public static String EditorsPreferencePage_Content_Assist_Auto_Display;
 	public static String EditorsPreferencePage_Content_Assist_Short_Delay;
 	public static String EditorsPreferencePage_Content_Assist_Auto_Insert;

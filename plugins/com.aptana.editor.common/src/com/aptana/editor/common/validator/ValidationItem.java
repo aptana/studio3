@@ -17,9 +17,9 @@ public class ValidationItem implements IValidationItem
 
 	private final int severity;
 	private final String message;
-	private final int offset;
+	private int offset;
 	private final int length;
-	private final int lineNumber;
+	private int lineNumber;
 	private final String sourcePath;
 
 	public ValidationItem(int severity, String message, int offset, int length, int lineNumber, String sourcePath)
@@ -72,5 +72,15 @@ public class ValidationItem implements IValidationItem
 		attributes.put(IMarker.LINE_NUMBER, getLineNumber());
 
 		return attributes;
+	}
+
+	public void setOffset(int offset)
+	{
+		this.offset = offset;
+	}
+
+	public void setLineNumber(int lineNumber)
+	{
+		this.lineNumber = lineNumber;
 	}
 }

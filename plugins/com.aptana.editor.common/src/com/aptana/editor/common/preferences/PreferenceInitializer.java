@@ -43,6 +43,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putInt(IPreferenceConstants.CONTENT_ASSIST_DELAY,
 				CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY);
 		prefs.putBoolean(IPreferenceConstants.CONTENT_ASSIST_AUTO_INSERT, true);
+		prefs.putBoolean(IPreferenceConstants.CONTENT_ASSIST_HOVER, true);
 
 		// insert matching characters
 		prefs.putBoolean(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE, true);
