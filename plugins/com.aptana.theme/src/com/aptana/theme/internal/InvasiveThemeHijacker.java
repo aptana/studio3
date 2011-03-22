@@ -827,6 +827,7 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 			return;
 		if (revertToDefaults)
 		{
+			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND);
 			prefs.remove(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND);
@@ -834,8 +835,10 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 		}
 		else
 		{
-			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_BACKGROUND,
 					StringConverter.asString(theme.getSelectionAgainstBG()));
+			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_SELECTION_FOREGROUND,
+					StringConverter.asString(theme.getForeground()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_BACKGROUND, StringConverter.asString(theme.getBackground()));
 			prefs.put(AbstractTextEditor.PREFERENCE_COLOR_FOREGROUND, StringConverter.asString(theme.getForeground()));
 			prefs.put(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE_COLOR,
