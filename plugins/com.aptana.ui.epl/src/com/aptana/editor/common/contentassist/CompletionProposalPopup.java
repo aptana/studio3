@@ -299,7 +299,6 @@ public class CompletionProposalPopup implements IContentAssistListener
 			{
 				public void run()
 				{
-
 					fInvocationOffset = fContentAssistSubjectControlAdapter.getSelectedRange().x;
 					fFilterOffset = fInvocationOffset;
 					fComputedProposals = computeProposals(fInvocationOffset, autoActivated);
@@ -309,12 +308,21 @@ public class CompletionProposalPopup implements IContentAssistListener
 
 					int count = (fComputedProposals == null ? 0 : fComputedProposals.length);
 
-					if (count == 1 && !autoActivated && canAutoInsert(fComputedProposals[0]))
+					// If we don't have any proposals, and we've manually asked for proposals, show "no proposals"
+					if (!autoActivated && count == 0)
 					{
+						fComputedProposals = createNoProposal();
+						count = fComputedProposals.length;
+					}
 
+					if (count == 0)
+					{
+						hide();
+					}
+					else if (count == 1 && !autoActivated && canAutoInsert(fComputedProposals[0]))
+					{
 						insertProposal(fComputedProposals[0], (char) 0, 0, fInvocationOffset);
 						hide();
-
 					}
 					else
 					{
@@ -326,6 +334,20 @@ public class CompletionProposalPopup implements IContentAssistListener
 		}
 
 		return getErrorMessage();
+	}
+
+	/**
+	 * Create the "no proposals" proposal
+	 * 
+	 * @return
+	 */
+	private ICompletionProposal[] createNoProposal()
+	{
+		fEmptyProposal.fOffset = fFilterOffset;
+		fEmptyProposal.fDisplayString = fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages
+				.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
+		modifySelection(-1, -1); // deselect everything
+		return new ICompletionProposal[] { fEmptyProposal };
 	}
 
 	/**
@@ -980,15 +1002,9 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (oldProposal instanceof ICompletionProposalExtension2 && fViewer != null)
 				((ICompletionProposalExtension2) oldProposal).unselected(fViewer);
 
-			boolean noProposal = false;
-
-			if (proposals == null || proposals.length == 0)
+			if (proposals == null)
 			{
-				fEmptyProposal.fOffset = fFilterOffset;
-				fEmptyProposal.fDisplayString = fEmptyMessage != null ? fEmptyMessage : JFaceTextMessages
-						.getString("CompletionProposalPopup.no_proposals"); //$NON-NLS-1$
-				proposals = new ICompletionProposal[] { fEmptyProposal };
-				noProposal = true;
+				proposals = new ICompletionProposal[] {};
 			}
 
 			fFilteredProposals = proposals;
@@ -1020,9 +1036,9 @@ public class CompletionProposalPopup implements IContentAssistListener
 			// Custom code for modifying selection/size
 			int defaultIndex = -1;
 			int suggestedIndex = -1;
-
-			// no default or suggested and only one proposal, just make it default
-			if (noProposal == false)
+			
+			// select the first proposal
+			if (proposals.length > 0)
 			{
 				defaultIndex = 0;
 				suggestedIndex = 0;
@@ -2031,7 +2047,8 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 * 
 	 * @since 3.2
 	 */
-	private static final class EmptyProposal implements ICompletionProposal, ICompletionProposalExtension
+	private static final class EmptyProposal implements ICompletionProposal, ICompletionProposalExtension,
+			ICompletionProposalExtension4
 	{
 
 		String fDisplayString;
@@ -2117,6 +2134,14 @@ public class CompletionProposalPopup implements IContentAssistListener
 		public int getContextInformationPosition()
 		{
 			return -1;
+		}
+
+		/*
+		 * @see org.eclipse.jface.text.contentassist.ICompletionProposalExtension#isAutoInsertable()
+		 */
+		public boolean isAutoInsertable()
+		{
+			return false;
 		}
 	}
 
