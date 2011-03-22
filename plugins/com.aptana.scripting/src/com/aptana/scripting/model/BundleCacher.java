@@ -1075,6 +1075,10 @@ public class BundleCacher
 			if (real == null)
 			{
 				BundleElement owning = getOwningBundle();
+				if (owning == null)
+				{
+					return;
+				}
 				// remove all elements that are declared in the same file, since they'll end up getting
 				// loaded below.
 				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());

@@ -249,8 +249,8 @@
             locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
          <command
                commandId="com.aptana.deploy.commands.deployApp"
+               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/elcl16/arrow_up_down.png"
                label="%FTPDeploy.label"
-               icon="icons/full/elcl16/arrow_up_down.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -284,6 +284,20 @@
       <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
          <command
+               commandId="com.aptana.ide.syncing.ui.commands.synchronize"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
                commandId="com.aptana.ide.syncing.ui.commands.upload"
                style="push">
             <visibleWhen
@@ -299,6 +313,60 @@
          </command>
          <command
                commandId="com.aptana.ide.syncing.ui.commands.download"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <menu
+               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/obj16/ftp.png"
+               label="Connections">
+            <command
+                  commandId="com.aptana.ide.syncing.ui.commands.newconnection"
+                  style="push">
+            </command>
+            <command
+                  commandId="com.aptana.ide.syncing.ui.commands.connectionmanager"
+                  style="push">
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </menu>
+         <separator
+               name="group.ftp.cloaking"
+               visible="true">
+         </separator>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.cloak"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="ftp">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="com.aptana.ide.syncing.ui.commands.uncloak"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -381,6 +449,13 @@
                </iterate>
             </visibleWhen>
          </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:com.aptana.explorer.view?before=group.edit">
+         <dynamic
+               class="com.aptana.explorer.internal.ui.DeployPopupContributionItem"
+               id="com.aptana.explorer.deploy.popup">
+         </dynamic>
       </menuContribution>
       <menuContribution
             locationURI="popup:com.aptana.explorer.view?before=additions">
@@ -1191,6 +1266,13 @@
                
             </visibleWhen>
          </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
+         <dynamic
+               class="com.aptana.explorer.internal.ui.DeployPopupContributionItem"
+               id="com.aptana.projectexplorer.deploy.popup">
+         </dynamic>
       </menuContribution>
    </extension>
    <extension
