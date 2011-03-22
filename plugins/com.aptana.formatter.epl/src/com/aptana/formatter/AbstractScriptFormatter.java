@@ -25,6 +25,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.epl.FormatterPlugin;
 import com.aptana.formatter.ui.CodeFormatterConstants;
 import com.aptana.formatter.ui.FormatterMessages;
@@ -368,7 +369,12 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 		}
 		try
 		{
-			int lineNumber = document.getLineOfOffset(offset + 1);
+			String lineDelimiter = document.getLineDelimiter(document.getLineOfOffset(offset));
+			if (lineDelimiter == null)
+			{
+				lineDelimiter = StringUtil.EMPTY;
+			}
+			int lineNumber = document.getLineOfOffset(Math.min(document.getLength(), offset + lineDelimiter.length()));
 			if (lineNumber > 0)
 			{
 				IRegion previousLineRegion = document.getLineInformation(lineNumber - 1);
