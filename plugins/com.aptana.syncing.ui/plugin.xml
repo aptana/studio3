@@ -271,14 +271,6 @@
                tooltip="%Action.Upload.tooltip">
          </action>
          <action
-               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
-               icon="icons/full/elcl16/arrow_up_down.png"
-               id="com.aptana.ide.syncing.ui.actions.FileSystemSynchronizeNewAction"
-               label="%Action.SynchronizeNew.name"
-               menubarPath="aptanasynchronize/syncingGroup"
-               tooltip="%Action.SynchronizeNew.tooltip">
-         </action>
-         <action
                class="com.aptana.ide.syncing.ui.actions.SynchronizeAction"
                enablesFor="1"
                icon="icons/full/obj16/transfer_files.png"
@@ -286,6 +278,14 @@
                label="%Action.Synchronize.name"
                menubarPath="aptanasynchronize/syncingGroup"
                tooltip="%Action.Synchronize.tooltip">
+         </action>
+         <action
+               class="com.aptana.ide.syncing.ui.actions.SynchronizeFilesAction"
+               icon="icons/full/elcl16/arrow_up_down.png"
+               id="com.aptana.ide.syncing.ui.actions.FileSystemSynchronizeNewAction"
+               label="%Action.SynchronizeNew.name"
+               menubarPath="aptanasynchronize/syncingGroup"
+               tooltip="%Action.SynchronizeNew.tooltip">
          </action>
          <action
                class="com.aptana.ide.syncing.ui.actions.NewSiteAction"
@@ -399,6 +399,29 @@
             id="com.aptana.ide.syncing.ui.commands.connectionmanager"
             name="%Action.ConnectionManager.name">
       </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="com.aptana.ide.syncing.ui.commands.synchronize"
+            icon="icons/full/obj16/transfer_files.png">
+      </image>
+      <image
+            commandId="com.aptana.ide.syncing.ui.commands.synchronize.files"
+            icon="icons/full/elcl16/arrow_up_down.png">
+      </image>
+      <image
+            commandId="com.aptana.ide.syncing.ui.commands.synchronize.project"
+            icon="icons/full/elcl16/arrow_up_down.png">
+      </image>
+      <image
+            commandId="com.aptana.ide.syncing.ui.commands.upload"
+            icon="icons/full/elcl16/arrow_up.png">
+      </image>
+      <image
+            commandId="com.aptana.ide.syncing.ui.commands.download"
+            icon="icons/full/elcl16/arrow_down.png">
+      </image>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">

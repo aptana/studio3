@@ -285,7 +285,6 @@
             locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
          <command
                commandId="com.aptana.ide.syncing.ui.commands.synchronize"
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/obj16/transfer_files.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -300,7 +299,6 @@
          </command>
          <command
                commandId="com.aptana.ide.syncing.ui.commands.upload"
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/elcl16/arrow_up.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -315,7 +313,6 @@
          </command>
          <command
                commandId="com.aptana.ide.syncing.ui.commands.download"
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/elcl16/arrow_down.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
