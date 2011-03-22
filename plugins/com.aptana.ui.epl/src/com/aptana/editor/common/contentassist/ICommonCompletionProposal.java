@@ -13,6 +13,21 @@ import org.eclipse.swt.graphics.Image;
 public interface ICommonCompletionProposal extends ICompletionProposal, Comparable<ICompletionProposal>
 {
 	/**
+	 * The proposal is highly relevant
+	 */
+	public static int RELEVANCE_HIGH = 90;
+
+	/**
+	 * The proposal is somewhat relevant
+	 */
+	public static int RELEVANCE_MEDIUM = 50;
+
+	/**
+	 * The proposal is slightly relevant
+	 */
+	public static int RELEVANCE_LOW = 10;
+
+	/**
 	 * getFileLocation
 	 * 
 	 * @return
@@ -71,11 +86,4 @@ public interface ICommonCompletionProposal extends ICompletionProposal, Comparab
 	 * @deprecated Use setRelevance instead
 	 */
 	void setIsSuggestedSelection(boolean isSuggested);
-
-	/**
-	 * Extra information relevant to the proposal in question
-	 * 
-	 * @return
-	 */
-	String getExtraInfo();
 }

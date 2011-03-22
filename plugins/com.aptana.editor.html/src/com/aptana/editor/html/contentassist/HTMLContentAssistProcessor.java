@@ -42,6 +42,7 @@ import com.aptana.core.IURIMapper;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
@@ -751,7 +752,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					HTMLIndexConstants.CORE, offset, src.length());
 			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
 			{
-				proposal.setRelevance(1);
+				proposal.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
 			}
 			proposals.add(proposal);
 		}

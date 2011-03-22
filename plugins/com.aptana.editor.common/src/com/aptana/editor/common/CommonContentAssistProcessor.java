@@ -43,6 +43,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
@@ -158,7 +159,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (others == null || others.length == 0)
 		{
-			// Pre-select the first ruble-contributed proposal/snippet
 			return proposals.toArray(new ICompletionProposal[proposals.size()]);
 		}
 
@@ -572,11 +572,12 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (caseSensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseSensitiveProposal).setRelevance(3);
+			((CommonCompletionProposal) caseSensitiveProposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
 		}
 		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseInsensitiveProposal).setRelevance(2);
+			((CommonCompletionProposal) caseInsensitiveProposal)
+					.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
 		}
 		else
 		{
@@ -586,7 +587,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 				if (proposal instanceof CommonCompletionProposal)
 				{
-					((CommonCompletionProposal) proposal).setRelevance(1);
+					((CommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_LOW);
 				}
 			}
 		}
