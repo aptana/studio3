@@ -43,9 +43,12 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 
-public class SnippetTemplateProposal extends TemplateProposal implements ICompletionProposalExtension6
+public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
+		ICompletionProposalExtension6, Comparable<ICompletionProposal>
 {
 
 	// TODO Figure out space tab width and use it rather than constant of 2!
@@ -58,6 +61,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	private final Template fTemplate;
 	private final TemplateContext fContext;
 	private final IRegion fRegion;
+	private int fRelevance;
 
 	private ICompletionProposal delegateTemplateProposal;
 	private IRegion fSelectedRegion; // initialized by apply()
@@ -65,6 +69,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 	private InclusivePositionUpdater fUpdater;
 
 	private StyledString styledDisplayString;
+	private StyledString styledActivationString;
 
 	private Styler styler;
 
@@ -470,19 +475,34 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		return getStyledDisplayString().getString().trim();
 	}
 
+	public String getActivationString()
+	{
+		return getStyledActivationString().getString().trim();
+	}
+
 	public StyledString getStyledDisplayString()
 	{
 		if (styledDisplayString == null)
 		{
 			Template template = getTemplate();
-			styledDisplayString = new StyledString(String.format("%1$-20.20s%2$10.10s ", //$NON-NLS-1$
-					template.getDescription(), template.getName() + "\u00bb") //$NON-NLS-1$
+			styledDisplayString = new StyledString(template.getDescription(), styler);
+		}
+		return styledDisplayString;
+	}
+
+	public StyledString getStyledActivationString()
+	{
+		if (styledActivationString == null)
+		{
+			Template template = getTemplate();
+			styledActivationString = new StyledString(String.format("%1$10.10s ", //$NON-NLS-1$
+					template.getName() + " \u00bb") //$NON-NLS-1$
 					+ (triggerChar == '\000' ? " " : String.valueOf(triggerChar)) //$NON-NLS-1$
 					// Need padding on windows to work around the width computation
 					+ (Platform.OS_WIN32.equals(Platform.getOS()) ? "                                " : ""), //$NON-NLS-1$ //$NON-NLS-2$ 
 					styler);
 		}
-		return styledDisplayString;
+		return styledActivationString;
 	}
 
 	Template getTemplateSuper()
@@ -521,6 +541,119 @@ public class SnippetTemplateProposal extends TemplateProposal implements IComple
 		}
 
 		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getFileLocation()
+	 */
+	public String getFileLocation()
+	{
+		return getActivationString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getUserAgentImages()
+	 */
+	public Image[] getUserAgentImages()
+	{
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#isDefaultSelection()
+	 */
+	public boolean isDefaultSelection()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#setIsSuggestedSelection()
+	 */
+	public boolean isSuggestedSelection()
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#setIsSuggestedSelection()
+	 */
+	public void setIsDefaultSelection(boolean isDefault)
+	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#setIsSuggestedSelection()
+	 */
+	public void setIsSuggestedSelection(boolean isSuggested)
+	{
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getExtraInfo()
+	 */
+	public String getExtraInfo()
+	{
+		return getActivationString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(ICompletionProposal o)
+	{
+		if (this == o)
+		{
+			return 0;
+		}
+
+		Template t = getTemplate();
+		if (t == null)
+		{
+			return -1;
+		}
+
+		if (o instanceof SnippetTemplateProposal)
+		{
+			Template t2 = ((SnippetTemplateProposal) o).getTemplate();
+			if (t2 == null)
+			{
+				return 1;
+			}
+
+			return StringUtil
+.compareCaseInsensitive(t.getName(), t2.getName());
+		}
+		else
+		{
+			return StringUtil.compareCaseInsensitive(t.getName(), o.getDisplayString());
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#getRelevance()
+	 */
+	public int getRelevance()
+	{
+		return fRelevance;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonCompletionProposal#setRelevance(int)
+	 */
+	public void setRelevance(int relevance)
+	{
+		fRelevance = relevance;
 	}
 
 }

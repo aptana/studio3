@@ -13,8 +13,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import com.aptana.core.util.StringUtil;
-
 public class StringUtilTest extends TestCase
 {
 	public void testMd5()
@@ -96,6 +94,36 @@ public class StringUtilTest extends TestCase
 	public void testAreNotEqual2()
 	{
 		assertTrue(StringUtil.areNotEqual("test", "tes"));
+	}
+
+	public void testCompare()
+	{
+		assertTrue(StringUtil.compare(null, null) == 0);
+		assertTrue(StringUtil.compare(null, "a") < 0);
+		assertTrue(StringUtil.compare("", "a") < 0);
+		assertTrue(StringUtil.compare("a", null) > 0);
+		assertTrue(StringUtil.compare("a", "") > 0);
+		assertTrue(StringUtil.compare("A", "A") == 0);
+		assertTrue(StringUtil.compare("A", "a") < 0);
+		assertTrue(StringUtil.compare("a", "a") == 0);
+		assertTrue(StringUtil.compare("a", "A") > 0);
+		assertTrue(StringUtil.compare("b", "A") > 0);
+		assertTrue(StringUtil.compare("A", "b") < 0);
+	}
+
+	public void testCompareCaseInsensitive()
+	{
+		assertTrue(StringUtil.compareCaseInsensitive(null, null) == 0);
+		assertTrue(StringUtil.compareCaseInsensitive(null, "a") < 0);
+		assertTrue(StringUtil.compareCaseInsensitive("", "a") < 0);
+		assertTrue(StringUtil.compareCaseInsensitive("a", null) > 0);
+		assertTrue(StringUtil.compareCaseInsensitive("a", "") > 0);
+		assertTrue(StringUtil.compareCaseInsensitive("A", "A") == 0);
+		assertTrue(StringUtil.compareCaseInsensitive("A", "a") == 0);
+		assertTrue(StringUtil.compareCaseInsensitive("a", "a") == 0);
+		assertTrue(StringUtil.compareCaseInsensitive("a", "A") == 0);
+		assertTrue(StringUtil.compareCaseInsensitive("b", "A") > 0);
+		assertTrue(StringUtil.compareCaseInsensitive("A", "b") < 0);
 	}
 
 	public void getStringValueWithNull()

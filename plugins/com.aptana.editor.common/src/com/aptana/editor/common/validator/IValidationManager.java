@@ -8,7 +8,6 @@
 package com.aptana.editor.common.validator;
 
 import java.net.URI;
-import java.util.List;
 
 public interface IValidationManager
 {
@@ -26,8 +25,9 @@ public interface IValidationManager
 	 *            the length of the errored text
 	 * @param sourcePath
 	 *            the source path
+	 * @return the validation item added
 	 */
-	public void addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
+	public IValidationItem addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
 	 * Adds a validation warning.
@@ -42,15 +42,18 @@ public interface IValidationManager
 	 *            the length of the warning text
 	 * @param sourcePath
 	 *            the source path
+	 * @return the validation item added
 	 */
-	public void addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
+	public IValidationItem addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath);
 
 	/**
-	 * Gets the list of current validation items.
+	 * Indicates the source contains the specified nested language so those blocks will be validated by its own
+	 * validator.
 	 * 
-	 * @return the items as a list
+	 * @param language
+	 *            the nested language (e.g. CSS/JS for HTML)
 	 */
-	public List<IValidationItem> getItems();
+	public void addNestedLanguage(String language);
 
 	/**
 	 * Checks if the validation message should be ignored for the particular language.

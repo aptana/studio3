@@ -8,6 +8,7 @@
 package com.aptana.editor.js.validator;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -26,6 +27,7 @@ public class MozillaJsValidator implements IValidator
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		Context cx = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
 		try
@@ -61,14 +63,14 @@ public class MozillaJsValidator implements IValidator
 				severity = error.getSeverity();
 				if (severity == IMarker.SEVERITY_ERROR)
 				{
-					manager.addError(message, error.getLine(), error.getLineOffset(), 0, path);
+					items.add(manager.addError(message, error.getLine(), error.getLineOffset(), 0, path));
 				}
 				else if (severity == IMarker.SEVERITY_WARNING)
 				{
-					manager.addWarning(message, error.getLine(), error.getLineOffset(), 0, path);
+					items.add(manager.addWarning(message, error.getLine(), error.getLineOffset(), 0, path));
 				}
 			}
 		}
-		return manager.getItems();
+		return items;
 	}
 }

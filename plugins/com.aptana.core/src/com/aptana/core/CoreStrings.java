@@ -37,4 +37,8 @@ public interface CoreStrings
 	public static final String ERROR = Messages.CoreStrings_Error;
 
 	public static final String HELP = Messages.CoreStrings_Help;
+
+	public static final String ON = Messages.CoreStrings_On;
+
+	public static final String OFF = Messages.CoreStrings_Off;
 }

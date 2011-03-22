@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.parsing.ast.JSAssignmentNode;
 import com.aptana.editor.js.parsing.ast.JSCatchNode;
 import com.aptana.editor.js.parsing.ast.JSDeclarationNode;
@@ -206,14 +205,8 @@ public class JSSymbolCollector extends JSTreeWalker
 					switch (lhs.getNodeType())
 					{
 						case JSNodeTypes.IDENTIFIER:
-							String name = lhs.getText();
-
-							if (this._scope.hasSymbol(name) || JSTypeConstants.WINDOW_PROPERTY.equals(name))
-							{
-								JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
-								collector.visit(node);
-							}
-							// else secondary assignment without declared symbol
+							JSPropertyCollector collector = new JSPropertyCollector(this._scope.getObject());
+							collector.visit(node);
 							break LOOP;
 
 						case JSNodeTypes.THIS:
