@@ -27,10 +27,5 @@ public interface IPreferenceContants
 	 * The preference key used to set the option for when we want close tags auto inserted using Content Assist, or HTMLOpenTagCloser.
 	 */
 	String HTML_AUTO_CLOSE_TAG_PAIRS = "HTML_AUTO_CLOSE_TAG_PAIRS"; //$NON-NLS-1$
-	
-	/**
-	 * The preference key used to enable and disable auto indent.
-	 */
-	
-	String HTML_AUTO_INDENT = "HTML_AUTO_INDENT"; //$NON-NLS-1$
+
 }

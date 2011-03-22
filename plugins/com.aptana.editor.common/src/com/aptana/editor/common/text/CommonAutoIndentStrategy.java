@@ -7,6 +7,10 @@
  */
 package com.aptana.editor.common.text;
 
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -15,6 +19,11 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
+
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 /**
  * This class will auto-indent after curly braces {} by default (and won't auto dedent on close brace). Subclasses
@@ -42,10 +51,39 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	{
 		return fViewerConfiguration;
 	}
-	
+
 	protected ISourceViewer getSourceViewer()
 	{
 		return fSourceViewer;
+	}
+
+	protected static void addPreferenceListener(final String pluginId, BundleContext bundleContext,
+			final Runnable prefChangeAction)
+	{
+		final IPreferenceChangeListener autoIndentPrefChangeListener = new IPreferenceChangeListener()
+		{
+
+			public void preferenceChange(PreferenceChangeEvent event)
+			{
+				if (IPreferenceConstants.EDITOR_AUTO_INDENT.equals(event.getKey()))
+				{
+					prefChangeAction.run();
+				}
+			}
+		};
+		new InstanceScope().getNode(pluginId).addPreferenceChangeListener(autoIndentPrefChangeListener);
+
+		bundleContext.addBundleListener(new BundleListener()
+		{
+
+			public void bundleChanged(BundleEvent event)
+			{
+				if (event.getType() == BundleEvent.STOPPING)
+				{
+					new InstanceScope().getNode(pluginId).removePreferenceChangeListener(autoIndentPrefChangeListener);
+				}
+			}
+		});
 	}
 
 	/**
@@ -167,10 +205,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
-			else if (buf.length() != 0 && trimmedLine.endsWith("*/") && buf.charAt(buf.length()-1) == ' ') //$NON-NLS-1$
+			else if (buf.length() != 0 && trimmedLine.endsWith("*/") && buf.charAt(buf.length() - 1) == ' ') //$NON-NLS-1$
 			{
-				//We want to delete an extra space when closing block comments
-				buf.deleteCharAt(buf.length() -1);
+				// We want to delete an extra space when closing block comments
+				buf.deleteCharAt(buf.length() - 1);
 			}
 		}
 		catch (BadLocationException e)

@@ -7,46 +7,26 @@
  */
 package com.aptana.editor.json;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
-import com.aptana.editor.json.preferences.IPreferenceConstants;
 
 public class JSONAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 {
 	private static boolean shouldAutoIndent;
-	private static IPreferenceChangeListener autoIndentPrefChangeListener;
 
 	static
 	{
-		JSONAutoIndentStrategy.autoIndentPrefChangeListener = new IPreferenceChangeListener()
-		{
-
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (IPreferenceConstants.JSON_AUTO_INDENT.equals(event.getKey()))
-					updateAutoIndentPreference();
-			}
-		};
-
-		new InstanceScope().getNode(JSONPlugin.PLUGIN_ID).addPreferenceChangeListener(autoIndentPrefChangeListener);
-
-		JSONPlugin.getDefault().getBundle().getBundleContext().addBundleListener(new BundleListener()
-		{
-
-			public void bundleChanged(BundleEvent event)
-			{
-				if (event.getType() == BundleEvent.STOPPING)
-					new InstanceScope().getNode(JSONPlugin.PLUGIN_ID).removePreferenceChangeListener(
-							autoIndentPrefChangeListener);
-			}
-		});
+		addPreferenceListener(JSONPlugin.PLUGIN_ID, JSONPlugin.getDefault().getBundle().getBundleContext(),
+				new Runnable()
+				{
+					public void run()
+					{
+						updateAutoIndentPreference();
+					}
+				});
 	}
 
 	public JSONAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
@@ -65,7 +45,7 @@ public class JSONAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	private static void updateAutoIndentPreference()
 	{
 		shouldAutoIndent = JSONPlugin.getDefault().getPreferenceStore()
-				.getBoolean(IPreferenceConstants.JSON_AUTO_INDENT);
+				.getBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT);
 	}
 
 }

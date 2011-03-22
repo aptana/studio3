@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.yaml.YAMLPlugin;
 
 public class YAMLPreferenceInitializer extends AbstractPreferenceInitializer
@@ -20,7 +21,7 @@ public class YAMLPreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(YAMLPlugin.PLUGIN_ID);
-		prefs.putBoolean(IPreferenceConstants.YAML_AUTO_INDENT, true);
+		prefs.putBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 	}
 
 }

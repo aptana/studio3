@@ -25,9 +25,4 @@ public interface IPreferenceConstants
 	 */
 	String JS_ACTIVATION_CHARACTERS = "JS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
 
-	/**
-	 * The preference key used to enable and disable auto indent.
-	 */
-
-	String JS_AUTO_INDENT = "JS_AUTO_INDENT"; //$NON-NLS-1$
 }

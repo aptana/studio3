@@ -30,7 +30,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.CSS_INDEX_VERSION, 0);
-		prefs.putBoolean(IPreferenceConstants.CSS_AUTO_INDENT, true);
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 		prefs.put(IPreferenceConstants.CSS_ACTIVATION_CHARACTERS, ".#:\t");
 
 		prefs = new DefaultScope().getNode(CommonEditorPlugin.PLUGIN_ID);

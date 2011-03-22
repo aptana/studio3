@@ -30,7 +30,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
 		prefs.put(IPreferenceConstants.JS_ACTIVATION_CHARACTERS, "."); //$NON-NLS-1$
-		prefs.putBoolean(IPreferenceConstants.JS_AUTO_INDENT, true);
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 
 	}
 }

@@ -31,7 +31,7 @@ public class JSONPreferenceInitializer extends AbstractPreferenceInitializer
 		pref.put(IPreferenceConstants.FORMATTER_TAB_CHAR, CodeFormatterConstants.EDITOR);
 		pref.put(IPreferenceConstants.FORMATTER_TAB_SIZE, "4"); //$NON-NLS-1$
 		pref.put(IPreferenceConstants.FORMATTER_INDENTATION_SIZE, "4"); //$NON-NLS-1$
-		pref.putBoolean(IPreferenceConstants.JSON_AUTO_INDENT, true);
+		pref.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 
 	}
 }

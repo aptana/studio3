@@ -7,45 +7,26 @@
  */
 package com.aptana.editor.html;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
-import com.aptana.editor.html.preferences.IPreferenceContants;
 
 public class HTMLAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 {
-
 	private static boolean shouldAutoIndent;
-	private static IPreferenceChangeListener autoIndentPrefChangeListener;
 
 	static
 	{
-		HTMLAutoIndentStrategy.autoIndentPrefChangeListener = new IPreferenceChangeListener()
-		{
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (IPreferenceContants.HTML_AUTO_INDENT.equals(event.getKey()))
-					updateAutoIndentPreference();
-			}
-		};
-		new InstanceScope().getNode(HTMLPlugin.PLUGIN_ID).addPreferenceChangeListener(autoIndentPrefChangeListener);
-		
-		HTMLPlugin.getDefault().getBundle().getBundleContext().addBundleListener(new BundleListener()
-		{
-			
-			public void bundleChanged(BundleEvent event)
-			{
-				if (event.getType() == BundleEvent.STOPPING)
-					new InstanceScope().getNode(HTMLPlugin.PLUGIN_ID).removePreferenceChangeListener(
-							autoIndentPrefChangeListener);
-			}
-		});
+		addPreferenceListener(HTMLPlugin.PLUGIN_ID, HTMLPlugin.getDefault().getBundle().getBundleContext(),
+				new Runnable()
+				{
+					public void run()
+					{
+						updateAutoIndentPreference();
+					}
+				});
 	}
 
 	public HTMLAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
@@ -64,7 +45,7 @@ public class HTMLAutoIndentStrategy extends RubyRegexpAutoIndentStrategy
 	private static void updateAutoIndentPreference()
 	{
 		shouldAutoIndent = HTMLPlugin.getDefault().getPreferenceStore()
-				.getBoolean(IPreferenceContants.HTML_AUTO_INDENT);
+				.getBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT);
 	}
 
 }
