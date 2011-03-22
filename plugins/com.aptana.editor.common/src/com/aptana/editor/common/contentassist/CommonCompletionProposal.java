@@ -19,6 +19,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Range;
 
@@ -416,10 +417,12 @@ public class CommonCompletionProposal implements ICommonCompletionProposal, ICom
 	public int compareTo(ICompletionProposal o)
 	{
 		if (this == o)
+		{
 			return 0;
+		}
 
 		// not yet sorting on relevance
-		return this.getDisplayString().compareToIgnoreCase(o.getDisplayString());
+		return StringUtil.compareCaseInsensitive(this.getDisplayString(), o.getDisplayString());
 	}
 
 	/*

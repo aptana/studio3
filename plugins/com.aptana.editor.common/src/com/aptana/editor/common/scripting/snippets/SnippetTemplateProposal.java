@@ -43,6 +43,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 
@@ -610,16 +611,31 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 	public int compareTo(ICompletionProposal o)
 	{
 		if (this == o)
+		{
 			return 0;
+		}
 
 		Template t = getTemplate();
 		if (t == null)
+		{
 			return -1;
+		}
 
 		if (o instanceof SnippetTemplateProposal)
-			return t.getName().compareToIgnoreCase(((SnippetTemplateProposal) o).getTemplate().getName());
+		{
+			Template t2 = ((SnippetTemplateProposal) o).getTemplate();
+			if (t2 == null)
+			{
+				return 1;
+			}
+
+			return StringUtil
+.compareCaseInsensitive(t.getName(), t2.getName());
+		}
 		else
-			return t.getName().compareToIgnoreCase(o.getDisplayString());
+		{
+			return StringUtil.compareCaseInsensitive(t.getName(), o.getDisplayString());
+		}
 	}
 
 	/*

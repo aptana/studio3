@@ -130,7 +130,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 								Integer.toString(CommonSourceViewerConfiguration.DEFAULT_CONTENT_ASSIST_DELAY) },
 						{ Messages.EditorsPreferencePage_Content_Assist_Short_Delay,
 								Integer.toString(CommonSourceViewerConfiguration.LONG_CONTENT_ASSIST_DELAY) },
-						{ CoreStrings.OFF, "-1" } },
+						{ CoreStrings.OFF, "-1" } }, //$NON-NLS-1$
 				caGroup));
 
 		addField(new ComboFieldEditor(IPreferenceConstants.CONTENT_ASSIST_HOVER,

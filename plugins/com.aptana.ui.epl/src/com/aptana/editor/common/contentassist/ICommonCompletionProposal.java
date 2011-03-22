@@ -13,6 +13,11 @@ import org.eclipse.swt.graphics.Image;
 public interface ICommonCompletionProposal extends ICompletionProposal, Comparable<ICompletionProposal>
 {
 	/**
+	 * The proposal is an exact match
+	 */
+	public static int RELEVANCE_EXACT = 100;
+
+	/**
 	 * The proposal is highly relevant
 	 */
 	public static int RELEVANCE_HIGH = 90;
@@ -33,7 +38,7 @@ public interface ICommonCompletionProposal extends ICompletionProposal, Comparab
 	 * @return
 	 */
 	String getFileLocation();
-	
+
 	/**
 	 * getUserAgentImages
 	 * 

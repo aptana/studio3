@@ -68,6 +68,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.ui.epl.UIEplPlugin;
 
 /**
@@ -303,7 +304,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 					fFilterOffset = fInvocationOffset;
 					fComputedProposals = computeProposals(fInvocationOffset, autoActivated);
 					IDocument doc = fContentAssistSubjectControlAdapter.getDocument();
-					DocumentEvent initial = new DocumentEvent(doc, fInvocationOffset, 0, "");
+					DocumentEvent initial = new DocumentEvent(doc, fInvocationOffset, 0, StringUtil.EMPTY);
 					fComputedProposals = filterProposals(fComputedProposals, doc, fInvocationOffset, initial);
 
 					int count = (fComputedProposals == null ? 0 : fComputedProposals.length);
@@ -632,7 +633,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		if (0 <= index && index < fFilteredProposals.length)
 		{
 			ICompletionProposal current = fFilteredProposals[index];
-			String entry = current.getDisplayString().trim() + "  ";
+			String entry = current.getDisplayString().trim() + "  "; //$NON-NLS-1$
 			item.setImage(current.getImage());
 			item.setText(0, entry);
 
@@ -641,7 +642,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (current instanceof ICommonCompletionProposal)
 			{
 				ICommonCompletionProposal proposal = (ICommonCompletionProposal) current;
-				String location = " " + proposal.getFileLocation() + " ";
+				String location = " " + proposal.getFileLocation() + " "; //$NON-NLS-1$  //$NON-NLS-2$
 				Image[] images = proposal.getUserAgentImages();
 
 				if (images != null)
@@ -687,6 +688,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		fProposalTable.getColumn(0).pack();
 		for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
 		{
+			// User agent images are 16px. Adding a few px for padding
 			fProposalTable.getColumn(j).setWidth(22);
 		}
 		fProposalTable.getColumn(fProposalTable.getColumnCount() - 1).pack();
