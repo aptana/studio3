@@ -136,7 +136,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer) };
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer,
+				CommonEditorPlugin.getDefault().getPreferenceStore()) };
 	}
 
 	/*

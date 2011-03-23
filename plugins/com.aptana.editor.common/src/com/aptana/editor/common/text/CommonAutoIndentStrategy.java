@@ -7,9 +7,7 @@
  */
 package com.aptana.editor.common.text;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -18,9 +16,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
-import org.osgi.framework.BundleListener;
 
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 
@@ -37,13 +32,15 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	private String fContentType;
 	private SourceViewerConfiguration fViewerConfiguration;
 	private ISourceViewer fSourceViewer;
+	private IPreferenceStore fPrefStore;
 
 	public CommonAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
-			ISourceViewer sourceViewer)
+			ISourceViewer sourceViewer, IPreferenceStore prefStore)
 	{
 		fContentType = contentType;
 		fViewerConfiguration = configuration;
 		fSourceViewer = sourceViewer;
+		fPrefStore = prefStore;
 	}
 
 	protected SourceViewerConfiguration getSourceViewerConfiguration()
@@ -54,35 +51,6 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	protected ISourceViewer getSourceViewer()
 	{
 		return fSourceViewer;
-	}
-
-	protected static void addPreferenceListener(final String pluginId, BundleContext bundleContext,
-			final Runnable prefChangeAction)
-	{
-		final IPreferenceChangeListener autoIndentPrefChangeListener = new IPreferenceChangeListener()
-		{
-
-			public void preferenceChange(PreferenceChangeEvent event)
-			{
-				if (IPreferenceConstants.EDITOR_AUTO_INDENT.equals(event.getKey()))
-				{
-					prefChangeAction.run();
-				}
-			}
-		};
-		new InstanceScope().getNode(pluginId).addPreferenceChangeListener(autoIndentPrefChangeListener);
-
-		bundleContext.addBundleListener(new BundleListener()
-		{
-
-			public void bundleChanged(BundleEvent event)
-			{
-				if (event.getType() == BundleEvent.STOPPING)
-				{
-					new InstanceScope().getNode(pluginId).removePreferenceChangeListener(autoIndentPrefChangeListener);
-				}
-			}
-		});
 	}
 
 	/**
@@ -310,6 +278,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	 */
 	protected boolean shouldAutoIndent()
 	{
+		if (fPrefStore != null)
+		{
+			return fPrefStore.getBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT);
+		}
 		return true;
 	}
 }

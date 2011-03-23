@@ -9,6 +9,8 @@ package com.aptana.editor.common.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -204,8 +206,6 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
 
-	protected abstract void createAutoIndentOptions(Composite parent);
-
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
 
 	public void init(IWorkbench workbench)
@@ -256,6 +256,16 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	protected void createAutoIndentOptions(Composite parent)
+	{
+		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
+		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+
+		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
+				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup);
+		addField(autoIndentTag);
 	}
 
 }

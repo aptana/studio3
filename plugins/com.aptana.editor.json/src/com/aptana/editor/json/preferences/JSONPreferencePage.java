@@ -9,14 +9,9 @@ package com.aptana.editor.json.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import com.aptana.editor.common.preferences.CommonEditorPreferencePage;
-import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.json.JSONEditor;
 import com.aptana.editor.json.JSONPlugin;
 
@@ -48,18 +43,6 @@ public class JSONPreferencePage extends CommonEditorPreferencePage
 	protected IPreferenceStore getChainedEditorPreferenceStore()
 	{
 		return JSONEditor.getChainedPreferenceStore();
-	}
-
-	@Override
-	protected void createAutoIndentOptions(Composite parent)
-	{
-		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
-		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
-
-		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
-				com.aptana.editor.common.preferences.Messages.CommonEditorPreferencePage_auto_indent_label,
-				autoIndentGroup);
-		addField(autoIndentTag);
 	}
 
 }

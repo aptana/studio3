@@ -14,6 +14,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 
 public class YAMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
@@ -41,7 +42,8 @@ public class YAMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IAutoEditStrategy[] { new YAMLAutoIndentStrategy(contentType, this, sourceViewer) };
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, YAMLPlugin
+				.getDefault().getPreferenceStore()) };
 	}
 
 }

@@ -17,6 +17,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.css.text.CSSTextHover;
 
@@ -77,7 +78,8 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	@Override
 	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
 	{
-		return new IAutoEditStrategy[] { new CSSAutoIndentStrategy(contentType, this, sourceViewer) };
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, CSSPlugin
+				.getDefault().getPreferenceStore()) };
 	}
 
 }
