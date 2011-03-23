@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -153,6 +154,9 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 								try {
 									privateKeyFile.toPrivateKey(String.copyValueOf(password));
 								} catch (InvalidSshKeyException e) {
+									if (e.getCause() instanceof NoSuchAlgorithmException) {
+										SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, e.getCause().getMessage()));
+									}
 									promptPassword(MessageFormat.format(Messages.SFTPConnectionFileManager_PublicKeyAuthentication, new Object[] { host, keyFilePath.toOSString() }), Messages.SFTPConnectionFileManager_PassphraseNotAccepted);
 									continue;
 								}
