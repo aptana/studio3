@@ -253,14 +253,4 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
-	 */
-	@Override
-	public boolean canDisconnect()
-	{
-		return isConnected();
-	}
-
 }
