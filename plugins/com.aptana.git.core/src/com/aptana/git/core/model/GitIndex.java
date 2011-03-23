@@ -98,7 +98,7 @@ public class GitIndex
 					return Status.OK_STATUS;
 				}
 			};
-			indexRefreshJob.setSystem(!EclipseUtil.isInDebugMode());
+			indexRefreshJob.setSystem(!EclipseUtil.showSystemJobs());
 		}
 		else
 		{
@@ -213,7 +213,7 @@ public class GitIndex
 		for (Job toSchedule : jobs)
 		{
 			refreshStatus++;
-			toSchedule.setSystem(!EclipseUtil.isInDebugMode());
+			toSchedule.setSystem(!EclipseUtil.showSystemJobs());
 			toSchedule.setPriority(Job.SHORT);
 			toSchedule.schedule();
 		}

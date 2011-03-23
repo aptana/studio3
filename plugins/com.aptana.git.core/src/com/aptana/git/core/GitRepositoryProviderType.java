@@ -56,7 +56,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.isInDebugMode());
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.schedule();
 	}
 

@@ -219,19 +219,18 @@ public class EclipseUtil
 	}
 
 	/**
-	 * Checks to see if user has turned on our own "debug" mode to swap system jobs to user, etc. If -debug flag from
-	 * Eclipse is set, we also return true.
+	 * Checks to see if user has turned on showing system jobs to user, etc. If -debug flag from Eclipse is set, we also
+	 * return true.
 	 * 
 	 * @return
 	 */
-	public static boolean isInDebugMode()
+	public static boolean showSystemJobs()
 	{
 		if (System.getProperty("osgi.debug") != null) //$NON-NLS-1$
 		{
 			return true;
 		}
-		// TODO Cache this and add a pref change listener to update it?
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_DEBUG_MODE, false, null);
+				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false, null);
 	}
 }

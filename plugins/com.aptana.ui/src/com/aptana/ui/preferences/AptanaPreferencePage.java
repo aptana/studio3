@@ -76,7 +76,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	{
 		// Don't use EclipseUtil.isInDebugMode, because that also checks for osgi.debug system property or -debug flag
 		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
-				ICorePreferenceConstants.PREF_DEBUG_MODE, false, null);
+				ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false, null);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		try
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-			prefs.putBoolean(ICorePreferenceConstants.PREF_DEBUG_MODE, debugButton.getSelection());
+			prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
@@ -103,7 +103,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		try
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
-			prefs.remove(ICorePreferenceConstants.PREF_DEBUG_MODE);
+			prefs.remove(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS);
 			prefs.flush();
 		}
 		catch (BackingStoreException e)

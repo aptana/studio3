@@ -227,7 +227,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(!EclipseUtil.isInDebugMode());
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}));
@@ -275,7 +275,7 @@ public class GitRepository
 											return Status.OK_STATUS;
 										}
 									};
-									job.setSystem(!EclipseUtil.isInDebugMode());
+									job.setSystem(!EclipseUtil.showSystemJobs());
 									job.schedule();
 								}
 							}
@@ -312,7 +312,7 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					job.setSystem(!EclipseUtil.isInDebugMode());
+					job.setSystem(!EclipseUtil.showSystemJobs());
 					job.schedule();
 				}
 
@@ -340,7 +340,7 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					job.setSystem(!EclipseUtil.isInDebugMode());
+					job.setSystem(!EclipseUtil.showSystemJobs());
 					job.schedule();
 				}
 			}));
@@ -379,7 +379,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(!EclipseUtil.isInDebugMode());
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -409,7 +409,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(!EclipseUtil.isInDebugMode());
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -431,7 +431,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(!EclipseUtil.isInDebugMode());
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -454,7 +454,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(!EclipseUtil.isInDebugMode());
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}

@@ -80,7 +80,7 @@ public class CorePlugin extends Plugin
 				return Status.OK_STATUS;
 			}
 		};
-		addFilewatcherJob.setSystem(!EclipseUtil.isInDebugMode());
+		addFilewatcherJob.setSystem(!EclipseUtil.showSystemJobs());
 		addFilewatcherJob.setPriority(Job.LONG);
 		addFilewatcherJob.schedule(250);
 		
@@ -152,7 +152,7 @@ public class CorePlugin extends Plugin
 				return status;
 			}
 		};
-		addBuilderJob.setSystem(!EclipseUtil.isInDebugMode());
+		addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
 		addBuilderJob.setPriority(Job.LONG);
 		addBuilderJob.schedule(250);
 	}

@@ -144,7 +144,7 @@ class GitResourceListener implements IResourceChangeListener
 					return multi;
 				}
 			};
-			job.setSystem(!EclipseUtil.isInDebugMode());
+			job.setSystem(!EclipseUtil.showSystemJobs());
 			job.setPriority(Job.SHORT);
 			job.schedule();
 		}

@@ -552,7 +552,7 @@ public class FilteringProjectView extends GitProjectView
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.isInDebugMode());
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		// We have to delay it a bit, otherwise, the tree collapse back due
 		// to other jobs.
 		job.schedule(getRefreshJobDelay() * 2);
@@ -706,7 +706,7 @@ public class FilteringProjectView extends GitProjectView
 	private void createRefreshJob()
 	{
 		refreshJob = doCreateRefreshJob();
-		refreshJob.setSystem(!EclipseUtil.isInDebugMode());
+		refreshJob.setSystem(!EclipseUtil.showSystemJobs());
 	}
 
 	/**

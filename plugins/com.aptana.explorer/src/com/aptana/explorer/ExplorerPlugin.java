@@ -147,7 +147,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		};
-		uiJob.setSystem(!EclipseUtil.isInDebugMode());
+		uiJob.setSystem(!EclipseUtil.showSystemJobs());
 		uiJob.schedule();
 	}
 

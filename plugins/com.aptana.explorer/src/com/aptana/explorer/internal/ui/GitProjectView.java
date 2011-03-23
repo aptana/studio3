@@ -124,7 +124,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					return Status.OK_STATUS;
 				}
 			};
-			job.setSystem(!EclipseUtil.isInDebugMode());
+			job.setSystem(!EclipseUtil.showSystemJobs());
 			job.setPriority(Job.SHORT);
 			job.schedule(300);
 		}
@@ -342,7 +342,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.isInDebugMode());
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
@@ -564,7 +564,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				}
 			}
 		};
-		refreshUIJob.setSystem(!EclipseUtil.isInDebugMode());
+		refreshUIJob.setSystem(!EclipseUtil.showSystemJobs());
 		refreshUIJob.setPriority(Job.INTERACTIVE);
 		refreshUIJob.schedule(100);
 	}

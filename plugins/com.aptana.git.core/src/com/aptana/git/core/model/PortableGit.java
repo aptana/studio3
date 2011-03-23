@@ -72,7 +72,7 @@ public final class PortableGit {
 						return Status.OK_STATUS;
 					}
 				};
-				job.setSystem(!EclipseUtil.isInDebugMode());
+				job.setSystem(!EclipseUtil.showSystemJobs());
 				job.setPriority(Job.LONG);
 				job.schedule();
 			}

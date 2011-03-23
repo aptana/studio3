@@ -18,8 +18,7 @@ public interface ICorePreferenceConstants
 	String PREF_WEB_FILES = "web_files"; //$NON-NLS-1$
 
 	/**
-	 * A boolean used to turn on our own "debug" mode. Meant to be used to swap system jobs to user so they show in the
-	 * UI for debugging CPU usage.
+	 * A boolean used to swap system jobs to user so they show in the UI for debugging CPU usage.
 	 */
-	String PREF_DEBUG_MODE = "debug_mode"; //$NON-NLS-1$
+	String PREF_SHOW_SYSTEM_JOBS = "show_system_jobs"; //$NON-NLS-1$
 }

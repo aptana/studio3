@@ -134,7 +134,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(!EclipseUtil.isInDebugMode());
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}

@@ -330,7 +330,7 @@ public class KeybindingsManager implements LoadCycleListener
 			}
 		};
 		workbenchJob.setRule(MUTEX_RULE);
-		workbenchJob.setSystem(!EclipseUtil.isInDebugMode());
+		workbenchJob.setSystem(!EclipseUtil.showSystemJobs());
 		workbenchJob.setPriority(Job.LONG);
 		workbenchJob.schedule();
 	}
@@ -365,7 +365,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 			};
 			workbenchJob.setRule(MUTEX_RULE);
-			workbenchJob.setSystem(!EclipseUtil.isInDebugMode());
+			workbenchJob.setSystem(!EclipseUtil.showSystemJobs());
 			workbenchJob.setPriority(Job.LONG);
 		}
 		else
