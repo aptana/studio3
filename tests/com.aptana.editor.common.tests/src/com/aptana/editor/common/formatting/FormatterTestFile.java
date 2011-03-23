@@ -127,10 +127,6 @@ public class FormatterTestFile
 	 */
 	public void generateFormattedContent(boolean overwriteFormattedBlock) throws IOException
 	{
-		if (formattedContent.length() > 0)
-		{
-			formattedContent.delete(0, formattedContent.length());
-		}
 		URL fileURL = FileLocator.find(Platform.getBundle(formatterId), Path.fromPortableString(filename), null);
 		String file = FileLocator.toFileURL(fileURL).getFile();
 		// Read all the content till we hit the word "==FORMATTED==", or till the end of the file.
@@ -152,6 +148,10 @@ public class FormatterTestFile
 		if (foundFormattedBlock && !overwriteFormattedBlock)
 		{
 			return;
+		}
+		if (formattedContent.length() > 0)
+		{
+			formattedContent.delete(0, formattedContent.length());
 		}
 		trimTrailingWhitespaces(fileContentBuilder);
 		FileWriter formattedStream = new FileWriter(file);

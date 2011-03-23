@@ -2906,7 +2906,11 @@ if(typeof window.jQuery == "undefined") {
                         e = jQuery(e.cloneNode(true))
                         .find(":radio").removeAttr("checked").end()
                         .css({
-                            visibility: "hidden", position: "absolute", display: "block", right: "0", left: "0"
+                            visibility: "hidden",
+                            position: "absolute",
+                            display: "block",
+                            right: "0",
+                            left: "0"
                         }).appendTo(e.parentNode)[0];
 
                         var parPos = jQuery.css(e.parentNode,"position") || "static";
@@ -2954,7 +2958,9 @@ else if (document.defaultView && document.defaultView.getComputedStyle) {
                 else if ( prop == "display" )
                     ret = "none";
                 else
-                    jQuery.swap(elem, { display: "block" }, function() {
+                    jQuery.swap(elem, {
+                        display: "block"
+                    }, function() {
                         var c = document.defaultView.getComputedStyle(this, "");
                         ret = c && c.getPropertyValue(prop) || "";
                     });
@@ -3247,7 +3253,7 @@ else if (document.defaultView && document.defaultView.getComputedStyle) {
             });
         };
     });
-    jQuery.each( {
+    jQuery.each({
         removeAttr: function( key ) {
             jQuery.attr( this, key, "" );
             this.removeAttribute( key );
@@ -3689,7 +3695,10 @@ else if ( m[1] == "@" ) {
 
             // Return an array of filtered elements (r)
             // and the modified expression string (t)
-            return { r: r, t: t };
+            return {
+                r: r,
+                t: t
+            };
         },
         /** @id jQuery.$.parents */
         parents: function( elem ) {
@@ -3869,7 +3878,10 @@ else if ( m[1] == "@" ) {
                 var val, ret, fn = jQuery.isFunction( element[ type ] || null );
 
                 // Pass along a fake event
-                data.unshift( this.fix({ type: type, target: element }) );
+                data.unshift( this.fix({
+                    type: type,
+                    target: element
+                }) );
 
                 // Trigger the event
                 if ( jQuery.isFunction(element.$handle) && (val = element.$handle.apply( element, data )) !== false )
@@ -4061,8 +4073,8 @@ else if ( m[1] == "@" ) {
 
     jQuery.extend({
         /*
-        * All the code that makes DOM Ready work nicely.
-        */
+         * All the code that makes DOM Ready work nicely.
+         */
         isReady: false,
         readyList: [],
 
@@ -4552,7 +4564,9 @@ else if ( m[1] == "@" ) {
         show: function(speed,callback) {
             return speed ?
             this.animate({
-                height: "show", width: "show", opacity: "show"
+                height: "show",
+                width: "show",
+                opacity: "show"
             }, speed, callback) :
 
             this.filter(":hidden").each( function() {
@@ -4565,7 +4579,9 @@ else if ( m[1] == "@" ) {
         hide: function(speed,callback) {
             return speed ?
             this.animate({
-                height: "hide", width: "hide", opacity: "hide"
+                height: "hide",
+                width: "hide",
+                opacity: "hide"
             }, speed, callback) :
 
             this.filter(":visible").each( function() {
@@ -4582,7 +4598,9 @@ else if ( m[1] == "@" ) {
             this._toggle( fn, fn2 ) :
             fn ?
             this.animate({
-                height: "toggle", width: "toggle", opacity: "toggle"
+                height: "toggle",
+                width: "toggle",
+                opacity: "toggle"
             }, fn, fn2) :
             this.each( function() {
                 jQuery(this)[ jQuery(this).is(":hidden") ? "show" : "hide" ]();
@@ -4590,27 +4608,39 @@ else if ( m[1] == "@" ) {
         },
         /** @id jQuery.slideDown */
         slideDown: function(speed,callback) {
-            return this.animate({height: "show"}, speed, callback);
+            return this.animate({
+                height: "show"
+            }, speed, callback);
         },
         /** @id jQuery.slideUp */
         slideUp: function(speed,callback) {
-            return this.animate({height: "hide"}, speed, callback);
+            return this.animate({
+                height: "hide"
+            }, speed, callback);
         },
         /** @id jQuery.slideToggle */
         slideToggle: function(speed, callback) {
-            return this.animate({height: "toggle"}, speed, callback);
+            return this.animate({
+                height: "toggle"
+            }, speed, callback);
         },
         /** @id jQuery.fadeIn */
         fadeIn: function(speed, callback) {
-            return this.animate({opacity: "show"}, speed, callback);
+            return this.animate({
+                opacity: "show"
+            }, speed, callback);
         },
         /** @id jQuery.fadeOut */
         fadeOut: function(speed, callback) {
-            return this.animate({opacity: "hide"}, speed, callback);
+            return this.animate({
+                opacity: "hide"
+            }, speed, callback);
         },
         /** @id jQuery.fadeTo */
         fadeTo: function(speed,to,callback) {
-            return this.animate({opacity: to}, speed, callback);
+            return this.animate({
+                opacity: to
+            }, speed, callback);
         },
         /** @id jQuery.animate */
         animate: function( prop, speed, easing, callback ) {
@@ -4678,8 +4708,10 @@ else if ( m[1] == "@" ) {
             };
 
             opt.duration = (opt.duration && opt.duration.constructor == Number ?
-                opt.duration :
-                { slow: 600, fast: 200 }[opt.duration]) || 400;
+                opt.duration : {
+                    slow: 600,
+                    fast: 200
+                }[opt.duration]) || 400;
 
             // Queueing
             opt.old = opt.complete;
