@@ -29,6 +29,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.ui.internal.WebPerspectiveFactory;
 import com.aptana.ui.preferences.IPreferenceConstants;
 import com.aptana.ui.util.UIUtils;
@@ -93,7 +94,7 @@ public class UIPlugin extends AbstractUIPlugin
 					return Status.OK_STATUS;
 				}
 			};
-			job.setSystem(true);
+			job.setSystem(!EclipseUtil.showSystemJobs());
 			job.setPriority(Job.INTERACTIVE);
 			job.schedule();
 		}

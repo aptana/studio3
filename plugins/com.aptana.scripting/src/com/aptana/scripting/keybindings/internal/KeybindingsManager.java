@@ -65,6 +65,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.services.IEvaluationService;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.ScriptingActivator;
 import com.aptana.scripting.keybindings.ICommandElementsProvider;
 import com.aptana.scripting.model.AbstractElement;
@@ -329,7 +330,7 @@ public class KeybindingsManager implements LoadCycleListener
 			}
 		};
 		workbenchJob.setRule(MUTEX_RULE);
-		workbenchJob.setSystem(true);
+		workbenchJob.setSystem(!EclipseUtil.showSystemJobs());
 		workbenchJob.setPriority(Job.LONG);
 		workbenchJob.schedule();
 	}
@@ -364,7 +365,7 @@ public class KeybindingsManager implements LoadCycleListener
 
 			};
 			workbenchJob.setRule(MUTEX_RULE);
-			workbenchJob.setSystem(true);
+			workbenchJob.setSystem(!EclipseUtil.showSystemJobs());
 			workbenchJob.setPriority(Job.LONG);
 		}
 		else

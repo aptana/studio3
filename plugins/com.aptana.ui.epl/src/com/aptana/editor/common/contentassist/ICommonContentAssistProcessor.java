@@ -32,5 +32,26 @@ public interface ICommonContentAssistProcessor
 	 * @param offset Offset into the document
 	 * @return
 	 */
-	boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset);
+	boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset);
+
+	/**
+	 * Is the current position a valid place to show content assist?
+	 * 
+	 * @param c
+	 *            Character
+	 * @param keyCode
+	 *            Key code
+	 */
+	boolean isValidIdentifier(char c, int keyCode);
+
+	/**
+	 * Is the current position a valid place to show content assist?
+	 * 
+	 * @param c
+	 *            Character
+	 * @param keyCode
+	 *            Key code
+	 */
+	boolean isValidActivationCharacter(char c, int keyCode);
+
 }

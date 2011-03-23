@@ -18,6 +18,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.LoadCycleListener;
 
@@ -75,7 +76,7 @@ public class CommonReconciler extends MonoReconciler
 						return Status.OK_STATUS;
 					}
 				};
-				job.setSystem(true);
+				job.setSystem(!EclipseUtil.showSystemJobs());
 				job.schedule(750);
 			}
 

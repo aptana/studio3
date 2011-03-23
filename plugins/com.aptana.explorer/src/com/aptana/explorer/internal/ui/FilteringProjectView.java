@@ -73,6 +73,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.WorkbenchJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.ui.filter.AbstractResourceBasedViewerFilter;
 import com.aptana.explorer.ui.filter.PathFilter;
@@ -551,7 +552,7 @@ public class FilteringProjectView extends GitProjectView
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		// We have to delay it a bit, otherwise, the tree collapse back due
 		// to other jobs.
 		job.schedule(getRefreshJobDelay() * 2);
@@ -705,7 +706,7 @@ public class FilteringProjectView extends GitProjectView
 	private void createRefreshJob()
 	{
 		refreshJob = doCreateRefreshJob();
-		refreshJob.setSystem(true);
+		refreshJob.setSystem(!EclipseUtil.showSystemJobs());
 	}
 
 	/**

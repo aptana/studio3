@@ -56,6 +56,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.epl.ReadWriteMonitor;
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filewatcher.FileWatcher;
@@ -226,7 +227,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(true);
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}));
@@ -274,7 +275,7 @@ public class GitRepository
 											return Status.OK_STATUS;
 										}
 									};
-									job.setSystem(true);
+									job.setSystem(!EclipseUtil.showSystemJobs());
 									job.schedule();
 								}
 							}
@@ -311,7 +312,7 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					job.setSystem(true);
+					job.setSystem(!EclipseUtil.showSystemJobs());
 					job.schedule();
 				}
 
@@ -339,7 +340,7 @@ public class GitRepository
 							return Status.OK_STATUS;
 						}
 					};
-					job.setSystem(true);
+					job.setSystem(!EclipseUtil.showSystemJobs());
 					job.schedule();
 				}
 			}));
@@ -368,7 +369,7 @@ public class GitRepository
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
 							// now,
 							// seems harmless to fire both.
-							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							Job job = new Job("Firing pull and push event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -378,7 +379,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(true);
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -398,7 +399,7 @@ public class GitRepository
 							// FIXME Can't tell if we pushed or pulled unless we look at sha tree/commit list. For
 							// now,
 							// seems harmless to fire both.
-							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							Job job = new Job("Firing pull and push event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -408,7 +409,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(true);
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -420,7 +421,7 @@ public class GitRepository
 						if (isProbablyBranch(name))
 						{
 							branches.remove(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
-							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							Job job = new Job("Firing branch removed and pull event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -430,7 +431,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(true);
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}
@@ -443,7 +444,7 @@ public class GitRepository
 							addBranch(new GitRevSpecifier(GitRef.refFromString(GitRef.REFS_REMOTES + name)));
 							// Since we suddenly know about a new remote branch, we probably pulled.
 
-							Job job = new Job("Firing pull event") //$NON-NLS-1$
+							Job job = new Job("Firing branche added and pull event") //$NON-NLS-1$
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor)
@@ -453,7 +454,7 @@ public class GitRepository
 									return Status.OK_STATUS;
 								}
 							};
-							job.setSystem(true);
+							job.setSystem(!EclipseUtil.showSystemJobs());
 							job.schedule();
 						}
 					}

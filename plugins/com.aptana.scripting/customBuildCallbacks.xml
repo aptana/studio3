@@ -114,7 +114,7 @@
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="html.ruble" />
 		  	<param name="bundle.dir.name" value="html.ruble" />
-		  	<param name="bundle.branch" value="origin/development" />
+		  	<param name="bundle.branch" value="master" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="css.ruble" />

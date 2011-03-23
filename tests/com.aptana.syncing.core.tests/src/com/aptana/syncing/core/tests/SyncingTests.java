@@ -111,7 +111,6 @@ public abstract class SyncingTests extends TestCase
 				clientManager.disconnect(null);
 			}
 		}
-
 		try
 		{
 			if (serverDirectory.fetchInfo().exists())

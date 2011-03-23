@@ -39,6 +39,7 @@ import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.editor.common.internal.scripting.ContentTypeTranslation;
 import com.aptana.editor.common.internal.scripting.DocumentScopeManager;
 import com.aptana.editor.common.scripting.IContentTypeTranslator;
@@ -98,7 +99,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 						return Status.OK_STATUS;
 					}
 				};
-				job.setSystem(true);
+				job.setSystem(!EclipseUtil.showSystemJobs());
 				job.setPriority(Job.SHORT);
 			}
 		}
@@ -122,7 +123,7 @@ public class CommonEditorPlugin extends AbstractUIPlugin
 						return Status.OK_STATUS;
 					}
 				};
-				job.setSystem(true);
+				job.setSystem(!EclipseUtil.showSystemJobs());
 				job.setPriority(Job.SHORT);
 			}
 		}

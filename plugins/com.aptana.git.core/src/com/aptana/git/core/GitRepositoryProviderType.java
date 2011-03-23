@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProviderType;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitRepositoryProviderType extends RepositoryProviderType
@@ -55,7 +56,7 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.schedule();
 	}
 

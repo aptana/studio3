@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.history.IFileRevision;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.git.core.model.GitCommit;
 import com.aptana.git.core.model.GitRepositoryManager;
@@ -79,7 +80,7 @@ public class GitPlugin extends Plugin
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.schedule();
 	}
 
