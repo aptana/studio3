@@ -87,5 +87,10 @@ public interface IPreferenceConstants
 	/**
 	 * Do we display code assist hovers
 	 */
-	public static final String CONTENT_ASSIST_HOVER = CommonEditorPlugin.PLUGIN_ID + ".contentAssistHover";
+	public static final String CONTENT_ASSIST_HOVER = CommonEditorPlugin.PLUGIN_ID + ".contentAssistHover"; //$NON-NLS-1$
+
+	/**
+	 * The preference key used to enable and disable auto indent.
+	 */
+	public static final String EDITOR_AUTO_INDENT = CommonEditorPlugin.PLUGIN_ID + ".autoIndent"; //$NON-NLS-1$
 }

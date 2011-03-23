@@ -60,4 +60,5 @@ public class HTMLPreferencePage extends CommonEditorPreferencePage
 	{
 		return HTMLEditor.getChainedPreferenceStore();
 	}
+
 }
