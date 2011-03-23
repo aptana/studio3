@@ -43,6 +43,5 @@ public class YAMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	{
 		return new IAutoEditStrategy[] { new YAMLAutoIndentStrategy(contentType, this, sourceViewer) };
 	}
-	
-	
+
 }

@@ -87,17 +87,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseDefaultOption);
 		tabSpaceCombo.setLayoutData(GridDataFactory.fillDefaults().create());
 
-		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
-		{
-			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
-		}
-		else
-		{
-			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
-			else
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
-		}
+		setTabSpaceCombo();
 
 		final Composite fildEditorGroup = new Composite(group, SWT.NONE);
 		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -190,6 +180,21 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 	}
 
+	private void setTabSpaceCombo()
+	{
+		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		{
+			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		}
+		else
+		{
+			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
+			else
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
+		}
+	}
+
 	/**
 	 * Create the Mark Occurrences group and options if there are any for this language/editor.
 	 * 
@@ -198,7 +203,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	protected abstract void createMarkOccurrenceOptions(Composite parent);
 
 	protected abstract IPreferenceStore getChainedEditorPreferenceStore();
-	
+
 	protected abstract void createAutoIndentOptions(Composite parent);
 
 	protected abstract IEclipsePreferences getPluginPreferenceStore();
@@ -238,11 +243,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	@Override
 	protected void performDefaults()
 	{
-		super.performDefaults();
 		IEclipsePreferences store = getPluginPreferenceStore();
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-		tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		setTabSpaceCombo();
+		super.performDefaults();
 		try
 		{
 			store.flush();
