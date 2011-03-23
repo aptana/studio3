@@ -629,7 +629,6 @@
                menubarPath="org.eclipse.ui.run/jsGroup"/>
          <action
                class="org.eclipse.debug.internal.ui.actions.breakpoints.RetargetToggleLineBreakpointAction"
-               definitionId="com.aptana.debug.ui.commands.ToggleBreakpoint"
                disabledIcon="$nl$/icons/full/obj16/linebreakpoint_d.gif"
                helpContextId="toggle_breakpoint_action_context"
                icon="$nl$/icons/full/obj16/linebreakpoint_e.gif"
@@ -639,7 +638,6 @@
                toolbarPath="org.eclipse.debug.ui.launchActionSet/debug"/>
          <action
                class="com.aptana.js.debug.ui.internal.actions.OpenURLAction"
-               definitionId="com.aptana.debug.ui.commands.openURL"
                icon="icons/full/etool16/url_file.gif"
                id="com.aptana.js.debug.ui.actions.openURL"
                label="%OpenURLAction.label"

@@ -7,7 +7,6 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.preview.ui.handlers.ShowPreviewHandler"
             description="%command.preview.description"
             id="com.aptana.preview.commands.showPreview"
             name="%command.preview.name">
@@ -72,5 +71,33 @@
             contentType="com.aptana.contenttype.html">
       </handler>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="com.aptana.preview.ui.handlers.ShowPreviewHandler"
+            commandId="com.aptana.preview.commands.showPreview">
+         <enabledWhen>
+            <with
+                  variable="activeEditor">
+               <instanceof
+                     value="org.eclipse.ui.IEditorPart">
+               </instanceof>
+               <test
+                     forcePluginActivation="true"
+                     property="com.aptana.preview.hasPreviewHandler">
+               </test>
+            </with>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.aptana.preview.internal.HasPreviewPropertyTester"
+            id="com.aptana.preview.propertyTester"
+            namespace="com.aptana.preview"
+            properties="hasPreviewHandler"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+   </extension>
 </plugin>

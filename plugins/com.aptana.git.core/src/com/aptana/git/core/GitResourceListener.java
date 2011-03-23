@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.GitIndex;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -143,7 +144,7 @@ class GitResourceListener implements IResourceChangeListener
 					return multi;
 				}
 			};
-			job.setSystem(true);
+			job.setSystem(!EclipseUtil.showSystemJobs());
 			job.setPriority(Job.SHORT);
 			job.schedule();
 		}

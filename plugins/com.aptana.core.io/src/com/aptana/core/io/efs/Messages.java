@@ -21,6 +21,8 @@ public class Messages extends NLS // NO_UCD
 	public static String SyncUtils_ERR_Reading;
 	public static String SyncUtils_ERR_Writing;
 
+	public static String WorkspaceFileSystem_FetchingTreeError;
+
 	static
 	{
 		// initialize resource bundle

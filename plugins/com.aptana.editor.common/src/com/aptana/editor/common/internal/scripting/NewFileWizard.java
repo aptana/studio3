@@ -18,6 +18,7 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.internal.formatter.CommonFormatterUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.TemplateElement;
@@ -131,6 +132,7 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		{
 			return null;
 		}
-		return result.getOutputString();
+		// Run the template's output through the current formatter and return its formatted output
+		return CommonFormatterUtils.format(absoluteFilePath, result.getOutputString());
 	}
 }

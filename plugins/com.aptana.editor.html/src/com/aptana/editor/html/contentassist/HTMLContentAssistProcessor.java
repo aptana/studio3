@@ -1599,7 +1599,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 

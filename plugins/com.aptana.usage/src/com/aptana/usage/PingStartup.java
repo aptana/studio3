@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.ui.IStartup;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.usage.preferences.IPreferenceConstants;
 import com.eaio.uuid.MACAddress;
 
@@ -74,7 +75,7 @@ public class PingStartup implements IStartup
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.BUILD);
 		job.schedule();
 	}
