@@ -11,6 +11,7 @@ package com.aptana.filesystem.ftp.internal;
 import com.aptana.core.util.KeepAliveObjectPool;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
+import com.enterprisedt.net.ftp.FTPTransferType;
 
 public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 {
@@ -62,6 +63,7 @@ public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 			try
 			{
 				((FTPClient) o).noOperation();
+				((FTPClient) o).setType(FTPTransferType.BINARY);
 			}
 			catch (Exception e)
 			{
