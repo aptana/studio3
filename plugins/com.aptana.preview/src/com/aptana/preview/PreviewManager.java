@@ -245,14 +245,15 @@ public final class PreviewManager {
 			if (sourceConfig != null) {
 				IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
 				if (handler == null) {
-					if (DefaultPreviewHandler.getInstance().handle(sourceConfig) != null) {
-						return true;
-					}
-				} else {
-					// TODO: use IPreviewHandler.canHandle() ?
-					return true;
+					handler = DefaultPreviewHandler.getInstance();
 				}
-				
+
+				PreviewConfig previewConfig = handler.handle(sourceConfig);
+				if (previewConfig == null && !(handler instanceof DefaultPreviewHandler))
+				{
+					previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+				}
+				return previewConfig != null;
 			}
 		} catch (CoreException e) {
 			Activator.log(e);
