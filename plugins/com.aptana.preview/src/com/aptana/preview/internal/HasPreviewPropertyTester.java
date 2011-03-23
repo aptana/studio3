@@ -4,7 +4,7 @@ import org.eclipse.ui.IEditorPart;
 
 import com.aptana.preview.PreviewManager;
 
-public class PropertyTester extends org.eclipse.core.expressions.PropertyTester
+public class HasPreviewPropertyTester extends org.eclipse.core.expressions.PropertyTester
 {
 
 	private static final String HAS_PREVIEW_HANDLER = "hasPreviewHandler"; //$NON-NLS-1$

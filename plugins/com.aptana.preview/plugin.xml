@@ -93,7 +93,7 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="com.aptana.preview.internal.PropertyTester"
+            class="com.aptana.preview.internal.HasPreviewPropertyTester"
             id="com.aptana.preview.propertyTester"
             namespace="com.aptana.preview"
             properties="hasPreviewHandler"
