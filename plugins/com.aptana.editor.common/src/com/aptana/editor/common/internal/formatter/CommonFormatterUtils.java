@@ -52,11 +52,11 @@ public class CommonFormatterUtils
 	 */
 	public static String format(IPath filePath, String input)
 	{
-		if (input == null || input.trim().length() == 0)
+		if (filePath == null || input == null || input.trim().length() == 0)
 		{
 			return input;
 		}
-		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filePath.toString());
+		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filePath.lastSegment());
 		if (contentType != null)
 		{
 			// Format the string before returning it
