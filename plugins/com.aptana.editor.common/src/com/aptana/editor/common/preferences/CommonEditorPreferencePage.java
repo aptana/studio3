@@ -191,9 +191,13 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		else
 		{
 			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+			{
 				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
+			}
 			else
+			{
 				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
+			}
 		}
 	}
 
