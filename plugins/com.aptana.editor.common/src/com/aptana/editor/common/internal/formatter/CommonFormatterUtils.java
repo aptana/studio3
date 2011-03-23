@@ -20,6 +20,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
@@ -52,11 +54,11 @@ public class CommonFormatterUtils
 	 */
 	public static String format(IPath filePath, String input)
 	{
-		if (input == null || input.trim().length() == 0)
+		if (filePath == null || input == null || input.trim().length() == 0)
 		{
 			return input;
 		}
-		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filePath.toString());
+		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(filePath.toFile().getName());
 		if (contentType != null)
 		{
 			// Format the string before returning it
