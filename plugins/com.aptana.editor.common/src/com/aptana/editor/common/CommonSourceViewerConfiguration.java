@@ -44,6 +44,7 @@ import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.contentassist.InformationControl;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
+import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
@@ -348,9 +349,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationControlCreator(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
 	public IInformationControlCreator getInformationControlCreator(ISourceViewer sourceViewer)
@@ -359,26 +358,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				return new InformationControl(parent, SWT.NONE, new HTMLTextPresenter(true))
-				{
-					@Override
-					protected Color getBackground()
-					{
-						return getThemeBackground();
-					}
-
-					@Override
-					protected Color getForeground()
-					{
-						return getThemeForeground();
-					}
-
-					@Override
-					protected Color getBorderColor()
-					{
-						return getForeground();
-					}
-				};
+				return new ThemedInformationControl(parent, SWT.NONE, new HTMLTextPresenter(true));
 			}
 		};
 	}
@@ -403,9 +383,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	/*
 	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source
-	 * .ISourceViewer)
+	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source.ISourceViewer)
 	 */
 	@Override
 	public IInformationPresenter getInformationPresenter(ISourceViewer sourceViewer)
