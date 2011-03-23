@@ -199,7 +199,7 @@ public class JSFormatWalker extends JSTreeWalker
 			
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(label); //$NON-NLS-1$
+				this._printer.print(" ").print(text); //$NON-NLS-1$
 			}
 		}
 
@@ -302,7 +302,7 @@ public class JSFormatWalker extends JSTreeWalker
 			
 			if (text != null && text.length() > 0)
 			{
-				this._printer.print(" ").print(label); //$NON-NLS-1$
+				this._printer.print(" ").print(text); //$NON-NLS-1$
 			}
 		}
 
