@@ -57,16 +57,6 @@ public class FormatterJSObjectNode extends FormatterJSBlockNode
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
-	 */
-	@Override
-	protected boolean isAddingBeginNewLine()
-	{
-		return super.isAddingBeginNewLine();
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingEndNewLine()
 	 */
 	@Override
@@ -74,15 +64,4 @@ public class FormatterJSObjectNode extends FormatterJSBlockNode
 	{
 		return node.getChildCount() > 0;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
-	 */
-	@Override
-	protected boolean isIndenting()
-	{
-		return super.isIndenting();
-	}
-
 }
