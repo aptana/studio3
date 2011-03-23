@@ -20,7 +20,7 @@ public final class FTPClientPool extends KeepAliveObjectPool<FTPClientInterface>
 
 	public FTPClientPool(IPoolConnectionManager manager)
 	{
-		super();
+		super(7 * 60 * 1000); // 7 minutes
 		this.manager = manager;
 		start();
 	}
