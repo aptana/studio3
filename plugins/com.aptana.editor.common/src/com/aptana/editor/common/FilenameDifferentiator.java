@@ -35,6 +35,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * This is a special class that listens to editors and makes sure that the tab name is unique. If two tabs share same
  * filename we append additional text to disambiguate them.
@@ -53,7 +55,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public FilenameDifferentiator()
 	{
 		super("Install filename differentiator"); //$NON-NLS-1$
-		setSystem(true);
+		setSystem(!EclipseUtil.isInDebugMode());
 		baseNames = new HashMap<String, Set<IEditorPart>>();
 	}
 

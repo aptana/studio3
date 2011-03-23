@@ -20,6 +20,9 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.Bundle;
 
+import com.aptana.core.CorePlugin;
+import com.aptana.core.ICorePreferenceConstants;
+
 public class EclipseUtil
 {
 	public static final String STANDALONE_PLUGIN_ID = "com.aptana.rcp"; //$NON-NLS-1$
@@ -125,27 +128,27 @@ public class EclipseUtil
 	public static boolean isTesting()
 	{
 		String application = System.getProperty("eclipse.application"); //$NON-NLS-1$
-		if (application != null
-				&& (application.equals("org.eclipse.pde.junit.runtime.uitestapplication")  //$NON-NLS-1$
-						|| application.equals("org.eclipse.test.coretestapplication") //$NON-NLS-1$
-						|| application.equals("org.eclipse.test.uitestapplication") //$NON-NLS-1$
-						|| application.equals("org.eclipse.pde.junit.runtime.legacytestapplication") //$NON-NLS-1$
-						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplication") //$NON-NLS-1$
-						|| application.equals("org.eclipse.pde.junit.runtime.coretestapplicationnonmain") //$NON-NLS-1$
-						|| application.equals("org.eclipse.pde.junit.runtime.nonuithreadtestapplication"))) //$NON-NLS-1$
+		if (application != null && (application.equals("org.eclipse.pde.junit.runtime.uitestapplication") //$NON-NLS-1$
+				|| application.equals("org.eclipse.test.coretestapplication") //$NON-NLS-1$
+				|| application.equals("org.eclipse.test.uitestapplication") //$NON-NLS-1$
+				|| application.equals("org.eclipse.pde.junit.runtime.legacytestapplication") //$NON-NLS-1$
+				|| application.equals("org.eclipse.pde.junit.runtime.coretestapplication") //$NON-NLS-1$
+				|| application.equals("org.eclipse.pde.junit.runtime.coretestapplicationnonmain") //$NON-NLS-1$
+		|| application.equals("org.eclipse.pde.junit.runtime.nonuithreadtestapplication"))) //$NON-NLS-1$
 		{
 			return true;
 		}
 		Object commands = System.getProperties().get("eclipse.commands"); //$NON-NLS-1$
 		return (commands != null) ? commands.toString().contains("-testLoaderClass") : false; //$NON-NLS-1$
 	}
-	
+
 	/**
 	 * Returns path to application launcher executable
 	 * 
 	 * @return
 	 */
-	public static IPath getApplicationLauncher() {
+	public static IPath getApplicationLauncher()
+	{
 		return getApplicationLauncher(false);
 	}
 
@@ -155,29 +158,38 @@ public class EclipseUtil
 	 * @param asSplashLauncher
 	 * @return
 	 */
-	public static IPath getApplicationLauncher(boolean asSplashLauncher) {
+	public static IPath getApplicationLauncher(boolean asSplashLauncher)
+	{
 		IPath launcher = null;
 		String cmdline = System.getProperty("eclipse.commands"); //$NON-NLS-1$
-		if ( cmdline != null && cmdline.length() > 0 ) {
+		if (cmdline != null && cmdline.length() > 0)
+		{
 			String[] args = cmdline.split("\n"); //$NON-NLS-1$
-			for( int i = 0; i < args.length; ++i ) {
-				if ( "-launcher".equals(args[i]) && (i+1) < args.length ) { //$NON-NLS-1$
-					launcher = Path.fromOSString(args[i+1]);
+			for (int i = 0; i < args.length; ++i)
+			{
+				if ("-launcher".equals(args[i]) && (i + 1) < args.length) { //$NON-NLS-1$
+					launcher = Path.fromOSString(args[i + 1]);
 					break;
 				}
 			}
 		}
-		if ( launcher == null ) {
+		if (launcher == null)
+		{
 			Location location = Platform.getInstallLocation();
-			if ( location != null ) {
+			if (location != null)
+			{
 				launcher = new Path(location.getURL().getFile());
-				if ( launcher.toFile().isDirectory() ) {
-					String[] executableFiles = launcher.toFile().list(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
+				if (launcher.toFile().isDirectory())
+				{
+					String[] executableFiles = launcher.toFile().list(new FilenameFilter()
+					{
+						public boolean accept(File dir, String name)
+						{
 							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
 							name = path.removeFileExtension().lastSegment();
 							String ext = path.getFileExtension();
-							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+							if (Platform.OS_MACOSX.equals(Platform.getOS()))
+							{
 								if (!"app".equals(ext)) { //$NON-NLS-1$
 									return false;
 								}
@@ -188,19 +200,38 @@ public class EclipseUtil
 							return false;
 						}
 					});
-					if (executableFiles.length > 0) {
+					if (executableFiles.length > 0)
+					{
 						launcher = launcher.append(executableFiles[0]);
 					}
 				}
 			}
 		}
-		if (launcher == null || !launcher.toFile().exists() ) {
+		if (launcher == null || !launcher.toFile().exists())
+		{
 			return null;
 		}
-		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher)
+		{
 			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
 		}
 		return launcher;
 	}
 
+	/**
+	 * Checks to see if user has turned on our own "debug" mode to swap system jobs to user, etc. If -debug flag from
+	 * Eclipse is set, we also return true.
+	 * 
+	 * @return
+	 */
+	public static boolean isInDebugMode()
+	{
+		if (System.getProperty("osgi.debug") != null) //$NON-NLS-1$
+		{
+			return true;
+		}
+		// TODO Cache this and add a pref change listener to update it?
+		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_DEBUG_MODE, false, null);
+	}
 }

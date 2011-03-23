@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.GitPlugin;
@@ -97,7 +98,7 @@ public class GitIndex
 					return Status.OK_STATUS;
 				}
 			};
-			indexRefreshJob.setSystem(true);
+			indexRefreshJob.setSystem(!EclipseUtil.isInDebugMode());
 		}
 		else
 		{
@@ -212,7 +213,7 @@ public class GitIndex
 		for (Job toSchedule : jobs)
 		{
 			refreshStatus++;
-			toSchedule.setSystem(true);
+			toSchedule.setSystem(!EclipseUtil.isInDebugMode());
 			toSchedule.setPriority(Job.SHORT);
 			toSchedule.schedule();
 		}
