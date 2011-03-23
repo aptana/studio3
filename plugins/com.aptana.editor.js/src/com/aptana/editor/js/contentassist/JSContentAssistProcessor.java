@@ -702,6 +702,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				propertyNode = (JSGetPropertyNode) targetNode;
 			}
+			else if (targetNode.getNodeType() == JSNodeTypes.ARGUMENTS)
+			{
+				IParseNode candidate = targetNode.getParent().getFirstChild();
+
+				if (candidate instanceof JSGetPropertyNode)
+				{
+					propertyNode = (JSGetPropertyNode) candidate;
+				}
+			}
 			else
 			{
 				IParseNode parentNode = targetNode.getParent();
