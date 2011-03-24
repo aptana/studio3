@@ -40,7 +40,12 @@ public class TagRule extends MultiLineRule
 
 	public TagRule(String tag, IToken token, boolean ignoreCase)
 	{
-		super("<" + tag, ">", token); //$NON-NLS-1$ //$NON-NLS-2$
+		this("<" + tag, ">", token, ignoreCase); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	protected TagRule(String startSequence, String endSequence, IToken token, boolean ignoreCase)
+	{
+		super(startSequence, endSequence, token);
 		fIgnoreCase = ignoreCase;
 	}
 
@@ -94,29 +99,33 @@ public class TagRule extends MultiLineRule
 	 */
 	protected boolean endSequenceDetected(ICharacterScanner scanner)
 	{
+		CollectingCharacterScanner collectingCharacterScanner = new CollectingCharacterScanner(scanner, String.valueOf(fStartSequence));
 		int c;
-		while ((c = scanner.read()) != ICharacterScanner.EOF)
+		while ((c = collectingCharacterScanner.read()) != ICharacterScanner.EOF)
 		{
 			if (c == '\'')
 			{
-				scanner.unread();
-				IToken token = singleQuoteStringRule.evaluate(scanner);
+				collectingCharacterScanner.unread();
+				IToken token = singleQuoteStringRule.evaluate(collectingCharacterScanner);
 				if (token.isUndefined())
 				{
-					token = singleQuoteStringEOLRule.evaluate(scanner);
+					token = singleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
 				}
 			}
 			else if (c == '"')
 			{
-				scanner.unread();
-				IToken token = doubleQuoteStringRule.evaluate(scanner);
+				collectingCharacterScanner.unread();
+				IToken token = doubleQuoteStringRule.evaluate(collectingCharacterScanner);
 				if (token.isUndefined())
 				{
-					token = doubleQuoteStringEOLRule.evaluate(scanner);
+					token = doubleQuoteStringEOLRule.evaluate(collectingCharacterScanner);
 				}
 			}
-			else if (c == '>')
+			else if (c == fEndSequence[0])
 			{
+				if (fToken instanceof ExtendedToken) {
+					((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+				}
 				return true;
 			}
 		}
@@ -124,9 +133,12 @@ public class TagRule extends MultiLineRule
 		{
 			// this means the EOF came from seeing a switching sequence, so assumes the end is detected and no need to
 			// rewind one character
+			if (fToken instanceof ExtendedToken) {
+				((ExtendedToken) fToken).setContents(collectingCharacterScanner.getContents());
+			}
 			return true;
 		}
-		scanner.unread();
+		collectingCharacterScanner.unread();
 		return false;
 	}
 }

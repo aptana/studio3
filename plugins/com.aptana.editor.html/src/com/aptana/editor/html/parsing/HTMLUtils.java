@@ -71,4 +71,9 @@ public class HTMLUtils
 		name = name.replaceAll(">\\s*$", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		return name.replaceAll("^\\s*<", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
+	
+	public static boolean isTagSelfClosing(String tag)
+	{
+		return tag.endsWith("/>"); //$NON-NLS-1$
+	}
 }
