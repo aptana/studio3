@@ -56,7 +56,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -71,6 +70,7 @@ import com.aptana.editor.findbar.FindBarPlugin;
 import com.aptana.editor.findbar.api.IFindBarDecorator;
 import com.aptana.editor.findbar.impl.FindBarEntriesHelper.EntriesControlHandle;
 import com.aptana.editor.findbar.preferences.IPreferencesConstants;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * Main control of the find bar.
@@ -956,8 +956,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 
 	void showOptions(boolean useMousePos)
 	{
-		Shell shell = new Shell(Display.getCurrent());
-		Menu menu = new Menu(shell, SWT.POP_UP);
+		Menu menu = new Menu(UIUtils.getActiveShell(), SWT.POP_UP);
 
 		for (FindBarOption option : fFindBarOptions)
 		{
@@ -967,7 +966,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 		Point location;
 		if (useMousePos)
 		{
-			Display current = Display.getCurrent();
+			Display current = UIUtils.getDisplay();
 			location = current.getCursorLocation();
 		}
 		else
@@ -975,6 +974,7 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 			Rectangle bounds = options.getBounds();
 			location = options.getParent().toDisplay(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 		}
+
 		menu.setLocation(location);
 		menu.setVisible(true);
 	}
