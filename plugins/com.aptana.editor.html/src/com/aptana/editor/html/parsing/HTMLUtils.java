@@ -7,6 +7,9 @@
  */
 package com.aptana.editor.html.parsing;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.aptana.editor.html.contentassist.HTMLIndexQueryHelper;
 import com.aptana.editor.html.contentassist.model.EventElement;
 
@@ -72,8 +75,43 @@ public class HTMLUtils
 		return name.replaceAll("^\\s*<", ""); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	
-	public static boolean isTagSelfClosing(String tag)
+	/**
+	 * Returns true if the specified tag contents has self-closing tag
+	 * @param tagContents
+	 * @return
+	 */
+	public static boolean isTagSelfClosing(String tagContents)
 	{
-		return tag.endsWith("/>"); //$NON-NLS-1$
+		return tagContents.endsWith("/>"); //$NON-NLS-1$
+	}
+	
+	/**
+	 * Returns true if the specified tag contents has JavaScript &lt;script&gt; tag
+	 * @param tagContents
+	 * @return
+	 */
+	public static boolean isJavaScriptTag(String tagContents)
+	{
+		String type = getTagAttribute(tagContents, "type"); //$NON-NLS-1$
+		if (type != null && type.toLowerCase().contains("javascript")) //$NON-NLS-1$
+		{
+			return true;
+		}
+		String language = getTagAttribute(tagContents, "language"); //$NON-NLS-1$
+		if (language != null && language.toLowerCase().contains("javascript")) //$NON-NLS-1$
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	private static String getTagAttribute(String tagContents, String attributeName)
+	{
+		Matcher matcher = Pattern.compile(".*\\s+"+attributeName+"=\"([a-zA-Z_/0-9]+)\".*").matcher(tagContents.toLowerCase()); //$NON-NLS-1$ //$NON-NLS-2$
+		if (matcher.matches())
+		{
+			return matcher.group(1);
+		}
+		return null;
 	}
 }
