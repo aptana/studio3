@@ -102,7 +102,7 @@ public class HTMLUtils
 		{
 			return true;
 		}
-		return false;
+		return type == null && language == null;
 	}
 	
 	private static String getTagAttribute(String tagContents, String attributeName)
