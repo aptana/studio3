@@ -335,8 +335,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes);
 
-		typeName = JSModelFormatter.getTypeDisplayName(typeName);
-
 		for (PropertyElement property : properties)
 		{
 			String name = property.getName();

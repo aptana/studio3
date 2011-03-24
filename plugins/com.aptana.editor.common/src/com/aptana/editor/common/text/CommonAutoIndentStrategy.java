@@ -234,7 +234,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		String indentation = ""; //$NON-NLS-1$
-		int indentCount = (int) Math.floor(indentSize / indentStringWidth);
+		int indentCount = indentSize / indentStringWidth;
 		for (int i = 0; i < indentCount; ++i)
 		{
 			indentation += indentCharStr;

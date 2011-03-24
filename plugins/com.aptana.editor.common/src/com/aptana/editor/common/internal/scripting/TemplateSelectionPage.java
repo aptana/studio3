@@ -281,7 +281,7 @@ public class TemplateSelectionPage extends WizardPage implements ISelectionChang
 	/**
 	 * Label provider
 	 */
-	class ListLabelProvider extends LabelProvider implements ITableLabelProvider
+	static class ListLabelProvider extends LabelProvider implements ITableLabelProvider
 	{
 		public String getColumnText(Object obj, int index)
 		{

@@ -27,7 +27,7 @@ class EnvironmentDialog extends Dialog
 
 	private Map<String, String> environment;
 
-	private static Color ODD_ROW_COLOR;
+	private Color oddRowColor;
 
 	protected EnvironmentDialog(Shell shell, Map<String, String> environment)
 	{
@@ -35,6 +35,18 @@ class EnvironmentDialog extends Dialog
 		this.environment = new TreeMap<String, String>();
 		this.environment.putAll(environment);
 		this.environment.putAll(new ProcessBuilder("").environment()); //$NON-NLS-1$
+	}
+
+	@Override
+	public boolean close()
+	{
+		boolean close = super.close();
+		if (oddRowColor != null)
+		{
+			oddRowColor.dispose();
+			oddRowColor = null;
+		}
+		return close;
 	}
 
 	@Override
@@ -65,13 +77,16 @@ class EnvironmentDialog extends Dialog
 		table.setSelection(0);
 		table.deselectAll();
 
-		ODD_ROW_COLOR = new Color(parent.getDisplay(), 240, 240, 250);
+		if (oddRowColor == null)
+		{
+			oddRowColor = new Color(parent.getDisplay(), 240, 240, 250);
+		}
 		TableItem[] items = table.getItems();
 		for (int i = 0; i < items.length; i++)
 		{
 			if (i % 2 == 0)
 			{
-				items[i].setBackground(ODD_ROW_COLOR);
+				items[i].setBackground(oddRowColor);
 			}
 		}
 

@@ -325,12 +325,15 @@ public final class SchemaBuilder extends ValidatingReader
 		}
 		finally
 		{
-			try
+			if (fi != null)
 			{
-				fi.close();
-			}
-			catch (IOException e)
-			{
+				try
+				{
+					fi.close();
+				}
+				catch (IOException e)
+				{
+				}
 			}
 		}
 

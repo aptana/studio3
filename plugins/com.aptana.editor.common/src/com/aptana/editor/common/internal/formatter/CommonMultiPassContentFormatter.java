@@ -197,14 +197,17 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	private void updateContex(IFormattingContext context, String contentType, int offset, int length)
 	{
 		IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(contentType);
-		factory.setMainContentType(contentType);
-		if (factory != null && context != null)
+		if (factory != null)
 		{
-			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
-			context.setProperty(FormattingContextProperties.CONTEXT_PARTITION, new TypedPosition(offset, length,
-					contentType));
-			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_CAN_CONSUME_INDENTATION,
-					factory.canConsumePreviousIndent());
+			factory.setMainContentType(contentType);
+			if (context != null)
+			{
+				context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+				context.setProperty(FormattingContextProperties.CONTEXT_PARTITION, new TypedPosition(offset, length,
+						contentType));
+				context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_CAN_CONSUME_INDENTATION,
+						factory.canConsumePreviousIndent());
+			}
 		}
 	}
 

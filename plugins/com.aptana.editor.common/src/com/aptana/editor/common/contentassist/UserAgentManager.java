@@ -31,7 +31,7 @@ import com.aptana.ui.util.SWTUtils;
 
 public class UserAgentManager
 {
-	public class UserAgent implements Comparable<UserAgent>
+	public static class UserAgent implements Comparable<UserAgent>
 	{
 		public final String ID;
 		public final String name;

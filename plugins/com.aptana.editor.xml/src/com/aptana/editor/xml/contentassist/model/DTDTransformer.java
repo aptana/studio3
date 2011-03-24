@@ -28,7 +28,7 @@ import com.aptana.parsing.ast.IParseRootNode;
 
 public class DTDTransformer
 {
-	private class NodeCollector extends DTDTreeWalker
+	private static class NodeCollector extends DTDTreeWalker
 	{
 		private Map<String, ElementElement> _elementMap = new HashMap<String, ElementElement>();
 		private Set<AttributeElement> _attributes = new HashSet<AttributeElement>();
