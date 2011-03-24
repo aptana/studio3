@@ -113,7 +113,7 @@ public class SnippetsContentAssistant extends ContentAssistant {
 	@Override
 	protected void possibleCompletionsClosed() {
 		super.possibleCompletionsClosed();
-		if (contentAssistProcessor instanceof SnippetsCompletionProcessor)
+		if (contentAssistProcessor != null)
 		{
 			((SnippetsCompletionProcessor) contentAssistProcessor).possibleCompletionsClosed();
 		}

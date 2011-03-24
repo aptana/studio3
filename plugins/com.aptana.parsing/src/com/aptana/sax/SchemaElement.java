@@ -357,7 +357,7 @@ public class SchemaElement
 		}
 
 		// store attribute and attribute usage
-		this._attributes.put(name, new Integer(usageValue));
+		this._attributes.put(name, Integer.valueOf(usageValue));
 
 		// add required attributes to array list for easier testing
 		if ((usageValue & AttributeUsage.USAGE_MASK) == AttributeUsage.REQUIRED)
