@@ -1604,7 +1604,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			DocumentEvent event)
 	{
 
-		int length = proposals.length;
+		int length = proposals == null ? 0 : proposals.length;
 		List<ICompletionProposal> filtered = new ArrayList<ICompletionProposal>(length);
 		for (int i = 0; i < length; i++)
 		{
