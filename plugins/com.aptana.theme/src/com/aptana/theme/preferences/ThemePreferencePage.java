@@ -275,6 +275,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fInvasiveThemeCheckbox.setSelection(Platform.getPreferencesService().getBoolean(ThemePlugin.PLUGIN_ID,
 				IPreferenceConstants.INVASIVE_THEMES, false, null));
 		fInvasiveThemeCheckbox.addSelectionListener(this);
+		fInvasiveThemeCheckbox.setToolTipText(Messages.ThemePreferencePage_InvasiveThemesToolTip);
 	}
 
 	protected IThemeManager getThemeManager()

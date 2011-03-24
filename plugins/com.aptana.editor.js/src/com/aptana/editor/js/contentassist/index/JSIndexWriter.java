@@ -97,7 +97,7 @@ public class JSIndexWriter extends IndexWriter
 			{
 				parentType = StringUtil.join(JSIndexConstants.SUB_DELIMITER, parentTypes);
 			}
-			else if (type.equals(JSTypeConstants.OBJECT_TYPE) == false)
+			else if (type.getName().equals(JSTypeConstants.OBJECT_TYPE) == false)
 			{
 				parentType = JSTypeConstants.OBJECT_TYPE;
 			}

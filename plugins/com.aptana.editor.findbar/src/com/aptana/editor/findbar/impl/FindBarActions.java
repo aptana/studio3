@@ -8,6 +8,7 @@
 package com.aptana.editor.findbar.impl;
 
 import java.lang.ref.WeakReference;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,10 +59,10 @@ import com.aptana.editor.findbar.preferences.IPreferencesConstants;
 public class FindBarActions
 {
 
-	public static final String HIDE_FIND_BAR_COMMAND_ID = "org.eclipse.ui.edit.findbar.hide";  //$NON-NLS-1$
-	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious";  //$NON-NLS-1$
-	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext";  //$NON-NLS-1$
-	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev";  //$NON-NLS-1$
+	public static final String HIDE_FIND_BAR_COMMAND_ID = "org.eclipse.ui.edit.findbar.hide"; //$NON-NLS-1$
+	public static final String FIND_PREVIOUS_COMMAND_ID = "org.eclipse.ui.edit.findbar.findPrevious"; //$NON-NLS-1$
+	public static final String FIND_NEXT_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNext"; //$NON-NLS-1$
+	public static final String FIND_NEXT_OR_PREV_COMMAND_ID = "org.eclipse.ui.edit.findbar.findNextOrPrev"; //$NON-NLS-1$
 	public static final String FOCUS_REPLACE_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusReplace"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFind"; //$NON-NLS-1$
 	public static final String FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID = "org.eclipse.ui.edit.findbar.focusFindOrOpenEclipseSearch"; //$NON-NLS-1$
@@ -108,7 +109,8 @@ public class FindBarActions
 		fCommandToHandler.put(FIND_NEXT_COMMAND_ID, new FindNextHandler());
 		fCommandToHandler.put(FIND_NEXT_OR_PREV_COMMAND_ID, new FindNextOrPrevHandler());
 		fCommandToHandler.put(FOCUS_FIND_COMMAND_ID, new FocusFindFindBarHandler());
-		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID, new FocusFindOrOpenEclipseSearchFindBarHandler());
+		fCommandToHandler.put(FOCUS_FIND_OR_OPEN_ECLIPSE_SEARCH_COMMAND_ID,
+				new FocusFindOrOpenEclipseSearchFindBarHandler());
 		fCommandToHandler.put(FOCUS_REPLACE_COMMAND_ID, new FocusReplaceFindBarHandler());
 		fCommandToHandler.put(TOGGLE_CASE_MATCHING_COMMAND_ID, new ToggleCaseFindBarHandler());
 		fCommandToHandler.put(TOGGLE_WORD_MATCHING_COMMAND_ID, new ToggleWordFindBarHandler());
@@ -309,7 +311,7 @@ public class FindBarActions
 			return null;
 		}
 	}
-	
+
 	private class FindNextOrPrevHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -336,7 +338,7 @@ public class FindBarActions
 			return null;
 		}
 	}
-	
+
 	private class FocusFindOrOpenEclipseSearchFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -345,9 +347,10 @@ public class FindBarActions
 			if (dec != null)
 			{
 				IPreferenceStore preferenceStore = FindBarPlugin.getDefault().getPreferenceStore();
-				boolean openEclipseFindBar = preferenceStore.getBoolean(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR);
+				boolean openEclipseFindBar = preferenceStore
+						.getBoolean(IPreferencesConstants.CTRL_F_TWICE_OPENS_ECLIPSE_FIND_BAR);
 
-				if(openEclipseFindBar)
+				if (openEclipseFindBar)
 				{
 					dec.showFindReplaceDialog();
 				}
@@ -416,7 +419,7 @@ public class FindBarActions
 			return null;
 		}
 	}
-	
+
 	private class ToggleSearchBackwardFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -443,7 +446,7 @@ public class FindBarActions
 			return null;
 		}
 	}
-	
+
 	private class ShowOptionsFindBarHandler extends AbstractHandler
 	{
 		public Object execute(ExecutionEvent event) throws ExecutionException
@@ -516,15 +519,14 @@ public class FindBarActions
 			updateTooltip(TOGGLE_WORD_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_WholeWord, dec.wholeWord);
 			updateTooltip(TOGGLE_CASE_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_CaseSensitive,
 					dec.caseSensitive);
-			if(dec.regularExpression != null)
+			if (dec.regularExpression != null)
 			{
 				updateTooltip(TOGGLE_REGEXP_MATCHING_COMMAND_ID, Messages.FindBarDecorator_LABEL_RegularExpression,
 						dec.regularExpression);
 			}
 			updateTooltip(TOGGLE_SEARCH_BACKWARD_COMMAND_ID, Messages.FindBarDecorator_LABEL_SearchBackward,
 					dec.searchBackward);
-			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions,
-					dec.options);
+			updateTooltip(SHOW_OPTIONS_COMMAND_ID, Messages.FindBarDecorator_LABEL_ShowOptions, dec.options);
 
 			List<TriggerSequence> bindings = fCommandToBinding.get(FOCUS_REPLACE_COMMAND_ID);
 			if (bindings != null && bindings.size() > 0)
@@ -546,7 +548,7 @@ public class FindBarActions
 		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
 		if (bindings != null && bindings.size() > 0)
 		{
-			button.setToolTipText(tooltip + " (" + bindings.get(0) + ")"); //$NON-NLS-1$
+			button.setToolTipText(MessageFormat.format("{0} ({1})", tooltip, bindings.get(0))); //$NON-NLS-1$
 		}
 		else
 		{
@@ -559,7 +561,7 @@ public class FindBarActions
 		List<TriggerSequence> bindings = fCommandToBinding.get(commandId);
 		if (bindings != null && bindings.size() > 0)
 		{
-			item.setToolTipText(tooltip + " (" + bindings.get(0) + ")"); //$NON-NLS-1$
+			item.setToolTipText(MessageFormat.format("{0} ({1})", tooltip, bindings.get(0))); //$NON-NLS-1$
 		}
 		else
 		{

@@ -95,8 +95,7 @@ public class FormatterJSCommentNode extends FormatterCommentNode
 				// it's a multi-line, so we have to treat it differently and add the space in-front of the
 				// lines, accept for the first line.
 				visitor.ensureLineStarted(context);
-				visitor.writeText(context, " "); //$NON-NLS-1$
-				visitor.writeIndent(context);
+				visitor.writeText(context, " ", false); //$NON-NLS-1$
 			}
 			visitor.write(context, startOffset, endOffset);
 		}

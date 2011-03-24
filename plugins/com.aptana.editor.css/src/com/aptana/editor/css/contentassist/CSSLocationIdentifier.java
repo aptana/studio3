@@ -12,6 +12,7 @@ import com.aptana.editor.css.parsing.ast.CSSTreeWalker;
 /**
  * CSSLocationIdentifier
  */
+@SuppressWarnings("unused")
 public class CSSLocationIdentifier extends CSSTreeWalker
 {
 	private int _offset;

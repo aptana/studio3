@@ -14,8 +14,8 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 
 /**
  * @author Kevin Sawicki (ksawicki@aptana.com)

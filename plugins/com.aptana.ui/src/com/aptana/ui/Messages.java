@@ -25,6 +25,8 @@ public class Messages extends NLS
 	public static String UIPlugin_ResetPerspective_Description;
 	public static String UIPlugin_ResetPerspective_Title;
 
+	public static String AptanaPreferencePage_EnableDebugModeLabel;
+
 	static
 	{
 		// initialize resource bundle

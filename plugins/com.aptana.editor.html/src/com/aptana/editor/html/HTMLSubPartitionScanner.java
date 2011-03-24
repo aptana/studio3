@@ -15,14 +15,17 @@ import org.eclipse.jface.text.rules.Token;
 import com.aptana.editor.common.IPartitionScannerSwitchStrategy;
 import com.aptana.editor.common.PartitionScannerSwitchStrategy;
 import com.aptana.editor.common.text.rules.CompositeSubPartitionScanner;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.SubPartitionScanner;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.js.JSSourceConfiguration;
 import com.aptana.editor.svg.SVGSourceConfiguration;
 
 /**
- * HTMLSubPartitionScanner
+ * @author Max Stepanov
+ * 
  */
 public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 {
@@ -63,38 +66,37 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 	 * @see com.aptana.editor.common.CompositeSubPartitionScanner#setLastToken(org.eclipse.jface.text.rules.IToken)
 	 */
 	@Override
-	public void setLastToken(IToken token)
-	{
-		if (!(token.getData() instanceof String))
-		{
+	public void setLastToken(IToken token) {
+		if (!(token.getData() instanceof String)) {
 			current = TYPE_DEFAULT;
 			return;
 		}
 
 		String contentType = (String) token.getData();
 
-		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType) || SVGSourceConfiguration.SCRIPT.equals(contentType))
-		{
-			current = TYPE_JS;
-		}
-		else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType) || SVGSourceConfiguration.STYLE.equals(contentType))
-		{
-			current = TYPE_CSS;
-		}
-		else if (HTMLSourceConfiguration.HTML_SVG.equals(contentType))
-		{
-			current = TYPE_SVG;
-		}
-		else if (HTMLSourceConfiguration.DEFAULT.equals(contentType) || IDocument.DEFAULT_CONTENT_TYPE.equals(contentType))
-		{
+		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType)
+				|| SVGSourceConfiguration.SCRIPT.equals(contentType)) {
+			if (!(token instanceof ExtendedToken
+					&& (HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))
+						|| !HTMLUtils.isJavaScriptTag(((ExtendedToken) token).getContents())
+					)) {
+				current = TYPE_JS;
+			}
+		} else if (HTMLSourceConfiguration.HTML_STYLE.equals(contentType)
+				|| SVGSourceConfiguration.STYLE.equals(contentType)) {
+			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
+				current = TYPE_CSS;
+			}
+		} else if (HTMLSourceConfiguration.HTML_SVG.equals(contentType)) {
+			if (!(token instanceof ExtendedToken && HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))) {
+				current = TYPE_SVG;
+			}
+		} else if (HTMLSourceConfiguration.DEFAULT.equals(contentType)
+				|| IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
 			current = TYPE_DEFAULT;
-		}
-		else
-		{
-			for (int i = 0; i < subPartitionScanners.length; ++i)
-			{
-				if (subPartitionScanners[i].hasContentType(contentType))
-				{
+		} else {
+			for (int i = 0; i < subPartitionScanners.length; ++i) {
+				if (subPartitionScanners[i].hasContentType(contentType)) {
 					current = i;
 					break;
 				}

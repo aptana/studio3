@@ -25,9 +25,7 @@ js.formatter.formatter.tabulation.char=space
 var i = 1+
 //
 2;
-
 ==FORMATTED==
 var i = 1+
 //
 2;
-

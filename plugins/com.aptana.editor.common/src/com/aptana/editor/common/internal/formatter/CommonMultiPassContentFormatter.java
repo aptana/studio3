@@ -107,7 +107,7 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 		{
 
 			final ITypedRegion[] partitions = TextUtilities.computePartitioning(document, fPartitioning, offset,
-					length, false);
+					Math.min(length, document.getLength()), false);
 
 			if (!fType.equals(partitions[0].getType()))
 				partitions[0] = TextUtilities.getPartition(document, fPartitioning, partitions[0].getOffset(), false);
@@ -134,9 +134,15 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 				partition = partitions[index];
 				type = partition.getType();
 				boolean isDefaultType = fType.equals(type);
-				QualifiedContentType qualifiedContentType = documentScopeManager.getContentType(document, partition
-						.getOffset());
-				String contentType = extractContentType(qualifiedContentType);
+				QualifiedContentType qualifiedContentType = documentScopeManager.getContentType(document,
+						partition.getOffset());
+				// Verify that this content type is one of the supported slave types before we assign it as one.
+				String contentType = null;
+				String extractedContentType = extractContentType(qualifiedContentType);
+				if (slaveContentTypes.contains(extractedContentType))
+				{
+					contentType = extractedContentType;
+				}
 				if (!isDefaultType && contentType != null && !contentType.equals(masterContentType))
 				{
 					if (lastContentType == null || lastContentType.equals(contentType))
@@ -191,12 +197,17 @@ public class CommonMultiPassContentFormatter extends MultiPassContentFormatter
 	private void updateContex(IFormattingContext context, String contentType, int offset, int length)
 	{
 		IScriptFormatterFactory factory = ScriptFormatterManager.getSelected(contentType);
-		factory.setMainContentType(contentType);
-		if (factory != null && context != null)
+		if (factory != null)
 		{
-			context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
-			context.setProperty(FormattingContextProperties.CONTEXT_PARTITION, new TypedPosition(offset, length,
-					contentType));
+			factory.setMainContentType(contentType);
+			if (context != null)
+			{
+				context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID, factory.getId());
+				context.setProperty(FormattingContextProperties.CONTEXT_PARTITION, new TypedPosition(offset, length,
+						contentType));
+				context.setProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_CAN_CONSUME_INDENTATION,
+						factory.canConsumePreviousIndent());
+			}
 		}
 	}
 

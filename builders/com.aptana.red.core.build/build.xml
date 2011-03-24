@@ -211,6 +211,7 @@
 					<include name="plugins/*" />
 					<include name="features/*" />
 					<exclude name="plugins/com.aptana.usage" />
+					<exclude name="plugins/com.aptana.scripting" />
 					<exclude name="${topLevelElementType}s/${topLevelElementId}" />
 				</dirset>
 			</path>

@@ -117,7 +117,7 @@ public class HTMLIndexReader extends IndexReader
 	{
 		String namePattern = RegexUtil.createQuotedListPattern(names);
 
-		return MessageFormat.format("^{1}{0}", this.getDelimiter(), namePattern);
+		return MessageFormat.format("^{1}{0}", this.getDelimiter(), namePattern); //$NON-NLS-1$
 	}
 
 	/**

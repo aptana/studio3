@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Shell;
 import com.aptana.deploy.internal.wizard.FTPDeployComposite;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
-import com.aptana.ide.ui.ftp.internal.FTPConnectionPropertyComposite;
-import com.aptana.ide.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
+import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;
+import com.aptana.ui.secureftp.dialogs.CommonFTPConnectionPointPropertyDialog;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

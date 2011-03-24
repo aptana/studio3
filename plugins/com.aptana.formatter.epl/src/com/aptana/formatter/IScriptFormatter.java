@@ -49,10 +49,15 @@ public interface IScriptFormatter
 	 *            the length of the region to format
 	 * @param indentationLevel
 	 *            the additional indent level
+	 * @param isSelection
+	 *            Indicate that we are formatting selected text.
 	 * @param context
+	 *            {@link IFormatterContext}
+	 * @param indentSufix
+	 *            Extra string indent to insert into the end of the formatter text (may be empty)
 	 */
 	TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException;
+			IFormattingContext context, String indentSufix) throws FormatterException;
 
 	void setIsSlave(boolean isSlave);
 

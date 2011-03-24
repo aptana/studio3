@@ -24,8 +24,6 @@ js.formatter.formatter.tabulation.char=space
 ==CONTENT==
 while(c--)          
 j           = k[ c] ||e ( c   );
-
 ==FORMATTED==
 while(c--)
     j           = k[ c] ||e ( c   );
-

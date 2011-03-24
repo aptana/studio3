@@ -25,5 +25,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		prefs.putDouble(IPreferenceContants.HTML_INDEX_VERSION, 0);
 		prefs.put(IPreferenceContants.HTML_ACTIVATION_CHARACTERS, "</>=&'\""); //$NON-NLS-1$
 		prefs.putBoolean(IPreferenceContants.HTML_AUTO_CLOSE_TAG_PAIRS, true);
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 	}
 }

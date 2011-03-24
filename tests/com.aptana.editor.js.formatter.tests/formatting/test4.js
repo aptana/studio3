@@ -31,7 +31,6 @@ function test(){
 		/**test7*/	
 	}
 }
-
 ==FORMATTED==
 function test() {
     a();
@@ -43,4 +42,3 @@ function test() {
         /**test7*/
     }
 }
-

@@ -150,7 +150,7 @@ public class BundleCacher
 		try
 		{
 			File configFile = new File(be.getBundleDirectory(), CACHE_FILE);
-			writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8");
+			writer = new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"); //$NON-NLS-1$
 
 			Yaml yaml = createYAML(be.getBundleDirectory());
 			yaml.dump(be, writer);
@@ -200,10 +200,15 @@ public class BundleCacher
 			try
 			{
 				Yaml yaml = createYAML(bundleDirectory);
-				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8");
+				reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8"); //$NON-NLS-1$
 				sub.subTask(MessageFormat.format(Messages.BundleCacher_LoadCacheTaskName,
 						bundleDirectory.getAbsolutePath()));
-				be = (BundleElement) yaml.load(reader);
+
+				synchronized (this)
+				{
+					be = (BundleElement) yaml.load(reader);
+				}
+
 				sub.worked(80);
 
 				// If any file has been deleted, ignore the cache, it'll get rewritten
@@ -1070,6 +1075,10 @@ public class BundleCacher
 			if (real == null)
 			{
 				BundleElement owning = getOwningBundle();
+				if (owning == null)
+				{
+					return;
+				}
 				// remove all elements that are declared in the same file, since they'll end up getting
 				// loaded below.
 				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());

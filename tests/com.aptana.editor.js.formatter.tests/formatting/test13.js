@@ -25,9 +25,7 @@ js.formatter.formatter.tabulation.char=space
 e = {
     s: a//333
 };
-
 ==FORMATTED==
 e = {
     s: a//333
 };
-

@@ -41,7 +41,8 @@ import com.aptana.debug.core.util.DebugUtil;
  * @author Max Stepanov
  */
 public class ScriptsView extends AbstractDebugView implements IDebugEventSetListener {
-	private static final String GOTO_FILE_ACTION = "GotoFile";
+
+	private static final String GOTO_FILE_ACTION = "GotoFile"; //$NON-NLS-1$
 	private ISelectionListener selectionListener;
 	private IDebugTarget currentTarget;
 	private boolean currentTerminated;

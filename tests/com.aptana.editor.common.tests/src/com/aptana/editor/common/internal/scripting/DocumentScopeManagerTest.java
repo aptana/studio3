@@ -124,6 +124,43 @@ public class DocumentScopeManagerTest extends TestCase
 		}
 	}
 	
+	public void testGetScopeAtEndOfFile() throws Exception
+	{
+		ITextEditor editor = null;
+		File file = null;
+		try
+		{
+			IWorkbenchPage page = UIUtils.getActivePage();
+			file = File.createTempFile("eof_scope", ".js");
+			FileWriter writer = new FileWriter(file);
+			writer.write("// This is a comment");
+			writer.close();
+
+			IEditorPart part = IDE.openEditorOnFileStore(page, EFS.getLocalFileSystem().fromLocalFile(file));
+			editor = (ITextEditor) part;
+			ISourceViewer viewer = TextEditorUtils.getSourceViewer(editor);
+
+			assertEquals("source.js comment.line.double-slash.js", CommonEditorPlugin.getDefault()
+					.getDocumentScopeManager().getScopeAtOffset(viewer, 2));
+			assertEquals("source.js comment.line.double-slash.js", CommonEditorPlugin.getDefault()
+					.getDocumentScopeManager().getScopeAtOffset(viewer, 20));
+		}
+		finally
+		{
+			if (editor != null)
+			{
+				editor.close(false);
+			}
+			if (file != null)
+			{
+				if (!file.delete())
+				{
+					file.deleteOnExit();
+				}
+			}
+		}
+	}
+
 	public void testOffByOneBug() throws Exception
 	{
 		ITextEditor editor = null;

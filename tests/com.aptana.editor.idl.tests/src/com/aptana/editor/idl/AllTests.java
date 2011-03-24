@@ -7,7 +7,7 @@ public class AllTests
 {
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite("Test for com.aptana.editor.idl");
+		TestSuite suite = new TestSuite("Test for com.aptana.editor.idl"); //$NON-NLS-1$
 		//$JUnit-BEGIN$
 		suite.addTestSuite(IDLSouceScannerTests.class);
 		//suite.addTestSuite(IDLParserTests.class);

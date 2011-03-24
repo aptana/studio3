@@ -101,13 +101,13 @@ public final class XMLMemento implements IMemento {
             }
         } catch (ParserConfigurationException e) {
             exception = e;
-            errorMessage = "Internal XML parser configuration error.";
+            errorMessage = "Internal XML parser configuration error."; //$NON-NLS-1$
         } catch (IOException e) {
             exception = e;
-            errorMessage = "Could not read content of XML file."; 
+            errorMessage = "Could not read content of XML file."; //$NON-NLS-1$
         } catch (SAXException e) {
             exception = e;
-            errorMessage = "Could not parse content of XML file."; 
+            errorMessage = "Could not parse content of XML file."; //$NON-NLS-1$
         }
 
         String problemText = null;
@@ -116,7 +116,7 @@ public final class XMLMemento implements IMemento {
 		}
         if (problemText == null || problemText.length() == 0) {
 			problemText = errorMessage != null ? errorMessage
-                    : "Could not find root element node of XML file.";
+                    : "Could not find root element node of XML file."; //$NON-NLS-1$
 		} 
         throw new CoreException(new Status(Status.ERROR, CoreEPLPlugin.PLUGIN_ID, 0, problemText, exception));
     }

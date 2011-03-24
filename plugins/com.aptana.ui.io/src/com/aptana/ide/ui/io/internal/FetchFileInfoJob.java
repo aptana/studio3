@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**

@@ -159,7 +159,7 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 		{
 			public int compare(Template template1, Template template2)
 			{
-				return template1.getDescription().compareTo(template2.getDescription());
+				return template1.getName().compareTo(template2.getName());
 			}
 		});
 		return templatesList.toArray(new Template[0]);
@@ -169,35 +169,6 @@ public class SnippetsCompletionProcessor extends TemplateCompletionProcessor
 	public ICompletionProposal[] computeCompletionProposals(ITextViewer viewer, int offset)
 	{
 		ICompletionProposal[] completionProposals = super.computeCompletionProposals(viewer, offset);
-
-		// FIXME We need to be smarter about prefix. If full prefix doesn't match, chop off at non-letter/digit portions
-		// from beginning until we have a match!
-		// We now check if there is only one proposal that
-		// matches exactly with the prefix the user has typed
-		String extractPrefix = extractPrefix(viewer, offset);
-		int exactPrefixMatches = 0;
-		int exactPrefixMatchIndex = -1;
-		for (int i = 0; i < completionProposals.length; i++)
-		{
-			SnippetTemplateProposal snippetTemplateProposal = (SnippetTemplateProposal) completionProposals[i];
-			Template template = snippetTemplateProposal.getTemplateSuper();
-			if (template instanceof CommandTemplate)
-			{
-				CommandTemplate commandTemplate = (CommandTemplate) template;
-				if (commandTemplate.exactMatches(extractPrefix))
-				{
-					exactPrefixMatches++;
-					exactPrefixMatchIndex = i;
-				}
-			}
-		}
-
-		// There is only one proposal that matches the prefix exactly
-		// So we just return it
-		if (exactPrefixMatches == 1)
-		{
-			return new ICompletionProposal[] { completionProposals[exactPrefixMatchIndex] };
-		}
 
 		for (int i = 0; i < completionProposals.length; i++)
 		{

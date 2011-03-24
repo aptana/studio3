@@ -10,6 +10,7 @@ package com.aptana.editor.js.validator;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
@@ -43,21 +44,23 @@ public class JSLintValidator implements IValidator
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		Context context = Context.enter();
 		DefaultErrorReporter reporter = new DefaultErrorReporter();
 		try
 		{
 			context.setErrorReporter(reporter);
-			parseWithLint(context, source, path, manager);
+			parseWithLint(context, source, path, manager, items);
 		}
 		finally
 		{
 			Context.exit();
 		}
-		return manager.getItems();
+		return items;
 	}
 
-	private void parseWithLint(Context context, String source, URI path, IValidationManager manager)
+	private void parseWithLint(Context context, String source, URI path, IValidationManager manager,
+			List<IValidationItem> items)
 	{
 		Scriptable scope = context.initStandardObjects();
 		getJSLintScript().exec(context, scope);
@@ -104,16 +107,15 @@ public class JSLintValidator implements IValidator
 						{
 							if (i == ids.length - 2 && lastIsError)
 							{
-								manager.addError(reason, line, character, 0, path);
+								items.add(manager.addError(reason, line, character, 0, path));
 							}
 							else
 							{
-								manager.addWarning(reason, line, character, 0, path);
+								items.add(manager.addWarning(reason, line, character, 0, path));
 							}
 						}
 					}
 				}
-
 			}
 		}
 	}

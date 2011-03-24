@@ -25,7 +25,6 @@ xml.formatter.formatter.tabulation.char=space
   <heading>Reminder</heading>
   <body>Don't forget me this weekend</body>
 </note>
-
 ==FORMATTED==
 <?xml version="1.0"?>
 <!DOCTYPE note [
@@ -51,4 +50,3 @@ xml.formatter.formatter.tabulation.char=space
         Don't forget me this weekend
     </body>
 </note>
-

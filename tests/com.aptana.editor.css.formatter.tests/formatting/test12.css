@@ -12,9 +12,7 @@ css.formatter.formatter.tabulation.char=space
 body div.one, body div#two, h3, h4 {
   position: relative;
 }
-
 ==FORMATTED==
 body div.one, body div#two, h3, h4 {
     position: relative;
 }
-

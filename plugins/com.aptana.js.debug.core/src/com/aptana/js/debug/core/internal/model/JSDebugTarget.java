@@ -54,6 +54,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupDirector;
 import org.osgi.framework.Constants;
 
 import com.aptana.core.IURIMapper;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.IUniformResourceMarker;
 import com.aptana.core.util.StringUtil;
@@ -61,7 +62,6 @@ import com.aptana.debug.core.DebugCorePlugin;
 import com.aptana.debug.core.DetailFormatter;
 import com.aptana.debug.core.IDetailFormattersChangeListener;
 import com.aptana.debug.core.sourcelookup.IFileContentRetriever;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.ILaunchConfigurationConstants;
 import com.aptana.js.debug.core.JSDebugPlugin;
@@ -95,7 +95,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	private static final String DETAILS_0_V2 = "details*{0,number,integer}*{1}"; //$NON-NLS-1$
 	private static final String SET_VALUE_0_1 = "setValue*{1}*{2}"; //$NON-NLS-1$
 	private static final String SET_VALUE_0_1_V2 = "setValue*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
-	private static final String EVAL_0 = "eval[{0,number,integer}]"; //$NON-NLS-1$
+	private static final String EVAL_0 = "eval[{0}]"; //$NON-NLS-1$
 	private static final String EVAL_0_1 = "eval*{1}*{2}"; //$NON-NLS-1$
 	private static final String EVAL_0_1_V2 = "eval*{0,number,integer}*{1}*{2}"; //$NON-NLS-1$
 	private static final String RESULT = "result"; //$NON-NLS-1$
@@ -860,7 +860,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			stepFilterMask = stepFilterMask & (FLAG_STEP_FILTERS_ENABLED ^ XOR_MASK);
 		}
 		try {
-			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled())); //$NON-NLS-1$
+			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
 		} catch (DebugException e) {
 			JSDebugPlugin.log(e);
 		}
@@ -994,8 +994,8 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_ERRORS);
 			handleAttribute(ILaunchConfigurationConstants.CONFIGURATION_SUSPEND_ON_DEBUGGER_KEYWORDS);
 
-			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors())); //$NON-NLS-1$
-			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled())); //$NON-NLS-1$
+			setOption(BYPASS_CONSTRUCTORS, Boolean.toString(isFilterConstructors()));
+			setOption(STEP_FILTERS_ENABLED2, Boolean.toString(isStepFiltersEnabled()));
 			if (stepFilters != null && stepFilters.length > 0) {
 				StringBuffer sb = new StringBuffer(STEP_FILTERS);
 				for (int i = 0; i < stepFilters.length; ++i) {

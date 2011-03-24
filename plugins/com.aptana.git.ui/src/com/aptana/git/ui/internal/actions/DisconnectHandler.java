@@ -35,7 +35,7 @@ public class DisconnectHandler extends AbstractGitHandler
 
 		for (final IProject project : projects)
 		{
-			Job job = new WorkspaceJob(MessageFormat.format("Disconnecting {0}", project.getName()))
+			Job job = new WorkspaceJob(MessageFormat.format(Messages.DisconnectHandler_Job_Title, project.getName()))
 			{
 
 				@Override

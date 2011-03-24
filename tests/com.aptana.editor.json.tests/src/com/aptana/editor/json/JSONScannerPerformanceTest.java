@@ -45,8 +45,8 @@ public class JSONScannerPerformanceTest extends PerformanceTestCase
 	public void testLongOneLiner() throws Exception
 	{
 		// read in the file
-		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.json.tests"),
-			Path.fromPortableString("performance/api-aptana-format.json"), false);
+		InputStream stream = FileLocator.openStream(Platform.getBundle("com.aptana.editor.json.tests"), //$NON-NLS-1$
+				Path.fromPortableString("performance/api-aptana-format.json"), false); //$NON-NLS-1$
 		String src = IOUtil.read(stream);
 		IDocument document = new Document(src);
 

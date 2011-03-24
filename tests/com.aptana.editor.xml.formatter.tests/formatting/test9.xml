@@ -116,7 +116,6 @@ xml.formatter.formatter.tabulation.char=space
    <MCANSWER CORRECTNESS="0">Title and Body</MCANSWER>
    </MCQUESTION>
    </QUESTIONS>
-
 ==FORMATTED==
 <?xml version="1.0"?>
 <!DOCTYPE QUESTIONS SYSTEM "SATML.dtd">
@@ -327,4 +326,3 @@ xml.formatter.formatter.tabulation.char=space
         </MCANSWER>
     </MCQUESTION>
 </QUESTIONS>
-

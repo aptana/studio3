@@ -26,7 +26,6 @@ this.Library = new function(){
 
 }
 ==FORMATTED==
-this.Library = new
-function() {
+this.Library = new function() {
 
 }

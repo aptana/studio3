@@ -7,6 +7,7 @@
  */
 package com.aptana.editor.common.text;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -15,6 +16,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
+
+import com.aptana.editor.common.preferences.IPreferenceConstants;
 
 /**
  * This class will auto-indent after curly braces {} by default (and won't auto dedent on close brace). Subclasses
@@ -29,20 +32,22 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	private String fContentType;
 	private SourceViewerConfiguration fViewerConfiguration;
 	private ISourceViewer fSourceViewer;
+	private IPreferenceStore fPrefStore;
 
 	public CommonAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
-			ISourceViewer sourceViewer)
+			ISourceViewer sourceViewer, IPreferenceStore prefStore)
 	{
 		fContentType = contentType;
 		fViewerConfiguration = configuration;
 		fSourceViewer = sourceViewer;
+		fPrefStore = prefStore;
 	}
 
 	protected SourceViewerConfiguration getSourceViewerConfiguration()
 	{
 		return fViewerConfiguration;
 	}
-	
+
 	protected ISourceViewer getSourceViewer()
 	{
 		return fSourceViewer;
@@ -167,6 +172,11 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 				}
 				d.replace(c.offset, 0, "\n" + indent + toEnd); //$NON-NLS-1$
 			}
+			else if (buf.length() != 0 && trimmedLine.endsWith("*/") && buf.charAt(buf.length() - 1) == ' ') //$NON-NLS-1$
+			{
+				// We want to delete an extra space when closing block comments
+				buf.deleteCharAt(buf.length() - 1);
+			}
 		}
 		catch (BadLocationException e)
 		{
@@ -224,7 +234,7 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 		}
 
 		String indentation = ""; //$NON-NLS-1$
-		int indentCount = (int) Math.floor(indentSize / indentStringWidth);
+		int indentCount = indentSize / indentStringWidth;
 		for (int i = 0; i < indentCount; ++i)
 		{
 			indentation += indentCharStr;
@@ -268,6 +278,10 @@ public abstract class CommonAutoIndentStrategy implements IAutoEditStrategy
 	 */
 	protected boolean shouldAutoIndent()
 	{
+		if (fPrefStore != null)
+		{
+			return fPrefStore.getBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT);
+		}
 		return true;
 	}
 }

@@ -57,6 +57,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final boolean isSelection;
 		final IRegion selectedRegion;
 		final IFormattingContext context;
+		final boolean canConsumeIndentation;
 
 		/**
 		 * @param context
@@ -65,18 +66,21 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		 * @param project
 		 * @param formatterId
 		 * @param isSlave
+		 * @param canConsumeIndentation
 		 * @param isSelection
 		 * @param selectedRegion
 		 *            - Should be valid when isSelection is true.
 		 */
 		public FormatJob(IFormattingContext context, IDocument document, TypedPosition partition, IProject project,
-				String formatterId, Boolean isSlave, Boolean isSelection, IRegion selectedRegion)
+				String formatterId, Boolean isSlave, Boolean canConsumeIndentation, Boolean isSelection,
+				IRegion selectedRegion)
 		{
 			this.context = context;
 			this.document = document;
 			this.partition = partition;
 			this.project = project;
 			this.formatterId = formatterId;
+			this.canConsumeIndentation = canConsumeIndentation;
 			this.isSlave = (isSlave != null) ? isSlave : false;
 			this.isSelection = (isSelection != null) ? isSelection : false;
 			this.selectedRegion = selectedRegion;
@@ -115,7 +119,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 	/**
 	 * @since 2.0
 	 */
-	@SuppressWarnings( { "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void doFormat(final FormatJob job)
 	{
 		final IDocument document = job.document;
@@ -152,6 +156,7 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 					formatter.setIsSlave(job.isSlave);
 					final int indentationLevel = (offset != 0) ? formatter.detectIndentationLevel(document, offset,
 							job.isSelection, job.context) : 0;
+					StringBuilder consumedIndent = new StringBuilder();
 					if (job.isSlave)
 					{
 						for (; length + offset > offset; length--)
@@ -159,13 +164,25 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 							char c = document.getChar(offset + length - 1);
 							if (c == ' ' || c == '\t')
 							{
+								// in case the formatter job can consume the existing indent
+								// we save the string that may get consumed.
+								if (job.canConsumeIndentation)
+								{
+									consumedIndent.append(c);
+								}
 								continue;
 							}
 							break;
 						}
 					}
+					// revert the length to what we had before we collected the indent suffix that
+					// can be consumed.
+					if (job.canConsumeIndentation)
+					{
+						length += consumedIndent.length();
+					}
 					final TextEdit edit = formatter.format(document.get(), offset, length, indentationLevel,
-							job.isSelection, job.context);
+							job.isSelection, job.context, consumedIndent.reverse().toString());
 					if (edit != null)
 					{
 						if (edit.getChildrenSize() > 20)
@@ -190,13 +207,11 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 				WorkbenchWindow window = (WorkbenchWindow) workbench.getActiveWorkbenchWindow();
 				if (window != null && window.getStatusLineManager() != null)
 				{
-					window
-							.getStatusLineManager()
+					window.getStatusLineManager()
 							.setErrorMessage(
-									NLS
-											.bind(
-													FormatterMessages.ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError,
-													e.getMessage()));
+									NLS.bind(
+											FormatterMessages.ScriptFormattingStrategy_unableToFormatSourceContainingSyntaxError,
+											e.getMessage()));
 				}
 				workbench.getDisplay().beep();
 			}
@@ -215,8 +230,8 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 			}
 			catch (Exception e)
 			{
-				final String msg = NLS.bind(FormatterMessages.ScriptFormattingStrategy_unexpectedFormatterError, e
-						.toString());
+				final String msg = NLS.bind(FormatterMessages.ScriptFormattingStrategy_unexpectedFormatterError,
+						e.toString());
 				FormatterPlugin.logError(msg, e);
 			}
 			finally
@@ -249,14 +264,18 @@ public class ScriptFormattingStrategy extends ContextBasedFormattingStrategy
 		final String formatterId = (String) context.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_ID);
 		final Boolean isSlave = (Boolean) context
 				.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_IS_SLAVE);
+		final Boolean canConsumeIndentation = isSlave != null
+				&& isSlave
+				&& (Boolean) context
+						.getProperty(ScriptFormattingContextProperties.CONTEXT_FORMATTER_CAN_CONSUME_INDENTATION);
 		final Boolean isSelection = !(Boolean) context.getProperty(FormattingContextProperties.CONTEXT_DOCUMENT);
 		IRegion selectionRegion = null;
 		if (isSelection != null && isSelection)
 		{
 			selectionRegion = (IRegion) context.getProperty(FormattingContextProperties.CONTEXT_REGION);
 		}
-		fJobs.addLast(new FormatJob(context, document, partition, project, formatterId, isSlave, isSelection,
-				selectionRegion));
+		fJobs.addLast(new FormatJob(context, document, partition, project, formatterId, isSlave, canConsumeIndentation,
+				isSelection, selectionRegion));
 	}
 
 	@Override

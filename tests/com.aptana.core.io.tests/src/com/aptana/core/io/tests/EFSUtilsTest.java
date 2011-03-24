@@ -14,8 +14,8 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.ide.core.io.LocalConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 
 import junit.framework.TestCase;
 

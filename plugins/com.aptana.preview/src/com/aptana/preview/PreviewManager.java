@@ -245,14 +245,15 @@ public final class PreviewManager {
 			if (sourceConfig != null) {
 				IPreviewHandler handler = PreviewHandlers.getInstance().getHandler(sourceConfig.getContentType());
 				if (handler == null) {
-					if (DefaultPreviewHandler.getInstance().handle(sourceConfig) != null) {
-						return true;
-					}
-				} else {
-					// TODO: use IPreviewHandler.canHandle() ?
-					return true;
+					handler = DefaultPreviewHandler.getInstance();
 				}
-				
+
+				PreviewConfig previewConfig = handler.handle(sourceConfig);
+				if (previewConfig == null && !(handler instanceof DefaultPreviewHandler))
+				{
+					previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
+				}
+				return previewConfig != null;
 			}
 		} catch (CoreException e) {
 			Activator.log(e);
@@ -336,12 +337,18 @@ public final class PreviewManager {
 			for (IEditorPart previewEditorPart : openedPreviewEditors) {
 				previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
 			}
+			if (!forceOpen) {
+				workbenchPage.activate(editorPart);
+			}
 		} else {
 			openedPreviewEditors = EditorUtils.findEditors(input, PreviewEditorPart.EDITOR_ID);
 			if (openedPreviewEditors.length > 0) {
 				for (IEditorPart previewEditorPart : openedPreviewEditors) {
 					previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
-				}				
+				}
+				if (!forceOpen) {
+					workbenchPage.activate(editorPart);
+				}
 			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
 			}

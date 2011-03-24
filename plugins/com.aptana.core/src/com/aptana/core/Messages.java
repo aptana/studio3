@@ -44,5 +44,7 @@ public final class Messages extends NLS
 	public static String CoreStrings_Continue;
 	public static String CoreStrings_Cancel;
 	public static String CoreStrings_Help;
+	public static String CoreStrings_On;
+	public static String CoreStrings_Off;
 
 }

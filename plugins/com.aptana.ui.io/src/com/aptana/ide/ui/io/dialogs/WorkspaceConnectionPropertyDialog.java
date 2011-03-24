@@ -37,10 +37,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.WorkspaceConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ui.IPropertyDialog;
 

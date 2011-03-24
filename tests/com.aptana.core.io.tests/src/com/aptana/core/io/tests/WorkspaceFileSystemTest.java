@@ -13,6 +13,7 @@ import java.net.URI;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.filesystem.IFileSystem;
 import org.eclipse.core.resources.IWorkspace;
@@ -21,7 +22,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.ide.core.io.efs.WorkspaceFileSystem;
+import com.aptana.core.io.efs.WorkspaceFileSystem;
 
 public class WorkspaceFileSystemTest extends TestCase {
 
@@ -85,6 +86,13 @@ public class WorkspaceFileSystemTest extends TestCase {
 		URI uri = fs.toURI();
 		String replaced = uri.toString().replaceAll("workspace:", "file:"); //$NON-NLS-1$ //$NON-NLS-2$
 		assertEquals(location.toFile().toURI().toString(), replaced);
+	}
+
+	public void testNonExistingFile() throws CoreException {
+		IFileStore fs = wfs.getStore(location);
+		IFileStore child = fs.getChild("nonexisting.txt"); //$NON-NLS-1$
+		assertFalse(child.fetchInfo().exists());
+		assertNull(child.toLocalFile(EFS.NONE, null));
 	}
 
 }

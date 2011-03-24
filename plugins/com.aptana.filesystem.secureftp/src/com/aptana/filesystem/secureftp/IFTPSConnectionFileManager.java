@@ -10,7 +10,7 @@ package com.aptana.filesystem.secureftp;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.aptana.ide.core.io.vfs.IConnectionFileManager;
+import com.aptana.core.io.vfs.IConnectionFileManager;
 
 /**
  * @author Max Stepanov

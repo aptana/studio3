@@ -25,11 +25,17 @@ import org.eclipse.ui.actions.DeleteResourceAction;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.explorer.IExplorerUIConstants;
 import com.aptana.explorer.internal.ui.Messages;
-import com.aptana.explorer.internal.ui.SingleProjectView;
-import com.aptana.ui.actions.DefaultNavigatorActionProvider;
 
-public class CommandsActionProvider extends DefaultNavigatorActionProvider
+public class CommandsActionProvider extends ExplorerActionProvider
 {
+
+	public static final String ID = "com.aptana.explorer.navigator.actions.CommandsActions"; //$NON-NLS-1$
+
+	@Override
+	public String getActionId()
+	{
+		return ID;
+	}
 
 	@Override
 	protected Image getImage()
@@ -84,15 +90,5 @@ public class CommandsActionProvider extends DefaultNavigatorActionProvider
 				return true;
 			}
 		});
-	}
-
-	private IProject getSelectedProject()
-	{
-		SingleProjectView singleProjectView = ((SingleProjectView) getPartSite().getPart());
-		if (singleProjectView == null)
-		{
-			return null;
-		}
-		return singleProjectView.getActiveProject();
 	}
 }

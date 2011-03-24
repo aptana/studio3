@@ -22,5 +22,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(XMLPlugin.PLUGIN_ID);
 		prefs.putBoolean(IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
+		prefs.putBoolean(IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 	}
 }

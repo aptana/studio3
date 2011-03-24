@@ -9,8 +9,11 @@ package com.aptana.editor.common.validator;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -31,16 +34,20 @@ import com.aptana.core.resources.IUniformResource;
 import com.aptana.core.resources.MarkerUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.parsing.ast.IParseNode;
 
 public class ValidationManager implements IValidationManager
 {
 
+	private FileService fFileService;
 	private IDocument fDocument;
 	private Object fResource;
 	private URI fResourceUri;
-	private List<IValidationItem> fItems;
 	private String fCurrentLanguage;
+	// the nested languages that need to be validated as well
+	private Set<String> fNestedLanguages;
 
 	private IPropertyChangeListener fPropertyListener = new IPropertyChangeListener()
 	{
@@ -60,9 +67,10 @@ public class ValidationManager implements IValidationManager
 		}
 	};
 
-	public ValidationManager()
+	public ValidationManager(FileService fileService)
 	{
-		fItems = new ArrayList<IValidationItem>();
+		fFileService = fileService;
+		fNestedLanguages = new HashSet<String>();
 		CommonEditorPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
 	}
 
@@ -71,7 +79,6 @@ public class ValidationManager implements IValidationManager
 		fDocument = null;
 		fResource = null;
 		fResourceUri = null;
-		fItems.clear();
 		CommonEditorPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 	}
 
@@ -101,54 +108,86 @@ public class ValidationManager implements IValidationManager
 
 	public void validate(String source, String language)
 	{
-		fItems.clear();
 		fCurrentLanguage = language;
 
 		if (fResourceUri != null)
 		{
-			List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
-			String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-					.getString(getSelectedValidatorsPrefKey(fCurrentLanguage));
-			if (StringUtil.isEmpty(list))
+			Map<String, List<IValidationItem>> itemsByType = new HashMap<String, List<IValidationItem>>();
+			ValidatorReference validatorRef = getValidatorRef(language);
+			if (validatorRef != null)
 			{
-				// by default use the first validator that supports the language
-				if (validatorRefs.size() > 0)
+				List<IValidationItem> items = validatorRef.getValidator().validate(source, fResourceUri, this);
+				itemsByType.put(validatorRef.getType(), items);
+				// checks nested languages
+				for (String nestedLanguage : fNestedLanguages)
 				{
-					validatorRefs.get(0).getValidator().validate(source, fResourceUri, this);
+					processNestedLanguage(nestedLanguage, itemsByType);
 				}
+				update(itemsByType);
 			}
-			else
+		}
+	}
+
+	private void processNestedLanguage(String nestedLanguage, Map<String, List<IValidationItem>> itemsByType)
+	{
+		ValidatorReference validatorRef = getValidatorRef(nestedLanguage);
+		if (validatorRef != null)
+		{
+			IValidator validator = validatorRef.getValidator();
+			IParseNode rootAST = fFileService.getParseResult();
+			List<IValidationItem> items = new ArrayList<IValidationItem>();
+			processASTForNestedLanguage(rootAST, nestedLanguage, validator, items);
+			itemsByType.put(validatorRef.getType(), items);
+		}
+	}
+
+	private void processASTForNestedLanguage(IParseNode node, String language, IValidator validator,
+			List<IValidationItem> items)
+	{
+		if (node.getLanguage().equals(language))
+		{
+			if (!node.isEmpty())
 			{
-				String[] selectedValidators = list.split(","); //$NON-NLS-1$
-				for (String name : selectedValidators)
+				try
 				{
-					for (ValidatorReference validator : validatorRefs)
+					String source = fDocument.get(node.getStartingOffset(), node.getLength());
+					List<IValidationItem> newItems = validator.validate(source, fResourceUri, this);
+					int lines = fDocument.getLineOfOffset(node.getStartingOffset());
+					for (IValidationItem item : newItems)
 					{
-						if (validator.getName().equals(name))
-						{
-							validator.getValidator().validate(source, fResourceUri, this);
-							break;
-						}
+						((ValidationItem) item).setLineNumber(lines + item.getLineNumber());
+						((ValidationItem) item).setOffset(node.getStartingOffset() + item.getOffset());
+						items.add(item);
 					}
+				}
+				catch (BadLocationException e)
+				{
 				}
 			}
 		}
-		update(fItems.toArray(new IValidationItem[fItems.size()]));
+		else
+		{
+			IParseNode[] children = node.getChildren();
+			for (IParseNode child : children)
+			{
+				processASTForNestedLanguage(child, language, validator, items);
+			}
+		}
 	}
 
-	public void addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
+	public IValidationItem addError(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
 	{
-		addItem(IMarker.SEVERITY_ERROR, message, lineNumber, lineOffset, length, sourcePath);
+		return addItem(IMarker.SEVERITY_ERROR, message, lineNumber, lineOffset, length, sourcePath);
 	}
 
-	public void addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
+	public IValidationItem addWarning(String message, int lineNumber, int lineOffset, int length, URI sourcePath)
 	{
-		addItem(IMarker.SEVERITY_WARNING, message, lineNumber, lineOffset, length, sourcePath);
+		return addItem(IMarker.SEVERITY_WARNING, message, lineNumber, lineOffset, length, sourcePath);
 	}
 
-	public List<IValidationItem> getItems()
+	public void addNestedLanguage(String language)
 	{
-		return Collections.unmodifiableList(fItems);
+		fNestedLanguages.add(language);
 	}
 
 	public boolean isIgnored(String message, String language)
@@ -169,7 +208,8 @@ public class ValidationManager implements IValidationManager
 		return false;
 	}
 
-	private void addItem(int severity, String message, int lineNumber, int lineOffset, int length, URI sourcePath)
+	private IValidationItem addItem(int severity, String message, int lineNumber, int lineOffset, int length,
+			URI sourcePath)
 	{
 		int charLineOffset = 0;
 		if (fDocument != null)
@@ -183,10 +223,10 @@ public class ValidationManager implements IValidationManager
 			}
 		}
 		int offset = charLineOffset + lineOffset;
-		fItems.add(new ValidationItem(severity, message, offset, length, lineNumber, sourcePath.toString()));
+		return new ValidationItem(severity, message, offset, length, lineNumber, sourcePath.toString());
 	}
 
-	private void update(final IValidationItem[] items)
+	private void update(final Map<String, List<IValidationItem>> itemsByType)
 	{
 		// Performance fix: schedules the error handling as a single workspace update so that we don't trigger a
 		// bunch of resource updated events while problem markers are being added to the file.
@@ -195,7 +235,7 @@ public class ValidationManager implements IValidationManager
 
 			public void run(IProgressMonitor monitor)
 			{
-				updateValidation(items);
+				updateValidation(itemsByType);
 			}
 		};
 
@@ -210,7 +250,7 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	private synchronized void updateValidation(IValidationItem[] items)
+	private synchronized void updateValidation(Map<String, List<IValidationItem>> itemsByType)
 	{
 		if (fResource == null)
 		{
@@ -235,40 +275,86 @@ public class ValidationManager implements IValidationManager
 			return;
 		}
 
-		try
+		Set<String> markerTypes = itemsByType.keySet();
+		List<IValidationItem> items;
+		for (String markerType : markerTypes)
 		{
-			String markerType = IMarkerConstants.PROBLEM_MARKER;
-			// deletes the old markers
-			if (isExternal)
+			try
 			{
-				MarkerUtils.deleteMarkers(externalResource, markerType, true);
-			}
-			else
-			{
-				workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
-			}
-
-			// adds the new ones
-			IMarker marker;
-			for (IValidationItem item : items)
-			{
+				// deletes the old markers
 				if (isExternal)
 				{
-					marker = MarkerUtils.createMarker(externalResource, null, markerType);
-					// don't persist on external file
-					marker.setAttribute(IMarker.TRANSIENT, true);
+					MarkerUtils.deleteMarkers(externalResource, markerType, true);
+					// this is to remove "Aptana Problem" markers
+					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
+					{
+						MarkerUtils.deleteMarkers(externalResource, IMarkerConstants.PROBLEM_MARKER, true);
+					}
 				}
 				else
 				{
-					marker = workspaceResource.createMarker(markerType);
+					workspaceResource.deleteMarkers(markerType, true, IResource.DEPTH_INFINITE);
+					// this is to remove "Aptana Problem" markers
+					if (!markerType.equals(IMarkerConstants.PROBLEM_MARKER))
+					{
+						workspaceResource
+								.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
+					}
 				}
-				marker.setAttributes(item.createMarkerAttributes());
+
+				// adds the new ones
+				items = itemsByType.get(markerType);
+				IMarker marker;
+				for (IValidationItem item : items)
+				{
+					if (isExternal)
+					{
+						marker = MarkerUtils.createMarker(externalResource, null, markerType);
+						// don't persist on external file
+						marker.setAttribute(IMarker.TRANSIENT, true);
+					}
+					else
+					{
+						marker = workspaceResource.createMarker(markerType);
+					}
+					marker.setAttributes(item.createMarkerAttributes());
+				}
+			}
+			catch (CoreException e)
+			{
+				CommonEditorPlugin.logError(e);
 			}
 		}
-		catch (CoreException e)
+	}
+
+	private static ValidatorReference getValidatorRef(String language)
+	{
+		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
+		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
+				.getString(getSelectedValidatorsPrefKey(language));
+		if (StringUtil.isEmpty(list))
 		{
-			CommonEditorPlugin.logError(e);
+			// by default uses the first validator that supports the language
+			if (validatorRefs.size() > 0)
+			{
+				return validatorRefs.get(0);
+			}
 		}
+		else
+		{
+			String[] selectedValidators = list.split(","); //$NON-NLS-1$
+			for (String name : selectedValidators)
+			{
+				for (ValidatorReference validator : validatorRefs)
+				{
+					if (validator.getName().equals(name))
+					{
+						return validator;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	private static ISchedulingRule getMarkerRule(Object resource)

@@ -170,6 +170,11 @@ public class ParserPoolFactory
 	 */
 	public static IParseRootNode parse(String language, IParseState parseState)
 	{
+		if (language == null)
+		{
+			return null;
+		}
+
 		IParserPool pool = getInstance().getParserPool(language);
 		IParseRootNode result = null;
 		

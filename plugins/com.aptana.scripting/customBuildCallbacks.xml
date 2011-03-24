@@ -68,22 +68,23 @@
 			<arg value="-c" />
 			<arg value="git checkout ${bundle.branch}" />
 		</exec>
-		<!-- Now checkout the revision of the bundle as of the latest commit date for red_core -->
-		<echo message="git checkout `git rev-list -n 1 --before=${last.commit.date} ${bundle.branch}`"></echo>
-		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}">
+		<!-- Grab lastmod and append it to file containing all of the lastmods for each packaged ruble -->
+		<exec executable="/bin/bash" dir="bundles/${bundle.dir.name}" append="true" output="bundle_timestamps.txt">
 			<arg value="-c" />
-			<arg value="git checkout `git rev-list -n 1 --before=${last.commit.date} ${bundle.branch}`" />
+			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
 		</exec>
+		<echo append="true" file="bundle_timestamps.txt" message="," />
 		<!-- Now remove the .git subdirectory -->
 		<delete dir="bundles/${bundle.dir.name}/.git" quiet="true" />
 	</target>
 
 	<target name="pre.@dot">
-	    <!-- Find last commit date for our normal repo, so we can checkout that time for each bundle... -->
-		<exec executable="/bin/bash" dir="." outputproperty="last.commit.date">
+	    <!-- FIXME Find latest commit date between this plugin and every bundle and use that as the build qualifier! -->
+		<exec executable="/bin/bash" dir="." append="true" output="bundle_timestamps.txt">
 			<arg value="-c" />
-		  	<arg value="git log -1 --pretty=format:%ct" />
+			<arg value="git log --max-count=1 --pretty=format:'%ct' ." />
 		</exec>
+		<echo append="true" file="bundle_timestamps.txt" message="," />
 		<!-- Grab the pre-defined set of bundles -->
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="text.ruble" />
@@ -113,7 +114,7 @@
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="html.ruble" />
 		  	<param name="bundle.dir.name" value="html.ruble" />
-		  	<param name="bundle.branch" value="origin/development" />
+		  	<param name="bundle.branch" value="master" />
 		</antcall>
 		<antcall target="clone-bundle">
 		  	<param name="bundle.name" value="css.ruble" />
@@ -190,6 +191,40 @@
 			<param name="bundle.dir.name" value="engineyard.ruble" />
 		  	<param name="bundle.branch" value="master" />
 		</antcall>
+		<!-- Now grab the max value of lastmods in bundle_timestamps.txt file and use that as qualifier! -->
+		<property name="bundle.root.dir" location="${source.folder1}/.."/>
+		<script language="javascript">
+		<![CDATA[
+			importPackage(java.lang, java.util, java.io);
+
+			// The main method (called from the bottom of the file).
+			function main() {
+				var basedir = project.getProperty("bundle.root.dir");
+				
+				var timestamps = new File(basedir, "bundle_timestamps.txt");
+				var reader = new BufferedReader(new FileReader(timestamps));
+			    var line = reader.readLine();
+				System.out.println(line);
+				reader.close();
+				var max = 0;
+				var numbers = line.split(",");
+				for (var i = 0; i < numbers.length; i++) {
+					new_number = parseInt(numbers[i]);
+					if (new_number > max)
+					{
+						max = new_number;
+					}
+				}
+				System.out.println("Max timestamp of scripting plugin and bundles: " + max);
+			    // Write the max number into the qualifier!
+			    var writer = new FileWriter(new File(basedir, "build.properties"), true);
+				writer.write("qualifier = " + max + "\n");
+				writer.close();
+			}
+
+			main();
+		]]>
+		</script>
 	</target>
 
 	<!-- ===================================================================== -->

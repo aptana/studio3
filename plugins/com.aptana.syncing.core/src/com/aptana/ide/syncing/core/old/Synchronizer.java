@@ -31,13 +31,13 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
+import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.io.efs.SyncUtils;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.FileUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.SyncingPlugin;
-import com.aptana.syncing.core.internal.SyncUtils;
 
 /**
  * @author Kevin Lindsey
@@ -746,128 +746,143 @@ public class Synchronizer implements ILoggable
 		{
 			final VirtualFileSyncPair item = fileList[i];
 			final IFileStore clientFile = item.getSourceFile();
-			final IFileInfo clientFileInfo = item.getSourceFileInfo();
 			final IFileStore serverFile = item.getDestinationFile();
-			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
-			setSyncItemDirection(item, false, false);
 			SubMonitor childMonitor = subMonitor.newChild(1);
 			childMonitor.setTaskName(getSyncStatus(item));
 
-			// fire event
-			if (!syncEvent(item, i, totalItems, childMonitor))
+			try
 			{
-				delete = false;
-				break;
-			}
+				final IFileInfo clientFileInfo = item.getSourceFileInfo();
+				final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
-			Policy.checkCanceled(childMonitor);
+				setSyncItemDirection(item, false, false);
 
-			switch (item.getSyncState())
-			{
-				case SyncState.ClientItemOnly:
-					// only exists on client; checks if it needs to be deleted
-					if (delete)
-					{
-						// Need to query first because deletion makes isDirectory always return false
-						boolean wasDirectory = clientFileInfo.isDirectory();
-						clientFile.delete(EFS.NONE, null);
-						if (wasDirectory)
+				// fire event
+				if (!syncEvent(item, i, totalItems, childMonitor))
+				{
+					delete = false;
+					break;
+				}
+
+				Policy.checkCanceled(childMonitor);
+
+				switch (item.getSyncState())
+				{
+					case SyncState.ClientItemOnly:
+						// only exists on client; checks if it needs to be deleted
+						if (delete)
 						{
-							this._clientDirectoryDeletedCount++;
+							// Need to query first because deletion makes isDirectory always return false
+							boolean wasDirectory = clientFileInfo.isDirectory();
+							clientFile.delete(EFS.NONE, null);
+							if (wasDirectory)
+							{
+								this._clientDirectoryDeletedCount++;
+							}
+							else
+							{
+								this._clientFileDeletedCount++;
+							}
+						}
+						syncDone(item, childMonitor);
+						break;
+
+					case SyncState.ServerItemOnly:
+						final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot,
+								item.getDestinationFile(), _clientFileRoot);
+
+						if (serverFileInfo.isDirectory())
+						{
+							logCreatedDirectory(targetClientFile);
+
+							if (!targetClientFile.fetchInfo().exists())
+							{
+								targetClientFile.mkdir(EFS.NONE, null);
+								this._clientDirectoryCreatedCount++;
+								_newFilesDownloaded.add(targetClientFile);
+							}
+
+							logSuccess();
+							syncDone(item, childMonitor);
 						}
 						else
 						{
-							this._clientFileDeletedCount++;
+							logDownloading(serverFile);
+							try
+							{
+								SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
+								Synchronizer.this._serverFileTransferedCount++;
+								_newFilesDownloaded.add(targetClientFile);
+
+								logSuccess();
+								syncDone(item, childMonitor);
+							}
+							catch (CoreException e)
+							{
+								logError(e);
+								if (!syncError(item, e, childMonitor))
+								{
+									result = false;
+									break FILE_LOOP;
+								}
+							}
 						}
-					}
-					syncDone(item, childMonitor);
-					break;
+						break;
 
-				case SyncState.ServerItemOnly:
-					final IFileStore targetClientFile = EFSUtils.createFile(_serverFileRoot, item.getDestinationFile(),
-							_clientFileRoot);
-
-					if (serverFileInfo.isDirectory())
-					{
-						logCreatedDirectory(targetClientFile);
-
-						if (!targetClientFile.fetchInfo().exists())
-						{
-							targetClientFile.mkdir(EFS.NONE, null);
-							this._clientDirectoryCreatedCount++;
-							_newFilesDownloaded.add(targetClientFile);
-						}
-
-						logSuccess();
-						syncDone(item, childMonitor);
-					}
-					else
-					{
+					case SyncState.ServerItemIsNewer:
+					case SyncState.CRCMismatch:
+						// exists on both sides, but the server item is newer
 						logDownloading(serverFile);
-						try
+						if (serverFileInfo.isDirectory())
 						{
-							SyncUtils.copy(serverFile, serverFileInfo, targetClientFile, EFS.NONE, childMonitor);
-							Synchronizer.this._serverFileTransferedCount++;
-							_newFilesDownloaded.add(targetClientFile);
+							try
+							{
+								EFSUtils.setModificationTime(serverFileInfo.getLastModified(), clientFile);
+							}
+							catch (CoreException e)
+							{
+								logError(e);
+							}
 
 							logSuccess();
 							syncDone(item, childMonitor);
 						}
-						catch (CoreException e)
+						else
 						{
-							logError(e);
-							if (!syncError(item, e, childMonitor))
+							try
 							{
-								result = false;
-								break FILE_LOOP;
+								SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, childMonitor);
+								Synchronizer.this._serverFileTransferedCount++;
+								logSuccess();
+								syncDone(item, childMonitor);
+							}
+							catch (CoreException e)
+							{
+								logError(e);
+								if (!syncError(item, e, childMonitor))
+								{
+									result = false;
+									break FILE_LOOP;
+								}
 							}
 						}
-					}
-					break;
+						break;
 
-				case SyncState.ServerItemIsNewer:
-				case SyncState.CRCMismatch:
-					// exists on both sides, but the server item is newer
-					logDownloading(serverFile);
-					if (serverFileInfo.isDirectory())
-					{
-						try
-						{
-							EFSUtils.setModificationTime(serverFileInfo.getLastModified(), clientFile);
-						}
-						catch (CoreException e)
-						{
-							logError(e);
-						}
-
-						logSuccess();
+					default:
 						syncDone(item, childMonitor);
-					}
-					else
-					{
-						try
-						{
-							SyncUtils.copy(serverFile, serverFileInfo, clientFile, EFS.NONE, childMonitor);
-							Synchronizer.this._serverFileTransferedCount++;
-							logSuccess();
-							syncDone(item, childMonitor);
-						}
-						catch (CoreException e)
-						{
-							logError(e);
-							if (!syncError(item, e, childMonitor))
-							{
-								result = false;
-								break FILE_LOOP;
-							}
-						}
-					}
-					break;
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				SyncingPlugin.logError(Messages.Synchronizer_ErrorDuringSync, ex);
+				result = false;
 
-				default:
-					syncDone(item, childMonitor);
-					break;
+				if (!syncError(item, ex, childMonitor))
+				{
+					break FILE_LOOP;
+				}
 			}
 		}
 
@@ -1271,139 +1286,154 @@ public class Synchronizer implements ILoggable
 		{
 			final VirtualFileSyncPair item = fileList[i];
 			final IFileStore clientFile = item.getSourceFile();
-			final IFileInfo clientFileInfo = item.getSourceFileInfo();
 			final IFileStore serverFile = item.getDestinationFile();
-			final IFileInfo serverFileInfo = item.getDestinationFileInfo();
 
-			setSyncItemDirection(item, true, false);
 			SubMonitor childMonitor = subMonitor.newChild(1);
 			childMonitor.setTaskName(getSyncStatus(item));
 
-			// fire event
-			if (!syncEvent(item, i, totalItems, childMonitor))
+			try
 			{
-				result = false;
-				break;
-			}
+				final IFileInfo clientFileInfo = item.getSourceFileInfo(childMonitor);
+				final IFileInfo serverFileInfo = item.getDestinationFileInfo(childMonitor);
 
-			Policy.checkCanceled(childMonitor);
+				setSyncItemDirection(item, true, false);
 
-			switch (item.getSyncState())
-			{
-				case SyncState.ClientItemOnly:
-					// only exists on client; creates the item on server
-					final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(),
-							_serverFileRoot);
-
-					if (clientFileInfo.isDirectory())
-					{
-						// targetServerFile.mkdir(EFS.NONE, null); // = server.createVirtualDirectory(serverPath);
-
-						if (!targetServerFile.fetchInfo().exists())
-						{
-							targetServerFile.mkdir(EFS.NONE, null); // server.createLocalDirectory(targetServerFile);
-							this._serverDirectoryCreatedCount++;
-							_newFilesUploaded.add(targetServerFile);
-						}
-
-						syncDone(item, childMonitor);
-					}
-					else
-					{
-						logUploading(clientFile);
-
-						try
-						{
-							SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
-							Synchronizer.this._clientFileTransferedCount++;
-							_newFilesUploaded.add(targetServerFile);
-							logSuccess();
-							syncDone(item, childMonitor);
-						}
-						catch (CoreException e)
-						{
-							logError(e);
-
-							if (!syncError(item, e, childMonitor))
-							{
-								result = false;
-								break FILE_LOOP;
-							}
-						}
-
-					}
+				// fire event
+				if (!syncEvent(item, i, totalItems, childMonitor))
+				{
+					result = false;
 					break;
+				}
 
-				case SyncState.ServerItemOnly:
-					// only exists on server; checks if it needs to be deleted
-					if (delete)
-					{
-						// Need to query if directory first because deletion makes isDirectory always return false.
-						boolean wasDirectory = serverFileInfo.isDirectory();
-						serverFile.delete(EFS.NONE, childMonitor);
-						if (wasDirectory)
+				Policy.checkCanceled(childMonitor);
+
+				switch (item.getSyncState())
+				{
+					case SyncState.ClientItemOnly:
+						// only exists on client; creates the item on server
+						final IFileStore targetServerFile = EFSUtils.createFile(_clientFileRoot, item.getSourceFile(),
+								_serverFileRoot);
+
+						if (clientFileInfo.isDirectory())
 						{
-							this._serverDirectoryDeletedCount++;
+							// targetServerFile.mkdir(EFS.NONE, null); // = server.createVirtualDirectory(serverPath);
+
+							if (!targetServerFile.fetchInfo().exists())
+							{
+								targetServerFile.mkdir(EFS.NONE, null); // server.createLocalDirectory(targetServerFile);
+								this._serverDirectoryCreatedCount++;
+								_newFilesUploaded.add(targetServerFile);
+							}
+
+							syncDone(item, childMonitor);
 						}
 						else
 						{
-							this._serverFileDeletedCount++;
-						}
-					}
-					syncDone(item, childMonitor);
-					break;
+							logUploading(clientFile);
 
-				case SyncState.ClientItemIsNewer:
-				case SyncState.CRCMismatch:
-					// exists on both sides, but the client item is newer
-					logUploading(clientFile);
-					if (clientFileInfo.isDirectory())
-					{
-						// just needs to set the modification time for directory
-						try
-						{
-							EFSUtils.setModificationTime(clientFileInfo.getLastModified(), serverFile);
-						}
-						catch (CoreException e)
-						{
-							logError(e);
-
-							if (!syncError(item, e, childMonitor))
+							try
 							{
-								result = false;
-								break FILE_LOOP;
+								SyncUtils.copy(clientFile, clientFileInfo, targetServerFile, EFS.NONE, childMonitor);
+								Synchronizer.this._clientFileTransferedCount++;
+								_newFilesUploaded.add(targetServerFile);
+								logSuccess();
+								syncDone(item, childMonitor);
+							}
+							catch (CoreException e)
+							{
+								logError(e);
+
+								if (!syncError(item, e, childMonitor))
+								{
+									result = false;
+									break FILE_LOOP;
+								}
+							}
+
+						}
+						break;
+
+					case SyncState.ServerItemOnly:
+						// only exists on server; checks if it needs to be deleted
+						if (delete)
+						{
+							// Need to query if directory first because deletion makes isDirectory always return false.
+							boolean wasDirectory = serverFileInfo.isDirectory();
+							serverFile.delete(EFS.NONE, childMonitor);
+							if (wasDirectory)
+							{
+								this._serverDirectoryDeletedCount++;
+							}
+							else
+							{
+								this._serverFileDeletedCount++;
 							}
 						}
-
-						logSuccess();
 						syncDone(item, childMonitor);
-					}
-					else
-					{
-						try
+						break;
+
+					case SyncState.ClientItemIsNewer:
+					case SyncState.CRCMismatch:
+						// exists on both sides, but the client item is newer
+						logUploading(clientFile);
+						if (clientFileInfo.isDirectory())
 						{
-							SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, childMonitor);
-							Synchronizer.this._clientFileTransferedCount++;
+							// just needs to set the modification time for directory
+							try
+							{
+								EFSUtils.setModificationTime(clientFileInfo.getLastModified(), serverFile);
+							}
+							catch (CoreException e)
+							{
+								logError(e);
+
+								if (!syncError(item, e, childMonitor))
+								{
+									result = false;
+									break FILE_LOOP;
+								}
+							}
+
 							logSuccess();
 							syncDone(item, childMonitor);
 						}
-						catch (CoreException e)
+						else
 						{
-							logError(e);
-
-							if (!syncError(item, e, childMonitor))
+							try
 							{
-								result = false;
-								break FILE_LOOP;
+								SyncUtils.copy(clientFile, clientFileInfo, serverFile, EFS.NONE, childMonitor);
+								Synchronizer.this._clientFileTransferedCount++;
+								logSuccess();
+								syncDone(item, childMonitor);
 							}
+							catch (CoreException e)
+							{
+								logError(e);
+
+								if (!syncError(item, e, childMonitor))
+								{
+									result = false;
+									break FILE_LOOP;
+								}
+							}
+
 						}
+						break;
 
-					}
-					break;
+					default:
+						syncDone(item, childMonitor);
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				SyncingPlugin.logError(Messages.Synchronizer_ErrorDuringSync, ex);
+				result = false;
 
-				default:
-					syncDone(item, childMonitor);
-					break;
+				if (!syncError(item, ex, childMonitor))
+				{
+					break FILE_LOOP;
+				}
 			}
 		}
 

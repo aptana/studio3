@@ -22,13 +22,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.syncing.core.old.ILogger;
 import com.aptana.ide.syncing.core.old.Synchronizer;
 import com.aptana.ide.syncing.core.old.VirtualFileSyncPair;
@@ -147,25 +147,30 @@ public abstract class LargeSampleSyncingTests extends TestCase
 	// syncTest(true, System.currentTimeMillis());
 	// }
 
+	// @formatter:off
 	/**
-	 * Tests synchronization using a large sample size. Test does the following: 1) Checks out a git repo to a local
-	 * directory (Directory A) at a particular tag (version 1.4) 2) Checkout out the same git repo to another local
-	 * directory (Directory B) at an older tag (say version 1.3) 3) Copies the local git repo to a second directory
-	 * (Directory C) 4) Uploads Directory B to the remote server (Directory D) 5) Compares A and C to make sure nothing
-	 * changed during the upload 6) Compares C and D to make sure the upload succeeded 7) Does a Synchronization between
-	 * A and D, deleting any orphaned files on D. This would simulate a user uploading a new website 8) Compare A & C
-	 * again to make sure nothing changed on A during the sync. 9) Compare A & D to make sure they are identical
+	 * Tests synchronization using a large sample size. Test does the following:
+	 * 1) Checks out a git repo to a local directory (Directory A) at a particular tag (version 1.4)
+	 * 2) Checkout out the same git repo to another local directory (Directory B) at an older tag (say version 1.3)
+	 * 3) Copies the local git repo to a second directory (Directory C)
+	 * 4) Uploads Directory B to the remote server (Directory D)
+	 * 5) Compares A and C to make sure nothing changed during the upload
+	 * 6) Compares C and D to make sure the upload succeeded
+	 * 7) Does a Synchronization between A and D, deleting any orphaned files on D. This would simulate a user uploading a new website
+	 * 8) Compare A & C again to make sure nothing changed on A during the sync.
+	 * 9) Compare A & D to make sure they are identical
 	 * 
 	 * @throws IOException
 	 * @throws ConnectionException
 	 */
+	// @formatter:on
 	public void syncTest(boolean includeCloakedFiles, long sysTime) throws IOException, CoreException
 	{
 		String CLIENT_TEST = "client_test";
 		String CLIENT_CONTROL = "client_control";
 		String SERVER_LOCAL = "server_local";
 		String SERVER_TEST = "server_test";
-		int timeTolerance = 1000; // 150000;
+		int timeTolerance = 60000;
 
 		IFileStore clientTestDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_TEST + sysTime));
 		IFileStore clientControlDirectory = clientDirectory.getFileStore(new Path("/" + CLIENT_CONTROL + sysTime));
@@ -178,7 +183,7 @@ public abstract class LargeSampleSyncingTests extends TestCase
 		runGitClone("git://github.com/DmitryBaranovskiy/raphael.git", clientDirectory, clientTestDirectory.getName());
 
 		System.out.println("2) Writing github repo to " + EFSUtils.getAbsolutePath(serverLocalDirectory));
-		runGitClone("git://github.com/DmitryBaranovskiy/raphael.git", serverDirectory, serverLocalDirectory.getName());
+		runGitClone("git://github.com/DmitryBaranovskiy/raphael.git", clientDirectory, serverLocalDirectory.getName());
 
 		// checkout specific tags
 		System.out.println("Checking out tag v1.4.0 on client_test");

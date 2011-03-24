@@ -41,9 +41,12 @@ import org.jruby.RubyHash;
 import org.jruby.RubySymbol;
 import org.jruby.runtime.builtin.IRubyObject;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.ICommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.UserAgentManager;
+import com.aptana.editor.common.scripting.IDocumentScopeManager;
 import com.aptana.editor.common.scripting.snippets.SnippetsCompletionProcessor;
 import com.aptana.index.core.Index;
 import com.aptana.index.core.IndexManager;
@@ -157,12 +160,6 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (others == null || others.length == 0)
 		{
-			// Pre-select the first ruble-contributed proposal/snippet
-			ICompletionProposal proposal = proposals.get(0);
-			if (proposal instanceof CommonCompletionProposal)
-			{
-				((CommonCompletionProposal) proposal).setIsDefaultSelection(true);
-			}
 			return proposals.toArray(new ICompletionProposal[proposals.size()]);
 		}
 
@@ -208,8 +205,8 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
 		try
 		{
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(viewer, offset);
-			List<ContentAssistElement> commands = BundleManager.getInstance().getContentAssists(new ScopeFilter(scope));
+			String scope = getDocumentScopeManager().getScopeAtOffset(viewer, offset);
+			List<ContentAssistElement> commands = getBundleManager().getContentAssists(new ScopeFilter(scope));
 			if (commands != null && commands.size() > 0)
 			{
 				Ruby ruby = Ruby.newInstance();
@@ -335,6 +332,16 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 			CommonEditorPlugin.logError(e.getMessage(), e);
 		}
 		return proposals;
+	}
+
+	protected BundleManager getBundleManager()
+	{
+		return BundleManager.getInstance();
+	}
+
+	protected IDocumentScopeManager getDocumentScopeManager()
+	{
+		return CommonEditorPlugin.getDefault().getDocumentScopeManager();
 	}
 
 	protected ICompletionProposal[] doComputeCompletionProposals(ITextViewer viewer, int offset, char activationChar,
@@ -501,11 +508,14 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 */
 	protected URI getURI()
 	{
-		IEditorInput editorInput = editor.getEditorInput();
-		if (editorInput instanceof IURIEditorInput)
+		if (editor != null)
 		{
-			IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
-			return fileEditorInput.getURI();
+			IEditorInput editorInput = editor.getEditorInput();
+			if (editorInput instanceof IURIEditorInput)
+			{
+				IURIEditorInput fileEditorInput = (IURIEditorInput) editorInput;
+				return fileEditorInput.getURI();
+			}
 		}
 		return null;
 	}
@@ -545,6 +555,11 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 		ICompletionProposal caseSensitiveProposal = null;
 		ICompletionProposal caseInsensitiveProposal = null;
 
+		if (prefix == null || prefix.equals(StringUtil.EMPTY) || proposals == null)
+		{
+			return;
+		}
+
 		for (ICompletionProposal proposal : proposals)
 		{
 			String displayString = proposal.getDisplayString();
@@ -568,11 +583,12 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 		if (caseSensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseSensitiveProposal).setIsDefaultSelection(true);
+			((CommonCompletionProposal) caseSensitiveProposal).setRelevance(ICommonCompletionProposal.RELEVANCE_HIGH);
 		}
 		else if (caseInsensitiveProposal instanceof CommonCompletionProposal)
 		{
-			((CommonCompletionProposal) caseInsensitiveProposal).setIsDefaultSelection(true);
+			((CommonCompletionProposal) caseInsensitiveProposal)
+					.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
 		}
 		else
 		{
@@ -582,7 +598,7 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 
 				if (proposal instanceof CommonCompletionProposal)
 				{
-					((CommonCompletionProposal) proposal).setIsSuggestedSelection(true);
+					((CommonCompletionProposal) proposal).setRelevance(ICommonCompletionProposal.RELEVANCE_LOW);
 				}
 			}
 		}
@@ -592,7 +608,25 @@ public class CommonContentAssistProcessor implements IContentAssistProcessor, IC
 	 * (non-Javadoc)
 	 * @see com.aptana.editor.common.ICommonContentAssistProcessor#isValidAssistLocation(char, int, org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.contentassist.ICommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
 	{
 		return false;
 	}

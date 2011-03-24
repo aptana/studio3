@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
+import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.core.util.StringUtil;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

@@ -10,9 +10,11 @@ package com.aptana.filesystem.secureftp;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jsch.internal.core.IConstants;
@@ -54,6 +56,9 @@ public final class SecureUtils {
 			SshPrivateKeyFile.parse(keyFile).toPrivateKey(String.copyValueOf(password));
 			return true;
 		} catch (InvalidSshKeyException e) {
+			if (e.getCause() instanceof NoSuchAlgorithmException) {
+				SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, e.getCause().getMessage()));
+			}
 		} catch (IOException e) {
 		}
 		return false;

@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.GitPlugin;
 
 /**
@@ -71,7 +72,7 @@ public final class PortableGit {
 						return Status.OK_STATUS;
 					}
 				};
-				job.setSystem(true);
+				job.setSystem(!EclipseUtil.showSystemJobs());
 				job.setPriority(Job.LONG);
 				job.schedule();
 			}

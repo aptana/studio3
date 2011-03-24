@@ -47,7 +47,7 @@ public class JSONObject extends HashMap implements Map, JSONAware, JSONStreamAwa
      */
 	public static void writeJSONString(Map map, Writer out) throws IOException {
 		if(map == null){
-			out.write("null");
+			out.write("null"); //$NON-NLS-1$
 			return;
 		}
 		
@@ -85,7 +85,7 @@ public class JSONObject extends HashMap implements Map, JSONAware, JSONStreamAwa
 	 */
 	public static String toJSONString(Map map){
 		if(map == null)
-			return "null";
+			return "null"; //$NON-NLS-1$
 		
         StringBuffer sb = new StringBuffer();
         boolean first = true;
@@ -112,7 +112,7 @@ public class JSONObject extends HashMap implements Map, JSONAware, JSONStreamAwa
 	private static String toJSONString(String key,Object value, StringBuffer sb){
 		sb.append('\"');
         if(key == null)
-            sb.append("null");
+            sb.append("null"); //$NON-NLS-1$
         else
             JSONValue.escape(key, sb);
 		sb.append('\"').append(':');

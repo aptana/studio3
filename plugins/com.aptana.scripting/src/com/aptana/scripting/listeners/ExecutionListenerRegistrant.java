@@ -153,7 +153,7 @@ public class ExecutionListenerRegistrant implements ElementVisibilityListener, I
 			Map<String, String> propertyMap = new HashMap<String, String>();
 
 			// add type
-			propertyMap.put("id", id);
+			propertyMap.put("id", id); //$NON-NLS-1$
 
 			// add optional key/values
 			int length = properties.length & ~0x01;
@@ -214,7 +214,7 @@ public class ExecutionListenerRegistrant implements ElementVisibilityListener, I
 	{
 		this.execute( //
 				commandId, //
-				"type", "postExecuteSuccess" //
+				"type", "postExecuteSuccess" // //$NON-NLS-1$ //$NON-NLS-2$
 		);
 	}
 

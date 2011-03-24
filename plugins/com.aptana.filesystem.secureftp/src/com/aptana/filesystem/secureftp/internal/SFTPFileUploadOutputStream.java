@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FileTransferOutputStream;
 import com.enterprisedt.net.ftp.ssh.SSHFTPClient;
+import com.enterprisedt.net.j2ssh.sftp.SshFxpStatus;
 
 /**
  * @author Max Stepanov
@@ -94,15 +95,23 @@ public class SFTPFileUploadOutputStream extends OutputStream {
 					ftpClient.rename(ftpOutputStream.getRemoteFile(), actualFilename);
 					filename = null;
 				}
-				if (modificationTime != null) {
-					ftpClient.setModTime(actualFilename, modificationTime);
-				}
-				if (permissions > 0) {
-					((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
+				try {
+					if (modificationTime != null) {
+						ftpClient.setModTime(actualFilename, modificationTime);
+					}
+					if (permissions > 0) {
+						((SSHFTPClient) ftpClient).changeMode((int) (permissions & 0777), actualFilename);
+					}
+				} catch (FTPException e) {
+					if (e.getReplyCode() != SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
+						throw e;
+					}
 				}
 			} catch (FTPException e) {
 				safeClose(true);
-				throw new IOException(e.getMessage()); 
+				IOException io = new IOException();
+				io.initCause(e);
+				throw io; 
 			}
 		} finally {
 			safeClose(false);

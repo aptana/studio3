@@ -78,7 +78,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private final class YAMLDocumentSeparatorRule extends ExtendedWordRule
+	private static final class YAMLDocumentSeparatorRule extends ExtendedWordRule
 	{
 		private YAMLDocumentSeparatorRule(IToken defaultToken)
 		{
@@ -93,7 +93,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
-	private final class SingleCharacterDetector implements IWordDetector
+	private static final class SingleCharacterDetector implements IWordDetector
 	{
 		private char fChar;
 
@@ -118,7 +118,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 	 * 
 	 * @author cwilliams
 	 */
-	private final class YAMLDirectiveSeparatorRule extends ExtendedWordRule
+	private static final class YAMLDirectiveSeparatorRule extends ExtendedWordRule
 	{
 		private YAMLDirectiveSeparatorRule(IToken defaultToken)
 		{
@@ -133,7 +133,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
-	private final class YAMLKeyRule extends ExtendedWordRule
+	private static final class YAMLKeyRule extends ExtendedWordRule
 	{
 		private Pattern pattern;
 
@@ -161,7 +161,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
-	private final class YAMLNumberRule extends ExtendedWordRule
+	private static final class YAMLNumberRule extends ExtendedWordRule
 	{
 		private Pattern pattern;
 
@@ -186,7 +186,7 @@ public class YAMLCodeScanner extends BufferedRuleBasedScanner
 		}
 	}
 
-	private final class YAMLDateRule extends ExtendedWordRule
+	private static final class YAMLDateRule extends ExtendedWordRule
 	{
 		private Pattern pattern;
 

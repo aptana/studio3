@@ -161,7 +161,7 @@ public final class BrowserUtil {
 				if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) != null) {
 					String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 					// Check for compatible Firebug version
-					if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) { //$NON-NLS-1$
+					if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) {
 						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
 						available = extension.toFile().exists() && !extension.append(DEBUGGER_FILE).toFile().exists();
 					}
@@ -317,7 +317,7 @@ public final class BrowserUtil {
 							return false;
 						}
 						String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
-						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) { //$NON-NLS-1$
+						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) {
 							prompter
 									.handleStatus(
 											installDebuggerPromptStatus,
@@ -353,7 +353,7 @@ public final class BrowserUtil {
 						execProcess(new String[] {
 								"/usr/bin/open", //$NON-NLS-1$
 								"-b", //$NON-NLS-1$
-								getMacOSXApplicationIdentifier(browserExecutable) }, -1); //$NON-NLS-1$
+								getMacOSXApplicationIdentifier(browserExecutable) }, -1);
 						try {
 							Thread.sleep(INSTALL_TIMEOUT);
 						} catch (InterruptedException e) {

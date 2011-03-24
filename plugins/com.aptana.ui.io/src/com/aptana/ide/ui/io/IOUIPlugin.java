@@ -317,6 +317,11 @@ public class IOUIPlugin extends AbstractUIPlugin
 		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, msg, e));
 	}
 
+	public static void logError(Exception e)
+	{
+		log(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
+	}
+
 	public static void logImportant(String msg, Exception e)
 	{
 		log(new Status(IStatus.WARNING, PLUGIN_ID, IStatus.OK, msg, e));

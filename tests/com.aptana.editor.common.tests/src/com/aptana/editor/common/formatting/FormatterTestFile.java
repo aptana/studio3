@@ -1,11 +1,12 @@
 package com.aptana.editor.common.formatting;
 
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.URL;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -15,12 +16,13 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
 
 /**
  * FormatterTestFile <br>
- * 
  * This class provides the basic functionality that should be used for all formatting test files. A formatting test file
  * is divided into different sections using tags surrounded by "==" (These tags need to be in its own separate tag). The
  * first tag should be "==PREFS==", followed by the preferences for that particular test. The second tag should be
@@ -33,8 +35,8 @@ import com.aptana.formatter.IScriptFormatterFactory;
 public class FormatterTestFile
 {
 
-	protected String content = ""; //$NON-NLS-1$
-	protected String formattedContent = ""; //$NON-NLS-1$
+	protected StringBuilder content = new StringBuilder();
+	protected StringBuilder formattedContent = new StringBuilder();
 	protected HashMap<String, String> prefs;
 	protected String formatting_folder;
 	protected String formatterId;
@@ -69,26 +71,32 @@ public class FormatterTestFile
 
 		InputStream stream = FileLocator.openStream(Platform.getBundle(formatterId), Path.fromPortableString(filename),
 				false);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String lineRead = reader.readLine();
-		String lineReadBuffer = ""; //$NON-NLS-1$
+
+		String contentStr = IOUtil.read(stream);
+		BufferedReader reader = new BufferedReader(new StringReader(contentStr));
+		String lineRead = null;
 
 		// We assume the first tag is the preference tag
 		Tag tag = Tag.PREFS;
 
-		while (lineRead != null)
+		while ((lineRead = reader.readLine()) != null)
 		{
 			if (lineRead.matches("[ ]*==[A-Z]+==")) //$NON-NLS-1$
 			{
 				tag = extractTag(lineRead);
-				lineRead = reader.readLine();
 			}
 			else
 			{
-				lineReadBuffer = reader.readLine();
-				storeLineByState(lineRead, tag, true);
-				lineRead = lineReadBuffer;
+				storeLineByState(lineRead, tag);
 			}
+		}
+		if (content.length() > 0)
+		{
+			content.deleteCharAt(content.length() - 1);
+		}
+		if (formattedContent.length() > 0 && !contentStr.endsWith("\n"))
+		{
+			formattedContent.deleteCharAt(formattedContent.length() - 1);
 		}
 
 		reader.close();
@@ -96,12 +104,12 @@ public class FormatterTestFile
 
 	public String getContent()
 	{
-		return content;
+		return content.toString();
 	}
 
 	public String getFormattedContent()
 	{
-		return formattedContent;
+		return formattedContent.toString();
 	}
 
 	public IScriptFormatter getFormatter()
@@ -109,51 +117,96 @@ public class FormatterTestFile
 		return formatter;
 	}
 
-	public void generateFormattedContent() throws IOException
+	/**
+	 * Re-generate the test content by reading the existing content and writing it back with the formatted content.
+	 * 
+	 * @param overwriteFormattedBlock
+	 *            In case 'true', the ==FORMATTED== part will be overwritten with the output from the formatter; In case
+	 *            'false', we will only add a content in case the ==FORMATTED== tag is missing.
+	 * @throws IOException
+	 */
+	public void generateFormattedContent(boolean overwriteFormattedBlock) throws IOException
 	{
-		if (formattedContent.equals("")) //$NON-NLS-1$
+		URL fileURL = FileLocator.find(Platform.getBundle(formatterId), Path.fromPortableString(filename), null);
+		String file = FileLocator.toFileURL(fileURL).getFile();
+		// Read all the content till we hit the word "==FORMATTED==", or till the end of the file.
+		StringBuilder fileContentBuilder = new StringBuilder();
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String line = null;
+		boolean foundFormattedBlock = false;
+		while ((line = reader.readLine()) != null)
 		{
-			FileWriter formattedStream;
-
-			formattedStream = new FileWriter(new File(filename), true);
-			TextEdit formattedTextEdit = formatter.format(content, 0, content.length(), 0, false, null);
-
-			formattedStream.write("==FORMATTED==\n"); //$NON-NLS-1$
-
-			if (formattedTextEdit instanceof ReplaceEdit)
+			if ("==FORMATTED==".equals(line.trim()))
 			{
-				formattedStream.write(((ReplaceEdit) formattedTextEdit).getText());
-				formattedContent = ((ReplaceEdit) formattedTextEdit).getText();
+				foundFormattedBlock = true;
+				break;
 			}
-			else if ((formattedTextEdit instanceof MultiTextEdit))
-			{
-				// write original content if the formatted text is same as original
-				formattedStream.write(content);
-				formattedContent = content;
-			}
+			fileContentBuilder.append(line);
+			fileContentBuilder.append('\n');
+		}
+		// Return in case we are not allowed to overwrite the block
+		if (foundFormattedBlock && !overwriteFormattedBlock)
+		{
+			return;
+		}
+		if (formattedContent.length() > 0)
+		{
+			formattedContent.delete(0, formattedContent.length());
+		}
+		trimTrailingWhitespaces(fileContentBuilder);
+		FileWriter formattedStream = new FileWriter(file);
+		TextEdit formattedTextEdit = formatter.format(content.toString(), 0, content.length(), 0, false, null,
+				StringUtil.EMPTY);
 
-			formattedStream.close();
-			// if formatting fails, we don't write anything
+		formattedStream.write(fileContentBuilder.toString());
+		formattedStream.write("\n==FORMATTED==\n"); //$NON-NLS-1$
+
+		if (formattedTextEdit instanceof ReplaceEdit)
+		{
+			String formatResult = ((ReplaceEdit) formattedTextEdit).getText().replaceAll("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			formattedStream.write(formatResult);
+			formattedContent.append(formatResult);
+		}
+		else if ((formattedTextEdit instanceof MultiTextEdit))
+		{
+			// write original content if the formatted text is same as original
+			formattedStream.write(content.toString());
+			formattedContent.append(content);
+		}
+		formattedStream.flush();
+		formattedStream.close();
+		// if formatting fails, we don't write anything
+	}
+
+	/**
+	 * @param fileContentBuilder
+	 */
+	private void trimTrailingWhitespaces(StringBuilder builder)
+	{
+		for (int i = builder.length() - 1; i >= 0; i--)
+		{
+			if (Character.isWhitespace(builder.charAt(i)))
+			{
+				builder.deleteCharAt(i);
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
 
-	protected void storeLineByState(String line, Tag tag, boolean addNewLine)
+	protected void storeLineByState(String line, Tag tag)
 	{
 		switch (tag)
 		{
 			case CONTENT:
-				content += line;
-				if (addNewLine)
-				{
-					content += "\n"; //$NON-NLS-1$
-				}
+				content.append(line);
+				content.append('\n');
 				break;
 			case FORMATTED:
-				formattedContent += line;
-				if (addNewLine)
-				{
-					formattedContent += "\n"; //$NON-NLS-1$
-				}
+				formattedContent.append(line);
+				formattedContent.append('\n');
 				break;
 			case PREFS:
 				// add it to the preferences hashmap

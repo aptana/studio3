@@ -39,7 +39,7 @@ public final class WorkbenchCloseListener implements Listener {
 		if (event.widget instanceof Shell && PlatformUI.getWorkbench().getWorkbenchWindowCount() == 1
 				&& PlatformUI.getWorkbench().getWorkbenchWindows()[0].getShell() == event.widget) {
 			// last workbench window is about to close
-			if (DebugOptionsManager.isDebuggerActive(JSDebugModel.getModelIdentifier())) { //$NON-NLS-1$
+			if (DebugOptionsManager.isDebuggerActive(JSDebugModel.getModelIdentifier())) {
 				IEclipsePreferences preferences = new InstanceScope().getNode(JSDebugUIPlugin.PLUGIN_ID);
 				if (preferences.getBoolean(IJSDebugUIConstants.PREF_CONFIRM_EXIT_DEBUGGER, true) == false) {
 					return;

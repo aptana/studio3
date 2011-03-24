@@ -9,9 +9,9 @@ package com.aptana.editor.js.contentassist;
 
 import java.text.MessageFormat;
 
-import com.aptana.editor.js.tests.EditorBasedTests;
+import com.aptana.editor.js.tests.JSEditorBasedTests;
 
-public class LocationTests extends EditorBasedTests
+public class LocationTests extends JSEditorBasedTests
 {
 	/**
 	 * testLocations
@@ -22,24 +22,28 @@ public class LocationTests extends EditorBasedTests
 	protected void testLocations(String resource, LocationTypeRange... ranges)
 	{
 		// setup everything for the test
-		TestContext context = this.getTestContext(resource);
-		
+		this.setupTestContext(resource);
+
 		for (LocationTypeRange range : ranges)
 		{
 			for (int offset = range.startingOffset; offset <= range.endingOffset; offset++)
 			{
-				LocationType location = context.processor.getLocation(context.document, offset);
+				LocationType location = this.processor.getLocation(this.document, offset);
+				// @formatter:off
 				String message = MessageFormat.format(
 					"Expected {0} at location {1} of ''{2}'': character = ''{3}''",
 					range.location.toString(),
 					Integer.toString(offset),
-					context.source,
-					(offset < context.source.length()) ? context.source.charAt(offset) : '\0'
+					this.source,
+					(offset < this.source.length()) ? this.source.charAt(offset) : '\0'
 				);
+				// @formatter:on
 				assertEquals(message, range.location, location);
 			}
 		}
 	}
+
+	// @formatter:off
 	
 	/**
 	 * testInvokeWithoutParams

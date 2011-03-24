@@ -70,6 +70,22 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	private IParseNode _statementNode;
 	private IRange _replaceRange;
 
+	// NOTE: temp (I hope) until we get proper partitions for JS inside of HTML
+	private IRange _activeRange;
+
+	/**
+	 * JSContentAssistProcessor
+	 * 
+	 * @param editor
+	 * @param activeRange
+	 */
+	public JSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
+	{
+		this(editor);
+
+		this._activeRange = activeRange;
+	}
+
 	/**
 	 * JSIndexContentAssitProcessor
 	 * 
@@ -319,8 +335,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		// add properties and methods
 		List<PropertyElement> properties = this._indexHelper.getTypeMembers(index, allTypes);
 
-		typeName = JSModelFormatter.getTypeDisplayName(typeName);
-
 		for (PropertyElement property : properties)
 		{
 			String name = property.getName();
@@ -391,7 +405,12 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	{
 		LexemeProvider<JSTokenType> result;
 
-		if (this._statementNode != null)
+		// NOTE: temp until we get proper partitions for JS inside of HTML
+		if (this._activeRange != null)
+		{
+			result = new JSLexemeProvider(document, this._activeRange, new JSTokenScanner());
+		}
+		else if (this._statementNode != null)
 		{
 			result = new JSLexemeProvider(document, this._statementNode, new JSTokenScanner());
 		}
@@ -680,6 +699,15 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 			if (targetNode.getNodeType() == JSNodeTypes.GET_PROPERTY)
 			{
 				propertyNode = (JSGetPropertyNode) targetNode;
+			}
+			else if (targetNode.getNodeType() == JSNodeTypes.ARGUMENTS)
+			{
+				IParseNode candidate = targetNode.getParent().getFirstChild();
+
+				if (candidate instanceof JSGetPropertyNode)
+				{
+					propertyNode = (JSGetPropertyNode) candidate;
+				}
 			}
 			else
 			{
@@ -1048,7 +1076,7 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<JSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
@@ -1061,7 +1089,6 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		if (index != -1)
 		{
 			Lexeme<JSTokenType> currentLexeme = lexemeProvider.getLexeme(index);
-
 			boolean isIdentifier = (currentLexeme.getType() == JSTokenType.IDENTIFIER);
 			boolean inObjectLiteral = false;
 			index--;
@@ -1109,5 +1136,23 @@ public class JSContentAssistProcessor extends CommonContentAssistProcessor
 		}
 
 		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return (Character.isJavaIdentifierStart(c) || Character.isJavaIdentifierPart(c) || c == '$');
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return Character.isWhitespace(c) || c == '(' || c == ',';
 	}
 }

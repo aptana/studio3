@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ItemList {
-	private String sp=",";
+	private String sp=","; //$NON-NLS-1$
 	List items=new ArrayList();
 	
 	
@@ -142,7 +142,7 @@ public class ItemList {
 	}
 	
 	public void reset(){
-		sp=",";
+		sp=","; //$NON-NLS-1$
 		items.clear();
 	}
 }

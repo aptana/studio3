@@ -12,6 +12,10 @@ public class FormattingTests extends AbstractFormatterTestCase
 	// com.aptana.editor.xml.formatter.tests plugin
 	// NOTE: Ensure that the contents section ends with a newline, or the generation may not work.
 	private static boolean INITIALIZE_MODE = false;
+	// Turning on the overwrite will re-generate the formatted block and overwrite it into the test files.
+	// This is a drastic move that will require a review of the output right after to make sure we have the
+	// right formatting for all the test file, so turn it on at your own risk.
+	private static boolean OVERWRITE_MODE = false;
 
 	private static String FORMATTER_FACTORY_ID = "com.aptana.editor.xml.formatterFactory"; //$NON-NLS-1$
 	private static String FORMATTER_ID = "com.aptana.editor.xml.formatter.tests"; //$NON-NLS-1$
@@ -27,9 +31,9 @@ public class FormattingTests extends AbstractFormatterTestCase
 	}
 
 	@Override
-	protected boolean compareWithWhiteSpace(String original, String formattedText)
+	protected boolean compareWithWhiteSpace(String formattedText, String expectedResult)
 	{
-		return original.equals(formattedText);
+		return expectedResult.equals(formattedText);
 	}
 
 	public void testFilesInFormattingFolder() throws Exception
@@ -41,10 +45,10 @@ public class FormattingTests extends AbstractFormatterTestCase
 		{
 
 			FormatterTestFile file = new FormatterTestFile(factory, FORMATTER_ID, filename, FORMATTING_FOLDER);
-			
+
 			if (INITIALIZE_MODE)
 			{
-				file.generateFormattedContent();
+				file.generateFormattedContent(OVERWRITE_MODE);
 			}
 
 			formatterTest(file, filename, FILE_TYPE);

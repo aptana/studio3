@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public interface IBaseRemoteConnectionPoint extends IConnectionPoint {
 
-    public static final String CATEGORY = "com.aptana.ide.filesystem.ftp.ftpCategory"; //$NON-NLS-1$
+    public static final String CATEGORY = "com.aptana.filesystem.ftp.ftpCategory"; //$NON-NLS-1$
 
 	/**
 	 * @param name the name to set

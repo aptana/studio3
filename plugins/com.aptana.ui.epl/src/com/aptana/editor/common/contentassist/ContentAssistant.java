@@ -371,12 +371,11 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 			// Only act on characters that are trigger candidates. This
 			// avoids computing the model selection on every keystroke
 			boolean validAssistLocation = false;
+
 			if (computeAllAutoActivationTriggers().indexOf(e.character) < 0)
 			{
 				StyledText styledText = (StyledText) e.widget;
-				IDocument document = fContentAssistSubjectControlAdapter.getDocument();
-				int offset = styledText.getCaretOffset();
-				validAssistLocation = isValidAssistLocation(e.character, e.keyCode, document, offset);
+				validAssistLocation = isValidAutoAssistLocation(e.character, e.keyCode, styledText);
 				if (!validAssistLocation)
 				{
 					stop();
@@ -1278,18 +1277,54 @@ public class ContentAssistant implements IContentAssistant, IContentAssistantExt
 	 * @param offset
 	 * @param document
 	 */
-	private boolean isValidAssistLocation(char c, int keyCode, IDocument document, int offset)
+	private boolean isValidAutoAssistLocation(char c, int keyCode, StyledText styledText)
 	{
 		if (keyCode == SWT.ESC || (keyCode & SWT.KEYCODE_BIT) != 0)
 		{
 			return false;
 		}
 
+		int offset = styledText.getCaretOffset();
 		IContentAssistProcessor processor = getProcessor(fContentAssistSubjectControlAdapter, offset);
 		if (processor instanceof ICommonContentAssistProcessor)
 		{
-			return ((ICommonContentAssistProcessor) processor).triggerAdditionalAutoActivation(c, keyCode, document,
-					offset);
+			ICommonContentAssistProcessor cp = (ICommonContentAssistProcessor) processor;
+			return cp.isValidIdentifier(c, keyCode) && isLeftCharacterWhitespace(cp, styledText, c, keyCode);
+
+			// alternate method--commented out for now, but left in to show how it was called.
+			// return ((ICommonContentAssistProcessor) processor).isValidAutoActivationLocation(c, keyCode,
+			// fContentAssistSubjectControlAdapter.getDocument(),
+			// offset);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * @param cp
+	 * @param styledText
+	 * @param c
+	 * @param keyCode
+	 * @return
+	 */
+	private boolean isLeftCharacterWhitespace(ICommonContentAssistProcessor cp, StyledText styledText, char c,
+			int keyCode)
+	{
+		int offset = styledText.getCaretOffset();
+
+		// Are we at beginning of file?
+		if (offset == 0)
+		{
+			return true;
+		}
+
+		String line = styledText.getText(offset - 1, offset - 1);
+
+		if (line.length() > 0)
+		{
+			return cp.isValidActivationCharacter(line.charAt(0), keyCode);
 		}
 		else
 		{

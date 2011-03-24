@@ -58,8 +58,10 @@ public class FormatterXMLElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected boolean isAddingEndNewLine()
 	{
-		Set<String> set = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
-		return (!set.contains(element) || children);
+		Set<String> excludedTags = getDocument().getSet(XMLFormatterConstants.NEW_LINES_EXCLUDED_TAGS);
+		boolean excludeNewLineOnTextNodes = getDocument().getBoolean(
+				XMLFormatterConstants.NEW_LINES_EXCLUDED_ON_TEXT_NODES);
+		return (children || (!excludedTags.contains(element) && !excludeNewLineOnTextNodes));
 	}
 
 	/*

@@ -11,9 +11,7 @@ xml.formatter.formatter.tabulation.char=space
 xml.formatter.newline.excluded=a!b
 ==CONTENT==
 <a href=""><b>I like it</b></a>
-
 ==FORMATTED==
 <a href="">
     <b>I like it</b>
 </a>
-

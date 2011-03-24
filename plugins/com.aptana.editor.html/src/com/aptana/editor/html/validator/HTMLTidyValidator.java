@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -37,49 +38,48 @@ public class HTMLTidyValidator implements IValidator
 	@SuppressWarnings("nls")
 	private static final String[] HTML5_ELEMENTS = { "article>", "aside>", "audio>", "canvas>", "command>",
 			"datalist>", "details>", "embed>", "figcaption>", "figure>", "footer>", "header>", "hgroup>", "keygen>",
-			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "ruby>", "section>", "source>",
-			"summary>", "time>", "video>", "wbr>" };
+			"mark>", "meter>", "nav>", "output>", "progress>", "rp>", "rt>", "\"role\"", "ruby>", "section>",
+			"source>", "summary>", "time>", "video>", "wbr>" };
 
 	public List<IValidationItem> validate(String source, URI path, IValidationManager manager)
 	{
+		List<IValidationItem> items = new ArrayList<IValidationItem>();
 		String report = parseWithTidy(source);
-		if (StringUtil.isEmpty(report))
+		if (!StringUtil.isEmpty(report))
 		{
-			return Collections.emptyList();
-		}
-
-		BufferedReader reader = null;
-		try
-		{
-			reader = new BufferedReader(new StringReader(report));
-			String line;
-			while ((line = reader.readLine()) != null)
+			BufferedReader reader = null;
+			try
 			{
-				if (line.startsWith("line")) //$NON-NLS-1$
+				reader = new BufferedReader(new StringReader(report));
+				String line;
+				while ((line = reader.readLine()) != null)
 				{
-					parseTidyOutput(line, path, manager);
+					if (line.startsWith("line")) //$NON-NLS-1$
+					{
+						parseTidyOutput(line, path, manager, items);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
+						reader.close();
+					}
+					catch (IOException e)
+					{
+						// ignores
+					}
 				}
 			}
 		}
-		catch (Exception e)
-		{
-			HTMLPlugin.logError(Messages.HTMLTidyValidator_ERR_ParseErrors, e);
-		}
-		finally
-		{
-			if (reader != null)
-			{
-				try
-				{
-					reader.close();
-				}
-				catch (IOException e)
-				{
-					// ignores
-				}
-			}
-		}
-		return manager.getItems();
+		return items;
 	}
 
 	private static String parseWithTidy(String source)
@@ -101,7 +101,7 @@ public class HTMLTidyValidator implements IValidator
 		return bout.toString();
 	}
 
-	private static void parseTidyOutput(String report, URI path, IValidationManager manager)
+	private static void parseTidyOutput(String report, URI path, IValidationManager manager, List<IValidationItem> items)
 	{
 		Matcher matcher = PATTERN.matcher(report);
 
@@ -117,11 +117,11 @@ public class HTMLTidyValidator implements IValidator
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$
 				{
-					manager.addError(message, lineNumber, column, 0, path);
+					items.add(manager.addError(message, lineNumber, column, 0, path));
 				}
 				else if (type.startsWith("Warning")) //$NON-NLS-1$
 				{
-					manager.addWarning(message, lineNumber, column, 0, path);
+					items.add(manager.addWarning(message, lineNumber, column, 0, path));
 				}
 			}
 		}

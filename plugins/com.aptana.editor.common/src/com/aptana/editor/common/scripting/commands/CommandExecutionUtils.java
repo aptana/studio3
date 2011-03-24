@@ -1038,12 +1038,6 @@ public class CommandExecutionUtils
 		return new Region(start, end - start);
 	}
 
-	@SuppressWarnings("unused")
-	private static IOConsole getMessageConsole()
-	{
-		return getMessageConsole(DEFAULT_CONSOLE_NAME);
-	}
-
 	private static IOConsole getMessageConsole(String name)
 	{
 		IOConsole messageConsole = nameToMessageConsole.get(name);

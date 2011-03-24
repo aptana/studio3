@@ -37,7 +37,6 @@ public class SchemaReader implements ContentHandler
 	 */
 	protected SchemaReader()
 	{
-
 	}
 
 	/*
@@ -46,7 +45,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endArray() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.END_ARRAY, null);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.END_ARRAY, null);
+		}
 
 		return true;
 	}
@@ -57,8 +59,11 @@ public class SchemaReader implements ContentHandler
 	 */
 	public void endJSON() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.END_PARSE, null);
-		this._schema.exit();
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.END_PARSE, null);
+			this._schema.exit();
+		}
 	}
 
 	/*
@@ -67,7 +72,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endObject() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.END_OBJECT, null);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.END_OBJECT, null);
+		}
 
 		return true;
 	}
@@ -78,7 +86,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean endObjectEntry() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.END_OBJECT_ENTRY, null);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.END_OBJECT_ENTRY, null);
+		}
 
 		return true;
 	}
@@ -109,7 +120,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean primitive(Object value) throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.PRIMITIVE, value);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.PRIMITIVE, value);
+		}
 
 		return true;
 	}
@@ -132,11 +146,11 @@ public class SchemaReader implements ContentHandler
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			// log
 		}
 		catch (ParseException e)
 		{
-			e.printStackTrace();
+			// log
 		}
 
 		// drop ref to context
@@ -159,7 +173,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startArray() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.START_ARRAY, null);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.START_ARRAY, null);
+		}
 
 		return true;
 	}
@@ -170,8 +187,11 @@ public class SchemaReader implements ContentHandler
 	 */
 	public void startJSON() throws ParseException, IOException
 	{
-		this._schema.enter();
-		this._schema.transition(this._context, SchemaEventType.START_PARSE, null);
+		if (this._schema != null)
+		{
+			this._schema.enter();
+			this._schema.transition(this._context, SchemaEventType.START_PARSE, null);
+		}
 	}
 
 	/*
@@ -180,7 +200,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startObject() throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.START_OBJECT, null);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.START_OBJECT, null);
+		}
 
 		return true;
 	}
@@ -191,7 +214,10 @@ public class SchemaReader implements ContentHandler
 	 */
 	public boolean startObjectEntry(String key) throws ParseException, IOException
 	{
-		this._schema.transition(this._context, SchemaEventType.START_OBJECT_ENTRY, key);
+		if (this._schema != null)
+		{
+			this._schema.transition(this._context, SchemaEventType.START_OBJECT_ENTRY, key);
+		}
 
 		return true;
 	}

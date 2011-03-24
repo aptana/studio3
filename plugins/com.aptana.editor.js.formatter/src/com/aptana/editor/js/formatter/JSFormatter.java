@@ -8,8 +8,6 @@
 package com.aptana.editor.js.formatter;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITypedRegion;
@@ -19,7 +17,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
-import com.aptana.core.util.StringUtil;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
@@ -70,9 +67,6 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			JSFormatterConstants.INDENT_CASE_BODY, JSFormatterConstants.INDENT_SWITCH_BODY,
 			JSFormatterConstants.INDENT_FUNCTION_BODY, JSFormatterConstants.INDENT_GROUP_BODY };
 
-	private static final Pattern JS_COMMENTS_PATTERN = Pattern.compile("((?s)(/\\*.*?\\*/))|(//.*)");//$NON-NLS-1$
-	private static final Pattern COMMENTS_STRIPPING_PATTERN = Pattern.compile("\\s|\\*|//"); //$NON-NLS-1$
-
 	private String lineSeparator;
 
 	/**
@@ -96,8 +90,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		try
 		{
 			// detect the indentation offset with the parser, only if the given offset is not the first one in the
-			// current
-			// partition.
+			// current partition.
 			ITypedRegion partition = document.getPartition(offset);
 			if (partition != null && partition.getOffset() == offset)
 			{
@@ -138,12 +131,15 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.ui.IScriptFormatter#format(java.lang.String, int, int, int)
+	 * @see com.aptana.formatter.IScriptFormatter#format(java.lang.String, int, int, int, boolean,
+	 * org.eclipse.jface.text.formatter.IFormattingContext, java.lang.String)
 	 */
 	public TextEdit format(String source, int offset, int length, int indentationLevel, boolean isSelection,
-			IFormattingContext context) throws FormatterException
+			IFormattingContext context, String indentSufix) throws FormatterException
 	{
-		String input = source.substring(offset, offset + length);
+		String originalText = source.substring(offset, offset + length);
+		String input = originalText.trim();
+		int inputOffset = offset + countLeftWhitespaceChars(originalText);
 		IParser parser = checkoutParser();
 		IParseState parseState = new ParseState();
 		parseState.setEditState(input, null, 0, 0);
@@ -153,18 +149,19 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			checkinParser(parser);
 			if (parseResult != null)
 			{
-				final String output = format(input, parseResult, indentationLevel, offset, isSelection);
+				final String output = format(input, parseResult, indentationLevel, inputOffset, isSelection,
+						indentSufix, offset != 0, length != source.length());
 				if (output != null)
 				{
-					if (!input.equals(output))
+					if (!originalText.equals(output))
 					{
-						if (equalContent(input, output))
+						if (equalContent(parseResult, output))
 						{
 							return new ReplaceEdit(offset, length, output);
 						}
 						else
 						{
-							logError(input, output);
+							logError(originalText, output);
 						}
 					}
 					else
@@ -176,9 +173,9 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		}
 		catch (FormatterException e)
 		{
-			StatusLineMessageTimerManager.setErrorMessage(NLS.bind(
-					FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()), ERROR_DISPLAY_TIMEOUT,
-					true);
+			StatusLineMessageTimerManager.setErrorMessage(
+					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
+					ERROR_DISPLAY_TIMEOUT, true);
 		}
 		catch (Exception e)
 		{
@@ -190,57 +187,38 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	}
 
 	/**
-	 * @param input
+	 * @param inputParseResult
 	 * @param output
 	 * @return
 	 */
-	private boolean equalContent(String input, String output)
+	private boolean equalContent(IParseRootNode inputParseResult, String output)
 	{
-		// first, strip out all the comments from the input and the output.
-		// save those comments for later comparison.
-		int inputLength = input.length();
-		int outputLength = output.length();
-		StringBuilder inputBuffer = new StringBuilder(inputLength);
-		StringBuilder outputBuffer = new StringBuilder(outputLength);
-		StringBuilder inputComments = new StringBuilder();
-		StringBuilder outputComments = new StringBuilder();
-		Matcher inputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(input);
-		Matcher outputCommentsMatcher = JS_COMMENTS_PATTERN.matcher(output);
-		int inputOffset = 0;
-		int outputOffset = 0;
-		while (inputCommentsMatcher.find())
+		if (output == null)
 		{
-			inputComments.append(inputCommentsMatcher.group());
-			inputBuffer.append(input.subSequence(inputOffset, inputCommentsMatcher.start()));
-			inputOffset = inputCommentsMatcher.end();
+			return false;
 		}
-		if (inputOffset < inputLength)
+		output = output.trim();
+		IParser parser = checkoutParser();
+		IParseState parseState = new ParseState();
+		parseState.setEditState(output, null, 0, 0);
+		IParseRootNode outputParseResult = null;
+		try
 		{
-			inputBuffer.append(input.subSequence(inputOffset, inputLength));
+			outputParseResult = parser.parse(parseState);
 		}
-		while (outputCommentsMatcher.find())
+		catch (Exception e)
 		{
-			outputComments.append(outputCommentsMatcher.group());
-			outputBuffer.append(output.subSequence(outputOffset, outputCommentsMatcher.start()));
-			outputOffset = outputCommentsMatcher.end();
-
+			return false;
 		}
-		if (outputOffset < outputLength)
+		checkinParser(parser);
+		if (outputParseResult == null)
 		{
-			outputBuffer.append(output.subSequence(outputOffset, outputLength));
+			return false;
 		}
-		return stripComment(inputComments.toString()).equals(stripComment(outputComments.toString()))
-				&& equalsIgnoreWhitespaces(inputBuffer.toString(), outputBuffer.toString());
-	}
-
-	/**
-	 * Remove any whitespace, '*' or '//' from a comment string
-	 * 
-	 * @param inputComment
-	 */
-	private String stripComment(String comment)
-	{
-		return COMMENTS_STRIPPING_PATTERN.matcher(comment).replaceAll(StringUtil.EMPTY);
+		// Flatten the AST's and do a string compare
+		// The toString() of the JSParseRootNode calls the JSFormatWalker,
+		// which should generate the same string for the input and the output.
+		return outputParseResult.toString().equals(inputParseResult.toString());
 	}
 
 	/*
@@ -297,11 +275,17 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 	 *            A JavaScript parser result - {@link com.aptana.parsing.ast.IParseNode}
 	 * @param indentationLevel
 	 *            The indentation level to start from
+	 * @param indentSufix
+	 * @param prefixWithNewLine
+	 *            Prefix the output with a line terminator
+	 * @param postfixWithNewLine
+	 *            Terminate the output with a line terminator and append the 'indentSuffix' to it.
 	 * @return A formatted string
 	 * @throws Exception
 	 */
-	private String format(String input, IParseRootNode parseResult, int indentationLevel, int offset,
-			boolean isSelection) throws Exception
+	private String format(String input, IParseRootNode parseResult, int indentationLevel, int inputOffset,
+			boolean isSelection, String indentSufix, boolean prefixWithNewLine, boolean postfixWithNewLine)
+			throws Exception
 	{
 		int spacesCount = -1;
 		if (isSelection)
@@ -309,7 +293,7 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 			spacesCount = countLeftWhitespaceChars(input);
 		}
 		final JSFormatterNodeBuilder builder = new JSFormatterNodeBuilder();
-		final FormatterDocument document = createFormatterDocument(input, offset);
+		final FormatterDocument document = createFormatterDocument(input, inputOffset);
 		IFormatterContainerNode root = builder.build(parseResult, document);
 		new JSFormatterNodeRewriter(parseResult, document).rewrite(root);
 		IFormatterContext context = new JSFormatterContext(indentationLevel);
@@ -329,6 +313,10 @@ public class JSFormatter extends AbstractScriptFormatter implements IScriptForma
 		if (isSelection)
 		{
 			output = leftTrim(output, spacesCount);
+		}
+		else
+		{
+			output = processNestedOutput(output, lineSeparator, indentSufix, prefixWithNewLine, postfixWithNewLine);
 		}
 		return output;
 	}

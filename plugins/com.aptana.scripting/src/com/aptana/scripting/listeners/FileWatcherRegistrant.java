@@ -203,7 +203,7 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 		Map<String, String> propertyMap = new HashMap<String, String>();
 
 		// add type
-		propertyMap.put("type", type);
+		propertyMap.put("type", type); //$NON-NLS-1$
 
 		// add optional key/values
 		int length = properties.length & ~0x01;
@@ -237,9 +237,9 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		this.execute( //
 			wd, //
-			"created", //
-			"rootPath", rootPath, //
-			"name", name //
+			"created", // //$NON-NLS-1$
+			"rootPath", rootPath, // //$NON-NLS-1$
+			"name", name // //$NON-NLS-1$
 		);
 	}
 
@@ -251,9 +251,9 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		this.execute( //
 			wd, //
-			"deleted", //
-			"rootPath", rootPath, //
-			"name", name //
+			"deleted", // //$NON-NLS-1$
+			"rootPath", rootPath, // //$NON-NLS-1$
+			"name", name // //$NON-NLS-1$
 		);
 	}
 
@@ -265,9 +265,9 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		this.execute( //
 			wd, //
-			"modified", //
-			"rootPath", rootPath, //
-			"name", name //
+			"modified", // //$NON-NLS-1$
+			"rootPath", rootPath, // //$NON-NLS-1$
+			"name", name // //$NON-NLS-1$
 		);
 	}
 
@@ -280,10 +280,10 @@ public class FileWatcherRegistrant implements ElementVisibilityListener, JNotify
 	{
 		this.execute( //
 			wd, //
-			"deleted", //
-			"rootPath", rootPath, //
-			"oldName", oldName, //
-			"newName", newName //
+			"deleted", // //$NON-NLS-1$
+			"rootPath", rootPath, // //$NON-NLS-1$
+			"oldName", oldName, // //$NON-NLS-1$
+			"newName", newName // //$NON-NLS-1$
 		);
 	}
 

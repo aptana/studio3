@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.io.vfs.ExtendedFileInfo;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
@@ -43,7 +45,6 @@ import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.PermissionDeniedException;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
-import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
 import com.enterprisedt.net.ftp.FTPException;
 import com.enterprisedt.net.ftp.FTPFile;
 import com.enterprisedt.net.ftp.FTPTransferType;
@@ -120,7 +121,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#connect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void connect(IProgressMonitor monitor) throws CoreException {
 		Assert.isTrue(ftpClient != null, Messages.SFTPConnectionFileManager_ConnectionNotInitialized);
@@ -153,6 +154,9 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 								try {
 									privateKeyFile.toPrivateKey(String.copyValueOf(password));
 								} catch (InvalidSshKeyException e) {
+									if (e.getCause() instanceof NoSuchAlgorithmException) {
+										SecureFTPPlugin.log(new Status(IStatus.WARNING, SecureFTPPlugin.PLUGIN_ID, e.getCause().getMessage()));
+									}
 									promptPassword(MessageFormat.format(Messages.SFTPConnectionFileManager_PublicKeyAuthentication, new Object[] { host, keyFilePath.toOSString() }), Messages.SFTPConnectionFileManager_PassphraseNotAccepted);
 									continue;
 								}
@@ -268,7 +272,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#disconnect(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	public void disconnect(IProgressMonitor monitor) throws CoreException {
 		try {
@@ -296,7 +300,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.core.io.vfs.IConnectionFileManager#isConnected()
+	 * @see com.aptana.core.io.vfs.IConnectionFileManager#isConnected()
 	 */
 	public boolean isConnected() {
 		return ftpClient != null && ftpClient.connected();
@@ -312,7 +316,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				cwd = path;
 			}
 		} catch (FTPException e) {
-			throwWrappedException(e, path);
+			throwWrappedException(e, path, SshFxpStatus.STATUS_FX_FAILURE);
 		} catch (IOException e) {
 			cwd = null;
 			throw e;			
@@ -320,12 +324,17 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private static void throwWrappedException(FTPException e, IPath path) throws FileNotFoundException, FTPException, PermissionDeniedException {
+		throwWrappedException(e, path, -1);
+	}
+
+	private static void throwWrappedException(FTPException e, IPath path, int fileNotFoundErrorCode) throws FileNotFoundException, FTPException, PermissionDeniedException {
 		int reply = e.getReplyCode();
 		if (reply == -1 && e.getCause() instanceof FTPException) {
 			reply = ((FTPException) e.getCause()).getReplyCode();
 		}
-		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
-			throw new FileNotFoundException(path.toPortableString());
+		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE
+				|| reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH || reply == fileNotFoundErrorCode) {
+			throw initFileNotFoundException(path, e);
 		}
         if (reply == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
 			throw new PermissionDeniedException(path.toPortableString(), e);
@@ -355,7 +364,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#clearCache(org.eclipse.core.runtime.IPath)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#clearCache(org.eclipse.core.runtime.IPath)
 	 */
 	@Override
 	protected void clearCache(IPath path) {
@@ -373,7 +382,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#checkConnected()
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#checkConnected()
 	 */
 	@Override
 	protected void checkConnected() throws Exception {
@@ -391,7 +400,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#getRootCanonicalURI()
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#getRootCanonicalURI()
 	 */
 	@Override
 	protected URI getRootCanonicalURI() {
@@ -403,7 +412,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#fetchFile(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#fetchFile(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected ExtendedFileInfo fetchFile(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
@@ -454,7 +463,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#fetchFiles(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#fetchFiles(org.eclipse.core.runtime.IPath, int, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected ExtendedFileInfo[] fetchFiles(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
@@ -498,7 +507,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#createDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#createDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void createDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -524,7 +533,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#deleteDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#deleteDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void deleteDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -556,7 +565,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	 * @see com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager#createFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
-	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
+	protected void createFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		try {
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
@@ -564,12 +573,14 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.put(new ByteArrayInputStream(new byte[] {}), path.lastSegment());
 			} catch (FTPException e) {
-			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, MessageFormat.format(Messages.SFTPConnectionFileManager_CreateFile0Failed, path.toPortableString()), e));
+				throwWrappedException(e, path);
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
+			throw e;
+		} catch (PermissionDeniedException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID,
@@ -580,7 +591,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#deleteFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#deleteFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void deleteFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -591,7 +602,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				ftpClient.delete(path.lastSegment());
 			} catch (FTPException e) {
-			    SecureFTPPlugin.log(new Status(IStatus.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedDeleteFile + path.toString(), e));
+				throwWrappedException(e, path);
 				throw e;
 			}
 		} catch (FileNotFoundException e) {
@@ -607,7 +618,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#renameFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#renameFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -642,7 +653,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#listDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#listDirectory(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected String[] listDirectory(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -670,7 +681,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#readFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#readFile(org.eclipse.core.runtime.IPath, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected InputStream readFile(IPath path, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -731,7 +742,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#setModificationTime(org.eclipse.core.runtime.IPath, long, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#setModificationTime(org.eclipse.core.runtime.IPath, long, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void setModificationTime(IPath path, long modificationTime, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -739,7 +750,11 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			IPath dirPath = path.removeLastSegments(1);
 			changeCurrentDir(dirPath);
 			Policy.checkCanceled(monitor);
-			ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			try {
+				ftpClient.setModTime(path.lastSegment(), new Date(modificationTime));
+			} catch (FTPException e) {
+				throwWrappedException(e, path);
+			}
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (OperationCanceledException e) {
@@ -752,7 +767,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#changeFileGroup(org.eclipse.core.runtime.IPath, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#changeFileGroup(org.eclipse.core.runtime.IPath, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void changeFileGroup(IPath path, String group, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
@@ -763,6 +778,8 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			try {
 				int gid = Integer.parseInt(group);
 				ftpClient.changeGroup(gid, path.lastSegment());
+			} catch (FTPException e) {
+				throwWrappedException(e, path);
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException(Messages.SFTPConnectionFileManager_InvalidGroup);
 			}
@@ -778,7 +795,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aptana.ide.filesystem.ftp.BaseFTPConnectionFileManager#changeFilePermissions(org.eclipse.core.runtime.IPath, long, org.eclipse.core.runtime.IProgressMonitor)
+	 * @see com.aptana.filesystem.ftp.BaseFTPConnectionFileManager#changeFilePermissions(org.eclipse.core.runtime.IPath, long, org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	protected void changeFilePermissions(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException {

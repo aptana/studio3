@@ -37,12 +37,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.aptana.core.io.vfs.ExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.core.io.ConnectionContext;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.vfs.ExtendedFileInfo;
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Max Stepanov
@@ -65,7 +65,7 @@ public abstract class CommonConnectionTest extends TestCase
 	}
 
 	protected IConnectionPoint cp;
-	private IPath testPath;
+	protected IPath testPath;
 	private static Properties cachedProperties;
 
 	protected static final Properties getConfig()
@@ -102,7 +102,9 @@ public abstract class CommonConnectionTest extends TestCase
 		assertNotNull(fs);
 		fs.mkdir(EFS.NONE, null);
 		cp.disconnect(null);
-		assertFalse(cp.isConnected());
+		if (persistentConnection()) {
+			assertFalse(cp.isConnected());
+		}
 	}
 
 	@Override
@@ -151,9 +153,13 @@ public abstract class CommonConnectionTest extends TestCase
 	{
 		cp.connect(null);
 		assertTrue(cp.isConnected());
-		assertTrue(cp.canDisconnect());
+		if (persistentConnection()) {
+			assertTrue(cp.canDisconnect());
+		}
 		cp.disconnect(null);
-		assertFalse(cp.isConnected());
+		if (persistentConnection()) {
+			assertFalse(cp.isConnected());
+		}
 		assertFalse(cp.canDisconnect());
 	}
 
@@ -825,10 +831,6 @@ public abstract class CommonConnectionTest extends TestCase
 		}
 		catch (CoreException e)
 		{
-			while (e.getCause() instanceof CoreException)
-			{
-				e = (CoreException) e.getCause();
-			}
 			assertEquals(FileNotFoundException.class, e.getCause().getClass());
 			assertEquals(
 					testPath.append("folder/file2.txt").toPortableString(), ((FileNotFoundException) e.getCause()).getMessage()); //$NON-NLS-1$

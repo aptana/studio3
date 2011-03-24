@@ -402,4 +402,36 @@ public abstract class StringUtil
 	{
 		return '\'' + string + '\'';
 	}
+
+	/**
+	 * Compares two strings for ordering taking into account that none, one, or both may be null. We respect case
+	 * differences here
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static int compare(String s1, String s2)
+	{
+		s1 = getStringValue(s1);
+		s2 = getStringValue(s2);
+
+		return s1.compareTo(s2);
+	}
+
+	/**
+	 * Compares two strings for ordering taking into account that none, one, or both may be null. We ignore case
+	 * differences here
+	 * 
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static int compareCaseInsensitive(String s1, String s2)
+	{
+		s1 = getStringValue(s1);
+		s2 = getStringValue(s2);
+
+		return s1.compareToIgnoreCase(s2);
+	}
 }

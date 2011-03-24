@@ -936,7 +936,6 @@ public class CommandElement extends AbstractBundleElement
 			}
 
 			// Force each string to be uppercase, http://aptana.lighthouseapp.com/projects/45260/tickets/393
-			int i = 0;
 			List<String> uppercase = new ArrayList<String>(keyBindings.length);
 			for (String binding : keyBindings)
 			{

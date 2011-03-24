@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreePath;
 
-import com.aptana.ide.core.io.vfs.IExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.ui.io.internal.FetchFileInfoJob;
 import com.aptana.ide.ui.io.internal.FetchFileInfoStatus;
 

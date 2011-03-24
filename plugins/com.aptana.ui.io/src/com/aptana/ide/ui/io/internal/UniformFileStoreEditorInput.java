@@ -15,10 +15,11 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 
-import com.aptana.ide.core.io.vfs.IExtendedFileStore;
-import com.aptana.ide.ui.io.preferences.FTPPreferenceUtil;
+import com.aptana.core.io.vfs.IExtendedFileStore;
+import com.aptana.ide.ui.io.IUniformFileStoreEditorInput;
+import com.aptana.ide.ui.io.preferences.RemotePreferenceUtil;
 
-public class UniformFileStoreEditorInput extends FileStoreEditorInput
+public class UniformFileStoreEditorInput extends FileStoreEditorInput implements IUniformFileStoreEditorInput
 {
 
 	private IFileStore fLocalFileStore;
@@ -82,7 +83,7 @@ public class UniformFileStoreEditorInput extends FileStoreEditorInput
 	@Override
 	public IPersistableElement getPersistable()
 	{
-		boolean reopen = FTPPreferenceUtil.getReopenRemoteOnStartup();
+		boolean reopen = RemotePreferenceUtil.getReopenRemoteOnStartup();
 		return reopen ? this : null;
 	}
 

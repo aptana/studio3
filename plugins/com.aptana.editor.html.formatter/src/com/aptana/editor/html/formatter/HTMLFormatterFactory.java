@@ -97,4 +97,15 @@ public class HTMLFormatterFactory extends AbstractScriptFormatterFactory
 	{
 		return HTMLSourceConfiguration.getDefault();
 	}
+
+	/**
+	 * Returns 'false' for HTML (it's never a 'slave' formatter).
+	 * 
+	 * @see com.aptana.formatter.AbstractScriptFormatterFactory#canConsumePreviousIndent()
+	 */
+	@Override
+	public boolean canConsumePreviousIndent()
+	{
+		return false;
+	}
 }

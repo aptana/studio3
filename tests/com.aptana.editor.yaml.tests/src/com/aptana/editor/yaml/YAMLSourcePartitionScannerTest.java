@@ -23,6 +23,7 @@ import com.aptana.editor.common.text.rules.NullSubPartitionScanner;
  * @author Chris
  * @author Sandip
  */
+@SuppressWarnings("nls")
 public class YAMLSourcePartitionScannerTest extends TestCase
 {
 

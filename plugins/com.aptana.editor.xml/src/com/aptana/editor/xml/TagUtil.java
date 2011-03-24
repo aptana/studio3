@@ -17,12 +17,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
 
-import com.aptana.parsing.lexer.Lexeme;
-
 /**
- * Utilities for dealing with HTML tags
+ * Utilities for dealing with HTML tags.
+ * 
  * @author Ingo Muschenetz
- *
  */
 public class TagUtil
 {

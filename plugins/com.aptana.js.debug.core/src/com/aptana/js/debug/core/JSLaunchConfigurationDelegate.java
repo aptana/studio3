@@ -35,12 +35,12 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 
 import com.aptana.core.IURIMapper;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
 import com.aptana.debug.core.internal.Util;
 import com.aptana.debug.core.util.DebugUtil;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
@@ -83,6 +83,13 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				Object result = prompter.handleStatus(launchBrowserPromptStatus, null);
 				if ((result instanceof Boolean) && (((Boolean) result).booleanValue())) {
 					activeSession.terminate();
+					while (!monitor.isCanceled() && !activeSession.isTerminated()) {
+						try {
+							Thread.sleep(250);
+						} catch (InterruptedException ignore) {
+						}
+					}
+					
 				} else {
 					String errorMessage = Messages.JSLaunchConfigurationDelegate_MultipleJavaScriptDebugNotSupported
 							+ Messages.JSLaunchConfigurationDelegate_PleaseTerminateActiveSession;
@@ -336,7 +343,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 			} else {
 				DebugPlugin.newProcess(launch, process, browserExecutable);
 			}
-		} else if (ILaunchManager.RUN_MODE.equals(mode)) { //$NON-NLS-1$
+		} else if (ILaunchManager.RUN_MODE.equals(mode)) {
 			try {
 				String launchPage = launchURL.toExternalForm();
 				if (Platform.OS_MACOSX.equals(Platform.getOS())) {

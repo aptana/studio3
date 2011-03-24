@@ -46,8 +46,6 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 	private char[] password;
 	private String host = DEFAULT_HOST;
 
-	private boolean isConnected;
-
 	/**
 	 * Default constructor
 	 */
@@ -244,7 +242,6 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 				throw new CoreException(new Status(IStatus.ERROR, S3FileSystemPlugin.PLUGIN_ID,
 						"Failed to connect. Invalid credentials?"));
 			}
-			isConnected = true;
 		}
 		catch (CoreException e)
 		{
@@ -254,37 +251,6 @@ public class S3ConnectionPoint extends ConnectionPoint implements IBaseRemoteCon
 		{
 			throw S3FileSystemPlugin.coreException(e);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#disconnect(org.eclipse.core.runtime.IProgressMonitor)
-	 */
-	@Override
-	public void disconnect(IProgressMonitor monitor) throws CoreException
-	{
-		// do nothing
-		isConnected = false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#isConnected()
-	 */
-	@Override
-	public boolean isConnected()
-	{
-		return isConnected;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.ide.core.io.ConnectionPoint#canDisconnect()
-	 */
-	@Override
-	public boolean canDisconnect()
-	{
-		return isConnected();
 	}
 
 }

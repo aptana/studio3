@@ -15,15 +15,17 @@ import com.aptana.formatter.ui.CodeFormatterConstants;
 public interface IPreferenceConstants
 {
 	public static final String FORMATTER_ID = "json.formatter"; //$NON-NLS-1$
-	
+
 	// tabs
 	public static final String FORMATTER_TAB_CHAR = FORMATTER_ID + "." + CodeFormatterConstants.FORMATTER_TAB_CHAR; //$NON-NLS-1$
 	public static final String FORMATTER_TAB_SIZE = FORMATTER_ID + "." + CodeFormatterConstants.FORMATTER_TAB_SIZE; //$NON-NLS-1$
-	
+
 	// indentation
-	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID + "." + CodeFormatterConstants.FORMATTER_INDENTATION_SIZE; //$NON-NLS-1$
-	
+	public static final String FORMATTER_INDENTATION_SIZE = FORMATTER_ID
+			+ "." + CodeFormatterConstants.FORMATTER_INDENTATION_SIZE; //$NON-NLS-1$
+
 	// wrapping
 	public static final String WRAP_COMMENTS = FORMATTER_ID + ".wrap.comments"; //$NON-NLS-1$
 	public static final String WRAP_COMMENTS_LENGTH = FORMATTER_ID + ".wrap.comments.length"; //$NON-NLS-1$
+
 }

@@ -15,40 +15,34 @@ import java.util.Map;
 
 import com.aptana.core.CorePlugin;
 
-public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
-{
+public abstract class KeepAliveObjectPool<T> implements IObjectPool<T> {
 
-	private static final int RELEASE_TIME = 15 * 60 * 1000; // 15 minutes
+	private final List<T> locked;
+	private final Map<T, Long> unlocked;
+	private final ConnectionReaper reaper;
+	private final int releaseTime;
 
-	private List<T> locked;
-	private Map<T, Long> unlocked;
-	private ConnectionReaper reaper;
-
-	public KeepAliveObjectPool()
-	{
+	public KeepAliveObjectPool(int releaseTime) {
+		this.releaseTime = releaseTime;
 		locked = new ArrayList<T>();
 		unlocked = new LinkedHashMap<T, Long>();
 
 		reaper = new ConnectionReaper();
 	}
-	
+
 	protected void start() {
-		reaper.start();		
+		reaper.start();
 	}
 
-	public synchronized void checkIn(T t)
-	{
+	public synchronized void checkIn(T t) {
 		locked.remove(t);
 		unlocked.put(t, System.currentTimeMillis());
 	}
 
-	public synchronized T checkOut()
-	{
+	public synchronized T checkOut() {
 		// returns the first valid connection from the unused queue
-		for (T c : unlocked.keySet())
-		{
-			if (validate(c))
-			{
+		for (T c : unlocked.keySet()) {
+			if (validate(c)) {
 				unlocked.remove(c);
 				locked.add(c);
 				return c;
@@ -61,15 +55,12 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 		return c;
 	}
 
-	public synchronized void dispose()
-	{
-		for (T c : unlocked.keySet())
-		{
+	public synchronized void dispose() {
+		for (T c : unlocked.keySet()) {
 			expire(c);
 		}
 		unlocked.clear();
-		if (locked.size() > 0)
-		{
+		if (locked.size() > 0) {
 			CorePlugin.logWarning(MessageFormat.format(
 					"Killed a connection pool that still has {0} locked items", locked.size())); //$NON-NLS-1$
 			locked.clear();
@@ -77,22 +68,16 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 		reaper.exit();
 	}
 
-	protected synchronized void reap()
-	{
+	protected synchronized void reap() {
 		long now = System.currentTimeMillis();
-		for (T c : unlocked.keySet())
-		{
-			if ((now - unlocked.get(c)) > timeToRelease())
-			{
+		for (T c : unlocked.keySet()) {
+			if ((now - unlocked.get(c)) > timeToRelease()) {
 				// time to release the connection
 				unlocked.remove(c);
 				expire(c);
-			}
-			else
-			{
+			} else {
 				// keeps the connection alive unless it no longer validates
-				if (!validate(c))
-				{
+				if (!validate(c)) {
 					unlocked.remove(c);
 					expire(c);
 				}
@@ -100,40 +85,31 @@ public abstract class KeepAliveObjectPool<T> implements IObjectPool<T>
 		}
 	}
 
-	private int timeToRelease()
-	{
-		return RELEASE_TIME / ((unlocked.size() + locked.size()) ^ 2);
+	private int timeToRelease() {
+		return releaseTime / ((unlocked.size() + locked.size()) ^ 2);
 	}
 
-	private class ConnectionReaper extends Thread
-	{
+	private class ConnectionReaper extends Thread {
 
 		private static final long INTERVAL = 15000; // 15 seconds
 
 		private boolean isRunning;
 
-		public ConnectionReaper()
-		{
+		public ConnectionReaper() {
 			isRunning = true;
 		}
 
-		public void run()
-		{
-			while (isRunning)
-			{
-				try
-				{
+		public void run() {
+			while (isRunning) {
+				try {
 					sleep(INTERVAL);
-				}
-				catch (InterruptedException e)
-				{
+				} catch (InterruptedException e) {
 				}
 				reap();
 			}
 		}
 
-		public void exit()
-		{
+		public void exit() {
 			isRunning = false;
 		}
 	}

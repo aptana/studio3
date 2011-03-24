@@ -42,9 +42,11 @@ import com.aptana.core.IURIMapper;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonContentAssistProcessor;
 import com.aptana.editor.common.contentassist.CommonCompletionProposal;
+import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.common.contentassist.UserAgentManager;
 import com.aptana.editor.css.CSSSourceConfiguration;
+import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.html.HTMLPlugin;
 import com.aptana.editor.html.HTMLScopeScanner;
 import com.aptana.editor.html.HTMLSourceConfiguration;
@@ -56,9 +58,11 @@ import com.aptana.editor.html.contentassist.model.EntityElement;
 import com.aptana.editor.html.contentassist.model.EventElement;
 import com.aptana.editor.html.contentassist.model.ValueElement;
 import com.aptana.editor.html.parsing.HTMLParseState;
+import com.aptana.editor.html.parsing.HTMLUtils;
 import com.aptana.editor.html.parsing.lexer.HTMLTokenType;
 import com.aptana.editor.html.preferences.IPreferenceContants;
 import com.aptana.editor.js.JSSourceConfiguration;
+import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 import com.aptana.editor.xml.TagUtil;
 import com.aptana.parsing.lexer.IRange;
 import com.aptana.parsing.lexer.Lexeme;
@@ -91,8 +95,8 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	};
 
 	static final Image ELEMENT_ICON = HTMLPlugin.getImage("/icons/element.png"); //$NON-NLS-1$
-	private static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
-	private static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
+	static final Image ATTRIBUTE_ICON = HTMLPlugin.getImage("/icons/attribute.png"); //$NON-NLS-1$
+	static final Image EVENT_ICON = HTMLPlugin.getImage("/icons/event.gif"); //$NON-NLS-1$
 	private static final Map<String, LocationType> locationMap;
 	private static final Map<String, String> DOCTYPES;
 
@@ -168,7 +172,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 
 		if (element != null)
 		{
-			int length = 2;
 			String postfix = "=\"\""; //$NON-NLS-1$
 			switch (this._currentLexeme.getType())
 			{
@@ -179,7 +182,6 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					{
 						this._replaceRange = this._currentLexeme = lexemeProvider.getLexeme(index - 1);
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 
@@ -193,45 +195,52 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					if (nextlexeme != null && nextlexeme.getType() == HTMLTokenType.EQUAL)
 					{
 						postfix = ""; //$NON-NLS-1$
-						length = 0;
 					}
 					break;
 			}
 
+			int replaceLength = 0;
+			if (this._replaceRange != null)
+			{
+				offset = this._replaceRange.getStartingOffset();
+				replaceLength = this._replaceRange.getLength();
+			}
 			List<String> userAgents = element.getUserAgentNames();
 			Image[] userAgentIcons = UserAgentManager.getInstance().getUserAgentImages(userAgents);
 
 			for (AttributeElement attribute : this._queryHelper.getAttributes(element))
 			{
 				String name = attribute.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					ATTRIBUTE_ICON, //
-					attribute.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLAttributeProposal p = new HTMLAttributeProposal(attribute, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 
 			for (EventElement event : this._queryHelper.getEvents(element))
 			{
 				String name = event.getName();
-				CommonCompletionProposal p = this.createProposal( //
-					name, //
-					name + postfix, //
-					EVENT_ICON, //
-					event.getDescription(), //
-					userAgentIcons, //
-					HTMLIndexConstants.CORE, //
-					offset, //
-					name.length() + length //
-				);
-
+				String replaceString = name + postfix;
+				int[] positions;
+				if (postfix.length() == 0)
+				{
+					positions = new int[] { replaceString.length() };
+				}
+				else
+				{
+					positions = new int[] { replaceString.length() - 1, replaceString.length() };
+				}
+				HTMLEventProposal p = new HTMLEventProposal(event, name + postfix, userAgentIcons, offset,
+						replaceLength, positions);
 				proposals.add(p);
 			}
 		}
@@ -296,6 +305,12 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					break;
 
 				case EQUAL:
+					this._replaceRange = new Range(offset, offset - 1);
+					break;
+
+				// https://aptana.lighthouseapp.com/projects/35272/tickets/1640-coosing-attribute-value-in-html-ca-can-overwrite-part-of-open-tag
+				case TAG_END:
+				case TAG_SELF_CLOSE:
 					this._replaceRange = new Range(offset, offset - 1);
 					break;
 
@@ -366,6 +381,10 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			valuePrefix = valuePrefix.substring(0, length);
 
 			URI editorStoreURI = getURI();
+			if (editorStoreURI == null)
+			{
+				return proposals;
+			}
 			IFileStore editorStore = EFS.getStore(editorStoreURI);
 
 			// Strip the quotes off the value prefix!
@@ -383,12 +402,11 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 				baseStore = EFS.getStore(getProjectURI());
 
 				// Get the project webroot
-				IURIMapper serverConfiguration = ProjectPreviewUtil
-						.getServerConfiguration(getProject());
+				IURIMapper serverConfiguration = ProjectPreviewUtil.getServerConfiguration(getProject());
 				if (serverConfiguration == null)
 				{
-					for (IURIMapper server : WebServerCorePlugin.getDefault()
-							.getServerConfigurationManager().getServerConfigurations())
+					for (IURIMapper server : WebServerCorePlugin.getDefault().getServerConfigurationManager()
+							.getServerConfigurations())
 					{
 						if (server.resolve(editorStore) != null)
 						{
@@ -734,8 +752,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 					HTMLIndexConstants.CORE, offset, src.length());
 			if (src.equalsIgnoreCase("HTML")) // Make HTML 5 the default //$NON-NLS-1$
 			{
-				proposal.setIsSuggestedSelection(true);
-				proposal.setIsDefaultSelection(true);
+				proposal.setRelevance(ICommonCompletionProposal.RELEVANCE_MEDIUM);
 			}
 			proposals.add(proposal);
 		}
@@ -1054,7 +1071,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 			boolean autoActivated)
 	{
 		// tokenize the current document
-		_document = viewer.getDocument();
+		this._document = viewer.getDocument();
 
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(_document, offset);
 
@@ -1071,7 +1088,30 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		{
 			case IN_OPEN_TAG:
 				fineLocation = this.getOpenTagLocationType(lexemeProvider, offset);
-				this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+
+				if (fineLocation == LocationType.IN_ELEMENT_NAME)
+				{
+					this.addUnclosedTagProposals(fineLocation, result, lexemeProvider, offset);
+				}
+				// NOTE: The following is an ugly hack to get CA for JS and CSS inside of certain attributes. Ideally,
+				// at some point in the future we will get JS and CSS partitions in these cases so we won't have to
+				// rely on this code.
+				else if (fineLocation == LocationType.IN_ATTRIBUTE_VALUE)
+				{
+					String elementName = this.getElementName(lexemeProvider, offset);
+					String attributeName = this.getAttributeName(lexemeProvider, offset);
+					IRange activeRange = new Range(this._currentLexeme.getStartingOffset() + 1, this._currentLexeme.getEndingOffset() - 1);
+
+					if (HTMLUtils.isCSSAttribute(attributeName))
+					{
+						return new CSSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+					}
+					else if (HTMLUtils.isJSAttribute(elementName, attributeName))
+					{
+						return new JSContentAssistProcessor(this.editor, activeRange).computeCompletionProposals(viewer, offset, activationChar, autoActivated);
+					}
+				}
+
 				this.addOpenTagProposals(fineLocation, result, lexemeProvider, offset);
 				break;
 
@@ -1232,18 +1272,20 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 		String result = null;
 		int index = lexemeProvider.getLexemeFloorIndex(offset);
 
-		LOOP: for (int i = index; i >= 0; i--)
+		for (int i = index; i >= 0; i--)
 		{
 			Lexeme<HTMLTokenType> lexeme = lexemeProvider.getLexeme(i);
 
-			switch (lexeme.getType())
+			if (lexeme.getType() == HTMLTokenType.TAG_START)
 			{
-				case BLOCK_TAG:
-				case INLINE_TAG:
-				case STRUCTURE_TAG:
-				case TAG_START:
-					result = lexeme.getText();
-					break LOOP;
+				Lexeme<HTMLTokenType> nextLexeme = lexemeProvider.getLexeme(i + 1);
+
+				if (nextLexeme != null)
+				{
+					result = nextLexeme.getText();
+				}
+
+				break;
 			}
 		}
 
@@ -1300,7 +1342,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 									{
 										ITypedRegion previousPartition = document.getPartition(offset - 1);
 										String src = document.get(previousPartition.getOffset(), previousPartition.getLength()).trim();
-										
+
 										if (src.length() == 0 || src.charAt(src.length() - 1) == '>' || (src.indexOf('<') == -1 && src.indexOf('>') == -1))
 										{
 											result = LocationType.IN_TEXT;
@@ -1557,7 +1599,7 @@ public class HTMLContentAssistProcessor extends CommonContentAssistProcessor
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<HTMLTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 

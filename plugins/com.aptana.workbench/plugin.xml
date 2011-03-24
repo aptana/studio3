@@ -50,30 +50,5 @@
          </adapter>
       </factory>
    </extension>
-   <extension
-         point="org.eclipse.ui.navigator.navigatorContent">
-      <actionProvider
-            class="com.aptana.workbench.navigator.actions.DeployActionProvider"
-            id="com.aptana.workbench.navigator.actions.DeployActions">
-         <enablement>
-            <or>
-               <instanceof
-                     value="org.eclipse.core.resources.IResource">
-               </instanceof>
-            </or>
-         </enablement>
-      </actionProvider>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerActionBinding
-            viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-         <includes>
-            <actionExtension
-                  pattern="com.aptana.workbench.navigator.actions.*">
-            </actionExtension>
-         </includes>
-      </viewerActionBinding>
-   </extension>
 
 </plugin>

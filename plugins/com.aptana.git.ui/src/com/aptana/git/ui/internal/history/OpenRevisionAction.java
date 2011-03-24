@@ -38,7 +38,7 @@ class OpenRevisionAction extends Action
 	@Override
 	public String getText()
 	{
-		return "Open Revision";
+		return Messages.OpenRevisionAction_Text;
 	}
 
 	@Override

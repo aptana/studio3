@@ -27,8 +27,6 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.console.TextConsole;
 
-import com.aptana.theme.extensions.ConsoleThemePageParticipant;
-
 /**
  * This extension will make sure that the colors for the console are always following the theme preferences.
  */
@@ -65,7 +63,7 @@ public class ConsoleThemer
 	 * Should be called in the UI thread. Usually, there's no way to create this extension from any console, as the
 	 * ConsoleThemePageParticipant takes care of that for all consoles (provided they are properly configured).
 	 * 
-	 * @see ConsoleThemePageParticipant
+	 * @see com.aptana.theme.extensions.ConsoleThemePageParticipant
 	 * @param textConsole
 	 *            console with the streams.
 	 * @param themeConsoleStreamToColor

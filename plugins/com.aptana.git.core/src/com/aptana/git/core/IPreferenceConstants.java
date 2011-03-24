@@ -26,4 +26,9 @@ public interface IPreferenceConstants
 	 */
 	String AUTO_ATTACH_REPOS = "auto_attach_repos"; //$NON-NLS-1$
 
+	/**
+	 * Preference key for boolean pref determining if we ignore when no git was found
+	 */
+	String IGNORE_NO_GIT = "ignore_no_git"; //$NON-NLS-1$
+
 }

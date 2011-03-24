@@ -48,7 +48,8 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#copy()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#copy()
 	 */
 	public IFormatterContext copy()
 	{
@@ -64,7 +65,8 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#decIndent()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#decIndent()
 	 */
 	public void decIndent()
 	{
@@ -73,7 +75,8 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#incIndent()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#incIndent()
 	 */
 	public void incIndent()
 	{
@@ -81,7 +84,8 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#resetIndent()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#resetIndent()
 	 */
 	public void resetIndent()
 	{
@@ -98,7 +102,8 @@ public abstract class FormatterContext implements IFormatterContext, Cloneable
 	}
 
 	/*
-	 * @see org.eclipse.dltk.ruby.formatter.node.IFormatterContext#getIndent()
+	 * (non-Javadoc)
+	 * @see com.aptana.formatter.IFormatterContext#getIndent()
 	 */
 	public int getIndent()
 	{

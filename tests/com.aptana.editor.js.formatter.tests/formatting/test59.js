@@ -7054,7 +7054,6 @@ dojo.declare("dojo._Animation", null, {
 })();
 
 }
-
 ==FORMATTED==
 /*
  Copyright (c) 2004-2007, The Dojo Foundation
@@ -7162,7 +7161,10 @@ if(typeof dojo == "undefined") {
     //TODOC:  HOW TO DOC THIS?
     dojo.version = {
         // summary: version number of this instance of dojo.
-        major: 0, minor: 9, patch: 0, flag: "",
+        major: 0,
+        minor: 9,
+        patch: 0,
+        flag: "",
         revision: Number("$Rev: 10315 $".match(/[0-9]+/)[0]),
         toString: function() {
             with(dojo.version) {
@@ -7174,7 +7176,7 @@ if(typeof dojo == "undefined") {
     dojo._getProp = function(/*Array*/parts, /*Boolean*/create, /*Object*/context) {
         var obj=context||dojo.global;
         for(var i=0, p; obj&&(p=parts[i]); i++) {
-            obj = (p in obj ? obj[p] : (create ? obj[p]={} : undefined));
+            obj = (p in obj ? obj[p] : (create ? obj[p]= {} : undefined));
         }
         return obj; // Any
     }
@@ -7318,9 +7320,18 @@ if(typeof dojo == "undefined") {
 
             // FIXME: it should be possible to pull module prefixes in from djConfig
             _modulePrefixes: {
-                dojo: {name: "dojo", value: "."},
-                doh: {name: "doh", value: "../util/doh"},
-                tests: {name: "tests", value: "tests"}
+                dojo: {
+                    name: "dojo",
+                    value: "."
+                },
+                doh: {
+                    name: "doh",
+                    value: "../util/doh"
+                },
+                tests: {
+                    name: "tests",
+                    value: "tests"
+                }
             },
 
             _moduleHasPrefix: function(/*String*/module) {
@@ -7723,7 +7734,10 @@ if(typeof dojo == "undefined") {
         //		relative to Dojo root. For example, module acme is mapped to
         //		../acme.  If you want to use a different module name, use
         //		dojo.registerModulePath.
-        this._modulePrefixes[module] = { name: module, value: prefix };
+        this._modulePrefixes[module] = {
+            name: module,
+            value: prefix
+        };
     }
     dojo.requireLocalization = function(/*String*/moduleName, /*String*/bundleName, /*String?*/locale, /*String?*/availableFlatLocales) {
         // summary:
@@ -8697,7 +8711,11 @@ if(!dojo._hasResource["dojo._base.declare"]) { //_hasResource checks added by bu
             }
         }
         // decorate prototype
-        dojo.extend(ctor, {declaredClass: className, _constructor: init, preamble: null}, props||0);
+        dojo.extend(ctor, {
+            declaredClass: className,
+            _constructor: init,
+            preamble: null
+        }, props||0);
         // special help for IE
         ctor.prototype.constructor = ctor;
         // create named reference
@@ -8709,13 +8727,18 @@ if(!dojo._hasResource["dojo._base.declare"]) { //_hasResource checks added by bu
             // fresh constructor, fresh prototype
             var ctor = dojo.declare._makeCtor();
             // cache ancestry
-            dojo.mixin(ctor, {superclass: bp, mixin: mp});
+            dojo.mixin(ctor, {
+                superclass: bp,
+                mixin: mp
+            });
             // chain prototypes
             if(base) {
                 ctor.prototype = dojo._delegate(bp);
             };
             // add mixin and core
-            dojo.extend(ctor, dojo.declare._core, mp||0, {_constructor: null});
+            dojo.extend(ctor, dojo.declare._core, mp||0, {
+                _constructor: null
+            });
             // special help for IE
             ctor.prototype.constructor = ctor;
             // name this class for debugging
@@ -9830,7 +9853,10 @@ if(!dojo._hasResource["dojo._base.Color"]) { //_hasResource checks added by buil
     };
 
     dojo.extend(dojo.Color, {
-        r: 255, g: 255, b: 255, a: 1,
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 1,
         _set: function(r, g, b, a) {
             var t = this;
             t.r = r;
@@ -10310,7 +10336,11 @@ if(!dojo._hasResource["dojo._base.event"]) { //_hasResource checks added by buil
                             }
                         }
                         // simulate a keypress event
-                        var faux = del._synthesizeEvent(evt, {type: 'keypress', faux: true, charCode: c});
+                        var faux = del._synthesizeEvent(evt, {
+                            type: 'keypress',
+                            faux: true,
+                            charCode: c
+                        });
                         kp.call(evt.currentTarget, faux);
                         evt.cancelBubble = faux.cancelBubble;
                         evt.returnValue = faux.returnValue;
@@ -10375,7 +10405,9 @@ if(!dojo._hasResource["dojo._base.event"]) { //_hasResource checks added by buil
                                 // lowercase CTRL-[A-Z] keys
                                 c += 32;
                             }
-                            return del._synthesizeEvent(evt, { charCode: c });
+                            return del._synthesizeEvent(evt, {
+                                charCode: c
+                            });
                     }
                     return evt;
                 }
@@ -10402,7 +10434,11 @@ if(!dojo._hasResource["dojo._base.event"]) { //_hasResource checks added by buil
                             } else {
                                 c = (c>=32 && c<63232 ? c : 0); // avoid generating keyChar for non-printables
                             }
-                            return del._synthesizeEvent(evt, {charCode: c, shiftKey: s, keyCode: k});
+                            return del._synthesizeEvent(evt, {
+                                charCode: c,
+                                shiftKey: s,
+                                keyCode: k
+                            });
                     }
                     return evt;
                 }
@@ -10437,7 +10473,14 @@ if(!dojo._hasResource["dojo._base.event"]) { //_hasResource checks added by buil
                 SCROLL_LOCK: 63249,
                 NUM_LOCK: 63289
             });
-            var dk = dojo.keys, identifierMap = { "Up": dk.UP_ARROW, "Down": dk.DOWN_ARROW, "Left": dk.LEFT_ARROW, "Right": dk.RIGHT_ARROW, "PageUp": dk.PAGE_UP, "PageDown": dk.PAGE_DOWN };
+            var dk = dojo.keys, identifierMap = {
+                "Up": dk.UP_ARROW,
+                "Down": dk.DOWN_ARROW,
+                "Left": dk.LEFT_ARROW,
+                "Right": dk.RIGHT_ARROW,
+                "PageUp": dk.PAGE_UP,
+                "PageDown": dk.PAGE_DOWN
+            };
         }
     })();
     if(dojo.isIE) {
@@ -10853,7 +10896,10 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
         );
 
         var _pixelNamesCache = {
-            width: true, height: true, left: true, top: true
+            width: true,
+            height: true,
+            left: true,
+            top: true
         };
         var _toStyleValue = function(node, type, value) {
             type = type.toLowerCase();
@@ -11196,7 +11242,12 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
             }
             dojo._setBox(node, leftPx, topPx, widthPx, heightPx);
         }
-        var _nilExtents = { l:0, t:0, w:0, h:0 };
+        var _nilExtents = {
+            l:0,
+            t:0,
+            w:0,
+            h:0
+        };
 
         // public API
 
@@ -11296,12 +11347,17 @@ if(!dojo._hasResource["dojo._base.html"]) { //_hasResource checks added by build
 
             var de = dojo.doc.documentElement;
             if(dojo.isIE >= 7) {
-                return {x: de.getBoundingClientRect().left, y: de.getBoundingClientRect().top}; // Object
+                return {
+                    x: de.getBoundingClientRect().left,
+                    y: de.getBoundingClientRect().top
+                }; // Object
             } else {
                 // IE 6.0
-                return {x: dojo._isBodyLtr() || window.parent == window ?
+                return {
+                    x: dojo._isBodyLtr() || window.parent == window ?
                     de.clientLeft : de.offsetWidth - de.clientWidth - de.clientLeft,
-                    y: de.clientTop}; // Object
+                    y: de.clientTop
+                }; // Object
             }
         };
         dojo._fixIeBiDiScrollLeft = function(/*Integer*/ scrollLeft) {
@@ -11520,7 +11576,7 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
             popup.show(1, 1, 1, 1);
         }
 
-        dojo.extend(dojo.NodeList,	{
+        dojo.extend(dojo.NodeList, {
             // http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Array#Methods
 
             // FIXME: would it be smaller if we set these w/ iteration?
@@ -11823,9 +11879,11 @@ if(!dojo._hasResource["dojo._base.NodeList"]) { //_hasResource checks added by b
             },
             _anim: function(method, args) {
                 var anims = [];
-                args = args||{};
+                args = args|| {};
                 this.forEach( function(item) {
-                    var tmpArgs = { node: item };
+                    var tmpArgs = {
+                        node: item
+                    };
                     d.mixin(tmpArgs, args);
                     anims.push(d[method](tmpArgs));
                 });
@@ -12046,32 +12104,27 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
             match: function(attr, value) {
                 return "[contains(concat(' ',@"+attr+",' '), ' "+ value +"-')]";
             }
-        },
-        {
+        },{
             key: "~=",
             match: function(attr, value) {
                 return "[contains(concat(' ',@"+attr+",' '), ' "+ value +" ')]";
             }
-        },
-        {
+        },{
             key: "^=",
             match: function(attr, value) {
                 return "[starts-with(@"+attr+", '"+ value +"')]";
             }
-        },
-        {
+        },{
             key: "*=",
             match: function(attr, value) {
                 return "[contains(@"+attr+", '"+ value +"')]";
             }
-        },
-        {
+        },{
             key: "$=",
             match: function(attr, value) {
                 return "[substring(@"+attr+", string-length(@"+attr+")-"+(value.length-1)+")='"+value+"']";
             }
-        },
-        {
+        },{
             key: "!=",
             match: function(attr, value) {
                 return "[not(@"+attr+"='"+ value +"')]";
@@ -12440,24 +12493,21 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     );
                 }
             }
-        },
-        {
+        },{
             key: "^=",
             match: function(attr, value) {
                 return function(elem) {
                     return (_getAttr(elem, attr).indexOf(value)==0);
                 }
             }
-        },
-        {
+        },{
             key: "*=",
             match: function(attr, value) {
                 return function(elem) {
                     return (_getAttr(elem, attr).indexOf(value)>=0);
                 }
             }
-        },
-        {
+        },{
             key: "~=",
             match: function(attr, value) {
                 // return "[contains(concat(' ',@"+attr+",' '), ' "+ value +" ')]";
@@ -12467,8 +12517,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (ea.indexOf(tval)>=0);
                 }
             }
-        },
-        {
+        },{
             key: "$=",
             match: function(attr, value) {
                 var tval = " "+value;
@@ -12477,8 +12526,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (ea.lastIndexOf(value)==(ea.length-value.length));
                 }
             }
-        },
-        {
+        },{
             key: "!=",
             match: function(attr, value) {
                 return function(elem) {
@@ -12497,8 +12545,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
         }
         ];
 
-        var pseudos = [
-        {
+        var pseudos = [{
             key: "first-child",
             match: function(name, condition) {
                 return function(elem) {
@@ -12513,8 +12560,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (!fc);
                 }
             }
-        },
-        {
+        },{
             key: "last-child",
             match: function(name, condition) {
                 return function(elem) {
@@ -12529,8 +12575,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (!nc);
                 }
             }
-        },
-        {
+        },{
             key: "empty",
             match: function(name, condition) {
                 return function(elem) {
@@ -12549,8 +12594,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return true;
                 }
             }
-        },
-        {
+        },{
             key: "contains",
             match: function(name, condition) {
                 return function(elem) {
@@ -12562,8 +12606,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (elem.innerHTML.indexOf(condition) >= 0);
                 }
             }
-        },
-        {
+        },{
             key: "not",
             match: function(name, condition) {
                 var ntf = getFilterFunc(condition);
@@ -12576,8 +12619,7 @@ if(!dojo._hasResource["dojo._base.query"]) { //_hasResource checks added by buil
                     return (!ntf(elem));
                 }
             }
-        },
-        {
+        },{
             key: "nth-child",
             match: function(name, condition) {
                 var pi = parseInt;
@@ -13416,7 +13458,9 @@ if(!dojo._hasResource["dojo._base.xhr"]) { //_hasResource checks added by build.
                 miArgs.push(args.content);
             }
             if(args.preventCache) {
-                miArgs.push({"dojo.preventCache": new Date().valueOf()});
+                miArgs.push({
+                    "dojo.preventCache": new Date().valueOf()
+                });
             }
             ioArgs.query = dojo.objectToQuery(dojo.mixin.apply(null, miArgs));
 
@@ -13572,7 +13616,12 @@ if(!dojo._hasResource["dojo._base.xhr"]) { //_hasResource checks added by build.
             if(dfd.ioArgs.args.timeout) {
                 dfd.startTime = (new Date()).getTime();
             }
-            _inFlight.push({dfd: dfd, validCheck: validCheck, ioCheck: ioCheck, resHandle: resHandle});
+            _inFlight.push({
+                dfd: dfd,
+                validCheck: validCheck,
+                ioCheck: ioCheck,
+                resHandle: resHandle
+            });
             if(!_inFlightIntvl) {
                 _inFlightIntvl = setInterval(_watchInFlight, 50);
             }
@@ -13938,7 +13987,9 @@ if(!dojo._hasResource["dojo._base.fx"]) { //_hasResource checks added by build. 
                 throw new Error("dojo._fade needs an end value");
             }
             args.node = dojo.byId(args.node);
-            var fArgs = dojo.mixin({ properties: {} }, args);
+            var fArgs = dojo.mixin({
+                properties: {}
+            }, args);
             var props = (fArgs.properties.opacity = {});
             props.start = (typeof fArgs.start == "undefined") ? function() {
                 return Number(dojo.style(fArgs.node, "opacity"));
@@ -13959,7 +14010,9 @@ if(!dojo._hasResource["dojo._base.fx"]) { //_hasResource checks added by build. 
             // mixins:
             // args.duration: Duration of the animation in milliseconds.
             // args.easing: An easing function.
-            return dojo._fade(dojo.mixin({ end: 1 }, args)); // dojo._Animation
+            return dojo._fade(dojo.mixin({
+                end: 1
+            }, args)); // dojo._Animation
         }
         dojo.fadeOut = function(/*Object*/ args) {
             // summary: Returns an animation that will fade node
@@ -13968,7 +14021,9 @@ if(!dojo._hasResource["dojo._base.fx"]) { //_hasResource checks added by build. 
             // mixins:
             // duration: Duration of the animation in milliseconds.
             // easing: An easing function.
-            return dojo._fade(dojo.mixin({ end: 0 }, args)); // dojo._Animation
+            return dojo._fade(dojo.mixin({
+                end: 0
+            }, args)); // dojo._Animation
         }
         if(dojo.isKhtml && !dojo.isSafari) {
             // the cool kids are obviously not using konqueror...
@@ -14078,4 +14133,3 @@ if(!dojo._hasResource["dojo._base.fx"]) { //_hasResource checks added by build. 
         }
     })();
 }
-

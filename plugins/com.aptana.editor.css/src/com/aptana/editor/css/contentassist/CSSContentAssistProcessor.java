@@ -57,6 +57,21 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	private Lexeme<CSSTokenType> _currentLexeme;
 	private IRange _replaceRange;
 
+	// NOTE: temp (I hope) until we get proper partitions for CSS inside of HTML
+	private IRange _activeRange;
+
+	/**
+	 * CSSContentAssistProcessor
+	 * 
+	 * @param editor
+	 */
+	public CSSContentAssistProcessor(AbstractThemeableEditor editor, IRange activeRange)
+	{
+		this(editor);
+
+		this._activeRange = activeRange;
+	}
+
 	/**
 	 * CSSContentAssistProcessor
 	 * 
@@ -559,8 +574,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 		// CA context is fine-tuned below
 		this._replaceRange = this._currentLexeme;
 
-		// first step is to determine if we're inside our outside of a rule
-		LocationType location = this.getCoarseLocationType(lexemeProvider, offset);
+		// NOTE: Temp until we get proper partitions for CSS inside of HTML
+		// @formatter:off
+		LocationType location = (this._activeRange == null) ? this.getCoarseLocationType(lexemeProvider, offset) : LocationType.INSIDE_RULE;
+		// @formatter:on
 
 		// create proposal container
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
@@ -611,14 +628,29 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 */
 	LexemeProvider<CSSTokenType> createLexemeProvider(IDocument document, int offset)
 	{
-		return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+		// NOTE: temp until we get proper partitions for CSS inside of HTML
+		if (this._activeRange != null)
 		{
-			@Override
-			protected CSSTokenType getTypeFromData(Object data)
+			return new LexemeProvider<CSSTokenType>(document, this._activeRange, new CSSScopeScanner())
 			{
-				return (CSSTokenType) data;
-			}
-		};
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
+		else
+		{
+			return new LexemeProvider<CSSTokenType>(document, offset, new CSSScopeScanner())
+			{
+				@Override
+				protected CSSTokenType getTypeFromData(Object data)
+				{
+					return (CSSTokenType) data;
+				}
+			};
+		}
 	}
 
 	/*
@@ -836,15 +868,10 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 			{
 				Lexeme<CSSTokenType> previousLexeme = (i > 0) ? lexemeProvider.getLexeme(i - 1) : null;
 
-				if (this.isValueDelimiter(currentLexeme))
+				if (this.isValueDelimiter(currentLexeme) || previousLexeme.isContiguousWith(currentLexeme) == false)
 				{
-					index = i + 1;
-					break;
-				}
-				else if (previousLexeme.isContiguousWith(currentLexeme) == false)
-				{
-					// there's a space between this lexeme and the previous lexeme
-					// treat the previous lexeme like it is the delimiter
+					// the current lexeme is a natural delimiter or there's a space between this lexeme and the previous
+					// lexeme, so treat the previous lexeme like it is the delimiter
 					index = i;
 					break;
 				}
@@ -1107,10 +1134,30 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
 		return (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON));
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return ('A' <= keyCode && keyCode <= 'Z') || ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#'
+				|| c == '.' || c == '-';
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return Character.isWhitespace(c) || c == ':';
+	}
+
 }

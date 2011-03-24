@@ -53,17 +53,17 @@ import org.eclipse.ui.internal.ide.dialogs.FileFolderSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.core.util.StringUtil;
 import com.aptana.filesystem.ftp.FTPConnectionPoint;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
-import com.aptana.ide.core.io.efs.EFSUtils;
 import com.aptana.ide.syncing.core.DefaultSiteConnection;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
-import com.aptana.ide.ui.ftp.internal.FTPPropertyDialogProvider;
 import com.aptana.ui.IPropertyDialog;
+import com.aptana.ui.ftp.internal.FTPPropertyDialogProvider;
 
 /**
  * @author Max Stepanov

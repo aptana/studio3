@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.aptana.ui.ftp;singleton:=true
 Bundle-Version: 3.0.0.qualifier
-Bundle-Activator: com.aptana.ide.ui.ftp.FTPUIPlugin
+Bundle-Activator: com.aptana.ui.ftp.FTPUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  com.aptana.theme
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
-Export-Package: com.aptana.ide.ui.ftp.actions,
- com.aptana.ide.ui.ftp.dialogs,
- com.aptana.ide.ui.ftp.internal;x-friends:="com.aptana.ide.ui.secureftp"
+Export-Package: com.aptana.ui.ftp.actions,
+ com.aptana.ui.ftp.dialogs,
+ com.aptana.ui.ftp.internal;x-friends:="com.aptana.ui.secureftp"
 Eclipse-ExtensibleAPI: true

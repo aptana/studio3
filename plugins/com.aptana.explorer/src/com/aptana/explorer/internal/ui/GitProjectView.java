@@ -50,6 +50,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -123,7 +124,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					return Status.OK_STATUS;
 				}
 			};
-			job.setSystem(true);
+			job.setSystem(!EclipseUtil.showSystemJobs());
 			job.setPriority(Job.SHORT);
 			job.schedule(300);
 		}
@@ -321,7 +322,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 
 	private void revertToCurrentBranch(final GitRepository repo)
 	{
-		Job job = new UIJob("") //$NON-NLS-1$
+		Job job = new UIJob("Reverting back to current branch") //$NON-NLS-1$
 		{
 
 			@Override
@@ -341,7 +342,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
@@ -563,7 +564,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				}
 			}
 		};
-		refreshUIJob.setSystem(true);
+		refreshUIJob.setSystem(!EclipseUtil.showSystemJobs());
 		refreshUIJob.setPriority(Job.INTERACTIVE);
 		refreshUIJob.schedule(100);
 	}

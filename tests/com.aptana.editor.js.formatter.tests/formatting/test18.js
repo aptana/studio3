@@ -24,8 +24,6 @@ js.formatter.formatter.tabulation.char=space
 ==CONTENT==
 s = 1/*3*/;
 s = 1;/*2*/
-
 ==FORMATTED==
 s = 1/*3*/;
 s = 1;/*2*/
-

@@ -10,6 +10,7 @@ package com.aptana.editor.html;
 import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
@@ -19,6 +20,7 @@ import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.TextUtils;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.css.CSSSourceConfiguration;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
 import com.aptana.editor.css.text.CSSTextHover;
@@ -75,8 +77,9 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer)
 	{
-		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE }, HTMLSourceConfiguration.CONTENT_TYPES,
-			JSSourceConfiguration.CONTENT_TYPES, CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
+		return TextUtils.combine(new String[][] { { IDocument.DEFAULT_CONTENT_TYPE },
+				HTMLSourceConfiguration.CONTENT_TYPES, JSSourceConfiguration.CONTENT_TYPES,
+				CSSSourceConfiguration.CONTENT_TYPES, SVGSourceConfiguration.CONTENT_TYPES });
 	}
 
 	/*
@@ -98,7 +101,7 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 	 * .ISourceViewer)
 	 */
 	@Override
-	@SuppressWarnings( { "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Map getHyperlinkDetectorTargets(ISourceViewer sourceViewer)
 	{
 		Map targets = super.getHyperlinkDetectorTargets(sourceViewer);
@@ -135,4 +138,12 @@ public class HTMLSourceViewerConfiguration extends SimpleSourceViewerConfigurati
 
 		return super.getTextHover(sourceViewer, contentType);
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, HTMLPlugin
+				.getDefault().getPreferenceStore()) };
+	}
+
 }

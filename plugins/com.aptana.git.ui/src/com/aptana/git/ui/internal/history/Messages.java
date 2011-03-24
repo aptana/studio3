@@ -31,6 +31,7 @@ public class Messages extends NLS
 	public static String GitCompareFileRevisionEditorInput_ProblemGettingContent_Error;
 	public static String GitHistoryPage_DateFormat;
 	public static String GitHistoryPage_GeneratingHistoryJob_title;
+	public static String OpenRevisionAction_Text;
 
 	static
 	{

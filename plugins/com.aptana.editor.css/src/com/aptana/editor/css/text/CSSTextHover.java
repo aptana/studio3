@@ -15,19 +15,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
-import org.eclipse.jface.text.IInformationControlExtension2;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.editor.common.contentassist.InformationControl;
+import com.aptana.editor.common.contentassist.CommonTextHover;
 import com.aptana.editor.common.contentassist.LexemeProvider;
 import com.aptana.editor.css.CSSColors;
 import com.aptana.editor.css.CSSScopeScanner;
@@ -36,76 +33,11 @@ import com.aptana.editor.css.contentassist.model.ElementElement;
 import com.aptana.editor.css.contentassist.model.PropertyElement;
 import com.aptana.editor.css.parsing.lexer.CSSTokenType;
 import com.aptana.parsing.lexer.Lexeme;
-import com.aptana.theme.ColorManager;
-import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
-public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
+public class CSSTextHover extends CommonTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2
 {
 	private static final String RGB = "rgb"; //$NON-NLS-1$
-
-	private static class ThemedInformationControl extends InformationControl implements IInformationControlExtension2
-	{
-		public ThemedInformationControl(Shell parent)
-		{
-			super(parent);
-
-			GridData gd = (GridData) getStyledTextWidget().getLayoutData();
-
-			gd.horizontalIndent = 0;
-			gd.verticalIndent = 0;
-		}
-
-		@Override
-		protected Color getBackground()
-		{
-			return getThemeBackground();
-		}
-
-		@Override
-		protected Color getBorderColor()
-		{
-			return getForeground();
-		}
-
-		protected ColorManager getColorManager()
-		{
-			return ThemePlugin.getDefault().getColorManager();
-		}
-
-		protected Theme getCurrentTheme()
-		{
-			return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
-		}
-
-		@Override
-		protected Color getForeground()
-		{
-			return getThemeForeground();
-		}
-
-		protected Color getThemeBackground()
-		{
-			return getColorManager().getColor(getCurrentTheme().getBackground());
-		}
-
-		protected Color getThemeForeground()
-		{
-			return getColorManager().getColor(getCurrentTheme().getForeground());
-		}
-
-		public void setInput(Object input)
-		{
-			if (input instanceof RGB)
-			{
-				setBackgroundColor(getColorManager().getColor((RGB) input));
-			}
-			else if (input instanceof String)
-			{
-				setInformation((String) input);
-			}
-		}
-	}
 
 	/*
 	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
@@ -116,7 +48,7 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 		{
 			public IInformationControl createInformationControl(Shell parent)
 			{
-				return new ThemedInformationControl(parent);
+				return new CSSTextHoverInformationControl(parent);
 			}
 		};
 	}
@@ -139,6 +71,9 @@ public class CSSTextHover implements ITextHover, ITextHoverExtension, ITextHover
 	 */
 	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion)
 	{
+		if (!isHoverEnabled())
+			return null;
+
 		int offset = hoverRegion.getOffset();
 		LexemeProvider<CSSTokenType> lexemeProvider = getLexemeProvider(textViewer, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getLexemeFromOffset(offset);
