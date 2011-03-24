@@ -92,6 +92,7 @@ public class ThemedInformationControl extends InformationControl implements IInf
 	 * @see org.eclipse.jface.text.IInformationControlExtension2#setInput(java.lang.Object)
 	 */
 	public void setInput(Object input) {
+		setInformation(String.valueOf(input));
 	}
 
 	/* (non-Javadoc)
