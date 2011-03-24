@@ -10,6 +10,8 @@ package com.aptana.editor.js.formatter;
 import java.util.HashSet;
 import java.util.Set;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
@@ -42,6 +44,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
+import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
@@ -426,7 +429,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSObjectNode node)
 		{
-			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document);
+			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document, hasOffset(node.getLeftBrace()
+					.getStart()), node);
 			objectNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset() + 1));
 			push(objectNode);
 			visitChildren(node);
@@ -434,6 +438,24 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(objectNode, end);
 			end = locateColonOrSemicolonInLine(end + 1, document);
 			objectNode.setEnd(createTextNode(document, node.getEndingOffset(), end));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNameValuePairNode)
+		 */
+		@Override
+		public void visit(JSNameValuePairNode node)
+		{
+			FormatterJSDefaultLineNode lineNode = new FormatterJSDefaultLineNode(document);
+			IParseNode name = node.getName();
+			Symbol colon = node.getColon();
+			lineNode.setBegin(createTextNode(document, name.getStartingOffset(), colon.getEnd() + 1));
+			push(lineNode);
+			IParseNode value = node.getValue();
+			visit((JSNode) value);
+			checkedPop(lineNode, value.getEndingOffset());
 		}
 
 		/*

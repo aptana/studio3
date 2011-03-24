@@ -8,10 +8,13 @@
 package com.aptana.editor.xml;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
+import org.eclipse.jface.text.source.ISourceViewer;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 
 public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
@@ -35,4 +38,12 @@ public class XMLSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	{
 		return XMLSourceConfiguration.getDefault();
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, XMLPlugin
+				.getDefault().getPreferenceStore()) };
+	}
+
 }

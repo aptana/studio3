@@ -27,6 +27,7 @@ import com.aptana.editor.common.scripting.IContentTypeTranslator;
 import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.rules.CaseInsensitiveMultiLineRule;
 import com.aptana.editor.common.text.rules.CommentScanner;
+import com.aptana.editor.common.text.rules.ExtendedToken;
 import com.aptana.editor.common.text.rules.ISubPartitionScanner;
 import com.aptana.editor.common.text.rules.PartitionerSwitchingIgnoreRule;
 import com.aptana.editor.common.text.rules.TagRule;
@@ -67,9 +68,9 @@ public class HTMLSourceConfiguration implements IPartitioningConfiguration, ISou
 			new DocTypeRule(new Token(CDATA)),
 			new PartitionerSwitchingIgnoreRule(
 					new MultiLineRule("<!--", "-->", new Token(HTML_COMMENT), (char) 0, true)), //$NON-NLS-1$ //$NON-NLS-2$
-			new TagRule("script", new Token(HTML_SCRIPT), true), //$NON-NLS-1$
-			new TagRule("style", new Token(HTML_STYLE), true), //$NON-NLS-1$
-			new TagRule("svg", new Token(HTML_SVG), true), //$NON-NLS-1$
+			new TagRule("script", new ExtendedToken(HTML_SCRIPT), true), //$NON-NLS-1$
+			new TagRule("style", new ExtendedToken(HTML_STYLE), true), //$NON-NLS-1$
+			new TagRule("svg", new ExtendedToken(HTML_SVG), true), //$NON-NLS-1$
 			new TagRule("/", new Token(HTML_TAG)), //$NON-NLS-1$
 			new TagRule(new Token(HTML_TAG)) };
 

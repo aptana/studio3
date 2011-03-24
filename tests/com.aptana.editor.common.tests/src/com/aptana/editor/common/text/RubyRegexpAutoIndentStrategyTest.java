@@ -214,7 +214,7 @@ public class RubyRegexpAutoIndentStrategyTest extends TestCase
 	{
 		AlwaysMatchRubyRegexpAutoIndentStrategy()
 		{
-			super("", null, null);
+			super("", null, null, null);
 		}
 
 		@Override

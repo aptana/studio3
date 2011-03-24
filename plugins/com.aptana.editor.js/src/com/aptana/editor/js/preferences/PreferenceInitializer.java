@@ -16,7 +16,6 @@ import com.aptana.editor.js.JSPlugin;
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 	public static final boolean DEFAULT_COMMENT_INDENT_USE_STAR = true;
-	public static final boolean DEFAULT_AUTO_INDENT_ON_RETURN = true;
 
 	/*
 	 * (non-Javadoc)
@@ -26,12 +25,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	public void initializeDefaultPreferences()
 	{
 		IEclipsePreferences prefs = (new DefaultScope()).getNode(JSPlugin.PLUGIN_ID);
-		
+
 		prefs.putBoolean(IPreferenceConstants.COMMENT_INDENT_USE_STAR, DEFAULT_COMMENT_INDENT_USE_STAR);
-		prefs.putBoolean(IPreferenceConstants.AUTO_INDENT_ON_CARRIAGE_RETURN, DEFAULT_AUTO_INDENT_ON_RETURN);
 		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.LINK_OUTLINE_WITH_EDITOR, true);
 		prefs.putDouble(IPreferenceConstants.JS_INDEX_VERSION, 0);
 		prefs.put(IPreferenceConstants.JS_ACTIVATION_CHARACTERS, "."); //$NON-NLS-1$
+		prefs.putBoolean(com.aptana.editor.common.preferences.IPreferenceConstants.EDITOR_AUTO_INDENT, true);
 
 	}
 }

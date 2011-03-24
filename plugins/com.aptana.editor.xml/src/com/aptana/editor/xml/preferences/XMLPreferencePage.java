@@ -21,14 +21,14 @@ public class XMLPreferencePage extends CommonEditorPreferencePage
 	/**
 	 * XMLPreferencePage
 	 */
-	
+
 	public XMLPreferencePage()
 	{
 		super();
 		setDescription(Messages.XMLPreferencePage_XML_Page_Title);
 		setPreferenceStore(XMLPlugin.getDefault().getPreferenceStore());
 	}
-	
+
 	@Override
 	protected void createMarkOccurrenceOptions(Composite parent)
 	{
