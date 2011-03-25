@@ -41,6 +41,7 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 		if (!isToolbarFilled)
 		{
 			toolbarItem = fillToolbar(actionBars.getToolBarManager());
+			actionBars.updateActionBars();
 			isToolbarFilled = true;
 		}
 		toolbarItem.setEnabled(isEnabled());
