@@ -482,7 +482,7 @@ public class HTMLParser implements IParser
 		}
 	}
 
-	private static boolean isJavaScript(HTMLElementNode node)
+	public static boolean isJavaScript(HTMLElementNode node)
 	{
 		String type = node.getAttributeValue(ATTR_TYPE);
 		if (isInArray(type, JS_VALID_TYPE_ATTR))
