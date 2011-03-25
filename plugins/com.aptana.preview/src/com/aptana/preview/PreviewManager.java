@@ -238,7 +238,7 @@ public final class PreviewManager {
 			Activator.log(e);
 		}
 	}
-	
+
 	public boolean testEditorInputForPreview(IEditorInput editorInput) {
 		try {
 			SourceConfig sourceConfig = getSourceConfig(editorInput, null);
@@ -249,8 +249,7 @@ public final class PreviewManager {
 				}
 
 				PreviewConfig previewConfig = handler.handle(sourceConfig);
-				if (previewConfig == null && !(handler instanceof DefaultPreviewHandler))
-				{
+				if (previewConfig == null && !(handler instanceof DefaultPreviewHandler)) {
 					previewConfig = DefaultPreviewHandler.getInstance().handle(sourceConfig);
 				}
 				return previewConfig != null;
@@ -291,11 +290,11 @@ public final class PreviewManager {
 			return null;
 		}
 		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(fileName);
-		return new SourceConfig(editorInput, project,
-				project != null ? workspacePath : path, content, contentType);
+		return new SourceConfig(editorInput, project, project != null ? workspacePath : path, content, contentType);
 	}
 
-	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen) throws CoreException {
+	private void openPreview(IEditorPart editorPart, IEditorInput editorInput, String content, boolean forceOpen)
+			throws CoreException {
 		SourceConfig sourceConfig = getSourceConfig(editorInput, content);
 		PreviewConfig previewConfig = null;
 		if (sourceConfig != null) {
@@ -315,7 +314,8 @@ public final class PreviewManager {
 		}
 	}
 
-	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig, boolean forceOpen) throws CoreException {
+	private void showEditor(IEditorPart editorPart, SourceConfig sourceConfig, PreviewConfig previewConfig,
+			boolean forceOpen) throws CoreException {
 		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage workbenchPage = null;
 		if (workbenchWindow != null) {
@@ -370,8 +370,10 @@ public final class PreviewManager {
 					editorPreviewDelegate.init(editor);
 					if (editorPreviewDelegate.isLinked(uri)) {
 						editorPart = editor;
-						// TODO: what if multiple editors in the tracked list need to update?
-						// Need a way to know which editor the Preview editor is currently
+						// TODO: what if multiple editors in the tracked list
+						// need to update?
+						// Need a way to know which editor the Preview editor is
+						// currently
 						// previewing against
 						break;
 					}
@@ -398,8 +400,7 @@ public final class PreviewManager {
 	private void addFilewatchListener(IEditorPart editorPart) {
 		IEditorInput editorInput = editorPart.getEditorInput();
 		if (editorInput instanceof IFileEditorInput) {
-			String projectPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation()
-					.toOSString();
+			String projectPath = ((IFileEditorInput) editorInput).getFile().getProject().getLocation().toOSString();
 			try {
 				int watchId = FileWatcher.addWatch(projectPath, IJNotify.FILE_ANY, true, new JNotifyAdapter() {
 
@@ -420,7 +421,7 @@ public final class PreviewManager {
 			} catch (JNotifyException e) {
 				Activator.log(e);
 			}
-		}	
+		}
 	}
 
 	private void removeFilewatchListener(IEditorPart editorPart) {
@@ -445,15 +446,12 @@ public final class PreviewManager {
 		PlatformUI.getWorkbench().addWindowListener(windowListener);
 	}
 
-	private void removePartListener()
-	{
+	private void removePartListener() {
 		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
 		IPartService partService;
-		for (IWorkbenchWindow window : windows)
-		{
+		for (IWorkbenchWindow window : windows) {
 			partService = window.getPartService();
-			if (partService != null)
-			{
+			if (partService != null) {
 				partService.removePartListener(editorPartListener);
 			}
 		}

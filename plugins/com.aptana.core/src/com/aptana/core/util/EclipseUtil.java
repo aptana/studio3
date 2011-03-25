@@ -158,38 +158,29 @@ public class EclipseUtil
 	 * @param asSplashLauncher
 	 * @return
 	 */
-	public static IPath getApplicationLauncher(boolean asSplashLauncher)
-	{
+	public static IPath getApplicationLauncher(boolean asSplashLauncher) {
 		IPath launcher = null;
 		String cmdline = System.getProperty("eclipse.commands"); //$NON-NLS-1$
-		if (cmdline != null && cmdline.length() > 0)
-		{
+		if (cmdline != null && cmdline.length() > 0) {
 			String[] args = cmdline.split("\n"); //$NON-NLS-1$
-			for (int i = 0; i < args.length; ++i)
-			{
+			for (int i = 0; i < args.length; ++i) {
 				if ("-launcher".equals(args[i]) && (i + 1) < args.length) { //$NON-NLS-1$
 					launcher = Path.fromOSString(args[i + 1]);
 					break;
 				}
 			}
 		}
-		if (launcher == null)
-		{
+		if (launcher == null) {
 			Location location = Platform.getInstallLocation();
-			if (location != null)
-			{
+			if (location != null) {
 				launcher = new Path(location.getURL().getFile());
-				if (launcher.toFile().isDirectory())
-				{
-					String[] executableFiles = launcher.toFile().list(new FilenameFilter()
-					{
-						public boolean accept(File dir, String name)
-						{
+				if (launcher.toFile().isDirectory()) {
+					String[] executableFiles = launcher.toFile().list(new FilenameFilter() {
+						public boolean accept(File dir, String name) {
 							IPath path = Path.fromOSString(dir.getAbsolutePath()).append(name);
 							name = path.removeFileExtension().lastSegment();
 							String ext = path.getFileExtension();
-							if (Platform.OS_MACOSX.equals(Platform.getOS()))
-							{
+							if (Platform.OS_MACOSX.equals(Platform.getOS())) {
 								if (!"app".equals(ext)) { //$NON-NLS-1$
 									return false;
 								}
@@ -200,19 +191,16 @@ public class EclipseUtil
 							return false;
 						}
 					});
-					if (executableFiles.length > 0)
-					{
+					if (executableFiles.length > 0) {
 						launcher = launcher.append(executableFiles[0]);
 					}
 				}
 			}
 		}
-		if (launcher == null || !launcher.toFile().exists())
-		{
+		if (launcher == null || !launcher.toFile().exists()) {
 			return null;
 		}
-		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher)
-		{
+		if (Platform.OS_MACOSX.equals(Platform.getOS()) && asSplashLauncher) {
 			launcher = new Path(PlatformUtil.getApplicationExecutable(launcher.toOSString()).getAbsolutePath());
 		}
 		return launcher;
