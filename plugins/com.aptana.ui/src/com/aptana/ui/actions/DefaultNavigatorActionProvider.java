@@ -76,6 +76,10 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 	 */
 	protected void run(ToolBar parent)
 	{
+		if (!isEnabled())
+		{
+			return;
+		}
 		Point toolbarLocation = parent.getLocation();
 		toolbarLocation = parent.getParent().toDisplay(toolbarLocation.x, toolbarLocation.y);
 		Point toolbarSize = parent.getSize();
