@@ -7,7 +7,6 @@
  */
 package com.aptana.ui.actions;
 
-import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.graphics.Image;
@@ -26,7 +25,8 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 {
 
 	private IWorkbenchPartSite partSite;
-	private IContributionItem toolbarItem;
+	private DefaultNavigatorContributionItem toolbarItem;
+	private boolean isToolbarFilled;
 
 	@Override
 	public void init(ICommonActionExtensionSite aSite)
@@ -38,25 +38,12 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 	@Override
 	public void fillActionBars(IActionBars actionBars)
 	{
-		if (isEnabled())
+		if (!isToolbarFilled)
 		{
-			if (toolbarItem == null)
-			{
-				// adds the item
-				toolbarItem = fillToolbar(actionBars.getToolBarManager());
-				actionBars.updateActionBars();
-			}
+			toolbarItem = fillToolbar(actionBars.getToolBarManager());
+			isToolbarFilled = true;
 		}
-		else
-		{
-			if (toolbarItem != null)
-			{
-				// removes the item
-				actionBars.getToolBarManager().remove(toolbarItem);
-				toolbarItem = null;
-				actionBars.updateActionBars();
-			}
-		}
+		toolbarItem.setEnabled(isEnabled());
 	}
 
 	public abstract String getActionId();
@@ -110,9 +97,9 @@ public abstract class DefaultNavigatorActionProvider extends CommonActionProvide
 	{
 	}
 
-	protected IContributionItem fillToolbar(IToolBarManager toolBarManager)
+	protected DefaultNavigatorContributionItem fillToolbar(IToolBarManager toolBarManager)
 	{
-		IContributionItem item = new DefaultNavigatorContributionItem(this);
+		DefaultNavigatorContributionItem item = new DefaultNavigatorContributionItem(this);
 		toolBarManager.add(item);
 		return item;
 	}
