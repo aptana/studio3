@@ -107,7 +107,7 @@ public class HTMLUtils
 	
 	private static String getTagAttribute(String tagContents, String attributeName)
 	{
-		Matcher matcher = Pattern.compile(".*\\s+"+attributeName+"=\"([a-zA-Z_/0-9]+)\".*").matcher(tagContents.toLowerCase()); //$NON-NLS-1$ //$NON-NLS-2$
+		Matcher matcher = Pattern.compile(".*\\s+"+attributeName+"=\"([a-zA-Z_/0-9-]+)\".*").matcher(tagContents.toLowerCase()); //$NON-NLS-1$ //$NON-NLS-2$
 		if (matcher.matches())
 		{
 			return matcher.group(1);
