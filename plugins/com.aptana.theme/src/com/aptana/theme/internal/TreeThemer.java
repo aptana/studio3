@@ -80,7 +80,7 @@ class TreeThemer extends ControlThemer
 	protected void applyTheme()
 	{
 		super.applyTheme();
-		if (fTreeViewer != null)
+		if (fTreeViewer != null && !fTreeViewer.getTree().isDisposed())
 		{
 			fTreeViewer.refresh(true);
 		}

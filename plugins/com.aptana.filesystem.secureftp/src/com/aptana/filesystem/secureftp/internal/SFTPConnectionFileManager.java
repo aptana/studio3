@@ -623,7 +623,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		try {
-			changeCurrentDir(Path.ROOT);
+			changeCurrentDir(sourcePath.removeLastSegments(1));
 			Policy.checkCanceled(monitor);
 			if (ftpClient.exists(destinationPath.toPortableString())) {
 				ftpClient.delete(destinationPath.toPortableString());

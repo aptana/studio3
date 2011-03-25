@@ -380,10 +380,15 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 							Messages.BaseConnectionFileManager_cant_move));				
 				}
 			} else {
-				fileInfo = fetchAndCacheFileInfo(destinationPath.removeLastSegments(1), Policy.subMonitorFor(monitor, 1));
-				if (!fileInfo.exists()) {
+				try {
+					changeCurrentDir(basePath.append(destinationPath).removeLastSegments(1));
+				} catch (FileNotFoundException e) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
-							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(destinationPath, null)));
+							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(destinationPath, e.getCause())));
+				} catch (Exception e) {
+					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
+							Messages.BaseConnectionFileManager_failed_change_directory, initFileNotFoundException(destinationPath, null)));
+
 				}
 			}
 			clearCache(sourcePath);
