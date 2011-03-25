@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.AnnotationPreference;
+import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -158,11 +159,35 @@ public class ThemeManager implements IThemeManager
 		if (Platform.getPreferencesService().getBoolean("org.python.pydev.red_core", "PYDEV_USE_APTANA_THEMES", true, //$NON-NLS-1$ //$NON-NLS-2$
 				null))
 		{
-			// Have to use highlighting, since there's no pref key for text style to use box style. As a result we also
-			// use search result color, which is a lighter/darker selection/line highlight color
-			prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
-			prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
-			prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+			MarkerAnnotationPreferences preferences = new MarkerAnnotationPreferences();
+			AnnotationPreference pydevOccurPref = null;
+			for (Object obj : preferences.getAnnotationPreferences())
+			{
+				AnnotationPreference pref = (AnnotationPreference) obj;
+				Object type = pref.getAnnotationType();
+				if ("com.python.pydev.occurrences".equals(type)) //$NON-NLS-1$
+				{
+					pydevOccurPref = pref;
+				}
+			}
+			if (pydevOccurPref != null)
+			{
+				if (pydevOccurPref.getTextStylePreferenceKey() != null)
+				{
+					// Now that pydev supports text style, use the box style and don't highlight.
+					prefs.putBoolean("pydevOccurrenceHighlighting", false); //$NON-NLS-1$
+					prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+					prefs.put("pydevOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
+					prefs.put("pydevOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+				}
+				else
+				{
+					// Must use highlighting, since we're against older pydev that had no text style
+					prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
+					prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+					prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+				}
+			}
 		}
 
 		try
