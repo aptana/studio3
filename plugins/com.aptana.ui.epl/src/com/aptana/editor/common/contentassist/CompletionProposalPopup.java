@@ -655,7 +655,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		if (0 <= index && index < fFilteredProposals.length)
 		{
 			ICompletionProposal current = fFilteredProposals[index];
-			String entry = current.getDisplayString().trim() + "  "; //$NON-NLS-1$
+			String entry = current.getDisplayString().trim();
 			item.setImage(current.getImage());
 			item.setText(0, entry);
 
@@ -664,7 +664,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 			if (current instanceof ICommonCompletionProposal)
 			{
 				ICommonCompletionProposal proposal = (ICommonCompletionProposal) current;
-				String location = " " + proposal.getFileLocation() + " "; //$NON-NLS-1$  //$NON-NLS-2$
+				String location = proposal.getFileLocation();
 				Image[] images = proposal.getUserAgentImages();
 
 				if (images != null)
@@ -707,17 +707,34 @@ public class CompletionProposalPopup implements IContentAssistListener
 	private void resizeTable()
 	{
 		int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
+		fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
+				.create());
 		fProposalTable.getColumn(0).pack();
+		padColumn(fProposalTable.getColumn(0), 30);
 		for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
 		{
 			// User agent images are 16px. Adding a few px for padding
 			fProposalTable.getColumn(j).setWidth(22);
 		}
-		fProposalTable.getColumn(fProposalTable.getColumnCount() - 1).pack();
+		TableColumn lastColumn = fProposalTable.getColumn(fProposalTable.getColumnCount() - 1);
+		lastColumn.pack();
+		padColumn(lastColumn, 20);
 
-		fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
-				.create());
 		fProposalShell.pack(true);
+	}
+
+	/**
+	 * Adds a specified amount of padding to the particular column
+	 * 
+	 * @param tc
+	 * @param amount
+	 */
+	private void padColumn(TableColumn tc, int amount)
+	{
+		if (tc != null)
+		{
+			tc.setWidth(tc.getWidth() + amount);
+		}
 	}
 
 	/**
