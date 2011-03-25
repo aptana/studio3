@@ -23,6 +23,8 @@ public class Messages extends NLS // NO_UCD
 	public static String BaseConnectionFileManager_creating_folders;
 	public static String BaseConnectionFileManager_deleting;
 
+	public static String BaseConnectionFileManager_failed_change_directory;
+
 	public static String BaseConnectionFileManager_file_already_exists;
 	public static String BaseConnectionFileManager_file_is_directory;
 	public static String BaseConnectionFileManager_gethering_details;
