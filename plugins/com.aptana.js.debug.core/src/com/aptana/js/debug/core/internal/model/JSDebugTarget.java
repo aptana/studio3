@@ -616,6 +616,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 		} else if (DESTROYED.equals(action)) {
 			JSDebugThread thread = threads.get(threadId);
 			if (thread != null) {
+				threads.remove(threadId);
 				thread.fireTerminateEvent();
 				fireChangeEvent(DebugEvent.CONTENT);				
 			}
