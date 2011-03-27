@@ -41,6 +41,7 @@ import com.aptana.core.util.URLEncoder;
 import com.aptana.debug.core.IActiveResourcePathGetterAdapter;
 import com.aptana.debug.core.internal.Util;
 import com.aptana.debug.core.util.DebugUtil;
+import com.aptana.js.debug.core.internal.ProtocolLogger;
 import com.aptana.js.debug.core.internal.browsers.BrowserUtil;
 import com.aptana.js.debug.core.internal.browsers.Firefox;
 import com.aptana.js.debug.core.internal.browsers.InternetExplorer;
@@ -323,7 +324,7 @@ public class JSLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 				JSDebugTarget debugTarget = null;
 				try {
 					JSDebugProcess debugProcess = new JSDebugProcess(launch, browserExecutable, null);
-					DebugConnection controller = DebugConnection.createConnection(socket);
+					DebugConnection controller = DebugConnection.createConnection(socket, new ProtocolLogger("jsdebugger", JSDebugPlugin.PLUGIN_ID));
 					debugTarget = new JSDebugTarget(launch, debugProcess, urlMapper, controller, debug);
 					monitor.subTask(MessageFormat.format(Messages.JSLaunchConfigurationDelegate_OpeningPage,
 							launchURL));
