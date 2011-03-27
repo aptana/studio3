@@ -1238,10 +1238,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	protected Object evaluateExpression(String expression, IDebugElement context) throws DebugException {
-		if (!isSuspended()) {
-			return null;
-		}
-
 		int threadId;
 		String qualifier;
 		Object result = null;
@@ -1254,6 +1250,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			threadId = ((JSDebugVariable) context).getThreadId();
 		} else {
 			return result;
+		}
+		if (!isThreadSuspended(threadId)) {
+			return null;
 		}
 		String command = MessageFormat.format(protocolVersion >= 2 ? EVAL_0_1_V2 : EVAL_0_1, threadId, Util.encodeData(qualifier), Util.encodeData(expression));
 		String[] args = connection.sendCommandAndWait(command);
@@ -1287,10 +1286,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	protected Object setValue(IVariable variable, IValue newValue) throws DebugException {
-		if (!isSuspended()) {
-			return null;
-		}
-
 		int threadId;
 		String qualifier;
 		String vqualifier;
@@ -1305,6 +1300,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			vqualifier = ((JSDebugValue) newValue).getQualifier();
 		} else {
 			return result;
+		}
+		if (!isThreadSuspended(threadId)) {
+			return null;
 		}
 		String command = MessageFormat.format(protocolVersion >= 2 ? SET_VALUE_0_1_V2 : SET_VALUE_0_1, threadId, Util.encodeData(qualifier), vqualifier);
 		String[] args = connection.sendCommandAndWait(command);
@@ -1329,10 +1327,6 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @see com.aptana.js.debug.core.model.IJSDebugTarget#computeValueDetails(org.eclipse.debug.core.model.IValue)
 	 */
 	public String computeValueDetails(IValue value) throws DebugException {
-		if (!isSuspended()) {
-			return StringUtil.EMPTY;
-		}
-
 		int threadId;
 		String qualifier;
 		String result = null;
@@ -1341,6 +1335,9 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			threadId = ((JSDebugValue) value).getThreadId();
 		} else {
 			return value.getValueString();
+		}
+		if (!isThreadSuspended(threadId)) {
+			return StringUtil.EMPTY;
 		}
 		String command = MessageFormat.format(protocolVersion >= 2 ? DETAILS_0_V2 : DETAILS_0, threadId, Util.encodeData(qualifier));
 		String[] args = connection.sendCommandAndWait(command);
