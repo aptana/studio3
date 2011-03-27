@@ -1196,7 +1196,7 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 	 * @throws DebugException
 	 */
 	protected IVariable[] loadVariables(int threadId, String qualifier) throws DebugException {
-		if (!isSuspended()) {
+		if (!isThreadSuspended(threadId)) {
 			return new IVariable[0];
 		}
 		List<IVariable> list = new ArrayList<IVariable>();
@@ -1735,6 +1735,14 @@ public class JSDebugTarget extends JSDebugElement implements IJSDebugTarget, IBr
 			}
 		}
 		return flags;
+	}
+	
+	private boolean isThreadSuspended(int threadId) {
+		JSDebugThread thread = threads.get(threadId);
+		if (thread != null) {
+			return thread.isSuspended();
+		}
+		return false;
 	}
 
 	/*
