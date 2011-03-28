@@ -23,10 +23,10 @@ public class FormatterPlugin extends AbstractUIPlugin
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "com.aptana.formatter.epl"; //$NON-NLS-1$
-	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
 
 	// The shared instance
 	private static FormatterPlugin plugin;
+	public static final boolean DEBUG = Boolean.valueOf(Platform.getDebugOption(PLUGIN_ID + "/debug")).booleanValue(); //$NON-NLS-1$
 
 	/**
 	 * The constructor
@@ -43,6 +43,19 @@ public class FormatterPlugin extends AbstractUIPlugin
 	{
 		super.start(context);
 		plugin = this;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.core.runtime.Plugin#isDebugging()
+	 */
+	@Override
+	public boolean isDebugging()
+	{
+		if (DEBUG)
+			return true;
+
+		return super.isDebugging();
 	}
 
 	/*
