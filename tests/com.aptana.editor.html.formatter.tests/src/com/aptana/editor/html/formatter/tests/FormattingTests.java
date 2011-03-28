@@ -4,6 +4,7 @@ import com.aptana.editor.common.formatting.AbstractFormatterTestCase;
 import com.aptana.editor.common.formatting.FormatterTestFile;
 import com.aptana.formatter.IScriptFormatterFactory;
 import com.aptana.formatter.ScriptFormatterManager;
+import com.aptana.formatter.epl.FormatterPlugin;
 
 public class FormattingTests extends AbstractFormatterTestCase
 {
@@ -26,7 +27,7 @@ public class FormattingTests extends AbstractFormatterTestCase
 	{
 		factory = (IScriptFormatterFactory) ScriptFormatterManager.getInstance().getContributionById(
 				FORMATTER_FACTORY_ID);
-
+		FormatterPlugin.getDefault().setDebugging(true);
 		super.setUp();
 	}
 

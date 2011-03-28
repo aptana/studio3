@@ -30,7 +30,7 @@ function test(){
 }
 ==FORMATTED==
 function test() {
-    x={
+    x= {
         a:2,/*ee*/
         b:2
     };

@@ -151,7 +151,7 @@ public class XMLFormatter extends AbstractScriptFormatter implements IScriptForm
 			StatusLineMessageTimerManager.setErrorMessage(
 					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
 					ERROR_DISPLAY_TIMEOUT, true);
-			if (FormatterPlugin.DEBUG)
+			if (FormatterPlugin.getDefault().isDebugging())
 			{
 				FormatterPlugin.logError(e);
 			}

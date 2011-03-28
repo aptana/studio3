@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import junit.framework.TestCase;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -13,8 +15,6 @@ import org.eclipse.text.edits.TextEdit;
 import com.aptana.core.util.StringUtil;
 import com.aptana.formatter.IScriptFormatter;
 import com.aptana.formatter.IScriptFormatterFactory;
-
-import junit.framework.TestCase;
 
 /**
  * AbstractFormatterTestCase <br>
@@ -45,11 +45,11 @@ public abstract class AbstractFormatterTestCase extends TestCase
 		}
 		catch (MalformedTreeException e)
 		{
-			assertNotNull("Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
+			assertNotNull("MalformedTreeException: Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
 		}
 		catch (BadLocationException e)
 		{
-			assertNotNull("Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
+			assertNotNull("BadLocationException: Could not format " + filename, formattedTextEdit); //$NON-NLS-1$
 		}
 
 	}
