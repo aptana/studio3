@@ -44,6 +44,7 @@ public class FormatterJSObjectNode extends FormatterJSBlockNode
 		switch (parent.getNodeType())
 		{
 			case JSNodeTypes.ELEMENTS:
+			case JSNodeTypes.ASSIGN:
 				return 0;
 			case JSNodeTypes.ARGUMENTS:
 				// Only if it's the first argument, return 0
