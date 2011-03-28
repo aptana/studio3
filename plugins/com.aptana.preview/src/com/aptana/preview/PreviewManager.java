@@ -337,11 +337,17 @@ public final class PreviewManager {
 			for (IEditorPart previewEditorPart : openedPreviewEditors) {
 				previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
 			}
+			if (forceOpen) {
+				workbenchPage.activate(openedPreviewEditors[0]);
+			}
 		} else {
 			openedPreviewEditors = EditorUtils.findEditors(input, PreviewEditorPart.EDITOR_ID);
 			if (openedPreviewEditors.length > 0) {
 				for (IEditorPart previewEditorPart : openedPreviewEditors) {
 					previewEditorPart.getSite().getPage().reuseEditor((IReusableEditor) previewEditorPart, input);
+				}
+				if (forceOpen) {
+					workbenchPage.activate(openedPreviewEditors[0]);
 				}
 			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
