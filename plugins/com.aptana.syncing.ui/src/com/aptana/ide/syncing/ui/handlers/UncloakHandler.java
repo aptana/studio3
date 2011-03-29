@@ -23,7 +23,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.syncing.ui.actions.UncloakAction;
-import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.ui.io.Utils;
 
 public class UncloakHandler extends AbstractHandler
 {
@@ -68,7 +68,7 @@ public class UncloakHandler extends AbstractHandler
 					{
 						if (element instanceof IAdaptable)
 						{
-							fileStore = SyncUtils.getFileStore((IAdaptable) element);
+							fileStore = Utils.getFileStore((IAdaptable) element);
 							if (fileStore != null)
 							{
 								if (CloakingUtils.isFileCloaked(fileStore))

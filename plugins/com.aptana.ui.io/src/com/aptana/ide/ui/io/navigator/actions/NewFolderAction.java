@@ -27,7 +27,7 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.util.UIUtils;
 
 /**

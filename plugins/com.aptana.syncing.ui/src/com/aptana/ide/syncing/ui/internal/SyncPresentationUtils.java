@@ -14,6 +14,8 @@ import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 
+import com.aptana.ide.ui.io.Utils;
+
 /**
  * @author Max Stepanov
  *
@@ -36,7 +38,7 @@ public final class SyncPresentationUtils {
 	    if (element instanceof IResource) {
 	        rawSize = ((IResource) element).getLocation().toFile().length();
 	    } else if (element instanceof IAdaptable) {
-	        IFileInfo fileInfo = SyncUtils.getFileInfo((IAdaptable) element);
+	        IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) element);
 	        if (fileInfo != null) {
 	            rawSize = fileInfo.getLength();
 	        }
@@ -96,7 +98,7 @@ public final class SyncPresentationUtils {
 	    if (element instanceof IResource) {
 	        timestamp = ((IResource) element).getLocalTimeStamp();
 	    } else if (element instanceof IAdaptable) {
-	        IFileInfo fileInfo = SyncUtils.getFileInfo((IAdaptable) element);
+	        IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) element);
 	        if (fileInfo != null) {
 	            timestamp = fileInfo.getLastModified();
 	        }

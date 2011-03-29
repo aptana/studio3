@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ide.ui.io.internal;
+package com.aptana.ide.ui.io;
 
 import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
@@ -13,7 +13,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.core.io.efs.EFSUtils;
-import com.aptana.ide.ui.io.FileSystemUtils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

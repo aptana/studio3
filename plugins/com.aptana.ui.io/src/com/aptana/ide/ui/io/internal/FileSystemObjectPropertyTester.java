@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.ide.ui.io.FileSystemUtils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

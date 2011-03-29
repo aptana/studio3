@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

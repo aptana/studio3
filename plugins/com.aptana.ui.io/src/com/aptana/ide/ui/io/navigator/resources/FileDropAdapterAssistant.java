@@ -35,9 +35,9 @@ import org.eclipse.ui.navigator.resources.ResourceDropAdapterAssistant;
 
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ide.ui.io.actions.MoveFilesOperation;
-import com.aptana.ide.ui.io.internal.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
