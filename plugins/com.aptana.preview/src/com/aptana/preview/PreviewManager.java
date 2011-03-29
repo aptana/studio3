@@ -349,6 +349,8 @@ public final class PreviewManager {
 			}
 			if (forceOpen) {
 				workbenchPage.activate(openedPreviewEditors[0]);
+			} else {
+				workbenchPage.bringToTop(openedPreviewEditors[0]);
 			}
 		} else {
 			openedPreviewEditors = EditorUtils.findEditors(input, PreviewEditorPart.EDITOR_ID);
@@ -358,6 +360,8 @@ public final class PreviewManager {
 				}
 				if (forceOpen) {
 					workbenchPage.activate(openedPreviewEditors[0]);
+				} else {
+					workbenchPage.bringToTop(openedPreviewEditors[0]);
 				}
 			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
