@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -107,9 +108,14 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 	 */
 	private boolean isParentMatch(Viewer viewer, Object element)
 	{
-		// TODO Also check if name matches the text matchers!
 
-		IResource resource = (IResource) element;
+	    IResource resource = getResourceFromObject(element);
+	    if(resource == null)
+	    {
+	        return false;
+	    }
+	    
+	    // TODO Also check if name matches the text matchers!
 		if (wordMatches(resource.getName()))
 		{
 			return true;
@@ -124,6 +130,28 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 		}
 		return false;
 	}
+
+	
+	/**
+	 * @return the IResource from the given object. May return null if unable to get a resource from the object.
+	 */
+    private IResource getResourceFromObject(Object element) 
+    {
+        IResource resource;
+        if (element instanceof IResource) 
+        {
+            resource = (IResource) element;
+        } 
+        else if (element instanceof IAdaptable)
+        {
+            resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+        }
+        else
+        {
+            resource = null;
+        }
+        return resource;
+    }
 
 	/**
 	 * Returns true if any of the elements makes it through the filter.
@@ -178,7 +206,12 @@ public class PathFilter extends AbstractResourceBasedViewerFilter
 
 	protected boolean doIsLeafMatch(Viewer viewer, Object element)
 	{
-		IResource resource = (IResource) element;
+        IResource resource = getResourceFromObject(element);
+        if(resource == null)
+        {
+            return false;
+        }
+
 		if (resource.equals(filterResource))
 		{
 			return true;
