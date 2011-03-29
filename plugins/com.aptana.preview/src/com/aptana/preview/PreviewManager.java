@@ -71,19 +71,9 @@ public final class PreviewManager {
 	private Map<IEditorPart, Integer> filewatchIds = new HashMap<IEditorPart, Integer>();
 	private Set<URI> trackedURIs = new HashSet<URI>();
 
-	private IEditorPart activeEditorPart;
-
 	private IPartListener editorPartListener = new IPartListener() {
 
 		public void partActivated(IWorkbenchPart part) {
-			// this is to work around the issue where the preview editor keeps grabbing the focus
-			if (part instanceof PreviewEditorPart && activeEditorPart != null) {
-				IWorkbenchPage page = UIUtils.getActivePage();
-				if (page != null) {
-					activeEditorPart = null;
-					page.activate(activeEditorPart);
-				}
-			}
 		}
 
 		public void partBroughtToTop(IWorkbenchPart part) {
@@ -349,8 +339,6 @@ public final class PreviewManager {
 			}
 			if (forceOpen) {
 				workbenchPage.activate(openedPreviewEditors[0]);
-			} else {
-				workbenchPage.bringToTop(openedPreviewEditors[0]);
 			}
 		} else {
 			openedPreviewEditors = EditorUtils.findEditors(input, PreviewEditorPart.EDITOR_ID);
@@ -360,15 +348,10 @@ public final class PreviewManager {
 				}
 				if (forceOpen) {
 					workbenchPage.activate(openedPreviewEditors[0]);
-				} else {
-					workbenchPage.bringToTop(openedPreviewEditors[0]);
 				}
 			} else if (forceOpen) {
 				workbenchPage.openEditor(input, PreviewEditorPart.EDITOR_ID, true, IWorkbenchPage.MATCH_INPUT);
 			}
-		}
-		if (!forceOpen) {
-			activeEditorPart = editorPart;
 		}
 		if (editorPart != null && !trackedEditors.containsKey(editorPart)) {
 			editorPart.addPropertyListener(editorPropertyListener);
