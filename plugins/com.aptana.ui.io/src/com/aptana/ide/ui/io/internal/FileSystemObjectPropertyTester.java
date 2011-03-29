@@ -31,7 +31,7 @@ public class FileSystemObjectPropertyTester extends PropertyTester {
         if (receiver instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) receiver;
             IFileStore fileStore = Utils.getFileStore(adaptable);
-            IFileInfo fileInfo = Utils.getFileInfo(adaptable);
+            IFileInfo fileInfo = Utils.getFileInfo(adaptable, EFS.NONE);
 
             boolean value = toBoolean(expectedValue);
             if (PROPERTY_IS_DIRECTORY.equals(property)) {

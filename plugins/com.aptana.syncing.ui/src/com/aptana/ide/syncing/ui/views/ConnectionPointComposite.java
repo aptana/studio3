@@ -63,6 +63,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -301,8 +302,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 			if (object instanceof IAdaptable)
 			{
 				IAdaptable adaptable = (IAdaptable) object;
-				IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) object);
-				if (fileInfo.isDirectory())
+				if (Utils.isDirectory((IAdaptable) object))
 				{
 					// goes into the folder
 					updateContent(adaptable);
@@ -604,8 +604,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		if (object instanceof IAdaptable)
 		{
 			IAdaptable adaptable = (IAdaptable) object;
-			IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) object);
-			if (fileInfo.isDirectory())
+			if (Utils.isDirectory((IAdaptable) object))
 			{
 				// goes into the folder
 				updateContent(adaptable);
@@ -825,7 +824,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 	private static IFileStore getFolderStore(IAdaptable destination)
 	{
 		IFileStore store = Utils.getFileStore(destination);
-		IFileInfo info = Utils.getFileInfo(destination);
+		IFileInfo info = Utils.getFileInfo(destination, IExtendedFileStore.EXISTENCE);
 		if (store != null && info != null && !info.isDirectory())
 		{
 			store = store.getParent();

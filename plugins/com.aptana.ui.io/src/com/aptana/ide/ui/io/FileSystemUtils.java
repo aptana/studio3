@@ -98,8 +98,8 @@ public final class FileSystemUtils {
 		return new TreePath(list.toArray());
 	}
 	
-	public static IFileInfo fetchFileInfo(IFileStore fileStore) throws OperationCanceledException {
-		Job job = new FetchFileInfoJob(fileStore);
+	public static IFileInfo fetchFileInfo(IFileStore fileStore, int options) throws OperationCanceledException {
+		Job job = new FetchFileInfoJob(fileStore, options);
 		job.setPriority(Job.SHORT);
 		job.setSystem(true);
 		job.schedule();

@@ -33,6 +33,7 @@ import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.navigator.CommonDropAdapter;
 import org.eclipse.ui.navigator.resources.ResourceDropAdapterAssistant;
 
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.core.io.LocalRoot;
 import com.aptana.ide.ui.io.IOUIPlugin;
 import com.aptana.ide.ui.io.Utils;
@@ -256,7 +257,7 @@ public class FileDropAdapterAssistant extends ResourceDropAdapterAssistant {
 
     private static IFileStore getFolderStore(IAdaptable destination) {
         IFileStore store = Utils.getFileStore(destination);
-        IFileInfo info = Utils.getFileInfo(destination);
+        IFileInfo info = Utils.getFileInfo(destination, IExtendedFileStore.EXISTENCE);
         if (store != null && info != null && !info.isDirectory()) {
             store = store.getParent();
         }

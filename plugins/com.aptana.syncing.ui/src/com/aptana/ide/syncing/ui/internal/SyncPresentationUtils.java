@@ -38,7 +38,7 @@ public final class SyncPresentationUtils {
 	    if (element instanceof IResource) {
 	        rawSize = ((IResource) element).getLocation().toFile().length();
 	    } else if (element instanceof IAdaptable) {
-	        IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) element);
+	        IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
 	        if (fileInfo != null) {
 	            rawSize = fileInfo.getLength();
 	        }
@@ -98,7 +98,7 @@ public final class SyncPresentationUtils {
 	    if (element instanceof IResource) {
 	        timestamp = ((IResource) element).getLocalTimeStamp();
 	    } else if (element instanceof IAdaptable) {
-	        IFileInfo fileInfo = Utils.getFileInfo((IAdaptable) element);
+	        IFileInfo fileInfo = Utils.getDetailedFileInfo((IAdaptable) element);
 	        if (fileInfo != null) {
 	            timestamp = fileInfo.getLastModified();
 	        }

@@ -13,27 +13,41 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.core.io.efs.EFSUtils;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
+ * @author Max Stepanov
  */
 public class Utils {
 
-    public static IFileStore getFileStore(Object adaptable) {
-        if (adaptable instanceof IResource) {
-        	return EFSUtils.getFileStore((IResource) adaptable);
-        }
-        return FileSystemUtils.getFileStore(adaptable);
-    }
+	public static IFileStore getFileStore(Object adaptable) {
+		if (adaptable instanceof IResource) {
+			return EFSUtils.getFileStore((IResource) adaptable);
+		}
+		return FileSystemUtils.getFileStore(adaptable);
+	}
 
-    public static IFileInfo getFileInfo(IAdaptable adaptable) {
-        IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
-        if (fileInfo == null) {
-            IFileStore fileStore = getFileStore(adaptable);
-            if (fileStore != null) {
-                fileInfo = FileSystemUtils.fetchFileInfo(fileStore);
-            }
-        }
-        return fileInfo;
-    }
+	public static IFileInfo getDetailedFileInfo(IAdaptable adaptable) {
+		return getFileInfo(adaptable, IExtendedFileStore.DETAILED);
+	}
+
+	public static boolean exists(IAdaptable adaptable) {
+		return getFileInfo(adaptable, IExtendedFileStore.EXISTENCE).exists();
+	}
+
+	public static boolean isDirectory(IAdaptable adaptable) {
+		return getFileInfo(adaptable, IExtendedFileStore.EXISTENCE).isDirectory();
+	}
+
+	public static IFileInfo getFileInfo(IAdaptable adaptable, int options) {
+		IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
+		if (fileInfo == null) {
+			IFileStore fileStore = getFileStore(adaptable);
+			if (fileStore != null) {
+				fileInfo = FileSystemUtils.fetchFileInfo(fileStore, options);
+			}
+		}
+		return fileInfo;
+	}
 }

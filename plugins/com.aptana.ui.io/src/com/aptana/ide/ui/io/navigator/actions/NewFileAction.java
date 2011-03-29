@@ -76,7 +76,7 @@ public class NewFileAction extends BaseSelectionListenerAction {
 
     private void createFile(final String filename) {
         final IFileStore fileStore = Utils.getFileStore(fSelectedElement);
-        final IFileInfo fileInfo = Utils.getFileInfo(fSelectedElement);
+        final boolean selectionIsDirectory = Utils.isDirectory(fSelectedElement);
 
         // run the file creation in a job
         Job job = new Job(Messages.NewFolderAction_JobTitle) {
@@ -86,7 +86,7 @@ public class NewFileAction extends BaseSelectionListenerAction {
                 try {
                     IFileStore parentStore = fileStore;
                     Object element = fSelectedElement;
-                    if (!fileInfo.isDirectory() && fileStore.getParent() != null) {
+                    if (!selectionIsDirectory && fileStore.getParent() != null) {
                         parentStore = fileStore.getParent();
                         // TODO: needs to find the element corresponding to
                         // the parent folder
