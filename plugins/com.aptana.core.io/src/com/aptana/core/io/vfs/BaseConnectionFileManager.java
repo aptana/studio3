@@ -239,7 +239,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		try {
 			ExtendedFileInfo fileInfo = getCachedFileInfo(path);
 			if (fileInfo == null) {
-				fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
+				fileInfo = fetchAndCacheFileInfo(path, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			}
 			if (!fileInfo.exists()) {
 				return;
@@ -269,7 +269,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_creating_folder, path.toPortableString()), 3);
 		testOrConnect(monitor);
 		try {
-			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
+			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			if (fileInfo.exists()) {
 				if (!fileInfo.isDirectory()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
@@ -278,7 +278,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				return;
 			}
 			if ((options & EFS.SHALLOW) != 0 && path.segmentCount() > 1) {
-				fileInfo = fetchAndCacheFileInfo(path.removeLastSegments(1), Policy.subMonitorFor(monitor, 1));
+				fileInfo = fetchAndCacheFileInfo(path.removeLastSegments(1), IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 				if (!fileInfo.exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, null)));
@@ -363,13 +363,13 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		monitor.beginTask(MessageFormat.format(Messages.BaseConnectionFileManager_moving, sourcePath.toPortableString()), 5);
 		testOrConnect(monitor);
 		try {
-			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(sourcePath, Policy.subMonitorFor(monitor, 1));
+			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(sourcePath, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			if (!fileInfo.exists()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 						Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, null)));
 			}
 			boolean isDirectory = fileInfo.isDirectory();
-			fileInfo = fetchAndCacheFileInfo(destinationPath, Policy.subMonitorFor(monitor, 1));
+			fileInfo = fetchAndCacheFileInfo(destinationPath, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
 			if (fileInfo.exists()) {
 				if ((options & EFS.OVERWRITE) == 0) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,

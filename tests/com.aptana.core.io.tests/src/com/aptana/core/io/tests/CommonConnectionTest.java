@@ -171,7 +171,7 @@ public abstract class CommonConnectionTest extends TestCase
 		{
 			assertFalse(cp.isConnected());
 		}
-		IFileInfo fi = fs.fetchInfo();
+		IFileInfo fi = fs.fetchInfo(IExtendedFileStore.EXISTENCE, null);
 		if (persistentConnection())
 		{
 			assertTrue(cp.isConnected());
