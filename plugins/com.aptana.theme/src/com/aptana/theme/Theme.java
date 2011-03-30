@@ -574,7 +574,7 @@ public class Theme
 		return props;
 	}
 
-	private String toHex(RGBa color)
+	static String toHex(RGBa color)
 	{
 		String rgbString = toHex(color.toRGB());
 		if (color.getAlpha() == 0)
@@ -584,13 +584,13 @@ public class Theme
 		return rgbString + pad(Integer.toHexString(color.getAlpha()), 2, '0');
 	}
 
-	private String toHex(RGB rgb)
+	static String toHex(RGB rgb)
 	{
 		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
 				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
 	}
 
-	private String pad(String string, int desiredLength, char padChar)
+	private static String pad(String string, int desiredLength, char padChar)
 	{
 		while (string.length() < desiredLength)
 			string = padChar + string;
