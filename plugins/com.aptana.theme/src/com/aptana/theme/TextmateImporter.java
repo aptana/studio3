@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import com.aptana.plist.PListParserFactory;
+import com.aptana.theme.internal.OrderedProperties;
 
 /**
  * An importer to bring in Textmate themes to our theme system. This is not guaranteed to work 100% because we don't
@@ -68,9 +69,10 @@ public class TextmateImporter
 		Map<String, Object> plistProperties = parse(file);
 		List<Map<String, Object>> tokenList = (List<Map<String, Object>>) plistProperties.get(SETTINGS);
 		Map<String, Object> globals = (Map<String, Object>) tokenList.get(0).get(SETTINGS);
-		Properties radRailsProps = new Properties();
+		Properties radRailsProps = new OrderedProperties();
 		for (Map.Entry<String, Object> entry : globals.entrySet())
 		{
+			// FIXME Skip invisibles
 			radRailsProps.put(entry.getKey(), entry.getValue());
 		}
 		radRailsProps.put(Theme.THEME_NAME_PROP_KEY, plistProperties.get(NAME));
@@ -78,8 +80,13 @@ public class TextmateImporter
 		tokenList.remove(0);
 		for (Map<String, Object> token : tokenList)
 		{
+			// FIXME Handle separators which have a name but no scope. They're useful visually for editing themes, but
+			// should be ignored in terms of actual rules
 			if (!token.containsKey(SCOPE))
 				continue;
+
+			String name = (String) token.get(NAME);
+
 			String scope = (String) token.get(SCOPE);
 			Map<String, Object> colors = (Map<String, Object>) token.get(SETTINGS);
 
@@ -124,11 +131,9 @@ public class TextmateImporter
 					}
 				}
 			}
-			StringTokenizer tokenizer = new StringTokenizer(scope, ","); //$NON-NLS-1$
-			while (tokenizer.hasMoreTokens())
-			{
-				radRailsProps.put(tokenizer.nextToken().trim(), value.toString());
-			}
+
+			value.append("^").append(scope);
+			radRailsProps.put(name, value.toString());
 		}
 
 		return radRailsProps;

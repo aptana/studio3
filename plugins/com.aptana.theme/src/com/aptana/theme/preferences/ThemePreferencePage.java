@@ -9,17 +9,13 @@ package com.aptana.theme.preferences;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
@@ -44,17 +40,18 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -94,15 +91,18 @@ import org.eclipse.ui.internal.themes.ThemeElementHelper;
 import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.scope.ScopeSelector;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.theme.ConsoleThemer;
+import com.aptana.theme.DelayedTextAttribute;
 import com.aptana.theme.IThemeManager;
+import com.aptana.theme.RGBa;
 import com.aptana.theme.TextmateImporter;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemeExporter;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.ThemeRule;
 
-@SuppressWarnings("restriction")
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener,
 		IInputValidator, IPropertyChangeListener
 {
@@ -175,7 +175,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private static final int ROW_HEIGHT = 20;
 
-	protected String fSelectedTheme;
+	protected Theme fSelectedTheme;
 
 	private ColorSelector fgSelector;
 	private ColorSelector bgSelector;
@@ -194,7 +194,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	private Button fImportButton;
 	private Button fAddTokenButton;
 	private Button fRemoveTokenButton;
-	private Text fScopeText;
+	private Combo fScopeText;
 
 	private Button fExportButton;
 
@@ -336,6 +336,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Composite colors = new Composite(composite, SWT.NONE);
 		colors.setLayout(new GridLayout(4, false));
 
+		// TODO Make the ColorSelector buttons be SWT.FLAT, and let them handle alpha values as Textmate does
 		Label label = new Label(colors, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 		label.setText(Messages.ThemePreferencePage_ForegroundLabel);
@@ -389,22 +390,26 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		// Hack to draw the underline in first column
 		table.addListener(SWT.PaintItem, new Listener()
 		{
-			@SuppressWarnings("unchecked")
 			public void handleEvent(Event event)
 			{
 				if ((event.detail & SWT.FOREGROUND) != 0 && event.index == 0)
 				{
 					TableItem item = (TableItem) event.item;
-					Entry<String, TextAttribute> token = (Entry<String, TextAttribute>) item.getData();
-					if ((token.getValue().getStyle() & TextAttribute.UNDERLINE) != 0)
+					ThemeRule token = (ThemeRule) item.getData();
+					if ((token.getTextAttribute().getStyle() & TextAttribute.UNDERLINE) != 0)
 					{
 						int y = event.getBounds().y + event.getBounds().height - 6;
 						int x2 = event.getBounds().width;
 						Color oldFG = event.gc.getForeground();
-						Color fg = token.getValue().getForeground();
-						if (fg == null)
+						Color fg;
+						RGBa rgb = token.getTextAttribute().getForeground();
+						if (rgb == null)
 						{
 							fg = ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
+						}
+						else
+						{
+							fg = ThemePlugin.getDefault().getColorManager().getColor(rgb.toRGB());
 						}
 						event.gc.setForeground(fg);
 						event.gc.drawLine(0, y, x2, y);
@@ -471,28 +476,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			}
 
-			@SuppressWarnings({ "unchecked", "rawtypes" })
 			public Object[] getElements(Object inputElement)
 			{
-				Map<String, TextAttribute> tokens = theme.getTokens();
-				Object[] array = tokens.entrySet().toArray();
-				// Sort by keys!
-				Arrays.sort(array, new Comparator()
-				{
-					public int compare(Object o1, Object o2)
-					{
-						Entry<String, TextAttribute> e1 = (Entry<String, TextAttribute>) o1;
-						Entry<String, TextAttribute> e2 = (Entry<String, TextAttribute>) o2;
-						return e1.getKey().compareTo(e2.getKey());
-					}
-				});
-				return array;
+				return theme.getTokens().toArray();
 			}
 		});
 		tableViewer.setLabelProvider(new TokenLabelProvider());
 		tableViewer.getTable().addMouseListener(new MouseAdapter()
 		{
-			@SuppressWarnings("unchecked")
 			@Override
 			public void mouseDown(MouseEvent e)
 			{
@@ -503,9 +494,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				int bgColX = fgColX + fgColWidth;
 				int bgColWidth = table.getColumn(2).getWidth() + 2;
 
-				Map.Entry<String, TextAttribute> token = null;
-				Color fg = null;
-				Color bg = null;
 				if (e.x > fgColX && e.x < (fgColX + fgColWidth))
 				{
 					// user clicked in FG column
@@ -517,9 +505,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 						return; // no color selected, don't change a thing!
 					}
 					TableItem tableItem = table.getItem(new Point(e.x, e.y));
-					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-					fg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
-					bg = token.getValue().getBackground();
+					ThemeRule token = (ThemeRule) tableItem.getData();
+					token.updateFG(new RGBa(newRGB));
 				}
 				else if (e.x > bgColX && e.x < (bgColX + bgColWidth)) // is user clicking in the BG column?
 				{
@@ -531,19 +518,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 						return; // no color selected, don't change a thing!
 					}
 					TableItem tableItem = table.getItem(new Point(e.x, e.y));
-					token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-					fg = token.getValue().getForeground();
-					bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+					ThemeRule token = (ThemeRule) tableItem.getData();
+					token.updateBG(new RGBa(newRGB));
 				}
 				else
 				{
 					return;
 				}
-
-				// Update the token's colors in our theme
-				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
-				getTheme().update(token.getKey(), at);
-				setTheme(fSelectedTheme);
 
 				// Need to update the drawing of this row in the table!
 				TableItem tableItem = table.getItem(new Point(e.x, e.y));
@@ -558,103 +539,75 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		layout.setColumnData(tokenName, new ColumnWeightData(100, true));
 		column.setLabelProvider(new ColumnLabelProvider()
 		{
-			@SuppressWarnings("unchecked")
 			public String getText(Object element)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				return token.getKey();
+				ThemeRule token = (ThemeRule) element;
+				return token.getName();
 			}
 
-			@SuppressWarnings("unchecked")
 			public Color getForeground(Object element)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				Color fg = token.getValue().getForeground();
+				ThemeRule token = (ThemeRule) element;
+				// TODO How do we handle alpha?
+				RGBa fg = token.getTextAttribute().getForeground();
 				if (fg == null)
 					return ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground());
-				return fg;
+				return ThemePlugin.getDefault().getColorManager().getColor(fg.toRGB());
 			}
 
-			@SuppressWarnings("unchecked")
 			public Color getBackground(Object element)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				Color bg = token.getValue().getBackground();
+				ThemeRule token = (ThemeRule) element;
+				// TODO How do we handle alpha?
+				RGBa bg = token.getTextAttribute().getBackground();
 				if (bg == null)
-				{
 					return ThemePlugin.getDefault().getColorManager().getColor(getTheme().getBackground());
-				}
-				return bg;
+				return ThemePlugin.getDefault().getColorManager().getColor(bg.toRGB());
 			}
 
-			@SuppressWarnings("unchecked")
 			public Font getFont(Object element)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				if (token.getValue().getStyle() == 0) // TODO Limit to only checking for bold or italic
+				ThemeRule token = (ThemeRule) element;
+				if (token.getTextAttribute().getStyle() == 0) // TODO Limit to only checking for bold or italic
 					return fFont;
-				return lazyFont(fFont, token.getValue().getStyle());
+				return lazyFont(fFont, token.getTextAttribute().getStyle());
 			}
 		});
 
 		column.setEditingSupport(new EditingSupport(tableViewer)
 		{
 
-			private ComboBoxCellEditor cellEditor;
+			private TextCellEditor cellEditor;
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected void setValue(Object element, Object value)
 			{
 				// FIXME What if user has edited the value but is trying to delete the row? check to see if the token
 				// even exists in the theme before saving/updating
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				Integer selection = (Integer) value;
-				String newName = null;
-				if (selection.intValue() == -1)
-				{
-					try
-					{
-						// edited value, need to grab text of combo
-						Field field = cellEditor.getClass().getDeclaredField("comboBox"); //$NON-NLS-1$
-						field.setAccessible(true);
-						CCombo combo = (CCombo) field.get(cellEditor);
-						newName = combo.getText();
-					}
-					catch (Exception e)
-					{
-						ThemePlugin.logError(e);
-					}
-				}
-				else
-				{
-					newName = cellEditor.getItems()[selection];
-				}
-				if (newName.equals(token.getKey()))
+				ThemeRule token = (ThemeRule) element;
+				String newName = (String) value;
+				if (newName.equals(token.getName()))
 				{
 					return;
 				}
-				Theme theme = getTheme();
-				theme.remove(token.getKey());
-				theme.update(newName, token.getValue());
-				setTheme(fSelectedTheme);
+				// FIXME How do we update the token in the theme?
+				token.setName(newName);
+				tableViewer.refresh(element);
 			}
 
 			@Override
 			protected Object getValue(Object element)
 			{
-				return 0;
+				ThemeRule token = (ThemeRule) element;
+				return token.getName();
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			protected CellEditor getCellEditor(Object element)
 			{
-				List<String> tokenTypes = new ArrayList<String>();
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) element;
-				tokenTypes.add(token.getKey());
-				tokenTypes.addAll(tokenTypeNames);
-				cellEditor = new ComboBoxCellEditor(table, tokenTypes.toArray(new String[tokenTypes.size()]));
+				ThemeRule token = (ThemeRule) element;
+				cellEditor = new TextCellEditor(table);
+				cellEditor.setValue(token.getName());
 				return cellEditor;
 			}
 
@@ -725,11 +678,25 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		Label addTokenLabel = new Label(textField, SWT.RIGHT);
 		addTokenLabel.setText(Messages.ThemePreferencePage_ScopeSelectoreLabel);
 
-		fScopeText = new Text(textField, SWT.SINGLE | SWT.BORDER);
+		fScopeText = new Combo(textField, SWT.SINGLE | SWT.BORDER);
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		fScopeText.setLayoutData(data);
-		fScopeText.setEditable(false);
+		for (String preset : tokenTypeNames)
+		{
+			fScopeText.add(preset);
+		}
 		table.addSelectionListener(this);
+		fScopeText.addModifyListener(new ModifyListener()
+		{
+
+			public void modifyText(ModifyEvent e)
+			{
+				// TODO Update the scope selector for the current token!
+				TableItem item = table.getSelection()[0];
+				ThemeRule rule = (ThemeRule) item.getData();
+				rule.setScopeSelector(new ScopeSelector(fScopeText.getText()));
+			}
+		});
 	}
 
 	protected Font lazyFont(Font font, int style)
@@ -754,42 +721,42 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
 		public String getColumnText(Object element, int columnIndex)
 		{
-			Map.Entry<String, TextAttribute> commit = (Map.Entry<String, TextAttribute>) element;
+			ThemeRule commit = (ThemeRule) element;
 			if (commit == null)
 				return ""; //$NON-NLS-1$
 			switch (columnIndex)
 			{
 				case 0:
-					return commit.getKey();
+					return commit.getName();
 				case 1:
-					return commit.getValue().getForeground() == null ? "" : commit.getValue().getForeground() //$NON-NLS-1$
-							.toString();
+					return commit.getTextAttribute().getForeground() == null ? "" : commit.getTextAttribute().getForeground() //$NON-NLS-1$
+									.toString();
 				case 2:
-					return commit.getValue().getBackground() == null ? "" : commit.getValue().getBackground() //$NON-NLS-1$
-							.toString();
+					return commit.getTextAttribute().getBackground() == null ? "" : commit.getTextAttribute().getBackground() //$NON-NLS-1$
+									.toString();
 				default:
-					return commit.getValue().getFont() == null ? "" : commit.getValue().getFont().toString(); //$NON-NLS-1$
+					return ""; //$NON-NLS-1$
 			}
 		}
 
 	}
 
-	protected void setTheme(String themeName)
+	protected void setTheme(Theme newTheme)
 	{
-		fSelectedTheme = themeName;
+		fSelectedTheme = newTheme;
+		newTheme.save();
 		Theme theme = getTheme();
 		fgSelector.setColorValue(theme.getForeground());
 		bgSelector.setColorValue(theme.getBackground());
 		lineHighlightSelector.setColorValue(theme.getLineHighlight().toRGB());
 		caretSelector.setColorValue(theme.getCaret());
 		selectionSelector.setColorValue(theme.getSelection().toRGB());
-		fThemeCombo.setText(themeName);
+		fThemeCombo.setText(theme.getName());
 		tableViewer.setInput(theme);
 		addCustomTableEditorControls();
-		if (getThemeManager().isBuiltinTheme(themeName))
+		if (getThemeManager().isBuiltinTheme(theme.getName()))
 		{
 			renameThemeButton.setEnabled(false);
 			deleteThemeButton.setEnabled(false);
@@ -801,7 +768,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addCustomTableEditorControls()
 	{
 		clearTableEditors();
@@ -810,16 +776,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		TableItem[] items = table.getItems();
 		for (int i = 0; i < items.length; i++)
 		{
-			Map.Entry<String, TextAttribute> commit = (Map.Entry<String, TextAttribute>) items[i].getData();
-			if (commit.getValue().getForeground() != null)
+			ThemeRule commit = (ThemeRule) items[i].getData();
+			if (commit.getTextAttribute().getForeground() != null)
 			{
-				createButton(table, items[i], 1, commit.getValue().getForeground());
+				createButton(table, items[i], 1, commit.getTextAttribute().getForeground());
 			}
-			if (commit.getValue().getBackground() != null)
+			if (commit.getTextAttribute().getBackground() != null)
 			{
-				createButton(table, items[i], 2, commit.getValue().getBackground());
+				createButton(table, items[i], 2, commit.getTextAttribute().getBackground());
 			}
-			createFontStyle(table, items[i], commit.getValue());
+			createFontStyle(table, items[i], commit.getTextAttribute());
 		}
 	}
 
@@ -836,7 +802,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		fTableEditors.clear();
 	}
 
-	private void createFontStyle(final Table table, final TableItem item, TextAttribute text)
+	private void createFontStyle(final Table table, final TableItem item, DelayedTextAttribute text)
 	{
 		boolean isBold = (text.getStyle() & SWT.BOLD) != 0;
 		boolean isItalic = (text.getStyle() & SWT.ITALIC) != 0;
@@ -872,22 +838,25 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		SelectionAdapter selectionAdapter = new SelectionAdapter()
 		{
-			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
+				ThemeRule token = (ThemeRule) item.getData();
 				int style = 0;
 				if (u.getSelection())
+				{
 					style |= TextAttribute.UNDERLINE;
+				}
 				if (b.getSelection())
+				{
 					style |= SWT.BOLD;
+				}
 				if (italic.getSelection())
+				{
 					style |= SWT.ITALIC;
-				TextAttribute at = new TextAttribute(token.getValue().getForeground(),
-						token.getValue().getBackground(), style, token.getValue().getFont());
-				getTheme().update(token.getKey(), at);
-				setTheme(fSelectedTheme);
+				}
+
+				token.updateFontStyle(style);
 			}
 		};
 		b.addSelectionListener(selectionAdapter);
@@ -895,7 +864,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		u.addSelectionListener(selectionAdapter);
 	}
 
-	private void createButton(final Table table, final TableItem tableItem, final int index, final Color color)
+	private void createButton(final Table table, final TableItem tableItem, final int index, final RGBa color)
 	{
 		TableEditor editor = new TableEditor(table);
 		Button button = new Button(table, SWT.PUSH | SWT.FLAT);
@@ -903,7 +872,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		GC gc = new GC(image);
 		if (color != null)
 		{
-			gc.setBackground(color);
+			gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(color.toRGB()));
 		}
 		gc.fillRectangle(0, 0, 16, 16);
 		gc.dispose();
@@ -921,25 +890,21 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				ColorDialog colorDialog = new ColorDialog(table.getShell());
-				colorDialog.setRGB(color.getRGB());
+				colorDialog.setRGB(color.toRGB());
 				RGB newRGB = colorDialog.open();
 				if (newRGB == null)
+				{
 					return;
-				Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				Color fg = token.getValue().getForeground();
-				Color bg = token.getValue().getBackground();
+				}
+				ThemeRule token = (ThemeRule) tableItem.getData();
 				if (index == 1)
 				{
-					fg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+					token.updateFG(new RGBa(newRGB));
 				}
 				else
 				{
-					bg = ThemePlugin.getDefault().getColorManager().getColor(newRGB);
+					token.updateBG(new RGBa(newRGB));
 				}
-
-				TextAttribute at = new TextAttribute(fg, bg, token.getValue().getStyle(), token.getValue().getFont());
-				getTheme().update(token.getKey(), at);
-				setTheme(fSelectedTheme);
 			}
 		});
 	}
@@ -952,6 +917,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	public boolean performOk()
 	{
 		performOkFonts();
+		getTheme().save();
 		getThemeManager().setCurrentTheme(getTheme());
 		return super.performOk();
 	}
@@ -1029,7 +995,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	protected Theme getTheme()
 	{
-		return getThemeManager().getTheme(fSelectedTheme);
+		return fSelectedTheme;
 	}
 
 	@Override
@@ -1092,7 +1058,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			// Pop a dialog to ask for new name
 			InputDialog dialog = new InputDialog(getShell(), Messages.ThemePreferencePage_RenameThemeTitle,
-					Messages.ThemePreferencePage_RenameThemeMsg, fSelectedTheme, this);
+					Messages.ThemePreferencePage_RenameThemeMsg, fSelectedTheme.getName(), this);
 			if (dialog.open() == Window.OK)
 			{
 				Theme oldTheme = getTheme();
@@ -1106,8 +1072,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		else if (source == deleteThemeButton)
 		{
 			boolean ok = MessageDialog.openConfirm(getShell(),
-					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme),
-					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme));
+					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeTitle, fSelectedTheme.getName()),
+					MessageFormat.format(Messages.ThemePreferencePage_DeleteThemeMsg, fSelectedTheme.getName()));
 			if (ok)
 			{
 				getTheme().delete();
@@ -1178,13 +1144,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			String newName = "newToken"; //$NON-NLS-1$
 			theme.addNewDefaultToken(newName);
 			setTheme(fSelectedTheme);
+			// FIXME Just select the last one!
 			// Select the new token!
 			TableItem[] items = tableViewer.getTable().getItems();
 			int i = 0;
 			for (TableItem tableItem : items)
 			{
-				Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				if (entry.getKey().equals(newName))
+				ThemeRule entry = (ThemeRule) tableItem.getData();
+				if (entry.getName().equals(newName))
 				{
 					break;
 				}
@@ -1207,8 +1174,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			Theme theme = getTheme();
 			for (TableItem tableItem : items)
 			{
-				Map.Entry<String, TextAttribute> entry = (Map.Entry<String, TextAttribute>) tableItem.getData();
-				theme.remove(entry.getKey());
+				ThemeRule entry = (ThemeRule) tableItem.getData();
+				theme.remove(entry);
 			}
 			theme.save();
 			setTheme(fSelectedTheme);
@@ -1216,9 +1183,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		else if (source == tableViewer.getTable())
 		{
 			TableItem item = (TableItem) e.item;
-			Map.Entry<String, TextAttribute> token = (Map.Entry<String, TextAttribute>) item.getData();
-			fScopeText.setText(token.getKey());
+			ThemeRule token = (ThemeRule) item.getData();
+			fScopeText.setText(token.getScopeSelector().toString());
 		}
+	}
+
+	private void setTheme(String text)
+	{
+		setTheme(getThemeManager().getTheme(text));
 	}
 
 	public String isValid(String newText)

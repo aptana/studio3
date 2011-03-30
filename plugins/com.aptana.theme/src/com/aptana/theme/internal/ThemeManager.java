@@ -352,7 +352,7 @@ public class ThemeManager implements IThemeManager
 						THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
 				if (xmlProps == null || xmlProps.trim().length() == 0)
 					continue;
-				Properties props = new Properties();
+				Properties props = new OrderedProperties();
 				props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
 				Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
 				fThemeMap.put(theme.getName(), theme);
@@ -380,7 +380,7 @@ public class ThemeManager implements IThemeManager
 				InputStream stream = url.openStream();
 				try
 				{
-					Properties props = new Properties();
+					Properties props = new OrderedProperties();
 					props.load(stream);
 					String themeName = props.getProperty(Theme.THEME_NAME_PROP_KEY);
 					if (themeName != null)
@@ -427,7 +427,7 @@ public class ThemeManager implements IThemeManager
 				String multipleThemeExtends = props.getProperty(Theme.THEME_EXTENDS_PROP_KEY);
 				if (multipleThemeExtends != null)
 				{
-					Properties newProperties = new Properties();
+					Properties newProperties = new OrderedProperties();
 					StringTokenizer tokenizer = new StringTokenizer(multipleThemeExtends, ","); //$NON-NLS-1$
 					String name = props.getProperty(Theme.THEME_NAME_PROP_KEY);
 					while (tokenizer.hasMoreTokens())
