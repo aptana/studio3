@@ -28,6 +28,11 @@ public class CompositeParserScanner extends Scanner
 		fTokenScanner = tokenScanner;
 	}
 
+	public CompositeTokenScanner getTokenScanner()
+	{
+		return fTokenScanner;
+	}
+
 	public IDocument getSource()
 	{
 		return fDocument;
@@ -55,7 +60,8 @@ public class CompositeParserScanner extends Scanner
 
 		int offset = fTokenScanner.getTokenOffset();
 		int length = fTokenScanner.getTokenLength();
-		if (token.isEOF()) {
+		if (token.isEOF())
+		{
 			return createSymbol(offset, offset, "", token); //$NON-NLS-1$
 		}
 
@@ -79,10 +85,5 @@ public class CompositeParserScanner extends Scanner
 	{
 		// by default ignores whitespace
 		return token.isWhitespace();
-	}
-
-	protected CompositeTokenScanner getTokenScanner()
-	{
-		return fTokenScanner;
 	}
 }

@@ -37,6 +37,11 @@ public class CompositeTokenScanner implements ITokenScanner
 		return fSwitchStrategies[fCurrentIndex];
 	}
 
+	public ITokenScanner getPrimaryTokenScanner()
+	{
+		return fPrimaryTokenScanner;
+	}
+
 	public int getTokenLength()
 	{
 		return fPrimaryTokenScanner.getTokenLength();

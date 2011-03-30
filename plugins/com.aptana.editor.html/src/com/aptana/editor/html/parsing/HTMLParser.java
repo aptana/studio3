@@ -14,6 +14,7 @@ import java.util.Stack;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 
 import beaver.Scanner.Exception;
 import beaver.Symbol;
@@ -135,6 +136,12 @@ public class HTMLParser implements IParser
 
 	protected void processLanguage(String language, short endToken) throws IOException, Exception
 	{
+		ITokenScanner tokenScanner = fScanner.getTokenScanner().getPrimaryTokenScanner();
+		if (tokenScanner instanceof HTMLTokenScanner)
+		{
+			((HTMLTokenScanner) tokenScanner).setInsideSpecialTag(true);
+		}
+
 		Symbol startTag = fCurrentSymbol;
 		advance();
 
@@ -146,6 +153,11 @@ public class HTMLParser implements IParser
 			end = fCurrentSymbol.getEnd();
 			advance();
 			id = fCurrentSymbol.getId();
+		}
+
+		if (tokenScanner instanceof HTMLTokenScanner)
+		{
+			((HTMLTokenScanner) tokenScanner).setInsideSpecialTag(false);
 		}
 
 		IParseNode[] nested = getParseResult(language, start, end);
