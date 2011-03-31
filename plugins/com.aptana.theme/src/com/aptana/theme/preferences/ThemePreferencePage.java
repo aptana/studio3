@@ -50,6 +50,15 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -78,6 +87,7 @@ import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -368,6 +378,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private void createTokenEditTable(Composite composite)
 	{
+		// FIXME allow drag and drop to sort items in the table!
 		Composite comp = new Composite(composite, SWT.NONE);
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		gridData.heightHint = 200;
@@ -418,45 +429,34 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			}
 		});
 
-		// Override selection color to match what is set in theme
-		table.addListener(SWT.EraseItem, new Listener()
+		Listener selectionOverride = new Listener()
 		{
 			public void handleEvent(Event event)
 			{
-				// Don't draw the background of the first column for selections
-				if ((event.detail & SWT.SELECTED) != 0 && event.index == 0)
+				if ((event.detail & SWT.SELECTED) != 0)
 				{
+					Scrollable scrollable = (Scrollable) event.widget;
+					Rectangle clientArea = scrollable.getClientArea();
+					int clientWidth = clientArea.width;
+
+					GC gc = event.gc;
+					Color oldBackground = gc.getBackground();
+
+					gc.setBackground(ThemePlugin.getDefault().getColorManager()
+							.getColor(getTheme().getSelectionAgainstBG()));
+					gc.fillRectangle(clientArea.x, event.y, clientWidth, event.height);
+					gc.setBackground(oldBackground);
+
 					event.detail &= ~SWT.SELECTED;
-				}
-			}
-		});
-		// Manual hack to draw the right bg color for the first column selection
-		// FIXME This should be able to be done by listening to Erase/PaintItem events!
-		table.addSelectionListener(new SelectionListener()
-		{
-			TableItem lastSelected;
-			private Color lastSelectedColor;
+					event.detail &= ~SWT.BACKGROUND;
 
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (lastSelected != null)
-				{
-					lastSelected.setBackground(0, lastSelectedColor);
-				}
-				TableItem item = (TableItem) e.item;
-				if (item != null)
-				{
-					lastSelectedColor = item.getBackground(0);
-					lastSelected = item;
-					item.setBackground(0,
-							ThemePlugin.getDefault().getColorManager().getColor(getTheme().getSelectionAgainstBG()));
+					// force foreground color. Otherwise on dark themes we get black FG (all the time on Win, on
+					// non-focus for Mac)
+					gc.setForeground(ThemePlugin.getDefault().getColorManager().getColor(getTheme().getForeground()));
 				}
 			}
-
-			public void widgetDefaultSelected(SelectionEvent e)
-			{
-			}
-		});
+		};
+		table.addListener(SWT.EraseItem, selectionOverride);
 
 		tableViewer = new TableViewer(table);
 		tableViewer.setContentProvider(new IStructuredContentProvider()
@@ -580,8 +580,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			@Override
 			protected void setValue(Object element, Object value)
 			{
-				// FIXME What if user has edited the value but is trying to delete the row? check to see if the token
-				// even exists in the theme before saving/updating
 				ThemeRule token = (ThemeRule) element;
 				String newName = (String) value;
 				if (newName.equals(token.getName()))
@@ -591,6 +589,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				// FIXME How do we update the token in the theme?
 				token.setName(newName);
 				tableViewer.refresh(element);
+				getTheme().save();
 			}
 
 			@Override
@@ -689,10 +688,72 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			public void modifyText(ModifyEvent e)
 			{
-				// TODO Update the scope selector for the current token!
+				// Update the scope selector for the current token!
 				TableItem item = table.getSelection()[0];
 				ThemeRule rule = (ThemeRule) item.getData();
 				rule.setScopeSelector(new ScopeSelector(fScopeText.getText()));
+			}
+		});
+
+		addDNDToTable(table);
+	}
+
+	private void addDNDToTable(final Table table)
+	{
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		DragSource source = new DragSource(table, DND.DROP_MOVE);
+		source.setTransfer(types);
+
+		source.addDragListener(new DragSourceAdapter()
+		{
+			public void dragSetData(DragSourceEvent event)
+			{
+				// Get the selected items in the drag source
+				DragSource ds = (DragSource) event.widget;
+				Table table = (Table) ds.getControl();
+				int selected = table.getSelectionIndex();
+				event.data = Integer.toString(selected);
+			}
+		});
+
+		// Create the drop target
+		DropTarget target = new DropTarget(table, DND.DROP_MOVE);
+		target.setTransfer(types);
+		target.addDropListener(new DropTargetAdapter()
+		{
+			public void dragEnter(DropTargetEvent event)
+			{
+				// Allow dropping text only
+				for (int i = 0, n = event.dataTypes.length; i < n; i++)
+				{
+					if (TextTransfer.getInstance().isSupportedType(event.dataTypes[i]))
+					{
+						event.currentDataType = event.dataTypes[i];
+					}
+				}
+			}
+
+			public void dragOver(DropTargetEvent event)
+			{
+				event.feedback = DND.FEEDBACK_INSERT_AFTER | DND.FEEDBACK_INSERT_BEFORE | DND.FEEDBACK_SCROLL;
+			}
+
+			public void drop(DropTargetEvent event)
+			{
+				if (TextTransfer.getInstance().isSupportedType(event.currentDataType))
+				{
+					// Get the dropped data
+					DropTarget target = (DropTarget) event.widget;
+					Table table = (Table) target.getControl();
+					String data = (String) event.data;
+					int selectionIndex = Integer.parseInt(data);
+
+					TableItem item = (TableItem) event.item;
+					int insertionIndex = table.indexOf(item);
+					getTheme().reorderRule(selectionIndex, insertionIndex);
+					tableViewer.refresh(true);
+					addCustomTableEditorControls();
+				}
 			}
 		});
 	}
@@ -1136,27 +1197,25 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		{
 			// Add a new row to the table by adding a basic token to the theme
 			Theme theme = getTheme();
-			String newName = "newToken"; //$NON-NLS-1$
-			theme.addNewDefaultToken(newName);
-			setTheme(fSelectedTheme);
-			// FIXME Just select the last one!
-			// Select the new token!
-			TableItem[] items = tableViewer.getTable().getItems();
-			int i = 0;
-			for (TableItem tableItem : items)
+			String newName = "untitled"; //$NON-NLS-1$
+			// Insert into the rules at the index after current selection in table!
+			int index = tableViewer.getTable().getSelectionIndex();
+			if (index == -1)
 			{
-				ThemeRule entry = (ThemeRule) tableItem.getData();
-				if (entry.getName().equals(newName))
-				{
-					break;
-				}
-				i++;
+				index = tableViewer.getTable().getItemCount();
 			}
+			else
+			{
+				index++;
+			}
+			theme.addNewDefaultToken(index, newName);
+			setTheme(fSelectedTheme);
 			// Have the new addition in an edit mode
-			Object newElement = tableViewer.getElementAt(i);
+			Object newElement = tableViewer.getElementAt(index);
 			if (newElement != null)
 			{
 				tableViewer.editElement(newElement, 0);
+				fScopeText.setText(""); //$NON-NLS-1$
 			}
 		}
 		else if (source == fRemoveTokenButton)

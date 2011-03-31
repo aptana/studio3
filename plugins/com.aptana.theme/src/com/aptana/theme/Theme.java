@@ -48,7 +48,10 @@ import com.aptana.theme.internal.ThemeManager;
 public class Theme
 {
 
-	private static final String SELECTOR_DELIMITER = "^";
+	/**
+	 * Delimiter used to append the scope selector after the fg/bg/fontStyle for a rule.
+	 */
+	private static final String SELECTOR_DELIMITER = "^"; //$NON-NLS-1$
 
 	static final String DELIMETER = ","; //$NON-NLS-1$
 
@@ -491,6 +494,8 @@ public class Theme
 	 */
 	public List<ThemeRule> getTokens()
 	{
+		// FIXME Exposing the underlying collection means we have an issue with the cache not being wiped when rules are
+		// modified!
 		return coloringRules;
 	}
 
@@ -669,6 +674,7 @@ public class Theme
 	 * Removes a scope selector rule from the theme. TODO take in a ScopeSelector, not a String!
 	 * 
 	 * @param scopeSelector
+	 * @deprecated Remove
 	 */
 	public void remove(String scopeSelector)
 	{
@@ -678,14 +684,21 @@ public class Theme
 		save();
 	}
 
-	/**
-	 * Adds a new token entry with no font styling, no bg, same FG as default for theme. TODO take in a ScopeSelector,
-	 * not a String!
-	 */
-	public void addNewDefaultToken(String scopeSelector)
+	public void reorderRule(int startIndex, int endIndex)
 	{
-		coloringRules
-				.add(new ThemeRule(scopeSelector, new ScopeSelector(scopeSelector), new DelayedTextAttribute(null)));
+		if (endIndex > startIndex)
+		{
+			endIndex--;
+		}
+		ThemeRule selected = coloringRules.remove(startIndex);
+		coloringRules.add(endIndex, selected);
+		wipeCache();
+		save();
+	}
+
+	public void addNewDefaultToken(int index, String newTokenName)
+	{
+		coloringRules.add(index, new ThemeRule(newTokenName, new ScopeSelector(""), new DelayedTextAttribute(null)));
 		wipeCache();
 		save();
 	}

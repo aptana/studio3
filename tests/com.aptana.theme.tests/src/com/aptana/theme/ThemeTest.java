@@ -97,7 +97,7 @@ public class ThemeTest extends TestCase
 	public void testAddingTokens()
 	{
 		assertFalse(theme.hasEntry("chris"));
-		theme.addNewDefaultToken("chris");
+		theme.addNewDefaultToken(0, "chris");
 		assertTrue(theme.hasEntry("chris"));
 		assertEquals(new RGB(255, 0, 0), theme.getForegroundAsRGB("chris"));
 	}
