@@ -8,6 +8,7 @@ import com.aptana.scope.ScopeSelector;
 public class ThemeRule
 {
 
+	private static final ScopeSelector EMPTY_SCOPE = new ScopeSelector(""); //$NON-NLS-1$
 	private IScopeSelector fSelector;
 	private String fName;
 	private DelayedTextAttribute fTextAttribute;
@@ -21,6 +22,10 @@ public class ThemeRule
 
 	public IScopeSelector getScopeSelector()
 	{
+		if (fSelector == null)
+		{
+			return EMPTY_SCOPE;
+		}
 		return fSelector;
 	}
 
@@ -98,5 +103,10 @@ public class ThemeRule
 	{
 		return MessageFormat.format(
 				"name: {0}; scope: {1}; style: {2}", getName(), getScopeSelector(), getTextAttribute()); //$NON-NLS-1$
+	}
+
+	public boolean isSeparator()
+	{
+		return getScopeSelector().equals(EMPTY_SCOPE);
 	}
 }

@@ -167,9 +167,8 @@ public class Theme
 				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
-			// FIXME What do we do with rules meant to be separators? Skip scope selectors with empty string?
-			coloringRules.add(new ThemeRule(name,
-					new ScopeSelector(scopeSelector == null ? "" : scopeSelector), attribute)); //$NON-NLS-1$
+			coloringRules.add(new ThemeRule(name, scopeSelector == null ? null : new ScopeSelector(scopeSelector),
+					attribute));
 		}
 	}
 
@@ -329,6 +328,10 @@ public class Theme
 	{
 		for (ThemeRule rule : coloringRules)
 		{
+			if (rule.isSeparator())
+			{
+				continue;
+			}
 			if (rule.getScopeSelector().equals(match))
 			{
 				return rule;
@@ -359,6 +362,10 @@ public class Theme
 		Collection<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
 		for (ThemeRule rule : coloringRules)
 		{
+			if (rule.isSeparator())
+			{
+				continue;
+			}
 			selectors.add(rule.getScopeSelector());
 		}
 		return ScopeSelector.bestMatch(selectors, scope);
@@ -518,7 +525,9 @@ public class Theme
 		for (ThemeRule rule : coloringRules)
 		{
 			if (rule == null)
+			{
 				continue;
+			}
 			StringBuilder value = new StringBuilder();
 			DelayedTextAttribute attr = rule.getTextAttribute();
 			RGBa color = attr.getForeground();
@@ -694,13 +703,12 @@ public class Theme
 		}
 		ThemeRule selected = coloringRules.remove(startIndex);
 		coloringRules.add(endIndex, selected);
-		wipeCache();
 		save();
 	}
 
 	public void addNewDefaultToken(int index, String newTokenName)
 	{
-		coloringRules.add(index, new ThemeRule(newTokenName, new ScopeSelector(""), new DelayedTextAttribute(null)));
+		coloringRules.add(index, new ThemeRule(newTokenName, null, new DelayedTextAttribute(null)));
 		wipeCache();
 		save();
 	}

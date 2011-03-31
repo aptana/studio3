@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * A special subclass of Properties intended to retain ordering of the properties.
+ * 
+ * @author cwilliams
+ */
 public class OrderedProperties extends Properties
 {
 
@@ -75,6 +80,8 @@ public class OrderedProperties extends Properties
 	@Override
 	public Set<java.util.Map.Entry<Object, Object>> entrySet()
 	{
+		// FIXME If we use entrySet() in a loop, this will recalc every iteration. Need to create it once and return the
+		// instance!
 		Set<java.util.Map.Entry<Object, Object>> entries = new LinkedHashSet<Map.Entry<Object, Object>>();
 		for (Object key : keySet())
 		{
