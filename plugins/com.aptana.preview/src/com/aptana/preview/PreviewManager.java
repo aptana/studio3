@@ -270,14 +270,18 @@ public final class PreviewManager {
 		IPath path = null;
 		IPath workspacePath = null;
 		if (editorInput instanceof IPathEditorInput) {
-			path = ((IPathEditorInput) editorInput).getPath();
-			if (path != null) {
-				fileName = path.lastSegment();
-				IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(path.toFile().toURI());
-				if (files.length > 0) {
-					project = files[0].getProject();
-					workspacePath = files[0].getFullPath();
+			try {
+				path = ((IPathEditorInput) editorInput).getPath();
+				if (path != null) {
+					fileName = path.lastSegment();
+					IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(path.toFile().toURI());
+					if (files.length > 0) {
+						project = files[0].getProject();
+						workspacePath = files[0].getFullPath();
+					}
 				}
+			} catch (Exception e) {
+				return null;
 			}
 		} else if (editorInput instanceof IStorageEditorInput) {
 

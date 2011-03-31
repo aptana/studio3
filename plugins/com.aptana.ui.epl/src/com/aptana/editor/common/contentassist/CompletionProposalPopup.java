@@ -706,6 +706,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	private void resizeTable()
 	{
+		fProposalTable.setRedraw(false);
 		int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
 		fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
 				.create());
@@ -719,7 +720,7 @@ public class CompletionProposalPopup implements IContentAssistListener
 		TableColumn lastColumn = fProposalTable.getColumn(fProposalTable.getColumnCount() - 1);
 		lastColumn.pack();
 		padColumn(lastColumn, 20);
-
+		fProposalTable.setRedraw(true);
 		fProposalShell.pack(true);
 	}
 

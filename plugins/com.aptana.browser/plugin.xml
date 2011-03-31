@@ -49,13 +49,13 @@
          </action>
       </actionSet>
    </extension>
-   <extension
+   <!-- extension
          point="org.eclipse.ui.browserSupport">
       <support
             class="com.aptana.browser.support.WorkbenchBrowserSupport"
             default="false">
       </support>
-   </extension>
+   </extension -->
    <extension
          point="com.aptana.browser.configuration">
       <sizeCategory

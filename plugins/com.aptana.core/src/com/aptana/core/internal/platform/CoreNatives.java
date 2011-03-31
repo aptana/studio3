@@ -39,9 +39,14 @@ public final class CoreNatives {
 	public static final int CSIDL_DESKTOPDIRECTORY = 0x0010;
 	
 	/**
-	 * CSIDL_DESKTOPDIRECTORY
+	 * CSIDL_LOCAL_APPDATA
 	 */
 	public static final int CSIDL_LOCAL_APPDATA = 0x001C;
+
+	/**
+	 * CSIDL_COMMON_APPDATA
+	 */
+	public static final int CSIDL_COMMON_APPDATA = 0x0023;
 
 	/**
 	 * FILE_ATTRIBUTE_HIDDEN

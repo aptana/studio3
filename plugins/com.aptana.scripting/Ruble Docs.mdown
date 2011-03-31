@@ -1,1 +1,1 @@
-The most current version lives here: https://aptanastudio.tenderapp.com/faqs/scripting-aptana-studio/ruble-programming-guide
+The most current version lives here: http://wiki.appcelerator.org/display/tis/Scripting
