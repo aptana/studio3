@@ -20,7 +20,7 @@ public class WebPerspectiveFactory implements IPerspectiveFactory
 	/**
 	 * NOTE: Update this when the perspective layout changes
 	 */
-	public static final int VERSION = 100;
+	public static final int VERSION = 101;
 
 	private static final String APP_EXPLORER_ID = "com.aptana.explorer.view"; //$NON-NLS-1$
 

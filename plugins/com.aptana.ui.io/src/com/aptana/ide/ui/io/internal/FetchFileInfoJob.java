@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.ui.io.IOUIPlugin;
 
 /**
@@ -27,14 +26,16 @@ import com.aptana.ide.ui.io.IOUIPlugin;
  */
 public class FetchFileInfoJob extends Job {
 
-	private IFileStore fileStore;
+	private final IFileStore fileStore;
+	private final int options;
 	
 	/**
 	 * @param name
 	 */
-	public FetchFileInfoJob(IFileStore fileStore) {
+	public FetchFileInfoJob(IFileStore fileStore, int options) {
 		super(MessageFormat.format(Messages.FetchFileInfoJob_Title, fileStore.toString()));
 		this.fileStore = fileStore;
+		this.options = options;
 	}
 
 	/* (non-Javadoc)
@@ -47,7 +48,7 @@ public class FetchFileInfoJob extends Job {
 		}
 		IFileInfo fileInfo;
 		try {
-			fileInfo = fileStore.fetchInfo(IExtendedFileStore.DETAILED, monitor);
+			fileInfo = fileStore.fetchInfo(options, monitor);
 		} catch (CoreException e) {
 			IOUIPlugin.logImportant(Messages.FetchFileInfoJob_FailedToFetch, e);
 			return e.getStatus();

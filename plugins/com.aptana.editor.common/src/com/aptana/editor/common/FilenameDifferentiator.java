@@ -231,18 +231,25 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	private IPath getPath(IEditorPart otherEditor)
 	{
 		IEditorInput input = otherEditor.getEditorInput();
-		if (input instanceof IPathEditorInput)
+		try
 		{
-			return ((IPathEditorInput) input).getPath();
+			if (input instanceof IPathEditorInput)
+			{
+				return ((IPathEditorInput) input).getPath();
+			}
+
+			URI uri = (URI) input.getAdapter(URI.class);
+			if (uri != null)
+			{
+				return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
+			}
+			if (input instanceof IURIEditorInput)
+			{
+				return URIUtil.toPath(((IURIEditorInput) input).getURI());
+			}
 		}
-		
-		URI uri = (URI) input.getAdapter(URI.class);
-		if (uri != null) {
-			return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
-		}
-		if (input instanceof IURIEditorInput)
+		catch (Exception e)
 		{
-			return URIUtil.toPath(((IURIEditorInput) input).getURI());
 		}
 		return null;
 	}

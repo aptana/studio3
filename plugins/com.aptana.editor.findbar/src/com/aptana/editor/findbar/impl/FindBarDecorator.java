@@ -336,7 +336,6 @@ public class FindBarDecorator implements IFindBarDecorator, SelectionListener
 	{
 		GridData gridData = new GridData(horizontalAlignment, verticalAlignment, grabExcessHorizontalSpace,
 				grabExcessVerticalSpace);
-		gridData.heightHint = 22;
 		return gridData;
 	}
 

@@ -8,6 +8,7 @@
 package com.aptana.editor.html.parsing;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.IRule;
@@ -26,6 +27,8 @@ import com.aptana.editor.html.parsing.lexer.HTMLTokens;
 
 public class HTMLTokenScanner extends RuleBasedScanner
 {
+
+	private IRule generalTagRule;
 
 	public HTMLTokenScanner()
 	{
@@ -49,7 +52,7 @@ public class HTMLTokenScanner extends RuleBasedScanner
 		rules.add(new TagRule("?xml", createToken(getTokenName(HTMLTokens.XML_DECL)))); //$NON-NLS-1$
 		// tags
 		rules.add(new TagRule("/", createToken(getTokenName(HTMLTokens.END_TAG)))); //$NON-NLS-1$
-		rules.add(new TagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
+		rules.add(generalTagRule = new TagRule(createToken(getTokenName(HTMLTokens.START_TAG))));
 
 		// text
 		IToken token = createToken(getTokenName(HTMLTokens.TEXT));
@@ -57,6 +60,21 @@ public class HTMLTokenScanner extends RuleBasedScanner
 
 		setRules(rules.toArray(new IRule[rules.size()]));
 		setDefaultReturnToken(token);
+	}
+
+	public void setInsideSpecialTag(boolean special)
+	{
+		List<IRule> rules = new ArrayList<IRule>();
+		rules.addAll(Arrays.asList(fRules));
+		if (special)
+		{
+			rules.remove(generalTagRule);
+		}
+		else
+		{
+			rules.add(generalTagRule);
+		}
+		setRules(rules.toArray(new IRule[rules.size()]));
 	}
 
 	protected IToken createToken(String string)

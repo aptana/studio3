@@ -18,7 +18,7 @@ import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)

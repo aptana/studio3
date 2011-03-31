@@ -604,6 +604,19 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			String name = path.lastSegment();
 			FTPFile result = ftpFileCache.get(path);
 			if (result == null) {
+				if ((options & IExtendedFileStore.EXISTENCE) != 0) {
+					ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
+					try {
+						changeCurrentDir(path);
+						fileInfo.setExists(true);
+						fileInfo.setDirectory(true);
+					} catch (FileNotFoundException ignore) {
+					}
+					if (!fileInfo.exists()) {
+						fileInfo.setExists(ftpClient.existsFile(path.toPortableString()));
+					}
+					return fileInfo;
+				}
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
 					Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
@@ -960,7 +973,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		try {
-			changeCurrentDir(Path.ROOT);
+			changeCurrentDir(sourcePath.removeLastSegments(1));
 			Policy.checkCanceled(monitor);
 			try {
 				ftpClient.rename(sourcePath.toPortableString(), destinationPath.toPortableString());

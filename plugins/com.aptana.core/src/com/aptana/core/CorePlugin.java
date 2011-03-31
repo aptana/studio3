@@ -29,10 +29,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
@@ -83,7 +87,7 @@ public class CorePlugin extends Plugin
 		addFilewatcherJob.setSystem(!EclipseUtil.showSystemJobs());
 		addFilewatcherJob.setPriority(Job.LONG);
 		addFilewatcherJob.schedule(250);
-		
+
 		addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 		{
 			protected IStatus run(IProgressMonitor monitor)
@@ -262,7 +266,6 @@ public class CorePlugin extends Plugin
 	{
 		if (fProjectsListener != null)
 		{
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectsListener);
 			fProjectsListener.dispose();
 			fProjectsListener = null;
 		}
@@ -272,16 +275,17 @@ public class CorePlugin extends Plugin
 	{
 		fProjectsListener = new ResourceListener();
 		fProjectsListener.start();
-		// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
 	}
-	
-	public static String getAptanaStudioVersion() {
+
+	public static String getAptanaStudioVersion()
+	{
 		String version = EclipseUtil.getPluginVersion(EclipseUtil.STANDALONE_PLUGIN_ID);
-		if (version == null) {
+		if (version == null)
+		{
 			version = EclipseUtil.getPluginVersion(PLUGIN_ID);
 		}
-		if (version == null) {
+		if (version == null)
+		{
 			version = EclipseUtil.getProductVersion();
 		}
 		return version;
@@ -293,12 +297,29 @@ public class CorePlugin extends Plugin
 	 * 
 	 * @author cwilliams
 	 */
-	private static class ResourceListener implements IResourceChangeListener
+	private static class ResourceListener implements IResourceChangeListener, IPreferenceChangeListener
 	{
 
 		private Map<IProject, Integer> fWatchers;
 
+		ResourceListener()
+		{
+			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
+		}
+
 		public void start()
+		{
+			if (autoHookFileWatcher())
+			{
+				hookAll();
+			}
+		}
+
+		/**
+		 * Hook a filewatcher to every open project, and add a resource listener to handle projects getting
+		 * added/opened/closed.
+		 */
+		private void hookAll()
 		{
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
@@ -308,10 +329,27 @@ public class CorePlugin extends Plugin
 					hookFilewatcher(project);
 				}
 			}
+			// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+		}
+
+		private boolean autoHookFileWatcher()
+		{
+			return Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+					ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
 		}
 
 		public synchronized void dispose()
 		{
+			// Don't listen to auto-refresh pref changes anymore
+			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
+			// Now remove all the existing file watchers
+			unhookAll();
+		}
+
+		private void unhookAll()
+		{
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 			if (fWatchers != null)
 			{
 				for (IProject project : new HashSet<IProject>(fWatchers.keySet()))
@@ -324,6 +362,10 @@ public class CorePlugin extends Plugin
 
 		protected synchronized void hookFilewatcher(IProject newProject)
 		{
+			if (!autoHookFileWatcher())
+			{
+				return;
+			}
 			try
 			{
 				if (newProject != null && newProject.exists() && newProject.getLocation() != null)
@@ -399,7 +441,7 @@ public class CorePlugin extends Plugin
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-											.isAccessible()))
+												.isAccessible()))
 							{
 								unhookFilewatcher(resource.getProject());
 							}
@@ -411,6 +453,21 @@ public class CorePlugin extends Plugin
 			catch (CoreException e)
 			{
 				log(e.getStatus());
+			}
+		}
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (ResourcesPlugin.PREF_AUTO_REFRESH.equals(event.getKey()))
+			{
+				if (Boolean.TRUE.toString().equals(event.getNewValue()))
+				{
+					hookAll();
+				}
+				else
+				{
+					unhookAll();
+				}
 			}
 		}
 	}

@@ -85,17 +85,17 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 				} else {
 					response.setStatusCode(HttpStatus.SC_OK);
 					if (METHOD_GET.equals(method)) {
-							final File file = fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-							response.setEntity(new NFileEntity(file,  HTML_TEXT_TYPE) {
-								@Override
-								public void finish() {
-									super.finish();
-									if (!file.delete()) {
-										file.deleteOnExit();
-									}
+						File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
+						final File temporaryFile = file == null ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor()) : null;
+						response.setEntity(new NFileEntity(file != null ? file : temporaryFile,  getMimeType(fileStore.getName())) {
+							@Override
+							public void finish() {
+								super.finish();
+								if (temporaryFile != null && !temporaryFile.delete()) {
+									temporaryFile.deleteOnExit();
 								}
-								
-							});
+							}
+						});
 					} else {
 						response.setEntity(null);
 					}
@@ -128,6 +128,10 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			}
 		}
 		return EFS.getNullFileSystem().getStore(Path.EMPTY).fetchInfo();
+	}
+	
+	private static String getMimeType(String fileName) {
+		return MimeTypesRegistry.INSTANCE.getMimeType(Path.fromPortableString(fileName).getFileExtension());
 	}
 
 }

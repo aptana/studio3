@@ -13,7 +13,6 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IValue;
 
 import com.aptana.core.util.StringUtil;
-import com.aptana.js.debug.core.internal.model.JSDebugElement;
 import com.aptana.js.debug.core.model.IJSVariable;
 
 /**

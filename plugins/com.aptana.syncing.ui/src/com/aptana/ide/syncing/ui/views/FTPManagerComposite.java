@@ -63,6 +63,7 @@ import com.aptana.ide.syncing.ui.editors.EditorUtils;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.old.views.SmartSyncDialog;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -451,8 +452,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		{
 			if (focusedConnection == null)
 			{
-				IFileStore sourceStore = SyncUtils.getFileStore(fSource.getCurrentInput());
-				IFileStore targetStore = SyncUtils.getFileStore(fTarget.getCurrentInput());
+				IFileStore sourceStore = Utils.getFileStore(fSource.getCurrentInput());
+				IFileStore targetStore = Utils.getFileStore(fTarget.getCurrentInput());
 				dialog = new SmartSyncDialog(UIUtils.getActiveShell(), source, dest, sourceStore, targetStore,
 						source.getName(), dest.getName());
 			}
@@ -494,8 +495,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		action.setActivePart(null, UIUtils.getActivePart());
 		action.setSelectedSite(fSelectedSite);
 		action.setSelection(new StructuredSelection(fSource.getSelectedElements()));
-		action.setSourceRoot(SyncUtils.getFileStore(fSource.getCurrentInput()));
-		action.setDestinationRoot(SyncUtils.getFileStore(fTarget.getCurrentInput()));
+		action.setSourceRoot(Utils.getFileStore(fSource.getCurrentInput()));
+		action.setDestinationRoot(Utils.getFileStore(fTarget.getCurrentInput()));
 		action.addJobListener(new JobChangeAdapter()
 		{
 
@@ -525,8 +526,8 @@ public class FTPManagerComposite implements SelectionListener, ISiteConnectionLi
 		action.setActivePart(null, UIUtils.getActivePart());
 		action.setSelectedSite(fSelectedSite);
 		action.setSelection(new StructuredSelection(fTarget.getSelectedElements()), false);
-		action.setSourceRoot(SyncUtils.getFileStore(fSource.getCurrentInput()));
-		action.setDestinationRoot(SyncUtils.getFileStore(fTarget.getCurrentInput()));
+		action.setSourceRoot(Utils.getFileStore(fSource.getCurrentInput()));
+		action.setDestinationRoot(Utils.getFileStore(fTarget.getCurrentInput()));
 		action.addJobListener(new JobChangeAdapter()
 		{
 

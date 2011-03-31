@@ -165,7 +165,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			StatusLineMessageTimerManager.setErrorMessage(
 					NLS.bind(FormatterMessages.Formatter_formatterParsingErrorStatus, e.getMessage()),
 					ERROR_DISPLAY_TIMEOUT, true);
-			if (FormatterPlugin.DEBUG)
+			if (FormatterPlugin.getDefault().isDebugging())
 			{
 				FormatterPlugin.logError(e);
 			}

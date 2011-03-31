@@ -102,8 +102,8 @@ public class ThemeTest extends TestCase
 
 	public void testModifyingTokens()
 	{
-		TextAttribute at = new TextAttribute(colormanager.getColor(new RGB(128, 128, 128)), colormanager
-				.getColor(new RGB(64, 0, 64)), TextAttribute.UNDERLINE);
+		TextAttribute at = new TextAttribute(colormanager.getColor(new RGB(128, 128, 128)),
+				colormanager.getColor(new RGB(64, 0, 64)), TextAttribute.UNDERLINE);
 		theme.update("constant", at);
 		assertEquals(new RGB(128, 128, 128), theme.getForegroundAsRGB("constant.language"));
 		assertEquals(new RGB(64, 0, 64), theme.getBackgroundAsRGB("constant.language"));
@@ -223,5 +223,27 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(0, 255, 0), theme.getForegroundAsRGB("constant.language.js"));
 		assertEquals(new RGB(255, 0, 255), theme.getTextAttribute("constant.language.js").getBackground().getRGB());
 		assertEquals(new RGB(255, 0, 255), theme.getBackgroundAsRGB("constant.language.js"));
+	}
+
+	public void testDarkenDoesntGoOutOfRange()
+	{
+		assertEquals(new RGB(0, 0, 0), theme.darken(new RGB(0, 0, 0)));
+	}
+
+	public void testLightenDoesntGoOutOfRange()
+	{
+		assertEquals(new RGB(255, 255, 255), theme.lighten(new RGB(255, 255, 255)));
+	}
+
+	public void testDarken()
+	{
+		// TODO Keep darkening until we hit black?
+		assertEquals(new RGB(90, 90, 90), theme.darken(new RGB(128, 128, 128)));
+	}
+
+	public void testLighten()
+	{
+		// TODO Keep lightening until we hit white?
+		assertEquals(new RGB(166, 166, 166), theme.lighten(new RGB(128, 128, 128)));
 	}
 }

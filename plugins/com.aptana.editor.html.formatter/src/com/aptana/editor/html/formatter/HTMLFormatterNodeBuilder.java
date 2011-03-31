@@ -17,6 +17,7 @@ import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLContentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
+import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
@@ -257,7 +258,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		INameNode endNode = node.getEndNode();
 		int endOffset = node.getEndingOffset() + 1;
 		IRange endNameRange = endNode.getNameRange();
-		if (endNode != null && !endNameRange.isEmpty() && endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
+		if (endNode != null && !endNameRange.isEmpty()
+				&& endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
 		{
 			IRange endNodeRange = endNode.getNameRange();
 			endOffset = endNodeRange.getStartingOffset();
@@ -268,7 +270,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
-		if (node.getNodeType() == HTMLNodeTypes.SPECIAL)
+		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLParserConstants.LANGUAGE.equals(node.getLanguage()))
 		{
 			// Everything under this HTMLSpecialNode should be wrapped with a
 			// FormatterSpecialElementNode, and no need to visit its children.

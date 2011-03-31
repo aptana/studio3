@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 
 import com.aptana.ide.ui.io.FileSystemUtils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -30,7 +31,7 @@ public class FileSystemObjectPropertyTester extends PropertyTester {
         if (receiver instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) receiver;
             IFileStore fileStore = Utils.getFileStore(adaptable);
-            IFileInfo fileInfo = Utils.getFileInfo(adaptable);
+            IFileInfo fileInfo = Utils.getFileInfo(adaptable, EFS.NONE);
 
             boolean value = toBoolean(expectedValue);
             if (PROPERTY_IS_DIRECTORY.equals(property)) {

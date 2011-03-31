@@ -330,12 +330,14 @@
 				{
 					"name": "description",
 					"type": "String",
-					"description": "A description of the event"
+					"description": "A description of the event",
+					"optional": true
 				},
 				{
 					"name": "properties",
 					"type": "Array<EventProperty>",
-					"description": "A list of properties describing this event"
+					"description": "A list of properties describing this event",
+					"optional": true
 				}
 			]
 		},
@@ -351,7 +353,8 @@
 				{
 					"name": "description",
 					"type": "String",
-					"description": "A description of the event property"
+					"description": "A description of the event property",
+					"optional": true
 				},
 				{
 					"name": "type",
@@ -372,7 +375,8 @@
 				{
 					"name": "description",
 					"type": "String",
-					"description": "A description of the return type"
+					"description": "A description of the return type",
+					"optional": true
 				}
 			]
 		},
@@ -409,12 +413,14 @@
 				{
 					"name": "usage",
 					"type": "String",
-					"description": "An enumeration indicating the usage of the parameter. Possible values are required, optional, zero-or-more, one-or-more"
+					"description": "An enumeration indicating the usage of the parameter. Possible values are required, optional, zero-or-more, one-or-more",
+					"optional": true
 				},
 				{
 					"name": "description",
 					"type": "String",
-					"description": "A description of the parameter"
+					"description": "A description of the parameter",
+					"optional": true
 				}
 			]
 		},
@@ -430,7 +436,8 @@
 				{
 					"name": "description",
 					"type": "String",
-					"description": "A description of the exception"
+					"description": "A description of the exception",
+					"optional": true
 				}
 			]
 		}

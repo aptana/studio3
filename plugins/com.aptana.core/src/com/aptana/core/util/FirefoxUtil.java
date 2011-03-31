@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -336,7 +335,7 @@ public final class FirefoxUtil {
 		}
 
 		try {
-			ZipUtil.extract(new ZipFile(file), dir);
+			ZipUtil.extract(file, dir);
 		} catch (IOException e) {
 			CorePlugin.log(e);
 			return false;

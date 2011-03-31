@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.syncing.ui.decorators.DecoratorUtils;
-import com.aptana.ide.syncing.ui.internal.SyncUtils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * Cloaks a specific file type so the files will be ignored during syncing.
@@ -73,7 +73,7 @@ public class UncloakAction implements IObjectActionDelegate, IViewActionDelegate
 		{
 			if (element instanceof IAdaptable)
 			{
-				fileStore = SyncUtils.getFileStore((IAdaptable) element);
+				fileStore = Utils.getFileStore((IAdaptable) element);
 				if (fileStore != null)
 				{
 					if (CloakingUtils.isFileCloaked(fileStore))
@@ -119,7 +119,7 @@ public class UncloakAction implements IObjectActionDelegate, IViewActionDelegate
 		{
 			if (element instanceof IAdaptable)
 			{
-				fileStore = SyncUtils.getFileStore((IAdaptable) element);
+				fileStore = Utils.getFileStore((IAdaptable) element);
 				if (fileStore != null)
 				{
 					if (CloakingUtils.isFileCloaked(fileStore))

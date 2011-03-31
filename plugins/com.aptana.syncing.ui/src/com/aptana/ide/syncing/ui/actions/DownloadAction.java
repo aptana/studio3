@@ -29,6 +29,7 @@ import com.aptana.ide.syncing.ui.SyncingUIPlugin;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.DialogUtils;
 
 /**
@@ -72,7 +73,7 @@ public class DownloadAction extends BaseSyncAction
 					IFileStore[] fileStores = new IFileStore[files.length];
 					for (int i = 0; i < fileStores.length; ++i)
 					{
-						fileStores[i] = SyncUtils.getFileStore(files[i]);
+						fileStores[i] = Utils.getFileStore(files[i]);
 					}
 					IFileStore[] targetFiles = SyncUtils.getDownloadFiles(source, target, fileStores, fSelectedFromSource, true, monitor);
 

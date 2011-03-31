@@ -23,12 +23,21 @@ public interface IExtendedFileStore extends IFileStore {
 
 	/**
 	 * Option flag constant (value 1 &lt;&lt;10) indicating that a fetch
-	 * infosoperation should be detailed
+	 * info operation should be detailed
 	 * 
 	 * @see IFileStore#childInfos(int, IProgressMonitor)
 	 * @see IFileStore#fetchInfo(int, IProgressMonitor)
 	 */
 	public static final int DETAILED = 1 << 10;
+
+	/**
+	 * Option flag constant (value 1 &lt;&lt;10) indicating that a fetch
+	 * info operation should test only resource existence and type
+	 * 
+	 * @see IFileStore#childInfos(int, IProgressMonitor)
+	 * @see IFileStore#fetchInfo(int, IProgressMonitor)
+	 */
+	public static final int EXISTENCE = 1 << 11;
 
 	/**
 	 * 
