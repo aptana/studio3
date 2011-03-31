@@ -10,7 +10,6 @@ package com.aptana.theme;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -54,13 +53,18 @@ public class TextmateImporter
 	{
 		try
 		{
-			return new Theme(ThemePlugin.getDefault().getColorManager(), convertToProperties(file));
+			return new Theme(getColorManager(), convertToProperties(file));
 		}
 		catch (Exception e)
 		{
 			ThemePlugin.logError(e);
 		}
 		return null;
+	}
+
+	protected ColorManager getColorManager()
+	{
+		return ThemePlugin.getDefault().getColorManager();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -100,12 +104,13 @@ public class TextmateImporter
 			{
 				if (colors.containsKey(BACKGROUND) || colors.containsKey(FONT_STYLE))
 					value.append(radRailsProps.getProperty(Theme.FOREGROUND_PROP_KEY));
-				else
-				{
-					String tokenName = (String) token.get(NAME);
-					ThemePlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName)); //$NON-NLS-1$
-					continue;
-				}
+				// else
+				// {
+				// String tokenName = (String) token.get(NAME);
+				// // FIXME This is a separator!
+				//					ThemePlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName)); //$NON-NLS-1$
+				// continue;
+				// }
 			}
 
 			if (colors.containsKey(BACKGROUND))
@@ -132,7 +137,7 @@ public class TextmateImporter
 				}
 			}
 
-			value.append("^").append(scope);
+			value.append(Theme.SELECTOR_DELIMITER).append(scope);
 			radRailsProps.put(name, value.toString());
 		}
 

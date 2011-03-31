@@ -51,7 +51,7 @@ public class Theme
 	/**
 	 * Delimiter used to append the scope selector after the fg/bg/fontStyle for a rule.
 	 */
-	private static final String SELECTOR_DELIMITER = "^"; //$NON-NLS-1$
+	static final String SELECTOR_DELIMITER = "^"; //$NON-NLS-1$
 
 	static final String DELIMETER = ","; //$NON-NLS-1$
 
@@ -167,7 +167,9 @@ public class Theme
 				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
-			coloringRules.add(new ThemeRule(name, new ScopeSelector(scopeSelector), attribute));
+			// FIXME What do we do with rules meant to be separators? Skip scope selectors with empty string?
+			coloringRules.add(new ThemeRule(name,
+					new ScopeSelector(scopeSelector == null ? "" : scopeSelector), attribute)); //$NON-NLS-1$
 		}
 	}
 
