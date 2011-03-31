@@ -72,7 +72,6 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.FontDialog;
@@ -92,7 +91,6 @@ import org.eclipse.ui.themes.ITheme;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.scope.ScopeSelector;
-import com.aptana.scripting.model.BundleManager;
 import com.aptana.theme.ConsoleThemer;
 import com.aptana.theme.DelayedTextAttribute;
 import com.aptana.theme.IThemeManager;
@@ -1115,17 +1113,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		}
 		else if (source == fExportButton)
 		{
-			DirectoryDialog fileDialog = new DirectoryDialog(getShell(), SWT.SAVE);
+			FileDialog fileDialog = new FileDialog(getShell(), SWT.SAVE);
 			IDialogSettings editorSettings = ThemePlugin.getDefault().getDialogSettings();
 			String value = editorSettings.get(THEME_EXPORT_DIRECTORY);
 			if (value != null)
 			{
 				fileDialog.setFilterPath(value);
 			}
-			else
-			{
-				fileDialog.setFilterPath(BundleManager.getInstance().getUserBundlesPath());
-			}
+			fileDialog.setFileName(getTheme().getName() + ".tmTheme"); //$NON-NLS-1$
 			String path = fileDialog.open();
 			if (path == null)
 			{

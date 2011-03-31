@@ -320,7 +320,7 @@ public class Theme
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
-	private ThemeRule getRuleForSelector(IScopeSelector match)
+	ThemeRule getRuleForSelector(IScopeSelector match)
 	{
 		for (ThemeRule rule : coloringRules)
 		{
@@ -492,31 +492,6 @@ public class Theme
 	public List<ThemeRule> getTokens()
 	{
 		return coloringRules;
-	}
-
-	/**
-	 * Updates the TextAttribute for a token and immediately saves the theme. TODO take in a ScopeSelector, not a
-	 * String!
-	 * 
-	 * @param scopeSelector
-	 * @param at
-	 */
-	public void update(String scopeSelector, TextAttribute at)
-	{
-		RGBa fg = null;
-		if (at.getForeground() != null)
-		{
-			fg = new RGBa(at.getForeground().getRGB());
-		}
-		RGBa bg = null;
-		if (at.getBackground() != null)
-		{
-			bg = new RGBa(at.getBackground().getRGB());
-		}
-		coloringRules.add(new ThemeRule(scopeSelector, new ScopeSelector(scopeSelector), new DelayedTextAttribute(fg,
-				bg, at.getStyle())));
-		wipeCache();
-		save();
 	}
 
 	/**

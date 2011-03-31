@@ -1,5 +1,7 @@
 package com.aptana.theme;
 
+import java.text.MessageFormat;
+
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
 
@@ -60,5 +62,41 @@ public class ThemeRule
 	public void setScopeSelector(ScopeSelector scopeSelector)
 	{
 		this.fSelector = scopeSelector;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof ThemeRule))
+		{
+			return false;
+		}
+		ThemeRule other = (ThemeRule) obj;
+		if (!getName().equals(other.getName()))
+		{
+			return false;
+		}
+		if (!getScopeSelector().equals(other.getScopeSelector()))
+		{
+			return false;
+		}
+		if (!getTextAttribute().equals(other.getTextAttribute()))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
+
+	@Override
+	public String toString()
+	{
+		return MessageFormat.format(
+				"name: {0}; scope: {1}; style: {2}", getName(), getScopeSelector(), getTextAttribute()); //$NON-NLS-1$
 	}
 }

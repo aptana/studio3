@@ -23,15 +23,15 @@ public class ThemeExporter
 {
 
 	/**
-	 * Export a theme to ruby code that is placed in a ruble.
+	 * Export a theme to a *.tmTheme file.
 	 * 
-	 * @param themeDir
-	 *            Directory in which to place a bundle.rb file with the code for the theme.
+	 * @param themeFile
+	 *            The destination file
 	 * @param theme
 	 *            The theme to export to ruby (ruble) code
 	 */
 	@SuppressWarnings("nls")
-	public void export(File themeDir, Theme theme)
+	public void export(File themeFile, Theme theme)
 	{
 		// Spit out a tmTheme plist file!
 		StringBuilder buffer = new StringBuilder();
@@ -119,8 +119,6 @@ public class ThemeExporter
 		buffer.append("</dict>\n");
 		buffer.append("</plist>\n");
 
-		themeDir.mkdirs();
-		File themeFile = new File(themeDir, theme.getName() + ".tmTheme");
 		Writer writer = null;
 		try
 		{
