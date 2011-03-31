@@ -202,7 +202,8 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(255, 0, 0), theme.getTextAttribute("constant.language.js").getBackground().getRGB());
 		assertEquals(new RGB(255, 0, 0), theme.getBackgroundAsRGB("constant.language.js"));
 
-		theme.remove("constant.language.js");
+		ThemeRule rule = theme.getRuleForSelector(new ScopeSelector("constant.language.js"));
+		theme.remove(rule);
 
 		// Now check tokens
 		assertFalse(theme.hasEntry("constant.language.js"));

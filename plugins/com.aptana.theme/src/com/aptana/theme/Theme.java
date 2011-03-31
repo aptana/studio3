@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
@@ -503,9 +504,7 @@ public class Theme
 	 */
 	public List<ThemeRule> getTokens()
 	{
-		// FIXME Exposing the underlying collection means we have an issue with the cache not being wiped when rules are
-		// modified!
-		return coloringRules;
+		return Collections.unmodifiableList(coloringRules);
 	}
 
 	/**
@@ -584,7 +583,9 @@ public class Theme
 	private static String pad(String string, int desiredLength, char padChar)
 	{
 		while (string.length() < desiredLength)
+		{
 			string = padChar + string;
+		}
 		return string;
 	}
 
@@ -594,10 +595,14 @@ public class Theme
 		// use that as the "default"
 		IEclipsePreferences prefs = new DefaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		if (prefs == null)
+		{
 			return; // TODO Log something?
+		}
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		if (preferences == null)
+		{
 			return;
+		}
 		String value = preferences.get(getName(), null);
 		if (value == null)
 		{
@@ -681,20 +686,6 @@ public class Theme
 		}
 	}
 
-	/**
-	 * Removes a scope selector rule from the theme. TODO take in a ScopeSelector, not a String!
-	 * 
-	 * @param scopeSelector
-	 * @deprecated Remove
-	 */
-	public void remove(String scopeSelector)
-	{
-		ThemeRule rule = getRuleForSelector(new ScopeSelector(scopeSelector));
-		coloringRules.remove(rule);
-		wipeCache();
-		save();
-	}
-
 	public void reorderRule(int startIndex, int endIndex)
 	{
 		if (endIndex > startIndex)
@@ -709,6 +700,14 @@ public class Theme
 	public void addNewDefaultToken(int index, String newTokenName)
 	{
 		coloringRules.add(index, new ThemeRule(newTokenName, null, new DelayedTextAttribute(null)));
+		wipeCache();
+		save();
+	}
+
+	public void updateRule(int index, ThemeRule newRule)
+	{
+		coloringRules.remove(index);
+		coloringRules.add(index, newRule);
 		wipeCache();
 		save();
 	}
@@ -934,6 +933,8 @@ public class Theme
 	public void remove(ThemeRule entry)
 	{
 		coloringRules.remove(entry);
+		wipeCache();
+		save();
 	}
 
 }

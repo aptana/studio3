@@ -504,7 +504,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					}
 					TableItem tableItem = table.getItem(new Point(e.x, e.y));
 					ThemeRule token = (ThemeRule) tableItem.getData();
-					token.updateFG(new RGBa(newRGB));
+					int index = table.indexOf(tableItem);
+					getTheme().updateRule(index, token.updateFG(new RGBa(newRGB)));
 				}
 				else if (e.x > bgColX && e.x < (bgColX + bgColWidth)) // is user clicking in the BG column?
 				{
@@ -517,17 +518,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					}
 					TableItem tableItem = table.getItem(new Point(e.x, e.y));
 					ThemeRule token = (ThemeRule) tableItem.getData();
-					token.updateBG(new RGBa(newRGB));
+					int index = table.indexOf(tableItem);
+					getTheme().updateRule(index, token.updateBG(new RGBa(newRGB)));
 				}
 				else
 				{
 					return;
 				}
 
-				// Need to update the drawing of this row in the table!
-				TableItem tableItem = table.getItem(new Point(e.x, e.y));
-				Rectangle bounds = tableItem.getBounds(1);
-				table.redraw(bounds.x, bounds.y, bounds.width, bounds.height, true);
+				tableViewer.refresh();
+				addCustomTableEditorControls();
 			}
 		});
 
@@ -586,10 +586,10 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				{
 					return;
 				}
-				// FIXME How do we update the token in the theme?
-				token.setName(newName);
-				tableViewer.refresh(element);
-				getTheme().save();
+				// update the token in the theme
+				int index = getTheme().getTokens().indexOf(token);
+				getTheme().updateRule(index, token.setName(newName));
+				tableViewer.refresh();
 			}
 
 			@Override
@@ -691,7 +691,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				// Update the scope selector for the current token!
 				TableItem item = table.getSelection()[0];
 				ThemeRule rule = (ThemeRule) item.getData();
-				rule.setScopeSelector(new ScopeSelector(fScopeText.getText()));
+				int index = table.indexOf(item);
+				getTheme().updateRule(index, rule.setScopeSelector(new ScopeSelector(fScopeText.getText())));
 			}
 		});
 
@@ -915,7 +916,9 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					style |= SWT.ITALIC;
 				}
 
-				token.updateFontStyle(style);
+				int index = table.indexOf(item);
+				getTheme().updateRule(index, token.updateFontStyle(style));
+				tableViewer.refresh();
 			}
 		};
 		b.addSelectionListener(selectionAdapter);
@@ -958,12 +961,13 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				ThemeRule token = (ThemeRule) tableItem.getData();
 				if (index == 1)
 				{
-					token.updateFG(new RGBa(newRGB));
+					getTheme().updateRule(table.indexOf(tableItem), token.updateFG(new RGBa(newRGB)));
 				}
 				else
 				{
-					token.updateBG(new RGBa(newRGB));
+					getTheme().updateRule(table.indexOf(tableItem), token.updateBG(new RGBa(newRGB)));
 				}
+				tableViewer.refresh();
 			}
 		});
 	}

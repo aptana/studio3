@@ -84,12 +84,10 @@ public class TextmateImporter
 		tokenList.remove(0);
 		for (Map<String, Object> token : tokenList)
 		{
-			// FIXME Handle separators which have a name but no scope. They're useful visually for editing themes, but
-			// should be ignored in terms of actual rules
 			if (!token.containsKey(SCOPE))
+			{
 				continue;
-
-			String name = (String) token.get(NAME);
+			}
 
 			String scope = (String) token.get(SCOPE);
 			Map<String, Object> colors = (Map<String, Object>) token.get(SETTINGS);
@@ -100,17 +98,9 @@ public class TextmateImporter
 				String fg = (String) colors.get(FOREGROUND);
 				value.append(fg);
 			}
-			else
+			else if (colors.containsKey(BACKGROUND) || colors.containsKey(FONT_STYLE))
 			{
-				if (colors.containsKey(BACKGROUND) || colors.containsKey(FONT_STYLE))
-					value.append(radRailsProps.getProperty(Theme.FOREGROUND_PROP_KEY));
-				// else
-				// {
-				// String tokenName = (String) token.get(NAME);
-				// // FIXME This is a separator!
-				//					ThemePlugin.logWarning(MessageFormat.format("Token failed to import: {0}", tokenName)); //$NON-NLS-1$
-				// continue;
-				// }
+				value.append(radRailsProps.getProperty(Theme.FOREGROUND_PROP_KEY));
 			}
 
 			if (colors.containsKey(BACKGROUND))
@@ -138,6 +128,7 @@ public class TextmateImporter
 			}
 
 			value.append(Theme.SELECTOR_DELIMITER).append(scope);
+			String name = (String) token.get(NAME);
 			radRailsProps.put(name, value.toString());
 		}
 
