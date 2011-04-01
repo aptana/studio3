@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.ui.internal.commands;
+package com.aptana.ui.commands;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,27 +19,21 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.ui.UIPlugin;
 
-public class ReportBugCommandHandler extends AbstractHandler
+public class BrowserCommandHandler extends AbstractHandler
 {
 
-	private static final String REPORT_BUG_URL_STRING = "https://aptana.lighthouseapp.com/projects/35272-studio/tickets/new"; //$NON-NLS-1$
-	private static URL REPORT_BUG_URL;
+	private URL browserURL;
+	private String browserId;
 
-	static
+	public BrowserCommandHandler(String url, String browserId)
 	{
-		try
-		{
-			REPORT_BUG_URL = new URL(REPORT_BUG_URL_STRING);
-		}
-		catch (MalformedURLException e)
-		{
-			UIPlugin.log(e);
-		}
+		setURL(url);
+		this.browserId = browserId;
 	}
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		if (REPORT_BUG_URL == null)
+		if (browserURL == null)
 		{
 			return null;
 		}
@@ -52,13 +46,14 @@ public class ReportBugCommandHandler extends AbstractHandler
 			{
 				support.createBrowser(
 						IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-								| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS, "ReportBug", //$NON-NLS-1$
-						null, // Set the name to null. That way the browser tab will display the title of page loaded in the browser.
-						null).openURL(REPORT_BUG_URL);
+								| IWorkbenchBrowserSupport.AS_EDITOR | IWorkbenchBrowserSupport.STATUS, browserId,
+						null, // Set the name to null so that the browser tab will display the title of page loaded in
+								// the browser
+						null).openURL(browserURL);
 			}
 			else
 			{
-				support.getExternalBrowser().openURL(REPORT_BUG_URL);
+				support.getExternalBrowser().openURL(browserURL);
 			}
 		}
 		catch (PartInitException e)
@@ -67,5 +62,23 @@ public class ReportBugCommandHandler extends AbstractHandler
 		}
 
 		return null;
+	}
+
+	/**
+	 * Sets the url that the command should open.
+	 * 
+	 * @param url
+	 *            the url string
+	 */
+	protected void setURL(String url)
+	{
+		try
+		{
+			browserURL = new URL(url);
+		}
+		catch (MalformedURLException e)
+		{
+			UIPlugin.log(e);
+		}
 	}
 }

@@ -139,14 +139,14 @@
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.SendFeedbackCommandHandler"
+            defaultHandler="com.aptana.ui.commands.SendFeedbackCommandHandler"
             description="%SendFeedbackCommand.description"
             id="com.aptana.ui.command.sendfeedback"
             name="%SendFeedbackCommand.label">
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.ReportBugCommandHandler"
+            defaultHandler="com.aptana.ui.commands.ReportBugCommandHandler"
             description="%ReportBugCommand.description"
             id="com.aptana.ui.command.reportbug"
             name="%ReportBugCommand.label">
