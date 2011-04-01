@@ -5,15 +5,15 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>debugger@aptana.com</em:id>
-    <em:version>1.6.0</em:version>
+    <em:version>1.7.0</em:version>
     <em:type>2</em:type>
    
     <!-- Firefox -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>1.5</em:minVersion>
-        <em:maxVersion>3.7.*</em:maxVersion>
+        <em:minVersion>3.6</em:minVersion>
+        <em:maxVersion>4.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -31,20 +31,20 @@
         <!-- Firebug -->
         <em:id>firebug@software.joehewitt.com</em:id>
         <em:minVersion>1.2.0</em:minVersion>
-        <em:maxVersion>1.6.*</em:maxVersion>
+        <em:maxVersion>1.7.*</em:maxVersion>
         <em:homepageURL>http://www.getfirebug.com/</em:homepageURL>
         <em:updateURL>http://www.getfirebug.com/releases/update.rdf</em:updateURL>
       </Description>
     </em:requires>
 
     <em:name>Aptana Debugger</em:name>
-    <em:description>Aptana Studio Debugger Service (Requires Firebug 1.2/1.3/1.4/1.5/1.6)</em:description>
+    <em:description>Aptana Studio Debugger Service (Requires Firebug 1.2-1.7)</em:description>
     <em:creator>(c) Copyright Appcelerator, Inc. 2005-2011. All rights reserved.</em:creator>
     <em:contributor>Max Stepanov (Appcelerator, Inc.)</em:contributor>
     <em:iconURL>chrome://aptanadebugger/skin/aptana3232.png</em:iconURL>
     <em:homepageURL>http://www.aptana.com/</em:homepageURL>
     <em:aboutURL>chrome://aptanadebugger/content/about.xul</em:aboutURL>
-    <em:optionsURL>javascript:opener.openDialog('chrome://aptanadebugger/content/preferences.xul','','chrome,modal'); window.close();</em:optionsURL>
+    <em:optionsURL>chrome://aptanadebugger/content/preferences.xul</em:optionsURL>
     <em:updateURL>http://firefox.aptana.com/update/update.rdf</em:updateURL>
     <em:updateKey>
         MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCTuBw48dUYHXlI8AcKzils/Fqsu7zngHOk

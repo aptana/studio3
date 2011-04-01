@@ -16,7 +16,7 @@ function AptanaDebugger() {}
 
 // ************************************************************************************************
 
-const APTANA_DEBUGGER_VERSION = '1.6.0';
+const APTANA_DEBUGGER_VERSION = '1.7.0';
 const DEBUG = true;
 
 this.VERSION = APTANA_DEBUGGER_VERSION;

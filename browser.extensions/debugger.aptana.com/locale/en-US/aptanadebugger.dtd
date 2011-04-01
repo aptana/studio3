@@ -5,11 +5,11 @@
 <!ENTITY ad.about.version.label             "version">
 <!ENTITY ad.about.copyright                 "(c) Copyright Appcelerator, Inc. 2005-2011. All rights reserved.">
 <!ENTITY ad.about.homepage.label            "Find out more at">
-<!ENTITY ad.about.homepage.href             "http://www.appcelerator.com/">
+<!ENTITY ad.about.homepage.href             "http://www.aptana.com/">
 
 <!ENTITY ad.menu.about.label          "About Aptana Studio...">
 <!ENTITY ad.menu.website.label        "Website...">
-<!ENTITY ad.menu.website.href         "http://www.appcelerator.com/">
+<!ENTITY ad.menu.website.href         "http://www.aptana.com/">
 <!ENTITY ad.menu.forum.label          "Forums...">
 <!ENTITY ad.menu.forum.href           "http://aptanastudio.tenderapp.com/">
 <!ENTITY ad.menu.hide.label           "Hide">
