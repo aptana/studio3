@@ -56,4 +56,21 @@ public class DelayedTextAttribute
 		return builder.toString();
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof DelayedTextAttribute))
+		{
+			return false;
+		}
+		DelayedTextAttribute other = (DelayedTextAttribute) obj;
+		return toString().equals(other.toString());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
+	}
+
 }

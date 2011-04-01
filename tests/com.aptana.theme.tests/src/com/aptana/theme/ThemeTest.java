@@ -7,7 +7,7 @@
  */
 package com.aptana.theme;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -15,6 +15,8 @@ import junit.framework.TestCase;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+
+import com.aptana.scope.ScopeSelector;
 
 @SuppressWarnings("nls")
 public class ThemeTest extends TestCase
@@ -95,16 +97,15 @@ public class ThemeTest extends TestCase
 	public void testAddingTokens()
 	{
 		assertFalse(theme.hasEntry("chris"));
-		theme.addNewDefaultToken("chris");
+		theme.addNewDefaultToken(0, "chris");
 		assertTrue(theme.hasEntry("chris"));
 		assertEquals(new RGB(255, 0, 0), theme.getForegroundAsRGB("chris"));
 	}
 
 	public void testModifyingTokens()
 	{
-		TextAttribute at = new TextAttribute(colormanager.getColor(new RGB(128, 128, 128)),
-				colormanager.getColor(new RGB(64, 0, 64)), TextAttribute.UNDERLINE);
-		theme.update("constant", at);
+		ThemeRule rule = theme.getRuleForSelector(new ScopeSelector("constant"));
+		rule.setTextAttribute(new RGBa(128, 128, 128), new RGBa(64, 0, 64), TextAttribute.UNDERLINE);
 		assertEquals(new RGB(128, 128, 128), theme.getForegroundAsRGB("constant.language"));
 		assertEquals(new RGB(64, 0, 64), theme.getBackgroundAsRGB("constant.language"));
 	}
@@ -157,22 +158,16 @@ public class ThemeTest extends TestCase
 
 	public void testGetTokens()
 	{
-		Map<String, TextAttribute> tokens = theme.getTokens();
+		List<ThemeRule> tokens = theme.getTokens();
 		assertEquals(2, tokens.size());
-		assertTrue(tokens.containsKey("constant"));
-		assertTrue(tokens.containsKey("constant.language.js"));
-		assertFalse(tokens.containsKey("whatever"));
-		TextAttribute at = tokens.get("constant");
-		assertNotNull(at);
-		assertEquals(new RGB(0, 255, 0), at.getForeground().getRGB());
-		assertEquals(new RGB(255, 0, 255), at.getBackground().getRGB());
-		assertEquals(SWT.ITALIC, at.getStyle());
 
-		at = tokens.get("constant.language.js");
-		assertNotNull(at);
-		assertEquals(new RGB(0, 0, 0), at.getForeground().getRGB());
-		assertEquals(new RGB(255, 0, 0), at.getBackground().getRGB());
-		assertEquals(SWT.BOLD, at.getStyle());
+		assertTrue(tokens.contains(new ThemeRule("constant", new ScopeSelector("constant"), new DelayedTextAttribute(
+				new RGBa(0, 255, 0), new RGBa(255, 0, 255), SWT.ITALIC))));
+		assertTrue(tokens.contains(new ThemeRule("constant.language.js", new ScopeSelector("constant.language.js"),
+				new DelayedTextAttribute(new RGBa(0, 0, 0), new RGBa(255, 0, 0), SWT.BOLD))));
+
+		assertFalse(tokens.contains(new ThemeRule("whatever", new ScopeSelector("whatever"), new DelayedTextAttribute(
+				new RGBa(0, 0, 0), new RGBa(255, 0, 0), SWT.BOLD))));
 	}
 
 	public void testCopy()
@@ -207,7 +202,8 @@ public class ThemeTest extends TestCase
 		assertEquals(new RGB(255, 0, 0), theme.getTextAttribute("constant.language.js").getBackground().getRGB());
 		assertEquals(new RGB(255, 0, 0), theme.getBackgroundAsRGB("constant.language.js"));
 
-		theme.remove("constant.language.js");
+		ThemeRule rule = theme.getRuleForSelector(new ScopeSelector("constant.language.js"));
+		theme.remove(rule);
 
 		// Now check tokens
 		assertFalse(theme.hasEntry("constant.language.js"));

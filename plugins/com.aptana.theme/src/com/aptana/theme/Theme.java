@@ -14,12 +14,14 @@ import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -34,6 +36,7 @@ import org.osgi.service.prefs.Preferences;
 
 import com.aptana.scope.IScopeSelector;
 import com.aptana.scope.ScopeSelector;
+import com.aptana.theme.internal.OrderedProperties;
 import com.aptana.theme.internal.ThemeManager;
 
 /**
@@ -45,6 +48,11 @@ import com.aptana.theme.internal.ThemeManager;
  */
 public class Theme
 {
+
+	/**
+	 * Delimiter used to append the scope selector after the fg/bg/fontStyle for a rule.
+	 */
+	static final String SELECTOR_DELIMITER = "^"; //$NON-NLS-1$
 
 	static final String DELIMETER = ","; //$NON-NLS-1$
 
@@ -60,7 +68,7 @@ public class Theme
 	private static final String LINE_HIGHLIGHT_PROP_KEY = "lineHighlight"; //$NON-NLS-1$
 	private static final String CARET_PROP_KEY = "caret"; //$NON-NLS-1$
 
-	private Map<IScopeSelector, DelayedTextAttribute> coloringRules;
+	private List<ThemeRule> coloringRules;
 	private ColorManager colorManager;
 	private RGB defaultFG;
 	private RGBa lineHighlight;
@@ -84,7 +92,7 @@ public class Theme
 	public Theme(ColorManager colormanager, Properties props)
 	{
 		this.colorManager = colormanager;
-		coloringRules = new HashMap<IScopeSelector, DelayedTextAttribute>();
+		coloringRules = new ArrayList<ThemeRule>();
 		cache = new HashMap<String, TextAttribute>();
 		parseProps(props);
 		storeDefaults();
@@ -104,13 +112,22 @@ public class Theme
 		selection = parseHexRGBa((String) props.remove(SELECTION_PROP_KEY));
 		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
-		for (Entry<Object, Object> entry : props.entrySet())
+		Set<Object> propertyNames = props.keySet();
+		for (Object key : propertyNames)
 		{
-			String scopeSelector = (String) entry.getKey();
+			String name = (String) key;
 			int style = SWT.NORMAL;
 			RGBa foreground = null;
 			RGBa background = null;
-			List<String> values = tokenize((String) entry.getValue());
+			String value = props.getProperty(name);
+			String scopeSelector = name;
+			int selectorIndex = value.indexOf(SELECTOR_DELIMITER);
+			if (selectorIndex != -1)
+			{
+				scopeSelector = value.substring(selectorIndex + 1);
+				value = value.substring(0, selectorIndex);
+			}
+			List<String> values = tokenize(value);
 			// Handle empty fg with a bg color! If first token is just an empty value followed by a comma
 			int num = 0;
 			boolean skipFG = false;
@@ -152,7 +169,8 @@ public class Theme
 				num++;
 			}
 			DelayedTextAttribute attribute = new DelayedTextAttribute(foreground, background, style);
-			coloringRules.put(new ScopeSelector(scopeSelector), attribute);
+			coloringRules.add(new ThemeRule(name, scopeSelector == null ? null : new ScopeSelector(scopeSelector),
+					attribute));
 		}
 	}
 
@@ -252,7 +270,8 @@ public class Theme
 				return getParent(scope);
 			}
 			lastSelectorMatch = match;
-			DelayedTextAttribute attr = coloringRules.get(match);
+			ThemeRule rule = getRuleForSelector(match);
+			DelayedTextAttribute attr = rule.getTextAttribute();
 
 			// if our coloring has no background, we should use parent's. If it has some opacity (alpha != 255), we
 			// need to alpha blend
@@ -307,6 +326,22 @@ public class Theme
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
+	ThemeRule getRuleForSelector(IScopeSelector match)
+	{
+		for (ThemeRule rule : coloringRules)
+		{
+			if (rule.isSeparator())
+			{
+				continue;
+			}
+			if (rule.getScopeSelector().equals(match))
+			{
+				return rule;
+			}
+		}
+		return null;
+	}
+
 	protected DelayedTextAttribute getParent(String scope)
 	{
 		DelayedTextAttribute parentAttr = null;
@@ -326,7 +361,16 @@ public class Theme
 
 	private IScopeSelector findMatch(String scope)
 	{
-		return ScopeSelector.bestMatch(coloringRules.keySet(), scope);
+		Collection<IScopeSelector> selectors = new ArrayList<IScopeSelector>();
+		for (ThemeRule rule : coloringRules)
+		{
+			if (rule.isSeparator())
+			{
+				continue;
+			}
+			selectors.add(rule.getScopeSelector());
+		}
+		return ScopeSelector.bestMatch(selectors, scope);
 	}
 
 	private DelayedTextAttribute merge(DelayedTextAttribute childAttr, DelayedTextAttribute parentAttr)
@@ -459,38 +503,9 @@ public class Theme
 	 * 
 	 * @return
 	 */
-	public Map<String, TextAttribute> getTokens()
+	public List<ThemeRule> getTokens()
 	{
-		Map<String, TextAttribute> tokens = new HashMap<String, TextAttribute>();
-		for (Map.Entry<IScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
-		{
-			tokens.put(entry.getKey().toString(), toTextAttribute(entry.getValue(), false));
-		}
-		return tokens;
-	}
-
-	/**
-	 * Updates the TextAttribute for a token and immediately saves the theme. TODO take in a ScopeSelector, not a
-	 * String!
-	 * 
-	 * @param scopeSelector
-	 * @param at
-	 */
-	public void update(String scopeSelector, TextAttribute at)
-	{
-		RGBa fg = null;
-		if (at.getForeground() != null)
-		{
-			fg = new RGBa(at.getForeground().getRGB());
-		}
-		RGBa bg = null;
-		if (at.getBackground() != null)
-		{
-			bg = new RGBa(at.getBackground().getRGB());
-		}
-		coloringRules.put(new ScopeSelector(scopeSelector), new DelayedTextAttribute(fg, bg, at.getStyle()));
-		wipeCache();
-		save();
+		return Collections.unmodifiableList(coloringRules);
 	}
 
 	/**
@@ -500,19 +515,21 @@ public class Theme
 	 */
 	public Properties toProps()
 	{
-		Properties props = new Properties();
+		Properties props = new OrderedProperties();
 		props.put(THEME_NAME_PROP_KEY, getName());
 		props.put(SELECTION_PROP_KEY, toHex(getSelection()));
 		props.put(LINE_HIGHLIGHT_PROP_KEY, toHex(getLineHighlight()));
 		props.put(FOREGROUND_PROP_KEY, toHex(getForeground()));
 		props.put(BACKGROUND_PROP_KEY, toHex(getBackground()));
 		props.put(CARET_PROP_KEY, toHex(caret));
-		for (Map.Entry<IScopeSelector, DelayedTextAttribute> entry : coloringRules.entrySet())
+		for (ThemeRule rule : coloringRules)
 		{
-			if (entry.getKey() == null)
+			if (rule == null)
+			{
 				continue;
+			}
 			StringBuilder value = new StringBuilder();
-			DelayedTextAttribute attr = entry.getValue();
+			DelayedTextAttribute attr = rule.getTextAttribute();
 			RGBa color = attr.getForeground();
 			if (color != null)
 			{
@@ -540,14 +557,15 @@ public class Theme
 			{
 				value.deleteCharAt(value.length() - 1);
 			}
-			if (value.length() == 0)
-				continue;
-			props.put(entry.getKey().toString(), value.toString());
+			// Append the scope selector
+			value.append(SELECTOR_DELIMITER);
+			value.append(rule.getScopeSelector().toString());
+			props.put(rule.getName(), value.toString());
 		}
 		return props;
 	}
 
-	private String toHex(RGBa color)
+	static String toHex(RGBa color)
 	{
 		String rgbString = toHex(color.toRGB());
 		if (color.getAlpha() == 0)
@@ -557,16 +575,18 @@ public class Theme
 		return rgbString + pad(Integer.toHexString(color.getAlpha()), 2, '0');
 	}
 
-	private String toHex(RGB rgb)
+	static String toHex(RGB rgb)
 	{
 		return MessageFormat.format("#{0}{1}{2}", pad(Integer.toHexString(rgb.red), 2, '0'), pad(Integer //$NON-NLS-1$
 				.toHexString(rgb.green), 2, '0'), pad(Integer.toHexString(rgb.blue), 2, '0'));
 	}
 
-	private String pad(String string, int desiredLength, char padChar)
+	private static String pad(String string, int desiredLength, char padChar)
 	{
 		while (string.length() < desiredLength)
+		{
 			string = padChar + string;
+		}
 		return string;
 	}
 
@@ -576,10 +596,14 @@ public class Theme
 		// use that as the "default"
 		IEclipsePreferences prefs = new DefaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		if (prefs == null)
+		{
 			return; // TODO Log something?
+		}
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
 		if (preferences == null)
+		{
 			return;
+		}
 		String value = preferences.get(getName(), null);
 		if (value == null)
 		{
@@ -627,7 +651,7 @@ public class Theme
 		{
 			return;
 		}
-		Properties props = new Properties();
+		Properties props = new OrderedProperties();
 		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
 		coloringRules.clear();
 		wipeCache();
@@ -663,26 +687,28 @@ public class Theme
 		}
 	}
 
-	/**
-	 * Removes a scope selector rule from the theme. TODO take in a ScopeSelector, not a String!
-	 * 
-	 * @param scopeSelector
-	 */
-	public void remove(String scopeSelector)
+	public void reorderRule(int startIndex, int endIndex)
 	{
-		coloringRules.remove(new ScopeSelector(scopeSelector));
+		if (endIndex > startIndex)
+		{
+			endIndex--;
+		}
+		ThemeRule selected = coloringRules.remove(startIndex);
+		coloringRules.add(endIndex, selected);
+		save();
+	}
+
+	public void addNewDefaultToken(int index, String newTokenName)
+	{
+		coloringRules.add(index, new ThemeRule(newTokenName, null, new DelayedTextAttribute(null)));
 		wipeCache();
 		save();
 	}
 
-	/**
-	 * Adds a new token entry with no font styling, no bg, same FG as default for theme. TODO take in a ScopeSelector,
-	 * not a String!
-	 */
-	public void addNewDefaultToken(String scopeSelector)
+	public void updateRule(int index, ThemeRule newRule)
 	{
-		DelayedTextAttribute attr = new DelayedTextAttribute(null);
-		coloringRules.put(new ScopeSelector(scopeSelector), attr);
+		coloringRules.remove(index);
+		coloringRules.add(index, newRule);
 		wipeCache();
 		save();
 	}
@@ -783,7 +809,9 @@ public class Theme
 	 */
 	public boolean hasEntry(String scopeSelector)
 	{
-		return coloringRules.containsKey(new ScopeSelector(scopeSelector));
+		IScopeSelector selector = new ScopeSelector(scopeSelector);
+		ThemeRule rule = getRuleForSelector(selector);
+		return rule != null;
 	}
 
 	public Color getForeground(String scope)
@@ -901,6 +929,13 @@ public class Theme
 	public RGB getLineHighlightAgainstBG()
 	{
 		return alphaBlend(defaultBG, lineHighlight.toRGB(), lineHighlight.getAlpha());
+	}
+
+	public void remove(ThemeRule entry)
+	{
+		coloringRules.remove(entry);
+		wipeCache();
+		save();
 	}
 
 }
