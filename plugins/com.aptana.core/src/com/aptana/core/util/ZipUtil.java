@@ -19,6 +19,7 @@ import java.util.Enumeration;
 
 import org.apache.tools.zip.ZipEntry;
 import org.apache.tools.zip.ZipFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 
 /**
@@ -36,38 +37,54 @@ public final class ZipUtil {
 	/**
 	 * Extract zip file into specified local path
 	 * @param zipFile
-	 * @param path
+	 * @param destinationPath
 	 * @throws IOException
 	 */
-	public static void extract(File zipFile, File path) throws IOException {
-		extract(new ZipFile(zipFile), path);
+	public static void extract(File zipFile, File destinationPath) throws IOException {
+		extract(new ZipFile(zipFile), destinationPath);
 	}
 
 	/**
 	 * Extract zip file into specified local path
 	 * @param zip
-	 * @param path
+	 * @param destinationPath
 	 * @throws IOException
 	 */
-	public static void extract(ZipFile zip, File path) throws IOException {
-		extract(zip, zip.getEntries(), path);
+	public static void extract(ZipFile zip, File destinationPath) throws IOException {
+		extract(zip, zip.getEntries(), destinationPath);
+	}
+
+	/**
+	 * Open iput stream for specified zip entry
+	 * @param zipFile
+	 * @param path
+	 * @return
+	 * @throws IOException 
+	 */
+	public static InputStream openEntry(File zipFile, IPath path) throws IOException {
+		ZipFile zip = new ZipFile(zipFile);
+		ZipEntry entry = zip.getEntry(path.makeRelative().toPortableString());
+		if (entry != null) {
+			return zip.getInputStream(entry);
+		}
+		return null;
 	}
 	
 	/**
 	 * Extract specified list of entries from zip file to local path
 	 * @param zip
 	 * @param entries
-	 * @param path
+	 * @param destinationPath
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void extract(ZipFile zip, Enumeration entries, File path) throws IOException {
+	public static void extract(ZipFile zip, Enumeration entries, File destinationPath) throws IOException {
 		Collection collection = Collections.list(entries);
 		/* Create directories first */
 		for (Object i : collection) {
 			ZipEntry entry = (ZipEntry) i;
 			String name = entry.getName();
-			File file = new File(path, name);
+			File file = new File(destinationPath, name);
 			if (entry.isDirectory() && !file.exists()) {
 				file.mkdirs();
 			} else if (name.indexOf('/') != -1) {
@@ -83,7 +100,7 @@ public final class ZipUtil {
 		for (Object i : collection) {
 			ZipEntry entry = (ZipEntry) i;
 			String name = entry.getName();
-			File file = new File(path, name);
+			File file = new File(destinationPath, name);
 			if (!entry.isDirectory() && !file.exists()) {
 				if (!file.createNewFile()) {
 					continue;
