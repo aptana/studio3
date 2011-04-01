@@ -112,9 +112,10 @@ public class Theme
 		selection = parseHexRGBa((String) props.remove(SELECTION_PROP_KEY));
 		caret = parseHexRGB((String) props.remove(CARET_PROP_KEY), true);
 
-		Set<String> propertyNames = props.stringPropertyNames();
-		for (String name : propertyNames)
+		Set<Object> propertyNames = props.keySet();
+		for (Object key : propertyNames)
 		{
+			String name = (String) key;
 			int style = SWT.NORMAL;
 			RGBa foreground = null;
 			RGBa background = null;
