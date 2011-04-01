@@ -50,10 +50,10 @@ public abstract class MetadataReader extends ValidatingReader
 		// build entity map
 		ENTITY_MAP = new HashMap<String, String>();
 
-		ENTITY_MAP.put("&amp;", "&"); //$NON-NLS-1$
-		ENTITY_MAP.put("&quot;", "\""); //$NON-NLS-1$
-		ENTITY_MAP.put("&lt;", "<"); //$NON-NLS-1$
-		ENTITY_MAP.put("&gt;", ">"); //$NON-NLS-1$
+		ENTITY_MAP.put("&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&quot;", "\""); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&lt;", "<"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// build entity pattern
 		List<String> entities = new ArrayList<String>();
@@ -67,7 +67,7 @@ public abstract class MetadataReader extends ValidatingReader
 			entities.add(Pattern.quote(entity));
 		}
 
-		ENTITY_PATTERN = Pattern.compile(StringUtil.join("|", entities));
+		ENTITY_PATTERN = Pattern.compile(StringUtil.join("|", entities)); //$NON-NLS-1$
 	}
 
 	/**
