@@ -100,7 +100,7 @@ public class AbstractFormatterNodeBuilder
 	 *            Indicate that the matching of the characters should be done in a case sensitive way or not.
 	 * @return The offset of the char; The original offset is returned in case the search for the char failed.
 	 */
-	protected static int locateCharacterSkippingWhitespaces(FormatterDocument document, int startOffset, char c,
+	public static int locateCharacterSkippingWhitespaces(FormatterDocument document, int startOffset, char c,
 			boolean caseSensitive)
 	{
 		char toCheck = (caseSensitive) ? c : Character.toLowerCase(c);
@@ -121,6 +121,29 @@ public class AbstractFormatterNodeBuilder
 				continue;
 			}
 			break;
+		}
+		return startOffset;
+	}
+
+	/**
+	 * Returns the next non-white char offset. In case all the chars after the given start offset are white-spaces,
+	 * return the given start offset.
+	 * 
+	 * @param document
+	 * @param startOffset
+	 * @return The next non-white char; Or the given start-offset if all the chars right to the start offset were
+	 *         whitespaces.
+	 */
+	public int getNextNonWhiteCharOffset(FormatterDocument document, int startOffset)
+	{
+		int length = document.getLength();
+		for (int offset = startOffset; offset < length; offset++)
+		{
+			char charAt = document.charAt(offset);
+			if (!Character.isWhitespace(charAt))
+			{
+				return offset;
+			}
 		}
 		return startOffset;
 	}
