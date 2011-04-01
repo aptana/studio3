@@ -1,0 +1,5 @@
+<docs>
+	<summary>This is a summary
+		<para>With a new line of text</para>
+	</summary>
+</docs>
