@@ -22,7 +22,7 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 {
 
 	protected boolean commentOnPreviousLine;
-	
+
 	/**
 	 * @param document
 	 */
@@ -59,8 +59,8 @@ public class FormatterJSBlockNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return (commentOnPreviousLine || CodeFormatterConstants.NEW_LINE.equals(getDocument()
-				.getString(JSFormatterConstants.BRACE_POSITION_BLOCK)));
+		return (commentOnPreviousLine || CodeFormatterConstants.NEW_LINE.equals(getDocument().getString(
+				JSFormatterConstants.BRACE_POSITION_BLOCK)));
 	}
 
 	/*
