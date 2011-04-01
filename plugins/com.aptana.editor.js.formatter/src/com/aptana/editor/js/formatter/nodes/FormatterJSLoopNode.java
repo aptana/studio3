@@ -20,9 +20,9 @@ public class FormatterJSLoopNode extends FormatterJSBlockNode
 	/**
 	 * @param document
 	 */
-	public FormatterJSLoopNode(IFormatterDocument document, boolean hasCurlyBlock, boolean singleLineCommentOnPreviousLine)
+	public FormatterJSLoopNode(IFormatterDocument document, boolean hasCurlyBlock, boolean commentOnPreviousLine)
 	{
-		super(document, singleLineCommentOnPreviousLine);
+		super(document, commentOnPreviousLine);
 		this.hasCurlyBlock = hasCurlyBlock;
 	}
 

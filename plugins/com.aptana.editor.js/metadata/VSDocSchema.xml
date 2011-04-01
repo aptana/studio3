@@ -18,7 +18,6 @@
 		<child-element name="field"/>
 		<child-element name="include"/>
 		<child-element name="list"/>
-		<child-element name="para"/>
 		<child-element name="paramref"/>
 		<child-element name="permission"/>
 		<child-element name="remarks"/>
@@ -45,6 +44,8 @@
 		<attribute name="name"/>								<!-- string  -->
 		<attribute name="type"              usage="optional"/>	<!-- string  -->
 	</element>
+
+	<element name="para" onEnter="enterPara"/>
 
 	<element name="param" onEnter="enterParam" onExit="exitParam">
 		<attribute name="domElement"        usage="optional"/>	<!-- boolean -->
@@ -81,7 +82,9 @@
 		<attribute name="cref"/>
 	</element>
 
-	<element name="summary" onEnter="startTextBuffer" onExit="exitSummary"/>
+	<element name="summary" onEnter="startTextBuffer" onExit="exitSummary">
+		<child-element name="para"/>
+	</element>
 
 	<element name="userAgent" onEnter="enterUserAgent">
 		<attribute name="name"/>	<!-- string -->
