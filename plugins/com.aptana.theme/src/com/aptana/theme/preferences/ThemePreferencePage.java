@@ -111,6 +111,7 @@ import com.aptana.theme.ThemeExporter;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemeRule;
 
+@SuppressWarnings("restriction")
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener,
 		IInputValidator, IPropertyChangeListener
 {
@@ -1010,7 +1011,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		button.addSelectionListener(new SelectionAdapter()
 		{
-			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -1157,7 +1157,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	{
 	}
 
-	@SuppressWarnings("unchecked")
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();

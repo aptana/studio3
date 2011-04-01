@@ -265,7 +265,7 @@ public class JSModelFormatter
 
 				if (StringUtil.isEmpty(description) == false)
 				{
-					buffer.append(":\n").append(" \t").append(description); //$NON-NLS-1$
+					buffer.append(":\n").append(" \t").append(description); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				result.add(buffer.toString());

@@ -12,6 +12,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.git.ui.messages"; //$NON-NLS-1$
+
 	public static String DiffFormatter_NoContent;
 	public static String GitUIPlugin_0;
 	public static String GitUIPlugin_1;
@@ -24,6 +25,8 @@ public class Messages extends NLS
 	public static String GitUIPlugin_7;
 	public static String GitUIPlugin_8;
 	public static String GitUIPlugin_9;
+	public static String GitUIPlugin_ToggleMessage;
+
 	static
 	{
 		// initialize resource bundle
