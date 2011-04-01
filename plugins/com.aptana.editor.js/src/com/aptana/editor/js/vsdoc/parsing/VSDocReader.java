@@ -97,7 +97,7 @@ public class VSDocReader extends MetadataReader
 		if (this.isBufferingText())
 		{
 			// grab (normalized) content and add new line before paragraph
-			String text = this.getText() + "&x0A;";
+			String text = this.getText() + "&x0A;"; //$NON-NLS-1$
 
 			// restart text buffering
 			this.startTextBuffer();
