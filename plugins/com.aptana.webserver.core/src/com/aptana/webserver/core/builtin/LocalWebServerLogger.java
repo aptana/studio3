@@ -38,21 +38,18 @@ import org.apache.http.nio.protocol.EventListener;
 	 * @see org.apache.http.nio.protocol.EventListener#connectionOpen(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionOpen(NHttpConnection conn) {
-		System.out.println("connectionOpen"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionClosed(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionClosed(NHttpConnection conn) {
-		System.out.println("connectionClosed"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.http.nio.protocol.EventListener#connectionTimeout(org.apache.http.nio.NHttpConnection)
 	 */
 	public void connectionTimeout(NHttpConnection conn) {
-		System.out.println("connectionTimeout"); //$NON-NLS-1$
 	}
 
 }
