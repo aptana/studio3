@@ -37,6 +37,7 @@ var fb14p;
 var fb143p;
 var fb15p;
 var fb16p;
+var fb17p;
 var firebug_unMinimize;
 
 const self = this;
@@ -59,6 +60,7 @@ this.setHook("init",function(debuggr)
 	fb143p = (AptanaUtils.compareVersion(Firebug.version.substr(0,5), "1.4.3") >= 0);
 	fb15p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.5") >= 0);
 	fb16p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.6") >= 0);
+	fb17p = (AptanaUtils.compareVersion(Firebug.version.substr(0,3), "1.7") >= 0);
 	const AptanaDebuggerExtension = FBL.extend(Firebug.Extension,
 	{
 		// Firebug 1.4
@@ -398,7 +400,11 @@ this.setHook("init",function(debuggr)
 	Firebug.registerExtension(AptanaDebuggerExtension);
 	Firebug.Console.addListener(ConsoleListener);
 	Firebug.Spy.addListener(XHRSpyListener);
-	Firebug.registerEditor(AptanaEditor);
+	if (fb17p) {
+		Firebug.ExternalEditors.registerEditor(AptanaEditor);
+	} else {
+		Firebug.registerEditor(AptanaEditor);
+	}
 	
 	if (!fb15p)
 		Firebug.Console.isHostEnabled = 

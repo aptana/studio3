@@ -207,6 +207,12 @@ this.getShellService = function()
 
 this.findExtensionUpdate = function(extensionId,listener)
 {
+	// Firefox 4.0 implements new AddonManager. In case of Firefox 3.6 the module
+	// is not avaialble and there is an exception.
+	try {
+		Components.utils.import("resource://gre/modules/AddonManager.jsm");
+	} catch(e) {
+	} 
 	const extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
 											.getService(nsIExtensionManager);
 	var item = extensionManager.getItemForID(extensionId);
