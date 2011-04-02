@@ -7,7 +7,7 @@
 <dialog buttons="accept,extra1"
 		buttonlabelextra1="&ad.prefs.label;"
 		onaccept="close();"
-		ondialogextra1="openPreferences(); close();"
+		ondialogextra1="openPreferences();"
 		onload="onLoad(); sizeToContent();"
         title="&ad.about.title;"
         id="aptabadebugger-about-dialog"
