@@ -157,7 +157,9 @@ const debuggr =
 			return;
 		var fileName = script.fileName;
 		if ((fileName == '[Eval-script]') || (fileName.substr(0,11) == 'javascript:')
-			|| script.functionName == '_FirebugConsole') {
+			|| fileName.substr(0,15) == 'resource://gre/'
+			|| script.functionName == '_FirebugConsole'
+			|| script.functionName == '_createFirebugConsole') {
 			return;
 		}
 		var scriptKey = ""+fileName+":"+script.baseLineNumber+":"+script.functionName;
@@ -1503,7 +1505,8 @@ function enumerateScripts()
 	{
 		var scriptKey = ""+scripts[i].fileName+":"+scripts[i].baseLineNumber+":"+scripts[i].functionName;
 		var fileName = scripts[i].fileName;
-		if ( (scriptKey in loadedScripts) || (fileName == '[Eval-script]') || (fileName.substr(0,11) == 'javascript:'))
+		if ( (scriptKey in loadedScripts) || (fileName == '[Eval-script]') || (fileName.substr(0,11) == 'javascript:')
+			|| fileName.substr(0,15) == 'resource://gre/')
 		{
 			scripts.splice(i, 1);
 			--i;
