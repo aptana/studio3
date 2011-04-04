@@ -135,24 +135,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		selectAndReveal(newProject);
 		openIndexFile();
 
-		SamplesReference samplesRef;
-		if (localSample != null)
-		{
-			samplesRef = getSamplesReference(localSample);
-		}
-		else
-		{
-			samplesRef = remoteSample;
-		}
-		if (samplesRef != null)
-		{
-			ISampleProjectHandler projectHandler = samplesRef.getProjectHandler();
-			if (projectHandler != null)
-			{
-				projectHandler.projectCreated(newProject);
-			}
-		}
-
 		return true;
 	}
 
@@ -234,6 +216,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			{
 				doBasicCreateProject(newProjectHandle, description);
 				copySampleSource(newProjectHandle);
+				doPostProjectCreation();
 			}
 		}
 		catch (CoreException e)
@@ -361,6 +344,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				try
 				{
 					projectHandle.setDescription(projectDescription, null);
+					doPostProjectCreation();
 				}
 				catch (CoreException e)
 				{
@@ -368,6 +352,27 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			}
 		});
 		job.schedule();
+	}
+
+	private void doPostProjectCreation()
+	{
+		SamplesReference samplesRef;
+		if (localSample != null)
+		{
+			samplesRef = getSamplesReference(localSample);
+		}
+		else
+		{
+			samplesRef = remoteSample;
+		}
+		if (samplesRef != null)
+		{
+			ISampleProjectHandler projectHandler = samplesRef.getProjectHandler();
+			if (projectHandler != null)
+			{
+				projectHandler.projectCreated(newProject);
+			}
+		}
 	}
 
 	private void openIndexFile()
