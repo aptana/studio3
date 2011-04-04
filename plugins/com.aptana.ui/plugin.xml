@@ -174,7 +174,7 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:help?after=additions">
+            locationURI="menu:help?before=helpEnd">
          <menu
                id="aptanahelp"
                label="%Menu.Help.Aptana.label">
