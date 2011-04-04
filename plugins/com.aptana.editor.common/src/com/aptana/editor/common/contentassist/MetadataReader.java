@@ -10,6 +10,12 @@ package com.aptana.editor.common.contentassist;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -18,6 +24,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import com.aptana.core.util.StringUtil;
 import com.aptana.sax.Schema;
 import com.aptana.sax.SchemaBuilder;
 import com.aptana.sax.SchemaInitializationException;
@@ -25,10 +32,44 @@ import com.aptana.sax.ValidatingReader;
 
 public abstract class MetadataReader extends ValidatingReader
 {
+	private static final Map<String, String> ENTITY_MAP;
+	private static final Pattern ENTITY_PATTERN;
+	private static final Pattern LEADING_WHITESPACE = Pattern.compile("^\\s+"); //$NON-NLS-1$
+	private static final Pattern TRAILING_WHITESPACE = Pattern.compile("\\s+$"); //$NON-NLS-1$
+	private static final Pattern WHITESPACE = Pattern.compile("\\s+"); //$NON-NLS-1$
+
 	private boolean _bufferText;
 	private StringBuffer _textBuffer = new StringBuffer();
 	private Schema _metadataSchema;
-	
+
+	/*
+	 * static initializer
+	 */
+	static
+	{
+		// build entity map
+		ENTITY_MAP = new HashMap<String, String>();
+
+		ENTITY_MAP.put("&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&quot;", "\""); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&lt;", "<"); //$NON-NLS-1$ //$NON-NLS-2$
+		ENTITY_MAP.put("&gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// build entity pattern
+		List<String> entities = new ArrayList<String>();
+
+		// add character entity pattern first
+		entities.add("&(?:(\\\\d+)|x([a-zA-Z0-9]+));"); //$NON-NLS-1$
+
+		// now add entity names
+		for (String entity : ENTITY_MAP.keySet())
+		{
+			entities.add(Pattern.quote(entity));
+		}
+
+		ENTITY_PATTERN = Pattern.compile(StringUtil.join("|", entities)); //$NON-NLS-1$
+	}
+
 	/**
 	 * Process character data
 	 * 
@@ -43,25 +84,7 @@ public abstract class MetadataReader extends ValidatingReader
 			this._textBuffer.append(new String(buffer, offset, length));
 		}
 	}
-	
-	/**
-	 * decodes HTML encoded strings
-	 * 
-	 * @param text
-	 *            The text to decode
-	 * @return The decoded text
-	 */
-	protected String decodeHtml(String text)
-	{
-		String textTemp = text.replaceAll("&amp;", "&"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		textTemp = textTemp.replaceAll("&quot;", "\""); //$NON-NLS-1$//$NON-NLS-2$
-		textTemp = textTemp.replaceAll("&lt;", "<"); //$NON-NLS-1$ //$NON-NLS-2$
-		textTemp = textTemp.replaceAll("&gt;", ">"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		return textTemp;
-	}
-	
+
 	/**
 	 * getSchemaStream
 	 * 
@@ -77,12 +100,22 @@ public abstract class MetadataReader extends ValidatingReader
 	protected String getText()
 	{
 		String result = this._textBuffer.toString();
-		
+
 		// clear buffer and reset text buffering state
 		this._textBuffer.setLength(0);
 		this._bufferText = false;
-		
+
 		return result;
+	}
+
+	/**
+	 * isBufferingText
+	 * 
+	 * @return
+	 */
+	public boolean isBufferingText()
+	{
+		return this._bufferText;
 	}
 
 	/**
@@ -108,7 +141,7 @@ public abstract class MetadataReader extends ValidatingReader
 				{
 					String msg = Messages.MetadataReader_ErrorLoadingDocumentationXML;
 					Exception ie = new Exception(msg, e);
-	
+
 					throw ie;
 				}
 				finally
@@ -122,14 +155,14 @@ public abstract class MetadataReader extends ValidatingReader
 					{
 						String msg = Messages.MetadataReader_IOErrorProcessingDocumentationXML;
 						Exception ie = new Exception(msg, e);
-	
+
 						throw ie;
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the CSS metadata from the specified stream
 	 * 
@@ -171,13 +204,13 @@ public abstract class MetadataReader extends ValidatingReader
 
 				if (ex != null)
 				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML, new Object[] { ex
-							.getMessage() });
+					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML,
+							new Object[] { ex.getMessage() });
 				}
 				else
 				{
-					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML, new Object[] { e
-							.getMessage() });
+					msg = MessageFormat.format(Messages.MetadataReader_ErrorParsingDocumentationXML,
+							new Object[] { e.getMessage() });
 				}
 
 				Exception de = new Exception(msg, e);
@@ -193,7 +226,7 @@ public abstract class MetadataReader extends ValidatingReader
 			}
 		}
 	}
-	
+
 	/**
 	 * normalizeText
 	 * 
@@ -203,15 +236,100 @@ public abstract class MetadataReader extends ValidatingReader
 	public String normalizeText(String text)
 	{
 		String result = null;
-		
+
 		if (text != null)
 		{
-			result = text.replaceAll("\\s+", " ").trim();  //$NON-NLS-1$ //$NON-NLS-2$
+			result = LEADING_WHITESPACE.matcher(text).replaceAll(StringUtil.EMPTY);
+			result = TRAILING_WHITESPACE.matcher(result).replaceAll(StringUtil.EMPTY);
+			result = WHITESPACE.matcher(result).replaceAll(" "); //$NON-NLS-1$
 		}
-		
+
 		return result;
 	}
-	
+
+	/**
+	 * numericStringToString
+	 * 
+	 * @param text
+	 * @param base
+	 * @return
+	 */
+	private String numericStringToString(String text, int base)
+	{
+		String result = null;
+
+		if (text != null && text.length() > 0)
+		{
+			try
+			{
+				int charCode = Integer.parseInt(text, base);
+				char[] chars = Character.toChars(charCode);
+
+				result = new String(chars);
+			}
+			catch (NumberFormatException e)
+			{
+				// that string wasn't parse-able, so just return the origin text
+				result = text;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Resolve HTML entities to their string values
+	 * 
+	 * @param text
+	 *            The text to decode
+	 * @return The decoded text
+	 */
+	protected String resolveEntities(String text)
+	{
+		String result = text;
+
+		if (text != null && text.length() > 0)
+		{
+			// replace named entities
+			StringBuffer buffer = new StringBuffer();
+			Matcher m = ENTITY_PATTERN.matcher(text);
+
+			while (m.find())
+			{
+				// try group one as a decimal-encoded character
+				String replaceText = this.numericStringToString(m.group(1), 10);
+
+				if (replaceText == null)
+				{
+					// try group two as hexadecimal-encoded character
+					replaceText = this.numericStringToString(m.group(2), 16);
+				}
+
+				if (replaceText == null)
+				{
+					// try whatever matched as an entity name
+					replaceText = ENTITY_MAP.get(m.group());
+				}
+
+				if (replaceText == null)
+				{
+					// this should never happen, but fall back to original text in case all conversions failed
+					replaceText = m.group();
+				}
+
+				// append result
+				m.appendReplacement(buffer, replaceText);
+			}
+
+			// append remaining unmatched text
+			m.appendTail(buffer);
+
+			result = buffer.toString();
+		}
+
+		return result;
+	}
+
 	/**
 	 * start buffering text
 	 * 
@@ -224,7 +342,7 @@ public abstract class MetadataReader extends ValidatingReader
 	{
 		this._bufferText = true;
 	}
-	
+
 	/**
 	 * start buffering text
 	 * 

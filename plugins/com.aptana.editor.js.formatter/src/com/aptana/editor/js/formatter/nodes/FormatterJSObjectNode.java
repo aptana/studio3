@@ -24,12 +24,12 @@ public class FormatterJSObjectNode extends FormatterJSBlockNode
 
 	/**
 	 * @param document
-	 * @param singleLineCommentOnPreviousLine
+	 * @param commentOnPreviousLine
 	 * @param hasNameValuePairs
 	 */
-	public FormatterJSObjectNode(IFormatterDocument document, boolean singleLineCommentOnPreviousLine, JSObjectNode node)
+	public FormatterJSObjectNode(IFormatterDocument document, JSObjectNode node, boolean commentOnPreviousLine)
 	{
-		super(document, singleLineCommentOnPreviousLine);
+		super(document, commentOnPreviousLine);
 		this.node = node;
 	}
 

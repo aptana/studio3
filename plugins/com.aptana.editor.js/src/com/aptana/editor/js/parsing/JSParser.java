@@ -80,10 +80,9 @@ import com.aptana.parsing.ast.ParseRootNode;
  * <a href="http://beaver.sourceforge.net">Beaver</a> v0.9.6.1
  * from the grammar specification "JS.grammar".
  */
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ "unchecked", "rawtypes", "nls" })
 public class JSParser extends Parser implements IParser {
 
-	@SuppressWarnings("nls")
 	static final ParsingTables PARSING_TABLES = new ParsingTables(
 		"U9pjNGTyKsNtFkScQPk4lLesj43PYE9YYmCdGq0KHQR8a2bRXWmHH97fOCZUIxPxxu6AY7i" +
 		"huFgSuBxd$znxtpOtRKXxaz3o$xwR$CvztdcUSzxzjcbAbB6U7#AcT2Frvokf3tKnGbINpg" +

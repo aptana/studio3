@@ -111,6 +111,7 @@ import com.aptana.theme.ThemeExporter;
 import com.aptana.theme.ThemePlugin;
 import com.aptana.theme.ThemeRule;
 
+@SuppressWarnings("restriction")
 public class ThemePreferencePage extends PreferencePage implements IWorkbenchPreferencePage, SelectionListener,
 		IInputValidator, IPropertyChangeListener
 {
@@ -208,6 +209,8 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 	private Font fFont;
 	private Text fFontText;
+
+	private boolean reorderingRules = false;
 
 	@Override
 	protected Control createContents(Composite parent)
@@ -707,6 +710,20 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		source.addDragListener(new DragSourceAdapter()
 		{
+			@Override
+			public void dragStart(DragSourceEvent event)
+			{
+				reorderingRules = true;
+				super.dragStart(event);
+			}
+
+			@Override
+			public void dragFinished(DragSourceEvent event)
+			{
+				reorderingRules = false;
+				super.dragFinished(event);
+			}
+
 			public void dragSetData(DragSourceEvent event)
 			{
 				// Get the selected items in the drag source
@@ -736,17 +753,63 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 			public void dragOver(DropTargetEvent event)
 			{
-				event.feedback = DND.FEEDBACK_INSERT_AFTER | DND.FEEDBACK_INSERT_BEFORE | DND.FEEDBACK_SCROLL;
+				if (reorderingRules)
+				{
+					event.feedback = DND.FEEDBACK_INSERT_AFTER | DND.FEEDBACK_INSERT_BEFORE | DND.FEEDBACK_SCROLL;
+				}
+				else
+				{
+					// Don't show insertion feedback if it's a button!
+					event.feedback = DND.FEEDBACK_SCROLL;
+				}
 			}
 
 			public void drop(DropTargetEvent event)
 			{
 				if (TextTransfer.getInstance().isSupportedType(event.currentDataType))
 				{
-					// Get the dropped data
+					String data = (String) event.data;
+					// Handle drgagging of fg/bg color to remove it
+					if (data.startsWith("button:")) //$NON-NLS-1$
+					{
+						String[] parts = data.split(":"); //$NON-NLS-1$
+						int row = Integer.parseInt(parts[1]);
+						int fgBg = Integer.parseInt(parts[2]);
+
+						TableItem item = table.getItem(row);
+						Rectangle bounds = item.getBounds(fgBg);
+						bounds = event.display.map(table, null, bounds);
+						if (bounds.contains(event.x, event.y))
+						{
+							// Hasn't been dragged out of it's area, don't do anything
+							return;
+						}
+						// remove the fg or bg for the rule
+						ThemeRule rule = (ThemeRule) item.getData();
+						if (fgBg == 1)
+						{
+							getTheme().updateRule(row, rule.updateFG(null));
+						}
+						else
+						{
+							getTheme().updateRule(row, rule.updateBG(null));
+						}
+						tableViewer.refresh(true);
+
+						event.display.asyncExec(new Runnable()
+						{
+
+							public void run()
+							{
+								addCustomTableEditorControls();
+							}
+						});
+						return;
+					}
+					// It's not a button drag to remove the fg/bg, so...
+					// Re-order rules
 					DropTarget target = (DropTarget) event.widget;
 					Table table = (Table) target.getControl();
-					String data = (String) event.data;
 					int selectionIndex = Integer.parseInt(data);
 
 					TableItem item = (TableItem) event.item;
@@ -754,6 +817,7 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					getTheme().reorderRule(selectionIndex, insertionIndex);
 					tableViewer.refresh(true);
 					addCustomTableEditorControls();
+
 				}
 			}
 		});
@@ -947,7 +1011,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 
 		button.addSelectionListener(new SelectionAdapter()
 		{
-			@SuppressWarnings("unchecked")
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -968,6 +1031,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 					getTheme().updateRule(table.indexOf(tableItem), token.updateBG(new RGBa(newRGB)));
 				}
 				tableViewer.refresh();
+			}
+		});
+
+		// Allow dragging the button out of it's location to remove the fg/bg for the rule!
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		final DragSource source = new DragSource(button, DND.DROP_MOVE);
+		source.setTransfer(types);
+
+		source.addDragListener(new DragSourceAdapter()
+		{
+			public void dragSetData(DragSourceEvent event)
+			{
+				event.data = "button:" + table.indexOf(tableItem) + ":" + index; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
 	}
@@ -1081,7 +1157,6 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	{
 	}
 
-	@SuppressWarnings("unchecked")
 	public void widgetSelected(SelectionEvent e)
 	{
 		Object source = e.getSource();

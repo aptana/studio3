@@ -31,7 +31,8 @@ function test(){
 }
 ==FORMATTED==
 function test() {
-    switch /*1*/(/*2*/z)/*4*/ {
+    switch /*1*/(/*2*/z)/*4*/
+    {
         case 2:
             a();
             b();

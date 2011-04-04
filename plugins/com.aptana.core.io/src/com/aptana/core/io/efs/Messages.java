@@ -21,6 +21,7 @@ public class Messages extends NLS // NO_UCD
 	public static String SyncUtils_ERR_Reading;
 	public static String SyncUtils_ERR_Writing;
 
+	public static String WorkspaceFile_CreateFolderTask;
 	public static String WorkspaceFileSystem_FetchingTreeError;
 
 	static

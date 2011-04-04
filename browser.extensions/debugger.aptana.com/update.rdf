@@ -6,14 +6,14 @@
 		<RDF:Seq>
 			<RDF:li>
 				<RDF:Description>
-					<em:version>1.6.0</em:version>
+					<em:version>1.7.0</em:version>
 					
 					<em:targetApplication>
 						<RDF:Description>
 							<!-- Mozilla Firefox, version 1.5 to 3.6+ -->
 							<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 							<em:minVersion>1.5</em:minVersion>
-							<em:maxVersion>3.6.*</em:maxVersion>
+							<em:maxVersion>4.0.*</em:maxVersion>
 							<em:updateLink>http://firefox.aptana.com/update/aptanadebugger.xpi</em:updateLink>
 							<em:updateHash>sha256:afb24e703726aecf0499b03cbfdf28691d4d229ef99d791ab45916c1be5f4d75</em:updateHash>
 						</RDF:Description>

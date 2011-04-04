@@ -49,8 +49,8 @@ public class ProtocolLogger {
 		file.getParentFile().mkdirs();
 		try {
 			writer = new PrintWriter(new FileOutputStream(file), true);
-			writer.println(MessageFormat.format("Logger started at: {0,date,full}", new Date())); //$NON-NLS-1$
-			writer.println(MessageFormat.format("Compoment: {0}", pluginId)); //$NON-NLS-1$
+			writer.println(MessageFormat.format("Logger started at: {0,date,full} {0,time,full}", new Date())); //$NON-NLS-1$
+			writer.println(MessageFormat.format("Component: {0}", pluginId)); //$NON-NLS-1$
 			writer.println(MessageFormat.format("Version: {0}", EclipseUtil.getPluginVersion(pluginId))); //$NON-NLS-1$
 		} catch (FileNotFoundException e) {
 			throw new DebugException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, DebugException.TARGET_REQUEST_FAILED, StringUtil.EMPTY, e));
