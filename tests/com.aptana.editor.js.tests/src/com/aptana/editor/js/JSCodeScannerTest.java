@@ -138,6 +138,36 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("constant.numeric.js"), 23, 2);
 	}
 
+	public void testHexNumbers()
+	{
+		// @formatter:off
+		String[][] lists = {
+			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
+			{ "0" },
+			{ "x", "X" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
+	}
+
+	public void testScientificNotation()
+	{
+		// @formatter:off
+		String[][] lists = {
+			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
+			{ "1", ".9", "1.9" },
+			{ "e", "E" },
+			{ "+", "-", "" },
+			{ "10" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
+	}
+
 	public void testConstantWords()
 	{
 		String src = "true false null Infinity NaN undefined super this debugger";
