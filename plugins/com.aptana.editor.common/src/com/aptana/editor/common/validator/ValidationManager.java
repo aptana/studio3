@@ -113,31 +113,47 @@ public class ValidationManager implements IValidationManager
 		if (fResourceUri != null)
 		{
 			Map<String, List<IValidationItem>> itemsByType = new HashMap<String, List<IValidationItem>>();
-			ValidatorReference validatorRef = getValidatorRef(language);
-			if (validatorRef != null)
+			List<ValidatorReference> validatorRefs = getValidatorRefs(language);
+			for (ValidatorReference validatorRef : validatorRefs)
 			{
-				List<IValidationItem> items = validatorRef.getValidator().validate(source, fResourceUri, this);
-				itemsByType.put(validatorRef.getType(), items);
+				List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
+				String type = validatorRef.getType();
+				List<IValidationItem> items = itemsByType.get(type);
+				if (items == null)
+				{
+					items = new ArrayList<IValidationItem>();
+					itemsByType.put(type, items);
+				}
+				items.addAll(newItems);
+
 				// checks nested languages
 				for (String nestedLanguage : fNestedLanguages)
 				{
 					processNestedLanguage(nestedLanguage, itemsByType);
 				}
-				update(itemsByType);
 			}
+			update(itemsByType);
 		}
 	}
 
 	private void processNestedLanguage(String nestedLanguage, Map<String, List<IValidationItem>> itemsByType)
 	{
-		ValidatorReference validatorRef = getValidatorRef(nestedLanguage);
-		if (validatorRef != null)
+		List<ValidatorReference> validatorRefs = getValidatorRefs(nestedLanguage);
+		for (ValidatorReference validatorRef : validatorRefs)
 		{
 			IValidator validator = validatorRef.getValidator();
 			IParseNode rootAST = fFileService.getParseResult();
-			List<IValidationItem> items = new ArrayList<IValidationItem>();
-			processASTForNestedLanguage(rootAST, nestedLanguage, validator, items);
-			itemsByType.put(validatorRef.getType(), items);
+			List<IValidationItem> newItems = new ArrayList<IValidationItem>();
+			processASTForNestedLanguage(rootAST, nestedLanguage, validator, newItems);
+
+			String type = validatorRef.getType();
+			List<IValidationItem> items = itemsByType.get(type);
+			if (items == null)
+			{
+				items = new ArrayList<IValidationItem>();
+				itemsByType.put(type, items);
+			}
+			items.addAll(newItems);
 		}
 	}
 
@@ -327,8 +343,10 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	private static ValidatorReference getValidatorRef(String language)
+	private static List<ValidatorReference> getValidatorRefs(String language)
 	{
+		List<ValidatorReference> result = new ArrayList<ValidatorReference>();
+
 		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
 				.getString(getSelectedValidatorsPrefKey(language));
@@ -337,7 +355,7 @@ public class ValidationManager implements IValidationManager
 			// by default uses the first validator that supports the language
 			if (validatorRefs.size() > 0)
 			{
-				return validatorRefs.get(0);
+				result.add(validatorRefs.get(0));
 			}
 		}
 		else
@@ -349,12 +367,13 @@ public class ValidationManager implements IValidationManager
 				{
 					if (validator.getName().equals(name))
 					{
-						return validator;
+						result.add(validator);
+						break;
 					}
 				}
 			}
 		}
-		return null;
+		return result;
 	}
 
 	private static ISchedulingRule getMarkerRule(Object resource)
