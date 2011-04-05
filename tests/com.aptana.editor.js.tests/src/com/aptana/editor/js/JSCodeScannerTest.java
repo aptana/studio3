@@ -21,7 +21,60 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	{
 		return new JSCodeScanner();
 	}
-	
+
+	protected void enumerateLists(String[][] lists, String tokenType)
+	{
+		// accumulator used to determine the number of enumerations we have
+		int count = 1;
+
+		// current offset within each sub-list
+		int[] offsets = new int[lists.length];
+
+		// initialize offsets and and get total enumeration count
+		for (int i = 0; i < lists.length; i++)
+		{
+			offsets[i] = 0;
+
+			count *= lists[i].length;
+		}
+
+		// walk through all enumerations
+		for (int enumeration = 0; enumeration < count; enumeration++)
+		{
+			StringBuilder buffer = new StringBuilder();
+
+			// concatenate the current item from each sub-list into a single string
+			for (int i = 0; i < lists.length; i++)
+			{
+				buffer.append(lists[i][offsets[i]]);
+			}
+
+			// create document, scan, and check token type
+			String src = buffer.toString();
+			IDocument document = new Document(src);
+			scanner.setRange(document, 0, src.length());
+			assertToken(getToken(tokenType), 0, src.length());
+
+			// advance each offset, taking carries into account
+			for (int j = lists.length - 1; j >= 0; j--)
+			{
+				int current = offsets[j] + 1;
+
+				if (current > lists[j].length - 1)
+				{
+					// reset offset and continue processing to account for carry
+					offsets[j] = 0;
+				}
+				else
+				{
+					// value is in range, save it and stop processing
+					offsets[j] = current;
+					break;
+				}
+			}
+		}
+	}
+
 	public void testBasicTokenizing()
 	{
 		String src = "var one = 1;";
