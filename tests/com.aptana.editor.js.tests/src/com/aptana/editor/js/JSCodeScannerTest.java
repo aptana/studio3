@@ -30,7 +30,7 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		// current offset within each sub-list
 		int[] offsets = new int[lists.length];
 
-		// initialize offsets and and get total enumeration count
+		// initialize offsets and get total enumeration count
 		for (int i = 0; i < lists.length; i++)
 		{
 			offsets[i] = 0;
