@@ -11,16 +11,71 @@ import org.eclipse.jface.text.rules.IWordDetector;
 
 class JSNumberDetector implements IWordDetector
 {
+	/**
+	 * isWordStart
+	 * 
+	 * @param c
+	 */
 	public boolean isWordStart(char c)
 	{
-		return Character.isDigit(c) || c == '.';
+		return isWordPart(c);
 	}
 
+	/**
+	 * isWordPart
+	 * 
+	 * @param c
+	 */
 	public boolean isWordPart(char c)
 	{
-		if (isWordStart(c))
-			return true;
-		char lower = Character.toLowerCase(c);
-		return lower == 'a' || lower == 'b' || lower == 'c' || lower == 'd' || lower == 'e' || lower == 'f' || lower == 'x';
+		boolean result;
+
+		switch (c)
+		{
+			// leading plus or minus and plus or minus on exponent
+			case '-':
+			case '+':
+
+				// decimal point
+			case '.':
+
+				// decimal digits
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+
+				// hex digits - also covers e and E in scientific notation
+			case 'a':
+			case 'b':
+			case 'c':
+			case 'd':
+			case 'e':
+			case 'f':
+			case 'A':
+			case 'B':
+			case 'C':
+			case 'D':
+			case 'E':
+			case 'F':
+
+				// leading 0x and 0X for hex numbers
+			case 'x':
+			case 'X':
+				result = true;
+				break;
+
+			default:
+				result = false;
+				break;
+		}
+
+		return result;
 	}
 }

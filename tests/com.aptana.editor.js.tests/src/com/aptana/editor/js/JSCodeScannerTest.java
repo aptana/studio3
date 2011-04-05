@@ -21,7 +21,60 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 	{
 		return new JSCodeScanner();
 	}
-	
+
+	protected void enumerateLists(String[][] lists, String tokenType)
+	{
+		// accumulator used to determine the number of enumerations we have
+		int count = 1;
+
+		// current offset within each sub-list
+		int[] offsets = new int[lists.length];
+
+		// initialize offsets and get total enumeration count
+		for (int i = 0; i < lists.length; i++)
+		{
+			offsets[i] = 0;
+
+			count *= lists[i].length;
+		}
+
+		// walk through all enumerations
+		for (int enumeration = 0; enumeration < count; enumeration++)
+		{
+			StringBuilder buffer = new StringBuilder();
+
+			// concatenate the current item from each sub-list into a single string
+			for (int i = 0; i < lists.length; i++)
+			{
+				buffer.append(lists[i][offsets[i]]);
+			}
+
+			// create document, scan, and check token type
+			String src = buffer.toString();
+			IDocument document = new Document(src);
+			scanner.setRange(document, 0, src.length());
+			assertToken(getToken(tokenType), 0, src.length());
+
+			// advance each offset, taking carries into account
+			for (int j = lists.length - 1; j >= 0; j--)
+			{
+				int current = offsets[j] + 1;
+
+				if (current > lists[j].length - 1)
+				{
+					// reset offset and continue processing to account for carry
+					offsets[j] = 0;
+				}
+				else
+				{
+					// value is in range, save it and stop processing
+					offsets[j] = current;
+					break;
+				}
+			}
+		}
+	}
+
 	public void testBasicTokenizing()
 	{
 		String src = "var one = 1;";
@@ -83,6 +136,36 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 		assertToken(getToken("constant.numeric.js"), 19, 3);
 		assertToken(Token.WHITESPACE, 22, 1);
 		assertToken(getToken("constant.numeric.js"), 23, 2);
+	}
+
+	public void testHexNumbers()
+	{
+		// @formatter:off
+		String[][] lists = {
+			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
+			{ "0" },
+			{ "x", "X" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" },
+			{ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "A", "B", "C", "D", "E", "F" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
+	}
+
+	public void testScientificNotation()
+	{
+		// @formatter:off
+		String[][] lists = {
+			//{ "+", "-", "" },	// TODO: apparently the scanner can't differentiate between 5 + 10 and 5 + +10?
+			{ "1", ".9", "1.9" },
+			{ "e", "E" },
+			{ "+", "-", "" },
+			{ "10" }
+		};
+		// @formatter:on
+
+		this.enumerateLists(lists, "constant.numeric.js");
 	}
 
 	public void testConstantWords()
