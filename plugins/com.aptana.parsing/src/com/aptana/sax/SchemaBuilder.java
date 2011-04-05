@@ -654,9 +654,12 @@ public final class SchemaBuilder extends ValidatingReader
 			ISchemaElement set = this._sets.get(id);
 			ISchemaElement[] children = set.getTransitionElements();
 
-			for (ISchemaElement child : children)
+			if (children != null)
 			{
-				this._currentElement.addTransition(child);
+				for (ISchemaElement child : children)
+				{
+					this._currentElement.addTransition(child);
+				}
 			}
 		}
 		else
