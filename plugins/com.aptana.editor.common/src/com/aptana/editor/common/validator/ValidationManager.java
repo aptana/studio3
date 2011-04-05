@@ -9,6 +9,7 @@ package com.aptana.editor.common.validator;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +49,7 @@ public class ValidationManager implements IValidationManager
 	private String fCurrentLanguage;
 	// the nested languages that need to be validated as well
 	private Set<String> fNestedLanguages;
+	private Map<String, List<IValidationItem>> fItemsByType;
 
 	private IPropertyChangeListener fPropertyListener = new IPropertyChangeListener()
 	{
@@ -71,6 +73,7 @@ public class ValidationManager implements IValidationManager
 	{
 		fFileService = fileService;
 		fNestedLanguages = new HashSet<String>();
+		fItemsByType = new HashMap<String, List<IValidationItem>>();
 		CommonEditorPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(fPropertyListener);
 	}
 
@@ -112,27 +115,32 @@ public class ValidationManager implements IValidationManager
 
 		if (fResourceUri != null)
 		{
-			Map<String, List<IValidationItem>> itemsByType = new HashMap<String, List<IValidationItem>>();
+			Collection<List<IValidationItem>> values = fItemsByType.values();
+			for (List<IValidationItem> items : values)
+			{
+				items.clear();
+			}
+
 			List<ValidatorReference> validatorRefs = getValidatorRefs(language);
 			for (ValidatorReference validatorRef : validatorRefs)
 			{
 				List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
 				String type = validatorRef.getType();
-				List<IValidationItem> items = itemsByType.get(type);
+				List<IValidationItem> items = fItemsByType.get(type);
 				if (items == null)
 				{
 					items = new ArrayList<IValidationItem>();
-					itemsByType.put(type, items);
+					fItemsByType.put(type, items);
 				}
 				items.addAll(newItems);
 
 				// checks nested languages
 				for (String nestedLanguage : fNestedLanguages)
 				{
-					processNestedLanguage(nestedLanguage, itemsByType);
+					processNestedLanguage(nestedLanguage, fItemsByType);
 				}
 			}
-			update(itemsByType);
+			update(fItemsByType);
 		}
 	}
 
