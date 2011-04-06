@@ -17,6 +17,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 
 import com.aptana.scope.ScopeSelector;
+import com.aptana.theme.internal.OrderedProperties;
 
 @SuppressWarnings("nls")
 public class ThemeTest extends TestCase
@@ -29,7 +30,7 @@ public class ThemeTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		Properties props = new Properties();
+		Properties props = new OrderedProperties();
 		props.put("background", "#ffffff");
 		props.put("foreground", "#ff0000");
 		props.put("caret", "#00ff00");
@@ -98,6 +99,8 @@ public class ThemeTest extends TestCase
 	{
 		assertFalse(theme.hasEntry("chris"));
 		theme.addNewDefaultToken(0, "chris");
+		ThemeRule rule = theme.getTokens().get(0);
+		theme.updateRule(0, rule.setScopeSelector(new ScopeSelector("chris")));
 		assertTrue(theme.hasEntry("chris"));
 		assertEquals(new RGB(255, 0, 0), theme.getForegroundAsRGB("chris"));
 	}
@@ -105,7 +108,9 @@ public class ThemeTest extends TestCase
 	public void testModifyingTokens()
 	{
 		ThemeRule rule = theme.getRuleForSelector(new ScopeSelector("constant"));
-		rule.setTextAttribute(new RGBa(128, 128, 128), new RGBa(64, 0, 64), TextAttribute.UNDERLINE);
+		int index = theme.getTokens().indexOf(rule);
+		theme.updateRule(index,
+				rule.setTextAttribute(new RGBa(128, 128, 128), new RGBa(64, 0, 64), TextAttribute.UNDERLINE));
 		assertEquals(new RGB(128, 128, 128), theme.getForegroundAsRGB("constant.language"));
 		assertEquals(new RGB(64, 0, 64), theme.getBackgroundAsRGB("constant.language"));
 	}
