@@ -10,6 +10,7 @@ package com.aptana.editor.xml;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -73,12 +74,6 @@ public class OpenTagCloser implements VerifyKeyListener
 			if (closeTag == null)
 				return;
 
-			// Check to see if this tag is already closed...
-			if (TagUtil.tagClosed(document, openTag))
-			{
-				return;
-			}
-
 			final StringBuffer buffer = new StringBuffer();
 			// check if the char already exists next in doc! This is the special case of when we auto-paired the '<>' in
 			// linked mode...
@@ -92,6 +87,15 @@ public class OpenTagCloser implements VerifyKeyListener
 			{
 				buffer.append(event.character);
 			}
+
+			// Check to see if this tag is already closed...
+			IDocument copy = new Document(document.get());
+			copy.replace(offset, length, buffer.toString());
+			if (TagUtil.tagClosed(copy, openTag))
+			{
+				return;
+			}
+
 			buffer.append(closeTag);
 			document.replace(offset, length, buffer.toString());
 			if (nextIsLessThan || overwrite)
