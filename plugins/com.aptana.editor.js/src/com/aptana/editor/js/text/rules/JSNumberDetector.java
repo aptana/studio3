@@ -11,6 +11,11 @@ import org.eclipse.jface.text.rules.IWordDetector;
 
 class JSNumberDetector implements IWordDetector
 {
+	private char _lastChar;
+	private boolean _inExponent;
+	private boolean _seenDecimalPoint;
+	private boolean _inHex;
+
 	/**
 	 * isWordStart
 	 * 
@@ -18,6 +23,12 @@ class JSNumberDetector implements IWordDetector
 	 */
 	public boolean isWordStart(char c)
 	{
+		// reset state
+		this._lastChar = '\0';
+		this._inExponent = false;
+		this._seenDecimalPoint = false;
+		this._inHex = false;
+
 		return isWordPart(c);
 	}
 
@@ -30,16 +41,29 @@ class JSNumberDetector implements IWordDetector
 	{
 		boolean result;
 
+		// NOTE: There's no need to set flags on success only since the overall rule will fail anyway
 		switch (c)
 		{
 			// leading plus or minus and plus or minus on exponent
 			case '-':
 			case '+':
+				result = (this._lastChar == '\0' || this._lastChar == 'e' || this._lastChar == 'E');
+				break;
 
-				// decimal point
+			// leading 0x and 0X for hex numbers
+			case 'x':
+			case 'X':
+				result = (this._lastChar == '0');
+				this._inHex = true;
+				break;
+
+			// decimal point
 			case '.':
+				result = (this._inExponent == false && this._seenDecimalPoint == false);
+				this._seenDecimalPoint = true;
+				break;
 
-				// decimal digits
+			// decimal digits
 			case '0':
 			case '1':
 			case '2':
@@ -50,31 +74,36 @@ class JSNumberDetector implements IWordDetector
 			case '7':
 			case '8':
 			case '9':
+				result = true;
+				break;
 
-				// hex digits - also covers e and E in scientific notation
+			// hex digits - e and E are covered in the scientific notation logic below
 			case 'a':
 			case 'b':
 			case 'c':
 			case 'd':
-			case 'e':
 			case 'f':
 			case 'A':
 			case 'B':
 			case 'C':
 			case 'D':
-			case 'E':
 			case 'F':
+				result = this._inHex;
+				break;
 
-				// leading 0x and 0X for hex numbers
-			case 'x':
-			case 'X':
-				result = true;
+			// exponent
+			case 'e':
+			case 'E':
+				result = (this._inHex || this._inExponent == false);
+				this._inExponent = (this._inHex == false);
 				break;
 
 			default:
 				result = false;
 				break;
 		}
+
+		this._lastChar = c;
 
 		return result;
 	}
