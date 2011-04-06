@@ -299,4 +299,28 @@ public class JSCodeScannerTest extends AbstractTokenScannerTestCase
 
 		assertToken(getToken("source.js"), 0, 9);
 	}
+
+	public void testNumberRegression()
+	{
+		String src = "var i = 1+\n//\n2;";
+		IDocument document = new Document(src);
+		scanner.setRange(document, 0, src.length());
+
+		assertToken(getToken("storage.type.js"), 0, 3);
+		assertToken(Token.WHITESPACE, 3, 1);
+		assertToken(getToken("source.js"), 4, 1);
+		assertToken(Token.WHITESPACE, 5, 1);
+		assertToken(getToken("keyword.operator.js"), 6, 1);
+		assertToken(Token.WHITESPACE, 7, 1);
+		assertToken(getToken("constant.numeric.js"), 8, 1);
+		assertToken(getToken("keyword.operator.js"), 9, 1);
+		assertToken(Token.WHITESPACE, 10, 1);
+		assertToken(getToken("keyword.operator.js"), 11, 1); // technically not correct, but this scanner doesn't
+																// encounter comments normally
+		assertToken(getToken("keyword.operator.js"), 12, 1); // technically not correct, but this scanner doesn't
+																// encounter comments normally
+		assertToken(Token.WHITESPACE, 13, 1);
+		assertToken(getToken("constant.numeric.js"), 14, 1);
+		assertToken(getToken("punctuation.terminator.statement.js"), 15, 1);
+	}
 }
