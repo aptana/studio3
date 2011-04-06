@@ -24,18 +24,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.wizard.DeployWizard;
 
 public class RedHatDeployWizardPage extends WizardPage
 {
-
-	/**
-	 * App types allowed by Red Hat. TODO How can we generate this list programmatically? I'm assuming new versions of
-	 * the service will offer different options!
-	 */
-	private static final String RACK_1_1_0 = "rack-1.1.0"; //$NON-NLS-1$
-	private static final String WSGI_3_2_1 = "wsgi-3.2.1"; //$NON-NLS-1$
-	private static final String PHP_5_3_2 = "php-5.3.2"; //$NON-NLS-1$
 
 	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
 
@@ -83,9 +76,9 @@ public class RedHatDeployWizardPage extends WizardPage
 
 		typeCombo = new Combo(appSettings, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
 		typeCombo.setLayoutData(new GridData(250, SWT.DEFAULT));
-		typeCombo.add(PHP_5_3_2);
-		typeCombo.add(RACK_1_1_0);
-		typeCombo.add(WSGI_3_2_1);
+		typeCombo.add(RedHatAPI.PHP_5_3_2);
+		typeCombo.add(RedHatAPI.RACK_1_1_0);
+		typeCombo.add(RedHatAPI.WSGI_3_2_1);
 		typeCombo.setText(getDefaultType(getProject()));
 
 		Dialog.applyDialogFont(composite);
@@ -100,15 +93,15 @@ public class RedHatDeployWizardPage extends WizardPage
 			{
 				if (natureId.contains("ruby")) //$NON-NLS-1$
 				{
-					return RACK_1_1_0;
+					return RedHatAPI.RACK_1_1_0;
 				}
 				else if (natureId.contains("php")) //$NON-NLS-1$
 				{
-					return PHP_5_3_2;
+					return RedHatAPI.PHP_5_3_2;
 				}
 				else if (natureId.contains("python")) //$NON-NLS-1$
 				{
-					return WSGI_3_2_1;
+					return RedHatAPI.WSGI_3_2_1;
 				}
 			}
 		}
@@ -116,7 +109,7 @@ public class RedHatDeployWizardPage extends WizardPage
 		{
 			Activator.logError(e);
 		}
-		return PHP_5_3_2;
+		return RedHatAPI.PHP_5_3_2;
 	}
 
 	protected String getProjectName()

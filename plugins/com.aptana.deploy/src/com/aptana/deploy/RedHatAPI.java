@@ -15,6 +15,14 @@ public class RedHatAPI
 {
 
 	/**
+	 * App types allowed by Red Hat. TODO How can we generate this list programmatically? I'm assuming new versions of
+	 * the service will offer different options!
+	 */
+	public static final String RACK_1_1_0 = "rack-1.1.0"; //$NON-NLS-1$
+	public static final String WSGI_3_2_1 = "wsgi-3.2.1"; //$NON-NLS-1$
+	public static final String PHP_5_3_2 = "php-5.3.2"; //$NON-NLS-1$
+
+	/**
 	 * The binary scripts we wrap.
 	 */
 	private static final String USER_INFO_SCRIPT = "rhc-user-info"; //$NON-NLS-1$

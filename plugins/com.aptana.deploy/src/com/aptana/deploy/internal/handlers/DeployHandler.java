@@ -74,6 +74,10 @@ public class DeployHandler extends AbstractHandler
 		{
 			deployWithEngineYard();
 		}
+		else if (type == DeployType.RED_HAT)
+		{
+			deployWithRedHat();
+		}
 		return null;
 	}
 
@@ -133,6 +137,13 @@ public class DeployHandler extends AbstractHandler
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
 		terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
+	}
+
+	private void deployWithRedHat()
+	{
+		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+				selectedProject.getLocation());
+		terminal.sendInput("git push\n"); //$NON-NLS-1$
 	}
 
 	private void deployWithFTP()
