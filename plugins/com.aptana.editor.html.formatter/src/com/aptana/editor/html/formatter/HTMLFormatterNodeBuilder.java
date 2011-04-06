@@ -293,8 +293,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// In case one or more spaces exist left or right to the text, we have to maintain them in order to
 			// keep the HTML output the same. The browser will treat multiple spaces as one space, so we can trim down
 			// to one.
-			int textStartOffset = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
-			int textEndOffset = getEndWithoutWhiteSpaces(endNodeStartingOffset - 1, document);
+			int textStartOffset = getBeginWithoutSpacesAndTabs(beginNodeRange.getEndingOffset() + 1, document);
+			int textEndOffset = getEndWithoutSpacesAndTabs(endNodeStartingOffset - 1, document);
 			if (textStartOffset > 0 && document.charAt(textStartOffset - 1) == ' ')
 			{
 				textStartOffset--;
@@ -325,9 +325,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						textEndOffset + 1);
 				formatterNode.addChild(contentFormatterNode);
 				createdContentNode = true;
-
 			}
-
 		}
 
 		if (createdContentNode)
@@ -336,7 +334,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		else
 		{
-			checkedPop(formatterNode, getEndWithoutWhiteSpaces(endOffset - 1, document) + 1);
+			checkedPop(formatterNode, endOffset - 1);
 		}
 		formatterNode.setEnd(createTextNode(document, endOffset, node.getEndingOffset() + 1));
 		return formatterNode;
@@ -347,12 +345,13 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param document2
 	 * @return
 	 */
-	private int getBeginWithoutWhiteSpaces(int offset, FormatterDocument document)
+	private int getBeginWithoutSpacesAndTabs(int offset, FormatterDocument document)
 	{
 		int length = document.getLength();
 		while (offset < length)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)))
+			char charAt = document.charAt(offset);
+			if (!Character.isWhitespace(charAt) || charAt == '\n' || charAt == '\r')
 			{
 				break;
 			}
@@ -366,11 +365,12 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 * @param document2
 	 * @return
 	 */
-	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
+	private int getEndWithoutSpacesAndTabs(int offset, FormatterDocument document)
 	{
 		while (offset > 0)
 		{
-			if (!Character.isWhitespace(document.charAt(offset)))
+			char charAt = document.charAt(offset);
+			if (!Character.isWhitespace(charAt) || charAt == '\n' || charAt == '\r')
 			{
 				break;
 			}
@@ -379,4 +379,17 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return offset;
 	}
 
+	private int getEndWithoutWhiteSpaces(int offset, FormatterDocument document)
+	{
+		while (offset > 0)
+		{
+			char charAt = document.charAt(offset);
+			if (!Character.isWhitespace(charAt))
+			{
+				break;
+			}
+			offset--;
+		}
+		return offset;
+	}
 }

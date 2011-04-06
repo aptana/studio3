@@ -51,7 +51,8 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 	 * Blank lines constants
 	 */
 	protected static final String[] BLANK_LINES = { HTMLFormatterConstants.LINES_AFTER_ELEMENTS,
-			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS, HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS };
+			HTMLFormatterConstants.LINES_BEFORE_NON_HTML_ELEMENTS,
+			HTMLFormatterConstants.LINES_AFTER_NON_HTML_ELEMENTS, HTMLFormatterConstants.PRESERVED_LINES };
 
 	private String lineSeparator;
 
