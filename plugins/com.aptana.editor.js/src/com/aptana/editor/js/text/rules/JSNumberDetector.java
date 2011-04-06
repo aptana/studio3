@@ -44,10 +44,10 @@ class JSNumberDetector implements IWordDetector
 		// NOTE: There's no need to set flags on success only since the overall rule will fail anyway
 		switch (c)
 		{
-			// leading plus or minus and plus or minus on exponent
+			// plus or minus on exponent
 			case '-':
 			case '+':
-				result = (this._lastChar == '\0' || this._lastChar == 'e' || this._lastChar == 'E');
+				result = (this._lastChar == 'e' || this._lastChar == 'E');
 				break;
 
 			// leading 0x and 0X for hex numbers

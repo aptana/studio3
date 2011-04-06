@@ -574,6 +574,8 @@ public class JSParserTest extends TestCase
 		parseTest("for (var a in obj) {show(a);}" + EOL);
 	}
 
+	// bug and regression tests here
+
 	public void testSDocComment() throws Exception
 	{
 		fScanner.setSource("/**/");
@@ -583,6 +585,44 @@ public class JSParserTest extends TestCase
 
 		assertEquals(1, comments.size());
 	}
+
+	public void testPlusNegativeNumber() throws Exception
+	{
+		parseTest("var x = 5 + -3" + EOL);
+		parseTest("var x = 5+ -3" + EOL, "var x = 5 + -3" + EOL);
+		parseTest("var x = 5 +-3" + EOL, "var x = 5 + -3" + EOL);
+		parseTest("var x = 5+-3" + EOL, "var x = 5 + -3" + EOL);
+	}
+
+	public void testPlusPositiveNumber() throws Exception
+	{
+		parseTest("var x = 5 + +3" + EOL);
+		parseTest("var x = 5+ +3" + EOL, "var x = 5 + +3" + EOL);
+
+		// NOTE: The following commented tests are currently failing
+		// parseTest("var x = 5 ++3" + EOL, "var x = 5 + +3" + EOL);
+		// parseTest("var x = 5++3" + EOL, "var x = 5 + +3" + EOL);
+	}
+
+	public void testMinusNegativeNumber() throws Exception
+	{
+		parseTest("var x = 5 - -3" + EOL);
+		parseTest("var x = 5- -3" + EOL, "var x = 5 - -3" + EOL);
+
+		// NOTE: The following commented tests are currently failing
+		// parseTest("var x = 5 --3" + EOL, "var x = 5 - -3" + EOL);
+		// parseTest("var x = 5--3" + EOL, "var x = 5 - -3" + EOL);
+	}
+
+	public void testMinusPositiveNumber() throws Exception
+	{
+		parseTest("var x = 5 - +3" + EOL);
+		parseTest("var x = 5- +3" + EOL, "var x = 5 - +3" + EOL);
+		parseTest("var x = 5 -+3" + EOL, "var x = 5 - +3" + EOL);
+		parseTest("var x = 5-+3" + EOL, "var x = 5 - +3" + EOL);
+	}
+
+	// utility methods
 
 	protected void parseTest(String source) throws Exception
 	{
