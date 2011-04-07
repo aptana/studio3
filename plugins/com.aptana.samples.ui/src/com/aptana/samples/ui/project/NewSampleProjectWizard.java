@@ -13,7 +13,10 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
@@ -56,6 +59,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.core.util.StringUtil;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
@@ -344,11 +348,25 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				try
 				{
 					projectHandle.setDescription(projectDescription, null);
-					doPostProjectCreation();
 				}
 				catch (CoreException e)
 				{
 				}
+
+				DisconnectHandler disconnect = new DisconnectHandler();
+				List<IResource> selection = new ArrayList<IResource>();
+				selection.add(projectHandle);
+				disconnect.setSelectedResources(selection);
+				try
+				{
+					disconnect.execute(new ExecutionEvent());
+				}
+				catch (ExecutionException e)
+				{
+					SamplesUIPlugin.logError(Messages.NewSampleProjectWizard_ERR_FailToDisconnect, e);
+				}
+
+				doPostProjectCreation();
 			}
 		});
 		job.schedule();
