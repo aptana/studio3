@@ -165,7 +165,7 @@ public class RedHatAPI
 			if (binScript == null)
 			{
 				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), MessageFormat.format(
-						"Unable to find script '{0}'. Please ensure you have the Red Hat Libra gem installed.",
+						"Unable to find script ''{0}''. Please ensure you have the Red Hat Libra gem installed.",
 						scriptName));
 			}
 		}
