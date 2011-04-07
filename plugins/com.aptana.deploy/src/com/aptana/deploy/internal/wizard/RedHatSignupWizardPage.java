@@ -157,6 +157,13 @@ public class RedHatSignupWizardPage extends WizardPage
 	@Override
 	public boolean isPageComplete()
 	{
+		IStatus apiCheck = new RedHatAPI().verifyGemInstalled();
+		if (!apiCheck.isOK())
+		{
+			setErrorMessage(apiCheck.getMessage());
+			return false;
+		}
+
 		String desiredNamespace = this.namespace.getText();
 		// Verify alphanumeric, max 16 chars!
 		if (desiredNamespace == null || desiredNamespace.trim().length() < 1
@@ -167,7 +174,7 @@ public class RedHatSignupWizardPage extends WizardPage
 		}
 
 		String userId = this.userId.getText();
-		if (userId == null || userId.trim().length() < 1)
+		if (userId == null || userId.trim().length() < 6)
 		{
 			setErrorMessage(Messages.RedHatSignupWizardPage_EmptyUserIDError);
 			return false;

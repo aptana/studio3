@@ -1,5 +1,7 @@
 package com.aptana.deploy;
 
+import java.text.MessageFormat;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -147,6 +149,27 @@ public class RedHatAPI
 		IStatus status = ProcessUtil.runInBackground(binScript == null ? args[0] : binScript.toOSString(), null,
 				ShellExecutable.getEnvironment(), newArgs);
 		return status;
+	}
+
+	/**
+	 * Make sure we can find the scripts we need to wrap!
+	 * 
+	 * @return
+	 */
+	public IStatus verifyGemInstalled()
+	{
+		String[] scripts = new String[] { CREATE_DOMAIN_SCRIPT, CREATE_APP_SCRIPT, USER_INFO_SCRIPT };
+		for (String scriptName : scripts)
+		{
+			IPath binScript = ExecutableUtil.find(scriptName, false, null);
+			if (binScript == null)
+			{
+				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), MessageFormat.format(
+						"Unable to find script '{0}'. Please ensure you have the Red Hat Libra gem installed.",
+						scriptName));
+			}
+		}
+		return Status.OK_STATUS;
 	}
 
 }
