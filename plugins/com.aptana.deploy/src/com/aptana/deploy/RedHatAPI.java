@@ -115,7 +115,7 @@ public class RedHatAPI
 		// FIXME If we have an existing project, with an existing repo, we may need to specify -n to not do a git
 		// clone/pull
 		return run(CREATE_APP_SCRIPT, APPNAME_SWITCH, appName, APP_TYPE_SWITCH, type, REPO_PATH_SWITCH,
-				pathToNewRepo.toOSString());
+				quote(pathToNewRepo.toOSString()));
 	}
 
 	public IStatus createDomain(String namespace)
@@ -146,9 +146,24 @@ public class RedHatAPI
 		newArgs[1] = login;
 		newArgs[2] = PASSWORD_SWITCH;
 		newArgs[3] = password;
-		IStatus status = ProcessUtil.runInBackground(binScript == null ? args[0] : binScript.toOSString(), null,
+		IStatus status = ProcessUtil.runInBackground(binScript == null ? args[0] : quote(binScript.toOSString()), null,
 				ShellExecutable.getEnvironment(), newArgs);
 		return status;
+	}
+
+	/**
+	 * Wrap a string in double quotes in case it contains spaces
+	 * 
+	 * @param toQuote
+	 * @return
+	 */
+	private String quote(String toQuote)
+	{
+		if (toQuote.contains(" ")) //$NON-NLS-1$
+		{
+			return "\"" + toQuote + "\""; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		return toQuote;
 	}
 
 	/**
