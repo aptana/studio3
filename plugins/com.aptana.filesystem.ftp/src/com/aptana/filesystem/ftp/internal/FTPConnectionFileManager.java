@@ -143,8 +143,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 
 	protected void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
-		if (clientInterface.connected())
-		{
+		if (clientInterface.connected()) {
 			return;
 		}
 		FTPClient newFtpClient = (FTPClient) clientInterface;
@@ -476,7 +475,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 	}
 
-	private boolean serverSupportsFeature(String feature) {
+	protected boolean serverSupportsFeature(String feature) {
 		if (serverFeatures != null) {
 			return serverFeatures.contains(feature);
 		}
@@ -1202,8 +1201,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		return sb.toString();
 	}
 
-	public FTPClient newClient()
-	{
+	public FTPClient newClient() {
 		return new ProFTPClient();
 	}
 }
