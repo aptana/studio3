@@ -30,7 +30,6 @@ import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.io.vfs.IFileTreeVisitor;
 import com.aptana.core.util.URLEncoder;
 import com.aptana.ide.core.io.InfiniteProgressMonitor;
-import com.aptana.ide.core.io.preferences.CloakingUtils;
 
 /**
  * @author Max Stepanov
@@ -164,10 +163,6 @@ import com.aptana.ide.core.io.preferences.CloakingUtils;
 	 */
 	@Override
 	public void copy(IFileStore destination, int options, IProgressMonitor monitor) throws CoreException {
-	    if (CloakingUtils.isFileCloaked(this)) {
-	        // file is cloaked from transferring
-	        return;
-	    }
 		if (destination instanceof VirtualFile) {
 			if (((VirtualFile) destination).toCanonicalURI().equals(toCanonicalURI())) {
 				//nothing to do
