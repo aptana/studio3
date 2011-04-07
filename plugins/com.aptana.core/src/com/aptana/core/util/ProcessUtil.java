@@ -176,13 +176,12 @@ public abstract class ProcessUtil
 		}
 		catch (IOException e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			return new Status(IStatus.ERROR, CorePlugin.PLUGIN_ID, e.getMessage(), e);
 		}
 		catch (CoreException e)
 		{
-			CorePlugin.logError(e.getMessage(), e);
+			return e.getStatus();
 		}
-		return null;
 	}
 
 	/**
