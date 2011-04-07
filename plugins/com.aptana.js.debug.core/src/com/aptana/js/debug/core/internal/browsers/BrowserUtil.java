@@ -172,7 +172,8 @@ public final class BrowserUtil {
 		} else if (InternetExplorer.isBrowserExecutable(browserExecutable) && isIEDebuggerAvailable()) {
 			IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 					.append("AptanaDebugger.dll"); //$NON-NLS-1$
-			boolean available = dllPath.toFile().exists() && dllPath.addFileExtension("registered").toFile().exists(); //$NON-NLS-1$
+			IPath registeredPath = dllPath.addFileExtension("registered");
+			boolean available = dllPath.toFile().exists() && registeredPath.toFile().exists(); //$NON-NLS-1$
 
 			if (available) {
 				/* refresh dll file */
@@ -184,9 +185,10 @@ public final class BrowserUtil {
 							new File(currentDllPath).getAbsolutePath()) == 0);
 
 					// Update dll
-					if (file.exists()) {
-						if (file.delete()) {
+					if (!pathMatch || file.lastModified() != registeredPath.toFile().lastModified()) {
+						if (!dllPath.addFileExtension("noupdate").toFile().exists() && file.delete()) {
 							extractFile(IE_PLUGIN_ID, EXTENSION_LOCAL_PATH[2], file);
+							pathMatch = false;
 						} else if (!pathMatch) {
 							resetBrowserCache(browserExecutable);
 							return false;
@@ -217,6 +219,7 @@ public final class BrowserUtil {
 						if (currentDllPath == null
 								|| file.getAbsolutePath().compareTo(new File(currentDllPath).getAbsolutePath()) != 0) {
 							available = false;
+							registeredPath.toFile().setLastModified(file.lastModified());
 						}
 
 					}
@@ -399,6 +402,8 @@ public final class BrowserUtil {
 								dllPath.toOSString() }, -1);
 					}
 					dllPath.addFileExtension("registered").toFile().createNewFile(); //$NON-NLS-1$
+					dllPath.addFileExtension("registered").toFile().setLastModified(file.lastModified());
+
 				} catch (IOException e) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.BrowserUtil_InstallError, e));
