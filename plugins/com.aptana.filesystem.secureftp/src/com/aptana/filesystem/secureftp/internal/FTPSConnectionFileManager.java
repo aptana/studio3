@@ -29,15 +29,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PerformanceStats;
 import org.eclipse.core.runtime.Status;
 
-import com.aptana.filesystem.ftp.internal.FTPClientPool;
-import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
-import com.aptana.ide.core.io.ConnectionContext;
-import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.filesystem.ftp.FTPPlugin;
 import com.aptana.filesystem.ftp.IFTPConstants;
 import com.aptana.filesystem.ftp.Policy;
+import com.aptana.filesystem.ftp.internal.FTPClientPool;
+import com.aptana.filesystem.ftp.internal.FTPConnectionFileManager;
 import com.aptana.filesystem.secureftp.IFTPSConnectionFileManager;
 import com.aptana.filesystem.secureftp.IFTPSConstants;
+import com.aptana.ide.core.io.ConnectionContext;
+import com.aptana.ide.core.io.CoreIOPlugin;
 import com.enterprisedt.net.ftp.FTPClient;
 import com.enterprisedt.net.ftp.FTPClientInterface;
 import com.enterprisedt.net.ftp.FTPConnectMode;
@@ -282,8 +282,7 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 	 */
 	@Override
 	public void initAndAuthFTPClient(FTPClientInterface newFtpClient, IProgressMonitor monitor) throws IOException, FTPException {
-		if (newFtpClient.connected())
-		{
+		if (newFtpClient.connected()) {
 			return;
 		}
 		SSLFTPClient newFtpsClient = (SSLFTPClient) newFtpClient;
@@ -296,6 +295,18 @@ public class FTPSConnectionFileManager extends FTPConnectionFileManager implemen
 		Policy.checkCanceled(monitor);
 		if (!newFtpsClient.isImplicitFTPS()) {
 			newFtpsClient.auth(securityMechanism);
+		}
+		try {
+			if (serverSupportsFeature("PBSZ")) { //$NON-NLS-1$
+				newFtpsClient.pbsz(0);
+			}
+			if (serverSupportsFeature("PROT")) { //$NON-NLS-1$
+				newFtpsClient.prot(SSLFTPClient.PROT_PRIVATE);
+			}
+		} catch (FTPException e) {
+			if (serverSupportsFeature("PROT")) { //$NON-NLS-1$
+				newFtpsClient.prot(SSLFTPClient.PROT_CLEAR);
+			}
 		}
 		newFtpsClient.login(login, String.copyValueOf(password));
 		monitor.worked(1);
