@@ -85,7 +85,7 @@ public abstract class IOUtil
 				}
 			}
 
-			// emit the reset of the stream into the output buffer
+			// emit the rest of the stream into the output buffer
 			char[] buffer = new char[1024 * 4];
 			int read = 0;
 
