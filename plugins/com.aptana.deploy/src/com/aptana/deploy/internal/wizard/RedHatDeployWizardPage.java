@@ -8,45 +8,38 @@
 package com.aptana.deploy.internal.wizard;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.Activator;
-import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.wizard.DeployWizard;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.ui.util.SWTUtils;
 
-public class HerokuDeployWizardPage extends WizardPage
+public class RedHatDeployWizardPage extends WizardPage
 {
 
-	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
+	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
 
-	public static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
+	public static final String NAME = "RedHatDeploy"; //$NON-NLS-1$
 
 	private Text appName;
-	private Button publishButton;
+	private Combo typeCombo;
 
-	protected HerokuDeployWizardPage()
+	protected RedHatDeployWizardPage()
 	{
-		super(NAME, Messages.HerokuDeployWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.RedHatDeployWizardPage_Title, Activator.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -63,7 +56,7 @@ public class HerokuDeployWizardPage extends WizardPage
 		appSettings.setLayout(new GridLayout(2, false));
 
 		Label label = new Label(appSettings, SWT.NONE);
-		label.setText(Messages.HerokuDeployWizardPage_ApplicationNameLabel);
+		label.setText(Messages.RedHatDeployWizardPage_ApplicationNameLabel);
 
 		appName = new Text(appSettings, SWT.SINGLE | SWT.BORDER);
 		appName.setLayoutData(new GridData(250, SWT.DEFAULT));
@@ -78,35 +71,45 @@ public class HerokuDeployWizardPage extends WizardPage
 			}
 		});
 
-		publishButton = new Button(composite, SWT.CHECK);
-		publishButton.setText(Messages.HerokuDeployWizardPage_PublishApplicationLabel);
-		publishButton.setSelection(Platform.getPreferencesService().getBoolean(Activator.getPluginIdentifier(),
-				IPreferenceConstants.HEROKU_AUTO_PUBLISH, true, null));
+		Label typeLabel = new Label(appSettings, SWT.NONE);
+		typeLabel.setText("Type:");
 
-		if (doesntHaveGitRepo())
-		{
-			Label note = new Label(composite, SWT.WRAP);
-			// We need this italic, we may need to set a font explicitly here to get it
-			Font dialogFont = JFaceResources.getDialogFont();
-			FontData[] data = SWTUtils.italicizedFont(JFaceResources.getDialogFont());
-			final Font italic = new Font(dialogFont.getDevice(), data);
-			note.setFont(italic);
-			note.addDisposeListener(new DisposeListener()
-			{
-				public void widgetDisposed(DisposeEvent e)
-				{
-					if (italic != null && !italic.isDisposed())
-					{
-						italic.dispose();
-					}
-				}
-			});
-
-			note.setLayoutData(new GridData(400, SWT.DEFAULT));
-			note.setText(Messages.HerokuDeployWizardPage_NoGitRepoNote);
-		}
+		typeCombo = new Combo(appSettings, SWT.SINGLE | SWT.BORDER | SWT.READ_ONLY);
+		typeCombo.setLayoutData(new GridData(250, SWT.DEFAULT));
+		typeCombo.add(RedHatAPI.PHP_5_3_2);
+		typeCombo.add(RedHatAPI.RACK_1_1_0);
+		typeCombo.add(RedHatAPI.WSGI_3_2_1);
+		typeCombo.setText(getDefaultType(getProject()));
 
 		Dialog.applyDialogFont(composite);
+	}
+
+	private String getDefaultType(IProject project)
+	{
+		try
+		{
+			// FIXME Check real radrails/pydev/php project nature rateh rthan this hack?
+			for (String natureId : project.getDescription().getNatureIds())
+			{
+				if (natureId.contains("ruby")) //$NON-NLS-1$
+				{
+					return RedHatAPI.RACK_1_1_0;
+				}
+				else if (natureId.contains("php")) //$NON-NLS-1$
+				{
+					return RedHatAPI.PHP_5_3_2;
+				}
+				else if (natureId.contains("python")) //$NON-NLS-1$
+				{
+					return RedHatAPI.WSGI_3_2_1;
+				}
+			}
+		}
+		catch (CoreException e)
+		{
+			Activator.logError(e);
+		}
+		return RedHatAPI.PHP_5_3_2;
 	}
 
 	protected String getProjectName()
@@ -117,18 +120,6 @@ public class HerokuDeployWizardPage extends WizardPage
 			return ""; // Seems like we have big issues if we ever got into this state... //$NON-NLS-1$
 		}
 		return project.getName();
-	}
-
-	protected boolean doesntHaveGitRepo()
-	{
-		IProject project = getProject();
-		if (project == null)
-		{
-			return false; // Seems like we have big issues if we ever got into this state...
-		}
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager()
-				.getUnattachedExisting(project.getLocationURI());
-		return repo == null;
 	}
 
 	protected IProject getProject()
@@ -151,7 +142,7 @@ public class HerokuDeployWizardPage extends WizardPage
 		String app = this.appName.getText();
 		if (app == null || app.trim().length() < 1)
 		{
-			setErrorMessage(Messages.HerokuDeployWizardPage_EmotyApplicationNameError);
+			setErrorMessage(Messages.RedHatDeployWizardPage_EmotyApplicationNameError);
 			return false;
 		}
 
@@ -164,8 +155,13 @@ public class HerokuDeployWizardPage extends WizardPage
 		return appName.getText();
 	}
 
-	public boolean publishImmediately()
+	public String getType()
 	{
-		return publishButton.getSelection();
+		return typeCombo.getText();
+	}
+
+	public IPath getDestination()
+	{
+		return getProject().getLocation();
 	}
 }

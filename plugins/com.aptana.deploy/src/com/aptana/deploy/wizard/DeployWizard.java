@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
@@ -52,6 +53,7 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.Activator;
+import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardDeployWizardPage;
@@ -59,6 +61,7 @@ import com.aptana.deploy.internal.wizard.EngineYardSignupPage;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
 import com.aptana.deploy.internal.wizard.HerokuSignupPage;
+import com.aptana.deploy.internal.wizard.RedHatDeployWizardPage;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
@@ -137,6 +140,12 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			runnable = createEngineYardDeployRunnable(page);
 			type = DeployType.ENGINEYARD;
 		}
+		else if (RedHatDeployWizardPage.NAME.equals(pageName))
+		{
+			RedHatDeployWizardPage page = (RedHatDeployWizardPage) currentPage;
+			runnable = createRedHatDeployRunnable(page);
+			type = DeployType.RED_HAT;
+		}
 
 		// stores the deploy type and what application or FTP connection it's deploying to
 		if (type != null)
@@ -190,8 +199,8 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(project);
 						CoreIOPlugin.getConnectionPointManager().addConnectionPoint(sourceConnectionPoint);
 						site = SiteConnectionUtils.createSite(MessageFormat.format("{0} <-> {1}", project.getName(), //$NON-NLS-1$
-								destinationConnectionPoint.getName()),
-								sourceConnectionPoint, destinationConnectionPoint);
+								destinationConnectionPoint.getName()), sourceConnectionPoint,
+								destinationConnectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
 					else if (sites.length == 1)
@@ -453,7 +462,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		};
 		return runnable;
 	}
-	
+
 	protected IRunnableWithProgress createEngineYardSignupRunnable(EngineYardSignupPage page)
 	{
 		IRunnableWithProgress runnable;
@@ -551,7 +560,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		};
 		return runnable;
 	}
-	
+
 	protected IRunnableWithProgress createEngineYardDeployRunnable(EngineYardDeployWizardPage page)
 	{
 		IRunnableWithProgress runnable;
@@ -569,6 +578,32 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 						CommandElement command;
 						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App"); //$NON-NLS-1$
 						command.execute();
+					}
+				});
+			}
+
+		};
+		return runnable;
+	}
+
+	protected IRunnableWithProgress createRedHatDeployRunnable(RedHatDeployWizardPage page)
+	{
+		IRunnableWithProgress runnable;
+		final String appname = page.getAppName();
+		final String type = page.getType();
+		final IPath destination = page.getDestination();
+		runnable = new IRunnableWithProgress()
+		{
+
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+			{
+				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
+				{
+
+					public void run()
+					{
+						RedHatAPI api = new RedHatAPI();
+						api.createApp(appname, type, destination);
 					}
 				});
 			}
@@ -664,7 +699,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			super.dispose();
 		}
 	}
-	
+
 	private CommandElement getCommand(String bundleName, String commandName)
 	{
 		BundleEntry entry = BundleManager.getInstance().getBundleEntry(bundleName);
@@ -682,7 +717,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		}
 		return null;
 	}
-	
+
 	private void openSignupURLinEclipseBrowser(URL url, int style, String browserId, final String javascript)
 	{
 		try

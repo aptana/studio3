@@ -7,6 +7,8 @@
  */
 package com.aptana.deploy.internal.wizard;
 
+import java.net.URL;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IPageChangeProvider;
@@ -27,24 +29,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.Activator;
-import com.aptana.deploy.HerokuAPI;
 import com.aptana.deploy.ILoginValidator;
+import com.aptana.deploy.RedHatAPI;
 
-public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
+public class RedHatLoginWizardPage extends WizardPage implements ILoginValidator
 {
-	private static final String NAME = "HerokuLogin"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
+	private static final String NAME = "RedHatLogin"; //$NON-NLS-1$
+	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;
 
 	private IWizardPage fNextPage;
 
-	protected HerokuLoginWizardPage()
+	protected RedHatLoginWizardPage()
 	{
-		super(NAME, Messages.HerokuLoginWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.RedHatLoginWizardPage_Title, Activator.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -58,15 +63,15 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 
 		// Actual contents
 		Label label = new Label(composite, SWT.NONE);
-		label.setText(Messages.HerokuLoginWizardPage_EnterCredentialsLabel);
+		label.setText(Messages.RedHatLoginWizardPage_EnterCredentialsLabel);
 
 		Composite credentials = new Composite(composite, SWT.NONE);
 		credentials.setLayout(new GridLayout(2, false));
 
 		Label userIdLabel = new Label(credentials, SWT.NONE);
-		userIdLabel.setText(Messages.HerokuLoginWizardPage_UserIDLabel);
+		userIdLabel.setText(Messages.RedHatLoginWizardPage_UserIDLabel);
 		userId = new Text(credentials, SWT.SINGLE | SWT.BORDER);
-		userId.setMessage(Messages.HerokuLoginWizardPage_UserIDExample);
+		userId.setMessage(Messages.RedHatLoginWizardPage_UserIDExample);
 		GridData gd = new GridData(300, SWT.DEFAULT);
 		userId.setLayoutData(gd);
 		userId.addModifyListener(new ModifyListener()
@@ -79,9 +84,9 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		});
 
 		Label passwordLabel = new Label(credentials, SWT.NONE);
-		passwordLabel.setText(Messages.HerokuLoginWizardPage_PasswordLabel);
+		passwordLabel.setText(Messages.RedHatLoginWizardPage_PasswordLabel);
 		password = new Text(credentials, SWT.SINGLE | SWT.BORDER | SWT.PASSWORD);
-		password.setMessage(Messages.HerokuLoginWizardPage_PasswordExample);
+		password.setMessage(Messages.RedHatLoginWizardPage_PasswordExample);
 		password.setLayoutData(gd);
 		password.addModifyListener(new ModifyListener()
 		{
@@ -93,13 +98,12 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		});
 
 		Button checkAuth = new Button(credentials, SWT.PUSH);
-		checkAuth.setText(Messages.HerokuLoginWizardPage_SubmitButtonLabel);
+		checkAuth.setText(Messages.RedHatLoginWizardPage_SubmitButtonLabel);
 		checkAuth.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-//				api.writeCredentials(); // we write them automatically via a page changed listener below...
 				if (validateLogin() && isPageComplete())
 				{
 					getContainer().showPage(getNextPage());
@@ -109,22 +113,30 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 
 		// Signup link
 		Link link = new Link(composite, SWT.NONE);
-		link.setText(Messages.HerokuLoginWizardPage_SignupLink);
+		link.setText(Messages.RedHatLoginWizardPage_SignupLink);
 		link.addSelectionListener(new SelectionAdapter()
 		{
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				// Open the next dialog page where user can begin signup process!
-				IWizardPage signupPage = new HerokuSignupPage(userId.getText());
-				signupPage.setWizard(getWizard());
-				getContainer().showPage(signupPage);
+				// FIXME Do they sign up on the web form, or do they need to create a domain?
+				// Open the browser to the register URL
+				IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+				try
+				{
+					IWebBrowser browser = support.getExternalBrowser();
+					browser.openURL(new URL("https://www.redhat.com/wapps/ugc/register.html")); //$NON-NLS-1$
+				}
+				catch (Exception t)
+				{
+					// ignores the exception
+				}
 			}
 		});
 
 		Dialog.applyDialogFont(composite);
 
-		// Save credentials if user hit Next too!!!
+		// Save credentials if user hits Next too!!!
 		IWizardContainer container = getWizard().getContainer();
 		((IPageChangeProvider) container).addPageChangedListener(new IPageChangedListener()
 		{
@@ -132,10 +144,10 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 			public void pageChanged(PageChangedEvent event)
 			{
 				Object selected = event.getSelectedPage();
-				if (selected instanceof HerokuDeployWizardPage)
+				if (selected instanceof RedHatDeployWizardPage)
 				{
 					// If user has moved on to deploy page, write their credentials to a file
-					HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
+					RedHatAPI api = new RedHatAPI(userId.getText(), password.getText());
 					api.writeCredentials();
 				}
 			}
@@ -147,7 +159,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 	{
 		if (fNextPage == null)
 		{
-			fNextPage = new HerokuDeployWizardPage();
+			fNextPage = new RedHatDeployWizardPage();
 			fNextPage.setWizard(getWizard());
 		}
 		return fNextPage;
@@ -159,31 +171,47 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		String userId = this.userId.getText();
 		if (userId == null || userId.trim().length() < 1)
 		{
-			setErrorMessage(Messages.HerokuLoginWizardPage_EmptyUserIDError);
+			setErrorMessage(Messages.RedHatLoginWizardPage_EmptyUserIDError);
 			return false;
 		}
 
 		String password = this.password.getText();
 		if (password == null || password.trim().length() < 1)
 		{
-			setErrorMessage(Messages.HerokuLoginWizardPage_EmptyPasswordError);
+			setErrorMessage(Messages.RedHatLoginWizardPage_EmptyPasswordError);
 			return false;
 		}
 
 		setErrorMessage(null);
 		return true;
 	}
-	
+
 	public boolean validateLogin()
 	{
-		HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
+		RedHatAPI api = new RedHatAPI(userId.getText(), password.getText());
 		IStatus status = api.authenticate();
 		if (!status.isOK())
 		{
-			setErrorMessage(status.getMessage());
+			// TODO We have a list of error codes here:
+			// http://wiki.appcelerator.org/display/tools/Simplified+Cloud+Deployment
+			if (status.getCode() == 97)
+			{
+				// Credentials are wrong
+				setErrorMessage(Messages.RedHatLoginWizardPage_InvalidCredentialsError);
+			}
+			else if (status.getCode() == 99)
+			{
+				// no user exists by that login, maybe because domain wasn't created?
+				setErrorMessage(Messages.RedHatLoginWizardPage_InvalidCredentialsError);// TODO Create a different error
+																						// message for this?
+			}
+			else
+			{
+				setErrorMessage(status.getMessage());
+			}
 			return false;
 		}
-		
+
 		return true;
 	}
 
