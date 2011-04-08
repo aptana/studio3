@@ -334,7 +334,25 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				{
 				}
 
-				DisconnectHandler disconnect = new DisconnectHandler();
+				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
+				{
+
+					@Override
+					public void done(IJobChangeEvent event)
+					{
+						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+						if (gitFolder.exists())
+						{
+							try
+							{
+								gitFolder.delete(true, new NullProgressMonitor());
+							}
+							catch (CoreException e)
+							{
+							}
+						}
+					}
+				});
 				List<IResource> selection = new ArrayList<IResource>();
 				selection.add(projectHandle);
 				disconnect.setSelectedResources(selection);
