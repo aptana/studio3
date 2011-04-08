@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.deploy.preferences.IPreferenceConstants;
-import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.util.SWTUtils;
@@ -134,7 +133,7 @@ public class HerokuDeployWizardPage extends WizardPage
 
 	protected IProject getProject()
 	{
-		DeployWizard wizard = (DeployWizard) getWizard();
+		HerokuDeployWizard wizard = (HerokuDeployWizard) getWizard();
 		return wizard.getProject();
 	}
 

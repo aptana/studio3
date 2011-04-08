@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Text;
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.deploy.redhat.RedHatAPI;
-import com.aptana.deploy.wizard.DeployWizard;
 
 public class RedHatDeployWizardPage extends WizardPage
 {
@@ -125,7 +124,7 @@ public class RedHatDeployWizardPage extends WizardPage
 
 	protected IProject getProject()
 	{
-		DeployWizard wizard = (DeployWizard) getWizard();
+		RedHatDeployWizard wizard = (RedHatDeployWizard) getWizard();
 		return wizard.getProject();
 	}
 

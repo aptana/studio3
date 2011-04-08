@@ -25,11 +25,6 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 
 	private IProject project;
 
-	public RedHatDeployWizard()
-	{
-		// TODO Auto-generated constructor stub
-	}
-
 	@Override
 	public void addPages()
 	{
@@ -110,5 +105,10 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 
 		};
 		return runnable;
+	}
+
+	IProject getProject()
+	{
+		return this.project;
 	}
 }

@@ -26,10 +26,7 @@ import org.eclipse.ui.model.AdaptableList;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardRegistry;
 
-/**
- * The new wizard is responsible for allowing the user to choose which new (nested) wizard to run. The set of available
- * new wizards comes from the new extension point.
- */
+// FIXME Model after ImportExportWizard, which uses a tree with categories for wizards!
 public class NewDeployWizard extends Wizard
 {
 	private IWorkbench theWorkbench;

@@ -84,6 +84,11 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 		}
 	}
 
+	IProject getProject()
+	{
+		return this.project;
+	}
+
 	@Override
 	public boolean performFinish()
 	{
