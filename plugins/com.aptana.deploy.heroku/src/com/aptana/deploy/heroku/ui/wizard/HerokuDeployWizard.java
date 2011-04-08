@@ -36,8 +36,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.heroku.HerokuAPI;
 import com.aptana.deploy.heroku.HerokuPlugin;
+import com.aptana.deploy.heroku.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
 import com.aptana.git.core.GitPlugin;
@@ -50,6 +50,7 @@ import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.usage.PingStartup;
 
+@SuppressWarnings("restriction")
 public class HerokuDeployWizard extends Wizard implements IDeployWizard
 {
 

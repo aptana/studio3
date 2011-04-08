@@ -3,12 +3,6 @@
 <plugin>
    <extension-point id="deployWizards" name="Deployment Wizards" schema="schema/deployWizards.exsd"/>
    <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.aptana.deploy.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
-   <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="com.aptana.deploy.internal.ProjectPropertyTester"

@@ -10,5 +10,11 @@
             name="Heroku">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.deploy.heroku.internal.preferences.HerokuPreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>

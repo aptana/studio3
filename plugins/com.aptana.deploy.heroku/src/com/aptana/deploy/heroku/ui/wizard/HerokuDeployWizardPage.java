@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.heroku.HerokuPlugin;
-import com.aptana.deploy.preferences.IPreferenceConstants;
+import com.aptana.deploy.heroku.preferences.IPreferenceConstants;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.util.SWTUtils;
