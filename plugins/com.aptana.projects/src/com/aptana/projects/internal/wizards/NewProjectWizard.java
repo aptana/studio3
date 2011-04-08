@@ -64,14 +64,16 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.core.projectTemplates.TemplateType;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
+import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
-import com.aptana.scripting.model.ProjectTemplateElement.Type;
 import com.aptana.scripting.model.filters.IModelFilter;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
@@ -110,7 +112,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		List<ProjectTemplateElement> templates = getProjectTemplates(new Type[] { Type.WEB, Type.ALL });
+		List<IProjectTemplate> templates = getProjectTemplates(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
 		if (templates.size() > 0)
 		{
 			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
@@ -118,15 +120,16 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	}
 
 	/**
-	 * Returns a list of {@link ProjectTemplateElement} that match the any of the given types.
+	 * Returns a list of {@link IProjectTemplate} that match the any of the given types.<br>
+	 * Templates are loaded from the Rubles and from the "projectTemplates" extension point.
 	 * 
 	 * @param templateTypes
 	 *            The Types to match to.
 	 * @return A list of ProjectTemplateElement
 	 */
-	public static List<ProjectTemplateElement> getProjectTemplates(final Type[] templateTypes)
+	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
 	{
-		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
 			{
@@ -135,8 +138,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				if (element instanceof ProjectTemplateElement)
 				{
 					ProjectTemplateElement template = (ProjectTemplateElement) element;
-					Type type = template.getType();
-					for (Type t : templateTypes)
+					TemplateType type = template.getType();
+					for (TemplateType t : templateTypes)
 					{
 						if (type == t)
 						{
@@ -148,6 +151,11 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				return result;
 			}
 		});
+		ProjectTemplatesManager manager = new ProjectTemplatesManager();
+		for (TemplateType t : templateTypes)
+		{
+			templates.addAll(manager.getTemplatesForType(t));
+		}
 		return templates;
 	}
 
@@ -234,7 +242,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		boolean fromGit = false;
 		if (templatesPage != null)
 		{
-			ProjectTemplateElement template = templatesPage.getSelectedTemplate();
+			IProjectTemplate template = templatesPage.getSelectedTemplate();
 			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
 			{
 				// assumes to be creating the project from a git URL
@@ -249,7 +257,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				doBasicCreateProject(newProjectHandle, description);
 				if (templatesPage != null)
 				{
-					ProjectTemplateElement template = templatesPage.getSelectedTemplate();
+					IProjectTemplate template = templatesPage.getSelectedTemplate();
 					if (template != null)
 					{
 						extractZip(template, newProjectHandle);
@@ -329,7 +337,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	public static void extractZip(ProjectTemplateElement template, IProject project)
+	public static void extractZip(IProjectTemplate template, IProject project)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
 		final File zip_path = new File(template.getDirectory(), template.getLocation());
@@ -424,7 +432,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(ProjectTemplateElement template, final IProject projectHandle,
+	private void doCloneFromGit(IProjectTemplate template, final IProject projectHandle,
 			final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();

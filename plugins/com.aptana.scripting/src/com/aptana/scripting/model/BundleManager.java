@@ -37,6 +37,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
+import com.aptana.core.projectTemplates.IProjectTemplate;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
@@ -1462,9 +1463,9 @@ public class BundleManager
 	 *            result. The filter may be null which is equivalent to a filter that returns true for all elements
 	 * @return A list of elements that are visible and that pass the specified filter
 	 */
-	public List<ProjectTemplateElement> getProjectTemplates(IModelFilter filter)
+	public List<IProjectTemplate> getProjectTemplates(IModelFilter filter)
 	{
-		List<ProjectTemplateElement> result = new ArrayList<ProjectTemplateElement>();
+		List<IProjectTemplate> result = new ArrayList<IProjectTemplate>();
 
 		for (String name : this.getBundleNames())
 		{
