@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.heroku.ui.wizard.HerokuDeployWizard"
+            icon="icons/heroku.png"
+            id="com.aptana.deploy.heroku.wizard"
+            name="Heroku">
+      </wizard>
+   </extension>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.heroku.ui.wizard.HerokuDeployWizard"
+            id="com.aptana.deploy.heroku.wizard"
+            name="Heroku">
+      </wizard>
+   </extension>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.heroku.DeployWizard1"
+            id="com.aptana.deploy.heroku.wizard"
+            name="Heroku">
+      </wizard>
+   </extension>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.heroku.DeployWizard1"
+            id="com.aptana.deploy.heroku.wizard"
+            name="name">
+      </wizard>
+   </extension>
+
+</plugin>

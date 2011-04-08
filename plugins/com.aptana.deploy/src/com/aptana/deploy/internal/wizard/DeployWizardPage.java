@@ -12,17 +12,13 @@ import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -31,8 +27,6 @@ import org.eclipse.swt.widgets.Label;
 
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.EngineYardAPI;
-import com.aptana.deploy.HerokuAPI;
-import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.DeployWizard;
@@ -41,10 +35,8 @@ public class DeployWizardPage extends WizardPage
 {
 
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
-	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
 	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
 	private static final String EY_IMG_PATH = "icons/ey_small.png"; //$NON-NLS-1$
-	private static final String RED_HAT_IMG_PATH = "icons/redhat.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;
@@ -52,7 +44,6 @@ public class DeployWizardPage extends WizardPage
 	private Button deployWithEngineYard;
 
 	private IProject project;
-	private Button deployWithRedHat;
 
 	public DeployWizardPage(IProject project)
 	{
@@ -75,57 +66,7 @@ public class DeployWizardPage extends WizardPage
 		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		if (isRailsProject())
 		{
-			setImageDescriptor(DeployPlugin.getImageDescriptor(HEROKU_IMG_PATH));
 			label.setText(Messages.DeployWizardPage_ProvidersLabel);
-			// deploy with Heroku
-			deployWithHeroku = new Button(composite, SWT.RADIO);
-			deployWithHeroku.setImage(DeployPlugin.getImage(HEROKU_IMG_PATH));
-			// disable the button if the project is currently deployed to Heroku
-			boolean couldDeployWithHeroku = (type == null || type != DeployType.HEROKU);
-			deployWithHeroku.setEnabled(couldDeployWithHeroku);
-			deployWithHeroku.setSelection(couldDeployWithHeroku);
-			if (!couldDeployWithHeroku)
-			{
-				String app = DeployPreferenceUtil.getDeployEndpoint(project);
-				if (app == null)
-				{
-					app = "Heroku"; //$NON-NLS-1$
-				}
-				deployWithHeroku.setText(MessageFormat.format(Messages.DeployWizardPage_AlreadyDeployedToHeroku, app));
-			}
-
-			deployWithHeroku.addMouseListener(new MouseAdapter()
-			{
-				@Override
-				public void mouseDown(MouseEvent e)
-				{
-					super.mouseDown(e);
-					// If the image is clicked treat it like selecting and clicking Next button!
-					Rectangle deployBounds = deployWithHeroku.getBounds();
-					Rectangle imageBounds = deployWithHeroku.getImage().getBounds();
-					int x = deployBounds.width - imageBounds.width;
-					imageBounds.x = x;
-					if (imageBounds.contains(e.x, e.y))
-					{
-						if (isPageComplete())
-						{
-							if (deployWithHeroku.getSelection())
-								getContainer().showPage(getNextPage());
-							else
-								deployWithHeroku.setSelection(true);
-						}
-					}
-				}
-			});
-
-			deployWithHeroku.addSelectionListener(new SelectionAdapter()
-			{
-				@Override
-				public void widgetSelected(SelectionEvent e)
-				{
-					setImageDescriptor(DeployPlugin.getImageDescriptor(HEROKU_IMG_PATH));
-				}
-			});
 
 			// Deploy with Engine Yard
 			if (!Platform.OS_WIN32.equals(Platform.getOS()))
@@ -137,11 +78,8 @@ public class DeployWizardPage extends WizardPage
 				// disable the button if the project is currently deployed to Engine Yard
 				boolean couldDeployWithEY = (type == null || type != DeployType.ENGINEYARD);
 				deployWithEngineYard.setEnabled(couldDeployWithEY);
-				if (!couldDeployWithHeroku)
-				{
-					deployWithEngineYard.setSelection(couldDeployWithEY);
-					setImageDescriptor(DeployPlugin.getImageDescriptor(EY_IMG_PATH));
-				}
+				setImageDescriptor(DeployPlugin.getImageDescriptor(EY_IMG_PATH));
+
 				if (!couldDeployWithEY)
 				{
 					String app = DeployPreferenceUtil.getDeployEndpoint(project);
@@ -200,18 +138,6 @@ public class DeployWizardPage extends WizardPage
 			}
 		});
 
-		deployWithRedHat = new Button(composite, SWT.RADIO);
-		deployWithRedHat.setText(Messages.DeployWizardPage_RedHatLabel);
-		deployWithRedHat.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				// FIXME Seems to be some sizing/clipping issue here!
-				setImageDescriptor(DeployPlugin.getImageDescriptor(RED_HAT_IMG_PATH));
-			}
-		});
-
 		Dialog.applyDialogFont(composite);
 	}
 
@@ -245,19 +171,7 @@ public class DeployWizardPage extends WizardPage
 		// re-creating new objects for next page.
 		IWizardPage nextPage = null;
 		// Determine what page is next by the user's choice in the radio buttons
-		if (deployWithHeroku != null && deployWithHeroku.getSelection())
-		{
-			File credentials = HerokuAPI.getCredentialsFile();
-			if (credentials.exists() && HerokuAPI.fromCredentials().authenticate().isOK())
-			{
-				nextPage = new HerokuDeployWizardPage();
-			}
-			else
-			{
-				nextPage = new HerokuLoginWizardPage();
-			}
-		}
-		else if (deployWithFTP != null && deployWithFTP.getSelection())
+		if (deployWithFTP != null && deployWithFTP.getSelection())
 		{
 			nextPage = new FTPDeployWizardPage(project);
 		}
@@ -287,21 +201,7 @@ public class DeployWizardPage extends WizardPage
 			}
 
 		}
-		else if (deployWithRedHat != null && deployWithRedHat.getSelection())
-		{
-			RedHatAPI api = new RedHatAPI();
-			IStatus status = api.authenticate();
-			if (status.isOK())
-			{
-				nextPage = new RedHatDeployWizardPage();
-			}
-			else
-			{
-				// TODO What if there's already a domain, but no saved credentials?
-				nextPage = new RedHatSignupWizardPage();
-			}
 
-		}
 		if (nextPage == null)
 		{
 			nextPage = super.getNextPage();

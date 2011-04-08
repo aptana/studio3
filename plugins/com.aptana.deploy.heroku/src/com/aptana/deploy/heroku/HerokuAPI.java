@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy;
+package com.aptana.deploy.heroku;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -90,15 +90,16 @@ public class HerokuAPI
 
 			if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			{
-				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), Messages.HerokuAPI_AuthFailed_Error);
+				return new Status(IStatus.ERROR, HerokuPlugin.getPluginIdentifier(),
+						Messages.HerokuAPI_AuthFailed_Error);
 			}
 			// some other response code...
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
+			return new Status(IStatus.ERROR, HerokuPlugin.getPluginIdentifier(),
 					Messages.HerokuAPI_AuthConnectionFailed_Error);
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, HerokuPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -124,7 +125,7 @@ public class HerokuAPI
 		}
 		catch (IOException e)
 		{
-			DeployPlugin.logError(e);
+			HerokuPlugin.logError(e);
 		}
 		finally
 		{
@@ -156,7 +157,7 @@ public class HerokuAPI
 		}
 		catch (Exception e)
 		{
-			DeployPlugin.logError(e);
+			HerokuPlugin.logError(e);
 		}
 		finally
 		{
@@ -178,7 +179,7 @@ public class HerokuAPI
 			@Override
 			public IStatus authenticate()
 			{
-				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
+				return new Status(IStatus.ERROR, HerokuPlugin.getPluginIdentifier(),
 						Messages.HerokuAPI_UnableToGetHerokuCredentialsError);
 			}
 

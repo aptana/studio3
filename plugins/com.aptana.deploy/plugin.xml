@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="deployWizards" name="Deployment Wizards" schema="schema/deployWizards.exsd"/>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer

@@ -1,4 +1,4 @@
-package com.aptana.deploy;
+package com.aptana.deploy.redhat;
 
 import java.text.MessageFormat;
 
@@ -12,6 +12,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
+import com.aptana.deploy.DeployPlugin;
 
 public class RedHatAPI
 {

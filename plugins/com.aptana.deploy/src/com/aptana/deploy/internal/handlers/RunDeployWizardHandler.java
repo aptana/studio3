@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.deploy.wizard.DeployWizard;
+import com.aptana.deploy.wizard.NewDeployWizard;
 
 public class RunDeployWizardHandler extends AbstractHandler
 {
@@ -25,7 +25,7 @@ public class RunDeployWizardHandler extends AbstractHandler
 		IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 
 		// Instantiates and initializes the wizard
-		DeployWizard wizard = new DeployWizard();
+		NewDeployWizard wizard = new NewDeployWizard();
 		wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite()
 				.getSelectionProvider().getSelection());
 		wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);
@@ -36,6 +36,7 @@ public class RunDeployWizardHandler extends AbstractHandler
 		{
 			shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		}
+		// FIXME Don't use this special dialog! move ILoginValidator stuff to page change listener stuff when necessary!
 		DeployWizardDialog dialog = new DeployWizardDialog(shell, wizard);
 		dialog.setPageSize(350, 500);
 		dialog.setHelpAvailable(false);

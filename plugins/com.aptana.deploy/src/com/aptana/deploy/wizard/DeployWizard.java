@@ -20,13 +20,9 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -47,27 +43,18 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.browser.BrowserViewer;
 import org.eclipse.ui.internal.browser.WebBrowserEditor;
 import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
-import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardDeployWizardPage;
 import com.aptana.deploy.internal.wizard.EngineYardSignupPage;
 import com.aptana.deploy.internal.wizard.FTPDeployWizardPage;
-import com.aptana.deploy.internal.wizard.HerokuDeployWizardPage;
-import com.aptana.deploy.internal.wizard.HerokuSignupPage;
-import com.aptana.deploy.internal.wizard.RedHatDeployWizardPage;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -82,7 +69,6 @@ import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
-import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.usage.PingStartup;
 
@@ -90,7 +76,6 @@ import com.aptana.usage.PingStartup;
 public class DeployWizard extends Wizard implements IWorkbenchWizard
 {
 
-	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINEYARD = "Engine Yard"; //$NON-NLS-1$
 
 	private IProject project;
@@ -104,24 +89,12 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		String pageName = currentPage.getName();
 		DeployType type = null;
 		String deployEndpointName = null;
-		if (HerokuDeployWizardPage.NAME.equals(pageName))
-		{
-			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
-			runnable = createHerokuDeployRunnable(page);
-			type = DeployType.HEROKU;
-			deployEndpointName = page.getAppName();
-		}
-		else if (FTPDeployWizardPage.NAME.equals(pageName))
+		if (FTPDeployWizardPage.NAME.equals(pageName))
 		{
 			FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 			runnable = createFTPDeployRunnable(page);
 			type = DeployType.FTP;
 			deployEndpointName = page.getConnectionPoint().getName();
-		}
-		else if (HerokuSignupPage.NAME.equals(pageName))
-		{
-			HerokuSignupPage page = (HerokuSignupPage) currentPage;
-			runnable = createHerokuSignupRunnable(page);
 		}
 		else if (CapifyProjectPage.NAME.equals(pageName))
 		{
@@ -139,12 +112,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			EngineYardDeployWizardPage page = (EngineYardDeployWizardPage) currentPage;
 			runnable = createEngineYardDeployRunnable(page);
 			type = DeployType.ENGINEYARD;
-		}
-		else if (RedHatDeployWizardPage.NAME.equals(pageName))
-		{
-			RedHatDeployWizardPage page = (RedHatDeployWizardPage) currentPage;
-			runnable = createRedHatDeployRunnable(page);
-			type = DeployType.RED_HAT;
 		}
 
 		// stores the deploy type and what application or FTP connection it's deploying to
@@ -292,177 +259,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		return runnable;
 	}
 
-	protected IRunnableWithProgress createHerokuDeployRunnable(HerokuDeployWizardPage page)
-	{
-		IRunnableWithProgress runnable;
-		final String appName = page.getAppName();
-		final boolean publishImmediately = page.publishImmediately();
-
-		// persists the auto-publish setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
-		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, publishImmediately);
-		try
-		{
-			prefs.flush();
-		}
-		catch (BackingStoreException e)
-		{
-		}
-
-		runnable = new IRunnableWithProgress()
-		{
-
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
-			{
-				SubMonitor sub = SubMonitor.convert(monitor, 100);
-				try
-				{
-					// Initialize git repo for project if necessary
-					IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
-					GitRepository repo = manager.createOrAttach(project, sub.newChild(20));
-					// TODO What if we didn't create the repo right now, but it is "dirty"?
-					// Now do an initial commit
-					repo.index().refresh(sub.newChild(15));
-					repo.index().stageFiles(repo.index().changedFiles());
-					repo.index().commit(Messages.DeployWizard_AutomaticGitCommitMessage);
-					sub.worked(10);
-
-					// Run commands to create/deploy
-					PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
-					{
-
-						public void run()
-						{
-							CommandElement command;
-							if (publishImmediately)
-							{
-								command = getCommand(BUNDLE_HEROKU, "Create and Deploy App"); //$NON-NLS-1$
-							}
-							else
-							{
-								command = getCommand(BUNDLE_HEROKU, "Create App"); //$NON-NLS-1$
-							}
-							// TODO What if command is null!?
-							if (command != null)
-							{
-								// Send along the app name
-								CommandContext context = command.createCommandContext();
-								context.put("HEROKU_APP_NAME", appName); //$NON-NLS-1$
-								command.execute(context);
-							}
-						}
-					});
-				}
-				catch (CoreException ce)
-				{
-					throw new InvocationTargetException(ce);
-				}
-				finally
-				{
-					sub.done();
-				}
-			}
-
-		};
-		return runnable;
-	}
-
-	protected IRunnableWithProgress createHerokuSignupRunnable(HerokuSignupPage page)
-	{
-		IRunnableWithProgress runnable;
-		final String userID = page.getUserID();
-		runnable = new IRunnableWithProgress()
-		{
-
-			/**
-			 * Send a ping to aptana.com with email address for referral tracking
-			 * 
-			 * @throws IOException
-			 */
-			private String sendPing(IProgressMonitor monitor) throws IOException
-			{
-				HttpURLConnection connection = null;
-				try
-				{
-					final String HOST = "http://toolbox.aptana.com"; //$NON-NLS-1$
-					StringBuilder builder = new StringBuilder(HOST);
-					builder.append("/webhook/heroku?request_id="); //$NON-NLS-1$
-					builder.append(URLEncoder.encode(PingStartup.getApplicationId(), "UTF-8")); //$NON-NLS-1$
-					builder.append("&email="); //$NON-NLS-1$
-					builder.append(URLEncoder.encode(userID, "UTF-8")); //$NON-NLS-1$
-					builder.append("&type=signuphook"); //$NON-NLS-1$
-
-					URL url = new URL(builder.toString());
-					connection = (HttpURLConnection) url.openConnection();
-					connection.setUseCaches(false);
-					connection.setAllowUserInteraction(false);
-					int responseCode = connection.getResponseCode();
-					if (responseCode != HttpURLConnection.HTTP_OK)
-					{
-						// Log an error
-						DeployPlugin.logError(
-								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
-										builder.toString()), null);
-					}
-					else
-					{
-						return IOUtil.read(connection.getInputStream());
-					}
-				}
-				finally
-				{
-					if (connection != null)
-					{
-						connection.disconnect();
-					}
-				}
-				return ""; //$NON-NLS-1$
-			}
-
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
-			{
-				SubMonitor sub = SubMonitor.convert(monitor, 100);
-				try
-				{
-					String javascriptToInject = sendPing(sub.newChild(40));
-					openSignup(javascriptToInject, sub.newChild(60));
-				}
-				catch (Exception e)
-				{
-					throw new InvocationTargetException(e);
-				}
-				finally
-				{
-					sub.done();
-				}
-			}
-
-			/**
-			 * Open the Heroku signup page.
-			 * 
-			 * @param monitor
-			 * @throws Exception
-			 */
-			private void openSignup(final String javascript, IProgressMonitor monitor) throws Exception
-			{
-				final String BROWSER_ID = "heroku-signup"; //$NON-NLS-1$
-				final URL url = new URL("https://api.heroku.com/signup/aptana3"); //$NON-NLS-1$
-
-				final int style = IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR
-						| IWorkbenchBrowserSupport.STATUS;
-				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable()
-				{
-
-					public void run()
-					{
-						openSignupURLinEclipseBrowser(url, style, BROWSER_ID, javascript);
-					}
-				});
-			}
-		};
-		return runnable;
-	}
-
 	protected IRunnableWithProgress createEngineYardSignupRunnable(EngineYardSignupPage page)
 	{
 		IRunnableWithProgress runnable;
@@ -578,32 +374,6 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 						CommandElement command;
 						command = getCommand(BUNDLE_ENGINEYARD, "Deploy App"); //$NON-NLS-1$
 						command.execute();
-					}
-				});
-			}
-
-		};
-		return runnable;
-	}
-
-	protected IRunnableWithProgress createRedHatDeployRunnable(RedHatDeployWizardPage page)
-	{
-		IRunnableWithProgress runnable;
-		final String appname = page.getAppName();
-		final String type = page.getType();
-		final IPath destination = page.getDestination();
-		runnable = new IRunnableWithProgress()
-		{
-
-			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
-			{
-				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable()
-				{
-
-					public void run()
-					{
-						RedHatAPI api = new RedHatAPI();
-						api.createApp(appname, type, destination);
 					}
 				});
 			}
