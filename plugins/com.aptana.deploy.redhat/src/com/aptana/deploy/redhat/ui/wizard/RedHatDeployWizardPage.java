@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.redhat.ui.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -24,7 +24,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.RedHatAPI;
+import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.redhat.RedHatAPI;
 import com.aptana.deploy.wizard.DeployWizard;
 
 public class RedHatDeployWizardPage extends WizardPage

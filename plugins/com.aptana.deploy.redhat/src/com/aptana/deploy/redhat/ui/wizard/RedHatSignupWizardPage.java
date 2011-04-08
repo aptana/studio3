@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.redhat.ui.wizard;
 
 import java.net.URL;
 
@@ -35,7 +35,8 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.RedHatAPI;
+import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.redhat.RedHatAPI;
 import com.aptana.ui.util.UIUtils;
 
 public class RedHatSignupWizardPage extends WizardPage

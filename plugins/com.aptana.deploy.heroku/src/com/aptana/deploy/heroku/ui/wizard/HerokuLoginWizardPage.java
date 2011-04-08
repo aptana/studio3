@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.heroku.ui.wizard;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
@@ -29,8 +29,9 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.HerokuAPI;
 import com.aptana.deploy.ILoginValidator;
+import com.aptana.deploy.heroku.HerokuAPI;
+import com.aptana.deploy.internal.wizard.Messages;
 
 public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 {
