@@ -123,6 +123,9 @@ public class Messages extends NLS
 	public static String RedHatSignupWizardPage_EmptyUserIDError;
 	public static String RedHatSignupWizardPage_EmptyPasswordError;
 	public static String RedHatSignupWizardPage_EmptyConfirmPasswordError;
+	public static String RedHatSignupWizardPage_GemNotInstalledErrorMessage;
+	public static String RedHatSignupWizardPage_GemNotInstalledMessage;
+	public static String RedHatSignupWizardPage_GemNotInstalledTitle;
 	public static String RedHatSignupWizardPage_PasswordsDontMatchError;
 
 	static

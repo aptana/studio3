@@ -7,11 +7,15 @@
  */
 package com.aptana.deploy.internal.wizard;
 
+import java.net.URL;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IPageChangeProvider;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.IPageChangingListener;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.IWizardContainer;
@@ -26,9 +30,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.RedHatAPI;
+import com.aptana.ui.util.UIUtils;
 
 public class RedHatSignupWizardPage extends WizardPage
 {
@@ -141,6 +149,47 @@ public class RedHatSignupWizardPage extends WizardPage
 				}
 			}
 		});
+
+		IStatus apiCheck = new RedHatAPI().verifyGemInstalled();
+		if (!apiCheck.isOK())
+		{
+			MessageDialog dialog = new MessageDialog(
+					getShell(),
+					Messages.RedHatSignupWizardPage_GemNotInstalledTitle,
+					null,
+					Messages.RedHatSignupWizardPage_GemNotInstalledMessage,
+					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+			if (dialog.open() == 0)
+			{
+				// Open docs at http://wiki.appcelerator.org/display/tis/Red+Hat+Deployment
+				UIUtils.getDisplay().asyncExec(new Runnable()
+				{
+
+					public void run()
+					{
+						IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+						try
+						{
+							IWebBrowser browser = support.createBrowser(null);
+							browser.openURL(new URL("http://wiki.appcelerator.org/display/tis/Red+Hat+Deployment")); //$NON-NLS-1$
+						}
+						catch (Exception e)
+						{
+							// ignores the exception
+						}
+					}
+				});
+			}
+			// exit the wizard
+			UIUtils.getDisplay().asyncExec(new Runnable()
+			{
+
+				public void run()
+				{
+					((WizardDialog) getContainer()).close();
+				}
+			});
+		}
 	}
 
 	@Override
@@ -160,7 +209,7 @@ public class RedHatSignupWizardPage extends WizardPage
 		IStatus apiCheck = new RedHatAPI().verifyGemInstalled();
 		if (!apiCheck.isOK())
 		{
-			setErrorMessage(apiCheck.getMessage());
+			setErrorMessage(Messages.RedHatSignupWizardPage_GemNotInstalledErrorMessage);
 			return false;
 		}
 
