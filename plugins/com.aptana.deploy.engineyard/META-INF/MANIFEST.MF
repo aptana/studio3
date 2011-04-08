@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Engineyard Deployment
+Bundle-SymbolicName: com.aptana.deploy.engineyard
+Bundle-Version: 3.0.0.qualifier
+Bundle-Activator: com.aptana.deploy.engineyard.EngineYardPlugin
+Bundle-Vendor: Appcelerator, Inc.
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-ActivationPolicy: lazy
