@@ -73,9 +73,9 @@ public abstract class IOUtil
 			// Some editors emit a BOM (EF BB BF) for UTF-8 encodings which the JVM converts to \uFEFF. For lots of
 			// whining and an explanation of why this won't be fixed see
 			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058. Below, we try to read the first character for
-			// utf-8 encodings only. If it matches \uFEFF, then we skip that character; otherwise, we emit into our
+			// utf-8 encodings only. If it matches \uFEFF, then we skip that character; otherwise, we emit it into our
 			// output buffer
-			if (charset.toLowerCase().equals("utf-8"))
+			if (charset.toLowerCase().equals("utf-8")) //$NON-NLS-1$
 			{
 				char[] bomBuffer = new char[1];
 
