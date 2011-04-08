@@ -11,6 +11,8 @@ public class RedHatPlugin extends AbstractUIPlugin
 
 	private static final String PLUGIN_ID = "com.aptana.deploy.redhat"; //$NON-NLS-1$
 
+	public static final String WIZARD_IMAGE = "icons/redhat.png"; //$NON-NLS-1$
+
 	private static RedHatPlugin instance;
 
 	/*

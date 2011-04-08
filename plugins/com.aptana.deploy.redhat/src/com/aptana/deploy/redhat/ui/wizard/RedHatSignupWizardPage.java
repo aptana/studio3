@@ -41,7 +41,6 @@ import com.aptana.ui.util.UIUtils;
 public class RedHatSignupWizardPage extends WizardPage
 {
 	private static final String NAME = "RedHatSignup"; //$NON-NLS-1$
-	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;
@@ -52,7 +51,7 @@ public class RedHatSignupWizardPage extends WizardPage
 
 	protected RedHatSignupWizardPage()
 	{
-		super(NAME, Messages.RedHatSignupWizardPage_Title, RedHatPlugin.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatSignupWizardPage_Title, RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
 	}
 
 	public void createControl(Composite parent)

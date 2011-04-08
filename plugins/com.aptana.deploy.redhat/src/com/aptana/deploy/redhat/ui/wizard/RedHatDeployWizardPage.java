@@ -29,8 +29,6 @@ import com.aptana.deploy.redhat.RedHatPlugin;
 public class RedHatDeployWizardPage extends WizardPage
 {
 
-	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
-
 	public static final String NAME = "RedHatDeploy"; //$NON-NLS-1$
 
 	private Text appName;
@@ -38,7 +36,7 @@ public class RedHatDeployWizardPage extends WizardPage
 
 	protected RedHatDeployWizardPage()
 	{
-		super(NAME, Messages.RedHatDeployWizardPage_Title, RedHatPlugin.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatDeployWizardPage_Title, RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
 	}
 
 	public void createControl(Composite parent)

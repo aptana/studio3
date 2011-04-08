@@ -40,7 +40,6 @@ import com.aptana.deploy.redhat.RedHatPlugin;
 public class RedHatLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "RedHatLogin"; //$NON-NLS-1$
-	private static final String RED_HAT_ICON = "icons/redhat.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;
@@ -49,7 +48,7 @@ public class RedHatLoginWizardPage extends WizardPage implements ILoginValidator
 
 	protected RedHatLoginWizardPage()
 	{
-		super(NAME, Messages.RedHatLoginWizardPage_Title, RedHatPlugin.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatLoginWizardPage_Title, RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
 	}
 
 	public void createControl(Composite parent)
