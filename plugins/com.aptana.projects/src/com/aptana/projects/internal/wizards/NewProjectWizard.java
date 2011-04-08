@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -380,7 +381,25 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				{
 				}
 
-				DisconnectHandler disconnect = new DisconnectHandler();
+				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
+				{
+
+					@Override
+					public void done(IJobChangeEvent event)
+					{
+						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+						if (gitFolder.exists())
+						{
+							try
+							{
+								gitFolder.delete(true, new NullProgressMonitor());
+							}
+							catch (CoreException e)
+							{
+							}
+						}
+					}
+				});
 				List<IResource> selection = new ArrayList<IResource>();
 				selection.add(projectHandle);
 				disconnect.setSelectedResources(selection);

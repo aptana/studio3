@@ -57,10 +57,10 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.build.UnifiedBuilder;
-import com.aptana.core.util.StringUtil;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.samples.handlers.ISampleProjectHandler;
+import com.aptana.samples.model.ISample;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -78,8 +78,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private static final String NEWPROJECT_WIZARD = "BasicNewProjectResourceWizard"; //$NON-NLS-1$
 
-	private SampleEntry localSample;
-	private SamplesReference remoteSample;
+	private ISample sample;
 	private WizardNewProjectCreationPage mainPage;
 	private IProject newProject;
 	private IConfigurationElement configElement;
@@ -90,15 +89,9 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 	 * @param localSample
 	 *            the root sample entry
 	 */
-	public NewSampleProjectWizard(SampleEntry localSample)
+	public NewSampleProjectWizard(ISample sample)
 	{
-		this.localSample = localSample;
-		initDialogSettings();
-	}
-
-	public NewSampleProjectWizard(SamplesReference remoteSample)
-	{
-		this.remoteSample = remoteSample;
+		this.sample = sample;
 		initDialogSettings();
 	}
 
@@ -112,17 +105,10 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		mainPage.setDescription(Messages.NewSampleProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		if (localSample != null)
+		String name = sample.getName();
+		if (name != null)
 		{
-			File file = localSample.getFile();
-			if (file != null && !StringUtil.isEmpty(file.getName()))
-			{
-				mainPage.setInitialProjectName(file.getName());
-			}
-		}
-		else if (remoteSample != null)
-		{
-			mainPage.setInitialProjectName(remoteSample.getName());
+			mainPage.setInitialProjectName(name);
 		}
 	}
 
@@ -191,15 +177,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProjectDescription description = workspace.newProjectDescription(newProjectHandle.getName());
 		description.setLocationURI(location);
-		SamplesReference samplesRef;
-		if (localSample != null)
-		{
-			samplesRef = getSamplesReference(localSample);
-		}
-		else
-		{
-			samplesRef = remoteSample;
-		}
+		SamplesReference samplesRef = sample.getReference();
 		if (samplesRef != null)
 		{
 			description.setNatureIds(samplesRef.getNatures());
@@ -212,9 +190,9 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 		try
 		{
-			if (remoteSample != null)
+			if (sample.isRemote())
 			{
-				cloneFromGit(remoteSample.getPath(), newProjectHandle, description);
+				cloneFromGit(sample.getPath(), newProjectHandle, description);
 			}
 			else
 			{
@@ -300,19 +278,22 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private void copySampleSource(IProject project)
 	{
-		SampleEntry[] entries = localSample.getSubEntries();
+		SampleEntry[] entries = sample.getEntries();
 		IProgressMonitor monitor = new NullProgressMonitor();
 		IResource createdFile;
-		for (SampleEntry entry : entries)
+		if (entries != null)
 		{
-			createdFile = createFile(project, entry.getFile(), monitor);
-			if (createdFile instanceof IFolder)
+			for (SampleEntry entry : entries)
 			{
-				createNestedEntries((IFolder) createdFile, entry, monitor);
+				createdFile = createFile(project, entry.getFile(), monitor);
+				if (createdFile instanceof IFolder)
+				{
+					createNestedEntries((IFolder) createdFile, entry, monitor);
+				}
 			}
 		}
 
-		SamplesReference samplesRef = getSamplesReference(localSample);
+		SamplesReference samplesRef = sample.getReference();
 		if (samplesRef != null)
 		{
 			String[] includes = samplesRef.getIncludePaths();
@@ -353,7 +334,25 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				{
 				}
 
-				DisconnectHandler disconnect = new DisconnectHandler();
+				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
+				{
+
+					@Override
+					public void done(IJobChangeEvent event)
+					{
+						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+						if (gitFolder.exists())
+						{
+							try
+							{
+								gitFolder.delete(true, new NullProgressMonitor());
+							}
+							catch (CoreException e)
+							{
+							}
+						}
+					}
+				});
 				List<IResource> selection = new ArrayList<IResource>();
 				selection.add(projectHandle);
 				disconnect.setSelectedResources(selection);
@@ -374,15 +373,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 
 	private void doPostProjectCreation()
 	{
-		SamplesReference samplesRef;
-		if (localSample != null)
-		{
-			samplesRef = getSamplesReference(localSample);
-		}
-		else
-		{
-			samplesRef = remoteSample;
-		}
+		SamplesReference samplesRef = sample.getReference();
 		if (samplesRef != null)
 		{
 			ISampleProjectHandler projectHandler = samplesRef.getProjectHandler();
@@ -411,20 +402,6 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				}
 			}
 		}
-	}
-
-	private static SamplesReference getSamplesReference(SampleEntry entry)
-	{
-		Object parent = entry.getParent();
-		while (parent instanceof SampleEntry)
-		{
-			parent = ((SampleEntry) parent).getParent();
-		}
-		if (parent instanceof SamplesReference)
-		{
-			return (SamplesReference) parent;
-		}
-		return null;
 	}
 
 	/**
