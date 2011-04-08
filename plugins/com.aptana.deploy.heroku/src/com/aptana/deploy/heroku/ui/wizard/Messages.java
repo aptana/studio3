@@ -36,6 +36,9 @@ public class Messages extends NLS
 	public static String HerokuSignupPage_SignupNote;
 	public static String HerokuSignupPage_Title;
 
+	public static String DeployWizard_AutomaticGitCommitMessage;
+	public static String DeployWizard_FailureToGrabHerokuSignupJSError;
+
 	static
 	{
 		// initialize resource bundle

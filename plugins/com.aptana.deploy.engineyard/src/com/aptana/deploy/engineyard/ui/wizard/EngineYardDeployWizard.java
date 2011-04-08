@@ -37,7 +37,6 @@ import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
-import com.aptana.deploy.wizard.Messages;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;

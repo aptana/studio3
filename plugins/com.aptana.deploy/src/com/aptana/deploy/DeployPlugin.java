@@ -16,10 +16,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
+import com.aptana.deploy.wizard.DeployWizardRegistry;
 
 public class DeployPlugin extends AbstractUIPlugin
 {
@@ -117,5 +119,10 @@ public class DeployPlugin extends AbstractUIPlugin
 		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
 		getDefault().getImageRegistry().put(path, desc);
 		return desc;
+	}
+
+	public IWizardRegistry getDeployWizardRegistry()
+	{
+		return DeployWizardRegistry.getInstance();
 	}
 }

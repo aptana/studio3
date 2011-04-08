@@ -4,6 +4,7 @@ import org.eclipse.ui.internal.wizards.AbstractExtensionWizardRegistry;
 
 import com.aptana.deploy.DeployPlugin;
 
+@SuppressWarnings("restriction")
 public class DeployWizardRegistry extends AbstractExtensionWizardRegistry
 {
 

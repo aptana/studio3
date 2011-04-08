@@ -40,7 +40,6 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
-import com.aptana.deploy.wizard.Messages;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;

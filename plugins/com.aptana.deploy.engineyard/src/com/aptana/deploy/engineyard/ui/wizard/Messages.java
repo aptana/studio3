@@ -43,6 +43,8 @@ public class Messages extends NLS
 	public static String EngineYardSignupPage_SignupNote;
 	public static String EngineYardSignupPage_Title;
 
+	public static String DeployWizard_FailureToGrabHerokuSignupJSError;
+
 	static
 	{
 		// initialize resource bundle
