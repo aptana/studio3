@@ -21,12 +21,12 @@ import org.osgi.framework.BundleContext;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
-public class Activator extends AbstractUIPlugin
+public class DeployPlugin extends AbstractUIPlugin
 {
 
 	private static final String PLUGIN_ID = "com.aptana.deploy"; //$NON-NLS-1$
 
-	private static Activator instance;
+	private static DeployPlugin instance;
 
 	private IResourceChangeListener resourceListener = new IResourceChangeListener()
 	{
@@ -67,7 +67,7 @@ public class Activator extends AbstractUIPlugin
 		return PLUGIN_ID;
 	}
 
-	public static Activator getDefault()
+	public static DeployPlugin getDefault()
 	{
 		return instance;
 	}

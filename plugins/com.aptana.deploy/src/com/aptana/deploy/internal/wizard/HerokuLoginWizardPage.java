@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.HerokuAPI;
 import com.aptana.deploy.ILoginValidator;
 
@@ -44,7 +44,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 
 	protected HerokuLoginWizardPage()
 	{
-		super(NAME, Messages.HerokuLoginWizardPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuLoginWizardPage_Title, DeployPlugin.getImageDescriptor(HEROKU_ICON));
 	}
 
 	public void createControl(Composite parent)

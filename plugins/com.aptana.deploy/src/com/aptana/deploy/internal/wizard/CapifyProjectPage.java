@@ -32,7 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.terminal.widget.TerminalComposite;
 
@@ -141,7 +141,7 @@ public class CapifyProjectPage extends WizardPage
 				}
 				catch (Exception e1)
 				{
-					Activator.logError(e1);
+					DeployPlugin.logError(e1);
 				}
 
 			}

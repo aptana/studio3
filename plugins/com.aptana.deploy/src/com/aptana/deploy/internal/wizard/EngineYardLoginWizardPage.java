@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.EngineYardAPI;
 import com.aptana.deploy.ILoginValidator;
 
@@ -40,7 +40,7 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 
 	protected EngineYardLoginWizardPage()
 	{
-		super(NAME, Messages.EngineYardLoginWizardPage_Title, Activator.getImageDescriptor(ENGINE_YARD_ICON));
+		super(NAME, Messages.EngineYardLoginWizardPage_Title, DeployPlugin.getImageDescriptor(ENGINE_YARD_ICON));
 	}
 
 	public void createControl(Composite parent)

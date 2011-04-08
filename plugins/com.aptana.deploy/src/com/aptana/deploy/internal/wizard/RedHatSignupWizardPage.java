@@ -34,7 +34,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.RedHatAPI;
 import com.aptana.ui.util.UIUtils;
 
@@ -52,7 +52,7 @@ public class RedHatSignupWizardPage extends WizardPage
 
 	protected RedHatSignupWizardPage()
 	{
-		super(NAME, Messages.RedHatSignupWizardPage_Title, Activator.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatSignupWizardPage_Title, DeployPlugin.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)

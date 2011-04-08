@@ -52,7 +52,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.internal.wizard.CapifyProjectPage;
 import com.aptana.deploy.internal.wizard.DeployWizardPage;
@@ -165,7 +165,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 			}
 			catch (Exception e)
 			{
-				Activator.logError(e);
+				DeployPlugin.logError(e);
 			}
 		}
 		return true;
@@ -299,7 +299,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		final boolean publishImmediately = page.publishImmediately();
 
 		// persists the auto-publish setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
 		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, publishImmediately);
 		try
 		{
@@ -400,7 +400,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					if (responseCode != HttpURLConnection.HTTP_OK)
 					{
 						// Log an error
-						Activator.logError(
+						DeployPlugin.logError(
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
 										builder.toString()), null);
 					}
@@ -498,7 +498,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 					if (responseCode != HttpURLConnection.HTTP_OK)
 					{
 						// Log an error
-						Activator.logError(
+						DeployPlugin.logError(
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
 										builder.toString()), null);
 					}
@@ -747,7 +747,7 @@ public class DeployWizard extends Wizard implements IWorkbenchWizard
 		}
 		catch (Exception e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 	}
 

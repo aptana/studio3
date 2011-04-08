@@ -64,8 +64,8 @@ public class EngineYardAPI
 		}
 		catch (Exception e)
 		{
-			Activator.logError(e);
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),
+			DeployPlugin.logError(e);
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
 					Messages.EngineYardAPI_CredentialsFile_Invalid);
 		}
 		finally
@@ -104,15 +104,15 @@ public class EngineYardAPI
 			
 			 if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			 {
-			 return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),  ""); //$NON-NLS-1$
+			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),  ""); //$NON-NLS-1$
 			 }
 			// some other response code...
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
 					""); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -167,15 +167,15 @@ public class EngineYardAPI
 			
 			 if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			 {
-			 return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),  ""); //$NON-NLS-1$
+			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),  ""); //$NON-NLS-1$
 			 }
 //			 some other response code...
-			 return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),
+			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
 					 ""); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -204,7 +204,7 @@ public class EngineYardAPI
 			}
 			catch (IOException e)
 			{
-				Activator.logError(e);
+				DeployPlugin.logError(e);
 			}
 			finally
 			{

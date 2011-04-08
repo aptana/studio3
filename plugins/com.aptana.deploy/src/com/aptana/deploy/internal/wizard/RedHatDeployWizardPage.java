@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.RedHatAPI;
 import com.aptana.deploy.wizard.DeployWizard;
 
@@ -39,7 +39,7 @@ public class RedHatDeployWizardPage extends WizardPage
 
 	protected RedHatDeployWizardPage()
 	{
-		super(NAME, Messages.RedHatDeployWizardPage_Title, Activator.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatDeployWizardPage_Title, DeployPlugin.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -107,7 +107,7 @@ public class RedHatDeployWizardPage extends WizardPage
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 		return RedHatAPI.PHP_5_3_2;
 	}

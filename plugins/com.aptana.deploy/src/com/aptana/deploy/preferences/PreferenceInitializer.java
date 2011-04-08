@@ -11,7 +11,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -19,7 +19,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences()
 	{
-		IEclipsePreferences prefs = (new DefaultScope()).getNode(Activator.getPluginIdentifier());
+		IEclipsePreferences prefs = (new DefaultScope()).getNode(DeployPlugin.getPluginIdentifier());
 		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, true);
 	}
 }

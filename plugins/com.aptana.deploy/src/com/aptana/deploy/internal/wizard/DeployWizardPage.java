@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.EngineYardAPI;
 import com.aptana.deploy.HerokuAPI;
 import com.aptana.deploy.RedHatAPI;
@@ -75,11 +75,11 @@ public class DeployWizardPage extends WizardPage
 		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		if (isRailsProject())
 		{
-			setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
+			setImageDescriptor(DeployPlugin.getImageDescriptor(HEROKU_IMG_PATH));
 			label.setText(Messages.DeployWizardPage_ProvidersLabel);
 			// deploy with Heroku
 			deployWithHeroku = new Button(composite, SWT.RADIO);
-			deployWithHeroku.setImage(Activator.getImage(HEROKU_IMG_PATH));
+			deployWithHeroku.setImage(DeployPlugin.getImage(HEROKU_IMG_PATH));
 			// disable the button if the project is currently deployed to Heroku
 			boolean couldDeployWithHeroku = (type == null || type != DeployType.HEROKU);
 			deployWithHeroku.setEnabled(couldDeployWithHeroku);
@@ -123,7 +123,7 @@ public class DeployWizardPage extends WizardPage
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
+					setImageDescriptor(DeployPlugin.getImageDescriptor(HEROKU_IMG_PATH));
 				}
 			});
 
@@ -132,7 +132,7 @@ public class DeployWizardPage extends WizardPage
 			{
 
 				deployWithEngineYard = new Button(composite, SWT.RADIO);
-				deployWithEngineYard.setImage(Activator.getImage(EY_IMG_PATH));
+				deployWithEngineYard.setImage(DeployPlugin.getImage(EY_IMG_PATH));
 
 				// disable the button if the project is currently deployed to Engine Yard
 				boolean couldDeployWithEY = (type == null || type != DeployType.ENGINEYARD);
@@ -140,7 +140,7 @@ public class DeployWizardPage extends WizardPage
 				if (!couldDeployWithHeroku)
 				{
 					deployWithEngineYard.setSelection(couldDeployWithEY);
-					setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+					setImageDescriptor(DeployPlugin.getImageDescriptor(EY_IMG_PATH));
 				}
 				if (!couldDeployWithEY)
 				{
@@ -158,7 +158,7 @@ public class DeployWizardPage extends WizardPage
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+						setImageDescriptor(DeployPlugin.getImageDescriptor(EY_IMG_PATH));
 					}
 				});
 			}
@@ -179,14 +179,14 @@ public class DeployWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
+				setImageDescriptor(DeployPlugin.getImageDescriptor(FTP_IMG_PATH));
 			}
 		});
 		if ((deployWithHeroku == null || !deployWithHeroku.getEnabled())
 				&& (deployWithEngineYard == null || !deployWithEngineYard.getEnabled()))
 		{
 			deployWithFTP.setSelection(true);
-			setImageDescriptor(Activator.getImageDescriptor(FTP_IMG_PATH));
+			setImageDescriptor(DeployPlugin.getImageDescriptor(FTP_IMG_PATH));
 		}
 
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
@@ -208,7 +208,7 @@ public class DeployWizardPage extends WizardPage
 			public void widgetSelected(SelectionEvent e)
 			{
 				// FIXME Seems to be some sizing/clipping issue here!
-				setImageDescriptor(Activator.getImageDescriptor(RED_HAT_IMG_PATH));
+				setImageDescriptor(DeployPlugin.getImageDescriptor(RED_HAT_IMG_PATH));
 			}
 		});
 
@@ -225,7 +225,7 @@ public class DeployWizardPage extends WizardPage
 		}
 		catch (CoreException e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 		return false;
 	}

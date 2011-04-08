@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.ui.util.SWTUtils;
 
 public class HerokuSignupPage extends WizardPage
@@ -44,7 +44,7 @@ public class HerokuSignupPage extends WizardPage
 
 	protected HerokuSignupPage(String startingUserId)
 	{
-		super(NAME, Messages.HerokuSignupPage_Title, Activator.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuSignupPage_Title, DeployPlugin.getImageDescriptor(HEROKU_ICON));
 		this.startingUserId = startingUserId;
 	}
 

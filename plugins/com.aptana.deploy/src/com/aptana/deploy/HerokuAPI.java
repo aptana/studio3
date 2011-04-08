@@ -90,15 +90,15 @@ public class HerokuAPI
 
 			if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), Messages.HerokuAPI_AuthFailed_Error);
+				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), Messages.HerokuAPI_AuthFailed_Error);
 			}
 			// some other response code...
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
 					Messages.HerokuAPI_AuthConnectionFailed_Error);
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -124,7 +124,7 @@ public class HerokuAPI
 		}
 		catch (IOException e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 		finally
 		{
@@ -156,7 +156,7 @@ public class HerokuAPI
 		}
 		catch (Exception e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 		finally
 		{
@@ -178,7 +178,7 @@ public class HerokuAPI
 			@Override
 			public IStatus authenticate()
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(),
+				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
 						Messages.HerokuAPI_UnableToGetHerokuCredentialsError);
 			}
 

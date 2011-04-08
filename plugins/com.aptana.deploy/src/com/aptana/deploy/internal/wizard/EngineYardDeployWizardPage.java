@@ -31,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.ui.util.SWTUtils;
 
@@ -44,7 +44,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 
 	protected EngineYardDeployWizardPage()
 	{
-		super(NAME, Messages.EngineYardDeployWizardPage_Title, Activator.getImageDescriptor(EY_ICON));
+		super(NAME, Messages.EngineYardDeployWizardPage_Title, DeployPlugin.getImageDescriptor(EY_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -113,7 +113,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 						}
 						catch (Exception e)
 						{
-							Activator.logError(e);
+							DeployPlugin.logError(e);
 						}
 					}
 				});

@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
-import com.aptana.deploy.Activator;
+import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
 public class DeployPreferenceUtil
@@ -23,7 +23,7 @@ public class DeployPreferenceUtil
 
 	public static DeployType getDeployType(IProject project)
 	{
-		String type = Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
+		String type = Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
 				MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), null, //$NON-NLS-1$
 				null);
 		if (type != null)
@@ -50,7 +50,7 @@ public class DeployPreferenceUtil
 
 	public static String getDeployEndpoint(IProject project)
 	{
-		return Platform.getPreferencesService().getString(Activator.getPluginIdentifier(),
+		return Platform.getPreferencesService().getString(DeployPlugin.getPluginIdentifier(),
 				MessageFormat.format("{0}:{1}", //$NON-NLS-1$
 						com.aptana.deploy.preferences.IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()),
 				null, null);
@@ -58,7 +58,7 @@ public class DeployPreferenceUtil
 
 	public static void setDeployType(IProject project, DeployType type)
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
 		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_TYPE, project.getName()), //$NON-NLS-1$
 				type.toString());
 		try
@@ -72,7 +72,7 @@ public class DeployPreferenceUtil
 
 	public static void setDeployEndpoint(IProject project, String endpoint)
 	{
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(Activator.getPluginIdentifier());
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
 		prefs.put(MessageFormat.format("{0}:{1}", IPreferenceConstants.PROJECT_DEPLOY_ENDPOINT, project.getName()), //$NON-NLS-1$
 				endpoint);
 		try

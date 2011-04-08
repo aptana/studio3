@@ -83,7 +83,7 @@ public class RedHatAPI
 		}
 		catch (StorageException e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 	}
 
@@ -101,7 +101,7 @@ public class RedHatAPI
 		}
 		catch (Exception e)
 		{
-			Activator.logError(e);
+			DeployPlugin.logError(e);
 		}
 	}
 
@@ -135,11 +135,11 @@ public class RedHatAPI
 			loadSavedCredentials();
 			if (login == null)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Login cannot be null");
+				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), "Login cannot be null");
 			}
 			if (password == null)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Password cannot be null");
+				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), "Password cannot be null");
 			}
 		}
 		newArgs[0] = LOGIN_SWITCH;
@@ -179,7 +179,7 @@ public class RedHatAPI
 			IPath binScript = ExecutableUtil.find(scriptName, false, null);
 			if (binScript == null)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), MessageFormat.format(
+				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), MessageFormat.format(
 						"Unable to find script ''{0}''. Please ensure you have the Red Hat Libra gem installed.",
 						scriptName));
 			}
