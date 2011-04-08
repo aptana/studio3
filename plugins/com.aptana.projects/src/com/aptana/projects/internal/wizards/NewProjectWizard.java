@@ -110,6 +110,22 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
+		List<ProjectTemplateElement> templates = getProjectTemplates(new Type[] { Type.WEB, Type.ALL });
+		if (templates.size() > 0)
+		{
+			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Returns a list of {@link ProjectTemplateElement} that match the any of the given types.
+	 * 
+	 * @param templateTypes
+	 *            The Types to match to.
+	 * @return A list of ProjectTemplateElement
+	 */
+	public static List<ProjectTemplateElement> getProjectTemplates(final Type[] templateTypes)
+	{
 		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
@@ -120,18 +136,19 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				{
 					ProjectTemplateElement template = (ProjectTemplateElement) element;
 					Type type = template.getType();
-
-					result = (type == Type.WEB || type == Type.ALL);
+					for (Type t : templateTypes)
+					{
+						if (type == t)
+						{
+							result = true;
+							break;
+						}
+					}
 				}
-
 				return result;
 			}
 		});
-
-		if (templates.size() > 0)
-		{
-			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
-		}
+		return templates;
 	}
 
 	@Override
