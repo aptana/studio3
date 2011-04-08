@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.deploy.wizard.NewDeployWizard;
+import com.aptana.deploy.wizard.DeployWizard;
 
 public class RunDeployWizardHandler extends AbstractHandler
 {
@@ -25,7 +25,7 @@ public class RunDeployWizardHandler extends AbstractHandler
 		IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
 
 		// Instantiates and initializes the wizard
-		NewDeployWizard wizard = new NewDeployWizard();
+		DeployWizard wizard = new DeployWizard();
 		wizard.init(part.getSite().getWorkbenchWindow().getWorkbench(), (IStructuredSelection) part.getSite()
 				.getSelectionProvider().getSelection());
 		wizard.setWindowTitle(Messages.DeployHandler_Wizard_Title);

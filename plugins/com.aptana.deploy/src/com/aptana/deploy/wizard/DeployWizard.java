@@ -27,7 +27,7 @@ import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardRegistry;
 
 // FIXME Model after ImportExportWizard, which uses a tree with categories for wizards!
-public class NewDeployWizard extends Wizard
+public class DeployWizard extends Wizard
 {
 	private IWorkbench theWorkbench;
 
