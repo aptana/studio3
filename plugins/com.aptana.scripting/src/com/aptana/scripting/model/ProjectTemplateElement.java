@@ -15,7 +15,7 @@ public class ProjectTemplateElement extends AbstractBundleElement
 {
 	public enum Type
 	{
-		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON
+		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON, TITANIUM_MOBILE, TITANIUM_DESKTOP
 	}
 
 	private Type fType = Type.UNDEFINED;
@@ -44,7 +44,8 @@ public class ProjectTemplateElement extends AbstractBundleElement
 			return false;
 		}
 		ProjectTemplateElement other = (ProjectTemplateElement) obj;
-		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName()) && getLocation().equals(other.getLocation());
+		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName())
+				&& getLocation().equals(other.getLocation());
 	}
 
 	/**
@@ -157,7 +158,7 @@ public class ProjectTemplateElement extends AbstractBundleElement
 			fType = Type.UNDEFINED;
 		}
 	}
-	
+
 	/**
 	 * setType
 	 * 
