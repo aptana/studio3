@@ -30,8 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.ui.util.SWTUtils;
 
 public class HerokuSignupPage extends WizardPage
@@ -45,7 +44,7 @@ public class HerokuSignupPage extends WizardPage
 
 	protected HerokuSignupPage(String startingUserId)
 	{
-		super(NAME, Messages.HerokuSignupPage_Title, DeployPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuSignupPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
 		this.startingUserId = startingUserId;
 	}
 
@@ -105,12 +104,12 @@ public class HerokuSignupPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				if(!isEmailValid(userId.getText()))
+				if (!isEmailValid(userId.getText()))
 				{
 					MessageDialog.openError(getShell(), "Error", Messages.HerokuSignupPage_InvalidEmail_Message); //$NON-NLS-1$
 					return;
 				}
-				
+
 				// basically just perform finish!
 				if (getWizard().performFinish())
 				{
@@ -148,17 +147,17 @@ public class HerokuSignupPage extends WizardPage
 		setErrorMessage(null);
 		return true;
 	}
-	
+
 	private Boolean isEmailValid(String email)
 	{
-		
+
 		Pattern p = Pattern.compile("^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
-		
+
 		Matcher m = p.matcher(email);
-		
-		if(m.matches())
+
+		if (m.matches())
 			return true;
-		
+
 		return false;
 	}
 }

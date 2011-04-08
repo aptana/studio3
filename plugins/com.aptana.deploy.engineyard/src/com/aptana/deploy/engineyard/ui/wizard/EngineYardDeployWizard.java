@@ -32,8 +32,8 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.engineyard.EngineYardAPI;
+import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
@@ -117,7 +117,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 			}
 			catch (Exception e)
 			{
-				DeployPlugin.logError(e);
+				EngineYardPlugin.logError(e);
 			}
 		}
 		return true;
@@ -158,7 +158,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 					if (responseCode != HttpURLConnection.HTTP_OK)
 					{
 						// Log an error
-						DeployPlugin.logError(
+						EngineYardPlugin.logError(
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
 										builder.toString()), null);
 					}
@@ -294,7 +294,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 		}
 		catch (Exception e)
 		{
-			DeployPlugin.logError(e);
+			EngineYardPlugin.logError(e);
 		}
 	}
 }

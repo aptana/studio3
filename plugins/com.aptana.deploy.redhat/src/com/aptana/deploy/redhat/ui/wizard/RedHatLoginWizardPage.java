@@ -33,10 +33,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.ILoginValidator;
-import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.deploy.redhat.RedHatAPI;
+import com.aptana.deploy.redhat.RedHatPlugin;
 
 public class RedHatLoginWizardPage extends WizardPage implements ILoginValidator
 {
@@ -50,7 +49,7 @@ public class RedHatLoginWizardPage extends WizardPage implements ILoginValidator
 
 	protected RedHatLoginWizardPage()
 	{
-		super(NAME, Messages.RedHatLoginWizardPage_Title, DeployPlugin.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatLoginWizardPage_Title, RedHatPlugin.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)

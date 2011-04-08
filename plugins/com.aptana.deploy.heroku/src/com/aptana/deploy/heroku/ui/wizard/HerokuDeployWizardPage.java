@@ -27,8 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -46,7 +45,7 @@ public class HerokuDeployWizardPage extends WizardPage
 
 	protected HerokuDeployWizardPage()
 	{
-		super(NAME, Messages.HerokuDeployWizardPage_Title, DeployPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuDeployWizardPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -80,7 +79,7 @@ public class HerokuDeployWizardPage extends WizardPage
 
 		publishButton = new Button(composite, SWT.CHECK);
 		publishButton.setText(Messages.HerokuDeployWizardPage_PublishApplicationLabel);
-		publishButton.setSelection(Platform.getPreferencesService().getBoolean(DeployPlugin.getPluginIdentifier(),
+		publishButton.setSelection(Platform.getPreferencesService().getBoolean(HerokuPlugin.getPluginIdentifier(),
 				IPreferenceConstants.HEROKU_AUTO_PUBLISH, true, null));
 
 		if (doesntHaveGitRepo())

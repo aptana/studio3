@@ -28,10 +28,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.ILoginValidator;
 import com.aptana.deploy.heroku.HerokuAPI;
-import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.heroku.HerokuPlugin;
 
 public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 {
@@ -45,7 +44,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 
 	protected HerokuLoginWizardPage()
 	{
-		super(NAME, Messages.HerokuLoginWizardPage_Title, DeployPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuLoginWizardPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
 	}
 
 	public void createControl(Composite parent)

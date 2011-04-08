@@ -30,8 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.internal.wizard.Messages;
+import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.ui.util.SWTUtils;
 
 public class EngineYardSignupPage extends WizardPage
@@ -45,7 +44,7 @@ public class EngineYardSignupPage extends WizardPage
 
 	protected EngineYardSignupPage(String startingUserId)
 	{
-		super(NAME, Messages.EngineYardSignupPage_Title, DeployPlugin.getImageDescriptor(ENGINE_YARD_ICON));
+		super(NAME, Messages.EngineYardSignupPage_Title, EngineYardPlugin.getImageDescriptor(ENGINE_YARD_ICON));
 		this.startingUserId = startingUserId;
 	}
 

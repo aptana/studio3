@@ -34,8 +34,8 @@ import org.eclipse.ui.internal.browser.WebBrowserEditorInput;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.IOUtil;
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.heroku.HerokuAPI;
+import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
@@ -127,7 +127,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 			}
 			catch (Exception e)
 			{
-				DeployPlugin.logError(e);
+				HerokuPlugin.logError(e);
 			}
 		}
 		return true;
@@ -140,7 +140,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 		final boolean publishImmediately = page.publishImmediately();
 
 		// persists the auto-publish setting
-		IEclipsePreferences prefs = (new InstanceScope()).getNode(DeployPlugin.getPluginIdentifier());
+		IEclipsePreferences prefs = (new InstanceScope()).getNode(HerokuPlugin.getPluginIdentifier());
 		prefs.putBoolean(IPreferenceConstants.HEROKU_AUTO_PUBLISH, publishImmediately);
 		try
 		{
@@ -241,7 +241,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 					if (responseCode != HttpURLConnection.HTTP_OK)
 					{
 						// Log an error
-						DeployPlugin.logError(
+						HerokuPlugin.logError(
 								MessageFormat.format(Messages.DeployWizard_FailureToGrabHerokuSignupJSError,
 										builder.toString()), null);
 					}
@@ -352,7 +352,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 		}
 		catch (Exception e)
 		{
-			DeployPlugin.logError(e);
+			HerokuPlugin.logError(e);
 		}
 	}
 }

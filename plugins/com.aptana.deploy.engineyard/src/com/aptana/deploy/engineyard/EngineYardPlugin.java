@@ -1,11 +1,12 @@
 package com.aptana.deploy.engineyard;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class EngineYardPlugin extends Plugin
+public class EngineYardPlugin extends AbstractUIPlugin
 {
 
 	private static final String PLUGIN_ID = "com.aptana.deploy.engineyard"; //$NON-NLS-1$
@@ -39,12 +40,29 @@ public class EngineYardPlugin extends Plugin
 
 	public static void logError(Throwable t)
 	{
-		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginIdentifier(), t.getMessage(), t));
+		logError(t.getMessage(), t);
 	}
 
 	public static String getPluginIdentifier()
 	{
 		return PLUGIN_ID;
+	}
+
+	public static void logError(String msg, Throwable t)
+	{
+		getDefault().getLog().log(new Status(IStatus.ERROR, getPluginIdentifier(), msg, t));
+	}
+
+	public static ImageDescriptor getImageDescriptor(String path)
+	{
+		ImageDescriptor desc = getDefault().getImageRegistry().getDescriptor(path);
+		if (desc != null)
+		{
+			return desc;
+		}
+		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
+		getDefault().getImageRegistry().put(path, desc);
+		return desc;
 	}
 
 }

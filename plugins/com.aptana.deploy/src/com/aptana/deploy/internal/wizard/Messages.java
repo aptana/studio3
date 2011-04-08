@@ -24,46 +24,6 @@ public class Messages extends NLS
 	public static String CapifyProjectPage_LinkText;
 	public static String CapifyProjectPage_Title;
 
-	public static String HerokuDeployWizardPage_ApplicationNameLabel;
-	public static String HerokuDeployWizardPage_EmotyApplicationNameError;
-	public static String HerokuDeployWizardPage_NoGitRepoNote;
-	public static String HerokuDeployWizardPage_PublishApplicationLabel;
-	public static String HerokuDeployWizardPage_Title;
-
-	public static String HerokuLoginWizardPage_EmptyPasswordError;
-	public static String HerokuLoginWizardPage_EmptyUserIDError;
-	public static String HerokuLoginWizardPage_EnterCredentialsLabel;
-	public static String HerokuLoginWizardPage_PasswordExample;
-	public static String HerokuLoginWizardPage_PasswordLabel;
-	public static String HerokuLoginWizardPage_SignupLink;
-	public static String HerokuLoginWizardPage_SubmitButtonLabel;
-	public static String HerokuLoginWizardPage_Title;
-	public static String HerokuLoginWizardPage_UserIDExample;
-	public static String HerokuLoginWizardPage_UserIDLabel;
-
-	public static String HerokuSignupPage_InvalidEmail_Message;
-	public static String HerokuSignupPage_SignupButtonLabel;
-	public static String HerokuSignupPage_SignupNote;
-	public static String HerokuSignupPage_Title;
-
-	public static String RedHatDeployWizardPage_ApplicationNameLabel;
-	public static String RedHatDeployWizardPage_EmotyApplicationNameError;
-	public static String RedHatDeployWizardPage_NoGitRepoNote;
-	public static String RedHatDeployWizardPage_PublishApplicationLabel;
-	public static String RedHatDeployWizardPage_Title;
-
-	public static String RedHatLoginWizardPage_EmptyPasswordError;
-	public static String RedHatLoginWizardPage_EmptyUserIDError;
-	public static String RedHatLoginWizardPage_EnterCredentialsLabel;
-	public static String RedHatLoginWizardPage_PasswordExample;
-	public static String RedHatLoginWizardPage_PasswordLabel;
-	public static String RedHatLoginWizardPage_SignupLink;
-	public static String RedHatLoginWizardPage_SubmitButtonLabel;
-	public static String RedHatLoginWizardPage_Title;
-	public static String RedHatLoginWizardPage_UserIDExample;
-	public static String RedHatLoginWizardPage_UserIDLabel;
-	public static String RedHatLoginWizardPage_InvalidCredentialsError;
-
 	public static String DeployWizardPage_AlreadyDeployedToHeroku;
 	public static String DeployWizardPage_CapistranoLabel;
 	public static String DeployWizardPage_FTPLabel;
@@ -73,35 +33,6 @@ public class Messages extends NLS
 	public static String DeployWizardPage_ProvidersLabel;
 	public static String DeployWizardPage_Title;
 
-	public static String EngineYardDeployWizardPage_ApplicationLinkLabel;
-	public static String EngineYardDeployWizardPage_ApplicationNameLabel;
-	public static String EngineYardDeployWizardPage_ApplicationNoteLabel;
-	public static String EngineYardDeployWizardPage_Title;
-
-	public static String EngineYardLoginWizardPage_EmailAddressExample;
-	public static String EngineYardLoginWizardPage_EmailAddressLabel;
-	public static String EngineYardLoginWizardPage_EmptyEmailAddressLabel;
-	public static String EngineYardLoginWizardPage_EmptyPasswordLabel;
-	public static String EngineYardLoginWizardPage_EnterCredentialsLabel;
-	public static String EngineYardLoginWizardPage_ErrorTitle;
-	public static String EngineYardLoginWizardPage_InvalidCredentails_Message;
-	public static String EngineYardLoginWizardPage_PasswordExample;
-	public static String EngineYardLoginWizardPage_PasswordLabel;
-	public static String EngineYardLoginWizardPage_SignupLinkLabel;
-	public static String EngineYardLoginWizardPage_SubmitButtonLabel;
-	public static String EngineYardLoginWizardPage_Success_Message;
-	public static String EngineYardLoginWizardPage_SuccessTitle;
-	public static String EngineYardLoginWizardPage_Title;
-
-	public static String EngineYardSignupPage_EmailAddressExample;
-	public static String EngineYardSignupPage_EmailAddressLabel;
-	public static String EngineYardSignupPage_EmptyEmailAddressLabel;
-	public static String EngineYardSignupPage_EnterCredentialsLabel;
-	public static String EngineYardSignupPage_InvalidEmail_Message;
-	public static String EngineYardSignupPage_SignupButtonLabel;
-	public static String EngineYardSignupPage_SignupNote;
-	public static String EngineYardSignupPage_Title;
-
 	public static String FTPDeployWizardPage_ProtocolLabel;
 	public static String FTPDeployWizardPage_RemoteInfoLabel;
 	public static String FTPDeployWizardPage_SiteNameLabel;
@@ -110,23 +41,6 @@ public class Messages extends NLS
 	public static String InstallCapistranoGemPage_Description;
 	public static String InstallCapistranoGemPage_InstallGemLabel;
 	public static String InstallCapistranoGemPage_Title;
-
-	public static String RedHatSignupWizardPage_Title;
-	public static String RedHatSignupWizardPage_EnterCredentialsLabel;
-	public static String RedHatSignupWizardPage_NamespaceLabel;
-	public static String RedHatSignupWizardPage_NamespaceExample;
-	public static String RedHatSignupWizardPage_UserIDLabel;
-	public static String RedHatSignupWizardPage_UserIDExample;
-	public static String RedHatSignupWizardPage_PasswordLabel;
-	public static String RedHatSignupWizardPage_ConfirmPasswordLabel;
-	public static String RedHatSignupWizardPage_InvalidNamespaceError;
-	public static String RedHatSignupWizardPage_EmptyUserIDError;
-	public static String RedHatSignupWizardPage_EmptyPasswordError;
-	public static String RedHatSignupWizardPage_EmptyConfirmPasswordError;
-	public static String RedHatSignupWizardPage_GemNotInstalledErrorMessage;
-	public static String RedHatSignupWizardPage_GemNotInstalledMessage;
-	public static String RedHatSignupWizardPage_GemNotInstalledTitle;
-	public static String RedHatSignupWizardPage_PasswordsDontMatchError;
 
 	static
 	{

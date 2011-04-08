@@ -12,7 +12,6 @@ import org.eclipse.equinox.security.storage.StorageException;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.deploy.DeployPlugin;
 
 public class RedHatAPI
 {
@@ -84,7 +83,7 @@ public class RedHatAPI
 		}
 		catch (StorageException e)
 		{
-			DeployPlugin.logError(e);
+			RedHatPlugin.logError(e);
 		}
 	}
 
@@ -102,7 +101,7 @@ public class RedHatAPI
 		}
 		catch (Exception e)
 		{
-			DeployPlugin.logError(e);
+			RedHatPlugin.logError(e);
 		}
 	}
 
@@ -136,11 +135,11 @@ public class RedHatAPI
 			loadSavedCredentials();
 			if (login == null)
 			{
-				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), "Login cannot be null");
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), "Login cannot be null");
 			}
 			if (password == null)
 			{
-				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), "Password cannot be null");
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), "Password cannot be null");
 			}
 		}
 		newArgs[0] = LOGIN_SWITCH;
@@ -180,7 +179,7 @@ public class RedHatAPI
 			IPath binScript = ExecutableUtil.find(scriptName, false, null);
 			if (binScript == null)
 			{
-				return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), MessageFormat.format(
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), MessageFormat.format(
 						"Unable to find script ''{0}''. Please ensure you have the Red Hat Libra gem installed.",
 						scriptName));
 			}

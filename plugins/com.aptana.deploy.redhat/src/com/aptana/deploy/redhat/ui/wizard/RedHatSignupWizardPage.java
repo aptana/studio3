@@ -34,9 +34,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
-import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.deploy.redhat.RedHatAPI;
+import com.aptana.deploy.redhat.RedHatPlugin;
 import com.aptana.ui.util.UIUtils;
 
 public class RedHatSignupWizardPage extends WizardPage
@@ -53,7 +52,7 @@ public class RedHatSignupWizardPage extends WizardPage
 
 	protected RedHatSignupWizardPage()
 	{
-		super(NAME, Messages.RedHatSignupWizardPage_Title, DeployPlugin.getImageDescriptor(RED_HAT_ICON));
+		super(NAME, Messages.RedHatSignupWizardPage_Title, RedHatPlugin.getImageDescriptor(RED_HAT_ICON));
 	}
 
 	public void createControl(Composite parent)
@@ -154,12 +153,9 @@ public class RedHatSignupWizardPage extends WizardPage
 		IStatus apiCheck = new RedHatAPI().verifyGemInstalled();
 		if (!apiCheck.isOK())
 		{
-			MessageDialog dialog = new MessageDialog(
-					getShell(),
-					Messages.RedHatSignupWizardPage_GemNotInstalledTitle,
-					null,
-					Messages.RedHatSignupWizardPage_GemNotInstalledMessage,
-					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+			MessageDialog dialog = new MessageDialog(getShell(), Messages.RedHatSignupWizardPage_GemNotInstalledTitle,
+					null, Messages.RedHatSignupWizardPage_GemNotInstalledMessage, MessageDialog.ERROR, new String[] {
+							IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
 			if (dialog.open() == 0)
 			{
 				// Open docs at http://wiki.appcelerator.org/display/tis/Red+Hat+Deployment

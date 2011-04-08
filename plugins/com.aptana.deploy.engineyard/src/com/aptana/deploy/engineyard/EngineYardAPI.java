@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.PlatformUtil;
-import com.aptana.deploy.DeployPlugin;
 
 public class EngineYardAPI
 {
@@ -105,15 +104,15 @@ public class EngineYardAPI
 			
 			 if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			 {
-			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),  ""); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(), ""); //$NON-NLS-1$
 			 }
 			// some other response code...
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
+			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(),
 					""); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -168,15 +167,15 @@ public class EngineYardAPI
 			
 			 if (code == HttpURLConnection.HTTP_UNAUTHORIZED || code == HttpURLConnection.HTTP_FORBIDDEN)
 			 {
-			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),  ""); //$NON-NLS-1$
+				return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(), ""); //$NON-NLS-1$
 			 }
 //			 some other response code...
-			 return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
+			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(),
 					 ""); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(), e.getMessage(), e);
+			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(), e.getMessage(), e);
 		}
 		finally
 		{
@@ -205,7 +204,7 @@ public class EngineYardAPI
 			}
 			catch (IOException e)
 			{
-				DeployPlugin.logError(e);
+				EngineYardPlugin.logError(e);
 			}
 			finally
 			{

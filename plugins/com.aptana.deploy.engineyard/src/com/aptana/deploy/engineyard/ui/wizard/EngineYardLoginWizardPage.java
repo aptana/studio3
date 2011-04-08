@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.engineyard.ui.wizard;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.EngineYardAPI;
 import com.aptana.deploy.ILoginValidator;
+import com.aptana.deploy.engineyard.EngineYardAPI;
+import com.aptana.deploy.engineyard.EngineYardPlugin;
 
 public class EngineYardLoginWizardPage extends WizardPage implements ILoginValidator
 {
@@ -40,7 +40,7 @@ public class EngineYardLoginWizardPage extends WizardPage implements ILoginValid
 
 	protected EngineYardLoginWizardPage()
 	{
-		super(NAME, Messages.EngineYardLoginWizardPage_Title, DeployPlugin.getImageDescriptor(ENGINE_YARD_ICON));
+		super(NAME, Messages.EngineYardLoginWizardPage_Title, EngineYardPlugin.getImageDescriptor(ENGINE_YARD_ICON));
 	}
 
 	public void createControl(Composite parent)

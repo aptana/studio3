@@ -14,10 +14,10 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.redhat.RedHatAPI;
+import com.aptana.deploy.redhat.RedHatPlugin;
 import com.aptana.deploy.wizard.IDeployWizard;
 
 public class RedHatDeployWizard extends Wizard implements IDeployWizard
@@ -75,7 +75,7 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 			}
 			catch (Exception e)
 			{
-				DeployPlugin.logError(e);
+				RedHatPlugin.logError(e);
 			}
 		}
 		return true;
