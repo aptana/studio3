@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.dialogs;
+package com.aptana.deploy.ftp.ui.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import com.aptana.deploy.internal.wizard.FTPDeployComposite;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.syncing.ui.preferences.SyncPreferenceUtil;
 import com.aptana.ui.ftp.internal.FTPConnectionPropertyComposite;

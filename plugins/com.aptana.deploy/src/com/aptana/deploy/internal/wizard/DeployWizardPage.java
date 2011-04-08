@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
@@ -28,11 +27,8 @@ public class DeployWizardPage extends WizardPage
 {
 
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
-	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
 
-	private Button deployWithFTP;
 	private Button deployWithCapistrano;
-	private Button deployWithHeroku;
 
 	private IProject project;
 
@@ -56,21 +52,6 @@ public class DeployWizardPage extends WizardPage
 
 		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		label.setText(Messages.DeployWizardPage_DeploymentOptionsLabel);
-
-		// "Other" Deployment options radio button group
-		deployWithFTP = new Button(composite, SWT.RADIO);
-		deployWithFTP.setText(Messages.DeployWizardPage_FTPLabel);
-		deployWithFTP.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				setImageDescriptor(DeployPlugin.getImageDescriptor(FTP_IMG_PATH));
-			}
-		});
-
-		deployWithFTP.setSelection(true);
-		setImageDescriptor(DeployPlugin.getImageDescriptor(FTP_IMG_PATH));
 
 		deployWithCapistrano = new Button(composite, SWT.RADIO);
 		deployWithCapistrano.setText(Messages.DeployWizardPage_CapistranoLabel);
@@ -101,11 +82,7 @@ public class DeployWizardPage extends WizardPage
 		// re-creating new objects for next page.
 		IWizardPage nextPage = null;
 		// Determine what page is next by the user's choice in the radio buttons
-		if (deployWithFTP != null && deployWithFTP.getSelection())
-		{
-			nextPage = new FTPDeployWizardPage(project);
-		}
-		else if (deployWithCapistrano != null && deployWithCapistrano.getSelection())
+		if (deployWithCapistrano != null && deployWithCapistrano.getSelection())
 		{
 			if (InstallCapistranoGemPage.isCapistranoGemInstalled())
 			{

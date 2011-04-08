@@ -14,11 +14,6 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.deploy.internal.wizard.messages"; //$NON-NLS-1$
 
-	public static String FTPDeployComposite_AutoSync;
-	public static String FTPDeployComposite_Download;
-	public static String FTPDeployComposite_Synchronize;
-	public static String FTPDeployComposite_Upload;
-
 	public static String CapifyProjectPage_Description;
 	public static String CapifyProjectPage_GenerateButtonLabel;
 	public static String CapifyProjectPage_LinkText;
@@ -32,11 +27,6 @@ public class Messages extends NLS
 	public static String DeployWizardPage_DeploymentOptionsLabel;
 	public static String DeployWizardPage_ProvidersLabel;
 	public static String DeployWizardPage_Title;
-
-	public static String FTPDeployWizardPage_ProtocolLabel;
-	public static String FTPDeployWizardPage_RemoteInfoLabel;
-	public static String FTPDeployWizardPage_SiteNameLabel;
-	public static String FTPDeployWizardPage_Title;
 
 	public static String InstallCapistranoGemPage_Description;
 	public static String InstallCapistranoGemPage_InstallGemLabel;

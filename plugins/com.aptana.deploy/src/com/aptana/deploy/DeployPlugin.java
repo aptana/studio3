@@ -13,8 +13,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
@@ -94,31 +92,6 @@ public class DeployPlugin extends AbstractUIPlugin
 	public static void logError(CoreException e)
 	{
 		getDefault().getLog().log(e.getStatus());
-	}
-
-	public static Image getImage(String string)
-	{
-		if (getDefault().getImageRegistry().get(string) == null)
-		{
-			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
-			if (id != null)
-			{
-				getDefault().getImageRegistry().put(string, id);
-			}
-		}
-		return getDefault().getImageRegistry().get(string);
-	}
-
-	public static ImageDescriptor getImageDescriptor(String path)
-	{
-		ImageDescriptor desc = getDefault().getImageRegistry().getDescriptor(path);
-		if (desc != null)
-		{
-			return desc;
-		}
-		desc = imageDescriptorFromPlugin(PLUGIN_ID, path);
-		getDefault().getImageRegistry().put(path, desc);
-		return desc;
 	}
 
 	public IWizardRegistry getDeployWizardRegistry()

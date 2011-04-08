@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.ftp.ui.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
@@ -15,7 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
-import com.aptana.deploy.DeployPlugin;
+import com.aptana.deploy.ftp.FTPDeployPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -38,7 +38,7 @@ public class FTPDeployWizardPage extends WizardPage implements FTPConnectionProp
 
 	protected FTPDeployWizardPage(IProject project)
 	{
-		super(NAME, Messages.FTPDeployWizardPage_Title, DeployPlugin.getImageDescriptor(ICON_PATH));
+		super(NAME, Messages.FTPDeployWizardPage_Title, FTPDeployPlugin.getImageDescriptor(ICON_PATH));
 		this.project = project;
 		// checks if the project already has an associated FTP connection and fills the info automatically if one exists
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(project, true);
