@@ -5,7 +5,7 @@
          point="com.aptana.deploy.deployWizards">
       <wizard
             class="com.aptana.deploy.engineyard.ui.wizard.EngineYardDeployWizard"
-            icon="icons/ey_small.png"
+            icon="icons/icon-engineyard.png"
             id="com.aptana.deploy.engineyard.wizard"
             name="Engine Yard">
       </wizard>

@@ -5,7 +5,7 @@
          point="com.aptana.deploy.deployWizards">
       <wizard
             class="com.aptana.deploy.heroku.ui.wizard.HerokuDeployWizard"
-            icon="icons/heroku.png"
+            icon="icons/icon-heroku.png"
             id="com.aptana.deploy.heroku.wizard"
             name="Heroku">
       </wizard>

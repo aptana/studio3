@@ -5,7 +5,7 @@
          point="com.aptana.deploy.deployWizards">
       <wizard
             class="com.aptana.deploy.redhat.ui.wizard.RedHatDeployWizard"
-            icon="icons/redhat.png"
+            icon="icons/redhat-16.gif"
             id="com.aptana.deploy.redhat.wizard"
             name="Red Hat Libra">
       </wizard>

@@ -5,7 +5,7 @@
          point="com.aptana.deploy.deployWizards">
       <wizard
             class="com.aptana.deploy.ftp.ui.wizard.FTPDeployWizard"
-            icon="icons/ftp.png"
+            icon="icons/ftp16.png"
             id="com.aptana.deploy.ftp.wizard"
             name="FTP">
       </wizard>
