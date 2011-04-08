@@ -35,7 +35,7 @@ import com.aptana.deploy.ILoginValidator;
 public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "HerokuLogin"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;

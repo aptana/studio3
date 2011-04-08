@@ -42,9 +42,12 @@ public class DeployWizardPage extends WizardPage
 
 	public static final String NAME = "Deployment"; //$NON-NLS-1$
 	private static final String HEROKU_IMG_PATH = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String HEROKU_IMG_WIZARD_PATH = "icons/heroku_wizard.png"; //$NON-NLS-1$
 	private static final String FTP_IMG_PATH = "icons/ftp.png"; //$NON-NLS-1$
+	private static final String EY_IMG_WIZARD_PATH = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 	private static final String EY_IMG_PATH = "icons/ey_small.png"; //$NON-NLS-1$
 	private static final String RED_HAT_IMG_PATH = "icons/redhat.png"; //$NON-NLS-1$
+	private static final String BLANK_PATH = "icons/blank.png"; //$NON-NLS-1$
 
 	private Button deployWithFTP;
 	private Button deployWithCapistrano;
@@ -56,7 +59,7 @@ public class DeployWizardPage extends WizardPage
 
 	public DeployWizardPage(IProject project)
 	{
-		super(NAME, Messages.DeployWizardPage_Title, null);
+		super(NAME, Messages.DeployWizardPage_Title, Activator.getImageDescriptor(BLANK_PATH));
 		this.project = project;
 	}
 
@@ -75,7 +78,7 @@ public class DeployWizardPage extends WizardPage
 		DeployType type = DeployPreferenceUtil.getDeployType(project);
 		if (isRailsProject())
 		{
-			setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
+			setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_WIZARD_PATH));
 			label.setText(Messages.DeployWizardPage_ProvidersLabel);
 			// deploy with Heroku
 			deployWithHeroku = new Button(composite, SWT.RADIO);
@@ -123,7 +126,7 @@ public class DeployWizardPage extends WizardPage
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_PATH));
+					setImageDescriptor(Activator.getImageDescriptor(HEROKU_IMG_WIZARD_PATH));
 				}
 			});
 
@@ -140,7 +143,7 @@ public class DeployWizardPage extends WizardPage
 				if (!couldDeployWithHeroku)
 				{
 					deployWithEngineYard.setSelection(couldDeployWithEY);
-					setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+					setImageDescriptor(Activator.getImageDescriptor(EY_IMG_WIZARD_PATH));
 				}
 				if (!couldDeployWithEY)
 				{
@@ -158,7 +161,7 @@ public class DeployWizardPage extends WizardPage
 					@Override
 					public void widgetSelected(SelectionEvent e)
 					{
-						setImageDescriptor(Activator.getImageDescriptor(EY_IMG_PATH));
+						setImageDescriptor(Activator.getImageDescriptor(EY_IMG_WIZARD_PATH));
 					}
 				});
 			}
@@ -196,7 +199,7 @@ public class DeployWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				setImageDescriptor(null);
+				setImageDescriptor(Activator.getImageDescriptor(BLANK_PATH));
 			}
 		});
 
