@@ -28,6 +28,5 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy,
  com.aptana.deploy.dialogs,
- com.aptana.deploy.internal.wizard;x-friends:="com.appcelerator.titanium.ui.ide",
  com.aptana.deploy.preferences,
  com.aptana.deploy.wizard
