@@ -72,7 +72,7 @@ public class RedHatAPI
 		this.password = password;
 	}
 
-	private void loadSavedCredentials()
+	public void loadSavedCredentials()
 	{
 		try
 		{
@@ -85,6 +85,16 @@ public class RedHatAPI
 		{
 			Activator.logError(e);
 		}
+	}
+
+	/**
+	 * Returns the user's login
+	 * 
+	 * @return
+	 */
+	public String getLogin()
+	{
+		return login;
 	}
 
 	// TODO Return an IStatus?
@@ -135,11 +145,11 @@ public class RedHatAPI
 			loadSavedCredentials();
 			if (login == null)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Login cannot be null");
+				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Login cannot be null"); //$NON-NLS-1$
 			}
 			if (password == null)
 			{
-				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Password cannot be null");
+				return new Status(IStatus.ERROR, Activator.getPluginIdentifier(), "Password cannot be null"); //$NON-NLS-1$
 			}
 		}
 		newArgs[0] = LOGIN_SWITCH;
