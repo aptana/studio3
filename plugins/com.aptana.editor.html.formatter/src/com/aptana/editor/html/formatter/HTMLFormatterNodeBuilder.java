@@ -325,9 +325,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 						textEndOffset + 1);
 				formatterNode.addChild(contentFormatterNode);
 				createdContentNode = true;
-
 			}
-
 		}
 
 		if (createdContentNode)
@@ -378,5 +376,4 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		}
 		return offset;
 	}
-
 }

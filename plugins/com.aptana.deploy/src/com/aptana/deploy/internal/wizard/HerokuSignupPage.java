@@ -37,7 +37,7 @@ public class HerokuSignupPage extends WizardPage
 {
 
 	public static final String NAME = "HerokuSignup"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private String startingUserId;

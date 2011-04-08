@@ -1,3 +1,10 @@
+/**
+ * Aptana Studio
+ * Copyright (c) 2005-2011 by Appcelerator, Inc. All Rights Reserved.
+ * Licensed under the terms of the GNU Public License (GPL) v3 (with exceptions).
+ * Please see the license.html included with this distribution for details.
+ * Any modifications to this file must keep this entire header intact.
+ */
 package com.aptana.git.ui.internal.actions;
 
 import java.util.ArrayList;
@@ -32,6 +39,13 @@ abstract class AbstractGitHandler extends AbstractHandler
 {
 	private IEvaluationContext evalContext;
 	private boolean enabled;
+
+	private Collection<IResource> selectedResources;
+
+	public void setSelectedResources(Collection<IResource> resources)
+	{
+		selectedResources = resources;
+	}
 
 	protected void openError(final String title, final String msg)
 	{
@@ -137,6 +151,11 @@ abstract class AbstractGitHandler extends AbstractHandler
 
 	protected Collection<IResource> getSelectedResources()
 	{
+		if (selectedResources != null)
+		{
+			return selectedResources;
+		}
+
 		Collection<IResource> resources = new ArrayList<IResource>();
 		Object activePart = evalContext.getVariable(ISources.ACTIVE_PART_NAME);
 		if (activePart instanceof IEditorPart)

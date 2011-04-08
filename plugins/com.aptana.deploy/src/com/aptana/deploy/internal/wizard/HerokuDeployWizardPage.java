@@ -37,7 +37,7 @@ import com.aptana.ui.util.SWTUtils;
 public class HerokuDeployWizardPage extends WizardPage
 {
 
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
+	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
 
 	public static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
 

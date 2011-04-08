@@ -20,10 +20,16 @@ public class ExternalFileAnnotationModelFactory implements IAnnotationModelFacto
 
 	public IAnnotationModel createAnnotationModel(IPath location)
 	{
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(location);
-		if (file != null && file.exists())
+		try
 		{
-			return new ResourceMarkerAnnotationModel(file);
+			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(location);
+			if (file != null && file.exists())
+			{
+				return new ResourceMarkerAnnotationModel(file);
+			}
+		}
+		catch (Exception e)
+		{
 		}
 		return new ExternalFileAnnotationModel(EFS.getLocalFileSystem().getStore(location));
 	}

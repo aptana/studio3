@@ -19,7 +19,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.tm.terminal.model.ITerminalTextDataReadOnly;
 import org.eclipse.tm.terminal.model.ITerminalTextDataSnapshot;
 
-@SuppressWarnings({"unchecked","rawtypes"})
 abstract public class AbstractTextCanvasModel implements ITextCanvasModel {
 	protected List fListeners = new ArrayList();
 	private int fCursorLine;
@@ -47,7 +46,6 @@ abstract public class AbstractTextCanvasModel implements ITextCanvasModel {
 		fSnapshot=snapshot;
 		fLines=fSnapshot.getHeight();
 	}
-	
 	public void addCellCanvasModelListener(ITextCanvasModelListener listener) {
 		fListeners.add(listener);
 	}

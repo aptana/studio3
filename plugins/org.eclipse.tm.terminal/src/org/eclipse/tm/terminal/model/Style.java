@@ -21,7 +21,6 @@ import java.util.Map;
  */
 // TODO add an Object for user data, use weak map to keep track of styles with associated
 // user data
-@SuppressWarnings({"unchecked","rawtypes"})
 public class Style {
 	private final StyleColor fForground;
 	private final StyleColor fBackground;

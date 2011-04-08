@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2007, 2011 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
  * Anton Leherbauer (Wind River) - [294468] Fix scroller and text line rendering
  * Uwe Stieber (Wind River) - [205486] Fix ScrollLock always moving to line 1
  * Anton Leherbauer (Wind River) - [219589] Copy an entire line selection
+ * Anton Leherbauer (Wind River) - [196465] Resizing Terminal changes Scroller location
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.textcanvas;
 
@@ -78,6 +79,8 @@ public class TextCanvas extends GridCanvas {
 	private int fMinColumns=80;
 	private int fMinLines=4;
 	private boolean fCursorEnabled;
+	private boolean fResizing;
+	
 	/**
 	 * Create a new CellCanvas with the given SWT style bits.
 	 * (SWT.H_SCROLL and SWT.V_SCROLL are automatically added).
@@ -102,7 +105,8 @@ public class TextCanvas extends GridCanvas {
 				if(isDisposed())
 					return;
 				// scroll to end (unless scroll lock is active)
-				scrollToEnd();
+				if (!fResizing)
+					scrollToEnd();
 			}
 		});
 		// let the cursor blink if the text canvas gets the focus...
@@ -283,15 +287,23 @@ public class TextCanvas extends GridCanvas {
 	}
 
 	protected void onResize() {
-		onResize(false);
+		fResizing = true;
+		try {
+			onResize(false);
+		} finally {
+			fResizing = false;
+		}
 	}
 
 	private void calculateGrid() {
+		Rectangle virtualBounds = getVirtualBounds();
 		setVirtualExtend(getCols()*getCellWidth(),getRows()*getCellHeight());
 		setRedraw(false);
 		try {
-			// scroll to end (unless scroll lock is active)
-			scrollToEnd();
+			// scroll to end if view port was near last line
+			Rectangle viewRect = getViewRectangle();
+			if (virtualBounds.height - (viewRect.y + viewRect.height) < getCellHeight() * 2)
+				scrollToEnd();
 			getParent().layout();
 		} finally {
 			setRedraw(true);
