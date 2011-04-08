@@ -44,6 +44,8 @@ import org.eclipse.ui.part.ViewPart;
 import com.aptana.ide.ui.io.navigator.actions.EditorUtils;
 import com.aptana.samples.SamplesPlugin;
 import com.aptana.samples.handlers.ISamplePreviewHandler;
+import com.aptana.samples.model.LocalSample;
+import com.aptana.samples.model.RemoteSample;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
 import com.aptana.samples.ui.SamplesUIPlugin;
@@ -160,17 +162,20 @@ public class SamplesView extends ViewPart
 					if (samplesRef.isRemote())
 					{
 						// imports from git
-						SampleProjectCreator.createSampleProject(samplesRef);
+						SampleProjectCreator.createSampleProject(new RemoteSample(samplesRef));
 					}
 				}
-				SampleEntry sample = null;
-				if (firstElement instanceof SampleEntry)
+				else
 				{
-					sample = getRootSample((SampleEntry) firstElement);
-				}
-				if (sample != null)
-				{
-					SampleProjectCreator.createSampleProject(sample);
+					SampleEntry sampleEntry = null;
+					if (firstElement instanceof SampleEntry)
+					{
+						sampleEntry = getRootSample((SampleEntry) firstElement);
+					}
+					if (sampleEntry != null)
+					{
+						SampleProjectCreator.createSampleProject(new LocalSample(sampleEntry));
+					}
 				}
 			}
 		};
