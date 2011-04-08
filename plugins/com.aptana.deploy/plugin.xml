@@ -30,11 +30,6 @@
             id="com.aptana.deploy.commands.deploywizard"
             name="%DeployWizard.label">
       </command>
-      <command
-            defaultHandler="com.aptana.deploy.internal.handlers.DeploySettingsHandler"
-            id="com.aptana.deploy.commands.ftp.settings"
-            name="%command.deploysettings.name">
-      </command>
    </extension>
 
 </plugin>

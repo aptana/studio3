@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.ftp.ui.wizard.FTPDeployWizard"
+            icon="icons/ftp.png"
+            id="com.aptana.deploy.ftp.wizard"
+            name="FTP">
+      </wizard>
+   </extension>
+      <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.deploy.ftp.internal.handlers.DeploySettingsHandler"
+            id="com.aptana.deploy.commands.ftp.settings"
+            name="%command.deploysettings.name">
+      </command>
+   </extension>
+
+</plugin>

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FTP Deployment
-Bundle-SymbolicName: com.aptana.deploy.ftp
+Bundle-SymbolicName: com.aptana.deploy.ftp;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: com.aptana.deploy.ftp.FTPDeployPlugin
 Bundle-Vendor: Appcelerator, Inc.
