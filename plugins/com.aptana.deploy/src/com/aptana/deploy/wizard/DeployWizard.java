@@ -10,47 +10,26 @@
  *******************************************************************************/
 package com.aptana.deploy.wizard;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardNode;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWizard;
-import org.eclipse.ui.internal.dialogs.WizardCollectionElement;
-import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
-import org.eclipse.ui.internal.dialogs.WorkbenchWizardListSelectionPage;
-import org.eclipse.ui.internal.dialogs.WorkbenchWizardNode;
-import org.eclipse.ui.internal.registry.WizardsRegistryReader;
-import org.eclipse.ui.model.AdaptableList;
-import org.eclipse.ui.wizards.IWizardCategory;
-import org.eclipse.ui.wizards.IWizardRegistry;
 
 // FIXME Model after ImportExportWizard, which uses a tree with categories for wizards!
 public class DeployWizard extends Wizard
 {
-	private IWorkbench theWorkbench;
 
+	private IWorkbench workbench;
 	private IStructuredSelection selection;
+	private DeployWizardPage deployPage;
 
-	// the list selection page
-	class SelectionPage extends WorkbenchWizardListSelectionPage
+	/**
+	 * Subclasses must implement this <code>IWizard</code> method to perform any special finish processing for their
+	 * wizard.
+	 */
+	public boolean performFinish()
 	{
-		SelectionPage(IWorkbench w, IStructuredSelection ss, AdaptableList e, String s)
-		{
-			super(w, ss, e, s, null);
-		}
-
-		protected IWizardNode createWizardNode(WorkbenchWizardElement element)
-		{
-			return new WorkbenchWizardNode(this, element)
-			{
-				public IWorkbenchWizard createWizard() throws CoreException
-				{
-					return wizardElement.createWizard();
-				}
-			};
-		}
+		deployPage.saveWidgetValues();
+		return true;
 	}
 
 	/**
@@ -58,24 +37,8 @@ public class DeployWizard extends Wizard
 	 */
 	public void addPages()
 	{
-		addPage(new SelectionPage(this.theWorkbench, this.selection, getAvailableExportWizards(),
-				"Select a deployment provider: "));
-	}
-
-	/**
-	 * Returns the export wizards that are available for invocation.
-	 */
-	protected AdaptableList getAvailableExportWizards()
-	{
-		IWizardRegistry reg = DeployWizardRegistry.getInstance();
-		IWizardCategory root = reg.getRootCategory();
-		WizardCollectionElement otherCategory = (WizardCollectionElement) root.findCategory(new Path(
-				WizardsRegistryReader.UNCATEGORIZED_WIZARD_CATEGORY));
-		if (otherCategory == null)
-		{
-			return new AdaptableList();
-		}
-		return otherCategory.getWizardAdaptableList();
+		deployPage = new DeployWizardPage(this.workbench, this.selection);
+		addPage(deployPage);
 	}
 
 	/**
@@ -88,22 +51,9 @@ public class DeployWizard extends Wizard
 	 */
 	public void init(IWorkbench aWorkbench, IStructuredSelection currentSelection)
 	{
-		this.theWorkbench = aWorkbench;
+		this.workbench = aWorkbench;
 		this.selection = currentSelection;
 
-		setWindowTitle("Deploy");
-		// setDefaultPageImageDescriptor(DeployPlugin
-		// .getImageDescriptor("iocns/deploy.png"));
 		setNeedsProgressMonitor(true);
-	}
-
-	/**
-	 * Subclasses must implement this <code>IWizard</code> method to perform any special finish processing for their
-	 * wizard.
-	 */
-	public boolean performFinish()
-	{
-		((SelectionPage) getPages()[0]).saveWidgetValues();
-		return true;
 	}
 }
