@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.capistrano.ui.wizard;
 
 import java.net.URL;
 
@@ -33,7 +33,6 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class CapifyProjectPage extends WizardPage
@@ -97,7 +96,8 @@ public class CapifyProjectPage extends WizardPage
 
 									public void run()
 									{
-										getContainer().updateButtons(); // ok update the wizard TODO Just finish for them?
+										getContainer().updateButtons(); // ok update the wizard TODO Just finish for
+																		// them?
 									}
 								});
 							}
@@ -168,7 +168,7 @@ public class CapifyProjectPage extends WizardPage
 
 	protected IProject getProject()
 	{
-		return ((DeployWizard) getWizard()).getProject();
+		return ((CapistranoDeployWizard) getWizard()).getProject();
 	}
 
 	@Override

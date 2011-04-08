@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.capistrano.ui.wizard;
 
 import java.io.File;
 
@@ -31,7 +31,6 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.deploy.wizard.DeployWizard;
 import com.aptana.terminal.widget.TerminalComposite;
 
 public class InstallCapistranoGemPage extends WizardPage
@@ -192,6 +191,6 @@ public class InstallCapistranoGemPage extends WizardPage
 
 	protected IProject getProject()
 	{
-		return ((DeployWizard) getWizard()).getProject();
+		return ((CapistranoDeployWizard) getWizard()).getProject();
 	}
 }
