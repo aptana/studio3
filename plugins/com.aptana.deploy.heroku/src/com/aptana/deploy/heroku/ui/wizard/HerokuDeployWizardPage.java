@@ -36,8 +36,6 @@ import com.aptana.ui.util.SWTUtils;
 public class HerokuDeployWizardPage extends WizardPage
 {
 
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
-
 	public static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
 
 	private Text appName;
@@ -45,7 +43,7 @@ public class HerokuDeployWizardPage extends WizardPage
 
 	protected HerokuDeployWizardPage()
 	{
-		super(NAME, Messages.HerokuDeployWizardPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuDeployWizardPage_Title, null);
 	}
 
 	public void createControl(Composite parent)

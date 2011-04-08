@@ -30,21 +30,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.ui.util.SWTUtils;
 
 public class HerokuSignupPage extends WizardPage
 {
 
 	public static final String NAME = "HerokuSignup"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private String startingUserId;
 
 	protected HerokuSignupPage(String startingUserId)
 	{
-		super(NAME, Messages.HerokuSignupPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuSignupPage_Title, null);
 		this.startingUserId = startingUserId;
 	}
 

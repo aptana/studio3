@@ -30,12 +30,10 @@ import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.ILoginValidator;
 import com.aptana.deploy.heroku.HerokuAPI;
-import com.aptana.deploy.heroku.HerokuPlugin;
 
 public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "HerokuLogin"; //$NON-NLS-1$
-	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;
@@ -44,7 +42,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 
 	protected HerokuLoginWizardPage()
 	{
-		super(NAME, Messages.HerokuLoginWizardPage_Title, HerokuPlugin.getImageDescriptor(HEROKU_ICON));
+		super(NAME, Messages.HerokuLoginWizardPage_Title, null);
 	}
 
 	public void createControl(Composite parent)
@@ -99,7 +97,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-//				api.writeCredentials(); // we write them automatically via a page changed listener below...
+				// api.writeCredentials(); // we write them automatically via a page changed listener below...
 				if (validateLogin() && isPageComplete())
 				{
 					getContainer().showPage(getNextPage());
@@ -173,7 +171,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 		setErrorMessage(null);
 		return true;
 	}
-	
+
 	public boolean validateLogin()
 	{
 		HerokuAPI api = new HerokuAPI(userId.getText(), password.getText());
@@ -183,7 +181,7 @@ public class HerokuLoginWizardPage extends WizardPage implements ILoginValidator
 			setErrorMessage(status.getMessage());
 			return false;
 		}
-		
+
 		return true;
 	}
 

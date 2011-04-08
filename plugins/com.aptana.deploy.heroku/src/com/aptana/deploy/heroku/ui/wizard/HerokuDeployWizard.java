@@ -54,6 +54,7 @@ import com.aptana.usage.PingStartup;
 public class HerokuDeployWizard extends Wizard implements IDeployWizard
 {
 
+	private static final String HEROKU_ICON = "icons/heroku.png"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
 
 	private IProject project;
@@ -82,6 +83,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 			IResource resource = (IResource) element;
 			this.project = resource.getProject();
 		}
+		setDefaultPageImageDescriptor(HerokuPlugin.getImageDescriptor(HEROKU_ICON));
 	}
 
 	IProject getProject()
