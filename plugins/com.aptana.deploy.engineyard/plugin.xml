@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.engineyard.ui.wizard.EngineYardDeployWizard"
+            icon="icons/ey_small.png"
+            id="com.aptana.deploy.engineyard.wizard"
+            name="Engine Yard">
+      </wizard>
+   </extension>
+
+</plugin>

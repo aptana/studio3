@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.engineyard.ui.wizard;
 
 import java.net.URL;
 
@@ -32,7 +32,7 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import com.aptana.deploy.DeployPlugin;
-import com.aptana.deploy.wizard.DeployWizard;
+import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.ui.util.SWTUtils;
 
 public class EngineYardDeployWizardPage extends WizardPage
@@ -139,7 +139,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 
 	protected IProject getProject()
 	{
-		DeployWizard wizard = (DeployWizard) getWizard();
+		EngineYardDeployWizard wizard = (EngineYardDeployWizard) getWizard();
 		return wizard.getProject();
 	}
 

@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy;
+package com.aptana.deploy.engineyard;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.util.PlatformUtil;
+import com.aptana.deploy.DeployPlugin;
 
 public class EngineYardAPI
 {
@@ -64,8 +65,8 @@ public class EngineYardAPI
 		}
 		catch (Exception e)
 		{
-			DeployPlugin.logError(e);
-			return new Status(IStatus.ERROR, DeployPlugin.getPluginIdentifier(),
+			EngineYardPlugin.logError(e);
+			return new Status(IStatus.ERROR, EngineYardPlugin.getPluginIdentifier(),
 					Messages.EngineYardAPI_CredentialsFile_Invalid);
 		}
 		finally

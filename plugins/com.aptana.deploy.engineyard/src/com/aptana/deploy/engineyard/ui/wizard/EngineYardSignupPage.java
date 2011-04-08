@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.deploy.internal.wizard;
+package com.aptana.deploy.engineyard.ui.wizard;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import com.aptana.deploy.DeployPlugin;
+import com.aptana.deploy.internal.wizard.Messages;
 import com.aptana.ui.util.SWTUtils;
 
 public class EngineYardSignupPage extends WizardPage
