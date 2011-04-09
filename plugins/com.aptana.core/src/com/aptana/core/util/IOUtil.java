@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -53,26 +54,46 @@ public abstract class IOUtil
 	public static String read(InputStream stream, String charset)
 	{
 		if (stream == null)
+		{
 			return null;
+		}
+
+		// lookup up default charset if none was provided. We use this value later to possibly detect a UTF-8 BOM
+		if (charset == null)
+		{
+			charset = Charset.defaultCharset().name();
+		}
+
 		try
 		{
-			InputStreamReader inReader;
-			if (charset != null)
-			{
-				inReader = new InputStreamReader(stream, charset);
-			}
-			else
-			{
-				inReader = new InputStreamReader(stream);
-			}
+			InputStreamReader inReader = new InputStreamReader(stream, charset);
 			BufferedReader reader = new BufferedReader(inReader);
 			StringBuilder output = new StringBuilder();
+
+			// Some editors emit a BOM (EF BB BF) for UTF-8 encodings which the JVM converts to \uFEFF. For lots of
+			// whining and an explanation of why this won't be fixed see
+			// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058. Below, we try to read the first character for
+			// utf-8 encodings only. If it matches \uFEFF, then we skip that character; otherwise, we emit it into our
+			// output buffer
+			if (charset.toLowerCase().equals("utf-8")) //$NON-NLS-1$
+			{
+				char[] bomBuffer = new char[1];
+
+				if (reader.read(bomBuffer) != -1 && bomBuffer[0] != '\ufeff')
+				{
+					output.append(bomBuffer, 0, bomBuffer.length);
+				}
+			}
+
+			// emit the rest of the stream into the output buffer
 			char[] buffer = new char[1024 * 4];
 			int read = 0;
+
 			while ((read = reader.read(buffer)) != -1)
 			{
 				output.append(buffer, 0, read);
 			}
+
 			return output.toString();
 		}
 		catch (IOException e)
@@ -90,6 +111,7 @@ public abstract class IOUtil
 				// ignore
 			}
 		}
+
 		return null;
 	}
 

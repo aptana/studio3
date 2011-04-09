@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.aptana.scripting.model.ProjectTemplateElement;
+import com.aptana.core.projectTemplates.IProjectTemplate;
 
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
 {
@@ -38,26 +38,26 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private TableViewer fTemplateSelectionViewer;
 	private Text fPreviewText;
 
-	private ProjectTemplateElement[] fTemplates;
-	private ProjectTemplateElement fSelectedTemplate;
+	private IProjectTemplate[] fTemplates;
+	private IProjectTemplate fSelectedTemplate;
 
-	public ProjectTemplateSelectionPage(String pageName, List<ProjectTemplateElement> templates)
+	public ProjectTemplateSelectionPage(String pageName, List<IProjectTemplate> templates)
 	{
 		super(pageName);
-		
+
 		if (templates == null)
 		{
-			fTemplates = new ProjectTemplateElement[0];
+			fTemplates = new IProjectTemplate[0];
 		}
 		else
 		{
-			fTemplates = templates.toArray(new ProjectTemplateElement[templates.size()]);
+			fTemplates = templates.toArray(new IProjectTemplate[templates.size()]);
 		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
 	}
 
-	public ProjectTemplateElement getSelectedTemplate()
+	public IProjectTemplate getSelectedTemplate()
 	{
 		if (fUseTemplateButton.getSelection())
 		{
@@ -114,7 +114,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		String text = null;
 		if (!selection.isEmpty())
 		{
-			fSelectedTemplate = (ProjectTemplateElement) selection.getFirstElement();
+			fSelectedTemplate = (IProjectTemplate) selection.getFirstElement();
 			text = fSelectedTemplate.getDescription();
 		}
 		fPreviewText.setText(text == null ? "" : text); //$NON-NLS-1$
@@ -183,9 +183,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		@Override
 		public String getText(Object element)
 		{
-			if (element instanceof ProjectTemplateElement)
+			if (element instanceof IProjectTemplate)
 			{
-				ProjectTemplateElement template = (ProjectTemplateElement) element;
+				IProjectTemplate template = (IProjectTemplate) element;
 				return template.getDisplayName();
 			}
 			return super.getText(element);

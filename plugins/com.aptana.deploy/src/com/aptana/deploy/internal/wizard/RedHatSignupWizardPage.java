@@ -18,6 +18,7 @@ import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.dialogs.PageChangingEvent;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -33,6 +34,9 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
+import org.eclipse.ui.statushandlers.StatusAdapter;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.aptana.deploy.Activator;
 import com.aptana.deploy.RedHatAPI;
@@ -58,8 +62,10 @@ public class RedHatSignupWizardPage extends WizardPage
 	public void createControl(Composite parent)
 	{
 		Composite composite = new Composite(parent, SWT.NULL);
+
 		composite.setLayout(new GridLayout());
-		composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 		setControl(composite);
 
 		initializeDialogUnits(parent);
@@ -69,7 +75,10 @@ public class RedHatSignupWizardPage extends WizardPage
 		label.setText(Messages.RedHatSignupWizardPage_EnterCredentialsLabel);
 
 		Composite credentials = new Composite(composite, SWT.NONE);
-		credentials.setLayout(new GridLayout(2, false));
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		credentials.setLayout(layout);
+		credentials.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		ModifyListener buttonUpdatingListener = new ModifyListener()
 		{
@@ -85,7 +94,7 @@ public class RedHatSignupWizardPage extends WizardPage
 		namespaceLabel.setText(Messages.RedHatSignupWizardPage_NamespaceLabel);
 		namespace = new Text(credentials, SWT.SINGLE | SWT.BORDER);
 		namespace.setMessage(Messages.RedHatSignupWizardPage_NamespaceExample);
-		GridData gd = new GridData(300, SWT.DEFAULT);
+		GridData gd = GridDataFactory.fillDefaults().grab(true, false).create();
 		namespace.setLayoutData(gd);
 		namespace.addModifyListener(buttonUpdatingListener);
 
@@ -136,16 +145,21 @@ public class RedHatSignupWizardPage extends WizardPage
 
 			public void handlePageChanging(PageChangingEvent event)
 			{
-				RedHatAPI api = new RedHatAPI(userId.getText(), password.getText());
-				IStatus status = api.createDomain(namespace.getText());
-				if (!status.isOK())
+				if (event.getTargetPage().equals(getNextPage()))
 				{
-					event.doit = false;
-					setErrorMessage(status.getMessage());
-				}
-				else
-				{
-					api.writeCredentials();
+					RedHatAPI api = new RedHatAPI(userId.getText(), password.getText());
+					IStatus status = api.createDomain(namespace.getText());
+					if (!status.isOK())
+					{
+						event.doit = false;
+						StatusAdapter statusadap = new StatusAdapter(status);
+						statusadap.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, "Creation Error"); //$NON-NLS-1$
+						StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.BLOCK);
+					}
+					else
+					{
+						api.writeCredentials();
+					}
 				}
 			}
 		});
@@ -206,13 +220,6 @@ public class RedHatSignupWizardPage extends WizardPage
 	@Override
 	public boolean isPageComplete()
 	{
-		IStatus apiCheck = new RedHatAPI().verifyGemInstalled();
-		if (!apiCheck.isOK())
-		{
-			setErrorMessage(Messages.RedHatSignupWizardPage_GemNotInstalledErrorMessage);
-			return false;
-		}
-
 		String desiredNamespace = this.namespace.getText();
 		// Verify alphanumeric, max 16 chars!
 		if (desiredNamespace == null || desiredNamespace.trim().length() < 1
