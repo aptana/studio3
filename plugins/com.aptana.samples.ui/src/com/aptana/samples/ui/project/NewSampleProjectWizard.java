@@ -59,6 +59,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import com.aptana.core.build.UnifiedBuilder;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
+import com.aptana.projects.internal.wizards.NewProjectWizard;
 import com.aptana.samples.handlers.ISampleProjectHandler;
 import com.aptana.samples.model.ISample;
 import com.aptana.samples.model.SampleEntry;
@@ -197,7 +198,15 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 			else
 			{
 				doBasicCreateProject(newProjectHandle, description);
-				copySampleSource(newProjectHandle);
+				SampleEntry rootEntry = sample.getRootEntry();
+				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
+				{
+					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle);
+				}
+				else
+				{
+					copySampleSource(rootEntry, newProjectHandle);
+				}
 				doPostProjectCreation();
 			}
 		}
@@ -276,9 +285,9 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		}
 	}
 
-	private void copySampleSource(IProject project)
+	private void copySampleSource(SampleEntry rootEntry, IProject project)
 	{
-		SampleEntry[] entries = sample.getEntries();
+		SampleEntry[] entries = rootEntry.getSubEntries();
 		IProgressMonitor monitor = new NullProgressMonitor();
 		IResource createdFile;
 		if (entries != null)

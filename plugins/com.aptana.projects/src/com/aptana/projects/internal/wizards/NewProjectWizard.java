@@ -339,14 +339,18 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 
 	public static void extractZip(IProjectTemplate template, IProject project)
 	{
+		extractZip(new File(template.getDirectory(), template.getLocation()), project);
+	}
+
+	public static void extractZip(final File zipPath, IProject project)
+	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
-		final File zip_path = new File(template.getDirectory(), template.getLocation());
-		if (zip_path.exists())
+		if (zipPath.exists())
 		{
 			ZipFile zipFile = null;
 			try
 			{
-				zipFile = new ZipFile(zip_path, ZipFile.OPEN_READ);
+				zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
 				Enumeration<? extends ZipEntry> entries = zipFile.entries();
 				ZipEntry entry;
 				while (entries.hasMoreElements())
@@ -400,7 +404,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								catch (Exception e)
 								{
 									ProjectsPlugin.logError(
-											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 								}
 							}
 							return Status.OK_STATUS;
@@ -413,7 +417,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 			catch (Exception e)
 			{
-				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 			}
 			finally
 			{

@@ -152,7 +152,11 @@ public class SamplesReference
 
 		File samplesDirectory = new File(path);
 		File[] sampleFiles = samplesDirectory.listFiles();
-		if (sampleFiles != null)
+		if (sampleFiles == null)
+		{
+			samples.add(new SampleEntry(samplesDirectory, this, true));
+		}
+		else
 		{
 			for (File file : sampleFiles)
 			{
