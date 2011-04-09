@@ -297,7 +297,7 @@ public class CorePlugin extends Plugin
 					{
 						public boolean visit(IResourceDelta delta) throws CoreException
 						{
-							IResource resource = delta.getResource();
+							final IResource resource = delta.getResource();
 							if (resource.getType() == IResource.ROOT)
 							{
 								return true;
@@ -310,6 +310,16 @@ public class CorePlugin extends Plugin
 												&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
 												.isAccessible()))
 								{
+									addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
+									{
+										protected IStatus run(IProgressMonitor monitor)
+										{
+											return updateProjectNatures(new IProject[] { resource.getProject() },
+													monitor);
+										}
+									};
+									addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
+									addBuilderJob.setPriority(Job.LONG);
 									addBuilderJob.schedule();
 								}
 
