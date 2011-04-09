@@ -27,7 +27,6 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 
 import com.aptana.core.projectTemplates.IProjectTemplate;
 
@@ -36,7 +35,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	private Button fUseTemplateButton;
 	private TableViewer fTemplateSelectionViewer;
-	private Text fPreviewText;
+	private Label fPreviewText;
 
 	private IProjectTemplate[] fTemplates;
 	private IProjectTemplate fSelectedTemplate;
@@ -87,7 +86,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		fTemplateSelectionViewer.setInput(fTemplates);
 		fTemplateSelectionViewer.addSelectionChangedListener(this);
 
-		fPreviewText = new Text(sashForm, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+		fPreviewText = new Label(sashForm, SWT.WRAP | SWT.READ_ONLY);
 
 		Dialog.applyDialogFont(main);
 		setControl(main);
