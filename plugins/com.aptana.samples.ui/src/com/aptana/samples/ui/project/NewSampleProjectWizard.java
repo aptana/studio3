@@ -201,7 +201,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				SampleEntry rootEntry = sample.getRootEntry();
 				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
 				{
-					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle);
+					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true);
 				}
 				else
 				{

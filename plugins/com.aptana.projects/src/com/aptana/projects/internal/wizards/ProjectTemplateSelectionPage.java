@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -22,13 +23,17 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.projects.ProjectsPlugin;
 
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
 {
@@ -39,6 +44,9 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	private IProjectTemplate[] fTemplates;
 	private IProjectTemplate fSelectedTemplate;
+
+	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/protect_template_blank.png"); //$NON-NLS-1$
+	private Image wizard = null;;
 
 	public ProjectTemplateSelectionPage(String pageName, List<IProjectTemplate> templates)
 	{
@@ -67,6 +75,19 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public void createControl(Composite parent)
 	{
+		wizard = wizardDesc.createImage();
+		parent.addDisposeListener(new DisposeListener()
+		{
+			public void widgetDisposed(DisposeEvent e)
+			{
+				if (wizard != null)
+				{
+					wizard.dispose();
+					wizard = null;
+				}
+			}
+		});
+
 		Composite main = new Composite(parent, SWT.NONE);
 		main.setLayout(GridLayoutFactory.fillDefaults().spacing(5, 10).create());
 		main.setLayoutData(GridDataFactory.fillDefaults().grab(true, true).create());
@@ -178,7 +199,20 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	 */
 	private class ListLabelProvider extends LabelProvider
 	{
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
+		 */
+		@Override
+		public Image getImage(Object element)
+		{
+			return wizard;
+		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		@Override
 		public String getText(Object element)
 		{
