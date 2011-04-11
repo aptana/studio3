@@ -207,7 +207,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				{
 					copySampleSource(rootEntry, newProjectHandle);
 				}
-				doPostProjectCreation();
+				doPostProjectCreation(newProjectHandle);
 			}
 		}
 		catch (CoreException e)
@@ -374,13 +374,13 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 					SamplesUIPlugin.logError(Messages.NewSampleProjectWizard_ERR_FailToDisconnect, e);
 				}
 
-				doPostProjectCreation();
+				doPostProjectCreation(newProject);
 			}
 		});
 		job.schedule();
 	}
 
-	private void doPostProjectCreation()
+	private void doPostProjectCreation(IProject newProject)
 	{
 		SamplesReference samplesRef = sample.getReference();
 		if (samplesRef != null)
