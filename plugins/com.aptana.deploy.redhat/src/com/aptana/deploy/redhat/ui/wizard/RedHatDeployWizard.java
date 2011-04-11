@@ -15,8 +15,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.redhat.RedHatAPI;
+import com.aptana.deploy.redhat.RedHatDeployProvider;
 import com.aptana.deploy.redhat.RedHatPlugin;
 import com.aptana.deploy.wizard.IDeployWizard;
 
@@ -60,12 +60,8 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 		IWizardPage currentPage = getContainer().getCurrentPage();
 		RedHatDeployWizardPage page = (RedHatDeployWizardPage) currentPage;
 		IRunnableWithProgress runnable = createRedHatDeployRunnable(page);
-		DeployType type = DeployType.RED_HAT;
 
-		if (type != null)
-		{
-			DeployPreferenceUtil.setDeployType(project, type);
-		}
+		DeployPreferenceUtil.setDeployType(project, RedHatDeployProvider.ID);
 
 		if (runnable != null)
 		{

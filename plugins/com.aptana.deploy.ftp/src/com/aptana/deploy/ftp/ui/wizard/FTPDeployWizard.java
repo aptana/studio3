@@ -17,8 +17,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.ftp.FTPDeployPlugin;
+import com.aptana.deploy.ftp.FTPDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
@@ -66,17 +66,9 @@ public class FTPDeployWizard extends Wizard implements IDeployWizard
 		IWizardPage currentPage = getContainer().getCurrentPage();
 		FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 		IRunnableWithProgress runnable = createFTPDeployRunnable(page);
-		DeployType type = DeployType.FTP;
-		String deployEndpointName = page.getConnectionPoint().getName();
 
-		if (type != null)
-		{
-			DeployPreferenceUtil.setDeployType(project, type);
-			if (deployEndpointName != null)
-			{
-				DeployPreferenceUtil.setDeployEndpoint(project, deployEndpointName);
-			}
-		}
+		DeployPreferenceUtil.setDeployType(project, FTPDeployProvider.ID);
+		DeployPreferenceUtil.setDeployEndpoint(project, page.getConnectionPoint().getName());
 
 		if (runnable != null)
 		{

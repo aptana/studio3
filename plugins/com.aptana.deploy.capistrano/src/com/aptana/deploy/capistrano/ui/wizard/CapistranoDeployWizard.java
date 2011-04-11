@@ -18,9 +18,9 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import com.aptana.deploy.capistrano.CapistranoDeployProvider;
 import com.aptana.deploy.capistrano.CapistranoPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
 
 public class CapistranoDeployWizard extends Wizard implements IDeployWizard
@@ -63,10 +63,9 @@ public class CapistranoDeployWizard extends Wizard implements IDeployWizard
 	{
 		IWizardPage currentPage = getContainer().getCurrentPage();
 		CapifyProjectPage page = (CapifyProjectPage) currentPage;
-		DeployType type = DeployType.CAPISTRANO;
 		IRunnableWithProgress runnable = createCapifyRunnable(page);
 
-		DeployPreferenceUtil.setDeployType(project, type);
+		DeployPreferenceUtil.setDeployType(project, CapistranoDeployProvider.ID);
 
 		try
 		{

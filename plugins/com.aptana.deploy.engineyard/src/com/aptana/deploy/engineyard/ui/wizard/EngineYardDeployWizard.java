@@ -33,9 +33,9 @@ import com.aptana.core.CorePlugin;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.engineyard.EngineYardAPI;
+import com.aptana.deploy.engineyard.EngineYardDeployProvider;
 import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
@@ -89,7 +89,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 	{
 		IWizardPage currentPage = getContainer().getCurrentPage();
 		String pageName = currentPage.getName();
-		DeployType type = null;
+
 		IRunnableWithProgress runnable = null;
 		if (EngineYardSignupPage.NAME.equals(pageName))
 		{
@@ -100,12 +100,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 		{
 			EngineYardDeployWizardPage page = (EngineYardDeployWizardPage) currentPage;
 			runnable = createEngineYardDeployRunnable(page);
-			type = DeployType.ENGINEYARD;
-		}
-
-		if (type != null)
-		{
-			DeployPreferenceUtil.setDeployType(project, type);
+			DeployPreferenceUtil.setDeployType(project, EngineYardDeployProvider.ID);
 		}
 
 		if (runnable != null)

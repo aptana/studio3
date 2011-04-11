@@ -132,7 +132,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 			viewer.setLabelProvider(new WorkbenchLabelProvider());
 			viewer.setComparator(DataTransferWizardCollectionComparator.INSTANCE);
 
-			ArrayList inputArray = new ArrayList();
+			ArrayList<IWizardCategory> inputArray = new ArrayList<IWizardCategory>();
 			boolean expandTop = false;
 
 			if (wizardCategories != null)
@@ -162,6 +162,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 
 			// filter wizard list according to capabilities that are enabled
 			viewer.addFilter(new WizardActivityFilter());
+			// TODO Filter out wizards that can't handle the project we've selected!
 
 			viewer.setInput(input);
 		}

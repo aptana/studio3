@@ -35,10 +35,10 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.deploy.heroku.HerokuAPI;
+import com.aptana.deploy.heroku.HerokuDeployProvider;
 import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.deploy.heroku.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.IDeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -96,29 +96,19 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 	{
 		IWizardPage currentPage = getContainer().getCurrentPage();
 		String pageName = currentPage.getName();
-		DeployType type = null;
-		String deployEndpointName = null;
+
 		IRunnableWithProgress runnable = null;
 		if (HerokuDeployWizardPage.NAME.equals(pageName))
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
-			type = DeployType.HEROKU;
-			deployEndpointName = page.getAppName();
+			DeployPreferenceUtil.setDeployType(project, HerokuDeployProvider.ID);
+			DeployPreferenceUtil.setDeployEndpoint(project, page.getAppName());
 		}
 		else if (HerokuSignupPage.NAME.equals(pageName))
 		{
 			HerokuSignupPage page = (HerokuSignupPage) currentPage;
 			runnable = createHerokuSignupRunnable(page);
-		}
-
-		if (type != null)
-		{
-			DeployPreferenceUtil.setDeployType(project, type);
-			if (deployEndpointName != null)
-			{
-				DeployPreferenceUtil.setDeployEndpoint(project, deployEndpointName);
-			}
 		}
 
 		if (runnable != null)

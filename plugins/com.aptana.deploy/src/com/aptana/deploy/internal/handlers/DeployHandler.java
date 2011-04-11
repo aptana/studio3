@@ -16,7 +16,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -24,21 +23,16 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 
 import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.IDeployProvider;
+import com.aptana.deploy.preferences.DeployPreferenceUtil;
 
 public class DeployHandler extends AbstractHandler
 {
-
-	/**
-	 * Pref key used to store the associated deploy provider for a project
-	 */
-	private static final String DEPLOY_PROVIDER_ID_PREF_KEY = "deploy_provider_id"; //$NON-NLS-1$
 
 	/**
 	 * unique id of the provider.
@@ -114,8 +108,7 @@ public class DeployHandler extends AbstractHandler
 	private IDeployProvider getConfiguredProvider(IProject project)
 	{
 		// check what deploy provider id is stored for project, then get provider from ext pt matching that id.
-		IEclipsePreferences prefs = new ProjectScope(project).getNode(DeployPlugin.getPluginIdentifier());
-		String id = prefs.get(DEPLOY_PROVIDER_ID_PREF_KEY, null);
+		String id = DeployPreferenceUtil.getDeployProviderId(project);
 		if (id == null)
 		{
 			return null;

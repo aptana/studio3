@@ -7,9 +7,6 @@
  */
 package com.aptana.deploy;
 
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -17,8 +14,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
 
-import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 import com.aptana.deploy.wizard.DeployWizardRegistry;
 
 public class DeployPlugin extends AbstractUIPlugin
@@ -28,18 +23,6 @@ public class DeployPlugin extends AbstractUIPlugin
 
 	private static DeployPlugin instance;
 
-	private IResourceChangeListener resourceListener = new IResourceChangeListener()
-	{
-
-		public void resourceChanged(IResourceChangeEvent event)
-		{
-			if (event.getType() == IResourceChangeEvent.PRE_DELETE)
-			{
-				DeployPreferenceUtil.setDeployType(event.getResource().getProject(), DeployType.NONE);
-			}
-		}
-	};
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
@@ -48,7 +31,6 @@ public class DeployPlugin extends AbstractUIPlugin
 	{
 		super.start(bundleContext);
 		instance = this;
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener);
 	}
 
 	/*
@@ -57,7 +39,6 @@ public class DeployPlugin extends AbstractUIPlugin
 	 */
 	public void stop(BundleContext bundleContext) throws Exception
 	{
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
 		instance = null;
 		super.stop(bundleContext);
 	}

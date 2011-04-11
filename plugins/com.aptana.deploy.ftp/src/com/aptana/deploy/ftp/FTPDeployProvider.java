@@ -14,6 +14,8 @@ import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
 public class FTPDeployProvider implements IDeployProvider
 {
 
+	public static final String ID = "com.aptana.deploy.ftp.provider"; //$NON-NLS-1$
+
 	public void deploy(IProject selectedProject, IProgressMonitor monitor)
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();

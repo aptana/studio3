@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  com.aptana.ui,
  com.aptana.deploy,
- com.aptana.terminal
+ com.aptana.terminal,
+ com.aptana.git.core
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.deploy.redhat,

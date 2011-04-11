@@ -11,6 +11,8 @@ import com.aptana.terminal.views.TerminalView;
 public class HerokuDeployProvider implements IDeployProvider
 {
 
+	public static final String ID = "com.aptana.deploy.heroku.provider"; //$NON-NLS-1$
+
 	public void deploy(IProject selectedProject, IProgressMonitor monitor)
 	{
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
@@ -20,6 +22,7 @@ public class HerokuDeployProvider implements IDeployProvider
 
 	public boolean handles(IProject selectedProject)
 	{
+		// Check to see if a heroku remote exists on the git repo
 		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(selectedProject);
 		if (repo != null)
 		{

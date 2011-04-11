@@ -9,6 +9,8 @@ import com.aptana.terminal.views.TerminalView;
 public class CapistranoDeployProvider implements IDeployProvider
 {
 
+	public static final String ID = "com.aptana.deploy.capistrano.provider"; //$NON-NLS-1$
+
 	public void deploy(IProject selectedProject, IProgressMonitor monitor)
 	{
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
