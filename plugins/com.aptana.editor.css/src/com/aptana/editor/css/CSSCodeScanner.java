@@ -92,7 +92,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
-	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
+	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
