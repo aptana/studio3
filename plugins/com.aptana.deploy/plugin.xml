@@ -2,6 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="deployWizards" name="Deployment Wizards" schema="schema/deployWizards.exsd"/>
+   <extension-point id="deployProviders" name="Deployment Providers" schema="schema/deployProviders.exsd"/>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester

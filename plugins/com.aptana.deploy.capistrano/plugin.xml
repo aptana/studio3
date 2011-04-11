@@ -9,5 +9,12 @@
             name="Capistrano">
       </wizard>
    </extension>
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.capistrano.CapistranoDeployProvider"
+            id="com.aptana.deploy.capistrano.provider">
+      </provider>
+   </extension>
 
 </plugin>

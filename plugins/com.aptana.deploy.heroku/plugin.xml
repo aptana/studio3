@@ -16,5 +16,12 @@
             class="com.aptana.deploy.heroku.internal.preferences.HerokuPreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.heroku.HerokuDeployProvider"
+            id="com.aptana.deploy.heroku.provider">
+      </provider>
+   </extension>
 
 </plugin>

@@ -10,5 +10,12 @@
             name="Engine Yard">
       </wizard>
    </extension>
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.engineyard.EngineYardDeployProvider"
+            id="com.aptana.deploy.engineyard.provider">
+      </provider>
+   </extension>
 
 </plugin>

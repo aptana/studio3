@@ -18,5 +18,12 @@
             name="%command.deploysettings.name">
       </command>
    </extension>
+      <extension
+            point="com.aptana.deploy.deployProviders">
+         <provider
+               class="com.aptana.deploy.ftp.FTPDeployProvider"
+               id="com.aptana.deploy.ftp.provider">
+         </provider>
+      </extension>
 
 </plugin>
