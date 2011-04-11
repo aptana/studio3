@@ -92,7 +92,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"section", "article", "footer", "aside", "audio", "video", "canvas", "hgroup" };
 
 	@SuppressWarnings("nls")
-	private static final String[] FUNCTIONS = { "rgb", "url", "attr", "counters", "counter" };
+	private static final String[] FUNCTIONS = { "rgba", "rgb", "url", "attr", "counters", "counter" };
 
 	@SuppressWarnings("nls")
 	private static final String[] PROPERTY_NAMES = { "azimuth", "background-attachment", "background-clip",
@@ -115,7 +115,7 @@ public class CSSCodeScanner extends BufferedRuleBasedScanner
 			"-moz-border-radius", "opacity", "orphans", "outline-color", "outline-style", "outline-width", "outline",
 			"overflow-x", "overflow-y", "overflow", "padding-bottom", "padding-left", "padding-right", "padding-top",
 			"padding", "page-break-after", "page-break-before", "page-break-inside", "page", "pause-after",
-			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "richness", "right",
+			"pause-before", "pause", "pitch-range", "pitch", "play-during", "position", "quotes", "resize", "richness", "right",
 			"size", "speak-header", "speak-numeral", "speak-punctuation", "speech-rate", "speak", "stress",
 			"table-layout", "text-align", "text-decoration", "text-indent", "text-shadow", "text-transform", "top",
 			"unicode-bidi", "vertical-align", "visibility", "voice-family", "volume", "white-space", "widows", "width",
