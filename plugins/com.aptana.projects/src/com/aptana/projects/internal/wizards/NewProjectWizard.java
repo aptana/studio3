@@ -260,7 +260,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 					IProjectTemplate template = templatesPage.getSelectedTemplate();
 					if (template != null)
 					{
-						extractZip(template, newProjectHandle);
+						extractZip(template, newProjectHandle, true);
 					}
 				}
 			}
@@ -337,16 +337,20 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	public static void extractZip(IProjectTemplate template, IProject project)
+	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
+	{
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite);
+	}
+
+	public static void extractZip(final File zipPath, IProject project, boolean promptForOverwrite)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
-		final File zip_path = new File(template.getDirectory(), template.getLocation());
-		if (zip_path.exists())
+		if (zipPath.exists())
 		{
 			ZipFile zipFile = null;
 			try
 			{
-				zipFile = new ZipFile(zip_path, ZipFile.OPEN_READ);
+				zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
 				Enumeration<? extends ZipEntry> entries = zipFile.entries();
 				ZipEntry entry;
 				while (entries.hasMoreElements())
@@ -366,7 +370,14 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
 						if (newFile.exists())
 						{
-							conflicts.put(newFile, entry);
+							if (promptForOverwrite)
+							{
+								conflicts.put(newFile, entry);
+							}
+							else {
+								((IFile) newFile).setContents(zipFile.getInputStream(entry),
+										true, true, null);
+							}
 						}
 						else
 						{
@@ -389,9 +400,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 							{
 								try
 								{
-									Object[] overwritedFiles = overwriteFilesSelectionDialog.getResult();
+									Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
 									// Overwrite the selected files only.
-									for (Object file : overwritedFiles)
+									for (Object file : overwrittenFiles)
 									{
 										((IFile) file).setContents(finalZipFile.getInputStream(conflicts.get(file)),
 												true, true, null);
@@ -400,7 +411,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								catch (Exception e)
 								{
 									ProjectsPlugin.logError(
-											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 								}
 							}
 							return Status.OK_STATUS;
@@ -413,7 +424,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 			}
 			catch (Exception e)
 			{
-				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 			}
 			finally
 			{

@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.ui.io,
  com.aptana.samples,
  com.aptana.theme,
- com.aptana.git.ui
+ com.aptana.git.ui,
+ com.aptana.projects
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Eclipse-LazyStart: true
 Bundle-Localization: plugin

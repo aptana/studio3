@@ -37,7 +37,7 @@ public class RemoteSample implements ISample
 		return samplesRef;
 	}
 
-	public SampleEntry[] getEntries()
+	public SampleEntry getRootEntry()
 	{
 		return null;
 	}
