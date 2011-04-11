@@ -31,7 +31,7 @@ public interface ISample
 	public SamplesReference getReference();
 
 	/**
-	 * @return an array of sub-entries for the local sample, or null if the sample is remote
+	 * @return the root entry for the local sample, or null if the sample is remote
 	 */
-	public SampleEntry[] getEntries();
+	public SampleEntry getRootEntry();
 }
