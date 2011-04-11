@@ -31,7 +31,12 @@ public class LocalSample implements ISample
 		{
 			return null;
 		}
-		return file.getName();
+		String name = file.getName();
+		if (name.endsWith(".zip")) //$NON-NLS-1$
+		{
+			return name.substring(0, name.length() - 4);
+		}
+		return name;
 	}
 
 	public String getPath()
@@ -53,8 +58,8 @@ public class LocalSample implements ISample
 		return null;
 	}
 
-	public SampleEntry[] getEntries()
+	public SampleEntry getRootEntry()
 	{
-		return sampleEntry.getSubEntries();
+		return sampleEntry;
 	}
 }

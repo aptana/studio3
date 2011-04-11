@@ -28,6 +28,7 @@ public class ProjectPropertyTester extends PropertyTester
 	private static final String TYPE_HEROKU = "heroku"; //$NON-NLS-1$
 	private static final String TYPE_FTP = "ftp"; //$NON-NLS-1$
 	private static final String TYPE_ENGINEYARD = "engineyard"; //$NON-NLS-1$
+	private static final String TYPE_REDHAT = "redhat"; //$NON-NLS-1$
 
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
@@ -51,6 +52,10 @@ public class ProjectPropertyTester extends PropertyTester
 				if (TYPE_ENGINEYARD.equals(expectedValue))
 				{
 					return isEngineYardProject(project);
+				}
+				if (TYPE_REDHAT.equals(expectedValue))
+				{
+					return isRedhatProject(project);
 				}
 			}
 		}
@@ -105,6 +110,29 @@ public class ProjectPropertyTester extends PropertyTester
 		{
 			DeployType type = DeployPreferenceUtil.getDeployType(project);
 			return DeployType.ENGINEYARD.equals(type);
+		}
+		return false;
+	}
+
+	private static boolean isRedhatProject(IProject project)
+	{
+		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
+		if (repo != null)
+		{
+			for (String remote : repo.remotes())
+			{
+				if (remote.indexOf("rhcloud") != -1) //$NON-NLS-1$
+				{
+					return true;
+				}
+			}
+			for (String remoteURL : repo.remoteURLs())
+			{
+				if (remoteURL.indexOf("rhcloud.com") != -1) //$NON-NLS-1$
+				{
+					return true;
+				}
+			}
 		}
 		return false;
 	}

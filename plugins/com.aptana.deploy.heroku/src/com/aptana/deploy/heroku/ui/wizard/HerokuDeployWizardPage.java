@@ -35,7 +35,6 @@ import com.aptana.ui.util.SWTUtils;
 
 public class HerokuDeployWizardPage extends WizardPage
 {
-
 	public static final String NAME = "HerokuDeploy"; //$NON-NLS-1$
 
 	private Text appName;

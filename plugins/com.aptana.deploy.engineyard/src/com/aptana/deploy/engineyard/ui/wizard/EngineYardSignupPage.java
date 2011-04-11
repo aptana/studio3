@@ -37,7 +37,7 @@ public class EngineYardSignupPage extends WizardPage
 {
 
 	public static final String NAME = "EngineYardSignup"; //$NON-NLS-1$
-	private static final String ENGINE_YARD_ICON = "icons/ey_small.png"; //$NON-NLS-1$
+	private static final String ENGINE_YARD_ICON = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private String startingUserId;

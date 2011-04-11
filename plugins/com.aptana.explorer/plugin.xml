@@ -237,6 +237,10 @@
                            property="com.aptana.deploy.project.isDeployType"
                            value="engineyard">
                      </test>
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="redhat">
+                     </test>
                   </or>
                </iterate>
             </visibleWhen>

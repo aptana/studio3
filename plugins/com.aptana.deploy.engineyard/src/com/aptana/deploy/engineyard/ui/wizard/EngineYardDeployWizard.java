@@ -46,7 +46,7 @@ import com.aptana.usage.PingStartup;
 public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 {
 
-	private static final String EY_IMG_PATH = "icons/ey_small.png"; //$NON-NLS-1$
+	private static final String EY_IMG_PATH = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINEYARD = "Engine Yard"; //$NON-NLS-1$
 
 	private IProject project;
@@ -77,6 +77,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 			IResource resource = (IResource) element;
 			this.project = resource.getProject();
 		}
+		setDefaultPageImageDescriptor(EngineYardPlugin.getImageDescriptor(EY_IMG_PATH));
 	}
 
 	IProject getProject()

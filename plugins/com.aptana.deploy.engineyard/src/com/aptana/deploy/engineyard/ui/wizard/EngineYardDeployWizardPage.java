@@ -37,7 +37,7 @@ import com.aptana.ui.util.SWTUtils;
 public class EngineYardDeployWizardPage extends WizardPage
 {
 
-	private static final String EY_ICON = "icons/ey_small.png"; //$NON-NLS-1$
+	private static final String EY_ICON = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 
 	public static final String NAME = "EngineYardDeploy"; //$NON-NLS-1$
 

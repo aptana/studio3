@@ -55,6 +55,10 @@ public class DeployPreferenceUtil
 			{
 				return DeployType.ENGINEYARD;
 			}
+			if (type.equals(DeployType.RED_HAT.toString()))
+			{
+				return DeployType.RED_HAT;
+			}
 		}
 		return null;
 	}

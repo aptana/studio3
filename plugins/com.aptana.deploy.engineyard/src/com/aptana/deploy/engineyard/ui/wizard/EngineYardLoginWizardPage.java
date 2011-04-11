@@ -31,7 +31,7 @@ import com.aptana.deploy.engineyard.EngineYardPlugin;
 public class EngineYardLoginWizardPage extends WizardPage implements ILoginValidator
 {
 	private static final String NAME = "EngineYardLogin"; //$NON-NLS-1$
-	private static final String ENGINE_YARD_ICON = "icons/ey_small.png"; //$NON-NLS-1$
+	private static final String ENGINE_YARD_ICON = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 
 	private Text userId;
 	private Text password;

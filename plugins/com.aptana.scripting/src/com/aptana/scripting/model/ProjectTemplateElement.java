@@ -9,16 +9,13 @@ package com.aptana.scripting.model;
 
 import java.io.File;
 
+import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.core.projectTemplates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
 
-public class ProjectTemplateElement extends AbstractBundleElement
+public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
 {
-	public enum Type
-	{
-		UNDEFINED, ALL, RUBY, PHP, WEB, PYTHON
-	}
-
-	private Type fType = Type.UNDEFINED;
+	private TemplateType fType = TemplateType.UNDEFINED;
 	private String fLocation;
 	private String fDescription;
 
@@ -44,7 +41,8 @@ public class ProjectTemplateElement extends AbstractBundleElement
 			return false;
 		}
 		ProjectTemplateElement other = (ProjectTemplateElement) obj;
-		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName()) && getLocation().equals(other.getLocation());
+		return getType() == other.getType() && getDisplayName().equals(other.getDisplayName())
+				&& getLocation().equals(other.getLocation());
 	}
 
 	/**
@@ -91,7 +89,7 @@ public class ProjectTemplateElement extends AbstractBundleElement
 	 * 
 	 * @return
 	 */
-	public Type getType()
+	public TemplateType getType()
 	{
 		return fType;
 	}
@@ -150,20 +148,20 @@ public class ProjectTemplateElement extends AbstractBundleElement
 	{
 		try
 		{
-			fType = Type.valueOf(type.toUpperCase());
+			fType = TemplateType.valueOf(type.toUpperCase());
 		}
 		catch (Exception e)
 		{
-			fType = Type.UNDEFINED;
+			fType = TemplateType.UNDEFINED;
 		}
 	}
-	
+
 	/**
 	 * setType
 	 * 
 	 * @param type
 	 */
-	public void setType(Type type)
+	public void setType(TemplateType type)
 	{
 		fType = type;
 	}

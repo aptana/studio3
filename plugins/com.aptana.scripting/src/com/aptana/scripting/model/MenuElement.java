@@ -117,7 +117,19 @@ public class MenuElement extends AbstractBundleElement
 
 		if (this.isLeafMenu() && owningBundle != null)
 		{
-			result = owningBundle.getCommandByName(this._commandName);
+			BundleEntry be = BundleManager.getInstance().getBundleEntry(owningBundle.getDisplayName());
+
+			if (be != null)
+			{
+				for (CommandElement cmd : be.getCommands())
+				{
+					if (cmd.getDisplayName().equals(this._commandName))
+					{
+						result = cmd;
+						break;
+					}
+				}
+			}
 		}
 
 		return result;

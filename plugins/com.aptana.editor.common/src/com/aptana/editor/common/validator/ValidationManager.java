@@ -82,6 +82,7 @@ public class ValidationManager implements IValidationManager
 		fDocument = null;
 		fResource = null;
 		fResourceUri = null;
+		fItemsByType.clear();
 		CommonEditorPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(fPropertyListener);
 	}
 
@@ -113,35 +114,36 @@ public class ValidationManager implements IValidationManager
 	{
 		fCurrentLanguage = language;
 
-		if (fResourceUri != null)
+		Collection<List<IValidationItem>> values = fItemsByType.values();
+		for (List<IValidationItem> items : values)
 		{
-			Collection<List<IValidationItem>> values = fItemsByType.values();
-			for (List<IValidationItem> items : values)
-			{
-				items.clear();
-			}
-
-			List<ValidatorReference> validatorRefs = getValidatorRefs(language);
-			for (ValidatorReference validatorRef : validatorRefs)
-			{
-				List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
-				String type = validatorRef.getType();
-				List<IValidationItem> items = fItemsByType.get(type);
-				if (items == null)
-				{
-					items = new ArrayList<IValidationItem>();
-					fItemsByType.put(type, items);
-				}
-				items.addAll(newItems);
-
-				// checks nested languages
-				for (String nestedLanguage : fNestedLanguages)
-				{
-					processNestedLanguage(nestedLanguage, fItemsByType);
-				}
-			}
-			update(fItemsByType);
+			items.clear();
 		}
+
+		List<ValidatorReference> validatorRefs = getValidatorRefs(language);
+		for (ValidatorReference validatorRef : validatorRefs)
+		{
+			if (fResourceUri == null)
+			{
+				continue;
+			}
+			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
+			String type = validatorRef.getType();
+			List<IValidationItem> items = fItemsByType.get(type);
+			if (items == null)
+			{
+				items = new ArrayList<IValidationItem>();
+				fItemsByType.put(type, items);
+			}
+			items.addAll(newItems);
+
+			// checks nested languages
+			for (String nestedLanguage : fNestedLanguages)
+			{
+				processNestedLanguage(nestedLanguage, fItemsByType);
+			}
+		}
+		update(fItemsByType);
 	}
 
 	private void processNestedLanguage(String nestedLanguage, Map<String, List<IValidationItem>> itemsByType)

@@ -72,7 +72,7 @@ public class RedHatAPI
 		this.password = password;
 	}
 
-	private void loadSavedCredentials()
+	public void loadSavedCredentials()
 	{
 		try
 		{
@@ -85,6 +85,16 @@ public class RedHatAPI
 		{
 			RedHatPlugin.logError(e);
 		}
+	}
+
+	/**
+	 * Returns the user's login
+	 * 
+	 * @return
+	 */
+	public String getLogin()
+	{
+		return login;
 	}
 
 	// TODO Return an IStatus?
