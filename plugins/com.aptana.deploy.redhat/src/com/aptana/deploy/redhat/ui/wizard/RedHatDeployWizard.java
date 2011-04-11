@@ -2,15 +2,12 @@ package com.aptana.deploy.redhat.ui.wizard;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
@@ -18,12 +15,10 @@ import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.redhat.RedHatAPI;
 import com.aptana.deploy.redhat.RedHatDeployProvider;
 import com.aptana.deploy.redhat.RedHatPlugin;
-import com.aptana.deploy.wizard.IDeployWizard;
+import com.aptana.deploy.wizard.AbstractDeployWizard;
 
-public class RedHatDeployWizard extends Wizard implements IDeployWizard
+public class RedHatDeployWizard extends AbstractDeployWizard
 {
-
-	private IProject project;
 
 	@Override
 	public void addPages()
@@ -46,12 +41,8 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
-		Object element = selection.getFirstElement();
-		if (element instanceof IResource)
-		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
-		}
+		super.init(workbench, selection);
+		setDefaultPageImageDescriptor(RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
 	}
 
 	@Override
@@ -61,7 +52,7 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 		RedHatDeployWizardPage page = (RedHatDeployWizardPage) currentPage;
 		IRunnableWithProgress runnable = createRedHatDeployRunnable(page);
 
-		DeployPreferenceUtil.setDeployType(project, RedHatDeployProvider.ID);
+		DeployPreferenceUtil.setDeployType(getProject(), RedHatDeployProvider.ID);
 
 		if (runnable != null)
 		{
@@ -101,10 +92,5 @@ public class RedHatDeployWizard extends Wizard implements IDeployWizard
 
 		};
 		return runnable;
-	}
-
-	IProject getProject()
-	{
-		return this.project;
 	}
 }

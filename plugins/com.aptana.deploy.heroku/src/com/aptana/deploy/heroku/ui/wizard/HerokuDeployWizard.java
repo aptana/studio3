@@ -9,8 +9,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -19,7 +17,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
@@ -39,7 +36,7 @@ import com.aptana.deploy.heroku.HerokuDeployProvider;
 import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.deploy.heroku.preferences.IPreferenceConstants;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.IDeployWizard;
+import com.aptana.deploy.wizard.AbstractDeployWizard;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.git.core.model.IGitRepositoryManager;
@@ -51,13 +48,11 @@ import com.aptana.scripting.model.CommandElement;
 import com.aptana.usage.PingStartup;
 
 @SuppressWarnings("restriction")
-public class HerokuDeployWizard extends Wizard implements IDeployWizard
+public class HerokuDeployWizard extends AbstractDeployWizard
 {
 
 	private static final String HEROKU_ICON = "icons/heroku_wizard.png"; //$NON-NLS-1$
 	private static final String BUNDLE_HEROKU = "Heroku"; //$NON-NLS-1$
-
-	private IProject project;
 
 	@Override
 	public void addPages()
@@ -77,18 +72,8 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
-		Object element = selection.getFirstElement();
-		if (element instanceof IResource)
-		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
-		}
+		super.init(workbench, selection);
 		setDefaultPageImageDescriptor(HerokuPlugin.getImageDescriptor(HEROKU_ICON));
-	}
-
-	IProject getProject()
-	{
-		return this.project;
 	}
 
 	@Override
@@ -102,8 +87,8 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 		{
 			HerokuDeployWizardPage page = (HerokuDeployWizardPage) currentPage;
 			runnable = createHerokuDeployRunnable(page);
-			DeployPreferenceUtil.setDeployType(project, HerokuDeployProvider.ID);
-			DeployPreferenceUtil.setDeployEndpoint(project, page.getAppName());
+			DeployPreferenceUtil.setDeployType(getProject(), HerokuDeployProvider.ID);
+			DeployPreferenceUtil.setDeployEndpoint(getProject(), page.getAppName());
 		}
 		else if (HerokuSignupPage.NAME.equals(pageName))
 		{
@@ -152,7 +137,7 @@ public class HerokuDeployWizard extends Wizard implements IDeployWizard
 				{
 					// Initialize git repo for project if necessary
 					IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
-					GitRepository repo = manager.createOrAttach(project, sub.newChild(20));
+					GitRepository repo = manager.createOrAttach(getProject(), sub.newChild(20));
 					// TODO What if we didn't create the repo right now, but it is "dirty"?
 					// Now do an initial commit
 					repo.index().refresh(sub.newChild(15));

@@ -36,7 +36,7 @@ public class RedHatDeployWizardPage extends WizardPage
 
 	protected RedHatDeployWizardPage()
 	{
-		super(NAME, Messages.RedHatDeployWizardPage_Title, RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
+		super(NAME, Messages.RedHatDeployWizardPage_Title, null);
 	}
 
 	public void createControl(Composite parent)

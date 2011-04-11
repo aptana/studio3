@@ -3,23 +3,18 @@ package com.aptana.deploy.ftp.ui.wizard;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.ftp.FTPDeployPlugin;
 import com.aptana.deploy.ftp.FTPDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.IDeployWizard;
+import com.aptana.deploy.wizard.AbstractDeployWizard;
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
@@ -32,32 +27,15 @@ import com.aptana.ide.syncing.ui.actions.UploadAction;
 import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.syncing.ui.preferences.IPreferenceConstants.SyncDirection;
 
-public class FTPDeployWizard extends Wizard implements IDeployWizard
+public class FTPDeployWizard extends AbstractDeployWizard
 {
-
-	private IProject project;
 
 	@Override
 	public void addPages()
 	{
 		super.addPages();
 
-		addPage(new FTPDeployWizardPage(project));
-	}
-
-	public void init(IWorkbench workbench, IStructuredSelection selection)
-	{
-		Object element = selection.getFirstElement();
-		if (element instanceof IResource)
-		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
-		}
-	}
-
-	IProject getProject()
-	{
-		return this.project;
+		addPage(new FTPDeployWizardPage(getProject()));
 	}
 
 	@Override
@@ -67,8 +45,8 @@ public class FTPDeployWizard extends Wizard implements IDeployWizard
 		FTPDeployWizardPage page = (FTPDeployWizardPage) currentPage;
 		IRunnableWithProgress runnable = createFTPDeployRunnable(page);
 
-		DeployPreferenceUtil.setDeployType(project, FTPDeployProvider.ID);
-		DeployPreferenceUtil.setDeployEndpoint(project, page.getConnectionPoint().getName());
+		DeployPreferenceUtil.setDeployType(getProject(), FTPDeployProvider.ID);
+		DeployPreferenceUtil.setDeployEndpoint(getProject(), page.getConnectionPoint().getName());
 
 		if (runnable != null)
 		{
@@ -105,14 +83,15 @@ public class FTPDeployWizard extends Wizard implements IDeployWizard
 				try
 				{
 					ISiteConnection site = null;
-					ISiteConnection[] sites = SiteConnectionUtils.findSites(project, destinationConnectionPoint);
+					ISiteConnection[] sites = SiteConnectionUtils.findSites(getProject(), destinationConnectionPoint);
 					if (sites.length == 0)
 					{
 						// creates the site to link the project with the FTP connection
-						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(project);
+						IConnectionPoint sourceConnectionPoint = SyncUtils.findOrCreateConnectionPointFor(getProject());
 						CoreIOPlugin.getConnectionPointManager().addConnectionPoint(sourceConnectionPoint);
-						site = SiteConnectionUtils.createSite(MessageFormat.format("{0} <-> {1}", project.getName(), //$NON-NLS-1$
-								destinationConnectionPoint.getName()), sourceConnectionPoint,
+						site = SiteConnectionUtils.createSite(
+								MessageFormat.format("{0} <-> {1}", getProject().getName(), //$NON-NLS-1$
+										destinationConnectionPoint.getName()), sourceConnectionPoint,
 								destinationConnectionPoint);
 						SyncingPlugin.getSiteConnectionManager().addSiteConnection(site);
 					}
@@ -125,7 +104,7 @@ public class FTPDeployWizard extends Wizard implements IDeployWizard
 					{
 						// multiple FTP connections are associated with the project; finds the last one
 						// try for last remembered site first
-						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(project);
+						String lastConnection = DeployPreferenceUtil.getDeployEndpoint(getProject());
 						if (lastConnection != null)
 						{
 							site = SiteConnectionUtils.getSiteWithDestination(lastConnection, sites);
@@ -147,7 +126,7 @@ public class FTPDeployWizard extends Wizard implements IDeployWizard
 								action = new SynchronizeProjectAction();
 						}
 						action.setActivePart(null, activePart);
-						action.setSelection(new StructuredSelection(project));
+						action.setSelection(new StructuredSelection(getProject()));
 						action.setSelectedSite(site);
 						action.run(null);
 					}

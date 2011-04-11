@@ -3,16 +3,11 @@ package com.aptana.deploy.capistrano.ui.wizard;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -21,12 +16,10 @@ import org.eclipse.ui.ide.IDE;
 import com.aptana.deploy.capistrano.CapistranoDeployProvider;
 import com.aptana.deploy.capistrano.CapistranoPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.IDeployWizard;
+import com.aptana.deploy.wizard.AbstractDeployWizard;
 
-public class CapistranoDeployWizard extends Wizard implements IDeployWizard
+public class CapistranoDeployWizard extends AbstractDeployWizard
 {
-
-	private IProject project;
 
 	@Override
 	public void addPages()
@@ -43,21 +36,6 @@ public class CapistranoDeployWizard extends Wizard implements IDeployWizard
 		}
 	}
 
-	public void init(IWorkbench workbench, IStructuredSelection selection)
-	{
-		Object element = selection.getFirstElement();
-		if (element instanceof IResource)
-		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
-		}
-	}
-
-	IProject getProject()
-	{
-		return this.project;
-	}
-
 	@Override
 	public boolean performFinish()
 	{
@@ -65,7 +43,7 @@ public class CapistranoDeployWizard extends Wizard implements IDeployWizard
 		CapifyProjectPage page = (CapifyProjectPage) currentPage;
 		IRunnableWithProgress runnable = createCapifyRunnable(page);
 
-		DeployPreferenceUtil.setDeployType(project, CapistranoDeployProvider.ID);
+		DeployPreferenceUtil.setDeployType(getProject(), CapistranoDeployProvider.ID);
 
 		try
 		{
@@ -81,8 +59,7 @@ public class CapistranoDeployWizard extends Wizard implements IDeployWizard
 
 	protected IRunnableWithProgress createCapifyRunnable(CapifyProjectPage page)
 	{
-		IRunnableWithProgress runnable;
-		runnable = new IRunnableWithProgress()
+		return new IRunnableWithProgress()
 		{
 
 			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
@@ -120,6 +97,5 @@ public class CapistranoDeployWizard extends Wizard implements IDeployWizard
 				}
 			}
 		};
-		return runnable;
 	}
 }

@@ -39,7 +39,6 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.aptana.deploy.redhat.RedHatAPI;
-import com.aptana.deploy.redhat.RedHatPlugin;
 import com.aptana.ui.util.UIUtils;
 
 public class RedHatSignupWizardPage extends WizardPage
@@ -55,7 +54,7 @@ public class RedHatSignupWizardPage extends WizardPage
 
 	protected RedHatSignupWizardPage()
 	{
-		super(NAME, Messages.RedHatSignupWizardPage_Title, RedHatPlugin.getImageDescriptor(RedHatPlugin.WIZARD_IMAGE));
+		super(NAME, Messages.RedHatSignupWizardPage_Title, null);
 	}
 
 	public void createControl(Composite parent)

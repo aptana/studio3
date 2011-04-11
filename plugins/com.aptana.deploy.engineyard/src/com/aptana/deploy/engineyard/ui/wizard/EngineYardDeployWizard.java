@@ -9,14 +9,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
@@ -36,20 +33,18 @@ import com.aptana.deploy.engineyard.EngineYardAPI;
 import com.aptana.deploy.engineyard.EngineYardDeployProvider;
 import com.aptana.deploy.engineyard.EngineYardPlugin;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.wizard.IDeployWizard;
+import com.aptana.deploy.wizard.AbstractDeployWizard;
 import com.aptana.scripting.model.BundleElement;
 import com.aptana.scripting.model.BundleEntry;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.CommandElement;
 import com.aptana.usage.PingStartup;
 
-public class EngineYardDeployWizard extends Wizard implements IDeployWizard
+public class EngineYardDeployWizard extends AbstractDeployWizard
 {
 
 	private static final String EY_IMG_PATH = "icons/ey_small_wizard.png"; //$NON-NLS-1$
 	private static final String BUNDLE_ENGINEYARD = "Engine Yard"; //$NON-NLS-1$
-
-	private IProject project;
 
 	@Override
 	public void addPages()
@@ -71,18 +66,8 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
-		Object element = selection.getFirstElement();
-		if (element instanceof IResource)
-		{
-			IResource resource = (IResource) element;
-			this.project = resource.getProject();
-		}
+		super.init(workbench, selection);
 		setDefaultPageImageDescriptor(EngineYardPlugin.getImageDescriptor(EY_IMG_PATH));
-	}
-
-	IProject getProject()
-	{
-		return this.project;
 	}
 
 	@Override
@@ -101,7 +86,7 @@ public class EngineYardDeployWizard extends Wizard implements IDeployWizard
 		{
 			EngineYardDeployWizardPage page = (EngineYardDeployWizardPage) currentPage;
 			runnable = createEngineYardDeployRunnable(page);
-			DeployPreferenceUtil.setDeployType(project, EngineYardDeployProvider.ID);
+			DeployPreferenceUtil.setDeployType(getProject(), EngineYardDeployProvider.ID);
 		}
 
 		if (runnable != null)
