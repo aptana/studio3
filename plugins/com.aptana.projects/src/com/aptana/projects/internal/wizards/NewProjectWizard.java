@@ -381,7 +381,25 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						}
 						else
 						{
-							newFile.create(zipFile.getInputStream(entry), true, null);
+							try
+							{
+								newFile.create(zipFile.getInputStream(entry), true, null);
+							}
+							catch (CoreException re)
+							{
+								if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
+										&& re.getStatus() instanceof IResourceStatus)
+								{
+									IResourceStatus rs = (IResourceStatus) re.getStatus();
+									IFile newVariantFile = project.getParent().getFile(rs.getPath());
+									((IFile) newVariantFile).setContents(zipFile.getInputStream(entry), true, true,
+											null);
+								}
+								else
+								{
+									ProjectsPlugin.logError(Messages.NewProjectWizard_ZipFailure, re);
+								}
+							}
 						}
 					}
 				}

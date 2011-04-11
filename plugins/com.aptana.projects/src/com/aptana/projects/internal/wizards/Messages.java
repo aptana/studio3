@@ -26,6 +26,8 @@ public class Messages extends NLS
 	public static String NewProjectWizard_Title;
 	public static String NewProjectWizard_Warning_DirectoryExists;
 
+	public static String NewProjectWizard_ZipFailure;
+
 	public static String OverwriteFilesSelectionDialog_overwriteFilesTitle;
 
 	public static String ProjectTemplateSelectionPage_AvailableTemplates_TXT;
