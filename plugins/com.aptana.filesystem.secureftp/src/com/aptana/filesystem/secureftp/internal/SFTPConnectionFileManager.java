@@ -36,6 +36,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 
 import com.aptana.core.io.vfs.ExtendedFileInfo;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.ExpiringMap;
 import com.aptana.filesystem.ftp.Policy;
 import com.aptana.filesystem.ftp.internal.BaseFTPConnectionFileManager;
@@ -316,7 +317,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 				cwd = path;
 			}
 		} catch (FTPException e) {
-			throwWrappedException(e, path);
+			throwWrappedException(e, path, SshFxpStatus.STATUS_FX_FAILURE);
 		} catch (IOException e) {
 			cwd = null;
 			throw e;			
@@ -324,11 +325,16 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	}
 
 	private static void throwWrappedException(FTPException e, IPath path) throws FileNotFoundException, FTPException, PermissionDeniedException {
+		throwWrappedException(e, path, -1);
+	}
+
+	private static void throwWrappedException(FTPException e, IPath path, int fileNotFoundErrorCode) throws FileNotFoundException, FTPException, PermissionDeniedException {
 		int reply = e.getReplyCode();
 		if (reply == -1 && e.getCause() instanceof FTPException) {
 			reply = ((FTPException) e.getCause()).getReplyCode();
 		}
-		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE || reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH) {
+		if (reply == -1 || reply == SshFxpStatus.STATUS_FX_NO_SUCH_FILE
+				|| reply == SshFxpStatus.STATUS_FX_NO_SUCH_PATH || reply == fileNotFoundErrorCode) {
 			throw initFileNotFoundException(path, e);
 		}
         if (reply == SshFxpStatus.STATUS_FX_PERMISSION_DENIED) {
@@ -416,6 +422,20 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 			String name = path.lastSegment();
 			FTPFile result = ftpFileCache.get(path);
 			if (result == null) {
+				if ((options & IExtendedFileStore.EXISTENCE) != 0) {
+					ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
+					try {
+						fileInfo.setExists(ftpClient.exists(path.toPortableString()));
+						ftpClient.chdir(path.toPortableString());
+						fileInfo.setDirectory(true);
+					} catch (FTPException e) {
+						try {
+							throwWrappedException(e, path, SshFxpStatus.STATUS_FX_FAILURE);
+						} catch (FileNotFoundException ignore) {
+						}
+					}
+					return fileInfo;
+				}
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
 					if (".".equals(ftpFile.getName()) || "..".equals(ftpFile.getName())) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -618,7 +638,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	@Override
 	protected void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		try {
-			changeCurrentDir(Path.ROOT);
+			changeCurrentDir(sourcePath.removeLastSegments(1));
 			Policy.checkCanceled(monitor);
 			if (ftpClient.exists(destinationPath.toPortableString())) {
 				ftpClient.delete(destinationPath.toPortableString());

@@ -18,6 +18,7 @@ import org.eclipse.ui.internal.wizards.newresource.ResourceMessages;
 import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.common.internal.formatter.CommonFormatterUtils;
 import com.aptana.scripting.model.CommandContext;
 import com.aptana.scripting.model.CommandResult;
 import com.aptana.scripting.model.TemplateElement;
@@ -118,10 +119,6 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		{
 			return null;
 		}
-		// Escape periods in pattern (for regexp)
-		pattern = pattern.replaceAll("\\.", "\\\\."); //$NON-NLS-1$ //$NON-NLS-2$
-		// Replace * wildcard pattern with .+? regexp
-		pattern = pattern.replaceAll("\\*", "\\.\\+\\?"); //$NON-NLS-1$ //$NON-NLS-2$
 		CommandContext context = template.createCommandContext();
 		context.put("TM_NEW_FILE_BASENAME", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
 		context.put("TM_NEW_FILE", absoluteFilePath.toOSString()); //$NON-NLS-1$
@@ -131,6 +128,7 @@ public class NewFileWizard extends BasicNewFileResourceWizard
 		{
 			return null;
 		}
-		return result.getOutputString();
+		// Run the template's output through the current formatter and return its formatted output
+		return CommonFormatterUtils.format(absoluteFilePath, result.getOutputString());
 	}
 }

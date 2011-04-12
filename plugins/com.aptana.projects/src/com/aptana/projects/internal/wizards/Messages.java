@@ -15,13 +15,20 @@ public class Messages extends NLS
 
 	public static String NewProjectWizard_CreateOp_Title;
 	public static String NewProjectWizard_CreationProblem;
+	public static String NewProjectWizard_ERR_FailToDisconnect;
 	public static String NewProjectWizard_ERR_OpeningIndex;
 	public static String NewProjectWizard_ERR_UnzipFile;
+
+	public static String NewProjectWizard_filesOverwriteMessage;
 	public static String NewProjectWizard_InternalError;
 	public static String NewProjectWizard_ProjectPage_Description;
 	public static String NewProjectWizard_ProjectPage_Title;
 	public static String NewProjectWizard_Title;
 	public static String NewProjectWizard_Warning_DirectoryExists;
+
+	public static String NewProjectWizard_ZipFailure;
+
+	public static String OverwriteFilesSelectionDialog_overwriteFilesTitle;
 
 	public static String ProjectTemplateSelectionPage_AvailableTemplates_TXT;
 	public static String ProjectTemplateSelectionPage_Description;

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -198,52 +197,61 @@ public final class FirefoxUtil {
 	 * @return
 	 */
 	public static String getExtensionVersion(String extensionID, IPath profileDir) {
-		IPath dir = profileDir.append("extensions").append(extensionID); //$NON-NLS-1$
-		if (dir.toFile().exists()) {
-			File installRdf = dir.append("install.rdf").toFile(); //$NON-NLS-1$
-			if (installRdf.exists()) {
-				try {
-					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder parser = factory.newDocumentBuilder();
-					Document document = parser.parse(new FileInputStream(installRdf));
-					Node node = document.getDocumentElement().getFirstChild();
-					while (node != null) {
-						if ("description".equals(node.getNodeName().toLowerCase()) //$NON-NLS-1$
-								|| "rdf:description".equals(node.getNodeName().toLowerCase())) { //$NON-NLS-1$
-							NamedNodeMap attrs = node.getAttributes();
-							Node about = attrs.getNamedItem("about"); //$NON-NLS-1$
-							if (about == null) {
-								about = attrs.getNamedItem("RDF:about"); //$NON-NLS-1$
-							}
-							if (about != null) {
-								if ("urn:mozilla:install-manifest".equals(about.getNodeValue())) { //$NON-NLS-1$
-									break;
-								}
-							}
-						}
-						node = node.getNextSibling();
-					}
-					if (node != null) {
+		try {
+			IPath dir = profileDir.append("extensions").append(extensionID); //$NON-NLS-1$
+			InputStream rdfInputStream = null;
+			if (dir.toFile().isFile()) {
+				dir = Path.fromOSString(IOUtil.read(new FileInputStream(dir.toFile())));
+			}
+			if (dir.toFile().isDirectory()) {
+				File installRdf = dir.append("install.rdf").toFile(); //$NON-NLS-1$
+				if (installRdf.exists()) {
+					rdfInputStream = new FileInputStream(installRdf);
+				}
+			} else if (dir.addFileExtension("xpi").toFile().isFile()) {
+				rdfInputStream = ZipUtil.openEntry(dir.addFileExtension("xpi").toFile(), Path.fromPortableString("install.rdf"));
+			}
+			if (rdfInputStream != null) {
+				DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder parser = factory.newDocumentBuilder();
+				Document document = parser.parse(rdfInputStream);
+				Node node = document.getDocumentElement().getFirstChild();
+				while (node != null) {
+					if ("description".equals(node.getNodeName().toLowerCase()) //$NON-NLS-1$
+							|| "rdf:description".equals(node.getNodeName().toLowerCase())) { //$NON-NLS-1$
 						NamedNodeMap attrs = node.getAttributes();
-						Node version = attrs.getNamedItem("em:version"); //$NON-NLS-1$
-						if (version != null) {
-							return version.getNodeValue();
+						Node about = attrs.getNamedItem("about"); //$NON-NLS-1$
+						if (about == null) {
+							about = attrs.getNamedItem("RDF:about"); //$NON-NLS-1$
 						}
-						node = node.getFirstChild();
-					}
-					while (node != null) {
-						if ("em:version".equals(node.getNodeName().toLowerCase())) { //$NON-NLS-1$
-							break;
+						if (about != null) {
+							if ("urn:mozilla:install-manifest".equals(about.getNodeValue())) { //$NON-NLS-1$
+								break;
+							}
 						}
-						node = node.getNextSibling();
 					}
-					if (node != null) {
-						return node.getTextContent();
+					node = node.getNextSibling();
+				}
+				if (node != null) {
+					NamedNodeMap attrs = node.getAttributes();
+					Node version = attrs.getNamedItem("em:version"); //$NON-NLS-1$
+					if (version != null) {
+						return version.getNodeValue();
 					}
-				} catch (Exception e) {
-					CorePlugin.log(e);
+					node = node.getFirstChild();
+				}
+				while (node != null) {
+					if ("em:version".equals(node.getNodeName().toLowerCase())) { //$NON-NLS-1$
+						break;
+					}
+					node = node.getNextSibling();
+				}
+				if (node != null) {
+					return node.getTextContent();
 				}
 			}
+		} catch (Exception e) {
+			CorePlugin.log(e);
 		}
 		return null;
 	}
@@ -336,7 +344,7 @@ public final class FirefoxUtil {
 		}
 
 		try {
-			ZipUtil.extract(new ZipFile(file), dir);
+			ZipUtil.extract(file, dir);
 		} catch (IOException e) {
 			CorePlugin.log(e);
 			return false;

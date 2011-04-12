@@ -199,7 +199,6 @@ public final class PreviewEditorPart extends EditorPart implements IReusableEdit
 				initialURL = url.toExternalForm();
 			if (webBrowser != null) {
 				webBrowser.setURL(initialURL);
-				getSite().getWorkbenchWindow().getActivePage().activate(this);
 			}
 
 			setPartName(MessageFormat.format(Messages.PreviewEditorPart_Title, pei.getName()));

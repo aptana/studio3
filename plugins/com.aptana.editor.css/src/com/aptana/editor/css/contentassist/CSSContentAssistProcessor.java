@@ -1134,10 +1134,30 @@ public class CSSContentAssistProcessor extends CommonContentAssistProcessor
 	 * @see com.aptana.editor.common.CommonContentAssistProcessor#triggerAdditionalAutoActivation(char, int,
 	 * org.eclipse.jface.text.IDocument, int)
 	 */
-	public boolean triggerAdditionalAutoActivation(char c, int keyCode, IDocument document, int offset)
+	public boolean isValidAutoActivationLocation(char c, int keyCode, IDocument document, int offset)
 	{
 		LexemeProvider<CSSTokenType> lexemeProvider = this.createLexemeProvider(document, offset);
 		Lexeme<CSSTokenType> lexeme = lexemeProvider.getFloorLexeme(offset);
 		return (lexeme != null && (lexeme.getType() == CSSTokenType.IDENTIFIER || lexeme.getType() == CSSTokenType.COLON));
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidIdentifier(char, int)
+	 */
+	public boolean isValidIdentifier(char c, int keyCode)
+	{
+		return ('A' <= keyCode && keyCode <= 'Z') || ('a' <= keyCode && keyCode <= 'z') || c == '_' || c == '#'
+				|| c == '.' || c == '-';
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.CommonContentAssistProcessor#isValidActivationCharacter(char, int)
+	 */
+	public boolean isValidActivationCharacter(char c, int keyCode)
+	{
+		return Character.isWhitespace(c) || c == ':';
+	}
+
 }

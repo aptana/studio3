@@ -16,26 +16,28 @@ import com.aptana.editor.common.text.rules.ExtendedWordRule;
 
 public class JSNumberRule extends ExtendedWordRule
 {
-	private static final String REGEXP = "(0(x|X)[0-9a-fA-F]+)|(([0-9]+(\\.[0-9]+)?|\\.[0-9]+)(?:[eE]\\d+)?)"; //$NON-NLS-1$
-	private static Pattern pattern;
+	// @formatter:off
+	private static Pattern NUMBER_PATTERN = Pattern.compile("(?:(?:0[xX][0-9a-fA-F]+)|(?:(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:[eE][-+]?\\d+)?))"); //$NON-NLS-1$;
+	// @formatter:on
 
+	/**
+	 * JSNumberRule
+	 * 
+	 * @param token
+	 */
 	public JSNumberRule(IToken token)
 	{
 		super(new JSNumberDetector(), token, false);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.editor.common.text.rules.ExtendedWordRule#wordOK(java.lang.String,
+	 * org.eclipse.jface.text.rules.ICharacterScanner)
+	 */
 	@Override
 	protected boolean wordOK(String word, ICharacterScanner scanner)
 	{
-		return getPattern().matcher(word).matches();
-	}
-
-	private synchronized static Pattern getPattern()
-	{
-		if (pattern == null)
-		{
-			pattern = Pattern.compile(REGEXP);
-		}
-		return pattern;
+		return NUMBER_PATTERN.matcher(word).matches();
 	}
 }

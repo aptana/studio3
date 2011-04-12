@@ -147,9 +147,6 @@
             class="com.aptana.explorer.navigator.actions.DeployActionProvider"
             id="com.aptana.explorer.navigator.actions.DeployActions">
          <enablement>
-            <instanceof
-                  value="org.eclipse.core.resources.IResource">
-            </instanceof>
          </enablement>
       </actionProvider>
       <actionProvider
@@ -239,6 +236,10 @@
                      <test
                            property="com.aptana.deploy.project.isDeployType"
                            value="engineyard">
+                     </test>
+                     <test
+                           property="com.aptana.deploy.project.isDeployType"
+                           value="redhat">
                      </test>
                   </or>
                </iterate>

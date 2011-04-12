@@ -22,4 +22,5 @@ public interface IPreferenceConstants
 	 * CSSContentAssistProcessor
 	 */
 	String CSS_ACTIVATION_CHARACTERS = "CSS_ACTIVATION_CHARACTERS"; //$NON-NLS-1$
+
 }

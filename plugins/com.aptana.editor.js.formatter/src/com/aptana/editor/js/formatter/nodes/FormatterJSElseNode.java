@@ -24,6 +24,7 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	private boolean hasBlock;
 	private final boolean isElseIf;
 	private final boolean previousIfHasBlock;
+	private final boolean commentOnPreviousLine;
 
 	/**
 	 * @param document
@@ -31,14 +32,16 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	 * @param hasBlock
 	 * @param previousIfHasBlock
 	 *            Indicate that the previous 'if' block (the 'true' part) has a blocked body in curly-braces.
+	 * @param commentOnPreviousLine
 	 */
 	public FormatterJSElseNode(IFormatterDocument document, boolean hasBlock, boolean isElseIf,
-			boolean previousIfHasBlock)
+			boolean previousIfHasBlock, boolean commentOnPreviousLine)
 	{
 		super(document);
 		this.hasBlock = hasBlock;
 		this.isElseIf = isElseIf;
 		this.previousIfHasBlock = previousIfHasBlock;
+		this.commentOnPreviousLine = commentOnPreviousLine;
 	}
 
 	/*
@@ -68,7 +71,8 @@ public class FormatterJSElseNode extends FormatterBlockWithBeginNode
 	@Override
 	protected boolean isAddingBeginNewLine()
 	{
-		return !previousIfHasBlock || getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT);
+		return commentOnPreviousLine || !previousIfHasBlock
+				|| getDocument().getBoolean(JSFormatterConstants.NEW_LINES_BEFORE_ELSE_STATEMENT);
 	}
 
 	/**

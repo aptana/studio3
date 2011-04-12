@@ -35,6 +35,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.WorkbenchPart;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * This is a special class that listens to editors and makes sure that the tab name is unique. If two tabs share same
  * filename we append additional text to disambiguate them.
@@ -53,7 +55,7 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	public FilenameDifferentiator()
 	{
 		super("Install filename differentiator"); //$NON-NLS-1$
-		setSystem(true);
+		setSystem(!EclipseUtil.showSystemJobs());
 		baseNames = new HashMap<String, Set<IEditorPart>>();
 	}
 
@@ -229,18 +231,25 @@ class FilenameDifferentiator extends UIJob implements IPartListener
 	private IPath getPath(IEditorPart otherEditor)
 	{
 		IEditorInput input = otherEditor.getEditorInput();
-		if (input instanceof IPathEditorInput)
+		try
 		{
-			return ((IPathEditorInput) input).getPath();
+			if (input instanceof IPathEditorInput)
+			{
+				return ((IPathEditorInput) input).getPath();
+			}
+
+			URI uri = (URI) input.getAdapter(URI.class);
+			if (uri != null)
+			{
+				return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
+			}
+			if (input instanceof IURIEditorInput)
+			{
+				return URIUtil.toPath(((IURIEditorInput) input).getURI());
+			}
 		}
-		
-		URI uri = (URI) input.getAdapter(URI.class);
-		if (uri != null) {
-			return new Path(uri.getHost() + Path.SEPARATOR + uri.getPath());
-		}
-		if (input instanceof IURIEditorInput)
+		catch (Exception e)
 		{
-			return URIUtil.toPath(((IURIEditorInput) input).getURI());
 		}
 		return null;
 	}

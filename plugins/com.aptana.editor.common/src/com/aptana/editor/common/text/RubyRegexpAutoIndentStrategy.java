@@ -10,6 +10,7 @@ package com.aptana.editor.common.text;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IDocument;
@@ -36,9 +37,9 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 	private static final String TAB_CHAR = "\t"; //$NON-NLS-1$
 
 	public RubyRegexpAutoIndentStrategy(String contentType, SourceViewerConfiguration configuration,
-			ISourceViewer sourceViewer)
+			ISourceViewer sourceViewer, IPreferenceStore prefStore)
 	{
-		super(contentType, configuration, sourceViewer);
+		super(contentType, configuration, sourceViewer, prefStore);
 	}
 
 	public void customizeDocumentCommand(IDocument document, DocumentCommand command)
@@ -239,10 +240,10 @@ public class RubyRegexpAutoIndentStrategy extends CommonAutoIndentStrategy
 		for (int i = lineNumber - 1; i >= 0; i--)
 		{
 			IRegion region = d.getLineInformation(i);
-			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(getSourceViewer(),
-					region.getOffset());
-			String endScope = CommonEditorPlugin.getDefault().getDocumentScopeManager().getScopeAtOffset(getSourceViewer(),
-					region.getOffset() + region.getLength());
+			String scope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(getSourceViewer(), region.getOffset());
+			String endScope = CommonEditorPlugin.getDefault().getDocumentScopeManager()
+					.getScopeAtOffset(getSourceViewer(), region.getOffset() + region.getLength());
 			RubyRegexp increaseIndentRegexp = getIncreaseIndentRegexp(scope);
 			RubyRegexp decreaseIndentRegexp = getDecreaseIndentRegexp(endScope);
 

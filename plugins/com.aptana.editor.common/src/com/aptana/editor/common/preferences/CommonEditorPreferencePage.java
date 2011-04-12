@@ -9,6 +9,8 @@ package com.aptana.editor.common.preferences;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -68,6 +70,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		createTextEditingOptions(appearanceComposite, Messages.CommonEditorPreferencePage_Text_Editing_Label);
 		setPreferenceStore(originalPref);
+
 	}
 
 	protected void createTextEditingOptions(Composite parent, String groupName)
@@ -78,7 +81,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 
 		Label label = new Label(group, SWT.NONE);
 		label.setText(Messages.CommonEditorPreferencePage_LBL_TabPolicy);
-		label.setLayoutData(GridDataFactory.swtDefaults().create());
+		label.setLayoutData(GridDataFactory.fillDefaults().create());
 
 		tabSpaceCombo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseSpacesOption);
@@ -86,17 +89,7 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		tabSpaceCombo.add(Messages.CommonEditorPreferencePage_UseDefaultOption);
 		tabSpaceCombo.setLayoutData(GridDataFactory.fillDefaults().create());
 
-		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
-		{
-			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
-		}
-		else
-		{
-			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
-			else
-				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
-		}
+		setTabSpaceCombo();
 
 		final Composite fildEditorGroup = new Composite(group, SWT.NONE);
 		fildEditorGroup.setLayoutData(GridDataFactory.fillDefaults().grab(true, false).create());
@@ -184,6 +177,28 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		tabSize.setEnabled(!tabSpaceCombo.getText().equals(Messages.CommonEditorPreferencePage_UseDefaultOption),
 				fildEditorGroup);
 		addField(tabSize);
+
+		createAutoIndentOptions(group);
+
+	}
+
+	private void setTabSpaceCombo()
+	{
+		if (!originalPref.contains(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+		{
+			tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		}
+		else
+		{
+			if (getPreferenceStore().getBoolean(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS))
+			{
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseSpacesOption);
+			}
+			else
+			{
+				tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseTabOption);
+			}
+		}
 	}
 
 	/**
@@ -232,11 +247,11 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 	@Override
 	protected void performDefaults()
 	{
-		super.performDefaults();
 		IEclipsePreferences store = getPluginPreferenceStore();
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_SPACES_FOR_TABS);
 		store.remove(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
-		tabSpaceCombo.setText(Messages.CommonEditorPreferencePage_UseDefaultOption);
+		setTabSpaceCombo();
+		super.performDefaults();
 		try
 		{
 			store.flush();
@@ -245,6 +260,16 @@ public abstract class CommonEditorPreferencePage extends FieldEditorPreferencePa
 		{
 			CommonEditorPlugin.logError(e);
 		}
+	}
+
+	protected void createAutoIndentOptions(Composite parent)
+	{
+		Composite autoIndentGroup = new Composite(parent, SWT.NONE);
+		autoIndentGroup.setLayoutData(GridDataFactory.fillDefaults().span(3, 1).create());
+
+		FieldEditor autoIndentTag = new BooleanFieldEditor(IPreferenceConstants.EDITOR_AUTO_INDENT,
+				Messages.CommonEditorPreferencePage_auto_indent_label, autoIndentGroup);
+		addField(autoIndentTag);
 	}
 
 }

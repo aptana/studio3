@@ -202,12 +202,12 @@ public abstract class AbstractScriptFormatter implements IScriptFormatter
 	{
 		// Display a status error
 		StatusLineMessageTimerManager.setErrorMessage(FormatterMessages.Formatter_formatterErrorStatus, 3000L, true);
-		if (FormatterPlugin.DEBUG)
+		if (FormatterPlugin.getDefault().isDebugging())
 		{
 			// Log complete
 			FormatterPlugin.log(new Status(IStatus.ERROR, FormatterPlugin.PLUGIN_ID, IStatus.ERROR,
-					FormatterMessages.Formatter_formatterError, new DumpContentException(input
-							+ "\n<!----------------------------!>\n" + output))); //$NON-NLS-1$
+					FormatterMessages.Formatter_formatterError, new DumpContentException("Input:\n" + input //$NON-NLS-1$
+							+ "\n<!----------------------------!>\nOutput:\n" + output))); //$NON-NLS-1$
 		}
 		else
 		{

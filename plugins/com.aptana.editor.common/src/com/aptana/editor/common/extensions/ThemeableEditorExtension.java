@@ -112,7 +112,10 @@ public class ThemeableEditorExtension
 		{
 			IThemeableEditor editor = this.fEditor.get();
 			overrideThemeColors();
-			editor.getISourceViewer().invalidateTextPresentation();
+			if (editor != null)
+			{
+				editor.getISourceViewer().invalidateTextPresentation();
+			}
 		}
 		else if (event.getProperty().equals(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_CURRENT_LINE))
 		{

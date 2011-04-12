@@ -29,10 +29,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 
 import com.aptana.core.resources.FileDeltaRefreshAdapter;
@@ -53,6 +57,7 @@ public class CorePlugin extends Plugin
 	private static CorePlugin plugin;
 
 	private ResourceListener fProjectsListener;
+	private IResourceChangeListener fProjectCreationListener;
 
 	private Job addBuilderJob;
 	private Job addFilewatcherJob;
@@ -76,83 +81,22 @@ public class CorePlugin extends Plugin
 		{
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				addProjectResourceListener();
+				addProjectListeners();
 				return Status.OK_STATUS;
 			}
 		};
-		addFilewatcherJob.setSystem(true);
+		addFilewatcherJob.setSystem(!EclipseUtil.showSystemJobs());
 		addFilewatcherJob.setPriority(Job.LONG);
 		addFilewatcherJob.schedule(250);
-		
+
 		addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 		{
 			protected IStatus run(IProgressMonitor monitor)
 			{
-				MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
-				IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-				Map<String, String> oldToNewNatures = new HashMap<String, String>();
-				oldToNewNatures.put("com.aptana.ide.project.nature.web", "com.aptana.projects.webnature"); //$NON-NLS-1$ //$NON-NLS-2$
-				// oldToNewNatures.put("com.aptana.ide.project.remote.nature",
-				// "com.aptana.ruby.core.rubynature"); // There is no remote nature now
-				oldToNewNatures.put("com.aptana.ide.editor.php.phpnature", "com.aptana.editor.php.phpNature"); //$NON-NLS-1$ //$NON-NLS-2$
-				// oldToNewNatures.put("org.radrails.rails.core.railsnature",
-				// "org.radrails.rails.core.railsnature"); // Same id
-				oldToNewNatures.put("org.rubypeople.rdt.core.rubynature", "com.aptana.ruby.core.rubynature"); //$NON-NLS-1$ //$NON-NLS-2$
-				SubMonitor sub = SubMonitor.convert(monitor, 10 * projects.length);
-				for (IProject p : projects)
-				{
-					if (sub.isCanceled())
-					{
-						return Status.CANCEL_STATUS;
-					}
-
-					try
-					{
-						if (!p.isAccessible())
-						{
-							continue;
-						}
-						sub.subTask(p.getName());
-
-						// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
-						IProjectDescription desc = p.getDescription();
-						List<String> newNatures = new ArrayList<String>();
-						for (String nature : desc.getNatureIds())
-						{
-							String newNature = oldToNewNatures.get(nature);
-							if (newNature != null)
-							{
-								newNatures.add(newNature);
-							}
-							newNatures.add(nature);
-						}
-						desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
-						p.setDescription(desc, sub.newChild(5));
-
-						// Attach builders in case nature was already on project, but before we created the builder
-						String[] natureIds = desc.getNatureIds();
-						for (int i = 0; i < natureIds.length; i++)
-						{
-							String natureId = natureIds[i];
-							if (ResourceUtil.isAptanaNature(natureId))
-							{
-								IProjectNature nature = p.getNature(natureId);
-								nature.configure();
-							}
-						}
-						status.add(Status.OK_STATUS);
-						sub.worked(5);
-					}
-					catch (CoreException e)
-					{
-						status.add(e.getStatus());
-					}
-				}
-				sub.done();
-				return status;
+				return updateProjectNatures(ResourcesPlugin.getWorkspace().getRoot().getProjects(), monitor);
 			}
 		};
-		addBuilderJob.setSystem(true);
+		addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
 		addBuilderJob.setPriority(Job.LONG);
 		addBuilderJob.schedule(250);
 	}
@@ -175,7 +119,7 @@ public class CorePlugin extends Plugin
 				addBuilderJob.cancel();
 				addBuilderJob = null;
 			}
-			removeProjectResourceListener();
+			removeProjectListeners();
 		}
 		finally
 		{
@@ -258,30 +202,153 @@ public class CorePlugin extends Plugin
 		getDefault().getLog().log(new Status(IStatus.OK, PLUGIN_ID, string));
 	}
 
-	private void removeProjectResourceListener()
+	private IStatus updateProjectNatures(IProject[] projects, IProgressMonitor monitor)
+	{
+		MultiStatus status = new MultiStatus(PLUGIN_ID, Status.OK, Status.OK_STATUS.getMessage(), null);
+		Map<String, String> oldToNewNatures = new HashMap<String, String>();
+		oldToNewNatures.put("com.aptana.ide.project.nature.web", "com.aptana.projects.webnature"); //$NON-NLS-1$ //$NON-NLS-2$
+		// oldToNewNatures.put("com.aptana.ide.project.remote.nature",
+		// "com.aptana.ruby.core.rubynature"); // There is no remote nature now
+		oldToNewNatures.put("com.aptana.ide.editor.php.phpnature", "com.aptana.editor.php.phpNature"); //$NON-NLS-1$ //$NON-NLS-2$
+		// oldToNewNatures.put("org.radrails.rails.core.railsnature",
+		// "org.radrails.rails.core.railsnature"); // Same id
+		oldToNewNatures.put("org.rubypeople.rdt.core.rubynature", "com.aptana.ruby.core.rubynature"); //$NON-NLS-1$ //$NON-NLS-2$
+		SubMonitor sub = SubMonitor.convert(monitor, 10 * projects.length);
+		for (IProject p : projects)
+		{
+			if (sub.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+
+			try
+			{
+				if (!p.isAccessible())
+				{
+					continue;
+				}
+				sub.subTask(p.getName());
+
+				// Look for Studio 1.x and 2.x project natures, attach our new natures where needed
+				IProjectDescription desc = p.getDescription();
+				List<String> newNatures = new ArrayList<String>();
+				for (String nature : desc.getNatureIds())
+				{
+					String newNature = oldToNewNatures.get(nature);
+					if (newNature != null)
+					{
+						newNatures.add(newNature);
+					}
+					newNatures.add(nature);
+				}
+				desc.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
+				p.setDescription(desc, sub.newChild(5));
+
+				// Attach builders in case nature was already on project, but before we created the builder
+				String[] natureIds = desc.getNatureIds();
+				for (int i = 0; i < natureIds.length; i++)
+				{
+					String natureId = natureIds[i];
+					if (ResourceUtil.isAptanaNature(natureId))
+					{
+						IProjectNature nature = p.getNature(natureId);
+						nature.configure();
+					}
+				}
+				status.add(Status.OK_STATUS);
+				sub.worked(5);
+			}
+			catch (CoreException e)
+			{
+				status.add(e.getStatus());
+			}
+		}
+		sub.done();
+		return status;
+	}
+
+	private void removeProjectListeners()
 	{
 		if (fProjectsListener != null)
 		{
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectsListener);
 			fProjectsListener.dispose();
 			fProjectsListener = null;
 		}
+		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectCreationListener);
 	}
 
-	private void addProjectResourceListener()
+	private void addProjectListeners()
 	{
 		fProjectsListener = new ResourceListener();
 		fProjectsListener.start();
-		// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectsListener, IResourceChangeEvent.POST_CHANGE);
+
+		fProjectCreationListener = new IResourceChangeListener()
+		{
+			public void resourceChanged(IResourceChangeEvent event)
+			{
+				IResourceDelta delta = event.getDelta();
+				if (delta == null)
+				{
+					return;
+				}
+				try
+				{
+					delta.accept(new IResourceDeltaVisitor()
+					{
+						public boolean visit(IResourceDelta delta) throws CoreException
+						{
+							final IResource resource = delta.getResource();
+							if (resource.getType() == IResource.ROOT)
+							{
+								return true;
+							}
+							if (resource.getType() == IResource.PROJECT)
+							{
+								// a project was added or opened
+								if (delta.getKind() == IResourceDelta.ADDED
+										|| (delta.getKind() == IResourceDelta.CHANGED
+												&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
+												.isAccessible()))
+								{
+									addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
+									{
+										protected IStatus run(IProgressMonitor monitor)
+										{
+											return updateProjectNatures(new IProject[] { resource.getProject() },
+													monitor);
+										}
+									};
+									addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
+									addBuilderJob.setPriority(Job.LONG);
+									addBuilderJob.schedule();
+								}
+
+							}
+							return false;
+						}
+					});
+				}
+				catch (CoreException e)
+				{
+					log(e.getStatus());
+				}
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectCreationListener,
+				IResourceChangeEvent.POST_CHANGE);
+
 	}
-	
-	public static String getAptanaStudioVersion() {
+
+	public static String getAptanaStudioVersion()
+	{
 		String version = EclipseUtil.getPluginVersion(EclipseUtil.STANDALONE_PLUGIN_ID);
-		if (version == null) {
+		if (version == null)
+		{
 			version = EclipseUtil.getPluginVersion(PLUGIN_ID);
 		}
-		if (version == null) {
+		if (version == null)
+		{
 			version = EclipseUtil.getProductVersion();
 		}
 		return version;
@@ -293,12 +360,29 @@ public class CorePlugin extends Plugin
 	 * 
 	 * @author cwilliams
 	 */
-	private static class ResourceListener implements IResourceChangeListener
+	private static class ResourceListener implements IResourceChangeListener, IPreferenceChangeListener
 	{
 
 		private Map<IProject, Integer> fWatchers;
 
+		ResourceListener()
+		{
+			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
+		}
+
 		public void start()
+		{
+			if (autoHookFileWatcher())
+			{
+				hookAll();
+			}
+		}
+
+		/**
+		 * Hook a filewatcher to every open project, and add a resource listener to handle projects getting
+		 * added/opened/closed.
+		 */
+		private void hookAll()
 		{
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
@@ -308,10 +392,27 @@ public class CorePlugin extends Plugin
 					hookFilewatcher(project);
 				}
 			}
+			// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+		}
+
+		private boolean autoHookFileWatcher()
+		{
+			return Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+					ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
 		}
 
 		public synchronized void dispose()
 		{
+			// Don't listen to auto-refresh pref changes anymore
+			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
+			// Now remove all the existing file watchers
+			unhookAll();
+		}
+
+		private void unhookAll()
+		{
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 			if (fWatchers != null)
 			{
 				for (IProject project : new HashSet<IProject>(fWatchers.keySet()))
@@ -324,6 +425,10 @@ public class CorePlugin extends Plugin
 
 		protected synchronized void hookFilewatcher(IProject newProject)
 		{
+			if (!autoHookFileWatcher())
+			{
+				return;
+			}
 			try
 			{
 				if (newProject != null && newProject.exists() && newProject.getLocation() != null)
@@ -411,6 +516,21 @@ public class CorePlugin extends Plugin
 			catch (CoreException e)
 			{
 				log(e.getStatus());
+			}
+		}
+
+		public void preferenceChange(PreferenceChangeEvent event)
+		{
+			if (ResourcesPlugin.PREF_AUTO_REFRESH.equals(event.getKey()))
+			{
+				if (Boolean.TRUE.toString().equals(event.getNewValue()))
+				{
+					hookAll();
+				}
+				else
+				{
+					unhookAll();
+				}
 			}
 		}
 	}

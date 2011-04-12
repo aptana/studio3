@@ -132,7 +132,7 @@ public class SchemaObject implements IState, IPropertyContainer
 	 */
 	public String getTypeName()
 	{
-		return this.getTypeName();
+		return _currentPropertyTypeName;
 	}
 
 	/**

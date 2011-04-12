@@ -11,6 +11,7 @@ package com.aptana.webserver.core.builtin;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -33,6 +34,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.URIUtil;
 
 import com.aptana.webserver.core.EFSWebServerConfiguration;
 import com.aptana.webserver.core.WebServerCorePlugin;
@@ -68,7 +70,8 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			String method = request.getRequestLine().getMethod().toUpperCase(Locale.ENGLISH);
 			if (METHOD_GET.equals(method) || METHOD_HEAD.equals(method)) {
 				String target = URLDecoder.decode(request.getRequestLine().getUri(), HTTP.UTF_8);
-				IFileStore fileStore = configuration.resolve(Path.fromPortableString(target));
+				URI uri = URIUtil.fromString(target);
+				IFileStore fileStore = configuration.resolve(Path.fromPortableString(uri.getPath()));
 				IFileInfo fileInfo = fileStore.fetchInfo();
 				if (fileInfo.isDirectory()) {
 					fileInfo = getIndex(fileStore);
@@ -78,24 +81,24 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 				}
 				if (!fileInfo.exists()) {
 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-					response.setEntity(createTextEntity(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, target)));
+					response.setEntity(createTextEntity(MessageFormat.format(Messages.LocalWebServerHttpRequestHandler_FILE_NOT_FOUND, uri.getPath())));
 				} else if (fileInfo.isDirectory()) {
 					response.setStatusCode(HttpStatus.SC_FORBIDDEN);
 					response.setEntity(createTextEntity(Messages.LocalWebServerHttpRequestHandler_FORBIDDEN));
 				} else {
 					response.setStatusCode(HttpStatus.SC_OK);
 					if (METHOD_GET.equals(method)) {
-							final File file = fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor());
-							response.setEntity(new NFileEntity(file,  HTML_TEXT_TYPE) {
-								@Override
-								public void finish() {
-									super.finish();
-									if (!file.delete()) {
-										file.deleteOnExit();
-									}
+						File file = fileStore.toLocalFile(EFS.NONE, new NullProgressMonitor());
+						final File temporaryFile = file == null ? fileStore.toLocalFile(EFS.CACHE, new NullProgressMonitor()) : null;
+						response.setEntity(new NFileEntity(file != null ? file : temporaryFile,  getMimeType(fileStore.getName())) {
+							@Override
+							public void finish() {
+								super.finish();
+								if (temporaryFile != null && !temporaryFile.delete()) {
+									temporaryFile.deleteOnExit();
 								}
-								
-							});
+							}
+						});
 					} else {
 						response.setEntity(null);
 					}
@@ -128,6 +131,10 @@ import com.aptana.webserver.core.WebServerCorePlugin;
 			}
 		}
 		return EFS.getNullFileSystem().getStore(Path.EMPTY).fetchInfo();
+	}
+	
+	private static String getMimeType(String fileName) {
+		return MimeTypesRegistry.INSTANCE.getMimeType(Path.fromPortableString(fileName).getFileExtension());
 	}
 
 }

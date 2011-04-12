@@ -15,11 +15,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.team.core.RepositoryProviderType;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.IGitRepositoryManager;
 
 public class GitRepositoryProviderType extends RepositoryProviderType
@@ -32,31 +34,41 @@ public class GitRepositoryProviderType extends RepositoryProviderType
 		if (getGitRepositoryManager().getAttached(project) != null)
 			return;
 
-		final IProject toConnect = project;
-		Job job = new Job(Messages.GitRepositoryProviderType_AutoShareJob_Title)
+		if (autoAttachGitRepos())
 		{
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor)
+			final IProject toConnect = project;
+			Job job = new Job(Messages.GitRepositoryProviderType_AutoShareJob_Title)
 			{
-				if (monitor == null)
-					monitor = new NullProgressMonitor();
-				monitor.beginTask(MessageFormat.format(Messages.GitRepositoryProviderType_AttachingProject_Message,
-						toConnect.getName()), 100);
-				try
+
+				@Override
+				protected IStatus run(IProgressMonitor monitor)
 				{
-					getGitRepositoryManager().attachExisting(toConnect, new SubProgressMonitor(monitor, 100));
-					monitor.done();
+					if (monitor == null)
+						monitor = new NullProgressMonitor();
+					monitor.beginTask(
+							MessageFormat.format(Messages.GitRepositoryProviderType_AttachingProject_Message,
+									toConnect.getName()), 100);
+					try
+					{
+						getGitRepositoryManager().attachExisting(toConnect, new SubProgressMonitor(monitor, 100));
+						monitor.done();
+					}
+					catch (CoreException e)
+					{
+						return e.getStatus();
+					}
+					return Status.OK_STATUS;
 				}
-				catch (CoreException e)
-				{
-					return e.getStatus();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setSystem(true);
-		job.schedule();
+			};
+			job.setSystem(!EclipseUtil.showSystemJobs());
+			job.schedule();
+		}
+	}
+
+	private boolean autoAttachGitRepos()
+	{
+		return Platform.getPreferencesService().getBoolean(GitPlugin.getPluginId(),
+				IPreferenceConstants.AUTO_ATTACH_REPOS, true, null);
 	}
 
 	protected IGitRepositoryManager getGitRepositoryManager()

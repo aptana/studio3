@@ -59,7 +59,7 @@ public class EditorsPreferencePage extends FieldEditorPreferencePage implements 
 	 * 
 	 * @author Ingo Muschenetz
 	 */
-	private class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
+	private static class CategoryLabelProvider extends LabelProvider implements ITableLabelProvider
 	{
 		/**
 		 * @param decorate

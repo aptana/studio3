@@ -23,16 +23,18 @@ import com.aptana.core.util.SourcePrinter;
 /**
  * @author Kevin Lindsey
  */
-public class SchemaElement
+public class SchemaElement implements ISchemaElement
 {
-	private static final Class<?>[] enterSignature = new Class[] { String.class, String.class, String.class, Attributes.class };
+	private static final Class<?>[] enterSignature = new Class[] { String.class, String.class, String.class,
+			Attributes.class };
 	private static final Class<?>[] exitSignature = new Class[] { String.class, String.class, String.class };
 
 	private String _name;
 	private Schema _owningSchema;
-	private Map<String,SchemaElement> _transitions;
-	private Map<String,Integer> _attributes;
+	private Map<String, ISchemaElement> _transitions;
+	private Map<String, Integer> _attributes;
 	private List<String> _requiredAttributes;
+	private boolean _allowFreeformMarkup;
 
 	private String _instanceAttributes;
 
@@ -64,259 +66,14 @@ public class SchemaElement
 
 		this._owningSchema = owningSchema;
 		this._name = name;
-		this._transitions = new HashMap<String,SchemaElement>();
-		this._attributes = new HashMap<String,Integer>();
+		this._transitions = new HashMap<String, ISchemaElement>();
+		this._attributes = new HashMap<String, Integer>();
 		this._requiredAttributes = new ArrayList<String>();
 	}
-	
-	/**
-	 * Get the name associated with this Schema node
-	 * 
-	 * @return this node's name
-	 */
-	public String getName()
-	{
-		return this._name;
-	}
 
-	/**
-	 * Return the Method to call when entering this element
-	 * 
-	 * @return The Method to invoke. This value can be null if there is no OnEnter event handler associated with this
-	 *         element
-	 */
-	public Method getOnEnterMethod()
-	{
-		return this._onEnter;
-	}
-
-	/**
-	 * Set a flag indicating whether this element expects text as a child node
-	 * 
-	 * @param value
-	 */
-	public void setHasText(boolean value)
-	{
-		this._hasText = value;
-	}
-	
-	/**
-	 * Set the method to call after entering this element
-	 * 
-	 * @param onEnterMethod
-	 *            The name of the method to call on the schema's handler object when we enter this element
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	public void setOnEnter(String onEnterMethod) throws SecurityException, NoSuchMethodException
-	{
-		Class<?> handlerClass = this._owningSchema.getHandlerClass();
-
-		if (handlerClass != null)
-		{
-			// this._onEnter = handlerClass.getDeclaredMethod(onEnterMethod,
-			// enterSignature);
-			this._onEnter = handlerClass.getMethod(onEnterMethod, enterSignature);
-		}
-		else
-		{
-			this._onEnter = null;
-		}
-	}
-
-	/**
-	 * Return the Method to call when exiting this element
-	 * 
-	 * @return The Method to invoke. This value can be null if there is no OnExit event handler associated with this
-	 *         element
-	 */
-	public Method getOnExitMethod()
-	{
-		return this._onExit;
-	}
-
-	/**
-	 * Set the method to call before exiting this element
-	 * 
-	 * @param onExitMethod
-	 *            The name of the method to call on the schema's handler object when we exit this element
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	public void setOnExit(String onExitMethod) throws SecurityException, NoSuchMethodException
-	{
-		Class<?> handlerClass = this._owningSchema.getHandlerClass();
-
-		if (handlerClass != null)
-		{
-			// this._onExit = handlerClass.getDeclaredMethod(onExitMethod,
-			// exitSignature);
-			this._onExit = handlerClass.getMethod(onExitMethod, exitSignature);
-		}
-		else
-		{
-			this._onExit = null;
-		}
-	}
-
-	/**
-	 * getTransitionElements
-	 *
-	 * @return Returns an array of schema elements to which this element can transition.
-	 */
-	public SchemaElement[] getTransitionElements()
-	{
-		Collection<SchemaElement> values = this._transitions.values();
-		
-		return values.toArray(new SchemaElement[values.size()]);
-	}
-	
-	/**
-	 * Determine if this element has a definition for the specified attribute name
-	 * 
-	 * @param name
-	 *            The name of the attribute to test
-	 * @return Returns true if this element has an entry for the specified attribute name
-	 */
-	public boolean hasAttribute(String name)
-	{
-		return (this._attributes.containsKey(name));
-	}
-
-	/**
-	 * Determine if this element has an associated OnEnter handler
-	 * 
-	 * @return Returns true if this element has an OnEnter handler
-	 */
-	public boolean hasOnEnterMethod()
-	{
-		return (this._onEnter != null);
-	}
-
-	/**
-	 * Determine if this element has an associated OnExit handler
-	 * 
-	 * @return Returns true if this element has an OnExit handler
-	 */
-	public boolean hasOnExitMethod()
-	{
-		return (this._onExit != null);
-	}
-
-	/**
-	 * Determine if this element expects text as a child node or not
-	 * 
-	 * @return Returns true if this element expects to contain text
-	 */
-	public boolean hasText()
-	{
-		return this._hasText;
-	}
-	
-	/**
-	 * hasTransitions
-	 *
-	 * @return Returns true if this element has transitions
-	 */
-	public boolean hasTransitions()
-	{
-		return (this._transitions.size() > 0);
-	}
-	
-	/**
-	 * Determine if the specified attribute name is optional on this element
-	 * 
-	 * @param name
-	 *            The name of the attribute to test
-	 * @return Returns true if the specified attribute name does not have to exist on this element
-	 */
-	public boolean isDeprecatedAttribute(String name)
-	{
-		boolean result = false;
-
-		if (this.isValidAttribute(name))
-		{
-			int flags = this._attributes.get(name).intValue();
-
-			result = ((flags & AttributeUsage.DEPRECATED) == AttributeUsage.DEPRECATED);
-		}
-
-		return result;
-	}
-	
-	/**
-	 * Determine if the specified attribute name is optional on this element
-	 * 
-	 * @param name
-	 *            The name of the attribute to test
-	 * @return Returns true if the specified attribute name does not have to exist on this element
-	 */
-	public boolean isOptionalAttribute(String name)
-	{
-		boolean result = false;
-
-		if (this.isValidAttribute(name))
-		{
-			int flags = this._attributes.get(name).intValue();
-
-			result = ((flags & AttributeUsage.USAGE_MASK) == AttributeUsage.OPTIONAL);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Determine if the specified attribute name is required on this element
-	 * 
-	 * @param name
-	 *            The name of the attribute to test
-	 * @return Returns true if the specified attribute name must exist on this element
-	 */
-	public boolean isRequiredAttribute(String name)
-	{
-		boolean result = false;
-
-		if (this.isValidAttribute(name))
-		{
-			int flags = this._attributes.get(name).intValue();
-
-			result = ((flags & AttributeUsage.USAGE_MASK) == AttributeUsage.REQUIRED);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Determine if the specified attribute name is allowed on this element
-	 * 
-	 * @param name
-	 *            The name of the attribute to test
-	 * @return Returns true if the specified attribute name is allowed on this element
-	 */
-	public boolean isValidAttribute(String name)
-	{
-		return (this._attributes.containsKey(name));
-	}
-
-	/**
-	 * Determine if this node can transition to another node using the given name
-	 * 
-	 * @param name
-	 *            The name of the node to test as a possible transition target
-	 * @return Returns true if this node can transition to the given node name
-	 */
-	public boolean isValidTransition(String name)
-	{
-		return this._transitions.containsKey(name);
-	}
-
-	/**
-	 * Add an attribute to this element
-	 * 
-	 * @param name
-	 *            The name of the attribute
-	 * @param usage
-	 *            The usage requirements for the attribute
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#addAttribute(java.lang.String, java.lang.String)
 	 */
 	public void addAttribute(String name, String usage)
 	{
@@ -357,7 +114,7 @@ public class SchemaElement
 		}
 
 		// store attribute and attribute usage
-		this._attributes.put(name, new Integer(usageValue));
+		this._attributes.put(name, Integer.valueOf(usageValue));
 
 		// add required attributes to array list for easier testing
 		if ((usageValue & AttributeUsage.USAGE_MASK) == AttributeUsage.REQUIRED)
@@ -366,13 +123,11 @@ public class SchemaElement
 		}
 	}
 
-	/**
-	 * Add a transition out of this node to another node
-	 * 
-	 * @param node
-	 *            The node to which this node can transition
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#addTransition(com.aptana.sax.SchemaElement)
 	 */
-	public void addTransition(SchemaElement node)
+	public void addTransition(ISchemaElement node)
 	{
 		// make sure we have a valid object
 		if (node == null)
@@ -384,7 +139,7 @@ public class SchemaElement
 		String nodeName = node.getName();
 
 		// make sure we haven't added this name already
-		if (this.isValidTransition(nodeName))
+		if (this._transitions.containsKey(nodeName))
 		{
 			String msg = "A node name '" + nodeName + "' has already been added to " + this._name; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -395,25 +150,282 @@ public class SchemaElement
 		this._transitions.put(nodeName, node);
 	}
 
-	/**
-	 * Get the named SchemaElement that transitions from this element
-	 * 
-	 * @param name
-	 *            The name of the SchemaElement to transition to
-	 * @return The new SchemaElement
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#allowFreeformMarkup()
 	 */
-	public SchemaElement moveTo(String name)
+	public boolean allowFreeformMarkup()
 	{
-		return this._transitions.get(name);
+		return this._allowFreeformMarkup;
 	}
 
-	/**
-	 * Validate the list of attributes against this element's definition. Required attributes must exist and no
-	 * attributes can be in the list that have not been defined for this element.
-	 * 
-	 * @param attributes
-	 *            The list of attributes to test
-	 * @throws SAXException
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#getName()
+	 */
+	public String getName()
+	{
+		return this._name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#getOnEnterMethod()
+	 */
+	public Method getOnEnterMethod()
+	{
+		return this._onEnter;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#getOnExitMethod()
+	 */
+	public Method getOnExitMethod()
+	{
+		return this._onExit;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#getOwningSchema()
+	 */
+	public Schema getOwningSchema()
+	{
+		return this._owningSchema;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#getTransitionElements()
+	 */
+	public SchemaElement[] getTransitionElements()
+	{
+		Collection<ISchemaElement> values = this._transitions.values();
+
+		return values.toArray(new SchemaElement[values.size()]);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#hasAttribute(java.lang.String)
+	 */
+	public boolean hasAttribute(String name)
+	{
+		return (this._attributes.containsKey(name));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#hasOnEnterMethod()
+	 */
+	public boolean hasOnEnterMethod()
+	{
+		return (this._onEnter != null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#hasOnExitMethod()
+	 */
+	public boolean hasOnExitMethod()
+	{
+		return (this._onExit != null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#hasText()
+	 */
+	public boolean hasText()
+	{
+		return this._hasText;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#hasTransitions()
+	 */
+	public boolean hasTransitions()
+	{
+		return (this._transitions.size() > 0);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#isDeprecatedAttribute(java.lang.String)
+	 */
+	public boolean isDeprecatedAttribute(String name)
+	{
+		boolean result = false;
+
+		if (this.isValidAttribute(name))
+		{
+			int flags = this._attributes.get(name).intValue();
+
+			result = ((flags & AttributeUsage.DEPRECATED) == AttributeUsage.DEPRECATED);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#isOptionalAttribute(java.lang.String)
+	 */
+	public boolean isOptionalAttribute(String name)
+	{
+		boolean result = false;
+
+		if (this.isValidAttribute(name))
+		{
+			int flags = this._attributes.get(name).intValue();
+
+			result = ((flags & AttributeUsage.USAGE_MASK) == AttributeUsage.OPTIONAL);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#isRequiredAttribute(java.lang.String)
+	 */
+	public boolean isRequiredAttribute(String name)
+	{
+		boolean result = false;
+
+		if (this.isValidAttribute(name))
+		{
+			int flags = this._attributes.get(name).intValue();
+
+			result = ((flags & AttributeUsage.USAGE_MASK) == AttributeUsage.REQUIRED);
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#isValidAttribute(java.lang.String)
+	 */
+	public boolean isValidAttribute(String name)
+	{
+		return (this._attributes.containsKey(name));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#isValidTransition(java.lang.String)
+	 */
+	public boolean isValidTransition(String name)
+	{
+		return this._transitions.containsKey(name) || this.allowFreeformMarkup()
+				|| this.getOwningSchema().allowFreeformMarkup();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#moveTo(java.lang.String)
+	 */
+	public ISchemaElement moveTo(String name)
+	{
+		ISchemaElement result = this._transitions.get(name);
+
+		if (result == null && (this.allowFreeformMarkup() || this.getOwningSchema().allowFreeformMarkup()))
+		{
+			result = new SchemaFreeformElement(this.getOwningSchema());
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#setAllowFreeformMarkup(boolean)
+	 */
+	public void setAllowFreeformMarkup(boolean value)
+	{
+		this._allowFreeformMarkup = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#setHasText(boolean)
+	 */
+	public void setHasText(boolean value)
+	{
+		this._hasText = value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#setOnEnter(java.lang.String)
+	 */
+	public void setOnEnter(String onEnterMethod) throws SecurityException, NoSuchMethodException
+	{
+		Class<?> handlerClass = this.getOwningSchema().getHandlerClass();
+
+		if (handlerClass != null)
+		{
+			// this._onEnter = handlerClass.getDeclaredMethod(onEnterMethod,
+			// enterSignature);
+			this._onEnter = handlerClass.getMethod(onEnterMethod, enterSignature);
+		}
+		else
+		{
+			this._onEnter = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#setOnExit(java.lang.String)
+	 */
+	public void setOnExit(String onExitMethod) throws SecurityException, NoSuchMethodException
+	{
+		Class<?> handlerClass = this.getOwningSchema().getHandlerClass();
+
+		if (handlerClass != null)
+		{
+			// this._onExit = handlerClass.getDeclaredMethod(onExitMethod,
+			// exitSignature);
+			this._onExit = handlerClass.getMethod(onExitMethod, exitSignature);
+		}
+		else
+		{
+			this._onExit = null;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#toString()
+	 */
+	public String toString()
+	{
+		String result = "<" + this._name; //$NON-NLS-1$
+
+		if (this._instanceAttributes != null)
+		{
+			result += this._instanceAttributes;
+		}
+
+		if (this.hasTransitions())
+		{
+			result += ">"; //$NON-NLS-1$
+		}
+		else
+		{
+			result += "/>"; //$NON-NLS-1$
+		}
+
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.sax.ISchemaElement#validateAttributes(org.xml.sax.Attributes)
 	 */
 	public void validateAttributes(Attributes attributes) throws SAXException
 	{
@@ -442,7 +454,7 @@ public class SchemaElement
 				SourcePrinter writer = new SourcePrinter();
 
 				writer.print("<").print(this._name).print("> requires a '").print(name).println("' attribute"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				this._owningSchema.buildErrorMessage(writer, this._name, attributes);
+				this.getOwningSchema().buildErrorMessage(writer, this._name, attributes);
 
 				throw new SAXException(writer.toString());
 			}
@@ -455,44 +467,15 @@ public class SchemaElement
 
 			if (this._attributes.containsKey(name) == false)
 			{
-				String message = MessageFormat.format(
-					Messages.SchemaElement_Invalid_attribute_on_tag,
-					new Object[] {
-						name,
-						this._name
-					}
-				);
+				String message = MessageFormat.format(Messages.SchemaElement_Invalid_attribute_on_tag, new Object[] {
+						name, this._name });
 				SourcePrinter writer = new SourcePrinter();
-				
+
 				writer.println(message);
-				this._owningSchema.buildErrorMessage(writer, this._name, attributes);
+				this.getOwningSchema().buildErrorMessage(writer, this._name, attributes);
 
 				throw new SAXException(writer.toString());
 			}
 		}
-	}
-
-	/**
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString()
-	{
-		String result = "<" + this._name; //$NON-NLS-1$
-
-		if (this._instanceAttributes != null)
-		{
-			result += this._instanceAttributes;
-		}
-
-		if (this.hasTransitions())
-		{
-			result += ">"; //$NON-NLS-1$
-		}
-		else
-		{
-			result += "/>"; //$NON-NLS-1$
-		}
-
-		return result;
 	}
 }

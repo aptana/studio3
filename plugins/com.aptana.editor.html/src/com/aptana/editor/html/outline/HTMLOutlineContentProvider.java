@@ -31,6 +31,7 @@ import com.aptana.editor.common.outline.CompositeOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.parsing.HTMLParser;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
@@ -108,20 +109,27 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 	private String getExternalJSReference(HTMLSpecialNode item)
 	{
 		if (!isJavascriptTag(item))
+		{
 			return null;
-
+		}
 		return item.getAttributeValue("src"); //$NON-NLS-1$
 	}
 
 	private boolean isJavascriptTag(HTMLSpecialNode item)
 	{
 		if (item == null)
+		{
 			return false;
+		}
 		if (!item.getName().equalsIgnoreCase("script")) //$NON-NLS-1$
+		{
 			return false;
-		if (item.getChild(0) == null || !item.getChild(0).getLanguage().equals(IJSParserConstants.LANGUAGE))
+		}
+		String type = item.getAttributeValue("type"); //$NON-NLS-1$
+		if (type != null && !HTMLParser.isJavaScript(item))
+		{
 			return false;
-
+		}
 		return true;
 	}
 
@@ -179,14 +187,10 @@ public class HTMLOutlineContentProvider extends CompositeOutlineContentProvider
 			HTMLSpecialNode item = (HTMLSpecialNode) element;
 
 			// Special case of external JS file
-			if (isJavascriptTag(item))
+			String attribute = getExternalJSReference(item);
+			if (attribute != null && attribute.length() > 0)
 			{
-				String attribute = getExternalJSReference(item);
-
-				if (attribute != null && attribute.length() > 0)
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 		return super.hasChildren(element);

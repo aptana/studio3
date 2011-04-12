@@ -12,17 +12,24 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +39,7 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -40,6 +48,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -49,6 +58,7 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -56,13 +66,16 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.build.UnifiedBuilder;
+import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.core.projectTemplates.TemplateType;
 import com.aptana.git.ui.CloneJob;
+import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
 import com.aptana.projects.WebProjectNature;
+import com.aptana.projects.templates.ProjectTemplatesManager;
 import com.aptana.scripting.model.AbstractElement;
 import com.aptana.scripting.model.BundleManager;
 import com.aptana.scripting.model.ProjectTemplateElement;
-import com.aptana.scripting.model.ProjectTemplateElement.Type;
 import com.aptana.scripting.model.filters.IModelFilter;
 
 public class NewProjectWizard extends BasicNewResourceWizard implements IExecutableExtension
@@ -101,7 +114,24 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		mainPage.setDescription(Messages.NewProjectWizard_ProjectPage_Description);
 		addPage(mainPage);
 
-		List<ProjectTemplateElement> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
+		List<IProjectTemplate> templates = getProjectTemplates(new TemplateType[] { TemplateType.WEB, TemplateType.ALL });
+		if (templates.size() > 0)
+		{
+			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Returns a list of {@link IProjectTemplate} that match the any of the given types.<br>
+	 * Templates are loaded from the Rubles and from the "projectTemplates" extension point.
+	 * 
+	 * @param templateTypes
+	 *            The Types to match to.
+	 * @return A list of ProjectTemplateElement
+	 */
+	public static List<IProjectTemplate> getProjectTemplates(final TemplateType[] templateTypes)
+	{
+		List<IProjectTemplate> templates = BundleManager.getInstance().getProjectTemplates(new IModelFilter()
 		{
 			public boolean include(AbstractElement element)
 			{
@@ -110,19 +140,25 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				if (element instanceof ProjectTemplateElement)
 				{
 					ProjectTemplateElement template = (ProjectTemplateElement) element;
-					Type type = template.getType();
-
-					result = type == Type.WEB || type == Type.ALL;
+					TemplateType type = template.getType();
+					for (TemplateType t : templateTypes)
+					{
+						if (type == t)
+						{
+							result = true;
+							break;
+						}
+					}
 				}
-
 				return result;
 			}
 		});
-
-		if (templates.size() > 0)
+		ProjectTemplatesManager manager = new ProjectTemplatesManager();
+		for (TemplateType t : templateTypes)
 		{
-			addPage(templatesPage = new ProjectTemplateSelectionPage("templateSelectionPage", templates)); //$NON-NLS-1$
+			templates.addAll(manager.getTemplatesForType(t));
 		}
+		return templates;
 	}
 
 	@Override
@@ -208,7 +244,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		boolean fromGit = false;
 		if (templatesPage != null)
 		{
-			ProjectTemplateElement template = templatesPage.getSelectedTemplate();
+			IProjectTemplate template = templatesPage.getSelectedTemplate();
 			if (template != null && !template.getLocation().endsWith(".zip")) //$NON-NLS-1$
 			{
 				// assumes to be creating the project from a git URL
@@ -223,10 +259,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				doBasicCreateProject(newProjectHandle, description);
 				if (templatesPage != null)
 				{
-					ProjectTemplateElement template = templatesPage.getSelectedTemplate();
+					IProjectTemplate template = templatesPage.getSelectedTemplate();
 					if (template != null)
 					{
-						extractZip(template, newProjectHandle);
+						extractZip(template, newProjectHandle, true);
 					}
 				}
 			}
@@ -303,15 +339,46 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void extractZip(ProjectTemplateElement template, IProject project)
+	/**
+	 * @param template
+	 * @param project
+	 * @param preExistingResources
+	 *            A possible conflicting list of resources that the extraction should notify about to the user.
+	 */
+	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
 	{
-		File zip_path = new File(template.getDirectory(), template.getLocation());
-		if (zip_path.exists())
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, !preExistingResources.isEmpty(),
+				preExistingResources);
+	}
+
+	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
+	{
+		Set<IPath> emptySet = Collections.emptySet();
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet);
+	}
+
+	/**
+	 * Extracts a zip into a given project.
+	 * 
+	 * @param zipPath
+	 * @param project
+	 * @param promptForOverwrite
+	 *            Indicate that we should display a prompt in case the zip overwrites some of the existing project
+	 *            files.
+	 * @param preExistingResources
+	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
+	 *            empty list, the function will prompt on any overwritten file.
+	 */
+	public static void extractZip(final File zipPath, IProject project, boolean promptForOverwrite,
+			Set<IPath> preExistingResources)
+	{
+		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
+		if (zipPath.exists())
 		{
 			ZipFile zipFile = null;
 			try
 			{
-				zipFile = new ZipFile(zip_path, ZipFile.OPEN_READ);
+				zipFile = new ZipFile(zipPath, ZipFile.OPEN_READ);
 				Enumeration<? extends ZipEntry> entries = zipFile.entries();
 				ZipEntry entry;
 				while (entries.hasMoreElements())
@@ -321,18 +388,103 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 					if (entry.isDirectory())
 					{
 						IFolder newFolder = project.getFolder(Path.fromOSString(entry.getName()));
-						newFolder.create(true, true, null);
+						if (!newFolder.exists())
+						{
+							newFolder.create(true, true, null);
+						}
 					}
 					else
 					{
 						IFile newFile = project.getFile(Path.fromOSString(entry.getName()));
-						newFile.create(zipFile.getInputStream(entry), true, null);
+						if (newFile.exists())
+						{
+							if (promptForOverwrite)
+							{
+								// Add to the list of conflicts only when we didn't get any pre-existing list of
+								// possible conflicting files, or when the pre-existing list of paths contains the
+								// current file path.
+								if (preExistingResources == null || preExistingResources.isEmpty()
+										|| preExistingResources.contains(newFile.getLocation()))
+								{
+									conflicts.put(newFile, entry);
+								}
+								else
+								{
+									// The file exists right now, but was not in the pre-existing resources we check
+									// against, so we just need to set it with the new content.
+									((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
+								}
+							}
+							else
+							{
+								((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
+							}
+						}
+						else
+						{
+							try
+							{
+								newFile.create(zipFile.getInputStream(entry), true, null);
+							}
+							catch (CoreException re)
+							{
+								if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
+										&& re.getStatus() instanceof IResourceStatus)
+								{
+									IResourceStatus rs = (IResourceStatus) re.getStatus();
+									IFile newVariantFile = project.getParent().getFile(rs.getPath());
+									((IFile) newVariantFile).setContents(zipFile.getInputStream(entry), true, true,
+											null);
+								}
+								else
+								{
+									ProjectsPlugin.logError(Messages.NewProjectWizard_ZipFailure, re);
+								}
+							}
+
+						}
 					}
+				}
+				// Check if we had any conflicts. If so, display a dialog to let the user mark which
+				// files he/she wishes to keep, and which would be overwritten by the Zip's content.
+				if (!conflicts.isEmpty())
+				{
+					final ZipFile finalZipFile = zipFile;
+					UIJob openDialogJob = new UIJob(Messages.OverwriteFilesSelectionDialog_overwriteFilesTitle)
+					{
+						public IStatus runInUIThread(IProgressMonitor monitor)
+						{
+							OverwriteFilesSelectionDialog overwriteFilesSelectionDialog = new OverwriteFilesSelectionDialog(
+									conflicts.keySet(), Messages.NewProjectWizard_filesOverwriteMessage);
+							if (overwriteFilesSelectionDialog.open() == Window.OK)
+							{
+								try
+								{
+									Object[] overwrittenFiles = overwriteFilesSelectionDialog.getResult();
+									// Overwrite the selected files only.
+									for (Object file : overwrittenFiles)
+									{
+										((IFile) file).setContents(finalZipFile.getInputStream(conflicts.get(file)),
+												true, true, null);
+									}
+								}
+								catch (Exception e)
+								{
+									ProjectsPlugin.logError(
+											MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
+								}
+							}
+							return Status.OK_STATUS;
+						}
+					};
+					openDialogJob.setSystem(true);
+					openDialogJob.schedule();
+					openDialogJob.join();
 				}
 			}
 			catch (Exception e)
 			{
-				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zip_path), e);
+				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
 			}
 			finally
 			{
@@ -351,7 +503,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	private void doCloneFromGit(ProjectTemplateElement template, final IProject projectHandle,
+	private void doCloneFromGit(IProjectTemplate template, final IProject projectHandle,
 			final IProjectDescription projectDescription)
 	{
 		IPath path = mainPage.getLocationPath();
@@ -374,6 +526,37 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 				}
 				catch (CoreException e)
 				{
+				}
+
+				DisconnectHandler disconnect = new DisconnectHandler(new JobChangeAdapter()
+				{
+
+					@Override
+					public void done(IJobChangeEvent event)
+					{
+						IFolder gitFolder = projectHandle.getFolder(".git"); //$NON-NLS-1$
+						if (gitFolder.exists())
+						{
+							try
+							{
+								gitFolder.delete(true, new NullProgressMonitor());
+							}
+							catch (CoreException e)
+							{
+							}
+						}
+					}
+				});
+				List<IResource> selection = new ArrayList<IResource>();
+				selection.add(projectHandle);
+				disconnect.setSelectedResources(selection);
+				try
+				{
+					disconnect.execute(new ExecutionEvent());
+				}
+				catch (ExecutionException e)
+				{
+					ProjectsPlugin.logError(Messages.NewProjectWizard_ERR_FailToDisconnect, e);
 				}
 			}
 		});

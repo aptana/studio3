@@ -29,9 +29,10 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.ide.core.io.preferences.CloakingUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.preferences.IPreferenceConstants;
 import com.aptana.ui.DialogUtils;
 import com.aptana.ui.util.UIUtils;
@@ -446,13 +447,13 @@ public class CopyFilesOperation {
 						{
 							return Messages.CopyFilesOperation_ERR_NameConflict;
 						}
-						int type = Utils.getFileInfo(originalFile).isDirectory() ? IResource.FOLDER : IResource.FILE;
+						int type = Utils.isDirectory(originalFile) ? IResource.FOLDER : IResource.FILE;
 						IStatus status = ResourcesPlugin.getWorkspace().validateName(string, type);
 						if (!status.isOK())
 						{
 							return status.getMessage();
 						}
-						if (Utils.getFileInfo(parent.getChild(string)).exists())
+						if (Utils.exists(parent.getChild(string)))
 						{
 							return Messages.CopyFilesOperation_ERR_NameExists;
 						}
@@ -499,7 +500,7 @@ public class CopyFilesOperation {
 			{
 				newName = MessageFormat.format(Messages.CopyFilesOperation_DefaultNewName, name);
 			}
-			if (!Utils.getFileInfo(parent.getChild(newName)).exists())
+			if (!Utils.exists(parent.getChild(newName)))
 			{
 				return newName;
 			}
@@ -574,7 +575,7 @@ public class CopyFilesOperation {
      */
     private static IFileStore getFolderStore(IAdaptable adaptable) {
         IFileStore store = Utils.getFileStore(adaptable);
-        IFileInfo info = Utils.getFileInfo(adaptable);
+        IFileInfo info = Utils.getFileInfo(adaptable, IExtendedFileStore.EXISTENCE);
         if (store != null && info != null && !info.isDirectory()) {
             store = store.getParent();
         }

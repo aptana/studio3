@@ -46,4 +46,5 @@ public class CSSPreferencePage extends CommonEditorPreferencePage
 		return new InstanceScope().getNode(CSSPlugin.PLUGIN_ID);
 
 	}
+
 }

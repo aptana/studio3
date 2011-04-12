@@ -16,6 +16,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.ISuspendResume;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IWatchExpressionDelegate;
 import org.eclipse.debug.core.model.IWatchExpressionListener;
@@ -79,8 +80,12 @@ public class WatchExpressionDelegate implements IWatchExpressionDelegate {
 	 *      org.eclipse.debug.core.model.IWatchExpressionListener)
 	 */
 	public void evaluateExpression(String expression, IDebugElement context, IWatchExpressionListener listener) {
-		IDebugTarget target = context.getDebugTarget();
-		if (target.isSuspended()) {
+		ISuspendResume suspendResume = context.getDebugTarget();
+		if (context instanceof ISuspendResume) {
+			suspendResume = (ISuspendResume) context;
+		}
+		if (suspendResume.isSuspended()) {
+			IDebugTarget target = context.getDebugTarget();
 			if (target instanceof JSDebugTarget) {
 				Job job = new EvaluationJob((JSDebugTarget) target, expression, context, listener);
 				job.schedule();

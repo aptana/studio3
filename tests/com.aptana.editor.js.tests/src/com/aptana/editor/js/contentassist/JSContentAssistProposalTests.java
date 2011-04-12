@@ -67,33 +67,47 @@ public class JSContentAssistProposalTests extends JSEditorBasedTests
 	{
 		// @formatter:off
 		this.checkProposals(
-				"contentAssist/var-assign-with-ending-dot.js",
-				"E",
-				"LN10",
-				"LN2",
-				"LOG10E",
-				"LOG2E",
-				"PI",
-				"SQRT1_2",
-				"SQRT2",
-				"abs",
-				"acos",
-				"asin",
-				"atan",
-				"atan2",
-				"ceil",
-				"cos",
-				"exp",
-				"floor",
-				"log",
-				"max",
-				"min",
-				"pow",
-				"random",
-				"round",
-				"sin",
-				"sqrt",
-				"tan"
+			"contentAssist/var-assign-with-ending-dot.js",
+			"E",
+			"LN10",
+			"LN2",
+			"LOG10E",
+			"LOG2E",
+			"PI",
+			"SQRT1_2",
+			"SQRT2",
+			"abs",
+			"acos",
+			"asin",
+			"atan",
+			"atan2",
+			"ceil",
+			"cos",
+			"exp",
+			"floor",
+			"log",
+			"max",
+			"min",
+			"pow",
+			"random",
+			"round",
+			"sin",
+			"sqrt",
+			"tan"
+		);
+		// @formatter:on
+	}
+
+	/**
+	 * testObjectLiteral
+	 */
+	public void testObjectLiteral()
+	{
+		// @formatter:off
+		this.checkProposals(
+			"contentAssist/object-literal.js",
+			"flag",
+			"number"
 		);
 		// @formatter:on
 	}

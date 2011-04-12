@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.filesystem.IFileInfo;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -28,7 +27,7 @@ import com.aptana.core.io.efs.EFSUtils;
 import com.aptana.ide.core.io.ConnectionPointUtils;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.ui.io.FileSystemUtils;
+import com.aptana.ide.ui.io.Utils;
 
 /**
  * @author Michael Xia (mxia@aptana.com)
@@ -62,21 +61,6 @@ public class SyncUtils
 	/**
 	 * @param adaptable
 	 *            the IAdaptable object
-	 * @return the file store corresponding to the object
-	 */
-	public static IFileStore getFileStore(IAdaptable adaptable)
-	{
-		if (adaptable instanceof IResource)
-		{
-			IResource resource = (IResource) adaptable;
-			return EFSUtils.getFileStore(resource);
-		}
-		return (IFileStore) adaptable.getAdapter(IFileStore.class);
-	}
-
-	/**
-	 * @param adaptable
-	 *            the IAdaptable object
 	 * @return the array of file stores corresponding to the object
 	 */
 	public static IFileStore[] getFileStores(IAdaptable[] adaptable)
@@ -84,28 +68,9 @@ public class SyncUtils
 		IFileStore[] fileStores = new IFileStore[adaptable.length];
 		for (int i = 0; i < fileStores.length; ++i)
 		{
-			fileStores[i] = SyncUtils.getFileStore(adaptable[i]);
+			fileStores[i] = Utils.getFileStore(adaptable[i]);
 		}
 		return fileStores;
-	}
-
-	/**
-	 * @param adaptable
-	 *            the IAdaptable object
-	 * @return the file info corresponding to the object
-	 */
-	public static IFileInfo getFileInfo(IAdaptable adaptable)
-	{
-		IFileInfo fileInfo = (IFileInfo) adaptable.getAdapter(IFileInfo.class);
-		if (fileInfo == null)
-		{
-			IFileStore fileStore = getFileStore(adaptable);
-			if (fileStore != null)
-			{
-				fileInfo = FileSystemUtils.fetchFileInfo(fileStore);
-			}
-		}
-		return fileInfo;
 	}
 
 	public static IConnectionPoint findOrCreateConnectionPointFor(IAdaptable adaptable)

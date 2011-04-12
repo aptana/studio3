@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
@@ -133,7 +134,7 @@ public class DeleteBranchHandler extends AbstractGitHandler
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}

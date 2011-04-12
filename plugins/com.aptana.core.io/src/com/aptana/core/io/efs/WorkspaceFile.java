@@ -268,7 +268,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		ensureLocalFileStore(IFolder.class);
 		if (resource != null && !resource.exists()) {
 			monitor = Policy.monitorFor(monitor);
-			monitor.beginTask(StringUtil.EMPTY, 100);
+			monitor.beginTask(MessageFormat.format(com.aptana.core.io.efs.Messages.WorkspaceFile_CreateFolderTask, path.lastSegment()), 100);
 			try {
 				if ((options & EFS.SHALLOW) == 0) {
 					createParentsRecursive(resource, Policy.subMonitorFor(monitor, 80));

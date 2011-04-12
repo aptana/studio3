@@ -18,6 +18,7 @@ public class DefaultNavigatorContributionItem extends ContributionItem
 {
 
 	private DefaultNavigatorActionProvider actionProvider;
+	private ToolItem toolItem;
 
 	public DefaultNavigatorContributionItem(DefaultNavigatorActionProvider actionProvider)
 	{
@@ -30,10 +31,18 @@ public class DefaultNavigatorContributionItem extends ContributionItem
 		return actionProvider;
 	}
 
+	public void setEnabled(boolean enabled)
+	{
+		if (toolItem != null)
+		{
+			toolItem.setEnabled(enabled);
+		}
+	}
+
 	@Override
 	public void fill(final ToolBar parent, int index)
 	{
-		ToolItem toolItem = new ToolItem(parent, SWT.DROP_DOWN);
+		toolItem = new ToolItem(parent, SWT.DROP_DOWN);
 		toolItem.setImage(actionProvider.getImage());
 		toolItem.setToolTipText(actionProvider.getToolTip());
 

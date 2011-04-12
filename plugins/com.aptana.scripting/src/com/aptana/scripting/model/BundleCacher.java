@@ -1186,6 +1186,9 @@ public class BundleCacher
 				{
 					return;
 				}
+				// FIXME We should be updating "real" pointer for every "lazy" element, not just templates!
+				Set<LazyTemplateElement> lazyTemplates = new HashSet<BundleCacher.LazyTemplateElement>();
+				lazyTemplates.add(this);
 				// remove all elements that are declared in the same file, since they'll end up getting
 				// loaded below.
 				List<AbstractElement> elements = BundleElement.getElementsByPath(getPath());
@@ -1195,6 +1198,11 @@ public class BundleCacher
 					{
 						AbstractBundleElement abe = (AbstractBundleElement) element;
 						owning.removeChild(abe);
+
+						if (element instanceof LazyTemplateElement)
+						{
+							lazyTemplates.add((LazyTemplateElement) abe);
+						}
 					}
 				}
 
@@ -1207,14 +1215,21 @@ public class BundleCacher
 					this.setOwningBundle(owning);
 				}
 
-				// Now for whatever code is holding a reference to this, redirect method calls to the
+				// Now for whatever code is holding a reference to the lazy templates, redirect method calls to the
 				// real template
 				for (TemplateElement template : owning.getFileTemplates())
 				{
-					if (template.getDisplayName().equals(getDisplayName()))
+					if (template instanceof LazyTemplateElement)
 					{
-						real = template;
-						break;
+						continue;
+					}
+					for (LazyTemplateElement lazy : lazyTemplates)
+					{
+						if (template.getDisplayName().equals(lazy.getDisplayName()))
+						{
+							lazy.real = template;
+							break;
+						}
 					}
 				}
 			}

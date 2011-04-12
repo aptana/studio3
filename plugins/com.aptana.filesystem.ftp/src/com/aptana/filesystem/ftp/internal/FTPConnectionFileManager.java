@@ -145,8 +145,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	}
 
 	protected void initAndAuthFTPClient(FTPClientInterface clientInterface, IProgressMonitor monitor) throws IOException, FTPException {
-		if (clientInterface.connected())
-		{
+		if (clientInterface.connected()) {
 			return;
 		}
 		FTPClient newFtpClient = (FTPClient) clientInterface;
@@ -478,7 +477,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		}
 	}
 
-	private boolean serverSupportsFeature(String feature) {
+	protected boolean serverSupportsFeature(String feature) {
 		if (serverFeatures != null) {
 			return serverFeatures.contains(feature);
 		}
@@ -604,6 +603,19 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 			String name = path.lastSegment();
 			FTPFile result = ftpFileCache.get(path);
 			if (result == null) {
+				if ((options & IExtendedFileStore.EXISTENCE) != 0) {
+					ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
+					try {
+						changeCurrentDir(path);
+						fileInfo.setExists(true);
+						fileInfo.setDirectory(true);
+					} catch (FileNotFoundException ignore) {
+					}
+					if (!fileInfo.exists()) {
+						fileInfo.setExists(ftpClient.existsFile(path.toPortableString()));
+					}
+					return fileInfo;
+				}
 				FTPFile[] ftpFiles = listFiles(dirPath, monitor);
 				for (FTPFile ftpFile : ftpFiles) {
 					Date lastModifiedServerInLocalTZ = ftpFile.lastModified();
@@ -960,7 +972,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	@Override
 	protected void renameFile(IPath sourcePath, IPath destinationPath, IProgressMonitor monitor) throws CoreException, FileNotFoundException {
 		try {
-			changeCurrentDir(Path.ROOT);
+			changeCurrentDir(sourcePath.removeLastSegments(1));
 			Policy.checkCanceled(monitor);
 			try {
 				ftpClient.rename(sourcePath.toPortableString(), destinationPath.toPortableString());
@@ -1200,8 +1212,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		return sb.toString();
 	}
 
-	public FTPClient newClient()
-	{
+	public FTPClient newClient() {
 		return new ProFTPClient();
 	}
 }

@@ -70,6 +70,11 @@ public final class PlatformUtil
 	 */
 	public static final String LOCAL_APPDATA = "%LOCAL_APPDATA%"; //$NON-NLS-1$
 
+	/**
+	 * COMMON_APPDATA
+	 */
+	public static final String COMMON_APPDATA = "%COMMON_APPDATA%"; //$NON-NLS-1$
+
 
 	/**
 	 * DOCUMENTS_DIRECTORY
@@ -325,6 +330,11 @@ public final class PlatformUtil
 				String localAppData = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_LOCAL_APPDATA);
 				if (localAppData != null) {
 					path = localAppData + path.substring(LOCAL_APPDATA.length());
+				}
+			} else if (path.startsWith(COMMON_APPDATA)) {
+				String commonAppData = CoreNatives.GetSpecialFolderPath(CoreNatives.CSIDL_COMMON_APPDATA);
+				if (commonAppData != null) {
+					path = commonAppData + path.substring(COMMON_APPDATA.length());
 				}
 			}
 		} else if (Platform.OS_MACOSX.equals(Platform.getOS())) {

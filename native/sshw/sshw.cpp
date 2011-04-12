@@ -212,7 +212,7 @@ static void SavePassword(LPCTSTR szKeyName);
 static BOOL LoadPassword(LPCTSTR szKeyName);
 
 static _TCHAR szRegistrySubKey[] = _T("Software\\SSHW");
-static _TCHAR szPassword[80];
+static _TCHAR szPassword[256];
 static _TCHAR szKeyName[MAX_PATH+1];
 static BOOL bRememberPassword = FALSE;
 
@@ -239,7 +239,7 @@ int ask_password(_TCHAR* message)
 		::ZeroMemory(szPassword, sizeof(szPassword));
 		if( (_tcslen(szKeyName) != 0) && LoadPassword(szKeyName) )
 		{
-			_tprintf(szPassword);
+			_tprintf(_T("%s"), szPassword);
 			SavePassword(szKeyName);
 			::SecureZeroMemory(szPassword, sizeof(szPassword));
 			return 0;
@@ -249,7 +249,7 @@ int ask_password(_TCHAR* message)
 			NULL,
 			DialogProc,
 			(LPARAM)message) ) {
-				_tprintf(szPassword);
+				_tprintf(_T("%s"), szPassword);
 				if( bRememberPassword && (_tcslen(szKeyName) != 0) ) {
 					SavePassword(szKeyName);
 				}

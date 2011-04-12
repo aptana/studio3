@@ -119,12 +119,15 @@ abstract class AbstractStagingHandler extends AbstractGitHandler
 		{
 			IContainer container = (IContainer) resource;
 			GitRepository repo = getGitRepositoryManager().getAttached(resource.getProject());
-			List<ChangedFile> files = repo.getChangedFilesForContainer(container);
-			for (ChangedFile file : files)
+			if (repo != null)
 			{
-				if (changedFileIsValid(file))
+				List<ChangedFile> files = repo.getChangedFilesForContainer(container);
+				for (ChangedFile file : files)
 				{
-					return true;
+					if (changedFileIsValid(file))
+					{
+						return true;
+					}
 				}
 			}
 		}

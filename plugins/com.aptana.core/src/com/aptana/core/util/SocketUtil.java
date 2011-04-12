@@ -106,9 +106,27 @@ public final class SocketUtil {
 		List<InetAddress> addrs = new ArrayList<InetAddress>();
 		for (InetAddress inetAddr : getLocalAddresses()) {
 			if (!inetAddr.isLoopbackAddress()) {
-				addrs.add(inetAddr);
+				if (isPublic(inetAddr)) {
+					addrs.add(0, inetAddr);
+				} else {
+					addrs.add(inetAddr);
+				}
 			}
 		}
 		return addrs.toArray(new InetAddress[addrs.size()]);
+	}
+	
+	private static boolean isPublic(InetAddress inetAddress) {
+		String hostAddress = inetAddress.getHostAddress();
+		if (hostAddress.startsWith("10.") //$NON-NLS-1$
+				|| hostAddress.startsWith("192.168.") //$NON-NLS-1$
+				|| hostAddress.startsWith("169.254.") //$NON-NLS-1$
+				|| hostAddress.startsWith("127.")) { //$NON-NLS-1$
+			return false;
+		}
+		if (hostAddress.startsWith("172.")) { //$NON-NLS-1$
+			return !(inetAddress.getAddress()[1] >= 16 && inetAddress.getAddress()[1] <= 31);
+		}
+		return true;
 	}
 }

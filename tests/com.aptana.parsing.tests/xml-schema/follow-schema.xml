@@ -1,0 +1,5 @@
+<test>
+	<node name="root">
+		<child-node name="child"/>
+	</node>
+</test>

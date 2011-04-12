@@ -19,6 +19,8 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.progress.UIJob;
 
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * @author Max Stepanov
  *
@@ -58,7 +60,7 @@ public class DeferredTreeSelectionExpander extends JobChangeAdapter {
 				return Status.OK_STATUS;
 			}
 		};
-		job.setSystem(true);
+		job.setSystem(!EclipseUtil.showSystemJobs());
 		job.setPriority(Job.INTERACTIVE);
 	}
 

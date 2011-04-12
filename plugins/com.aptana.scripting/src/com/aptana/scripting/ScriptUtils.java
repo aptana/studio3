@@ -17,6 +17,7 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
 import org.jruby.RubyModule;
+import org.jruby.runtime.Block;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -56,7 +57,7 @@ public class ScriptUtils
 		// instantiate it, if it exists
 		if (rubyClass != null)
 		{
-			result = rubyClass.newInstance(threadContext, args, null);
+			result = rubyClass.newInstance(threadContext, args, Block.NULL_BLOCK);
 		}
 		
 		return result;
@@ -87,7 +88,7 @@ public class ScriptUtils
 			// instantiate it, if it exists
 			if (rubyClass != null)
 			{
-				result = rubyClass.newInstance(threadContext, args, null);
+				result = rubyClass.newInstance(threadContext, args, Block.NULL_BLOCK);
 			}
 		}
 		

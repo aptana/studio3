@@ -27,7 +27,7 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 import com.aptana.core.io.vfs.IExtendedFileInfo;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ui.util.UIUtils;
 
 /**
@@ -51,7 +51,7 @@ public class NewFolderAction extends BaseSelectionListenerAction {
             return;
         }
         final IFileStore fileStore = Utils.getFileStore(fSelectedElement);
-        final IFileInfo fileInfo = Utils.getFileInfo(fSelectedElement);
+        final boolean selectionIsDirectory = Utils.isDirectory(fSelectedElement);
 
         InputDialog input = new InputDialog(fWindow.getShell(),
                 Messages.NewFolderAction_InputTitle, Messages.NewFolderAction_InputMessage,
@@ -66,7 +66,7 @@ public class NewFolderAction extends BaseSelectionListenerAction {
                     try {
                         IFileStore parentStore = fileStore;
                         Object element = fSelectedElement;
-                        if (!fileInfo.isDirectory() && fileStore.getParent() != null) {
+                        if (!selectionIsDirectory && fileStore.getParent() != null) {
                             parentStore = fileStore.getParent();
                             // TODO: needs to find the element corresponding to
                             // the parent folder

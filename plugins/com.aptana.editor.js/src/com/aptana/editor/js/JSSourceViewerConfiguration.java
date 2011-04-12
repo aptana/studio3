@@ -8,6 +8,7 @@
 package com.aptana.editor.js;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -15,6 +16,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
+import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.js.contentassist.JSContentAssistProcessor;
 
 public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
@@ -58,4 +60,12 @@ public class JSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 	{
 		return JSSourceConfiguration.getDefault();
 	}
+
+	@Override
+	public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType)
+	{
+		return new IAutoEditStrategy[] { new RubyRegexpAutoIndentStrategy(contentType, this, sourceViewer, JSPlugin
+				.getDefault().getPreferenceStore()) };
+	}
+
 }

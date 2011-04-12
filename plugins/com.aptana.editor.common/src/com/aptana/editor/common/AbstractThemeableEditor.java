@@ -349,7 +349,7 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		fOverviewRuler = createOverviewRuler(getSharedColors());
 
 		// Need to make it a projection viewer now that we have folding...
-		ISourceViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
+		ProjectionViewer viewer = new ProjectionViewer(parent, ruler, getOverviewRuler(), isOverviewRulerVisible(), styles)
 		{
 			protected Layout createLayout()
 			{
@@ -426,12 +426,9 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 			}
 		};
 
-		if (viewer instanceof ITextViewerExtension)
-		{
-			this.fKeyListener = new ExpandSnippetVerifyKeyListener(this, viewer);
-			// add listener to our viewer
-			((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
-		}
+		this.fKeyListener = new ExpandSnippetVerifyKeyListener(this, viewer);
+		// add listener to our viewer
+		((ITextViewerExtension) viewer).prependVerifyKeyListener(this.fKeyListener);
 
 		// ensure decoration support has been created and configured.
 		getSourceViewerDecorationSupport(viewer);

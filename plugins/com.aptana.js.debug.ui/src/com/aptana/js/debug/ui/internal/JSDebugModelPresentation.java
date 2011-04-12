@@ -371,7 +371,7 @@ public class JSDebugModelPresentation extends LabelProvider implements IDebugMod
 	 */
 	public void computeDetail(IValue value, IValueDetailListener listener) {
 		IDebugTarget target = value.getDebugTarget();
-		if (target.isSuspended() && target instanceof IJSDebugTarget) {
+		if (target instanceof IJSDebugTarget) {
 			Job job = new DetailsJob(value, listener);
 			job.schedule();
 			return;

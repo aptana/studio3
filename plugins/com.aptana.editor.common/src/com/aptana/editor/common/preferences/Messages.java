@@ -13,6 +13,8 @@ public class Messages extends NLS
 {
 	private static final String BUNDLE_NAME = "com.aptana.editor.common.preferences.messages"; //$NON-NLS-1$
 
+	public static String CommonEditorPreferencePage_auto_indent_label;
+
 	public static String CommonEditorPreferencePage_Default_Editor_Preference_Link;
 	public static String CommonEditorPreferencePage_Editor_Preferences;
 

@@ -51,10 +51,9 @@ public final class BrowserUtil {
 		"/res/ie/AptanaDebugger.dll" //$NON-NLS-1$
 	};
 
-	private static final String FIREBUG_MIN_VERSION = "1.1.0"; //$NON-NLS-1$
+	private static final String FIREBUG_MIN_VERSION = "1.2.0"; //$NON-NLS-1$
 	private static final String IE_PLUGIN_ID = JSDebugPlugin.PLUGIN_ID + ".ie"; //$NON-NLS-1$
 	private static final String EXTENSIONS = "extensions/"; //$NON-NLS-1$
-	private static final String DEBUGGER_FILE = "chrome/aptanadebugger.jar"; //$NON-NLS-1$
 
 	private static final long INSTALL_TIMEOUT = 5000;
 
@@ -161,10 +160,7 @@ public final class BrowserUtil {
 				if (FirefoxUtil.getExtensionVersion(EXTENSION_ID[0], profile) != null) {
 					String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 					// Check for compatible Firebug version
-					if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0) {
-						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
-						available = extension.toFile().exists() && !extension.append(DEBUGGER_FILE).toFile().exists();
-					}
+					available = (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) >= 0);
 
 				}
 				browserCache.put(browserExecutable, Boolean.valueOf(available));
@@ -176,7 +172,8 @@ public final class BrowserUtil {
 		} else if (InternetExplorer.isBrowserExecutable(browserExecutable) && isIEDebuggerAvailable()) {
 			IPath dllPath = JSDebugPlugin.getDefault().getStateLocation().append(".dll").addTrailingSeparator() //$NON-NLS-1$
 					.append("AptanaDebugger.dll"); //$NON-NLS-1$
-			boolean available = dllPath.toFile().exists() && dllPath.addFileExtension("registered").toFile().exists(); //$NON-NLS-1$
+			IPath registeredPath = dllPath.addFileExtension("registered");
+			boolean available = dllPath.toFile().exists() && registeredPath.toFile().exists(); //$NON-NLS-1$
 
 			if (available) {
 				/* refresh dll file */
@@ -188,9 +185,10 @@ public final class BrowserUtil {
 							new File(currentDllPath).getAbsolutePath()) == 0);
 
 					// Update dll
-					if (file.exists()) {
-						if (file.delete()) {
+					if (!pathMatch || file.lastModified() != registeredPath.toFile().lastModified()) {
+						if (!dllPath.addFileExtension("noupdate").toFile().exists() && file.delete()) {
 							extractFile(IE_PLUGIN_ID, EXTENSION_LOCAL_PATH[2], file);
+							pathMatch = false;
 						} else if (!pathMatch) {
 							resetBrowserCache(browserExecutable);
 							return false;
@@ -221,6 +219,7 @@ public final class BrowserUtil {
 						if (currentDllPath == null
 								|| file.getAbsolutePath().compareTo(new File(currentDllPath).getAbsolutePath()) != 0) {
 							available = false;
+							registeredPath.toFile().setLastModified(file.lastModified());
 						}
 
 					}
@@ -308,14 +307,6 @@ public final class BrowserUtil {
 				IPath profile = FirefoxUtil.findDefaultProfileLocation();
 				if (profile != null) {
 					try {
-						IPath extension = profile.append(EXTENSIONS).append(EXTENSION_ID[1]);
-						if (extension.toFile().exists() && extension.append(DEBUGGER_FILE).toFile().exists()) {
-							prompter
-									.handleStatus(
-											installDebuggerPromptStatus,
-											"warning_" + Messages.BrowserUtil_PreviousVersionFound_Message); //$NON-NLS-1$
-							return false;
-						}
 						String version = FirefoxUtil.getExtensionVersion(EXTENSION_ID[1], profile);
 						if (version != null && VersionUtil.compareVersions(version, FIREBUG_MIN_VERSION) < 0) {
 							prompter
@@ -411,6 +402,8 @@ public final class BrowserUtil {
 								dllPath.toOSString() }, -1);
 					}
 					dllPath.addFileExtension("registered").toFile().createNewFile(); //$NON-NLS-1$
+					dllPath.addFileExtension("registered").toFile().setLastModified(file.lastModified());
+
 				} catch (IOException e) {
 					throw new CoreException(new Status(IStatus.ERROR, JSDebugPlugin.PLUGIN_ID, IStatus.OK,
 							Messages.BrowserUtil_InstallError, e));

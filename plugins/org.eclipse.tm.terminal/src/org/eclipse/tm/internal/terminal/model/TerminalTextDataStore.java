@@ -91,7 +91,6 @@ public class TerminalTextDataStore implements ITerminalTextData {
 	 * @param newSize the new array size.
 	 * @return A new array with the same contents (chopped off if needed or filled with 0 or null).
 	 */
-	@SuppressWarnings("rawtypes")
 	private Object resizeArray(Object origArray, int newSize) {
 		int oldSize = Array.getLength(origArray);
 		if(oldSize==newSize)
@@ -108,7 +107,6 @@ public class TerminalTextDataStore implements ITerminalTextData {
 	/* (non-Javadoc)
 	 * @see org.eclipse.tm.internal.terminal.text.ITerminalTextData#getLineSegments(int, int, int)
 	 */
-	@SuppressWarnings({"unchecked","rawtypes"})
 	public LineSegment[] getLineSegments(int line, int column, int len) {
 		// get the styles and chars for this line
 		Style[] styles=fStyle[line];
@@ -291,21 +289,18 @@ public class TerminalTextDataStore implements ITerminalTextData {
 		fStyle[destLine]=source.getStyles(sourceLine);
 	}
 
-	@SuppressWarnings("cast")
 	public char[] getChars(int line) {
 		if(fChars[line]==null)
 			return null;
 		return (char[]) fChars[line].clone();
 	}
 
-	@SuppressWarnings("cast")
 	public Style[] getStyles(int line) {
 		if(fStyle[line]==null)
 			return null;
 		return (Style[]) fStyle[line].clone();
 	}
 
-	@SuppressWarnings("cast")
 	public void setLine(int line, char[] chars, Style[] styles) {
 		fChars[line]=(char[]) chars.clone();
 		fStyle[line]=(Style[]) styles.clone();

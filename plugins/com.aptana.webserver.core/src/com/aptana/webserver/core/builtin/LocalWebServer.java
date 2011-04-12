@@ -15,7 +15,6 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.text.MessageFormat;
 
 import org.apache.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.http.impl.DefaultHttpResponseFactory;
@@ -133,7 +132,6 @@ public class LocalWebServer {
 	}
 	
 	private void runServer(InetSocketAddress socketAddress, HttpRequestHandler httpRequestHandler) {
-		System.out.println(MessageFormat.format("Starting webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort()))); //$NON-NLS-1$
 		HttpParams params = new BasicHttpParams();
 		params.setIntParameter(CoreConnectionPNames.SO_TIMEOUT, SOCKET_TIMEOUT)
 			.setBooleanParameter(CoreConnectionPNames.STALE_CONNECTION_CHECK, false)
@@ -169,8 +167,6 @@ public class LocalWebServer {
 			WebServerCorePlugin.log(e);
 		} catch (IOException e) {
 			WebServerCorePlugin.log(e);
-		} finally {
-			System.out.println(MessageFormat.format("Stopped webserver at {0}:{1}", socketAddress.getAddress().getHostAddress(), Integer.toString(socketAddress.getPort()))); //$NON-NLS-1$
 		}
 	}
 

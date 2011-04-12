@@ -7,34 +7,52 @@
  */
 package com.aptana.editor.js.formatter.nodes;
 
+import com.aptana.editor.js.parsing.ast.JSNodeTypes;
+import com.aptana.editor.js.parsing.ast.JSObjectNode;
 import com.aptana.formatter.IFormatterDocument;
-import com.aptana.formatter.nodes.FormatterBlockWithBeginEndNode;
+import com.aptana.parsing.ast.IParseNode;
 
 /**
  * A JavaScript formatter node for Object blocks (such as hashes etc.)
  * 
  * @author Shalom Gibly <sgibly@aptana.com>
  */
-public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
+public class FormatterJSObjectNode extends FormatterJSBlockNode
 {
+
+	private JSObjectNode node;
 
 	/**
 	 * @param document
+	 * @param commentOnPreviousLine
+	 * @param hasNameValuePairs
 	 */
-	public FormatterJSObjectNode(IFormatterDocument document)
+	public FormatterJSObjectNode(IFormatterDocument document, JSObjectNode node, boolean commentOnPreviousLine)
 	{
-		super(document);
+		super(document, commentOnPreviousLine);
+		this.node = node;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isAddingBeginNewLine()
+	 * @see com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode#getSpacesCountBefore()
 	 */
-	@Override
-	protected boolean isAddingBeginNewLine()
+	public int getSpacesCountBefore()
 	{
-		// TODO preferences?
-		return false;
+		// Check for the parent to decide if we need to add any space before the curly-open
+		IParseNode parent = node.getParent();
+		switch (parent.getNodeType())
+		{
+			case JSNodeTypes.ELEMENTS:
+				return 0;
+			case JSNodeTypes.ARGUMENTS:
+				// Only if it's the first argument, return 0
+				if (parent.getChildIndex(node) == 0)
+				{
+					return 0;
+				}
+		}
+		return 1;
 	}
 
 	/*
@@ -44,19 +62,6 @@ public class FormatterJSObjectNode extends FormatterBlockWithBeginEndNode
 	@Override
 	protected boolean isAddingEndNewLine()
 	{
-		// TODO preferences?
-		return false;
+		return node.getChildCount() > 0;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.formatter.nodes.FormatterBlockNode#isIndenting()
-	 */
-	@Override
-	protected boolean isIndenting()
-	{
-		// TODO preferences?
-		return true;
-	}
-
 }

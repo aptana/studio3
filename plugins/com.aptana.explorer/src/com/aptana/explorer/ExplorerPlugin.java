@@ -28,6 +28,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 
+import com.aptana.core.util.EclipseUtil;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -145,7 +147,7 @@ public class ExplorerPlugin extends AbstractUIPlugin
 				return Status.OK_STATUS;
 			}
 		};
-		uiJob.setSystem(true);
+		uiJob.setSystem(!EclipseUtil.showSystemJobs());
 		uiJob.schedule();
 	}
 

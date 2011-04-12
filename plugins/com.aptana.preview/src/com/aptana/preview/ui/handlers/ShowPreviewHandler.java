@@ -8,78 +8,37 @@
 
 package com.aptana.preview.ui.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.expressions.EvaluationResult;
-import org.eclipse.core.expressions.Expression;
-import org.eclipse.core.expressions.ExpressionInfo;
-import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.AbstractEvaluationHandler;
-import org.eclipse.ui.internal.InternalHandlerUtil;
 
 import com.aptana.preview.PreviewManager;
 
 /**
  * @author Max Stepanov
- * 
  */
-@SuppressWarnings("restriction")
-public class ShowPreviewHandler extends AbstractEvaluationHandler {
-
-	private Expression enabledWhen;
-	
-	public ShowPreviewHandler() {
-		registerEnablement();
-	}
+public class ShowPreviewHandler extends AbstractHandler
+{
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands. ExecutionEvent)
 	 */
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) throws ExecutionException
+	{
 		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IEditorPart editorPart = null;
-		if (workbenchPage != null) {
+		if (workbenchPage != null)
+		{
 			editorPart = workbenchPage.getActiveEditor();
 		}
-		if (editorPart != null) {
+		if (editorPart != null)
+		{
 			PreviewManager.getInstance().openPreviewForEditor(editorPart);
 		}
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression()
-	 */
-	@Override
-	protected Expression getEnabledWhenExpression() {
-		if (enabledWhen == null) {
-			enabledWhen = new Expression() {
-				public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
-					IEditorPart editorPart = InternalHandlerUtil.getActiveEditor(context);
-					if (editorPart != null) {
-						if (PreviewManager.getInstance().testEditorInputForPreview(editorPart.getEditorInput())) {
-							return EvaluationResult.TRUE;
-						}
-					}
-					return EvaluationResult.FALSE;
-				}
-
-				@Override
-				public void collectExpressionInfo(ExpressionInfo info) {
-					info.addVariableNameAccess(ISources.ACTIVE_EDITOR_NAME);
-				}
-			};
-		}
-		return enabledWhen;
-	}
-
 }

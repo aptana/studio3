@@ -50,6 +50,16 @@
                id="org.eclipse.ui.views.ContentOutline">
          </viewShortcut>
          <view
+               id="com.aptana.samples.ui.SamplesView"
+               minimized="false"
+               relationship="stack"
+               relative="org.eclipse.ui.views.ContentOutline"
+               visible="true">
+         </view>
+         <viewShortcut
+               id="com.aptana.samples.ui.SamplesView">
+         </viewShortcut>
+         <view
                id="com.aptana.terminal.views.terminal"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
@@ -129,14 +139,14 @@
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.SendFeedbackCommandHandler"
+            defaultHandler="com.aptana.ui.commands.SendFeedbackCommandHandler"
             description="%SendFeedbackCommand.description"
             id="com.aptana.ui.command.sendfeedback"
             name="%SendFeedbackCommand.label">
       </command>
       <command
             categoryId="com.aptana.ui.category"
-            defaultHandler="com.aptana.ui.internal.commands.ReportBugCommandHandler"
+            defaultHandler="com.aptana.ui.commands.ReportBugCommandHandler"
             description="%ReportBugCommand.description"
             id="com.aptana.ui.command.reportbug"
             name="%ReportBugCommand.label">
@@ -164,10 +174,11 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:help?after=additions">
+            locationURI="menu:help?before=helpEnd">
          <menu
                id="aptanahelp"
                label="%Menu.Help.Aptana.label">
+               <!--
             <command
                   commandId="com.aptana.ui.command.sendfeedback"
                   style="push">
@@ -180,6 +191,7 @@
                   name="slot1"
                   visible="true">
             </separator>
+            -->
             <command
                   commandId="com.aptana.ui.command.viewlog"
                   style="push">
@@ -188,6 +200,7 @@
                   commandId="com.aptana.ui.command.clearlog"
                   style="push">
             </command>
+            <!--
             <separator
                   name="slot2"
                   visible="true">
@@ -196,6 +209,7 @@
                   commandId="com.aptana.ui.command.viewreleasenotes"
                   style="push">
             </command>
+            -->
          </menu>
       </menuContribution>
       <menuContribution

@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugException;
 
 import com.aptana.js.debug.core.JSDebugPlugin;
+import com.aptana.js.debug.core.internal.ProtocolLogger;
 
 /**
  * @author Max Stepanov
@@ -48,6 +49,7 @@ public class DebugConnection {
 	private Writer writer;
 	private boolean connected = false;
 	private boolean terminated = false;
+	private final ProtocolLogger logger;
 
 	private Map<String, Object> locks = new Hashtable<String, Object>(); // synchronized get/put required
 	private volatile long lastReqId = System.currentTimeMillis();
@@ -59,20 +61,30 @@ public class DebugConnection {
 	 * 
 	 */
 	public static DebugConnection createConnection(Socket socket) throws DebugException {
+		return createConnection(socket, null);
+	}
+
+	/**
+	 * @throws DebugException
+	 * 
+	 */
+	public static DebugConnection createConnection(Socket socket, ProtocolLogger logger) throws DebugException {
 		try {
 			return new DebugConnection(socket,
 					new InputStreamReader(socket.getInputStream()),
-					new OutputStreamWriter(socket.getOutputStream()));
+					new OutputStreamWriter(socket.getOutputStream()),
+					logger);
 		} catch (IOException e) {
 			throwDebugException(e);
 			return null;
 		}
 	}
 
-	protected DebugConnection(Socket socket, Reader reader, Writer writer) {
+	protected DebugConnection(Socket socket, Reader reader, Writer writer, ProtocolLogger logger) {
 		this.socket = socket;
 		this.reader = reader;
 		this.writer = writer;
+		this.logger = logger;
 	}
 
 	public void start(IHandler handler) {
@@ -87,12 +99,18 @@ public class DebugConnection {
 						if (message == null) {
 							break;
 						}
+						if (logger != null) {
+							logger.log(true, message);
+						}
 						handleMessage(message);
 					} catch (SocketException e) {
 						break;
 					} catch (Exception e) {
 						JSDebugPlugin.log(e);
 					}
+				}
+				if (logger != null) {
+					logger.close();
 				}
 				handleConnectionTerminated();
 			}
@@ -190,8 +208,12 @@ public class DebugConnection {
 	 */
 	protected void sendCommand(String reqid, String command) throws DebugException {
 		try {
-			writer.write(MessageFormat.format("{0}*{1}*{2}", //$NON-NLS-1$
-					Integer.toString(command.length() + reqid.length() + 1), reqid, command));
+			String message = MessageFormat.format("{0}*{1}*{2}", //$NON-NLS-1$
+					Integer.toString(command.length() + reqid.length() + 1), reqid, command);
+			if (logger != null) {
+				logger.log(false, message);
+			}
+			writer.write(message);
 			writer.flush();
 		} catch (IOException e) {
 			throwDebugException(e);

@@ -13,7 +13,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -22,8 +24,10 @@ import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
+import com.aptana.deploy.wizard.Messages;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
+import com.aptana.git.core.model.IGitRepositoryManager;
 import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
@@ -73,6 +77,10 @@ public class DeployHandler extends AbstractHandler
 		else if (isEYProject(selectedProject))
 		{
 			deployWithEngineYard();
+		}
+		else if (type == DeployType.RED_HAT)
+		{
+			deployWithRedHat();
 		}
 		return null;
 	}
@@ -133,6 +141,25 @@ public class DeployHandler extends AbstractHandler
 		TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
 				selectedProject.getLocation());
 		terminal.sendInput("git push heroku master\n"); //$NON-NLS-1$
+	}
+
+	private void deployWithRedHat()
+	{
+		try
+		{
+			IGitRepositoryManager manager = GitPlugin.getDefault().getGitRepositoryManager();
+			GitRepository repo = manager.createOrAttach(selectedProject, new NullProgressMonitor());
+			repo.index().stageFiles(repo.index().changedFiles());
+			repo.index().commit(Messages.DeployWizard_AutomaticGitCommitMessage);
+
+			TerminalView terminal = TerminalView.openView(selectedProject.getName(), selectedProject.getName(),
+					selectedProject.getLocation());
+			terminal.sendInput("git push\n"); //$NON-NLS-1$
+		}
+		catch (CoreException e)
+		{
+			com.aptana.deploy.Activator.logError("Unable to deploy project", e); //$NON-NLS-1$
+		}
 	}
 
 	private void deployWithFTP()

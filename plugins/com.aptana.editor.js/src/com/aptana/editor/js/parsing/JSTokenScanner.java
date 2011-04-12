@@ -14,6 +14,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.SingleLineRule;
@@ -29,8 +30,8 @@ import com.aptana.editor.js.JSLanguageConstants;
 import com.aptana.editor.js.parsing.lexer.JSTokenType;
 import com.aptana.editor.js.text.rules.JSIdentifierDetector;
 import com.aptana.editor.js.text.rules.JSNumberRule;
-import com.aptana.editor.js.text.rules.JSRegExpRule;
 import com.aptana.editor.js.text.rules.JSOperatorDetector;
+import com.aptana.editor.js.text.rules.JSRegExpRule;
 
 /**
  * @author Michael Xia
@@ -120,10 +121,57 @@ public class JSTokenScanner extends RuleBasedScanner implements IJSTokenScanner
 		rules.add(new WhitespaceRule(new WhitespaceDetector()));
 
 		// comments and documentation
+
+		// NOTE: We have to try to match vsdoc comments before single-line comments because "//" will match "///"
+		// resulting in all vsdoc comments being treated as single-line comments
 		rules.add(new EndOfLineRule("///", createToken(JSTokenType.VSDOC))); //$NON-NLS-1$
 		rules.add(new EndOfLineRule("//", createToken(JSTokenType.SINGLELINE_COMMENT))); //$NON-NLS-1$
-		rules.add(new MultiLineRule("/**", "*/", createToken(JSTokenType.SDOC), (char) 0, true)); //$NON-NLS-1$ //$NON-NLS-2$
-		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT))); //$NON-NLS-1$ //$NON-NLS-2$
+
+		// NOTE: For some reason the sdoc rule matches "/**/". We have to match sdoc before multi-line comments, so we
+		// add a special rule to catch this one case where multi-line needs to match before sdoc
+		// @formatter:off
+		WordRule commentWordRule = new WordRule(
+			new IWordDetector()
+			{
+				private boolean _closed;
+
+				public boolean isWordStart(char c)
+				{
+					this._closed = false;
+
+					return c == '/';
+				}
+
+				public boolean isWordPart(char c)
+				{
+					boolean result = false;
+
+					if (this._closed == false)
+					{
+						if (c == '/')
+						{
+							this._closed = true;
+							result = true;
+						}
+						else if (c == '*')
+						{
+							result = true;
+						}
+					}
+
+					return result;
+				}
+			},
+			Token.UNDEFINED
+		);
+		// @formatter:on
+		commentWordRule.addWord("/**/", createToken(JSTokenType.MULTILINE_COMMENT));
+		rules.add(commentWordRule);
+
+		// NOTE: We have to try to match sdoc comments before multi-line comments because "/*" will match "/**"
+		// resulting in all sdoc comments being treated as multi-line comments
+		rules.add(new MultiLineRule("/**", "*/", createToken(JSTokenType.SDOC), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
+		rules.add(new MultiLineRule("/*", "*/", createToken(JSTokenType.MULTILINE_COMMENT), '\0', true)); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// quoted strings
 		IToken token = createToken(JSTokenType.STRING);

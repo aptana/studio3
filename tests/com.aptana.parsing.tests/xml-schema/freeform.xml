@@ -1,0 +1,6 @@
+<test>
+	<node name="root">
+		<child-node name="child"/>
+		<anonymous-child/>
+	</node>
+</test>

@@ -32,6 +32,7 @@ public final class SchemaBuilder extends ValidatingReader
 	private static final String ON_ENTER_ATTRIBUTE = "onEnter"; //$NON-NLS-1$
 	private static final String TYPE_ATTRIBUTE = "type"; //$NON-NLS-1$
 	private static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
+	private static final String ALLOW_FREEFORM_MARKUP_ATTRIBUTE = "allowFreeformMarkup"; //$NON-NLS-1$
 	private static final String USE_ELEMENT_SET_ELEMENT = "use-element-set"; //$NON-NLS-1$
 	private static final String ELEMENT_SET_ELEMENT = "element-set"; //$NON-NLS-1$
 	private static final String SETS_ELEMENT = "sets"; //$NON-NLS-1$
@@ -41,16 +42,16 @@ public final class SchemaBuilder extends ValidatingReader
 	private static final String REQUIRED = "required"; //$NON-NLS-1$
 	private static final String ELEMENT_ELEMENT = "element"; //$NON-NLS-1$
 	private static final String SCHEMA_ELEMENT = "schema"; //$NON-NLS-1$
-	
+
 	private static String SCHEMA_1_0_NAMESPACE = "http://www.aptana.com/2005/schema/1.0"; //$NON-NLS-1$
 	private static String SCHEMA_1_1_NAMESPACE = "http://www.aptana.com/2007/schema/1.1"; //$NON-NLS-1$
 
 	private Schema _newSchema;
-	private Stack<SchemaElement> _elementStack;
-	private SchemaElement _currentElement;
+	private Stack<ISchemaElement> _elementStack;
+	private ISchemaElement _currentElement;
 
 	private String _currentSetId;
-	private Map<String,SchemaElement> _sets;
+	private Map<String, ISchemaElement> _sets;
 
 	private Schema _versionSelectorSchema;
 	private Schema _schema10;
@@ -64,8 +65,8 @@ public final class SchemaBuilder extends ValidatingReader
 	 */
 	private SchemaBuilder() throws SchemaInitializationException
 	{
-		this._elementStack = new Stack<SchemaElement>();
-		this._sets = new HashMap<String,SchemaElement>();
+		this._elementStack = new Stack<ISchemaElement>();
+		this._sets = new HashMap<String, ISchemaElement>();
 
 		try
 		{
@@ -120,7 +121,7 @@ public final class SchemaBuilder extends ValidatingReader
 		// to process the current schema definition file
 
 		// create root element
-		SchemaElement root = result.createElement(SCHEMA_ELEMENT);
+		ISchemaElement root = result.createElement(SCHEMA_ELEMENT);
 
 		// tell schema this is the root
 		result.setRootElement(SCHEMA_ELEMENT);
@@ -142,13 +143,13 @@ public final class SchemaBuilder extends ValidatingReader
 		Schema result = new Schema(this);
 
 		// create the root element
-		SchemaElement root = result.createElement(SCHEMA_ELEMENT);
+		ISchemaElement root = result.createElement(SCHEMA_ELEMENT);
 
 		// tell schema this is the root
 		result.setRootElement(SCHEMA_ELEMENT);
 
 		// create element element and add as child of root
-		SchemaElement element = result.createElement(ELEMENT_ELEMENT);
+		ISchemaElement element = result.createElement(ELEMENT_ELEMENT);
 		root.addTransition(element);
 
 		// set element's attributes
@@ -157,13 +158,14 @@ public final class SchemaBuilder extends ValidatingReader
 		element.addAttribute(ON_ENTER_ATTRIBUTE, OPTIONAL);
 		element.addAttribute(ON_EXIT_ATTRIBUTE, OPTIONAL);
 		element.addAttribute(HAS_TEXT_ATTRIBUTE, OPTIONAL);
+		element.addAttribute(ALLOW_FREEFORM_MARKUP_ATTRIBUTE, OPTIONAL);
 
 		// set element's onEnter and onExit handlers
 		element.setOnEnter("startElementElement"); //$NON-NLS-1$
 		element.setOnExit("exitElementElement"); //$NON-NLS-1$
 
 		// create attribute element and add as child of element
-		SchemaElement attribute = result.createElement(ATTRIBUTE_ELEMENT);
+		ISchemaElement attribute = result.createElement(ATTRIBUTE_ELEMENT);
 		element.addTransition(attribute);
 
 		// set attribute's attributes
@@ -174,7 +176,7 @@ public final class SchemaBuilder extends ValidatingReader
 		attribute.setOnEnter("startAttributeElement"); //$NON-NLS-1$
 
 		// create child-element element and add as child of element
-		SchemaElement childElement = result.createElement(CHILD_ELEMENT_ELEMENT);
+		ISchemaElement childElement = result.createElement(CHILD_ELEMENT_ELEMENT);
 		element.addTransition(childElement);
 
 		// set child-element's attributes
@@ -197,13 +199,13 @@ public final class SchemaBuilder extends ValidatingReader
 		Schema result = new Schema(this);
 
 		// create the root element
-		SchemaElement root = result.createElement(SCHEMA_ELEMENT);
+		ISchemaElement root = result.createElement(SCHEMA_ELEMENT);
 
 		// tell schema this is the root
 		result.setRootElement(SCHEMA_ELEMENT);
 
 		// create element element and add as child of root
-		SchemaElement element = result.createElement(ELEMENT_ELEMENT);
+		ISchemaElement element = result.createElement(ELEMENT_ELEMENT);
 		root.addTransition(element);
 
 		// set element's attributes
@@ -220,7 +222,7 @@ public final class SchemaBuilder extends ValidatingReader
 		element.addTransition(element);
 
 		// create attribute element and add as child of element
-		SchemaElement attribute = result.createElement(ATTRIBUTE_ELEMENT);
+		ISchemaElement attribute = result.createElement(ATTRIBUTE_ELEMENT);
 		element.addTransition(attribute);
 
 		// set attribute's attributes
@@ -231,11 +233,11 @@ public final class SchemaBuilder extends ValidatingReader
 		attribute.setOnEnter("startAttributeElement"); //$NON-NLS-1$
 
 		// create sets element and add as child of root
-		SchemaElement sets = result.createElement(SETS_ELEMENT);
+		ISchemaElement sets = result.createElement(SETS_ELEMENT);
 		root.addTransition(sets);
 
 		// create element-set element and add as child of sets element
-		SchemaElement elementSet = result.createElement(ELEMENT_SET_ELEMENT);
+		ISchemaElement elementSet = result.createElement(ELEMENT_SET_ELEMENT);
 		sets.addTransition(elementSet);
 
 		// set elementSet's attributes
@@ -249,7 +251,7 @@ public final class SchemaBuilder extends ValidatingReader
 		elementSet.addTransition(element);
 
 		// create use-element-set element and add as child of root, element, and element-set
-		SchemaElement useElementSet = result.createElement(USE_ELEMENT_SET_ELEMENT);
+		ISchemaElement useElementSet = result.createElement(USE_ELEMENT_SET_ELEMENT);
 		root.addTransition(useElementSet);
 		element.addTransition(useElementSet);
 		elementSet.addTransition(useElementSet);
@@ -325,12 +327,15 @@ public final class SchemaBuilder extends ValidatingReader
 		}
 		finally
 		{
-			try
+			if (fi != null)
 			{
-				fi.close();
-			}
-			catch (IOException e)
-			{
+				try
+				{
+					fi.close();
+				}
+				catch (IOException e)
+				{
+				}
 			}
 		}
 
@@ -351,19 +356,19 @@ public final class SchemaBuilder extends ValidatingReader
 	{
 		Schema result = new Schema(handler);
 
-		SchemaBuilder _builder = new SchemaBuilder();
+		SchemaBuilder builder = new SchemaBuilder();
 
 		// setup selector schema and reset in case it has been used previously
-		_builder._schema = _builder._versionSelectorSchema;
-		_builder._schema.reset();
+		builder._schema = builder._versionSelectorSchema;
+		builder._schema.reset();
 
 		// create new schema and associate with resulting reader
-		_builder._newSchema = result;
+		builder._newSchema = result;
 
 		// build new schema from XML description
 		try
 		{
-			_builder.read(in);
+			builder.read(in);
 		}
 		catch (ParserConfigurationException e)
 		{
@@ -422,7 +427,7 @@ public final class SchemaBuilder extends ValidatingReader
 		String elementName = attributes.getValue(NAME_ATTRIBUTE);
 
 		// create a new SchemaElement for our target element
-		SchemaElement element = this._newSchema.createElement(elementName);
+		ISchemaElement element = this._newSchema.createElement(elementName);
 
 		this._currentElement.addTransition(element);
 	}
@@ -461,9 +466,10 @@ public final class SchemaBuilder extends ValidatingReader
 		String onEnter = attributes.getValue(ON_ENTER_ATTRIBUTE);
 		String onExit = attributes.getValue(ON_EXIT_ATTRIBUTE);
 		String hasText = attributes.getValue(HAS_TEXT_ATTRIBUTE);
+		String allowFreeformMarkup = attributes.getValue(ALLOW_FREEFORM_MARKUP_ATTRIBUTE);
 
 		// create a new SchemaElement for our target element
-		SchemaElement element = this._newSchema.createElement(elementName);
+		ISchemaElement element = this._newSchema.createElement(elementName);
 
 		// tag as root node, if needed
 		if (SCHEMA_1_0_NAMESPACE.equals(namespaceURI))
@@ -523,14 +529,23 @@ public final class SchemaBuilder extends ValidatingReader
 				throw new SAXException(message, e);
 			}
 		}
-		
+
 		// set hasText, if defined
 		if (hasText != null && hasText.length() > 0)
 		{
 			String lowerHasText = hasText.toLowerCase();
 			boolean hasTextValue = (lowerHasText.equals("true") || lowerHasText.equals("yes")); //$NON-NLS-1$ //$NON-NLS-2$
-			
+
 			element.setHasText(hasTextValue);
+		}
+
+		// set allowFreeformMarkup, if defined
+		if (allowFreeformMarkup != null && allowFreeformMarkup.length() > 0)
+		{
+			String lowerText = allowFreeformMarkup.toLowerCase();
+			boolean allowFreeformMarkupValue = (lowerText.equals("true") || lowerText.equals("yes")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			element.setAllowFreeformMarkup(allowFreeformMarkupValue);
 		}
 
 		// save current element on the stack
@@ -549,17 +564,18 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @param attributes
 	 * @throws SAXException
 	 */
-	public void startElementSetElement(String namespaceURI, String localName, String qualifiedName,	Attributes attributes) throws SAXException
+	public void startElementSetElement(String namespaceURI, String localName, String qualifiedName,
+			Attributes attributes) throws SAXException
 	{
 		// create a new SchemaElement for our target element
-		SchemaElement set = this._newSchema.createElement(localName, false);
+		ISchemaElement set = this._newSchema.createElement(localName, false);
 
 		// get id
 		String id = attributes.getValue("id"); //$NON-NLS-1$
-		
+
 		// save set name for later
 		this._currentSetId = id;
-		
+
 		// save current element on the stack
 		this._elementStack.push(this._currentElement);
 
@@ -626,7 +642,8 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @param attributes
 	 * @throws SAXException
 	 */
-	public void startUseElementSetElement(String namespaceURI, String localName, String qualifiedName, Attributes attributes) throws SAXException
+	public void startUseElementSetElement(String namespaceURI, String localName, String qualifiedName,
+			Attributes attributes) throws SAXException
 	{
 		String name = attributes.getValue(NAME_ATTRIBUTE);
 		String id = name.substring(1);
@@ -642,18 +659,19 @@ public final class SchemaBuilder extends ValidatingReader
 	 * @param element
 	 *            The element to which the set children will be added
 	 */
-	private void addSetToElement(String id, SchemaElement element)
+	private void addSetToElement(String id, ISchemaElement element)
 	{
 		if (this._sets.containsKey(id))
 		{
-			SchemaElement set = this._sets.get(id);
-			SchemaElement[] children = set.getTransitionElements();
-				
-			for (int i = 0; i < children.length; i++)
+			ISchemaElement set = this._sets.get(id);
+			ISchemaElement[] children = set.getTransitionElements();
+
+			if (children != null)
 			{
-				SchemaElement child = children[i];
-				
-				this._currentElement.addTransition(child);
+				for (ISchemaElement child : children)
+				{
+					this._currentElement.addTransition(child);
+				}
 			}
 		}
 		else

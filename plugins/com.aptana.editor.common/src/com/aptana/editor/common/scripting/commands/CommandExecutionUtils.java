@@ -8,6 +8,7 @@
 package com.aptana.editor.common.scripting.commands;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringBufferInputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.BreakIterator;
@@ -154,7 +156,15 @@ public class CommandExecutionUtils
 
 		public InputStream getInputStream()
 		{
-			return new StringBufferInputStream(string);
+			try
+			{
+				// FIXME Use the encoding from the file/document!
+				return new ByteArrayInputStream(string.getBytes("UTF-8"));
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				return new StringBufferInputStream(string);
+			}
 		}
 	}
 
@@ -1036,12 +1046,6 @@ public class CommandExecutionUtils
 		if (end == start)
 			return new Region(start, 0);
 		return new Region(start, end - start);
-	}
-
-	@SuppressWarnings("unused")
-	private static IOConsole getMessageConsole()
-	{
-		return getMessageConsole(DEFAULT_CONSOLE_NAME);
 	}
 
 	private static IOConsole getMessageConsole(String name)

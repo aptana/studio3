@@ -41,7 +41,7 @@ import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.StringUtil;
 import com.aptana.ide.core.io.preferences.PreferenceUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
-import com.aptana.ide.ui.io.internal.Utils;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.preferences.PermissionsGroup;
 import com.aptana.ui.util.UIUtils;
 

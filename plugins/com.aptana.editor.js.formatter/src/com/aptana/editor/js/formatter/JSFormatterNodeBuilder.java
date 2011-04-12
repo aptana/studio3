@@ -10,6 +10,8 @@ package com.aptana.editor.js.formatter;
 import java.util.HashSet;
 import java.util.Set;
 
+import beaver.Symbol;
+
 import com.aptana.editor.js.formatter.nodes.FormatterJSBlockNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseBodyNode;
 import com.aptana.editor.js.formatter.nodes.FormatterJSCaseNode;
@@ -42,6 +44,7 @@ import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSGroupNode;
 import com.aptana.editor.js.parsing.ast.JSIfNode;
 import com.aptana.editor.js.parsing.ast.JSInvokeNode;
+import com.aptana.editor.js.parsing.ast.JSNameValuePairNode;
 import com.aptana.editor.js.parsing.ast.JSNode;
 import com.aptana.editor.js.parsing.ast.JSNodeTypes;
 import com.aptana.editor.js.parsing.ast.JSObjectNode;
@@ -71,7 +74,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 {
 	private FormatterDocument document;
 	private boolean hasErrors;
-	private Set<Integer> singleLineCommentEndOffsets;
+	private Set<Integer> commentEndOffsets;
 
 	/**
 	 * @param parseResult
@@ -100,44 +103,38 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		return hasErrors;
 	}
 
-	/**
-	 * @param i
-	 * @param document2
-	 * @return
-	 */
-	private int getBeginWithoutWhiteSpaces(int offset)
-	{
-		int length = document.getLength();
-		while (offset < length)
-		{
-			if (!Character.isWhitespace(document.charAt(offset)) && (document.charAt(offset) != '\n'))
-			{
-				break;
-			}
-			offset++;
-		}
-		return offset;
-	}
-
 	private void generateSingleLineCommentEndOffsets(IParseNode[] comments)
 	{
-		singleLineCommentEndOffsets = new HashSet<Integer>();
+		commentEndOffsets = new HashSet<Integer>();
 		if (comments == null)
 		{
 			return;
 		}
 		for (IParseNode comment : comments)
 		{
-			if (comment.getNodeType() == JSNodeTypes.SINGLE_LINE_COMMENT)
+			short commentType = comment.getNodeType();
+			if (commentType == JSNodeTypes.SINGLE_LINE_COMMENT)
 			{
-				singleLineCommentEndOffsets.add(getBeginWithoutWhiteSpaces(comment.getEndingOffset()));
+				commentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset()));
+			}
+			else if (commentType == JSNodeTypes.MULTI_LINE_COMMENT || commentType == JSNodeTypes.SDOC_COMMENT
+					|| commentType == JSNodeTypes.VSDOC_COMMENT)
+			{
+				commentEndOffsets.add(getNextNonWhiteCharOffset(document, comment.getEndingOffset() + 1));
 			}
 		}
 	}
 
-	private boolean hasOffset(int element)
+	/**
+	 * Returns true if there is a comment right before the given element.<br>
+	 * There should be only whitespaces between the given offset and the comment.
+	 * 
+	 * @param offset
+	 * @return True, if the given offset is right after a comment.
+	 */
+	private boolean hasCommentBefore(int offset)
 	{
-		return singleLineCommentEndOffsets.contains(element);
+		return commentEndOffsets.contains(offset);
 	}
 
 	/**
@@ -164,7 +161,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			IParseNode body = node.getBody();
 			FormatterJSFunctionBodyNode bodyNode = new FormatterJSFunctionBodyNode(document,
 					FormatterJSDeclarationNode.isPartOfExpression(node.getParent()),
-					hasOffset(body.getStartingOffset()));
+					hasCommentBefore(body.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
 			push(bodyNode);
 			super.visit(node);
@@ -259,8 +256,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				// Construct the 'false' part if exist.
 				// Note that the JS parser does not provide us with the start offset of the 'else' keyword, so we need
-				// to
-				// locate it in between the end of the 'true' block and the begin of the 'false' block.
+				// to locate it in between the end of the 'true' block and the begin of the 'false' block.
 				int trueBlockEnd = trueBlock.getEndingOffset();
 				int falseBlockStart = falseBlock.getStartingOffset();
 				String segment = document.get(trueBlockEnd + 1, falseBlockStart);
@@ -269,7 +265,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 				int elseBlockDeclarationEnd = elseBlockStart + 4; // +4 for the keyword 'else'
 				boolean isElseIf = (falseBlock.getNodeType() == JSNodeTypes.IF);
 				FormatterJSElseNode elseNode = new FormatterJSElseNode(document, isCurlyFalseBlock, isElseIf,
-						isCurlyTrueBlock);
+						isCurlyTrueBlock, hasCommentBefore(elseBlockStart));
 				elseNode.setBegin(createTextNode(document, elseBlockStart, elseBlockDeclarationEnd));
 				push(elseNode);
 				if (isCurlyFalseBlock)
@@ -282,7 +278,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 					{
 						// Wrap the incoming 'if' with an Else-If node that will allow us later to break it and indent
 						// it.
-						FormatterJSElseIfNode elseIfNode = new FormatterJSElseIfNode(document);
+						FormatterJSElseIfNode elseIfNode = new FormatterJSElseIfNode(document,
+								hasCommentBefore(falseBlockStart));
 						elseIfNode.setBegin(createTextNode(document, falseBlockStart, falseBlockStart));
 						push(elseIfNode);
 						falseBlock.accept(this);
@@ -318,7 +315,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			JSNode body = (JSNode) node.getBody();
 			int blockEnd;
 			boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
-			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document, hasOffset(body.getStartingOffset()));
+			FormatterJSBlockNode doWhileBlock = new FormatterJSBlockNode(document,
+					hasCommentBefore(body.getStartingOffset()));
 			if (bodyInBrackets)
 			{
 				doWhileBlock.setBegin(createTextNode(document, body.getStartingOffset(), body.getStartingOffset() + 1));
@@ -407,7 +405,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				boolean hasCurlyBlock = nodeType == JSNodeTypes.STATEMENTS;
 				FormatterJSLoopNode loopNode = new FormatterJSLoopNode(document, hasCurlyBlock,
-						hasOffset(body.getStartingOffset()));
+						hasCommentBefore(body.getStartingOffset()));
 				int blockLength = hasCurlyBlock ? 1 : 0;
 				int bodyStart = body.getStartingOffset();
 				int bodyEnd = body.getEndingOffset() + 1 - blockLength;
@@ -426,7 +424,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		@Override
 		public void visit(JSObjectNode node)
 		{
-			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document);
+			FormatterJSObjectNode objectNode = new FormatterJSObjectNode(document, node, hasCommentBefore(node
+					.getLeftBrace().getStart()));
 			objectNode.setBegin(createTextNode(document, node.getStartingOffset(), node.getStartingOffset() + 1));
 			push(objectNode);
 			visitChildren(node);
@@ -434,6 +433,24 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			checkedPop(objectNode, end);
 			end = locateColonOrSemicolonInLine(end + 1, document);
 			objectNode.setEnd(createTextNode(document, node.getEndingOffset(), end));
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see
+		 * com.aptana.editor.js.parsing.ast.JSTreeWalker#visit(com.aptana.editor.js.parsing.ast.JSNameValuePairNode)
+		 */
+		@Override
+		public void visit(JSNameValuePairNode node)
+		{
+			FormatterJSDefaultLineNode lineNode = new FormatterJSDefaultLineNode(document);
+			IParseNode name = node.getName();
+			Symbol colon = node.getColon();
+			lineNode.setBegin(createTextNode(document, name.getStartingOffset(), colon.getEnd() + 1));
+			push(lineNode);
+			IParseNode value = node.getValue();
+			visit((JSNode) value);
+			checkedPop(lineNode, value.getEndingOffset());
 		}
 
 		/*
@@ -452,7 +469,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 
 			// push a switch-case body node
 			int blockStart = node.getLeftBrace().getStart();
-			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasOffset(blockStart));
+			FormatterJSSwitchNode blockNode = new FormatterJSSwitchNode(document, hasCommentBefore(blockStart));
 			blockNode.setBegin(createTextNode(document, blockStart, blockStart + 1));
 			push(blockNode);
 			// visit the children under that block node
@@ -749,7 +766,7 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				// we have a 'case' with a curly-block
 				FormatterJSCaseBodyNode caseBodyNode = new FormatterJSCaseBodyNode(document,
-						hasOffset(lastChild.getStartingOffset()));
+						hasCommentBefore(lastChild.getStartingOffset()));
 				caseBodyNode.setBegin(createTextNode(document, lastChild.getStartingOffset(),
 						lastChild.getStartingOffset() + 1));
 				push(caseBodyNode);
@@ -773,7 +790,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		 */
 		private void pushBlockNode(JSNode block, boolean consumeEndingSemicolon)
 		{
-			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document, hasOffset(block.getStartingOffset()));
+			FormatterJSBlockNode bodyNode = new FormatterJSBlockNode(document,
+					hasCommentBefore(block.getStartingOffset()));
 			bodyNode.setBegin(createTextNode(document, block.getStartingOffset(), block.getStartingOffset() + 1));
 			push(bodyNode);
 			// visit the children
@@ -803,7 +821,8 @@ public class JSFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			{
 				// Then, push the body (the body might be defined without any brackets, so in those cases the begin and
 				// end would be empty)
-				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document, hasOffset(body.getStartingOffset()));
+				FormatterJSBlockNode blockNode = new FormatterJSBlockNode(document,
+						hasCommentBefore(body.getStartingOffset()));
 				boolean bodyInBrackets = (body.getNodeType() == JSNodeTypes.STATEMENTS);
 				if (bodyInBrackets)
 				{

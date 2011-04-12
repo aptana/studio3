@@ -63,12 +63,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import com.aptana.core.CoreStrings;
+import com.aptana.core.io.vfs.IExtendedFileStore;
 import com.aptana.core.util.FileUtil;
 import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.syncing.ui.SyncingUIPlugin;
-import com.aptana.ide.syncing.ui.internal.SyncUtils;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ide.ui.io.Utils;
 import com.aptana.ide.ui.io.actions.CopyFilesOperation;
 import com.aptana.ide.ui.io.navigator.FileTreeContentProvider;
 import com.aptana.ide.ui.io.navigator.FileTreeNameSorter;
@@ -301,8 +302,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 			if (object instanceof IAdaptable)
 			{
 				IAdaptable adaptable = (IAdaptable) object;
-				IFileInfo fileInfo = SyncUtils.getFileInfo((IAdaptable) object);
-				if (fileInfo.isDirectory())
+				if (Utils.isDirectory((IAdaptable) object))
 				{
 					// goes into the folder
 					updateContent(adaptable);
@@ -369,7 +369,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		IFileStore targetStore = null;
 		if (event.item == null)
 		{
-			targetStore = SyncUtils.getFileStore((IAdaptable) fTreeViewer.getInput());
+			targetStore = Utils.getFileStore((IAdaptable) fTreeViewer.getInput());
 		}
 		else
 		{
@@ -604,8 +604,7 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		if (object instanceof IAdaptable)
 		{
 			IAdaptable adaptable = (IAdaptable) object;
-			IFileInfo fileInfo = SyncUtils.getFileInfo((IAdaptable) object);
-			if (fileInfo.isDirectory())
+			if (Utils.isDirectory((IAdaptable) object))
 			{
 				// goes into the folder
 				updateContent(adaptable);
@@ -717,10 +716,10 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		else
 		{
 			// a filesystem or remote path
-			IFileStore fileStore = SyncUtils.getFileStore(data);
+			IFileStore fileStore = Utils.getFileStore(data);
 			if (fileStore != null)
 			{
-				IFileStore homeFileStore = SyncUtils.getFileStore(fConnectionPoint);
+				IFileStore homeFileStore = Utils.getFileStore(fConnectionPoint);
 				while (fileStore.getParent() != null && !fileStore.equals(homeFileStore))
 				{
 					fEndPointData.add(0, fileStore);
@@ -790,11 +789,11 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 		}
 		else
 		{
-			IFileStore fileStore = SyncUtils.getFileStore(rootElement);
+			IFileStore fileStore = Utils.getFileStore(rootElement);
 			if (fileStore != null)
 			{
 				String path = fileStore.toString();
-				IFileStore homeFileStore = SyncUtils.getFileStore(fConnectionPoint);
+				IFileStore homeFileStore = Utils.getFileStore(fConnectionPoint);
 				if (homeFileStore != null)
 				{
 					String homePath = homeFileStore.toString();
@@ -824,8 +823,8 @@ public class ConnectionPointComposite implements SelectionListener, ISelectionCh
 
 	private static IFileStore getFolderStore(IAdaptable destination)
 	{
-		IFileStore store = SyncUtils.getFileStore(destination);
-		IFileInfo info = SyncUtils.getFileInfo(destination);
+		IFileStore store = Utils.getFileStore(destination);
+		IFileInfo info = Utils.getFileInfo(destination, IExtendedFileStore.EXISTENCE);
 		if (store != null && info != null && !info.isDirectory())
 		{
 			store = store.getParent();
