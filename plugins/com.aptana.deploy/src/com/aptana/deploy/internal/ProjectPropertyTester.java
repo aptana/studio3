@@ -22,6 +22,10 @@ public class ProjectPropertyTester extends PropertyTester
 		if (receiver instanceof IResource)
 		{
 			IProject project = ((IResource) receiver).getProject();
+			if (!project.isAccessible())
+			{
+				return false;
+			}
 			if ("isDeployable".equals(property)) //$NON-NLS-1$
 			{
 				// Check if we have an explicitly set deployment provider
