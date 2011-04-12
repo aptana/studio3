@@ -320,7 +320,8 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public boolean isValidTransition(String name)
 	{
-		return this._transitions.containsKey(name);
+		return this._transitions.containsKey(name) || this.allowFreeformMarkup()
+				|| this.getOwningSchema().allowFreeformMarkup();
 	}
 
 	/*
@@ -329,7 +330,14 @@ public class SchemaElement implements ISchemaElement
 	 */
 	public ISchemaElement moveTo(String name)
 	{
-		return this._transitions.get(name);
+		ISchemaElement result = this._transitions.get(name);
+
+		if (result == null && (this.allowFreeformMarkup() || this.getOwningSchema().allowFreeformMarkup()))
+		{
+			result = new SchemaFreeformElement(this.getOwningSchema());
+		}
+
+		return result;
 	}
 
 	/*
