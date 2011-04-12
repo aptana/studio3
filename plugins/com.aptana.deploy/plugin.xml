@@ -9,7 +9,7 @@
             class="com.aptana.deploy.internal.ProjectPropertyTester"
             id="com.aptana.deploy.projectPropertyTester"
             namespace="com.aptana.deploy.project"
-            properties="isDeployType"
+            properties="isDeployable,isDeployType"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
    </extension>

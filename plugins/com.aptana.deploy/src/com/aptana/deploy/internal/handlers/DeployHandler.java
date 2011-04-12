@@ -7,145 +7,57 @@
  */
 package com.aptana.deploy.internal.handlers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.InvalidRegistryObjectException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.progress.UIJob;
 
-import com.aptana.deploy.DeployPlugin;
 import com.aptana.deploy.IDeployProvider;
+import com.aptana.deploy.internal.DeployProviderRegistry;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
 
 public class DeployHandler extends AbstractHandler
 {
 
-	/**
-	 * unique id of the provider.
-	 */
-	private static final String PROVIDER_ID_ATTRIBUTE = "id"; //$NON-NLS-1$
-
-	/**
-	 * Element name to register a deploy provider.
-	 */
-	private static final String PROVIDER_ELEMENT_NAME = "provider"; //$NON-NLS-1$
-
-	/**
-	 * Extension point name/id.
-	 */
-	private static final String DEPLOY_PROVIDERS_EXP_PT = "deployProviders"; //$NON-NLS-1$
-
 	private IProject selectedProject;
 
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
-		IDeployProvider provider = getConfiguredProvider(selectedProject);
-		if (provider == null)
-		{
-			// Grab providers from ext pt!
-			List<IDeployProvider> providers = getAllProviders();
-			// Now go through the providers and find one that handles this project
-			for (IDeployProvider aProvider : providers)
-			{
-				if (aProvider.handles(selectedProject))
-				{
-					provider = aProvider;
-					break;
-				}
-			}
-		}
+		final DeployProviderRegistry registry = DeployProviderRegistry.getInstance();
+		final IDeployProvider provider = registry.getProvider(selectedProject);
 
 		// TODO What if provider is still null? Prompt to choose explicitly? Run wizard?
 		if (provider != null)
 		{
-			// TODO Run in a job?
-			provider.deploy(selectedProject, new NullProgressMonitor());
+			// Run in a job
+			Job job = new UIJob("Deploying...")
+			{
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor)
+				{
+					provider.deploy(selectedProject, monitor);
+					// Store the deployment provider explicitly, since we may have had none explicitly set, but detected
+					// one that works.
+					DeployPreferenceUtil.setDeployType(selectedProject, registry.getIdForProvider(provider));
+					return Status.OK_STATUS;
+				}
+			};
+			job.setUser(true);
+			job.setPriority(Job.SHORT);
+			job.schedule();
 		}
 		return null;
-	}
-
-	private List<IDeployProvider> getAllProviders()
-	{
-		List<IDeployProvider> providers = new ArrayList<IDeployProvider>();
-		try
-		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IConfigurationElement[] elements = registry.getConfigurationElementsFor(DeployPlugin.getPluginIdentifier(),
-					DEPLOY_PROVIDERS_EXP_PT);
-			for (IConfigurationElement element : elements)
-			{
-				if (PROVIDER_ELEMENT_NAME.equals(element.getName()))
-				{
-					providers.add(createProvider(element));
-				}
-			}
-		}
-		catch (InvalidRegistryObjectException e)
-		{
-			DeployPlugin.logError(e);
-		}
-		catch (CoreException e)
-		{
-			DeployPlugin.logError(e);
-		}
-		return providers;
-	}
-
-	private IDeployProvider getConfiguredProvider(IProject project)
-	{
-		// check what deploy provider id is stored for project, then get provider from ext pt matching that id.
-		String id = DeployPreferenceUtil.getDeployProviderId(project);
-		if (id == null)
-		{
-			return null;
-		}
-		// Now go through registered deploy providers and find one with matching id!
-		try
-		{
-			IExtensionRegistry registry = Platform.getExtensionRegistry();
-			IConfigurationElement[] elements = registry.getConfigurationElementsFor(DeployPlugin.getPluginIdentifier(),
-					DEPLOY_PROVIDERS_EXP_PT);
-			for (IConfigurationElement element : elements)
-			{
-				if (PROVIDER_ELEMENT_NAME.equals(element.getName()))
-				{
-					String providerId = element.getAttribute(PROVIDER_ID_ATTRIBUTE);
-					if (id.equals(providerId))
-					{
-						return createProvider(element);
-					}
-				}
-			}
-		}
-		catch (InvalidRegistryObjectException e)
-		{
-			DeployPlugin.logError(e);
-		}
-		catch (CoreException e)
-		{
-			DeployPlugin.logError(e);
-		}
-
-		return null;
-	}
-
-	private IDeployProvider createProvider(IConfigurationElement element) throws CoreException
-	{
-		return (IDeployProvider) element.createExecutableExtension("class"); //$NON-NLS-1$
 	}
 
 	@Override

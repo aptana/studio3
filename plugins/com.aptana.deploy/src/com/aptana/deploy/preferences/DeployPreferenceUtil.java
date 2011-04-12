@@ -10,8 +10,9 @@ package com.aptana.deploy.preferences;
 import java.text.MessageFormat;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
@@ -21,11 +22,6 @@ import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
 
 public class DeployPreferenceUtil
 {
-
-	/**
-	 * Pref key used to store the associated deploy provider for a project
-	 */
-	private static final String DEPLOY_PROVIDER_ID_PREF_KEY = "deploy_provider_id"; //$NON-NLS-1$
 
 	/**
 	 * @deprecated Please only use for compatibility layer internal to this plugin!
@@ -73,12 +69,19 @@ public class DeployPreferenceUtil
 
 	public static String getDeployProviderId(IProject project)
 	{
-		IEclipsePreferences prefs = new ProjectScope(project).getNode(DeployPlugin.getPluginIdentifier());
-		String id = prefs.get(DEPLOY_PROVIDER_ID_PREF_KEY, null);
-		if (id == null)
+		String id = null;
+		try
 		{
-			// Add a compatibility layer with old stuff here
-			id = mapTypeToId(getDeployType(project));
+			id = project.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"));
+			if (id == null)
+			{
+				// Add a compatibility layer with old stuff here
+				id = mapTypeToId(getDeployType(project));
+			}
+		}
+		catch (CoreException e)
+		{
+			DeployPlugin.logError(e);
 		}
 		return id;
 	}
@@ -111,14 +114,13 @@ public class DeployPreferenceUtil
 
 	public static void setDeployType(IProject project, String providerId)
 	{
-		IEclipsePreferences prefs = (new ProjectScope(project)).getNode(DeployPlugin.getPluginIdentifier());
-		prefs.put(IPreferenceConstants.PROJECT_DEPLOY_TYPE, providerId);
 		try
 		{
-			prefs.flush();
+			project.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId);
 		}
-		catch (BackingStoreException e)
+		catch (CoreException e1)
 		{
+			DeployPlugin.logError(e1);
 		}
 	}
 

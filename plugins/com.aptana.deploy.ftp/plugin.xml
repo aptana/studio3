@@ -40,7 +40,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -57,7 +57,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -71,7 +71,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -85,7 +85,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -107,7 +107,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -125,7 +125,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -139,7 +139,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>
@@ -157,7 +157,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="ftp">
+                        value="com.aptana.deploy.ftp.provider">
                   </test>
                </iterate>
             </visibleWhen>

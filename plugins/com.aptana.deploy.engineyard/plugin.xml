@@ -22,7 +22,7 @@
          <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
          <dynamic
-               class="com.aptana.explorer.internal.ui.EngineYardContributionItem"
+               class="com.aptana.deploy.engineyard.ui.EngineYardContributionItem"
                id="com.aptana.explorer.deploy.engineyard">
             <visibleWhen
                   checkEnabled="false">
@@ -30,7 +30,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="engineyard">
+                        value="com.aptana.deploy.engineyard.provider">
                   </test>
                </iterate>
             </visibleWhen>

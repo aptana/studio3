@@ -10,133 +10,39 @@ package com.aptana.deploy.internal;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Platform;
 
+import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
-import com.aptana.deploy.preferences.IPreferenceConstants.DeployType;
-import com.aptana.git.core.GitPlugin;
-import com.aptana.git.core.model.GitRepository;
-import com.aptana.ide.core.io.IBaseRemoteConnectionPoint;
-import com.aptana.ide.syncing.core.ISiteConnection;
-import com.aptana.ide.syncing.core.SiteConnectionUtils;
 
 public class ProjectPropertyTester extends PropertyTester
 {
-
-	private static final String DEPLOY_TYPE = "isDeployType"; //$NON-NLS-1$
-	private static final String TYPE_CAP = "cap"; //$NON-NLS-1$
-	private static final String TYPE_HEROKU = "heroku"; //$NON-NLS-1$
-	private static final String TYPE_FTP = "ftp"; //$NON-NLS-1$
-	private static final String TYPE_ENGINEYARD = "engineyard"; //$NON-NLS-1$
-	private static final String TYPE_REDHAT = "redhat"; //$NON-NLS-1$
 
 	public boolean test(Object receiver, String property, Object[] args, Object expectedValue)
 	{
 		if (receiver instanceof IResource)
 		{
 			IProject project = ((IResource) receiver).getProject();
-			if (DEPLOY_TYPE.equals(property))
+			if ("isDeployable".equals(property)) //$NON-NLS-1$
 			{
-				if (TYPE_CAP.equals(expectedValue))
-				{
-					return isCapistranoProject(project);
-				}
-				if (TYPE_HEROKU.equals(expectedValue))
-				{
-					return isHerokuProject(project);
-				}
-				if (TYPE_FTP.equals(expectedValue))
-				{
-					return isFTPProject(project);
-				}
-				if (TYPE_ENGINEYARD.equals(expectedValue))
-				{
-					return isEngineYardProject(project);
-				}
-				if (TYPE_REDHAT.equals(expectedValue))
-				{
-					return isRedhatProject(project);
-				}
-			}
-			else if ("isDeployable".equals(property))
-			{
-				// TODO Use code from DeployHandler where we check is a project has a deployment proivder explicitly or
-				// if we can implicitly choose one...
-			}
-		}
-		return false;
-	}
-
-	private static boolean isCapistranoProject(IProject project)
-	{
-		return project.getFile("Capfile").exists(); //$NON-NLS-1$
-	}
-
-	private static boolean isHerokuProject(IProject project)
-	{
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
-		if (repo != null)
-		{
-			for (String remote : repo.remotes())
-			{
-				if (remote.indexOf("heroku") != -1) //$NON-NLS-1$
+				// Check if we have an explicitly set deployment provider
+				String id = DeployPreferenceUtil.getDeployProviderId(project);
+				if (id != null)
 				{
 					return true;
 				}
+				return DeployProviderRegistry.getInstance().getProvider(project) != null;
 			}
-			for (String remoteURL : repo.remoteURLs())
+			else if ("isDeployType".equals(property)) //$NON-NLS-1$
 			{
-				if (remoteURL.indexOf("heroku.com") != -1) //$NON-NLS-1$
+				String id = DeployPreferenceUtil.getDeployProviderId(project);
+				String arg = (String) expectedValue;
+				if (id != null)
 				{
-					return true;
+					return arg.equals(id);
 				}
-			}
-		}
-		return false;
-	}
-
-	private static boolean isFTPProject(IProject project)
-	{
-		ISiteConnection[] siteConnections = SiteConnectionUtils.findSitesForSource(project);
-		for (ISiteConnection site : siteConnections)
-		{
-			if (site.getDestination() instanceof IBaseRemoteConnectionPoint)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean isEngineYardProject(IProject project)
-	{
-		// Engine Yard gem does not work in Windows
-		if (!Platform.OS_WIN32.equals(Platform.getOS()))
-		{
-			DeployType type = DeployPreferenceUtil.getDeployType(project);
-			return DeployType.ENGINEYARD.equals(type);
-		}
-		return false;
-	}
-
-	private static boolean isRedhatProject(IProject project)
-	{
-		GitRepository repo = GitPlugin.getDefault().getGitRepositoryManager().getAttached(project);
-		if (repo != null)
-		{
-			for (String remote : repo.remotes())
-			{
-				if (remote.indexOf("rhcloud") != -1) //$NON-NLS-1$
-				{
-					return true;
-				}
-			}
-			for (String remoteURL : repo.remoteURLs())
-			{
-				if (remoteURL.indexOf("rhcloud.com") != -1) //$NON-NLS-1$
-				{
-					return true;
-				}
+				// Instantiate provider with id, then call handles and check that!
+				IDeployProvider provider = DeployProviderRegistry.getInstance().getProviderById(arg);
+				return provider != null && provider.handles(project);
 			}
 		}
 		return false;

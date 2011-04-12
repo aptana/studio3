@@ -36,7 +36,7 @@
                      ifEmpty="false">
                   <test
                         property="com.aptana.deploy.project.isDeployType"
-                        value="heroku">
+                        value="com.aptana.deploy.heroku.provider">
                   </test>
                </iterate>
             </visibleWhen>
