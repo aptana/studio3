@@ -13,10 +13,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -337,12 +339,38 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		}
 	}
 
-	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
+	/**
+	 * @param template
+	 * @param project
+	 * @param preExistingResources
+	 *            A possible conflicting list of resources that the extraction should notify about to the user.
+	 */
+	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
 	{
-		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite);
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, !preExistingResources.isEmpty(),
+				preExistingResources);
 	}
 
-	public static void extractZip(final File zipPath, IProject project, boolean promptForOverwrite)
+	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
+	{
+		Set<IPath> emptySet = Collections.emptySet();
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet);
+	}
+
+	/**
+	 * Extracts a zip into a given project.
+	 * 
+	 * @param zipPath
+	 * @param project
+	 * @param promptForOverwrite
+	 *            Indicate that we should display a prompt in case the zip overwrites some of the existing project
+	 *            files.
+	 * @param preExistingResources
+	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
+	 *            empty list, the function will prompt on any overwritten file.
+	 */
+	public static void extractZip(final File zipPath, IProject project, boolean promptForOverwrite,
+			Set<IPath> preExistingResources)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
 		if (zipPath.exists())
@@ -372,16 +400,48 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 						{
 							if (promptForOverwrite)
 							{
-								conflicts.put(newFile, entry);
+								// Add to the list of conflicts only when we didn't get any pre-existing list of
+								// possible conflicting files, or when the pre-existing list of paths contains the
+								// current file path.
+								if (preExistingResources == null || preExistingResources.isEmpty()
+										|| preExistingResources.contains(newFile.getLocation()))
+								{
+									conflicts.put(newFile, entry);
+								}
+								else
+								{
+									// The file exists right now, but was not in the pre-existing resources we check
+									// against, so we just need to set it with the new content.
+									((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
+								}
 							}
-							else {
-								((IFile) newFile).setContents(zipFile.getInputStream(entry),
-										true, true, null);
+							else
+							{
+								((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
 							}
 						}
 						else
 						{
-							newFile.create(zipFile.getInputStream(entry), true, null);
+							try
+							{
+								newFile.create(zipFile.getInputStream(entry), true, null);
+							}
+							catch (CoreException re)
+							{
+								if (re.getStatus().getCode() == IResourceStatus.CASE_VARIANT_EXISTS
+										&& re.getStatus() instanceof IResourceStatus)
+								{
+									IResourceStatus rs = (IResourceStatus) re.getStatus();
+									IFile newVariantFile = project.getParent().getFile(rs.getPath());
+									((IFile) newVariantFile).setContents(zipFile.getInputStream(entry), true, true,
+											null);
+								}
+								else
+								{
+									ProjectsPlugin.logError(Messages.NewProjectWizard_ZipFailure, re);
+								}
+							}
+
 						}
 					}
 				}
