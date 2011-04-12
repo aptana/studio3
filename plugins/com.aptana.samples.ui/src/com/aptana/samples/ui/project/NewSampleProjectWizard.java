@@ -14,7 +14,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -201,7 +203,8 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 				SampleEntry rootEntry = sample.getRootEntry();
 				if (rootEntry.getFile().getName().endsWith(".zip")) //$NON-NLS-1$
 				{
-					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true);
+					Set<IPath> emptySet = Collections.emptySet();
+					NewProjectWizard.extractZip(rootEntry.getFile(), newProjectHandle, true, emptySet);
 				}
 				else
 				{
