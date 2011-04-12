@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.aptana.projects.internal.wizards.PromoteToProjectWizard;
 import com.aptana.ui.util.SWTUtils;
+import com.aptana.ui.util.UIUtils;
 
 public class PromoteToProjectHandler extends AbstractHandler
 {
@@ -56,9 +56,9 @@ public class PromoteToProjectHandler extends AbstractHandler
 			String path = file.isDirectory() ? file.getPath() : file.getParentFile().getPath();
 
 			PromoteToProjectWizard wizard = new PromoteToProjectWizard(path);
-			WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+			WizardDialog dialog = new WizardDialog(UIUtils.getActiveShell(), wizard);
 			dialog.create();
-			SWTUtils.center(Display.getCurrent().getActiveShell(), dialog.getShell());
+			SWTUtils.center(UIUtils.getActiveShell(), dialog.getShell());
 			dialog.open();
 		}
 
