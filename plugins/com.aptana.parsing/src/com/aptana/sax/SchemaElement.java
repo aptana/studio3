@@ -139,7 +139,7 @@ public class SchemaElement implements ISchemaElement
 		String nodeName = node.getName();
 
 		// make sure we haven't added this name already
-		if (this.isValidTransition(nodeName))
+		if (this._transitions.containsKey(nodeName))
 		{
 			String msg = "A node name '" + nodeName + "' has already been added to " + this._name; //$NON-NLS-1$ //$NON-NLS-2$
 
