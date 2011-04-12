@@ -39,7 +39,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				".*ime-mode.*", ".*layout-.*", ".*line-break.*", ".*page.*", ".*ruby-.*", ".*scrollbar-.*",
 				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
-				".*Parse Error.*", ".*-webkit-.*" };
+				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
 		prefs.put(ICSSParserConstants.LANGUAGE + ":"
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
