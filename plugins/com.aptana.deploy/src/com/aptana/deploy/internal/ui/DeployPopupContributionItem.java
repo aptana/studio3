@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.ui;
+package com.aptana.deploy.internal.ui;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
@@ -16,13 +16,10 @@ import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.IServiceLocator;
 
-import com.aptana.explorer.ExplorerPlugin;
-import com.aptana.explorer.IExplorerUIConstants;
+import com.aptana.deploy.DeployPlugin;
 
 public class DeployPopupContributionItem extends ContributionItem implements IWorkbenchContribution
 {
-
-	private static final String ICON = "icons/full/elcl16/deploy_package.png"; //$NON-NLS-1$
 
 	private IServiceLocator serviceLocator;
 
@@ -39,8 +36,8 @@ public class DeployPopupContributionItem extends ContributionItem implements IWo
 	public void fill(Menu menu, int index)
 	{
 		MenuManager menuManager = new MenuManager(Messages.DeployPopupContributionItem_Text,
-				AbstractUIPlugin.imageDescriptorFromPlugin(ExplorerPlugin.PLUGIN_ID, ICON),
-				IExplorerUIConstants.DEPLOY_MENU_ID);
+				AbstractUIPlugin.imageDescriptorFromPlugin(DeployPlugin.getPluginIdentifier(),
+						DeployPlugin.DEPLOY_MENU_ICON), DeployPlugin.DEPLOY_MENU_ID);
 		IMenuService menuService = (IMenuService) serviceLocator.getService(IMenuService.class);
 		menuService.populateContributionManager(menuManager, MenuUtil.menuUri(menuManager.getId()));
 		menuManager.fill(menu, index);

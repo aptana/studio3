@@ -58,6 +58,11 @@ public class ProjectPropertyTester extends PropertyTester
 					return isRedhatProject(project);
 				}
 			}
+			else if ("isDeployable".equals(property))
+			{
+				// TODO Use code from DeployHandler where we check is a project has a deployment proivder explicitly or
+				// if we can implicitly choose one...
+			}
 		}
 		return false;
 	}

@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.ui;
+package com.aptana.deploy.engineyard.ui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -13,6 +13,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import com.aptana.deploy.DeployContributionItem;
 import com.aptana.scripting.model.CommandElement;
 
 public class EngineYardContributionItem extends DeployContributionItem
@@ -34,7 +35,7 @@ public class EngineYardContributionItem extends DeployContributionItem
 	{
 		// open ssh session
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(Messages.SingleProjectView_OpenSSHSubmenuLabel);
+		item.setText(Messages.EngineYardContributionItem_OpenSSHSubmenuLabel);
 		item.addSelectionListener(new SelectionAdapter()
 		{
 
@@ -48,7 +49,7 @@ public class EngineYardContributionItem extends DeployContributionItem
 
 		// Deployment Submenu
 		MenuItem deploymentMenuItem = new MenuItem(menu, SWT.CASCADE);
-		deploymentMenuItem.setText(Messages.SingleProjectView_DeploymentSubmenuLabel);
+		deploymentMenuItem.setText(Messages.EngineYardContributionItem_DeploymentSubmenuLabel);
 		Menu deploymentSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(deploymentSubMenu, "List Environments", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
@@ -59,7 +60,7 @@ public class EngineYardContributionItem extends DeployContributionItem
 
 		// Recipes Submenu
 		MenuItem recipesMenuItem = new MenuItem(menu, SWT.CASCADE);
-		recipesMenuItem.setText(Messages.SingleProjectView_RecipesSubmenuLabel);
+		recipesMenuItem.setText(Messages.EngineYardContributionItem_RecipesSubmenuLabel);
 		Menu recipesSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(recipesSubMenu, "Apply Recipes", BUNDLE_ENGINE_YARD); //$NON-NLS-1$
@@ -69,7 +70,7 @@ public class EngineYardContributionItem extends DeployContributionItem
 
 		// Maintenance Submenu
 		MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-		maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+		maintenanceMenuItem.setText(Messages.EngineYardContributionItem_MaintenanceSubmenuLabel);
 		Menu maintenanceSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(maintenanceSubMenu, "Turn Maintenance On", BUNDLE_ENGINE_YARD); //$NON-NLS-1$

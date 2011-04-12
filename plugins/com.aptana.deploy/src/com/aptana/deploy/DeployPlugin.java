@@ -10,6 +10,8 @@ package com.aptana.deploy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
@@ -20,6 +22,17 @@ public class DeployPlugin extends AbstractUIPlugin
 {
 
 	private static final String PLUGIN_ID = "com.aptana.deploy"; //$NON-NLS-1$
+
+	/**
+	 * ID of the drop-down menu for the App Explorer's deployment options. Plugins can modify the menu using the
+	 * "menu: com.aptana.explorer.deploy" URI.
+	 */
+	public static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
+
+	/**
+	 * The path to the icon for deploy menu
+	 */
+	public static final String DEPLOY_MENU_ICON = "icons/full/elcl16/deploy_package.png"; //$NON-NLS-1$
 
 	private static DeployPlugin instance;
 
@@ -78,5 +91,16 @@ public class DeployPlugin extends AbstractUIPlugin
 	public IWizardRegistry getDeployWizardRegistry()
 	{
 		return DeployWizardRegistry.getInstance();
+	}
+
+	public static Image getImage(String string)
+	{
+		if (getDefault().getImageRegistry().get(string) == null)
+		{
+			ImageDescriptor id = imageDescriptorFromPlugin(PLUGIN_ID, string);
+			if (id != null)
+				getDefault().getImageRegistry().put(string, id);
+		}
+		return getDefault().getImageRegistry().get(string);
 	}
 }

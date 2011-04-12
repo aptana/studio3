@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.ui;
+package com.aptana.deploy;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;

@@ -21,17 +21,6 @@ public interface IExplorerUIConstants
 	public static final String GEAR_MENU_ID = "com.aptana.explorer.gear"; //$NON-NLS-1$
 
 	/**
-	 * ID of the drop-down menu for the App Explorer's deployment options. Plugins can modify the menu using the
-	 * "menu: com.aptana.explorer.deploy" URI.
-	 */
-	public static final String DEPLOY_MENU_ID = "com.aptana.explorer.deploy"; //$NON-NLS-1$
-
-	/**
-	 * The path to the icon for deploy menu
-	 */
-	public static final String DEPLOY_MENU_ICON = "icons/full/elcl16/deploy_package.png"; //$NON-NLS-1$
-
-	/**
 	 * The path to the icon for commands menu
 	 */
 	public static final String GEAR_MENU_ICON = "icons/full/elcl16/config.png"; //$NON-NLS-1$

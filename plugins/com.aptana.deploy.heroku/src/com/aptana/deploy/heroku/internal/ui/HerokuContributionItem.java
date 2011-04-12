@@ -5,7 +5,7 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.explorer.internal.ui;
+package com.aptana.deploy.heroku.internal.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import com.aptana.core.ShellExecutable;
 import com.aptana.core.util.ExecutableUtil;
 import com.aptana.core.util.ProcessUtil;
-import com.aptana.explorer.ExplorerPlugin;
+import com.aptana.deploy.DeployContributionItem;
+import com.aptana.deploy.heroku.HerokuPlugin;
 import com.aptana.ui.util.UIUtils;
 
 public class HerokuContributionItem extends DeployContributionItem
@@ -45,7 +46,7 @@ public class HerokuContributionItem extends DeployContributionItem
 		final IProject selectedProject = UIUtils.getSelectedProject();
 
 		MenuItem item = new MenuItem(menu, SWT.PUSH);
-		item.setText(Messages.SingleProjectView_OpenBrowserItem);
+		item.setText(Messages.HerokuContributionItem_OpenBrowserItem);
 		item.addSelectionListener(new SelectionAdapter()
 		{
 
@@ -83,14 +84,14 @@ public class HerokuContributionItem extends DeployContributionItem
 				}
 				catch (Exception e1)
 				{
-					ExplorerPlugin.logError(e1.getMessage(), e1);
+					HerokuPlugin.logError(e1);
 				}
 			}
 		});
 
 		// Sharing Submenu
 		MenuItem sharingMenuItem = new MenuItem(menu, SWT.CASCADE);
-		sharingMenuItem.setText(Messages.SingleProjectView_SharingSubmenuLabel);
+		sharingMenuItem.setText(Messages.HerokuContributionItem_SharingSubmenuLabel);
 		Menu sharingSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(sharingSubMenu, "Add Collaborator", BUNDLE_HEROKU); //$NON-NLS-1$
@@ -99,7 +100,7 @@ public class HerokuContributionItem extends DeployContributionItem
 
 		// Database
 		MenuItem databaseMenuItem = new MenuItem(menu, SWT.CASCADE);
-		databaseMenuItem.setText(Messages.SingleProjectView_DatabaseSubmenuLabel);
+		databaseMenuItem.setText(Messages.HerokuContributionItem_DatabaseSubmenuLabel);
 		Menu databaseSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(databaseSubMenu, "Rake db:migrate on Heroku", BUNDLE_HEROKU); //$NON-NLS-1$
@@ -110,7 +111,7 @@ public class HerokuContributionItem extends DeployContributionItem
 
 		// Maintenance
 		MenuItem maintenanceMenuItem = new MenuItem(menu, SWT.CASCADE);
-		maintenanceMenuItem.setText(Messages.SingleProjectView_MaintenanceSubmenuLabel);
+		maintenanceMenuItem.setText(Messages.HerokuContributionItem_MaintenanceSubmenuLabel);
 		Menu maintanenceSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(maintanenceSubMenu, "Turn Maintence On", BUNDLE_HEROKU); //$NON-NLS-1$
@@ -120,7 +121,7 @@ public class HerokuContributionItem extends DeployContributionItem
 
 		// Remote
 		MenuItem remoteMenuItem = new MenuItem(menu, SWT.CASCADE);
-		remoteMenuItem.setText(Messages.SingleProjectView_RemoteSubmenuLabel);
+		remoteMenuItem.setText(Messages.HerokuContributionItem_RemoteSubmenuLabel);
 		Menu remoteSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(remoteSubMenu, "Console", BUNDLE_HEROKU); //$NON-NLS-1$
@@ -130,7 +131,7 @@ public class HerokuContributionItem extends DeployContributionItem
 
 		// config vars
 		MenuItem configMenuItem = new MenuItem(menu, SWT.CASCADE);
-		configMenuItem.setText(Messages.SingleProjectView_ConfigVarsSubmenuLabel);
+		configMenuItem.setText(Messages.HerokuContributionItem_ConfigVarsSubmenuLabel);
 		Menu configSubMenu = new Menu(menu);
 
 		createDeploySubMenuItem(configSubMenu, "Add Config Var", BUNDLE_HEROKU); //$NON-NLS-1$

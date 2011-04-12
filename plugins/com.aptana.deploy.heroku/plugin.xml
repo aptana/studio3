@@ -23,5 +23,25 @@
             id="com.aptana.deploy.heroku.provider">
       </provider>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+               <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.deploy.heroku.internal.ui.HerokuContributionItem"
+               id="com.aptana.explorer.deploy.heroku">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="heroku">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
 
 </plugin>

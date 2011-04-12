@@ -17,5 +17,25 @@
             id="com.aptana.deploy.engineyard.provider">
       </provider>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.explorer.internal.ui.EngineYardContributionItem"
+               id="com.aptana.explorer.deploy.engineyard">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="engineyard">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
 
 </plugin>
