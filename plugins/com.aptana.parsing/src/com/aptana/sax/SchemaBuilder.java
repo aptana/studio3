@@ -32,6 +32,7 @@ public final class SchemaBuilder extends ValidatingReader
 	private static final String ON_ENTER_ATTRIBUTE = "onEnter"; //$NON-NLS-1$
 	private static final String TYPE_ATTRIBUTE = "type"; //$NON-NLS-1$
 	private static final String NAME_ATTRIBUTE = "name"; //$NON-NLS-1$
+	private static final String ALLOW_FREEFORM_MARKUP_ATTRIBUTE = "allowFreeformMarkup"; //$NON-NLS-1$
 	private static final String USE_ELEMENT_SET_ELEMENT = "use-element-set"; //$NON-NLS-1$
 	private static final String ELEMENT_SET_ELEMENT = "element-set"; //$NON-NLS-1$
 	private static final String SETS_ELEMENT = "sets"; //$NON-NLS-1$
@@ -157,6 +158,7 @@ public final class SchemaBuilder extends ValidatingReader
 		element.addAttribute(ON_ENTER_ATTRIBUTE, OPTIONAL);
 		element.addAttribute(ON_EXIT_ATTRIBUTE, OPTIONAL);
 		element.addAttribute(HAS_TEXT_ATTRIBUTE, OPTIONAL);
+		element.addAttribute(ALLOW_FREEFORM_MARKUP_ATTRIBUTE, OPTIONAL);
 
 		// set element's onEnter and onExit handlers
 		element.setOnEnter("startElementElement"); //$NON-NLS-1$
@@ -354,19 +356,19 @@ public final class SchemaBuilder extends ValidatingReader
 	{
 		Schema result = new Schema(handler);
 
-		SchemaBuilder _builder = new SchemaBuilder();
+		SchemaBuilder builder = new SchemaBuilder();
 
 		// setup selector schema and reset in case it has been used previously
-		_builder._schema = _builder._versionSelectorSchema;
-		_builder._schema.reset();
+		builder._schema = builder._versionSelectorSchema;
+		builder._schema.reset();
 
 		// create new schema and associate with resulting reader
-		_builder._newSchema = result;
+		builder._newSchema = result;
 
 		// build new schema from XML description
 		try
 		{
-			_builder.read(in);
+			builder.read(in);
 		}
 		catch (ParserConfigurationException e)
 		{
@@ -464,6 +466,7 @@ public final class SchemaBuilder extends ValidatingReader
 		String onEnter = attributes.getValue(ON_ENTER_ATTRIBUTE);
 		String onExit = attributes.getValue(ON_EXIT_ATTRIBUTE);
 		String hasText = attributes.getValue(HAS_TEXT_ATTRIBUTE);
+		String allowFreeformMarkup = attributes.getValue(ALLOW_FREEFORM_MARKUP_ATTRIBUTE);
 
 		// create a new SchemaElement for our target element
 		ISchemaElement element = this._newSchema.createElement(elementName);
@@ -534,6 +537,15 @@ public final class SchemaBuilder extends ValidatingReader
 			boolean hasTextValue = (lowerHasText.equals("true") || lowerHasText.equals("yes")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			element.setHasText(hasTextValue);
+		}
+
+		// set allowFreeformMarkup, if defined
+		if (allowFreeformMarkup != null && allowFreeformMarkup.length() > 0)
+		{
+			String lowerText = allowFreeformMarkup.toLowerCase();
+			boolean allowFreeformMarkupValue = (lowerText.equals("true") || lowerText.equals("yes")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			element.setAllowFreeformMarkup(allowFreeformMarkupValue);
 		}
 
 		// save current element on the stack
