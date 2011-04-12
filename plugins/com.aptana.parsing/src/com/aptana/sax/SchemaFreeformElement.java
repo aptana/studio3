@@ -62,7 +62,7 @@ public class SchemaFreeformElement implements ISchemaElement
 	 */
 	public String getName()
 	{
-		return "*";
+		return "*"; //$NON-NLS-1$
 	}
 
 	/*
