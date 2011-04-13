@@ -20,6 +20,8 @@ import org.eclipse.core.internal.preferences.Base64;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.aptana.core.util.PlatformUtil;
+
 @SuppressWarnings("restriction")
 public class HerokuAPI
 {
@@ -57,13 +59,9 @@ public class HerokuAPI
 
 	public static File getCredentialsFile()
 	{
-		String userHome = System.getProperty("user.home"); //$NON-NLS-1$
-		if (userHome == null || userHome.trim().length() == 0)
-		{
-			userHome = ""; // FIXME What should we use if we can't resolve user home???? //$NON-NLS-1$
-		}
-		File herokuDir = new File(userHome, ".heroku"); //$NON-NLS-1$
-		return new File(herokuDir, "credentials"); //$NON-NLS-1$
+		String filepath = PlatformUtil
+				.expandEnvironmentStrings("~" + File.separator + ".heroku" + File.separator + "credentials"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return new File(filepath);
 	}
 
 	public IStatus authenticate()
