@@ -396,7 +396,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
 	 */
 	@Override
-	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	public final ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
 		return new TextHover(sourceViewer);
 	}
