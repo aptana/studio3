@@ -152,11 +152,11 @@ public class RedHatAPI
 			loadSavedCredentials();
 			if (login == null)
 			{
-				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), "Login cannot be null");
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), Messages.RedHatAPI_LoginEmptyError);
 			}
 			if (password == null)
 			{
-				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), "Password cannot be null");
+				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), Messages.RedHatAPI_PasswordEmptyError);
 			}
 		}
 		newArgs[0] = LOGIN_SWITCH;
@@ -197,7 +197,7 @@ public class RedHatAPI
 			if (binScript == null)
 			{
 				return new Status(IStatus.ERROR, RedHatPlugin.getPluginIdentifier(), MessageFormat.format(
-						"Unable to find script ''{0}''. Please ensure you have the Red Hat Libra gem installed.",
+						Messages.RedHatAPI_UnableToFindBinScriptsError,
 						scriptName));
 			}
 		}

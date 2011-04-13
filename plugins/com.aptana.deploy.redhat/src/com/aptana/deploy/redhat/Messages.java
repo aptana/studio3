@@ -8,6 +8,12 @@ public class Messages extends NLS
 
 	public static String DeployWizard_AutomaticGitCommitMessage;
 
+	public static String RedHatAPI_LoginEmptyError;
+
+	public static String RedHatAPI_PasswordEmptyError;
+
+	public static String RedHatAPI_UnableToFindBinScriptsError;
+
 	static
 	{
 		// initialize resource bundle
