@@ -30,6 +30,9 @@
                   pattern="com.aptana.ide.ui.io.navigator.filters.*">
             </contentExtension>
             <contentExtension
+                  pattern="com.aptana.ui.io.navigator.filters.*">
+            </contentExtension>
+            <contentExtension
                   pattern="com.aptana.ui.io.navigator.linkHelper">
             </contentExtension>
          </includes>
@@ -286,6 +289,23 @@
             description="%commonFilter.startsWithDot.description"
             id="com.aptana.ide.ui.io.navigator.filters.startsWithDot"
             name="%commonFilter.startsWithDot.name">
+      </commonFilter>
+      <commonFilter
+            activeByDefault="true"
+            description="%commonFilter.localshortcuts.description"
+            id="com.aptana.ui.io.navigator.filters.localShortcuts"
+            name="%commonFilter.localshortcuts.name">
+         <filterExpression>
+            <and>
+               <instanceof
+                     value="com.aptana.ide.core.io.IConnectionPointCategory">
+               </instanceof>
+               <test
+                     property="com.aptana.ide.core.io.connection.category.id"
+                     value="com.aptana.ide.core.io.localShortcuts">
+               </test>
+            </and>
+         </filterExpression>
       </commonFilter>
    </extension>
    <!-- extension
@@ -643,6 +663,25 @@
             <objectState
                   name="canDisconnect"
                   value="true">
+            </objectState>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="com.aptana.ui.io.localCategoryContribution"
+            objectClass="com.aptana.ide.core.io.IConnectionPointCategory">
+         <action
+               class="com.aptana.ide.ui.io.actions.NewLocalConnectionAction"
+               enablesFor="1"
+               icon="icons/full/etool16/add.png"
+               id="com.aptana.ide.ui.io.actions.newLocalConnection"
+               label="%action.new.localshortcut.label"
+               menubarPath="group.new">
+         </action>
+         <visibility>
+            <objectState
+                  name="isCategory"
+                  value="com.aptana.ide.core.io.localShortcuts">
             </objectState>
          </visibility>
       </objectContribution>
