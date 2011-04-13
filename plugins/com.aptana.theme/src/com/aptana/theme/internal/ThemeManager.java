@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -377,7 +378,8 @@ public class ThemeManager implements IThemeManager
 		{
 			try
 			{
-				InputStream stream = url.openStream();
+				// Try forcing the file to be extracted out from zip before we try to read it
+				InputStream stream = FileLocator.toFileURL(url).openStream();
 				try
 				{
 					Properties props = new OrderedProperties();
