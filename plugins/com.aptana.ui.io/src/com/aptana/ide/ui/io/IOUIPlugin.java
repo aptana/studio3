@@ -46,6 +46,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
+import com.aptana.ide.ui.io.navigator.FileSystemElementComparer;
 import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.theme.IThemeManager;
@@ -127,7 +128,9 @@ public class IOUIPlugin extends AbstractUIPlugin
 		{
 			if (part instanceof ProjectExplorer)
 			{
-				final Tree tree = ((ProjectExplorer) part).getCommonViewer().getTree();
+				CommonViewer viewer = ((ProjectExplorer) part).getCommonViewer();
+				viewer.setComparer(new FileSystemElementComparer());
+				final Tree tree = viewer.getTree();
 				tree.addMouseListener(new MouseAdapter()
 				{
 
