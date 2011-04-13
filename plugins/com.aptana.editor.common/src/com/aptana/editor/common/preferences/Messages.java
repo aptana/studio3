@@ -54,6 +54,7 @@ public class Messages extends NLS
 	public static String EditorsPreferencePage_ToggleBetween;
 	public static String EditorsPreferencePage_Typing;
 	public static String EditorsPreferencePage_GeneralTextEditorPrefLink;
+	public static String EditorsPreferencePage_Wrap_Selection;
 
 	public static String ValidationPreferencePage_ERR_EmptyExpression;
 	public static String ValidationPreferencePage_Filter_Description;
