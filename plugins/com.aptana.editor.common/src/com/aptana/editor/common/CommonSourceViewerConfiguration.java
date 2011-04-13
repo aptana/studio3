@@ -396,7 +396,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
 	 */
 	@Override
-	public final ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
 		return new TextHover(sourceViewer);
 	}
@@ -506,6 +506,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2 {
 
+		private ITextHover activeTextHover;
+		
 		public TextHover(ISourceViewer sourceViewer) {
 			super(sourceViewer);
 		}
@@ -516,6 +518,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 */
 		@SuppressWarnings("deprecation")
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+			activeTextHover = null;
 			try {
 				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), hoverRegion.getOffset());
 				EvaluationContext context = new EvaluationContext(null, textViewer);
@@ -530,6 +533,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 							info = textHover.getHoverInfo(textViewer, hoverRegion);
 						}
 						if (info != null) {
+							activeTextHover = textHover;
 							return info;
 						}
 					}
@@ -544,6 +548,9 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
 		 */
 		public IInformationControlCreator getHoverControlCreator() {
+			if (activeTextHover instanceof ITextHoverExtension) {
+				return ((ITextHoverExtension) activeTextHover).getHoverControlCreator();
+			}
 			return new IInformationControlCreator() {
 				public IInformationControl createInformationControl(Shell parent) {
 					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString());
