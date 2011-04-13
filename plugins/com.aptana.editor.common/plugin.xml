@@ -3,7 +3,7 @@
 <plugin>
    <extension-point id="userAgent" name="%extension-point.userAgent.name" schema="schema/userAgent.exsd"/>
    <extension-point id="validator" name="%extension-point.validator.name" schema="schema/validator.exsd"/>
-   <extension-point id="sourceConfigurationContribution" name="%extension-point.sourceConfigurationContribution.name" schema="schema/sourceConfigurationContribution.exsd"/>
+   <extension-point id="textHovers" name="%extension-point.textHovers.name" schema="schema/textHovers.exsd"/>
    <extension
          point="org.eclipse.ui.commands">
        <command

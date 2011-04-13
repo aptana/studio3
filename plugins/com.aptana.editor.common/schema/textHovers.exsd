@@ -3,7 +3,7 @@
 <schema targetNamespace="com.aptana.editor.common" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="com.aptana.editor.common" id="sourceConfigurationContribution" name="sourceConfigurationContribution"/>
+         <meta.schema plugin="com.aptana.editor.common" id="textHovers" name="Text Hovers"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -17,8 +17,8 @@
          </appinfo>
       </annotation>
       <complexType>
-         <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="partitionTypeContribution"/>
+         <sequence>
+            <element ref="hover" minOccurs="1" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,11 +47,48 @@
       </complexType>
    </element>
 
-   <element name="partitionTypeContribution">
+   <element name="hover">
       <complexType>
-         <choice>
-            <element ref="textHoverDelegate"/>
-         </choice>
+         <sequence>
+            <element ref="enablement" minOccurs="0" maxOccurs="1"/>
+            <element ref="contentType" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="contentGroup" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="label" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="enablement" type="string">
+   </element>
+
+   <element name="contentType">
+      <complexType>
          <attribute name="type" type="string" use="required">
             <annotation>
                <documentation>
@@ -62,31 +99,13 @@
       </complexType>
    </element>
 
-   <element name="partitionGroupContribution">
+   <element name="contentGroup">
       <complexType>
-         <choice>
-            <element ref="textHoverDelegate"/>
-         </choice>
          <attribute name="prefix" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="textHoverDelegate">
-      <complexType>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-               <appinfo>
-                  <meta.attribute kind="java" basedOn=":com.aptana.editor.common.hover.ITextHoverDelegate"/>
-               </appinfo>
             </annotation>
          </attribute>
       </complexType>
