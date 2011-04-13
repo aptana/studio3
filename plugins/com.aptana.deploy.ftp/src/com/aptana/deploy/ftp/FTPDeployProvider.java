@@ -9,7 +9,6 @@ package com.aptana.deploy.ftp;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.ui.PlatformUI;
 
 import com.aptana.deploy.IDeployProvider;
 import com.aptana.deploy.preferences.DeployPreferenceUtil;
@@ -17,6 +16,7 @@ import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.ResourceSynchronizationUtils;
 import com.aptana.ide.syncing.core.SiteConnectionUtils;
 import com.aptana.ide.syncing.ui.actions.SynchronizeProjectAction;
+import com.aptana.ui.util.UIUtils;
 
 public class FTPDeployProvider implements IDeployProvider
 {
@@ -26,8 +26,8 @@ public class FTPDeployProvider implements IDeployProvider
 	public void deploy(IProject selectedProject, IProgressMonitor monitor)
 	{
 		SynchronizeProjectAction action = new SynchronizeProjectAction();
-		action.setActivePart(null, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart());
-		action.setSelection(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection());
+		action.setActivePart(null, UIUtils.getActivePart());
+		action.setSelection(UIUtils.getActiveWorkbenchWindow().getSelectionService().getSelection());
 		ISiteConnection[] sites = SiteConnectionUtils.findSitesForSource(selectedProject, true);
 		if (sites.length > 1)
 		{
