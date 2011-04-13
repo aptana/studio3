@@ -795,5 +795,24 @@
             properties="isStartPage"
             type="org.eclipse.core.resources.IFile"/>
    </extension>
+   <extension
+         point="com.aptana.editor.common.textHovers">
+      <hover
+            class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover"
+            id="com.aptana.js.debug.ui.hover"
+            label="JavaScript Debug Variable Hover">
+         <contentGroup
+               prefix="__js_">
+         </contentGroup>
+         <enablement>
+            <and>
+               <systemTest
+                     property="com.aptana.js.debug.core.debuggerActive"
+                     value="true">
+               </systemTest>
+            </and>
+         </enablement>
+      </hover>
+   </extension>
 
 </plugin>

@@ -8,22 +8,16 @@
 package com.aptana.js.debug.ui.internal.hovers;
 
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
-import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
-import org.eclipse.jface.text.ITextHoverExtension;
+import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Shell;
 
 import com.aptana.js.debug.core.IJSDebugConstants;
 import com.aptana.js.debug.core.model.IJSStackFrame;
@@ -31,17 +25,33 @@ import com.aptana.js.debug.core.model.IJSStackFrame;
 /**
  * @author Max Stepanov
  */
-public class JSDebugHover implements ITextHover, ITextHoverExtension {
-	private IDebugModelPresentation modelPresentation;
+public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
+	
+	private static IDebugModelPresentation modelPresentation;
 
 	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.ITextHover#getHoverInfo(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
 	 */
 	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
+		Object info = getHoverInfo2(textViewer, hoverRegion);
+		return info != null ? info.toString() : null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
+	 */
+	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
+		return null; // JavaWordFinder.findWord(textViewer.getDocument(), offset);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+	 */
+	public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
 		IJSStackFrame frame = getFrame();
 		if (frame != null) {
-			// first check for 'this' - code resolve does not resolve java
-			// elements for 'this'
 			IDocument document = textViewer.getDocument();
 			if (document != null) {
 				try {
@@ -62,31 +72,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension {
 		return null;
 	}
 
-	/*
-	 * @see org.eclipse.jface.text.ITextHover#getHoverRegion(org.eclipse.jface.text.ITextViewer, int)
-	 */
-	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-		return null; // JavaWordFinder.findWord(textViewer.getDocument(), offset);
-	}
-
-	/**
-	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
-	 */
-	public IInformationControlCreator getHoverControlCreator() {
-		return new IInformationControlCreator() {
-			public IInformationControl createInformationControl(Shell parent) {
-				return new DefaultInformationControl(parent, SWT.NONE,
-				/* new HTMLTextPresenter(true) */null, Messages.JSDebugHover_PressF2ForFocus);
-			}
-		};
-	}
-
-	/**
-	 * getFrame
-	 * 
-	 * @return IJSStackFrame
-	 */
-	protected IJSStackFrame getFrame() {
+	private IJSStackFrame getFrame() {
 		IAdaptable adaptable = DebugUITools.getDebugContext();
 		if (adaptable != null) {
 			return (IJSStackFrame) adaptable.getAdapter(IJSStackFrame.class);
@@ -94,7 +80,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension {
 		return null;
 	}
 
-	/**
+	/*
 	 * Returns HTML text for the given variable
 	 */
 	private String getVariableText(IVariable variable) {
@@ -110,7 +96,7 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension {
 		return null;
 	}
 
-	/**
+	/*
 	 * Replaces reserved HTML characters in the given string with their escaped
 	 * equivalents. This is to ensure that variable values containing reserved
 	 * characters are correctly displayed.
@@ -140,32 +126,12 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension {
 		return buffer.toString();
 	}
 
-	private IDebugModelPresentation getModelPresentation() {
+	private static IDebugModelPresentation getModelPresentation() {
 		if (modelPresentation == null) {
 			modelPresentation = DebugUITools.newDebugModelPresentation(IJSDebugConstants.ID_DEBUG_MODEL);
 			modelPresentation.setAttribute(IDebugModelPresentation.DISPLAY_VARIABLE_TYPE_NAMES, Boolean.TRUE);
 		}
 		return modelPresentation;
-	}
-	
-	public static class Factory implements IAdapterFactory {
-		
-		/*
-		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object, java.lang.Class)
-		 */
-		public Object getAdapter(Object adaptableObject, Class adapterType) {
-			if (adapterType == ITextHover.class) {
-				return new JSDebugHover();
-			}
-			return null;
-		}
-
-		/*
-		 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
-		 */
-		public Class[] getAdapterList() {
-			return new Class[] { ITextHover.class };
-		}
 	}
 
 }
