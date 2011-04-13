@@ -34,7 +34,7 @@ public class AddRemoteHandler extends AbstractSimpleGitCommandHandler
 		AddRemoteDialog dialog = new AddRemoteDialog(getShell(), repo, name, url);
 		if (dialog.open() == Window.OK)
 		{
-			name = dialog.getValue().trim();
+			name = dialog.getRemoteName().trim();
 			url = dialog.getRemoteURL();
 			if (dialog.track())
 			{
