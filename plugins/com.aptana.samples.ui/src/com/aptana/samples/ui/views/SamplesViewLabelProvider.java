@@ -21,6 +21,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import com.aptana.samples.model.SampleCategory;
 import com.aptana.samples.model.SampleEntry;
 import com.aptana.samples.model.SamplesReference;
+import com.aptana.samples.ui.SamplesUIPlugin;
 
 /**
  * @author Kevin Lindsey
@@ -33,6 +34,7 @@ public class SamplesViewLabelProvider extends LabelProvider
 			.getImage(ISharedImages.IMG_OBJ_FOLDER);
 	private static final Image IMAGE_FILE = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FILE);
+	private static final String ICON_REMOTE = "icons/samples_remote.gif"; //$NON-NLS-1$
 
 	private ImageRegistry imageRegistry;
 
@@ -97,6 +99,10 @@ public class SamplesViewLabelProvider extends LabelProvider
 				}
 				return image;
 			}
+		}
+		if (element instanceof SamplesReference)
+		{
+			return SamplesUIPlugin.getImage(ICON_REMOTE);
 		}
 		return super.getImage(element);
 	}

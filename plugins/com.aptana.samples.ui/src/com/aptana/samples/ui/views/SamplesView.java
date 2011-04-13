@@ -71,7 +71,6 @@ public class SamplesView extends ViewPart
 	private static final String ICON_IMPORT = "icons/import_wiz.gif"; //$NON-NLS-1$
 	private static final String ICON_PREVIEW = "icons/preview.gif"; //$NON-NLS-1$
 	private static final String ICON_HELP = "icons/book_open.png"; //$NON-NLS-1$
-
 	private TreeViewer treeViewer;
 
 	private Action importAction;
