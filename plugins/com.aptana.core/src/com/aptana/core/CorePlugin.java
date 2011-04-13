@@ -89,16 +89,19 @@ public class CorePlugin extends Plugin
 		addFilewatcherJob.setPriority(Job.LONG);
 		addFilewatcherJob.schedule(250);
 
-		addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
+		if (inMigrationMode())
 		{
-			protected IStatus run(IProgressMonitor monitor)
+			addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 			{
-				return updateProjectNatures(ResourcesPlugin.getWorkspace().getRoot().getProjects(), monitor);
-			}
-		};
-		addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
-		addBuilderJob.setPriority(Job.LONG);
-		addBuilderJob.schedule(250);
+				protected IStatus run(IProgressMonitor monitor)
+				{
+					return updateProjectNatures(ResourcesPlugin.getWorkspace().getRoot().getProjects(), monitor);
+				}
+			};
+			addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
+			addBuilderJob.setPriority(Job.LONG);
+			addBuilderJob.schedule(250);
+		}
 	}
 
 	/*
@@ -274,7 +277,22 @@ public class CorePlugin extends Plugin
 			fProjectsListener.dispose();
 			fProjectsListener = null;
 		}
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectCreationListener);
+
+		if (fProjectCreationListener != null)
+		{
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectCreationListener);
+		}
+	}
+
+	/**
+	 * Are we migrating projects from Studio 2.x to 3?
+	 * 
+	 * @return
+	 */
+	private boolean inMigrationMode()
+	{
+		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, false, null);
 	}
 
 	private void addProjectListeners()
@@ -282,62 +300,64 @@ public class CorePlugin extends Plugin
 		fProjectsListener = new ResourceListener();
 		fProjectsListener.start();
 
-		fProjectCreationListener = new IResourceChangeListener()
+		if (inMigrationMode())
 		{
-			public void resourceChanged(IResourceChangeEvent event)
+			fProjectCreationListener = new IResourceChangeListener()
 			{
-				IResourceDelta delta = event.getDelta();
-				if (delta == null)
+				public void resourceChanged(IResourceChangeEvent event)
 				{
-					return;
-				}
-				try
-				{
-					delta.accept(new IResourceDeltaVisitor()
+					IResourceDelta delta = event.getDelta();
+					if (delta == null)
 					{
-						public boolean visit(IResourceDelta delta) throws CoreException
+						return;
+					}
+					try
+					{
+						delta.accept(new IResourceDeltaVisitor()
 						{
-							final IResource resource = delta.getResource();
-							if (resource.getType() == IResource.ROOT)
+							public boolean visit(IResourceDelta delta) throws CoreException
 							{
-								return true;
-							}
-							if (resource.getType() == IResource.PROJECT)
-							{
-								// a project was added or opened
-								if (delta.getKind() == IResourceDelta.ADDED
-										|| (delta.getKind() == IResourceDelta.CHANGED
-												&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-												.isAccessible()))
+								final IResource resource = delta.getResource();
+								if (resource.getType() == IResource.ROOT)
 								{
-									addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
-									{
-										protected IStatus run(IProgressMonitor monitor)
-										{
-											return updateProjectNatures(new IProject[] { resource.getProject() },
-													monitor);
-										}
-									};
-									addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
-									addBuilderJob.setPriority(Job.LONG);
-									addBuilderJob.schedule();
+									return true;
 								}
+								if (resource.getType() == IResource.PROJECT)
+								{
+									// a project was added or opened
+									if (delta.getKind() == IResourceDelta.ADDED
+											|| (delta.getKind() == IResourceDelta.CHANGED
+													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
+													.isAccessible()))
+									{
+										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
+										{
+											protected IStatus run(IProgressMonitor monitor)
+											{
+												return updateProjectNatures(new IProject[] { resource.getProject() },
+														monitor);
+											}
+										};
+										addBuilderJob.setSystem(!EclipseUtil.showSystemJobs());
+										addBuilderJob.setPriority(Job.LONG);
+										addBuilderJob.schedule();
+									}
 
+								}
+								return false;
 							}
-							return false;
-						}
-					});
+						});
+					}
+					catch (CoreException e)
+					{
+						log(e.getStatus());
+					}
 				}
-				catch (CoreException e)
-				{
-					log(e.getStatus());
-				}
-			}
-		};
+			};
 
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectCreationListener,
-				IResourceChangeEvent.POST_CHANGE);
-
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(fProjectCreationListener,
+					IResourceChangeEvent.POST_CHANGE);
+		}
 	}
 
 	public static String getAptanaStudioVersion()

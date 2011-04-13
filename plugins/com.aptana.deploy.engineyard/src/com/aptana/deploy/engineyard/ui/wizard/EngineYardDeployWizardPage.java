@@ -71,7 +71,7 @@ public class EngineYardDeployWizardPage extends WizardPage
 		{
 			public void widgetDisposed(DisposeEvent e)
 			{
-				if (italic != null && !italic.isDisposed())
+				if (!italic.isDisposed())
 				{
 					italic.dispose();
 				}
