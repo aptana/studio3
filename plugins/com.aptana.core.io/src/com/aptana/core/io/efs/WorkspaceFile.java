@@ -268,7 +268,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 		ensureLocalFileStore(IFolder.class);
 		if (resource != null && !resource.exists()) {
 			monitor = Policy.monitorFor(monitor);
-			monitor.beginTask(MessageFormat.format(com.aptana.core.io.efs.Messages.WorkspaceFile_CreateFolderTask, path.lastSegment()), 100);
+			monitor.beginTask(MessageFormat.format("Creating folder {0}", path.lastSegment()), 100); //$NON-NLS-1$
 			try {
 				if ((options & EFS.SHALLOW) == 0) {
 					createParentsRecursive(resource, Policy.subMonitorFor(monitor, 80));
@@ -488,7 +488,7 @@ import com.aptana.ide.core.io.InfiniteProgressMonitor;
 	}
 
 	private static void buildFileTree(FileTree fileTree, WorkspaceFile parent, IFileTreeVisitor visitor, IProgressMonitor monitor) throws CoreException {
-		monitor.beginTask(MessageFormat.format("Listing directory {0}", parent.path), 20); //$NON-NLS-1$s
+		monitor.beginTask(MessageFormat.format("Listing directory {0}", parent.path), 20); //$NON-NLS-1$
 		IFileInfo[] infos = parent.childInfos(EFS.NONE, monitor);
 		List<IFileStore> stores = new ArrayList<IFileStore>();
 		List<IFileStore> dirs = new ArrayList<IFileStore>();
