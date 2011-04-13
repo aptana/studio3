@@ -97,10 +97,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 			prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
-
-			prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 			prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
-
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
