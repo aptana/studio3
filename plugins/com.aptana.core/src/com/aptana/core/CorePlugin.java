@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -328,7 +329,7 @@ public class CorePlugin extends Plugin
 									if (delta.getKind() == IResourceDelta.ADDED
 											|| (delta.getKind() == IResourceDelta.CHANGED
 													&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && resource
-													.isAccessible()))
+														.isAccessible()))
 									{
 										addBuilderJob = new Job(Messages.CorePlugin_Adding_Unified_Builders)
 										{
@@ -384,9 +385,11 @@ public class CorePlugin extends Plugin
 	{
 
 		private Map<IProject, Integer> fWatchers;
+		private boolean hooked;
 
 		ResourceListener()
 		{
+			new DefaultScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
 			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
 		}
 
@@ -404,16 +407,18 @@ public class CorePlugin extends Plugin
 		 */
 		private void hookAll()
 		{
+			// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+
 			IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 			for (IProject project : projects)
 			{
-				if (project.isOpen())
+				if (project.isAccessible())
 				{
 					hookFilewatcher(project);
 				}
 			}
-			// TODO Maybe hook to pre-close/pre-delete for unhooking listeners to projects?
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
+			hooked = true;
 		}
 
 		private boolean autoHookFileWatcher()
@@ -426,6 +431,7 @@ public class CorePlugin extends Plugin
 		{
 			// Don't listen to auto-refresh pref changes anymore
 			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
+			new DefaultScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
 			// Now remove all the existing file watchers
 			unhookAll();
 		}
@@ -441,6 +447,7 @@ public class CorePlugin extends Plugin
 				}
 				fWatchers = null;
 			}
+			hooked = false;
 		}
 
 		protected synchronized void hookFilewatcher(IProject newProject)
@@ -524,7 +531,7 @@ public class CorePlugin extends Plugin
 							else if (delta.getKind() == IResourceDelta.REMOVED
 									|| (delta.getKind() == IResourceDelta.CHANGED
 											&& (delta.getFlags() & IResourceDelta.OPEN) != 0 && !resource
-											.isAccessible()))
+												.isAccessible()))
 							{
 								unhookFilewatcher(resource.getProject());
 							}
@@ -541,15 +548,18 @@ public class CorePlugin extends Plugin
 
 		public void preferenceChange(PreferenceChangeEvent event)
 		{
+			// This might be instance or default that changed. So what do we do?
 			if (ResourcesPlugin.PREF_AUTO_REFRESH.equals(event.getKey()))
 			{
-				if (Boolean.TRUE.toString().equals(event.getNewValue()))
-				{
-					hookAll();
-				}
-				else
+				// we we're already hooked and now we're not supposed to, unhook
+				if (hooked && !autoHookFileWatcher())
 				{
 					unhookAll();
+				}
+				// if we're not already hooked and now we're supposed to, hook
+				else if (!hooked && autoHookFileWatcher())
+				{
+					hookAll();
 				}
 			}
 		}
