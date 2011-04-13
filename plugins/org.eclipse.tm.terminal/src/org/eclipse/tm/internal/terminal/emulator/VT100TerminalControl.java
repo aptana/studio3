@@ -26,6 +26,7 @@
  * Martin Oberhuber (Wind River) - [240745] Pressing Ctrl+F1 in the Terminal should bring up context help
  * Michael Scharf (Wind River) - [240098] The cursor should not blink when the terminal is disconnected
  * Anton Leherbauer (Wind River) - [335021] Middle mouse button copy/paste does not work with the terminal
+ * Max Stepanov (Appcelerator) - [339768] Fix ANSI code for PgUp / PgDn
  *******************************************************************************/
 package org.eclipse.tm.internal.terminal.emulator;
 
