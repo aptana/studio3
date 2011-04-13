@@ -800,7 +800,7 @@
       <hover
             class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover"
             id="com.aptana.js.debug.ui.hover"
-            label="JavaScript Debug Variable Hover">
+            label="%hover.label">
          <contentType
                type="com.aptana.contenttype.js">
          </contentType>

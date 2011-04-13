@@ -116,7 +116,7 @@
       <hover
             class="com.aptana.editor.css.text.CSSTextHover"
             id="com.aptana.editor.css.hover"
-            label="CSS Documentation Hover">
+            label="%hover.label">
          <contentType
                type="com.aptana.contenttype.css">
          </contentType>

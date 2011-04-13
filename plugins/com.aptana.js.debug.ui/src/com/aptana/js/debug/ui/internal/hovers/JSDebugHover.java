@@ -84,14 +84,14 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 	 * Returns HTML text for the given variable
 	 */
 	private String getVariableText(IVariable variable) {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		IDebugModelPresentation modelPresentation = getModelPresentation();
-		buffer.append("<p><pre>"); //$NON-NLS-1$
+		sb.append("<p><pre>"); //$NON-NLS-1$
 		String variableText = modelPresentation.getText(variable);
-		buffer.append(replaceHTMLChars(variableText));
-		buffer.append("</pre></p>"); //$NON-NLS-1$
-		if (buffer.length() > 0) {
-			return buffer.toString();
+		sb.append(replaceHTMLChars(variableText));
+		sb.append("</pre></p>"); //$NON-NLS-1$
+		if (sb.length() > 0) {
+			return sb.toString();
 		}
 		return null;
 	}
@@ -102,28 +102,28 @@ public class JSDebugHover implements ITextHover, ITextHoverExtension2 {
 	 * characters are correctly displayed.
 	 */
 	private static String replaceHTMLChars(String variableText) {
-		StringBuffer buffer = new StringBuffer(variableText.length());
+		StringBuilder sb = new StringBuilder(variableText.length());
 		char[] characters = variableText.toCharArray();
 		for (int i = 0; i < characters.length; i++) {
 			char character = characters[i];
 			switch (character) {
 			case '<':
-				buffer.append("&lt;"); //$NON-NLS-1$
+				sb.append("&lt;"); //$NON-NLS-1$
 				break;
 			case '>':
-				buffer.append("&gt;"); //$NON-NLS-1$
+				sb.append("&gt;"); //$NON-NLS-1$
 				break;
 			case '&':
-				buffer.append("&amp;"); //$NON-NLS-1$
+				sb.append("&amp;"); //$NON-NLS-1$
 				break;
 			case '"':
-				buffer.append("&quot;"); //$NON-NLS-1$
+				sb.append("&quot;"); //$NON-NLS-1$
 				break;
 			default:
-				buffer.append(character);
+				sb.append(character);
 			}
 		}
-		return buffer.toString();
+		return sb.toString();
 	}
 
 	private static IDebugModelPresentation getModelPresentation() {
