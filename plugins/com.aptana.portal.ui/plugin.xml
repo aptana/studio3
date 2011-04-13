@@ -121,6 +121,11 @@
             id="portal.views"
             name="View Actions">
       </actionController>
+      <actionController
+            class="com.aptana.portal.ui.dispatch.actionControllers.CommandHandlerActionController"
+            id="portal.commands"
+            name="Command Actions">
+      </actionController>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
