@@ -102,7 +102,7 @@ module Gem
 
   module Maven
     class Gemify
-      DEFAULT_PLUGIN_VERSION = "0.25.0"
+      DEFAULT_PLUGIN_VERSION = "0.26.0"
 
       attr_reader :repositories
 
@@ -241,14 +241,14 @@ module Gem
       def execute(goal, gemname, version, props = {})
         request = DefaultMavenExecutionRequest.new
         request.set_show_errors Gem.configuration.backtrace
-        request.user_properties.put("gemify.skipDependencies", "true")
+        skip_dependencies = (!maven_config["dependencies"]).to_s
+        request.user_properties.put("gemify.skipDependencies", skip_dependencies)
         request.user_properties.put("gemify.tempDir", temp_dir)
         request.user_properties.put("gemify.gemname", gemname)
         request.user_properties.put("gemify.version", version.to_s) if version
 
         if maven_config["repositories"]
-          repos = maven_config["repositories"].dup
-          @repositories.map {|r| repos << r if r }
+          maven_config["repositories"].each { |r| @repositories << r }
         end
         if @repositories.size > 0
           request.user_properties.put("gemify.repositories", @repositories.join(","))

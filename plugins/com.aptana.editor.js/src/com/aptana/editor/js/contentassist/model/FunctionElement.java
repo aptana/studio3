@@ -388,7 +388,7 @@ public class FunctionElement extends PropertyElement
 		printer.printIndent();
 
 		// print any annotations
-		if (this.isInstanceProperty())
+		if (this.isInstanceProperty() == false)
 		{
 			printer.print("static "); //$NON-NLS-1$
 		}

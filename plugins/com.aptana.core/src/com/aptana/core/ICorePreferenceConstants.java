@@ -21,4 +21,10 @@ public interface ICorePreferenceConstants
 	 * A boolean used to swap system jobs to user so they show in the UI for debugging CPU usage.
 	 */
 	String PREF_SHOW_SYSTEM_JOBS = "show_system_jobs"; //$NON-NLS-1$
+
+	/**
+	 * A boolean use to enable the migration of existing Studio 2.x projects to Studio 3
+	 */
+	String PREF_AUTO_MIGRATE_OLD_PROJECTS = "auto_migrate_old_projects"; //$NON-NLS-1$
+
 }
