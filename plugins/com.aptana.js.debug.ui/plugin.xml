@@ -801,9 +801,9 @@
             class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover"
             id="com.aptana.js.debug.ui.hover"
             label="JavaScript Debug Variable Hover">
-         <contentGroup
-               prefix="__js_">
-         </contentGroup>
+         <contentType
+               type="com.aptana.contenttype.js">
+         </contentType>
          <enablement>
             <and>
                <systemTest

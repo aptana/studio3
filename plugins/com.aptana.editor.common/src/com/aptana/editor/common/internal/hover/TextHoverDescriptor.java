@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.text.ITextHover;
 
 import com.aptana.editor.common.CommonEditorPlugin;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 
 /**
  * @author Max Stepanov
@@ -34,17 +35,14 @@ public class TextHoverDescriptor {
 
 	private static final String EXTENSION_POINT_ID = CommonEditorPlugin.PLUGIN_ID + ".textHovers"; //$NON-NLS-1$
 	private static final String TAG_CONTENT_TYPE = "contentType"; //$NON-NLS-1$
-	private static final String TAG_CONTENT_GROUP = "contentGroup"; //$NON-NLS-1$
 	private static final String TAG_HOVER = "hover"; //$NON-NLS-1$
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 	private static final String ATT_TYPE = "type"; //$NON-NLS-1$
-	private static final String ATT_PREFIX = "prefix"; //$NON-NLS-1$
 	
 	private static List<TextHoverDescriptor> descriptors = null;
 	
 	private final IConfigurationElement configurationElement;
 	private final Set<String> contentTypes = new HashSet<String>();
-	private final Set<String> contentGroups = new HashSet<String>();
 	private final Expression enablementExpression; 
 
 	/**
@@ -54,9 +52,6 @@ public class TextHoverDescriptor {
 	private TextHoverDescriptor(IConfigurationElement configurationElement) throws CoreException {
 		this.configurationElement = configurationElement;
 		for (IConfigurationElement element : configurationElement.getChildren(TAG_CONTENT_TYPE)) {
-			readElement(element);
-		}
-		for (IConfigurationElement element : configurationElement.getChildren(TAG_CONTENT_GROUP)) {
 			readElement(element);
 		}
 		IConfigurationElement[] elements = configurationElement.getChildren(ExpressionTagNames.ENABLEMENT);
@@ -94,13 +89,6 @@ public class TextHoverDescriptor {
 				return;
 			}
 			contentTypes.add(type);
-			
-		} else if (TAG_CONTENT_GROUP.equals(element.getName())) {
-			String prefix = element.getAttribute(ATT_PREFIX);
-			if (prefix == null || prefix.length() == 0) {
-				return;
-			}
-			contentGroups.add(prefix);	
 		}
 	}
 	
@@ -110,7 +98,7 @@ public class TextHoverDescriptor {
 	 * @param context
 	 * @return
 	 */
-	public boolean isEnabledFor(String contentType, IEvaluationContext context) {
+	public boolean isEnabledFor(QualifiedContentType contentType, IEvaluationContext context) {
 		if (!handlesContentType(contentType)) {
 			return false;
 		}
@@ -138,12 +126,9 @@ public class TextHoverDescriptor {
 		return null;
 	}
 	
-	private boolean handlesContentType(String contentType) {
-		if (contentTypes.contains(contentType)) {
-			return true;
-		}
-		for (String prefix : contentGroups) {
-			if (contentType.startsWith(prefix)) {
+	private boolean handlesContentType(QualifiedContentType contentType) {
+		for (String type : contentTypes) {
+			if (contentType.contains(type)) {
 				return true;
 			}
 		}

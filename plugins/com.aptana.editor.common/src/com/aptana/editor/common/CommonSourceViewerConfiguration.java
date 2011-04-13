@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.DefaultTextHover;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -56,6 +57,7 @@ import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
 import com.aptana.editor.common.internal.hover.TextHoverDescriptor;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
@@ -396,10 +398,10 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	@Override
 	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
 	{
-		return new TextHover(sourceViewer, contentType);
+		return new TextHover(sourceViewer);
 	}
 
-	protected IInformationControl createTextHoverInformationControl(Shell parent, String statusFieldText, String contentType)
+	protected IInformationControl createTextHoverInformationControl(Shell parent, String statusFieldText)
 	{
 		return new ThemedInformationControl(parent, SWT.NONE, new HTMLTextPresenter(true), statusFieldText);
 	}
@@ -504,11 +506,8 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 
 	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2 {
 
-		private final String contentType;
-
-		public TextHover(ISourceViewer sourceViewer, String contentType) {
+		public TextHover(ISourceViewer sourceViewer) {
 			super(sourceViewer);
-			this.contentType = contentType;
 		}
 
 		/*
@@ -517,21 +516,25 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		 */
 		@SuppressWarnings("deprecation")
 		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
-			EvaluationContext context = new EvaluationContext(null, textViewer);
-			context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
-			for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
-				if (descriptor.isEnabledFor(contentType, context)) {
-					ITextHover textHover = descriptor.createTextHover();
-					Object info = null;
-					if (textHover instanceof ITextHoverExtension2) {
-						info = ((ITextHoverExtension2) textHover).getHoverInfo2(textViewer, hoverRegion);
-					} else if (textHover != null) {
-						info = textHover.getHoverInfo(textViewer, hoverRegion);
-					}
-					if (info != null) {
-						return info;
+			try {
+				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), hoverRegion.getOffset());
+				EvaluationContext context = new EvaluationContext(null, textViewer);
+				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
+				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
+					if (descriptor.isEnabledFor(contentType, context)) {
+						ITextHover textHover = descriptor.createTextHover();
+						Object info = null;
+						if (textHover instanceof ITextHoverExtension2) {
+							info = ((ITextHoverExtension2) textHover).getHoverInfo2(textViewer, hoverRegion);
+						} else if (textHover != null) {
+							info = textHover.getHoverInfo(textViewer, hoverRegion);
+						}
+						if (info != null) {
+							return info;
+						}
 					}
 				}
+			} catch (BadLocationException e) {
 			}
 			return super.getHoverInfo(textViewer, hoverRegion);
 		}
@@ -543,8 +546,7 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		public IInformationControlCreator getHoverControlCreator() {
 			return new IInformationControlCreator() {
 				public IInformationControl createInformationControl(Shell parent) {
-					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString(),
-							contentType);
+					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString());
 				}
 			};
 		}

@@ -52,7 +52,6 @@
          <sequence>
             <element ref="enablement" minOccurs="0" maxOccurs="1"/>
             <element ref="contentType" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="contentGroup" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -90,18 +89,6 @@
    <element name="contentType">
       <complexType>
          <attribute name="type" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="contentGroup">
-      <complexType>
-         <attribute name="prefix" type="string" use="required">
             <annotation>
                <documentation>
                   
