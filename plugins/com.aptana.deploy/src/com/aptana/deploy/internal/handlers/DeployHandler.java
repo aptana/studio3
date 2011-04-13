@@ -41,7 +41,7 @@ public class DeployHandler extends AbstractHandler
 		if (provider != null)
 		{
 			// Run in a job
-			Job job = new UIJob("Deploying...")
+			Job job = new UIJob(Messages.DeployHandler_DeployJobTitle)
 			{
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor)
