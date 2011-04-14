@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.heroku.ui.wizard.HerokuDeployWizard"
+            icon="icons/icon-heroku.png"
+            id="com.aptana.deploy.heroku.wizard"
+            name="Heroku">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.aptana.deploy.heroku.internal.preferences.HerokuPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.heroku.HerokuDeployProvider"
+            id="com.aptana.deploy.heroku.provider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+               <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.deploy.heroku.internal.ui.HerokuContributionItem"
+               id="com.aptana.explorer.deploy.heroku">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="com.aptana.deploy.heroku.provider">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
+
+</plugin>

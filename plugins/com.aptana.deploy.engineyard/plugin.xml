@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.aptana.deploy.deployWizards">
+      <wizard
+            class="com.aptana.deploy.engineyard.ui.wizard.EngineYardDeployWizard"
+            icon="icons/icon-engineyard.png"
+            id="com.aptana.deploy.engineyard.wizard"
+            name="Engine Yard">
+      </wizard>
+   </extension>
+   <extension
+         point="com.aptana.deploy.deployProviders">
+      <provider
+            class="com.aptana.deploy.engineyard.EngineYardDeployProvider"
+            id="com.aptana.deploy.engineyard.provider">
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
+         <dynamic
+               class="com.aptana.deploy.engineyard.ui.EngineYardContributionItem"
+               id="com.aptana.explorer.deploy.engineyard">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <test
+                        property="com.aptana.deploy.project.isDeployType"
+                        value="com.aptana.deploy.engineyard.provider">
+                  </test>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+   </extension>
+
+</plugin>
