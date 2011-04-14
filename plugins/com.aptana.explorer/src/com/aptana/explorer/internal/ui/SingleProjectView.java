@@ -307,7 +307,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			projectNameMenuItem.setSelection(false);
 			Image image = null;
 			// Visually mark closed/open projects
-			if (!iProject.isOpen())
+			if (iProject.isOpen())
 			{
 				image = PlatformUI.getWorkbench().getSharedImages()
 						.getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
