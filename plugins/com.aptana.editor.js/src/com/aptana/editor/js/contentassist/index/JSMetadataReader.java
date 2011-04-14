@@ -10,8 +10,10 @@ package com.aptana.editor.js.contentassist.index;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +62,7 @@ public class JSMetadataReader extends MetadataReader
 	private ExceptionElement _currentException;
 
 	private Map<String, TypeElement> _typesByName = new HashMap<String, TypeElement>();
+	private List<AliasElement> _aliases = new ArrayList<AliasElement>();
 
 	/**
 	 * Create a new instance of CoreLoader
@@ -83,7 +86,7 @@ public class JSMetadataReader extends MetadataReader
 		alias.setName(attributes.getValue("name")); //$NON-NLS-1$
 		alias.setType(attributes.getValue("type")); //$NON-NLS-1$
 
-		// add somewhere?
+		this._aliases.add(alias);
 	}
 
 	/**
@@ -861,6 +864,16 @@ public class JSMetadataReader extends MetadataReader
 	 */
 	public void exitValue(String ns, String name, String qname)
 	{
+	}
+
+	/**
+	 * getAliases
+	 * 
+	 * @return
+	 */
+	public AliasElement[] getAliases()
+	{
+		return this._aliases.toArray(new AliasElement[this._aliases.size()]);
 	}
 
 	/*

@@ -213,6 +213,31 @@ public class TypeElement extends BaseElement
 	}
 
 	/**
+	 * getConstructors
+	 * 
+	 * @return
+	 */
+	public List<FunctionElement> getConstructors()
+	{
+		List<FunctionElement> result = new ArrayList<FunctionElement>();
+
+		for (PropertyElement property : this.getProperties())
+		{
+			if (property instanceof FunctionElement)
+			{
+				FunctionElement function = (FunctionElement) property;
+
+				if (function.isConstructor())
+				{
+					result.add(function);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getEvents
 	 * 
 	 * @return
@@ -346,6 +371,23 @@ public class TypeElement extends BaseElement
 	public boolean isDeprecated()
 	{
 		return this._deprecated;
+	}
+
+	/**
+	 * removeProperty
+	 * 
+	 * @param property
+	 */
+	public boolean removeProperty(PropertyElement property)
+	{
+		boolean result = false;
+
+		if (this._properties != null)
+		{
+			result = this._properties.remove(property);
+		}
+
+		return result;
 	}
 
 	/**
