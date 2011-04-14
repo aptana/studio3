@@ -10,7 +10,6 @@ package com.aptana.editor.css;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.source.ISourceViewer;
 
@@ -19,7 +18,6 @@ import com.aptana.editor.common.ISourceViewerConfiguration;
 import com.aptana.editor.common.SimpleSourceViewerConfiguration;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.css.contentassist.CSSContentAssistProcessor;
-import com.aptana.editor.css.text.CSSTextHover;
 
 public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguration
 {
@@ -61,18 +59,6 @@ public class CSSSourceViewerConfiguration extends SimpleSourceViewerConfiguratio
 	public ISourceViewerConfiguration getSourceViewerConfiguration()
 	{
 		return CSSSourceConfiguration.getDefault();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see
-	 * org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer
-	 * , java.lang.String)
-	 */
-	@Override
-	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
-	{
-		return new CSSTextHover();
 	}
 
 	@Override
