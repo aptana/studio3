@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
+   <extension-point id="diagnostic" name="diagnostic" schema="schema/diagnostic.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -170,6 +171,13 @@
             id="com.aptana.ui.command.ShowInFileManager"
             name="%ShowInFileManager.label">
       </command>
+      <command
+            categoryId="com.aptana.ui.category"
+            defaultHandler="com.aptana.ui.commands.DiagnosticHandler"
+            description="%runDiagnostic.description"
+            id="com.aptana.ui.command.diagnostic"
+            name="%runDiagnostic.name">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -178,6 +186,10 @@
          <menu
                id="aptanahelp"
                label="%Menu.Help.Aptana.label">
+            <command
+                  commandId="com.aptana.ui.command.diagnostic"
+                  style="push">
+            </command>
                <!--
             <command
                   commandId="com.aptana.ui.command.sendfeedback"
@@ -278,6 +290,13 @@
             id="com.aptana"
             name="%category.name">
       </category>
+   </extension>
+   <extension
+         point="com.aptana.ui.diagnostic">
+      <diagnostic
+            class="com.aptana.ui.EclipseDiagnosticLog"
+            ordinal="100">
+      </diagnostic>
    </extension>
 
 </plugin>
