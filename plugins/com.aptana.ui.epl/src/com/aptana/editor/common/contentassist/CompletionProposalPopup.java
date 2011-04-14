@@ -706,22 +706,31 @@ public class CompletionProposalPopup implements IContentAssistListener
 	 */
 	private void resizeTable()
 	{
-		fProposalTable.setRedraw(false);
-		int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
-		fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
-				.create());
-		fProposalTable.getColumn(0).pack();
-		padColumn(fProposalTable.getColumn(0), 30);
-		for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
+		// Try/catch is fix for LH where we are strangely getting an ArrayIndexOutOfBounds exception
+		// Not entirely sure how it's happening: https://aptana.lighthouseapp.com/projects/35272/tickets/2017
+		try
 		{
-			// User agent images are 16px. Adding a few px for padding
-			fProposalTable.getColumn(j).setWidth(22);
+			fProposalTable.setRedraw(false);
+			int height = (fProposalTable.getItemHeight() * Math.min(fFilteredProposals.length, PROPOSAL_ITEMS_VISIBLE));
+			fProposalTable.setLayoutData(GridDataFactory.fillDefaults().hint(SWT.DEFAULT, height).grab(false, true)
+					.create());
+			fProposalTable.getColumn(0).pack();
+			padColumn(fProposalTable.getColumn(0), 30);
+			for (int j = 1; j < fProposalTable.getColumnCount() - 1; j++)
+			{
+				// User agent images are 16px. Adding a few px for padding
+				fProposalTable.getColumn(j).setWidth(22);
+			}
+			TableColumn lastColumn = fProposalTable.getColumn(fProposalTable.getColumnCount() - 1);
+			lastColumn.pack();
+			padColumn(lastColumn, 20);
+			fProposalTable.setRedraw(true);
+			fProposalShell.pack(true);
 		}
-		TableColumn lastColumn = fProposalTable.getColumn(fProposalTable.getColumnCount() - 1);
-		lastColumn.pack();
-		padColumn(lastColumn, 20);
-		fProposalTable.setRedraw(true);
-		fProposalShell.pack(true);
+		catch (java.lang.ArrayIndexOutOfBoundsException e)
+		{
+			UIEplPlugin.log(JFaceTextMessages.getString("CompletionProposalPopup.Error_Resizing_Popup"), e); //$NON-NLS-1$
+		}
 	}
 
 	/**
