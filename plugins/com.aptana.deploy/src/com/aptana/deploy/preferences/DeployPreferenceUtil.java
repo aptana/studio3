@@ -72,7 +72,7 @@ public class DeployPreferenceUtil
 		String id = null;
 		try
 		{
-			id = project.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"));
+			id = project.getPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider")); //$NON-NLS-1$
 			if (id == null)
 			{
 				// Add a compatibility layer with old stuff here
@@ -94,6 +94,10 @@ public class DeployPreferenceUtil
 	 */
 	private static String mapTypeToId(DeployType type)
 	{
+		if (type == null)
+		{
+			return null;
+		}
 		switch (type)
 		{
 			case RED_HAT:
@@ -116,7 +120,7 @@ public class DeployPreferenceUtil
 	{
 		try
 		{
-			project.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId);
+			project.setPersistentProperty(new QualifiedName(DeployPlugin.getPluginIdentifier(), "provider"), providerId); //$NON-NLS-1$
 		}
 		catch (CoreException e1)
 		{
