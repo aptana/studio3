@@ -7,7 +7,10 @@
  */
 package com.aptana.projects.internal.wizards;
 
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -28,6 +31,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -46,7 +50,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	private IProjectTemplate fSelectedTemplate;
 
 	private static ImageDescriptor wizardDesc = ProjectsPlugin.getImageDescriptor("/icons/protect_template_blank.png"); //$NON-NLS-1$
-	private Image wizard = null;;
+	private Image defaultTemplateImage = null;
+	private Map<Object, Image> templateImages;
 
 	public ProjectTemplateSelectionPage(String pageName, List<IProjectTemplate> templates)
 	{
@@ -62,6 +67,7 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		}
 		setTitle(Messages.ProjectTemplateSelectionPage_Title);
 		setDescription(Messages.ProjectTemplateSelectionPage_Description);
+		templateImages = new HashMap<Object, Image>();
 	}
 
 	public IProjectTemplate getSelectedTemplate()
@@ -75,16 +81,24 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 
 	public void createControl(Composite parent)
 	{
-		wizard = wizardDesc.createImage();
+		defaultTemplateImage = wizardDesc.createImage();
 		parent.addDisposeListener(new DisposeListener()
 		{
 			public void widgetDisposed(DisposeEvent e)
 			{
-				if (wizard != null)
+				if (defaultTemplateImage != null)
 				{
-					wizard.dispose();
-					wizard = null;
+					defaultTemplateImage.dispose();
+					defaultTemplateImage = null;
 				}
+				for (Image image : templateImages.values())
+				{
+					if (!image.isDisposed())
+					{
+						image.dispose();
+					}
+				}
+				templateImages = null;
 			}
 		});
 
@@ -199,6 +213,8 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 	 */
 	private class ListLabelProvider extends LabelProvider
 	{
+		private static final int IMAGE_SIZE = 48;
+
 		/*
 		 * (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
@@ -206,7 +222,48 @@ public class ProjectTemplateSelectionPage extends WizardPage implements Selectio
 		@Override
 		public Image getImage(Object element)
 		{
-			return wizard;
+			Image image = templateImages.get(element);
+			if (image == null)
+			{
+				if (element instanceof IProjectTemplate)
+				{
+					// Resolve and load the image
+					IProjectTemplate template = (IProjectTemplate) element;
+					URL iconPath = template.getIconPath();
+					if (iconPath != null)
+					{
+						ImageDescriptor descriptor = ImageDescriptor.createFromURL(iconPath);
+						if (descriptor != null)
+						{
+							image = descriptor.createImage();
+							if (image != null)
+							{
+								// Scale the image to 48x48 in case it's not.
+								ImageData imageData = image.getImageData();
+								if (imageData.x != IMAGE_SIZE || imageData.y != IMAGE_SIZE)
+								{
+									// dispose the previous one
+									image.dispose();
+									// Scale the image data and create a new image
+									imageData = imageData.scaledTo(IMAGE_SIZE, IMAGE_SIZE);
+									image = ImageDescriptor.createFromImageData(imageData).createImage();
+								}
+							}
+
+						}
+					}
+					if (image == null)
+					{
+						image = defaultTemplateImage;
+					}
+					templateImages.put(element, image);
+				}
+				else
+				{
+					image = defaultTemplateImage;
+				}
+			}
+			return image;
 		}
 
 		/*

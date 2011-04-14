@@ -43,6 +43,22 @@ public class PropertyElement extends BaseElement
 	}
 
 	/**
+	 * PropertyElement
+	 * 
+	 * @param base
+	 */
+	public PropertyElement(PropertyElement base)
+	{
+		// NOTE: this is a shallow clone, so references are shared in lists
+		this._owningType = base.getOwningType();
+		this._isInstanceProperty = base.isInstanceProperty();
+		this._isClassProperty = base.isClassProperty();
+		this._isInternal = base.isInternal();
+		this._types = new ArrayList<ReturnTypeElement>(base.getTypes());
+		this._examples = new ArrayList<String>(base.getExamples());
+	}
+
+	/**
 	 * addExample
 	 * 
 	 * @param example

@@ -10,6 +10,8 @@ package com.aptana.sax;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -52,6 +54,30 @@ public class ValidatingReader extends DefaultHandler
 		}
 
 		this._schema = schema;
+	}
+
+	/**
+	 * attributesToMap
+	 * 
+	 * @param attributes
+	 * @return
+	 */
+	protected Map<String, String> attributesToMap(Attributes attributes, boolean trim)
+	{
+		Map<String, String> result = new HashMap<String, String>();
+
+		if (attributes != null)
+		{
+			for (int i = 0; i < attributes.getLength(); i++)
+			{
+				String name = attributes.getLocalName(i);
+				String value = trim ? attributes.getValue(i).trim() : attributes.getValue(i);
+
+				result.put(name, value);
+			}
+		}
+
+		return result;
 	}
 
 	/**

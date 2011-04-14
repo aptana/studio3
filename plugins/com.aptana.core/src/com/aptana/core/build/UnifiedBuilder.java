@@ -17,9 +17,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
-import com.aptana.index.core.IndexPlugin;
+import com.aptana.core.resources.IMarkerConstants;
 import com.aptana.index.core.IndexFilesOfProjectJob;
 import com.aptana.index.core.IndexManager;
+import com.aptana.index.core.IndexPlugin;
 import com.aptana.index.core.RebuildIndexJob;
 import com.aptana.index.core.RemoveIndexOfFilesOfProjectJob;
 
@@ -38,9 +39,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 		{
 			if (resource != null && resource.exists())
 			{
-				// FIXME We should only be deleting the markers we generate here. Use a base id for all our problem
-				// markers
-				resource.deleteMarkers(IMarker.PROBLEM, false, IResource.DEPTH_INFINITE);
+				resource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
 				resource.deleteMarkers(IMarker.TASK, false, IResource.DEPTH_INFINITE);
 			}
 		}
