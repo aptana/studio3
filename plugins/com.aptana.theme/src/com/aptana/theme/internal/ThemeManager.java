@@ -26,10 +26,14 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.JFaceResources;
@@ -39,6 +43,7 @@ import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.AnnotationPreference;
@@ -46,9 +51,12 @@ import org.eclipse.ui.texteditor.MarkerAnnotationPreferences;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.aptana.core.util.EclipseUtil;
+import com.aptana.scope.ScopeSelector;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
+import com.aptana.theme.ThemeRule;
 import com.aptana.theme.internal.preferences.ThemerPreferenceInitializer;
 import com.aptana.theme.preferences.IPreferenceConstants;
 
@@ -79,6 +87,65 @@ public class ThemeManager implements IThemeManager
 
 	private ThemeManager()
 	{
+		new InstanceScope().getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
+				new IPreferenceChangeListener()
+				{
+
+					public void preferenceChange(PreferenceChangeEvent event)
+					{
+						// Listen to see if the user is modifying the annotations through Annotations pref page
+						Set<String> keysToWatch = new HashSet<String>();
+						keysToWatch.add("pydevOccurrenceIndication"); //$NON-NLS-1$
+						keysToWatch.add("searchResultIndication"); //$NON-NLS-1$
+						keysToWatch.add("xmlTagPairOccurrenceIndication"); //$NON-NLS-1$
+						keysToWatch.add("htmlTagPairOccurrenceIndication"); //$NON-NLS-1$
+						keysToWatch.add("rubyBlockPairOccurrenceIndication"); //$NON-NLS-1$
+
+						for (String prefix : keysToWatch)
+						{
+							if (event.getKey().startsWith(prefix))
+							{
+								final String scopeSelector = "override." + prefix; //$NON-NLS-1$
+								// If it's color and getting set to null, then it probably means that user
+								// chose to restore defaults. Does that mean we should remove override?
+								if (event.getNewValue() == null && event.getKey().endsWith("Color")) //$NON-NLS-1$
+								{
+									// Do we need to run this in a delayed job to avoid clashes when the other pref
+									// changes come through at same time...?
+									Job job = new UIJob("Restoring overrides of Annotation") //$NON-NLS-1$
+									{
+										@Override
+										public IStatus runInUIThread(IProgressMonitor monitor)
+										{
+											ThemeRule rule = getCurrentTheme().getRuleForSelector(
+													new ScopeSelector(scopeSelector));
+											if (rule != null)
+											{
+												getCurrentTheme().remove(rule);
+											}
+											return Status.OK_STATUS;
+										}
+									};
+									job.setSystem(!EclipseUtil.showSystemJobs());
+									job.setPriority(Job.DECORATE);
+									job.schedule();
+								}
+								else
+								{
+									if (!getCurrentTheme().hasEntry(scopeSelector))
+									{
+										// Store that the user has overridden this annotation in this theme
+										int index = getCurrentTheme().getTokens().size();
+										getCurrentTheme().addNewRule(index, "Annotation Override - " + prefix,
+												new ScopeSelector(scopeSelector), null);
+									}
+
+								}
+								break;
+							}
+						}
+					}
+				});
 	}
 
 	public static ThemeManager instance()
@@ -141,52 +208,67 @@ public class ThemeManager implements IThemeManager
 
 		// Set the color for the search result annotation, the pref key is "searchResultIndicationColor"
 		prefs = new InstanceScope().getNode("org.eclipse.ui.editors"); //$NON-NLS-1$
-		prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		if (!theme.hasEntry("override.searchResultIndication")) //$NON-NLS-1$
+		{
+			prefs.put("searchResultIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+		}
 		// TODO Move this stuff over to theme change listeners in the XML/HTML/Ruby editor plugins?
-		prefs.putBoolean("xmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
-		prefs.putBoolean("xmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("xmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
-		prefs.put("xmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
-		prefs.putBoolean("htmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
-		prefs.putBoolean("htmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
-		prefs.put("htmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
-		prefs.putBoolean("rubyBlockPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
-		prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
-		prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
-		prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		if (!theme.hasEntry("override.xmlTagPairOccurrenceIndication")) //$NON-NLS-1$
+		{
+			prefs.putBoolean("xmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
+			prefs.putBoolean("xmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
+			prefs.put("xmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
+			prefs.put("xmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		}
+		if (!theme.hasEntry("override.htmlTagPairOccurrenceIndication")) //$NON-NLS-1$
+		{
+			prefs.putBoolean("htmlTagPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
+			prefs.putBoolean("htmlTagPairOccurrenceIndication", true); //$NON-NLS-1$
+			prefs.put("htmlTagPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
+			prefs.put("htmlTagPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		}
+		if (!theme.hasEntry("override.rubyBlockPairOccurrenceIndication")) //$NON-NLS-1$
+		{
+			prefs.putBoolean("rubyBlockPairOccurrenceIndicationHighlighting", false); //$NON-NLS-1$
+			prefs.putBoolean("rubyBlockPairOccurrenceIndication", true); //$NON-NLS-1$
+			prefs.put("rubyBlockPairOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
+			prefs.put("rubyBlockPairOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+		}
 		// PyDev Occurrences (com.python.pydev.occurrences)
 		// Override them if pydev is set to use our themes
 		if (Platform.getPreferencesService().getBoolean("org.python.pydev.red_core", "PYDEV_USE_APTANA_THEMES", true, //$NON-NLS-1$ //$NON-NLS-2$
 				null))
 		{
-			MarkerAnnotationPreferences preferences = new MarkerAnnotationPreferences();
-			AnnotationPreference pydevOccurPref = null;
-			for (Object obj : preferences.getAnnotationPreferences())
+			if (!theme.hasEntry("override.pydevOccurrenceIndication")) //$NON-NLS-1$
 			{
-				AnnotationPreference pref = (AnnotationPreference) obj;
-				Object type = pref.getAnnotationType();
-				if ("com.python.pydev.occurrences".equals(type)) //$NON-NLS-1$
+				MarkerAnnotationPreferences preferences = new MarkerAnnotationPreferences();
+				AnnotationPreference pydevOccurPref = null;
+				for (Object obj : preferences.getAnnotationPreferences())
 				{
-					pydevOccurPref = pref;
+					AnnotationPreference pref = (AnnotationPreference) obj;
+					Object type = pref.getAnnotationType();
+					if ("com.python.pydev.occurrences".equals(type)) //$NON-NLS-1$
+					{
+						pydevOccurPref = pref;
+					}
 				}
-			}
-			if (pydevOccurPref != null)
-			{
-				if (pydevOccurPref.getTextStylePreferenceKey() != null)
+				if (pydevOccurPref != null)
 				{
-					// Now that pydev supports text style, use the box style and don't highlight.
-					prefs.putBoolean("pydevOccurrenceHighlighting", false); //$NON-NLS-1$
-					prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
-					prefs.put("pydevOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
-					prefs.put("pydevOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
-				}
-				else
-				{
-					// Must use highlighting, since we're against older pydev that had no text style
-					prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
-					prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
-					prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+					if (pydevOccurPref.getTextStylePreferenceKey() != null)
+					{
+						// Now that pydev supports text style, use the box style and don't highlight.
+						prefs.putBoolean("pydevOccurrenceHighlighting", false); //$NON-NLS-1$
+						prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+						prefs.put("pydevOccurrenceIndicationColor", toString(theme.getOccurenceHighlightColor())); //$NON-NLS-1$
+						prefs.put("pydevOccurrenceIndicationTextStyle", AnnotationPreference.STYLE_BOX); //$NON-NLS-1$
+					}
+					else
+					{
+						// Must use highlighting, since we're against older pydev that had no text style
+						prefs.putBoolean("pydevOccurrenceHighlighting", true); //$NON-NLS-1$
+						prefs.putBoolean("pydevOccurrenceIndication", true); //$NON-NLS-1$
+						prefs.put("pydevOccurrenceIndicationColor", toString(theme.getSearchResultColor())); //$NON-NLS-1$
+					}
 				}
 			}
 		}

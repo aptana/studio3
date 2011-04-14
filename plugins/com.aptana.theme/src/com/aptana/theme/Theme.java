@@ -326,7 +326,7 @@ public class Theme
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
-	ThemeRule getRuleForSelector(IScopeSelector match)
+	public ThemeRule getRuleForSelector(IScopeSelector match)
 	{
 		for (ThemeRule rule : coloringRules)
 		{
@@ -700,7 +700,12 @@ public class Theme
 
 	public void addNewDefaultToken(int index, String newTokenName)
 	{
-		coloringRules.add(index, new ThemeRule(newTokenName, null, new DelayedTextAttribute(null)));
+		addNewRule(index, newTokenName, null, new DelayedTextAttribute(null));
+	}
+
+	public void addNewRule(int index, String ruleName, ScopeSelector selector, DelayedTextAttribute attr)
+	{
+		coloringRules.add(index, new ThemeRule(ruleName, selector, attr));
 		wipeCache();
 		save();
 	}

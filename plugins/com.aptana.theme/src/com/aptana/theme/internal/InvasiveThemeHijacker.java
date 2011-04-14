@@ -861,11 +861,11 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 
 	protected void setEditorValues(Theme theme, IEclipsePreferences prefs, boolean revertToDefaults)
 	{
+		// FIXME Check for overrides in theme
 		if (revertToDefaults)
 		{
 			prefs.remove("occurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("writeOccurrenceIndicationColor"); //$NON-NLS-1$
-			prefs.remove("pydevOccurrenceIndicationColor"); //$NON-NLS-1$
 			prefs.remove("currentIPColor"); //$NON-NLS-1$
 			prefs.remove("secondaryIPColor"); //$NON-NLS-1$
 
@@ -900,7 +900,6 @@ public class InvasiveThemeHijacker extends UIJob implements IPartListener, IPref
 
 			prefs.put("occurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			prefs.put("writeOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
-			prefs.put("pydevOccurrenceIndicationColor", StringConverter.asString(theme.getSelectionAgainstBG())); //$NON-NLS-1$
 			// Override the debug line highlight colors
 			prefs.put("currentIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
 			prefs.put("secondaryIPColor", StringConverter.asString(theme.getBackgroundAsRGB("meta.diff.header"))); //$NON-NLS-1$ //$NON-NLS-2$
