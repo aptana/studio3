@@ -39,6 +39,7 @@ public class ProjectTemplatesManager
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_LOCATION = "location"; //$NON-NLS-1$
 	private static final String ATTR_DESCRIPTION = "description"; //$NON-NLS-1$
+	private static final String ATTR_ICON = "icon"; //$NON-NLS-1$
 	private static final String ATTR_TYPE = "type"; //$NON-NLS-1$
 
 	private Map<TemplateType, List<IProjectTemplate>> projectTemplates;
@@ -117,7 +118,15 @@ public class ProjectTemplatesManager
 			{
 				description = StringUtil.EMPTY;
 			}
-			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, description);
+
+			String icon = element.getAttribute(ATTR_ICON);
+			URL iconURL = null;
+			if (icon != null)
+			{
+				iconURL = bundle.getEntry(icon);
+			}
+
+			IProjectTemplate projectTemplate = new ProjectTemplate(path, type, name, description, iconURL);
 			templates.add(projectTemplate);
 		}
 	}
