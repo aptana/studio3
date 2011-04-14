@@ -10,4 +10,6 @@ package com.aptana.core.resources;
 public interface IMarkerConstants
 {
 	public static final String PROBLEM_MARKER = "com.aptana.core.problem"; //$NON-NLS-1$
+
+	public static final String TASK_MARKER = "com.aptana.core.task"; //$NON-NLS-1$
 }
