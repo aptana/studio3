@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension-point id="deployWizards" name="%deployWizards.extension.name" schema="schema/deployWizards.exsd"/>
+
+ <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.aptana.deploy.internal.handlers.RunDeployWizardHandler"
+            id="com.aptana.deploy.commands.deploywizard"
+            name="%DeployWizard.label">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+            <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.wizard">
+         <command
+               commandId="com.aptana.deploy.commands.deploywizard"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                     <test
+                           property="org.eclipse.core.resources.open"
+                           value="open">
+                     </test>
+                  </adapt>
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      </extension>
+</fragment>

@@ -15,8 +15,6 @@ public class Messages extends NLS
 
 	public static String CommandsActionProvider_TTP_Commands;
 
-	public static String DeployPopupContributionItem_Text;
-
 	public static String FilteringProjectView_LBL_FilteringFor;
 	public static String FilteringProjectView_SearchByFilenameLabel;
 	public static String FilteringProjectView_SearchContentLabel;
@@ -27,18 +25,9 @@ public class Messages extends NLS
 	public static String GitProjectView_PullChangesTooltipMessage;
 	public static String GitProjectView_PushChangesTooltipMessage;
 
-	public static String SingleProjectView_OpenBrowserItem;
 	public static String SingleProjectView_OpenProjectButton;
-	public static String SingleProjectView_OpenSSHSubmenuLabel;
-	public static String SingleProjectView_RecipesSubmenuLabel;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;
-	public static String SingleProjectView_DeploymentSubmenuLabel;
-	public static String SingleProjectView_SharingSubmenuLabel;
-	public static String SingleProjectView_DatabaseSubmenuLabel;
-	public static String SingleProjectView_MaintenanceSubmenuLabel;
-	public static String SingleProjectView_RemoteSubmenuLabel;
 	public static String SingleProjectView_ClosedProjectSelectedLabel;
-	public static String SingleProjectView_ConfigVarsSubmenuLabel;
 	public static String SingleProjectView_CreateProjectButtonLabel;
 	public static String SingleProjectView_ImportProjectButtonLabel;
 	public static String SingleProjectView_NoProjectsDescription;
