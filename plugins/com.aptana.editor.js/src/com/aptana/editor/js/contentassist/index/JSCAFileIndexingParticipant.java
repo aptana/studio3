@@ -93,6 +93,7 @@ public class JSCAFileIndexingParticipant extends AbstractFileIndexingParticipant
 
 				// parse
 				reader.read(isr, context);
+				sub.worked(50);
 
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
