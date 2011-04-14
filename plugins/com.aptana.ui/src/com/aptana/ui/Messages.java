@@ -14,6 +14,12 @@ public class Messages extends NLS
 
 	private static final String BUNDLE_NAME = "com.aptana.ui.messages"; //$NON-NLS-1$
 
+	public static String DiagnosticDialog_close_label;
+
+	public static String DiagnosticDialog_copy_clipboard_label;
+
+	public static String DiagnosticDialog_run_diagnostic_title;
+
 	public static String DialogUtils_HideMessage;
 
 	public static String IDialogConstants_LBL_Apply;
@@ -28,6 +34,26 @@ public class Messages extends NLS
 	public static String AptanaPreferencePage_Auto_Migrate_Projects;
 
 	public static String AptanaPreferencePage_EnableDebugModeLabel;
+
+	public static String EclipseDiagnosticLog_eclipse_version;
+
+	public static String EclipseDiagnosticLog_host_os;
+
+	public static String EclipseDiagnosticLog_install_dir;
+
+	public static String EclipseDiagnosticLog_jre_home;
+
+	public static String EclipseDiagnosticLog_jre_vendor;
+
+	public static String EclipseDiagnosticLog_jre_version;
+
+	public static String EclipseDiagnosticLog_language;
+
+	public static String EclipseDiagnosticLog_os_arch;
+
+	public static String EclipseDiagnosticLog_vm_args;
+
+	public static String EclipseDiagnosticLog_workspace_dir;
 
 	static
 	{
