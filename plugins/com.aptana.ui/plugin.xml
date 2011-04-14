@@ -3,7 +3,7 @@
 <plugin>
    <extension-point id="propertyDialogs" name="%extension-point.propertydialogs.name" schema="schema/propertyDialogs.exsd"/>
    <extension-point id="imageAssociations" name="%extension-point.imageassociations.name" schema="schema/imageAssociations.exsd"/>
-   <extension-point id="diagnostic" name="diagnostic" schema="schema/diagnostic.exsd"/>
+   <extension-point id="diagnostic" name="%extension-point.diagnostic.name" schema="schema/diagnostic.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
