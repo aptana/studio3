@@ -25,7 +25,6 @@ import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
-import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -163,10 +162,33 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 
 				for (AliasElement alias : aliases)
 				{
-					PropertyElement property = new PropertyElement();
+					String typeName = alias.getType();
 
-					property.setName(alias.getName());
-					property.addType(JSTypeMapper.getInstance().getMappedType(alias.getType()));
+					// NOTE: we currently assume we can only alias types that were encountered in this sdocml file
+					PropertyElement property = window.getProperty(typeName);
+
+					if (property != null)
+					{
+						// we found a property, now clone it
+						if (property instanceof FunctionElement)
+						{
+							property = new FunctionElement((FunctionElement) property);
+						}
+						else
+						{
+							property = new PropertyElement(property);
+						}
+
+						// and change the name to match our alias
+						property.setName(alias.getName());
+					}
+					else
+					{
+						// didn't find anything, so create a new property
+						property = new PropertyElement();
+						property.setName(alias.getName());
+						property.addType(typeName);
+					}
 
 					window.addProperty(property);
 				}
