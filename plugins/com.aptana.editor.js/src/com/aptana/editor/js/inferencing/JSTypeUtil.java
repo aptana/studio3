@@ -464,7 +464,7 @@ public class JSTypeUtil
 
 		if (isFunctionPrefix(type) == false)
 		{
-			type = JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
+			result = JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
 		}
 
 		return result;

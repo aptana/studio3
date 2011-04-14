@@ -25,6 +25,7 @@ import com.aptana.editor.js.contentassist.model.AliasElement;
 import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -125,17 +126,17 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 								// remove the constructor and make it a global function
 								type.removeProperty(constructor);
 								window.addProperty(constructor);
+							}
 
-								// wrap the type name in Function<> and update the property owningType references to
-								// that name
-								String newName = JSTypeUtil.toFunctionType(typeName);
+							// wrap the type name in Function<> and update the property owningType references to
+							// that name
+							String newName = JSTypeUtil.toFunctionType(typeName);
 
-								type.setName(newName);
+							type.setName(newName);
 
-								for (PropertyElement property : type.getProperties())
-								{
-									property.setOwningType(newName);
-								}
+							for (PropertyElement property : type.getProperties())
+							{
+								property.setOwningType(newName);
 							}
 						}
 						else
@@ -165,7 +166,7 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 					PropertyElement property = new PropertyElement();
 
 					property.setName(alias.getName());
-					property.addType(alias.getType());
+					property.addType(JSTypeMapper.getInstance().getMappedType(alias.getType()));
 
 					window.addProperty(property);
 				}
