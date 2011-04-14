@@ -9,6 +9,7 @@ package com.aptana.editor.js.contentassist.index;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.filesystem.EFS;
@@ -20,8 +21,11 @@ import org.eclipse.core.runtime.SubMonitor;
 
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
+import com.aptana.editor.js.contentassist.model.AliasElement;
+import com.aptana.editor.js.contentassist.model.FunctionElement;
 import com.aptana.editor.js.contentassist.model.PropertyElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
+import com.aptana.editor.js.inferencing.JSTypeMapper;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
@@ -81,9 +85,6 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 				reader.loadXML(stream);
 				sub.worked(50);
 
-				// process results
-				JSIndexWriter indexer = new JSIndexWriter();
-
 				// create new Window type for this file
 				JSIndexReader jsir = new JSIndexReader();
 				TypeElement window = jsir.getType(index, JSTypeConstants.WINDOW_TYPE, true);
@@ -94,10 +95,14 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 					window.setName(JSTypeConstants.WINDOW_TYPE);
 				}
 
+				// process results
+				JSIndexWriter indexer = new JSIndexWriter();
+				TypeElement[] types = reader.getTypes();
+				AliasElement[] aliases = reader.getAliases();
 				URI location = file.toURI();
 
 				// write types and add properties to Window
-				for (TypeElement type : reader.getTypes())
+				for (TypeElement type : types)
 				{
 					// apply user agents to type
 					JSTypeUtil.addAllUserAgents(type);
@@ -108,27 +113,62 @@ public class SDocMLFileIndexingParticipant extends AbstractFileIndexingParticipa
 						JSTypeUtil.addAllUserAgents(property);
 					}
 
-					// write type
-					indexer.writeType(index, type, location);
-
 					String typeName = type.getName();
 
 					if (typeName.contains(".") == false && typeName.startsWith(JSTypeConstants.GENERIC_CLASS_OPEN) == false) //$NON-NLS-1$
 					{
-						PropertyElement property = window.getProperty(typeName);
+						List<FunctionElement> constructors = type.getConstructors();
 
-						if (property == null)
+						if (constructors.isEmpty() == false)
 						{
-							property = new PropertyElement();
+							for (FunctionElement constructor : constructors)
+							{
+								// remove the constructor and make it a global function
+								type.removeProperty(constructor);
+								window.addProperty(constructor);
+							}
 
-							property.setName(typeName);
-							property.addType(typeName);
+							// wrap the type name in Function<> and update the property owningType references to
+							// that name
+							String newName = JSTypeUtil.toFunctionType(typeName);
 
-							JSTypeUtil.addAllUserAgents(property);
+							type.setName(newName);
 
-							window.addProperty(property);
+							for (PropertyElement property : type.getProperties())
+							{
+								property.setOwningType(newName);
+							}
+						}
+						else
+						{
+							PropertyElement property = window.getProperty(typeName);
+
+							if (property == null)
+							{
+								property = new PropertyElement();
+
+								property.setName(typeName);
+								property.addType(typeName);
+
+								JSTypeUtil.addAllUserAgents(property);
+
+								window.addProperty(property);
+							}
 						}
 					}
+
+					// NOTE: we write the type after processing top-level types in case the type name changes
+					indexer.writeType(index, type, location);
+				}
+
+				for (AliasElement alias : aliases)
+				{
+					PropertyElement property = new PropertyElement();
+
+					property.setName(alias.getName());
+					property.addType(JSTypeMapper.getInstance().getMappedType(alias.getType()));
+
+					window.addProperty(property);
 				}
 
 				// write global type info

@@ -453,6 +453,24 @@ public class JSTypeUtil
 	}
 
 	/**
+	 * toFunctionType
+	 * 
+	 * @param type
+	 * @return
+	 */
+	public static String toFunctionType(String type)
+	{
+		String result = type;
+
+		if (isFunctionPrefix(type) == false)
+		{
+			result = JSTypeConstants.GENERIC_FUNCTION_OPEN + type + JSTypeConstants.GENERIC_CLOSE;
+		}
+
+		return result;
+	}
+
+	/**
 	 * JSContentAssistUtil
 	 */
 	private JSTypeUtil()
