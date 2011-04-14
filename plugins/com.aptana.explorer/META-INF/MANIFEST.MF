@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui,
  com.aptana.editor.html,
  com.aptana.index.core,
  com.aptana.theme,
- org.eclipse.ui.navigator.resources
+ org.eclipse.ui.navigator.resources,
+ com.aptana.deploy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-Localization: plugin

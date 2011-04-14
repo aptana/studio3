@@ -8,6 +8,7 @@
 package com.aptana.core.projectTemplates;
 
 import java.io.File;
+import java.net.URL;
 
 /**
  * A project template interface.
@@ -50,4 +51,11 @@ public interface IProjectTemplate
 	 * @return
 	 */
 	public TemplateType getType();
+
+	/**
+	 * getIconPath
+	 * 
+	 * @return The template's icon path as URL (can be null)
+	 */
+	public URL getIconPath();
 }
