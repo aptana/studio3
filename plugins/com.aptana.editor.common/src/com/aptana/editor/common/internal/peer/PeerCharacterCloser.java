@@ -63,6 +63,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	private Stack<BracketLevel> fBracketLevelStack = new Stack<BracketLevel>();
 	private List<Character> pairs = Collections.emptyList();
 	private boolean autoInsertEnabled = true;
+	private boolean autoWrapEnabled = true;
 
 	private static final IScopeSelector fgCommentSelector = new ScopeSelector("comment"); //$NON-NLS-1$
 	private static final IScopeSelector fgStringSelector = new ScopeSelector("string"); //$NON-NLS-1$
@@ -105,7 +106,7 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 				return;
 			}
 
-			if (length > 0)
+			if (length > 0 && isAutoWrapEnabled())
 			{
 				wrapSelection(event, document, offset, length);
 				return;
@@ -511,13 +512,12 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 
 	/**
 	 * Do we automatically insert matching characters?
-	 * @param autoInsertEnabled
 	 */
 	public boolean isAutoInsertEnabled()
 	{
 		return autoInsertEnabled;
 	}
-	
+
 	/**
 	 * Set the automatic insertion of matching characters on or off
 	 * @param autoInsertEnabled
@@ -525,6 +525,24 @@ public class PeerCharacterCloser implements VerifyKeyListener, ILinkedModeListen
 	public void setAutoInsertEnabled(boolean autoInsertEnabled)
 	{
 		this.autoInsertEnabled = autoInsertEnabled;
+	}
+
+	/**
+	 * Do we automatically wrap selected text?
+	 */
+	public boolean isAutoWrapEnabled()
+	{
+		return autoWrapEnabled;
+	}
+
+	/**
+	 * Set the automatic wrapping of selected text on or off
+	 * 
+	 * @param autoWrapEnabled
+	 */
+	public void setAutoWrapEnabled(boolean autoWrapEnabled)
+	{
+		this.autoWrapEnabled = autoWrapEnabled;
 	}
 
 	/**

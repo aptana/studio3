@@ -98,4 +98,27 @@ public class CompareWithRevisionHandler extends AbstractCompareRevisionHandler
 		return null;
 	}
 
+	protected boolean calculateEnabled()
+	{
+		Collection<IResource> resources = getSelectedResources();
+		if (resources == null || resources.isEmpty())
+		{
+			return false;
+		}
+		for (IResource blah : resources)
+		{
+			if (blah == null || blah.getType() != IResource.FILE)
+			{
+				continue;
+			}
+			GitRepository repo = getGitRepositoryManager().getAttached(blah.getProject());
+			if (repo == null)
+			{
+				continue;
+			}
+			return true;
+		}
+		return false;
+	}
+
 }

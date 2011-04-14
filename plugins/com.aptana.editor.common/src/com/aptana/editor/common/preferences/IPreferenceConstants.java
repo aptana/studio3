@@ -74,6 +74,11 @@ public interface IPreferenceConstants
 	public static final String EDITOR_PEER_CHARACTER_CLOSE = CommonEditorPlugin.PLUGIN_ID + ".editorPeerCharacterClose"; //$NON-NLS-1$
 
 	/**
+	 * Do we automatically wrap selections with matching chars?
+	 */
+	public static final String EDITOR_WRAP_SELECTION = CommonEditorPlugin.PLUGIN_ID + ".editorWrapSelection"; //$NON-NLS-1$
+
+	/**
 	 * The preference key for the comma-separated list of selected validators for a language
 	 */
 	public static final String SELECTED_VALIDATORS = CommonEditorPlugin.PLUGIN_ID + ".selectedValidators"; //$NON-NLS-1$

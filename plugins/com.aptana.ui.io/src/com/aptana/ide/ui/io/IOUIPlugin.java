@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
@@ -46,7 +47,7 @@ import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.core.io.IConnectionPointManager;
 import com.aptana.ide.core.io.events.ConnectionPointEvent;
 import com.aptana.ide.core.io.events.IConnectionPointListener;
-import com.aptana.ide.ui.io.navigator.IRefreshableNavigator;
+import com.aptana.ide.ui.io.navigator.FileSystemElementComparer;
 import com.aptana.ide.ui.io.navigator.RemoteNavigatorView;
 import com.aptana.theme.IThemeManager;
 import com.aptana.theme.ThemePlugin;
@@ -127,7 +128,9 @@ public class IOUIPlugin extends AbstractUIPlugin
 		{
 			if (part instanceof ProjectExplorer)
 			{
-				final Tree tree = ((ProjectExplorer) part).getCommonViewer().getTree();
+				CommonViewer viewer = ((ProjectExplorer) part).getCommonViewer();
+				viewer.setComparer(new FileSystemElementComparer());
+				final Tree tree = viewer.getTree();
 				tree.addMouseListener(new MouseAdapter()
 				{
 
@@ -285,21 +288,26 @@ public class IOUIPlugin extends AbstractUIPlugin
 		{
 			return;
 		}
-		if (viewPart instanceof IRefreshableNavigator)
-		{
-			((IRefreshableNavigator) viewPart).refresh(element);
-		}
-		else if (viewPart instanceof CommonNavigator)
+		if (viewPart instanceof CommonNavigator)
 		{
 			CommonViewer viewer = ((CommonNavigator) viewPart).getCommonViewer();
 			if (element == null)
 			{
 				// full refresh
+				System.err.println("FIXME: full refresh for "+viewer.getClass().getSimpleName());
 				viewer.refresh();
 			}
 			else
 			{
-				viewer.refresh(element);
+				Widget widget = viewer.testFindItem(element);
+				if (widget != null)
+				{
+					Object data = widget.getData();
+					if (data != null)
+					{
+						viewer.refresh(data);
+					}
+				}
 			}
 		}
 
