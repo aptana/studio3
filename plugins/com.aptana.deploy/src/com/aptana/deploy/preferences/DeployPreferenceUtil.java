@@ -56,7 +56,7 @@ public class DeployPreferenceUtil
 				return DeployType.RED_HAT;
 			}
 		}
-		return null;
+		return DeployType.NONE;
 	}
 
 	public static String getDeployEndpoint(IProject project)
