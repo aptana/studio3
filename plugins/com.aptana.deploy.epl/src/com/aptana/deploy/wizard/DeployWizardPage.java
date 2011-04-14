@@ -52,8 +52,6 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
-import com.aptana.deploy.DeployPlugin;
-
 @SuppressWarnings("restriction")
 public class DeployWizardPage extends WorkbenchWizardSelectionPage
 {
@@ -254,7 +252,7 @@ public class DeployWizardPage extends WorkbenchWizardSelectionPage
 	 */
 	protected Composite createTreeViewer(Composite parent)
 	{
-		IWizardCategory root = DeployPlugin.getDefault().getDeployWizardRegistry().getRootCategory();
+		IWizardCategory root = DeployWizardRegistry.getInstance().getRootCategory();
 		wizardTree = new CategorizedWizardSelectionTree(root, "Select a Deployment Provider: ");
 		Composite exportComp = wizardTree.createControl(parent);
 		wizardTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener()

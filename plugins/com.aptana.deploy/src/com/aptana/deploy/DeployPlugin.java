@@ -13,10 +13,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.BundleContext;
-
-import com.aptana.deploy.wizard.DeployWizardRegistry;
 
 public class DeployPlugin extends AbstractUIPlugin
 {
@@ -86,11 +83,6 @@ public class DeployPlugin extends AbstractUIPlugin
 	public static void logError(CoreException e)
 	{
 		getDefault().getLog().log(e.getStatus());
-	}
-
-	public IWizardRegistry getDeployWizardRegistry()
-	{
-		return DeployWizardRegistry.getInstance();
 	}
 
 	public static Image getImage(String string)
