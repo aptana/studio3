@@ -1831,7 +1831,7 @@ public class SmartSyncDialog extends TitleAreaDialog implements SelectionListene
 						if (viewPart instanceof RemoteNavigatorView)
 						{
 							RemoteNavigatorView view = (RemoteNavigatorView) viewPart;
-							view.refresh(serverConnection);
+							view.getCommonViewer().refresh(serverConnection);
 						}
 					}
 					catch (PartInitException e)
