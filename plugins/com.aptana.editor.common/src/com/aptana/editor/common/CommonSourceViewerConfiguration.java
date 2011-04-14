@@ -11,18 +11,26 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.internal.text.html.HTMLTextPresenter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.DefaultTextHover;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
+import org.eclipse.jface.text.ITextHover;
+import org.eclipse.jface.text.ITextHoverExtension;
+import org.eclipse.jface.text.ITextHoverExtension2;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
@@ -38,6 +46,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
 
@@ -45,7 +55,9 @@ import com.aptana.editor.common.contentassist.ContentAssistant;
 import com.aptana.editor.common.hover.CommonAnnotationHover;
 import com.aptana.editor.common.hover.ThemedInformationControl;
 import com.aptana.editor.common.internal.formatter.CommonMultiPassContentFormatter;
+import com.aptana.editor.common.internal.hover.TextHoverDescriptor;
 import com.aptana.editor.common.preferences.IPreferenceConstants;
+import com.aptana.editor.common.scripting.QualifiedContentType;
 import com.aptana.editor.common.text.CommonDoubleClickStrategy;
 import com.aptana.editor.common.text.RubyRegexpAutoIndentStrategy;
 import com.aptana.editor.common.text.reconciler.CommonCompositeReconcilingStrategy;
@@ -56,8 +68,7 @@ import com.aptana.theme.Theme;
 import com.aptana.theme.ThemePlugin;
 
 @SuppressWarnings("restriction")
-public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements
-		ITopContentTypesProvider
+public abstract class CommonSourceViewerConfiguration extends TextSourceViewerConfiguration implements ITopContentTypesProvider
 {
 	private AbstractThemeableEditor fTextEditor;
 	private CommonDoubleClickStrategy fDoubleClickStrategy;
@@ -381,6 +392,20 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 		return ThemePlugin.getDefault().getColorManager().getColor(bg);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.editors.text.TextSourceViewerConfiguration#getTextHover(org.eclipse.jface.text.source.ISourceViewer, java.lang.String)
+	 */
+	@Override
+	public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType)
+	{
+		return new TextHover(sourceViewer);
+	}
+
+	protected IInformationControl createTextHoverInformationControl(Shell parent, String statusFieldText)
+	{
+		return new ThemedInformationControl(parent, SWT.NONE, new HTMLTextPresenter(true), statusFieldText);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.jface.text.source.SourceViewerConfiguration#getInformationPresenter(org.eclipse.jface.text.source.ISourceViewer)
@@ -477,5 +502,69 @@ public abstract class CommonSourceViewerConfiguration extends TextSourceViewerCo
 	protected Theme getCurrentTheme()
 	{
 		return ThemePlugin.getDefault().getThemeManager().getCurrentTheme();
+	}
+
+	private class TextHover extends DefaultTextHover implements ITextHoverExtension, ITextHoverExtension2 {
+
+		private ITextHover activeTextHover;
+		
+		public TextHover(ISourceViewer sourceViewer) {
+			super(sourceViewer);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.text.ITextHoverExtension2#getHoverInfo2(org.eclipse.jface.text.ITextViewer, org.eclipse.jface.text.IRegion)
+		 */
+		@SuppressWarnings("deprecation")
+		public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
+			activeTextHover = null;
+			try {
+				QualifiedContentType contentType = CommonEditorPlugin.getDefault().getDocumentScopeManager().getContentType(textViewer.getDocument(), hoverRegion.getOffset());
+				EvaluationContext context = new EvaluationContext(null, textViewer);
+				context.addVariable(ISources.ACTIVE_EDITOR_ID_NAME, fTextEditor.getSite().getId());
+				for (TextHoverDescriptor descriptor : TextHoverDescriptor.getContributedHovers()) {
+					if (descriptor.isEnabledFor(contentType, context)) {
+						ITextHover textHover = descriptor.createTextHover();
+						Object info = null;
+						if (textHover instanceof ITextHoverExtension2) {
+							info = ((ITextHoverExtension2) textHover).getHoverInfo2(textViewer, hoverRegion);
+						} else if (textHover != null) {
+							info = textHover.getHoverInfo(textViewer, hoverRegion);
+						}
+						if (info != null) {
+							activeTextHover = textHover;
+							return info;
+						}
+					}
+				}
+			} catch (BadLocationException e) {
+			}
+			return super.getHoverInfo(textViewer, hoverRegion);
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
+		 */
+		public IInformationControlCreator getHoverControlCreator() {
+			if (activeTextHover instanceof ITextHoverExtension) {
+				return ((ITextHoverExtension) activeTextHover).getHoverControlCreator();
+			}
+			return new IInformationControlCreator() {
+				public IInformationControl createInformationControl(Shell parent) {
+					return createTextHoverInformationControl(parent, EditorsUI.getTooltipAffordanceString());
+				}
+			};
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.jface.text.DefaultTextHover#isIncluded(org.eclipse.jface.text.source.Annotation)
+		 */
+		@Override
+		protected boolean isIncluded(Annotation annotation) {
+			return isShownInText(annotation);
+		}
 	}
 }

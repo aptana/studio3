@@ -18,11 +18,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.navigator.CommonNavigator;
 
-import com.aptana.ide.core.io.IConnectionPointCategory;
 import com.aptana.theme.IControlThemerFactory;
 import com.aptana.theme.ThemePlugin;
 
-public class RemoteNavigatorView extends CommonNavigator implements IRefreshableNavigator
+public class RemoteNavigatorView extends CommonNavigator
 {
 
 	public static final String ID = "com.aptana.ui.io.remoteview"; //$NON-NLS-1$
@@ -83,22 +82,4 @@ public class RemoteNavigatorView extends CommonNavigator implements IRefreshable
 		return ThemePlugin.getDefault().getControlThemerFactory();
 	}
 
-	public void refresh()
-	{
-		getCommonViewer().refresh();
-	}
-
-	public void refresh(Object element)
-	{
-		// if the content of the remote category changed, refresh the root
-		if (element == null
-				|| (element instanceof IConnectionPointCategory && ((IConnectionPointCategory) element).isRemote()))
-		{
-			refresh();
-		}
-		else
-		{
-			getCommonViewer().refresh(element);
-		}
-	}
 }

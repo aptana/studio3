@@ -900,16 +900,16 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 		TableItem[] items = table.getItems();
 		for (int i = 0; i < items.length; i++)
 		{
-			ThemeRule commit = (ThemeRule) items[i].getData();
-			if (commit.getTextAttribute().getForeground() != null)
+			ThemeRule rule = (ThemeRule) items[i].getData();
+			if (rule.getTextAttribute().getForeground() != null)
 			{
-				createButton(table, items[i], 1, commit.getTextAttribute().getForeground());
+				createButton(table, items[i], 1, rule.getTextAttribute().getForeground());
 			}
-			if (commit.getTextAttribute().getBackground() != null)
+			if (rule.getTextAttribute().getBackground() != null)
 			{
-				createButton(table, items[i], 2, commit.getTextAttribute().getBackground());
+				createButton(table, items[i], 2, rule.getTextAttribute().getBackground());
 			}
-			createFontStyle(table, items[i], commit.getTextAttribute());
+			createFontStyle(table, items[i], rule.getTextAttribute());
 		}
 	}
 
@@ -994,20 +994,14 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 	{
 		TableEditor editor = new TableEditor(table);
 		Button button = new Button(table, SWT.PUSH | SWT.FLAT);
-		Image image = new Image(table.getDisplay(), 16, 16);
-		GC gc = new GC(image);
-		if (color != null)
-		{
-			gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(color.toRGB()));
-		}
-		gc.fillRectangle(0, 0, 16, 16);
-		gc.dispose();
+		Image image = createColorImage(table, color);
 		button.setImage(image);
 		button.pack();
 		editor.minimumWidth = button.getSize().x - 4;
 		editor.horizontalAlignment = SWT.CENTER;
 		editor.setEditor(button, tableItem, index);
 		fTableEditors.add(editor);
+		button.setData("color", color); //$NON-NLS-1$
 
 		button.addSelectionListener(new SelectionAdapter()
 		{
@@ -1015,21 +1009,31 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 			public void widgetSelected(SelectionEvent e)
 			{
 				ColorDialog colorDialog = new ColorDialog(table.getShell());
-				colorDialog.setRGB(color.toRGB());
+				Button self = ((Button) e.widget);
+				RGBa theColor = (RGBa) self.getData("color"); //$NON-NLS-1$
+				if (theColor == null)
+				{
+					theColor = color;
+				}
+				colorDialog.setRGB(theColor.toRGB());
 				RGB newRGB = colorDialog.open();
 				if (newRGB == null)
 				{
 					return;
 				}
 				ThemeRule token = (ThemeRule) tableItem.getData();
+				RGBa newColor = new RGBa(newRGB);
 				if (index == 1)
 				{
-					getTheme().updateRule(table.indexOf(tableItem), token.updateFG(new RGBa(newRGB)));
+					getTheme().updateRule(table.indexOf(tableItem), token.updateFG(newColor));
 				}
 				else
 				{
-					getTheme().updateRule(table.indexOf(tableItem), token.updateBG(new RGBa(newRGB)));
+					getTheme().updateRule(table.indexOf(tableItem), token.updateBG(newColor));
 				}
+				// Update the image for this button!
+				self.setImage(createColorImage(table, newColor));
+				self.setData("color", newColor); //$NON-NLS-1$
 				tableViewer.refresh();
 			}
 		});
@@ -1046,6 +1050,19 @@ public class ThemePreferencePage extends PreferencePage implements IWorkbenchPre
 				event.data = "button:" + table.indexOf(tableItem) + ":" + index; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		});
+	}
+
+	protected Image createColorImage(final Table table, final RGBa color)
+	{
+		Image image = new Image(table.getDisplay(), 16, 16);
+		GC gc = new GC(image);
+		if (color != null)
+		{
+			gc.setBackground(ThemePlugin.getDefault().getColorManager().getColor(color.toRGB()));
+		}
+		gc.fillRectangle(0, 0, 16, 16);
+		gc.dispose();
+		return image;
 	}
 
 	public void init(IWorkbench workbench)
