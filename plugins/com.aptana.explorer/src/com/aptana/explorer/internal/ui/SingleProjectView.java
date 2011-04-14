@@ -295,8 +295,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		projectsMenu = new Menu(projectsToolbar);
 		for (IProject iProject : projects)
 		{
-			// hide closed projects
-			if (!iProject.isAccessible())
+			// hide projects that don't exist
+			if (!iProject.exists())
 			{
 				continue;
 			}
@@ -305,6 +305,22 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 			final MenuItem projectNameMenuItem = new MenuItem(projectsMenu, SWT.RADIO);
 			projectNameMenuItem.setText(iProject.getName());
 			projectNameMenuItem.setSelection(false);
+			Image image = null;
+			// Visually mark closed/open projects
+			if (!iProject.isOpen())
+			{
+				image = PlatformUI.getWorkbench().getSharedImages()
+						.getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
+			}
+			else
+			{
+				image = PlatformUI.getWorkbench().getSharedImages()
+						.getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
+			}
+			if (image != null)
+			{
+				projectNameMenuItem.setImage(image);
+			}
 			projectNameMenuItem.addSelectionListener(new SelectionAdapter()
 			{
 
@@ -405,7 +421,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				action.run();
 			}
 		});
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(0, 5).applyTo(createProjectWhenNoneButton);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(0, 5)
+				.applyTo(createProjectWhenNoneButton);
 
 		importProjectWhenNoneButton = new Button(noProjectButtonsComp, SWT.FLAT);
 		importProjectWhenNoneButton.setText(Messages.SingleProjectView_ImportProjectButtonLabel);
@@ -417,7 +434,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				openImportWizard();
 			}
 		});
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(importProjectWhenNoneButton);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER)
+				.applyTo(importProjectWhenNoneButton);
 
 		return noProjectButtonsComp;
 	}
@@ -431,8 +449,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(closedProjectButtonsComp);
 
 		closedProjectlabel = new Label(closedProjectButtonsComp, SWT.WRAP);
-		closedProjectlabel
-				.setText(Messages.SingleProjectView_ClosedProjectSelectedLabel);
+		closedProjectlabel.setText(Messages.SingleProjectView_ClosedProjectSelectedLabel);
 		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).indent(5, 10)
 				.applyTo(closedProjectlabel);
 
@@ -468,7 +485,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				action.run();
 			}
 		});
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(createProjectWhenClosedButton);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER)
+				.applyTo(createProjectWhenClosedButton);
 
 		importProjectWhenClosedButton = new Button(closedProjectButtonsComp, SWT.FLAT);
 		importProjectWhenClosedButton.setText(Messages.SingleProjectView_ImportProjectButtonLabel);
@@ -480,7 +498,8 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 				openImportWizard();
 			}
 		});
-		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(importProjectWhenClosedButton);
+		GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER)
+				.applyTo(importProjectWhenClosedButton);
 
 		return closedProjectButtonsComp;
 	}
@@ -671,17 +690,18 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 
 		getControlThemerFactory().apply(closedProjectButtonsComp);
 		getControlThemerFactory().apply(closedProjectlabel);
-		
+
 		if (Platform.OS_WIN32.equals(Platform.getOS()))
 		{
-			fThemeChangeListener = new IPreferenceChangeListener() {
-				
+			fThemeChangeListener = new IPreferenceChangeListener()
+			{
+
 				public void preferenceChange(PreferenceChangeEvent event)
 				{
 					if (IThemeManager.THEME_CHANGED.equals(event.getKey()))
 					{
 						setButtonBackgrounds();
-					}					
+					}
 				}
 			};
 			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).addPreferenceChangeListener(fThemeChangeListener);
@@ -871,7 +891,7 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 		getControlThemerFactory().dispose(noProjectslabel);
 		getControlThemerFactory().dispose(closedProjectButtonsComp);
 		getControlThemerFactory().dispose(closedProjectlabel);
-		
+
 		removeThemeChangeListener();
 		removeProjectResourceListener();
 		removeActiveProjectPrefListener();
@@ -887,12 +907,11 @@ public abstract class SingleProjectView extends CommonNavigator implements Searc
 	{
 		if (fThemeChangeListener != null)
 		{
-			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(
-					fThemeChangeListener);
+			new InstanceScope().getNode(ThemePlugin.PLUGIN_ID).removePreferenceChangeListener(fThemeChangeListener);
 		}
 		fThemeChangeListener = null;
 	}
-	
+
 	private void removeProjectResourceListener()
 	{
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(fProjectsListener);
