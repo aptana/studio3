@@ -93,10 +93,7 @@
          name="%marker.css.name"
          point="org.eclipse.core.resources.markers">
       <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.textmarker">
+            type="com.aptana.core.problem">
       </super>
       <persistent
             value="true">
