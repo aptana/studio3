@@ -44,6 +44,24 @@ public class FunctionElement extends PropertyElement
 	}
 
 	/**
+	 * FunctionElement
+	 * 
+	 * @param base
+	 */
+	public FunctionElement(FunctionElement base)
+	{
+		super(base);
+
+		// NOTE: this is a shallow clone, so references are shared in lists
+		this._parameters = new ArrayList<ParameterElement>(base.getParameters());
+		this._references = new ArrayList<String>(base.getReferences());
+		this._exceptions = new ArrayList<ExceptionElement>(base.getExceptions());
+		this._returnTypes = new ArrayList<ReturnTypeElement>(base.getReturnTypes());
+		this._isConstructor = base.isConstructor();
+		this._isMethod = base.isMethod();
+	}
+
+	/**
 	 * addException
 	 * 
 	 * @param currentException
