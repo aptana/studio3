@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="com.aptana.deploy.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
+   <extension-point id="deployProviders" name="%deployProviders.extension.name" schema="schema/deployProviders.exsd"/>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="com.aptana.deploy.internal.ProjectPropertyTester"
             id="com.aptana.deploy.projectPropertyTester"
             namespace="com.aptana.deploy.project"
-            properties="isDeployType"
+            properties="isDeployable,isDeployType"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
    </extension>
@@ -24,16 +19,83 @@
             id="com.aptana.deploy.commands.deployApp"
             name="%Deploy.label">
       </command>
-      <command
-            defaultHandler="com.aptana.deploy.internal.handlers.RunDeployWizardHandler"
-            id="com.aptana.deploy.commands.deploywizard"
-            name="%DeployWizard.label">
-      </command>
-      <command
-            defaultHandler="com.aptana.deploy.internal.handlers.DeploySettingsHandler"
-            id="com.aptana.deploy.commands.ftp.settings"
-            name="%command.deploysettings.name">
-      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="com.aptana.deploy.commands.deployApp"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+M3+D">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy">
+         <separator
+               name="group.deploy"
+               visible="true">
+         </separator>
+         <separator
+               name="group.command"
+               visible="true">
+         </separator>
+         <separator
+               name="group.wizard"
+               visible="true">
+         </separator>
+         <separator
+               name="additions">
+         </separator>
+      </menuContribution>         
+         <menuContribution
+            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
+         <command
+               commandId="com.aptana.deploy.commands.deployApp"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <or>
+                     <test
+                           forcePluginActivation="true"
+                           property="com.aptana.deploy.project.isDeployable"
+                           value="true">
+                     </test>
+                  </or>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:com.aptana.explorer.view?before=group.edit">
+         <dynamic
+               class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
+               id="com.aptana.explorer.deploy.popup">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate
+                     ifEmpty="false">
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                     <test
+                           property="org.eclipse.core.resources.open"
+                           value="open">
+                     </test>
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?before=group.edit">
+         <dynamic
+               class="com.aptana.deploy.internal.ui.DeployPopupContributionItem"
+               id="com.aptana.projectexplorer.deploy.popup">
+         </dynamic>
+      </menuContribution>
    </extension>
 
 </plugin>
