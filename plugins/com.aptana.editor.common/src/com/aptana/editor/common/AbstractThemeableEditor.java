@@ -566,11 +566,13 @@ public abstract class AbstractThemeableEditor extends AbstractFoldingEditor impl
 		this.fThemeableEditorColorsExtension.handlePreferenceStoreChanged(event);
 		if (event.getProperty().equals(IPreferenceConstants.EDITOR_PEER_CHARACTER_CLOSE))
 		{
-			fPeerCharacterCloser.setAutoInsertEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue())));
+			fPeerCharacterCloser.setAutoInsertEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event
+					.getNewValue())));
 		}
 		else if (event.getProperty().equals(IPreferenceConstants.EDITOR_WRAP_SELECTION))
 		{
-			fPeerCharacterCloser.setAutoWrapEnabled((Boolean) event.getNewValue());
+			fPeerCharacterCloser
+					.setAutoWrapEnabled(Boolean.parseBoolean(StringUtil.getStringValue(event.getNewValue())));
 		}
 	}
 
