@@ -349,12 +349,14 @@ public class ThemeManager implements IThemeManager
 			try
 			{
 				String themeName = tokenizer.nextToken();
-				String xmlProps = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+				byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
 						THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
-				if (xmlProps == null || xmlProps.trim().length() == 0)
+				if (array == null)
+				{
 					continue;
+				}
 				Properties props = new OrderedProperties();
-				props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
+				props.load(new ByteArrayInputStream(array));
 				Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
 				fThemeMap.put(theme.getName(), theme);
 			}
