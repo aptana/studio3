@@ -28,6 +28,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IEclipsePreferences preferences = new DefaultScope().getNode(CorePlugin.PLUGIN_ID);
 		preferences.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, false);
 		preferences.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, true);
+		preferences.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, true);
 		preferences.put(ICorePreferenceConstants.PREF_WEB_FILES, "*.js;*.htm;*.html;*.xhtm;*.xhtml;*.css;*.xml;*.xsl;*.xslt;*.fla;*.gif;*.jpg;*.jpeg;*.php;*.asp;*.jsp;*.png;*.as;*.sdoc;*.swf;*.shtml;*.txt;*.aspx;*.asmx;"); //$NON-NLS-1$
 	}
 
