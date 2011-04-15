@@ -917,8 +917,20 @@ public class JSCAHandler implements IContextHandler
 
 	protected void createType()
 	{
-		this._currentType.setName(this._currentString);
-		this._typesByName.put(this._currentString, this._currentType);
+		// NOTE: It is assumed that the "name" property is always the first property on a type. This allows us to do the
+		// following.
+
+		if (this._typesByName.containsKey(this._currentString))
+		{
+			// Use existing type if we've already created one for the current name
+			this._currentType = this._typesByName.get(this._currentString);
+		}
+		else
+		{
+			// Otherwise, use the current empty type, set it's name, and store it in the type map
+			this._currentType.setName(this._currentString);
+			this._typesByName.put(this._currentString, this._currentType);
+		}
 
 		String[] parts = DOT_PATTERN.split(this._currentString);
 
