@@ -264,10 +264,15 @@ public class JSContextInformationValidator implements IContextInformationValidat
 		{
 			// bold the current argument name
 			int endingPosition = info.indexOf(',');
+			int closingParenPosition = info.indexOf(')');
 
 			if (endingPosition == -1)
 			{
-				endingPosition = info.indexOf(')');
+				endingPosition = closingParenPosition;
+			}
+			else if (closingParenPosition != -1)
+			{
+				endingPosition = Math.min(endingPosition, closingParenPosition);
 			}
 
 			for (int i = 0; i < argIndex; i++)
