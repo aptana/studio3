@@ -5,11 +5,15 @@
  * Please see the license.html included with this distribution for details.
  * Any modifications to this file must keep this entire header intact.
  */
-package com.aptana.core.resources;
+package com.aptana.ui;
 
-public interface IMarkerConstants
+public interface IDiagnosticLog
 {
-	public static final String PROBLEM_MARKER = "com.aptana.core.problem"; //$NON-NLS-1$
+	/**
+	 * Returns the log that should be added to the diagnostic dialog
+	 * 
+	 * @return
+	 */
+	public String getLog();
 
-	public static final String TASK_MARKER = "com.aptana.core.task"; //$NON-NLS-1$
 }

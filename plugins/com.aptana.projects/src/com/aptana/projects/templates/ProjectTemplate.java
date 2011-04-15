@@ -8,6 +8,7 @@
 package com.aptana.projects.templates;
 
 import java.io.File;
+import java.net.URL;
 
 import org.eclipse.core.runtime.Path;
 
@@ -26,6 +27,7 @@ public class ProjectTemplate implements IProjectTemplate
 	private String path;
 	private String description;
 	private String name;
+	private URL iconPath;
 
 	/**
 	 * Constructs a new ProjectTemplate
@@ -34,13 +36,15 @@ public class ProjectTemplate implements IProjectTemplate
 	 * @param type
 	 * @param name
 	 * @param description
+	 * @param iconPath
 	 */
-	public ProjectTemplate(String path, TemplateType type, String name, String description)
+	public ProjectTemplate(String path, TemplateType type, String name, String description, URL iconPath)
 	{
 		this.type = type;
 		this.path = path;
 		this.name = name;
 		this.description = description;
+		this.iconPath = iconPath;
 	}
 
 	/*
@@ -88,4 +92,12 @@ public class ProjectTemplate implements IProjectTemplate
 		return type;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.projectTemplates.IProjectTemplate#getIconPath()
+	 */
+	public URL getIconPath()
+	{
+		return iconPath;
+	}
 }
