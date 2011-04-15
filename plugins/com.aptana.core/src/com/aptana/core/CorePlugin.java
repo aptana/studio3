@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -389,8 +388,7 @@ public class CorePlugin extends Plugin
 
 		ResourceListener()
 		{
-			new DefaultScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
-			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).addPreferenceChangeListener(this);
+			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).addPreferenceChangeListener(this);
 		}
 
 		public void start()
@@ -423,15 +421,14 @@ public class CorePlugin extends Plugin
 
 		private boolean autoHookFileWatcher()
 		{
-			return Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
-					ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
+			return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+					ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, true, null);
 		}
 
 		public synchronized void dispose()
 		{
 			// Don't listen to auto-refresh pref changes anymore
-			new InstanceScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
-			new DefaultScope().getNode(ResourcesPlugin.PI_RESOURCES).removePreferenceChangeListener(this);
+			new InstanceScope().getNode(CorePlugin.PLUGIN_ID).removePreferenceChangeListener(this);
 			// Now remove all the existing file watchers
 			unhookAll();
 		}
@@ -549,7 +546,7 @@ public class CorePlugin extends Plugin
 		public void preferenceChange(PreferenceChangeEvent event)
 		{
 			// This might be instance or default that changed. So what do we do?
-			if (ResourcesPlugin.PREF_AUTO_REFRESH.equals(event.getKey()))
+			if (ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS.equals(event.getKey()))
 			{
 				// we we're already hooked and now we're not supposed to, unhook
 				if (hooked && !autoHookFileWatcher())

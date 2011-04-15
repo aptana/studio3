@@ -27,4 +27,10 @@ public interface ICorePreferenceConstants
 	 */
 	String PREF_AUTO_MIGRATE_OLD_PROJECTS = "auto_migrate_old_projects"; //$NON-NLS-1$
 
+	/**
+	 * A boolean to enable/disable attaching filewatchers to automatically refresh/handle edits made to project's
+	 * contents outside the IDE.
+	 */
+	String PREF_AUTO_REFRESH_PROJECTS = "auto_refresh_projects"; //$NON-NLS-1$
+
 }
