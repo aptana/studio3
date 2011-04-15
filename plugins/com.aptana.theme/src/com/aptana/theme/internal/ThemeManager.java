@@ -85,6 +85,16 @@ public class ThemeManager implements IThemeManager
 
 	private static ThemeManager fgInstance;
 
+	/**
+	 * The common prefixes of prefs related to annotations that we typically modify
+	 */
+	private static final String[] annotationKeyPrefixes = new String[] { "pydevOccurrenceIndication", //$NON-NLS-1$
+			"searchResultIndication", //$NON-NLS-1$
+			"xmlTagPairOccurrenceIndication", //$NON-NLS-1$
+			"htmlTagPairOccurrenceIndication", //$NON-NLS-1$
+			"rubyBlockPairOccurrenceIndication", //$NON-NLS-1$
+	};
+
 	private ThemeManager()
 	{
 		new InstanceScope().getNode("org.eclipse.ui.editors").addPreferenceChangeListener( //$NON-NLS-1$
@@ -94,14 +104,7 @@ public class ThemeManager implements IThemeManager
 					public void preferenceChange(PreferenceChangeEvent event)
 					{
 						// Listen to see if the user is modifying the annotations through Annotations pref page
-						Set<String> keysToWatch = new HashSet<String>();
-						keysToWatch.add("pydevOccurrenceIndication"); //$NON-NLS-1$
-						keysToWatch.add("searchResultIndication"); //$NON-NLS-1$
-						keysToWatch.add("xmlTagPairOccurrenceIndication"); //$NON-NLS-1$
-						keysToWatch.add("htmlTagPairOccurrenceIndication"); //$NON-NLS-1$
-						keysToWatch.add("rubyBlockPairOccurrenceIndication"); //$NON-NLS-1$
-
-						for (String prefix : keysToWatch)
+						for (String prefix : annotationKeyPrefixes)
 						{
 							if (event.getKey().startsWith(prefix))
 							{
