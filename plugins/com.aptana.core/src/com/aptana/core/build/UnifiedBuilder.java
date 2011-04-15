@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -40,7 +39,7 @@ public class UnifiedBuilder extends IncrementalProjectBuilder
 			if (resource != null && resource.exists())
 			{
 				resource.deleteMarkers(IMarkerConstants.PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
-				resource.deleteMarkers(IMarker.TASK, false, IResource.DEPTH_INFINITE);
+				resource.deleteMarkers(IMarkerConstants.TASK_MARKER, true, IResource.DEPTH_INFINITE);
 			}
 		}
 		catch (CoreException e)
