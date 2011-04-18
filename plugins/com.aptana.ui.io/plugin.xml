@@ -730,5 +730,16 @@
             id="com.aptana.ui.io.UniformFileStoreEditorInputFactory">
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="toolbar:com.aptana.ui.io.remoteview?after=additions">
+         <command
+               commandId="com.aptana.ui.ftp.command.add"
+               icon="platform:/plugin/com.aptana.ui.ftp/icons/full/etool16/new_connection.png"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
 
 </plugin>
