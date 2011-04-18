@@ -24,6 +24,7 @@ public class Messages extends NLS
 	public static String GitProjectView_createNewBranchOption;
 	public static String GitProjectView_PullChangesTooltipMessage;
 	public static String GitProjectView_PushChangesTooltipMessage;
+	public static String GitProjectView_SwitchBranchFailedTitle;
 
 	public static String SingleProjectView_OpenProjectButton;
 	public static String SingleProjectView_DeleteProjectMenuItem_LBL;

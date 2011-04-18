@@ -313,7 +313,7 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 		{
 			msg = ((ProcessStatus) switchStatus).getStdErr();
 		}
-		MessageDialog.openError(getSite().getShell(), "Unable to switch branch", msg);
+		MessageDialog.openError(getSite().getShell(), Messages.GitProjectView_SwitchBranchFailedTitle, msg);
 		// revertToCurrentBranch(repo);
 		return false;
 	}
