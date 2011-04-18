@@ -630,10 +630,10 @@ public class Theme
 		try
 		{
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			toProps().storeToXML(os, null);
+			toProps().store(os, null);
 			IEclipsePreferences prefs = scope.getNode(ThemePlugin.PLUGIN_ID);
 			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-			preferences.put(getName(), os.toString());
+			preferences.putByteArray(getName(), os.toByteArray());
 			prefs.flush();
 		}
 		catch (Exception e)
@@ -646,13 +646,13 @@ public class Theme
 	{
 		IEclipsePreferences prefs = new DefaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-		String xmlProps = preferences.get(getName(), null);
-		if (xmlProps == null)
+		byte[] array = preferences.getByteArray(getName(), null);
+		if (array == null)
 		{
 			return;
 		}
 		Properties props = new OrderedProperties();
-		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
+		props.load(new ByteArrayInputStream(array));
 		coloringRules.clear();
 		wipeCache();
 		parseProps(props);
