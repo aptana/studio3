@@ -644,15 +644,31 @@ public class Theme
 
 	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
 	{
+		Properties props = null;
 		IEclipsePreferences prefs = new DefaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-		byte[] array = preferences.getByteArray(getName(), null);
-		if (array == null)
+		try
 		{
-			return;
+			byte[] array = preferences.getByteArray(getName(), null);
+			if (array == null)
+			{
+				return;
+			}
+			props = new OrderedProperties();
+			props.load(new ByteArrayInputStream(array));
 		}
-		Properties props = new OrderedProperties();
-		props.load(new ByteArrayInputStream(array));
+		catch (IllegalArgumentException iae)
+		{
+			// Fallback to load theme that was saved in prefs as XML string
+			String xml = preferences.get(getName(), null);
+			if (xml == null)
+			{
+				return;
+			}
+			props = new OrderedProperties();
+			props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+			save(new DefaultScope());
+		}
 		coloringRules.clear();
 		wipeCache();
 		parseProps(props);

@@ -431,25 +431,58 @@ public class ThemeManager implements IThemeManager
 		StringTokenizer tokenizer = new StringTokenizer(themeNames, THEME_NAMES_DELIMETER);
 		while (tokenizer.hasMoreElements())
 		{
-			try
+			String themeName = tokenizer.nextToken();
+			Theme theme = loadUserTheme(themeName);
+			if (theme == null)
 			{
-				String themeName = tokenizer.nextToken();
-				byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
-						THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
-				if (array == null)
-				{
-					continue;
-				}
-				Properties props = new OrderedProperties();
-				props.load(new ByteArrayInputStream(array));
-				Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
-				fThemeMap.put(theme.getName(), theme);
+				continue;
 			}
-			catch (Exception e)
+			fThemeMap.put(theme.getName(), theme);
+		}
+	}
+
+	private Theme loadUserTheme(String themeName)
+	{
+		try
+		{
+			byte[] array = Platform.getPreferencesService().getByteArray(ThemePlugin.PLUGIN_ID,
+					THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
+			if (array == null)
 			{
-				ThemePlugin.logError(e);
+				return null;
+			}
+			Properties props = new OrderedProperties();
+			props.load(new ByteArrayInputStream(array));
+			Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+			return theme;
+		}
+		catch (IllegalArgumentException iae)
+		{
+			// Fallback to load theme that was saved in prefs as XML string
+			String xml = Platform.getPreferencesService().getString(ThemePlugin.PLUGIN_ID,
+					THEMES_NODE + "/" + themeName, null, null); //$NON-NLS-1$
+			if (xml != null)
+			{
+				try
+				{
+					Properties props = new OrderedProperties();
+					props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+					// Now store it as byte array explicitly so we don't run into this!
+					Theme theme = new Theme(ThemePlugin.getDefault().getColorManager(), props);
+					theme.save();
+					return theme;
+				}
+				catch (IOException e)
+				{
+					ThemePlugin.logError(e);
+				}
 			}
 		}
+		catch (IOException e)
+		{
+			ThemePlugin.logError(e);
+		}
+		return null;
 	}
 
 	private void loadBuiltinThemes()
