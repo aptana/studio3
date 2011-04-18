@@ -27,3 +27,5 @@ Bundle-ActivationPolicy: lazy
 Export-Package: com.aptana.js.debug.ui,
  com.aptana.js.debug.ui.internal,
  com.aptana.js.debug.ui.internal.launchConfigurations
+Import-Package: com.aptana.editor.html,
+ com.aptana.editor.js
