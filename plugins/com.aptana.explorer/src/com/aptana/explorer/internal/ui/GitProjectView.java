@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -300,12 +301,14 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 				return false;
 			}
 		}
-		if (repo.switchBranch(branchName, new NullProgressMonitor()))
+		IStatus switchStatus = repo.switchBranch(branchName, new NullProgressMonitor());
+		if (switchStatus.isOK())
 		{
 			refreshViewer(); // might be new file structure
 			return true;
 		}
-		revertToCurrentBranch(repo);
+		MessageDialog.openError(getSite().getShell(), "Unable to switch branch", switchStatus.getMessage());
+		// revertToCurrentBranch(repo);
 		return false;
 	}
 
@@ -338,7 +341,6 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 					menuItem.setSelection(menuItem.getText().equals(currentBranchName));
 				}
 				branchesToolbar.pack(true);
-				// TODO Pop a dialog saying we couldn't branches
 				return Status.OK_STATUS;
 			}
 		};

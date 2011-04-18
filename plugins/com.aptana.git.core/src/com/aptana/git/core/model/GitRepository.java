@@ -567,11 +567,11 @@ public class GitRepository
 	 *            the new branch to use as the working branch
 	 * @return true if the switch happened. false otherwise.
 	 */
-	public boolean switchBranch(String branchName, IProgressMonitor monitor)
+	public IStatus switchBranch(String branchName, IProgressMonitor monitor)
 	{
 		if (branchName == null)
 		{
-			return false;
+			return new Status(IStatus.ERROR, GitPlugin.PLUGIN_ID, "Branch to switch to must be provided.");
 		}
 		SubMonitor sub = SubMonitor.convert(monitor, 4);
 		try
@@ -591,13 +591,13 @@ public class GitRepository
 			if (result == null || !result.isOK())
 			{
 				openProjects(projectsNotExistingOnNewBranch, sub.newChild(1));
-				return false;
+				return result;
 			}
 			_headRef = null;
 			readCurrentBranch();
 			fireBranchChangeEvent(oldBranchName, branchName);
 			sub.worked(1);
-			return true;
+			return result;
 		}
 		finally
 		{
