@@ -52,6 +52,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.progress.UIJob;
 
 import com.aptana.core.util.EclipseUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.explorer.ExplorerPlugin;
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.IPreferenceConstants;
@@ -307,7 +308,12 @@ public class GitProjectView extends SingleProjectView implements IGitRepositoryL
 			refreshViewer(); // might be new file structure
 			return true;
 		}
-		MessageDialog.openError(getSite().getShell(), "Unable to switch branch", switchStatus.getMessage());
+		String msg = switchStatus.getMessage();
+		if (switchStatus instanceof ProcessStatus)
+		{
+			msg = ((ProcessStatus) switchStatus).getStdErr();
+		}
+		MessageDialog.openError(getSite().getShell(), "Unable to switch branch", msg);
 		// revertToCurrentBranch(repo);
 		return false;
 	}
