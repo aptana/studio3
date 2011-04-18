@@ -114,12 +114,12 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 		if (System.currentTimeMillis() - lastOperationTime > CHECK_CONNECTION_TIMEOUT) {
 			try {
 				checkConnected();
+				if (isConnected()) {
+					setLastOperationTime();
+				}
 			} catch (Exception e) {
 				FTPPlugin.log(new Status(IStatus.WARNING, FTPPlugin.PLUGIN_ID, Messages.BaseFTPConnectionFileManager_connection_check_failed, e));
 			}
-		}
-		if (isConnected()) {
-			setLastOperationTime();
 		}
 	}
 	
