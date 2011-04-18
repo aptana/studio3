@@ -571,10 +571,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		if (ftpClient.connected()) {
 			try {
 				ftpClient.noOperation();
+				ftpClient.setType(FTPTransferType.BINARY);
 				return;
 			} catch (FTPConnectionClosedException e) {
-			} catch (FTPException ignore) {
-				return;
+			} catch (FTPException e) {
 			} catch (IOException e) {
 			}
 			ftpClient.quitImmediately();
