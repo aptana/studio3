@@ -7,7 +7,7 @@
             class="com.aptana.editor.css.CSSSourceEditor"
             contributorClass="com.aptana.editor.common.CommonTextEditorActionContributor"
             default="true"
-            extensions="css"
+            extensions="css, jss"
             icon="icons/css.png"
             id="com.aptana.editor.css"
             name="%editor.css.name">
@@ -20,7 +20,7 @@
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             base-type="org.eclipse.core.runtime.text"
-            file-extensions="css"
+            file-extensions="css, jss"
             id="com.aptana.contenttype.css"
             name="%content-type.css.name"
             priority="normal">
