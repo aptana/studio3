@@ -146,7 +146,7 @@
    <element name="local">
       <complexType>
          <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="localToolTip"/>
+            <element ref="localDescription"/>
          </sequence>
          <attribute name="directory" type="string" use="required">
             <annotation>
@@ -170,7 +170,7 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="toolTipDescription" type="string">
+         <attribute name="description" type="string">
             <annotation>
                <documentation>
                   
@@ -212,10 +212,10 @@
       </complexType>
    </element>
 
-   <element name="localToolTip">
+   <element name="localDescription">
       <annotation>
          <documentation>
-            Provides the tool tip description for the given sample name
+            Provides the description for the given sample name
          </documentation>
       </annotation>
       <complexType>
@@ -226,7 +226,7 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="toolTipDescription" type="string">
+         <attribute name="description" type="string">
             <annotation>
                <documentation>
                   

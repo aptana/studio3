@@ -143,7 +143,7 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		if (element instanceof SamplesReference)
 		{
 			SamplesReference samplesRef = (SamplesReference) element;
-			toolTipText = samplesRef.getToolTipText();
+			toolTipText = samplesRef.getDescriptionText();
 			if (toolTipText == null)
 			{
 				toolTipText = samplesRef.getName();
@@ -156,7 +156,7 @@ public class SamplesViewLabelProvider extends ColumnLabelProvider
 		}
 		if (element instanceof SampleEntry)
 		{
-			toolTipText = ((SampleEntry) element).getToolTip();
+			toolTipText = ((SampleEntry) element).getDescription();
 			if (toolTipText != null)
 			{
 				return toolTipText;
