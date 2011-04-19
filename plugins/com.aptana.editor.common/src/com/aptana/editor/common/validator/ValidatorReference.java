@@ -21,14 +21,15 @@ public class ValidatorReference
 
 	private final String name;
 	private final ValidatorLanguage language;
-	private final String type;
+	private final String markerType;
 	private final IConfigurationElement configElement;
 	private IValidator validator;
 
-	public ValidatorReference(String name, String type, ValidatorLanguage language, IConfigurationElement configElement)
+	public ValidatorReference(String name, String markerType, ValidatorLanguage language,
+			IConfigurationElement configElement)
 	{
 		this.name = name;
-		this.type = type;
+		this.markerType = markerType;
 		this.language = language;
 		this.configElement = configElement;
 	}
@@ -38,9 +39,9 @@ public class ValidatorReference
 		return name;
 	}
 
-	public String getType()
+	public String getMarkerType()
 	{
-		return type;
+		return markerType;
 	}
 
 	public ValidatorLanguage getLanguage()

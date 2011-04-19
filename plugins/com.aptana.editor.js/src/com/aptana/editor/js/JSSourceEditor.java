@@ -20,7 +20,6 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.js.internal.text.JSFoldingComputer;
 import com.aptana.editor.js.outline.JSOutlineContentProvider;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 
 @SuppressWarnings("restriction")
 public class JSSourceEditor extends AbstractThemeableEditor
@@ -53,7 +52,7 @@ public class JSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(IJSParserConstants.LANGUAGE);
+		return new FileService(IJSConstants.CONTENT_TYPE_JS);
 	}
 
 	/*

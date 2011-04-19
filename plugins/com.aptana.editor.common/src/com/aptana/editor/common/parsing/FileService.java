@@ -26,18 +26,18 @@ public class FileService
 	private IParseState fParseState;
 	private int fLastSourceHash;
 	private Set<IParseListener> listeners = new HashSet<IParseListener>();
-	private String fLanguage;
+	private String contentType;
 	private ValidationManager fValidationManager;
 	private boolean fHasValidParseResult;
 
-	public FileService(String language)
+	public FileService(String contentType)
 	{
-		this(language, new ParseState());
+		this(contentType, new ParseState());
 	}
 
-	public FileService(String language, IParseState parseState)
+	public FileService(String contentType, IParseState parseState)
 	{
-		this.fLanguage = language;
+		this.contentType = contentType;
 		this.fParseState = parseState;
 		fValidationManager = new ValidationManager(this);
 	}
@@ -112,7 +112,7 @@ public class FileService
 	 */
 	public synchronized void parse(boolean force)
 	{
-		if (fLanguage != null && fDocument != null)
+		if (contentType != null && fDocument != null)
 		{
 			String source = fDocument.get();
 			int sourceHash = source.hashCode();
@@ -127,7 +127,7 @@ public class FileService
 
 				try
 				{
-					ParserPoolFactory.parse(fLanguage, fParseState);
+					ParserPoolFactory.parse(contentType, fParseState);
 
 					// indicate current parse result is now valid
 					this.fHasValidParseResult = true;
@@ -144,7 +144,7 @@ public class FileService
 					// edited by the user
 				}
 
-				fValidationManager.validate(source, fLanguage);
+				fValidationManager.validate(source, contentType);
 			}
 		}
 		else

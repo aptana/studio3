@@ -7,14 +7,19 @@
  */
 package com.aptana.git.ui;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -31,17 +36,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchListener;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.IStreamListener;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.ui.statushandlers.StatusManager;
 
+import com.aptana.core.CorePlugin;
+import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.model.GitExecutable;
-import com.aptana.git.ui.internal.Launcher;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
 import com.aptana.git.ui.internal.wizards.Messages;
 
@@ -80,9 +79,9 @@ public class CloneJob extends Job
 	}
 
 	@Override
-	protected IStatus run(IProgressMonitor monitor)
+	public IStatus run(IProgressMonitor monitor)
 	{
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 500);
+		SubMonitor subMonitor = SubMonitor.convert(monitor, 1000);
 		try
 		{
 			if (GitExecutable.instance() == null)
@@ -90,73 +89,30 @@ public class CloneJob extends Job
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(),
 						Messages.CloneJob_UnableToFindGitExecutableError));
 			}
-			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-			ILaunchListener listener = new ILaunchListener()
-			{
 
-				public void launchRemoved(ILaunch launch)
-				{
-				}
-
-				public void launchChanged(ILaunch launch)
-				{
-					// TODO Make sure this is our launch!
-					IProcess[] processes = launch.getProcesses();
-					if (processes != null)
-					{
-						IProcess process = processes[0];
-						// TODO Sniff the process output for percentages?
-						process.getStreamsProxy().getOutputStreamMonitor().addListener(new IStreamListener()
-						{
-
-							public void streamAppended(String text, IStreamMonitor monitor)
-							{
-								System.out.println(text);
-							}
-						});
-						process.getStreamsProxy().getErrorStreamMonitor().addListener(new IStreamListener()
-						{
-
-							public void streamAppended(String text, IStreamMonitor monitor)
-							{
-								System.err.println(text);
-								// TODO Look for "Checking out files: \d+% (\d+/\d+) and report progress accordingly
-							}
-						});
-					}
-				}
-
-				public void launchAdded(ILaunch launch)
-				{
-					// TODO Auto-generated method stub
-				}
-			};
-			manager.addLaunchListener(listener);
-
-			// FIXME This doesn't ever run in bg in 3.6!
-			ILaunch launch;
+			IPath gitPath = GitExecutable.instance().path();
+			Map<String, String> env = GitExecutable.instance().getSSHEnvironment();
+			Process p = null;
 			if (shallowClone)
 			{
-				launch = Launcher
-						.launch(null, subMonitor.newChild(100), "clone", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				p = ProcessUtil.run(gitPath.toOSString(), null, env,
+						"clone", "--progress", "--depth", "1", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 			}
 			else
 			{
-				launch = Launcher.launch(null, subMonitor.newChild(100), "clone", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$
+				p = ProcessUtil.run(gitPath.toOSString(), null, env, "clone", "--progress", "--", sourceURI, dest); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-			if (launch == null)
+			if (p == null)
 			{
-				manager.removeLaunchListener(listener);
 				throw new CoreException(new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), MessageFormat.format(
 						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
 			}
-			while (!launch.isTerminated())
-			{
-				if (subMonitor.isCanceled())
-					return Status.CANCEL_STATUS;
-				Thread.yield();
-			}
-			manager.removeLaunchListener(listener);
+
+			Runnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
+			Thread t = new Thread(runnable);
+			t.start();
+			t.join();
+
 			subMonitor.setWorkRemaining(100);
 			Collection<File> existingProjects = new ArrayList<File>();
 			if (!forceRootAsProject)
@@ -199,6 +155,72 @@ public class CloneJob extends Job
 			subMonitor.done();
 		}
 		return Status.OK_STATUS;
+	}
+
+	private class CloneRunnable implements Runnable
+	{
+		private Process p;
+		private IProgressMonitor monitor;
+
+		public CloneRunnable(Process p, IProgressMonitor monitor)
+		{
+			this.p = p;
+			this.monitor = monitor;
+		}
+
+		public void run()
+		{
+			SubMonitor sub = SubMonitor.convert(monitor, 100);
+			// FIXME Only sniff for "receiving objects", which is the meat of the operation
+			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+");
+			InputStreamReader isr = null;
+			int lastPercent = 0;
+			try
+			{
+				isr = new InputStreamReader(p.getErrorStream(), "UTF-8"); //$NON-NLS-1$
+				BufferedReader br = new BufferedReader(isr);
+				String line = null;
+				while ((line = br.readLine()) != null)
+				{
+					if (monitor.isCanceled())
+					{
+						p.destroy();
+						return;
+					}
+					sub.subTask(line);
+					// Else, read in the line and see if we can sniff progress
+					Matcher m = percentPattern.matcher(line);
+					if (m.find())
+					{
+						String percent = m.group(1);
+						int percentInt = Integer.parseInt(percent);
+						if (percentInt > lastPercent)
+						{
+							sub.worked(percentInt - lastPercent);
+							lastPercent = percentInt;
+						}
+					}
+				}
+			}
+			catch (IOException ioe)
+			{
+				CorePlugin.logError(ioe.getMessage(), ioe);
+			}
+			finally
+			{
+				if (isr != null)
+				{
+					try
+					{
+						isr.close();
+					}
+					catch (Exception e)
+					{
+					}
+				}
+				sub.done();
+			}
+		}
 	}
 
 	/**

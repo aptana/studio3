@@ -331,6 +331,7 @@ public class NewSampleProjectWizard extends BasicNewResourceWizard implements IE
 		{
 			path = path.append(projectDescription.getName());
 		}
+		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
 		Job job = new CloneJob(gitURL, path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{

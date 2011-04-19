@@ -10,7 +10,6 @@ package com.aptana.editor.idl;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
-import com.aptana.editor.idl.parsing.IDLParserConstants;
 
 public class IDLEditor extends AbstractThemeableEditor
 {
@@ -20,7 +19,7 @@ public class IDLEditor extends AbstractThemeableEditor
 	 */
 	protected FileService createFileService()
 	{
-		return new FileService(IDLParserConstants.LANGUAGE);
+		return new FileService(IIDLConstants.CONTENT_TYPE_IDL);
 	}
 
 	/*

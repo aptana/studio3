@@ -61,15 +61,15 @@
    </extension>
    <extension
          point="com.aptana.editor.common.validator">
-      <language
+      <content-type
             name="%validator.language.css.name"
-            type="text/css">
-      </language>
+            id="com.aptana.contenttype.css">
+      </content-type>
       <validator
             class="com.aptana.editor.css.validator.CSSValidator"
-            language="text/css"
-            name="%validator.css.name"
-            type="com.aptana.editor.css.problem">
+            content-type="com.aptana.contenttype.css"
+            marker-type="com.aptana.editor.css.problem"
+            name="%validator.css.name">
       </validator>
    </extension>
    <extension

@@ -12,6 +12,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -286,5 +287,49 @@ public class GitExecutable
 	{
 		// FIXME Inline into GitRevList.walkRevisionListWithSpecifier
 		return ProcessUtil.run(gitPath.toOSString(), directory, arguments);
+	}
+
+	/**
+	 * Sets up the environment map in a way that our special GIT_SSH env value is set so that the SSH passphrase prompt
+	 * stuff is hooked up. Use this for clones/pushes/pulls.
+	 * 
+	 * @return
+	 */
+	public Map<String, String> getSSHEnvironment()
+	{
+		Map<String, String> env = new HashMap<String, String>();
+		env.putAll(ShellExecutable.getEnvironment());
+		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
+		if (git_ssh != null)
+		{
+			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+		}
+		if (!env.isEmpty())
+		{
+			env = filterOutVariables(env);
+		}
+		return env;
+	}
+
+	/**
+	 * Filter out any env vars that contain "${" in their value. Otherwise Eclipse will try to substitute and fail! TODO
+	 * Maybe we can escape the ${ to avoid the issue?
+	 * 
+	 * @param env
+	 * @return
+	 */
+	private static Map<String, String> filterOutVariables(Map<String, String> env)
+	{
+		Map<String, String> filtered = new HashMap<String, String>();
+		for (Map.Entry<String, String> entry : env.entrySet())
+		{
+			String value = entry.getValue();
+			if (value.contains("${")) //$NON-NLS-1$
+			{
+				continue;
+			}
+			filtered.put(entry.getKey(), value);
+		}
+		return filtered;
 	}
 }

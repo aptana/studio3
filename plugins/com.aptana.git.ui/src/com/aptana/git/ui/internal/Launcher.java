@@ -8,7 +8,6 @@
 package com.aptana.git.ui.internal;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -24,8 +23,6 @@ import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import com.aptana.console.process.ConsoleProcessFactory;
-import com.aptana.core.ShellExecutable;
-import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.core.model.GitRepository;
 
@@ -104,42 +101,13 @@ public abstract class Launcher
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
-		Map<String, String> env = new HashMap<String, String>();
-		env.putAll(ShellExecutable.getEnvironment());
-		IPath git_ssh = GitPlugin.getDefault().getGIT_SSH();
-		if (git_ssh != null)
-		{
-			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
-		}
+		Map<String, String> env = GitExecutable.instance().getSSHEnvironment();
 		if (!env.isEmpty())
 		{
-			env = filterOutVariables(env);
 			config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);
 			config.setAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES, true);
 		}
 		return config;
-	}
-
-	/**
-	 * Filter out any env vars that contain "${" in their value. Otherwise Eclipse will try to substitute and fail! TODO
-	 * Maybe we can escape the ${ to avoid the issue?
-	 * 
-	 * @param env
-	 * @return
-	 */
-	private static Map<String, String> filterOutVariables(Map<String, String> env)
-	{
-		Map<String, String> filtered = new HashMap<String, String>();
-		for (Map.Entry<String, String> entry : env.entrySet())
-		{
-			String value = entry.getValue();
-			if (value.contains("${")) //$NON-NLS-1$
-			{
-				continue;
-			}
-			filtered.put(entry.getKey(), value);
-		}
-		return filtered;
 	}
 
 	private static String getLastPortion(String command)

@@ -97,6 +97,9 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	 */
 	private void addNode(IParseNode node)
 	{
+		// Push any spaces before this node as a text node.
+		preAddNode(node);
+		// Push the current node.
 		if (node instanceof HTMLNode)
 		{
 			// DEBUG
@@ -136,6 +139,85 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// it's a node that was generated from a foreign language parser, such as the RHTMLParser
 			pushForeignSpecialNode(node);
 		}
+		// Push any spaces after this node as a text node.
+		postAddNode(node);
+	}
+
+	/**
+	 * Push a text node that will fill in the gap between the given node and the previous one.
+	 * 
+	 * @param node
+	 */
+	private void preAddNode(IParseNode node)
+	{
+		// Check for any existing spaces BEFORE the node and push them in a text node.
+		IParseNode previousNode = node.getPreviousNode();
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && previousNode != null
+				&& previousNode.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			int previousEnding = 0;
+			if (previousNode.getEndingOffset() > node.getStartingOffset())
+			{
+				// This node is nested inside the previous one, so create a content node for the content between the
+				// name-node end and the current node start.
+				previousEnding = previousNode.getNameNode().getNameRange().getEndingOffset() + 1;
+			}
+			else
+			{
+				// The previous is a sibling of the current node, so create a content node for the content between the
+				// previous end and the current node start.
+				previousEnding = previousNode.getEndingOffset() + 1;
+			}
+			int currentStarting = node.getStartingOffset();
+			if (currentStarting > previousEnding)
+			{
+				// Check for any content in between the nodes
+				String str = document.get(previousEnding, currentStarting);
+				if (str.trim().length() == 0)
+				{
+					FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
+							previousEnding, currentStarting);
+					addChild(contentFormatterNode);
+				}
+			}
+
+		}
+	}
+
+	/**
+	 * Push a text node that will fill any gaps between the given node ending and the end of it's parent node.
+	 * 
+	 * @param node
+	 */
+	private void postAddNode(IParseNode node)
+	{
+		// Check for any existing spaces AFTER the node and push them in a text node.
+		IParseNode parentNode = node.getParent();
+		if (node.getNodeType() == HTMLNodeTypes.ELEMENT && parentNode != null
+				&& parentNode.getNodeType() == HTMLNodeTypes.ELEMENT)
+		{
+			int currentEnding = node.getEndingOffset() + 1;
+			INameNode endNode = ((HTMLElementNode) parentNode).getEndNode();
+			if (endNode != null)
+			{
+				IRange endNameRange = endNode.getNameRange();
+				if (!endNameRange.isEmpty() && endNameRange.getStartingOffset() != endNameRange.getEndingOffset())
+				{
+					IRange endNodeRange = endNode.getNameRange();
+					int previousEnding = endNodeRange.getStartingOffset();
+					if (previousEnding > currentEnding)
+					{
+						String str = document.get(currentEnding, previousEnding);
+						if (str.trim().length() == 0)
+						{
+							FormatterTextNode contentFormatterNode = new FormatterHTMLContentNode(document, null,
+									currentEnding, previousEnding);
+							addChild(contentFormatterNode);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -146,7 +228,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	private void pushForeignSpecialNode(IParseNode node)
 	{
 		int nodeStart = node.getStartingOffset();
-		int nodeEnd = node.getEndingOffset() + 1;
+		int nodeEnd = node.getEndingOffset();
 		nodeEnd = Math.min(document.getLength(), nodeEnd);
 		String text = document.get(nodeStart, nodeEnd);
 		// create a default node by looking at edges
@@ -295,11 +377,13 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 			// to one.
 			int textStartOffset = getBeginWithoutWhiteSpaces(beginNodeRange.getEndingOffset() + 1, document);
 			int textEndOffset = getEndWithoutWhiteSpaces(endNodeStartingOffset - 1, document);
-			if (textStartOffset > 0 && document.charAt(textStartOffset - 1) == ' ')
+			char charAt = document.charAt(textStartOffset - 1);
+			if (textStartOffset > 0 && (charAt == ' ' || charAt == '\t'))
 			{
 				textStartOffset--;
 			}
-			if (textEndOffset < document.getLength() - 1 && document.charAt(textEndOffset + 1) == ' ')
+			charAt = document.charAt(textEndOffset + 1);
+			if (textEndOffset < document.getLength() - 1 && (charAt == ' ' || charAt == '\t'))
 			{
 				textEndOffset++;
 			}
