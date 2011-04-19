@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -43,6 +44,7 @@ import com.aptana.ide.core.io.preferences.PreferenceUtils;
 public abstract class BaseConnectionFileManager implements IConnectionFileManager {
 
 	protected static final int CACHE_TTL = 60000; /* 1min */
+	private static final int RETRY_COUNT = 2;
 
 	protected String login;
 	protected char[] password = new char[0];
@@ -140,7 +142,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (fileInfos == null) {
 				testOrConnect(monitor);
 				try {
-					fileInfos = cache(path, fetchFiles(basePath.append(path), options, monitor));
+					fileInfos = cache(path, fetchFilesInternal(basePath.append(path), options, monitor));
 					for (ExtendedFileInfo fileInfo : fileInfos) {
 						postProcessFileInfo(fileInfo, basePath.append(path), options, monitor);
 						cache(path.append(fileInfo.getName()), fileInfo);
@@ -414,7 +416,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	}
 
 	
-	protected abstract void testConnection();
+	protected abstract void testConnection(boolean force);
 	protected abstract boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor);
 	
 	// all methods here accept absolute path
@@ -433,6 +435,49 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract void changeFilePermissions(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void changeFileGroup(IPath path, String group, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 
+	protected final ExtendedFileInfo[] fetchFilesInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
+		MultiStatus multiStatus = null;
+		boolean force = false;
+		for (int trial = 0; trial <= RETRY_COUNT; ++trial) {
+			try {
+				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
+				return fetchFiles(path, options, monitor);
+			} catch (CoreException e) {
+				IStatus status = e.getStatus();
+				if (multiStatus == null) {
+					multiStatus = new MultiStatus(status.getPlugin(), status.getCode(), status.getMessage(), null);
+				}
+				IStatus[] childStatus = multiStatus.getChildren();
+				if (childStatus.length < 1 || !childStatus[childStatus.length-1].getException().getClass().isInstance(status.getException())) {
+					multiStatus.add(status);
+				}
+				force = e.getCause() instanceof IOException || trial > 0;
+			}
+		}
+		throw new CoreException(multiStatus);
+	}
+	
+	protected final ExtendedFileInfo fetchFileInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
+		MultiStatus multiStatus = null;
+		boolean force = false;
+		for (int trial = 0; trial <= RETRY_COUNT; ++trial) {
+			try {
+				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
+				return fetchFile(path, options, monitor);
+			} catch (CoreException e) {
+				IStatus status = e.getStatus();
+				if (multiStatus == null) {
+					multiStatus = new MultiStatus(status.getPlugin(), status.getCode(), status.getMessage(), null);
+				}
+				IStatus[] childStatus = multiStatus.getChildren();
+				if (childStatus.length < 1 || !childStatus[childStatus.length-1].getException().getClass().isInstance(status.getException())) {
+					multiStatus.add(status);
+				}
+				force = e.getCause() instanceof IOException || trial > 0;
+			}
+		}
+		throw new CoreException(multiStatus);
+	}
 
 	private ExtendedFileInfo fetchAndCacheFileInfo(IPath path, IProgressMonitor monitor) throws CoreException {
 		return fetchAndCacheFileInfo(path, EFS.NONE, monitor);
@@ -441,7 +486,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	private ExtendedFileInfo fetchAndCacheFileInfo(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		ExtendedFileInfo fileInfo;
 		try {
-			fileInfo = fetchFile(basePath.append(path), options, monitor);
+			fileInfo = fetchFileInternal(basePath.append(path), options, monitor);
 		} catch (FileNotFoundException e) {
 			fileInfo = new ExtendedFileInfo(path.segmentCount() > 0 ? path.lastSegment() : Path.ROOT.toPortableString());
 			fileInfo.setExists(false);
@@ -505,7 +550,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (targetFileInfo == null) {
 				Policy.checkCanceled(monitor);
 				try {
-					targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
+					targetFileInfo = cache(targetPath, fetchFileInternal(targetPath, options, Policy.subMonitorFor(monitor, 1)));
 				} catch (PermissionDeniedException e) {
 					// permission denied is like file not found for the case of symlink resolving
 					throw initFileNotFoundException(targetPath, e);
@@ -573,10 +618,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	
 	protected void setLastOperationTime() {
 	}
-	
+
 	protected final void testOrConnect(IProgressMonitor monitor) throws CoreException {
+		testOrConnect(false, monitor);
+	}
+
+	protected final void testOrConnect(boolean force, IProgressMonitor monitor) throws CoreException {
 		Policy.checkCanceled(monitor);
-		testConnection();
+		testConnection(force);
 		if (!isConnected()) {
 			connect(Policy.subMonitorFor(monitor, 1));
 			Policy.checkCanceled(monitor);

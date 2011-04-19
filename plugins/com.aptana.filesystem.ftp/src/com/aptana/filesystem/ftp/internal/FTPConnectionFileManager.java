@@ -95,8 +95,6 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 	protected boolean hasServerInfo;
 	protected PrintWriter messageLogWriter;
 
-	private int connectionRetryCount;
-
 	protected FTPClientPool pool;
 
 	/* (non-Javadoc)
@@ -663,15 +661,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			// forces one connection retry
-			if (connectionRetryCount < 1) {
-				connectionRetryCount++;
-				testOrConnect(monitor);
-				return fetchFile(path, options, monitor);
-			} else {
-				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_fetch_failed, e));
-			}
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_fetch_failed, e));
 		}
 		ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
 		fileInfo.setExists(false);
@@ -726,15 +716,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			// forces one connection retry
-			if (connectionRetryCount < 1) {
-				connectionRetryCount++;
-				testOrConnect(monitor);
-				return fetchFiles(path, options, monitor);
-			} else {
-				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_fetching_directory_failed, e));
-			}
+			throw new CoreException(new Status(Status.ERROR, FTPPlugin.PLUGIN_ID, Messages.FTPConnectionFileManager_fetching_directory_failed, e));
 		} finally {
 			monitor.done();
 		}
