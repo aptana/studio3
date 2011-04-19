@@ -65,7 +65,7 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 				try {
 					try {
 						createFile(tempFile, Policy.subMonitorFor(monitor, 1));
-						tempFileInfo = fetchFile(tempFile, EFS.NONE, Policy.subMonitorFor(monitor, 1));
+						tempFileInfo = fetchFileInternal(tempFile, EFS.NONE, Policy.subMonitorFor(monitor, 1));
 					} finally {
 						deleteFile(tempFile, Policy.subMonitorFor(monitor, 1));
 					}
@@ -102,16 +102,17 @@ public abstract class BaseFTPConnectionFileManager extends BaseConnectionFileMan
 
 	protected abstract void checkConnected() throws Exception;
 	protected abstract URI getRootCanonicalURI();
-			
-	/* (non-Javadoc)
-	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#testConnection()
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.aptana.core.io.vfs.BaseConnectionFileManager#testConnection(boolean)
 	 */
 	@Override
-	protected void testConnection() {
+	protected void testConnection(boolean force) {
 		if (!isConnected()) {
 			return;
 		}
-		if (System.currentTimeMillis() - lastOperationTime > CHECK_CONNECTION_TIMEOUT) {
+		if (force || (System.currentTimeMillis() - lastOperationTime > CHECK_CONNECTION_TIMEOUT)) {
 			try {
 				checkConnected();
 				if (isConnected()) {
