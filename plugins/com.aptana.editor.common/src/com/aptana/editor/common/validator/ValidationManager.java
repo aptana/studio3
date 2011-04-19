@@ -46,7 +46,7 @@ public class ValidationManager implements IValidationManager
 	private IDocument fDocument;
 	private Object fResource;
 	private URI fResourceUri;
-	private String fCurrentLanguage;
+	private String fCurrentContentType;
 	// the nested languages that need to be validated as well
 	private Set<String> fNestedLanguages;
 	private Map<String, List<IValidationItem>> fItemsByType;
@@ -57,13 +57,13 @@ public class ValidationManager implements IValidationManager
 		public void propertyChange(PropertyChangeEvent event)
 		{
 			String property = event.getProperty();
-			if (fCurrentLanguage != null)
+			if (fCurrentContentType != null)
 			{
-				if (getSelectedValidatorsPrefKey(fCurrentLanguage).equals(property)
-						|| getFilterExpressionsPrefKey(fCurrentLanguage).equals(property))
+				if (getSelectedValidatorsPrefKey(fCurrentContentType).equals(property)
+						|| getFilterExpressionsPrefKey(fCurrentContentType).equals(property))
 				{
 					// re-validate
-					validate(fDocument.get(), fCurrentLanguage);
+					validate(fDocument.get(), fCurrentContentType);
 				}
 			}
 		}
@@ -110,9 +110,9 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	public void validate(String source, String language)
+	public void validate(String source, String contentType)
 	{
-		fCurrentLanguage = language;
+		fCurrentContentType = contentType;
 
 		Collection<List<IValidationItem>> values = fItemsByType.values();
 		for (List<IValidationItem> items : values)
@@ -120,7 +120,7 @@ public class ValidationManager implements IValidationManager
 			items.clear();
 		}
 
-		List<ValidatorReference> validatorRefs = getValidatorRefs(language);
+		List<ValidatorReference> validatorRefs = getValidatorRefs(contentType);
 		for (ValidatorReference validatorRef : validatorRefs)
 		{
 			if (fResourceUri == null)
@@ -128,7 +128,7 @@ public class ValidationManager implements IValidationManager
 				continue;
 			}
 			List<IValidationItem> newItems = validatorRef.getValidator().validate(source, fResourceUri, this);
-			String type = validatorRef.getType();
+			String type = validatorRef.getMarkerType();
 			List<IValidationItem> items = fItemsByType.get(type);
 			if (items == null)
 			{
@@ -156,7 +156,7 @@ public class ValidationManager implements IValidationManager
 			List<IValidationItem> newItems = new ArrayList<IValidationItem>();
 			processASTForNestedLanguage(rootAST, nestedLanguage, validator, newItems);
 
-			String type = validatorRef.getType();
+			String type = validatorRef.getMarkerType();
 			List<IValidationItem> items = itemsByType.get(type);
 			if (items == null)
 			{
@@ -353,16 +353,16 @@ public class ValidationManager implements IValidationManager
 		}
 	}
 
-	private static List<ValidatorReference> getValidatorRefs(String language)
+	private static List<ValidatorReference> getValidatorRefs(String contentType)
 	{
 		List<ValidatorReference> result = new ArrayList<ValidatorReference>();
 
-		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(language);
+		List<ValidatorReference> validatorRefs = ValidatorLoader.getInstance().getValidators(contentType);
 		String list = CommonEditorPlugin.getDefault().getPreferenceStore()
-				.getString(getSelectedValidatorsPrefKey(language));
+				.getString(getSelectedValidatorsPrefKey(contentType));
 		if (StringUtil.isEmpty(list))
 		{
-			// by default uses the first validator that supports the language
+			// by default uses the first validator that supports the content type
 			if (validatorRefs.size() > 0)
 			{
 				result.add(validatorRefs.get(0));
