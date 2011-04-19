@@ -36,15 +36,14 @@ public class SampleEntry
 	 */
 	public SampleEntry(File file, Object parent, boolean isRoot)
 	{
-		this.file = file;
-		this.parent = parent;
-		this.isRoot = isRoot;
-		description = null;
+		this(file, parent, isRoot, null);
 	}
 
 	public SampleEntry(File file, Object parent, boolean isRoot, String description)
 	{
-		this(file, parent, isRoot);
+		this.file = file;
+		this.parent = parent;
+		this.isRoot = isRoot;
 		this.description = description;
 	}
 

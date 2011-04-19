@@ -127,8 +127,9 @@ public class SamplesManager implements ISamplesManager
 			IConfigurationElement[] localPaths = element.getChildren(ELEMENT_LOCAL);
 			if (localPaths.length > 0)
 			{
-				String directory = localPaths[0].getAttribute(ATTR_DIRECTORY);
-				IConfigurationElement[] toolTipElement = localPaths[0].getChildren(ELEMENT_LOCAL_DESCRIPTION);
+				IConfigurationElement localPath = localPaths[0];
+				String directory = localPath.getAttribute(ATTR_DIRECTORY);
+				IConfigurationElement[] toolTipElement = localPath.getChildren(ELEMENT_LOCAL_DESCRIPTION);
 				URL url = bundle.getEntry(directory);
 				path = ResourceUtil.resourcePathToString(url);
 				for (IConfigurationElement toolTip : toolTipElement)
@@ -141,10 +142,10 @@ public class SamplesManager implements ISamplesManager
 				IConfigurationElement[] remotePaths = element.getChildren(ELEMENT_REMOTE);
 				if (remotePaths.length > 0)
 				{
+					IConfigurationElement remotePath = remotePaths[0];
 					isRemote = true;
-					path = remotePaths[0].getAttribute(ATTR_URL);
-					descriptions.put(SamplesReference.REMOTE_DESCRIPTION_KEY,
-							remotePaths[0].getAttribute(DESCRIPTION));
+					path = remotePath.getAttribute(ATTR_URL);
+					descriptions.put(SamplesReference.REMOTE_DESCRIPTION_KEY, remotePath.getAttribute(DESCRIPTION));
 				}
 			}
 			if (StringUtil.isEmpty(path))
