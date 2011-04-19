@@ -83,7 +83,11 @@
       </complexType>
    </element>
 
-   <element name="enablement" type="string">
+   <element name="enablement">
+      <complexType>
+         <choice>
+         </choice>
+      </complexType>
    </element>
 
    <element name="contentType">

@@ -166,7 +166,7 @@ public class FileSystemWorkbenchAdapter implements IWorkbenchAdapter, IDeferredW
 			if (image != null) {
 				return image;
 			}
-			return CoreIOImages.getImageDescriptor(CoreIOImages.IMG_OBJS_CONNECTION);
+			return CoreIOImages.getImageDescriptor(CoreIOImages.IMG_OBJS_SYMLINK);
 		}
 		return null;
 	}

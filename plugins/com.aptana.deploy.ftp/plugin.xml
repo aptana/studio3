@@ -7,7 +7,7 @@
             class="com.aptana.deploy.ftp.ui.wizard.FTPDeployWizard"
             icon="icons/ftp16.png"
             id="com.aptana.deploy.ftp.wizard"
-            name="FTP">
+            name="%wizard.ftp.name">
       </wizard>
    </extension>
       <extension
@@ -15,7 +15,7 @@
       <command
             defaultHandler="com.aptana.deploy.ftp.internal.handlers.DeploySettingsHandler"
             id="com.aptana.deploy.commands.ftp.settings"
-            name="%command.deploysettings.name">
+            name="Deployment Settings...">
       </command>
    </extension>
       <extension
@@ -27,25 +27,6 @@
       </extension>
       <extension
             point="org.eclipse.ui.menus">
-             <menuContribution
-            locationURI="menu:com.aptana.explorer.deploy?endof=group.deploy">
-         <command
-               commandId="com.aptana.deploy.commands.deployApp"
-               icon="platform:/plugin/com.aptana.syncing.ui/icons/full/elcl16/arrow_up_down.png"
-               label="%FTPDeploy.label"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate
-                     ifEmpty="false">
-                  <test
-                        property="com.aptana.deploy.project.isDeployType"
-                        value="com.aptana.deploy.ftp.provider">
-                  </test>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
       <menuContribution
             locationURI="menu:com.aptana.explorer.deploy?endof=group.command">
          <command
@@ -92,7 +73,7 @@
          </command>
          <menu
                icon="platform:/plugin/com.aptana.syncing.ui/icons/full/obj16/ftp.png"
-               label="Connections">
+               label="%menu.connections.label">
             <command
                   commandId="com.aptana.ide.syncing.ui.commands.newconnection"
                   style="push">

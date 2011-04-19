@@ -14,11 +14,19 @@
                label="%action.label.setStartPage"
                menubarPath="additions">
          </action>
-         <enablement>
-            <test
-                  property="com.aptana.core.isWebRunnable"
-                  value="true"/>
-         </enablement>
+         <visibility>
+            <and>
+               <not>
+                  <objectState
+                        name="StartPageFilter"
+                        value="isStartPage">
+                  </objectState></not>
+               <objectState
+                     name="WebRunnableFilter"
+                     value="isWebRunnable">
+               </objectState>
+            </and>
+         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="false"
@@ -30,11 +38,12 @@
                id="com.aptana.js.debug.ui.RemoveStartPageAction"
                label="%action.label.unsetStartPage"
                menubarPath="additions"/>
-         <enablement>
-            <test
-                  property="com.aptana.js.debug.ui.isStartPage"
-                  value="true"/>
-         </enablement>
+         <visibility>
+           <objectState
+                 name="StartPageFilter"
+                 value="isStartPage">
+           </objectState>
+         </visibility>
       </objectContribution>
       <objectContribution
             adaptable="true"
@@ -454,11 +463,6 @@
             class="com.aptana.debug.ui.internal.EditorOpenAdapter$Factory">
          <adapter type="com.aptana.debug.core.IEditorOpenAdapter"/>
       </factory>
-      <!--factory
-            adaptableType="com.aptana.ide.editors.unified.hover.LexemeTextHover"
-            class="com.aptana.js.debug.ui.internal.hovers.JSDebugHover$Factory">
-         <adapter type="org.eclipse.jface.text.ITextHover"/>
-      </factory -->
       <factory
             adaptableType="com.aptana.js.debug.core.JSLaunchConfigurationHelper"
             class="com.aptana.js.debug.ui.internal.WebBrowserEnumeratorAdapterFactory">
@@ -772,7 +776,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.resources.IFile"
-            class="">
+            class="java.lang.Object">
          <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
       </factory>
       <factory
@@ -785,15 +789,13 @@
             class="com.aptana.js.debug.ui.internal.WatchExpressionFactoryAdapter$Factory">
          <adapter type="org.eclipse.debug.ui.actions.IWatchExpressionFactoryAdapter"/>
       </factory>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="com.aptana.js.debug.ui.internal.StartPagePropertyTester"
-            id="com.aptana.js.debug.ui.StartPagePropertyTester"
-            namespace="com.aptana.js.debug.ui"
-            properties="isStartPage"
-            type="org.eclipse.core.resources.IFile"/>
+      <factory
+            adaptableType="org.eclipse.core.resources.IFile"
+            class="com.aptana.js.debug.ui.internal.StartPageActionFilter$Factory">
+         <adapter
+               type="org.eclipse.ui.IActionFilter">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="com.aptana.editor.common.textHovers">

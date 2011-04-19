@@ -554,7 +554,8 @@ public class GitRepositoryTest extends TestCase
 	 */
 	protected void assertSwitchBranch(String branchName)
 	{
-		assertTrue(fRepo.switchBranch(branchName, new NullProgressMonitor()));
+		IStatus status = fRepo.switchBranch(branchName, new NullProgressMonitor());
+		assertTrue(status.isOK());
 		assertEquals(branchName, fRepo.currentBranch());
 	}
 }

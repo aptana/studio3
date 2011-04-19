@@ -326,7 +326,7 @@ public class Theme
 		return new DelayedTextAttribute(new RGBa(defaultFG));
 	}
 
-	ThemeRule getRuleForSelector(IScopeSelector match)
+	public ThemeRule getRuleForSelector(IScopeSelector match)
 	{
 		for (ThemeRule rule : coloringRules)
 		{
@@ -630,10 +630,10 @@ public class Theme
 		try
 		{
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			toProps().storeToXML(os, null);
+			toProps().store(os, null);
 			IEclipsePreferences prefs = scope.getNode(ThemePlugin.PLUGIN_ID);
 			Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-			preferences.put(getName(), os.toString());
+			preferences.putByteArray(getName(), os.toByteArray());
 			prefs.flush();
 		}
 		catch (Exception e)
@@ -644,15 +644,31 @@ public class Theme
 
 	public void loadFromDefaults() throws InvalidPropertiesFormatException, UnsupportedEncodingException, IOException
 	{
+		Properties props = null;
 		IEclipsePreferences prefs = new DefaultScope().getNode(ThemePlugin.PLUGIN_ID);
 		Preferences preferences = prefs.node(ThemeManager.THEMES_NODE);
-		String xmlProps = preferences.get(getName(), null);
-		if (xmlProps == null)
+		try
 		{
-			return;
+			byte[] array = preferences.getByteArray(getName(), null);
+			if (array == null)
+			{
+				return;
+			}
+			props = new OrderedProperties();
+			props.load(new ByteArrayInputStream(array));
 		}
-		Properties props = new OrderedProperties();
-		props.loadFromXML(new ByteArrayInputStream(xmlProps.getBytes("UTF-8"))); //$NON-NLS-1$
+		catch (IllegalArgumentException iae)
+		{
+			// Fallback to load theme that was saved in prefs as XML string
+			String xml = preferences.get(getName(), null);
+			if (xml == null)
+			{
+				return;
+			}
+			props = new OrderedProperties();
+			props.loadFromXML(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+			save(new DefaultScope());
+		}
 		coloringRules.clear();
 		wipeCache();
 		parseProps(props);
@@ -700,7 +716,12 @@ public class Theme
 
 	public void addNewDefaultToken(int index, String newTokenName)
 	{
-		coloringRules.add(index, new ThemeRule(newTokenName, null, new DelayedTextAttribute(null)));
+		addNewRule(index, newTokenName, null, new DelayedTextAttribute(null));
+	}
+
+	public void addNewRule(int index, String ruleName, ScopeSelector selector, DelayedTextAttribute attr)
+	{
+		coloringRules.add(index, new ThemeRule(ruleName, selector, attr));
 		wipeCache();
 		save();
 	}

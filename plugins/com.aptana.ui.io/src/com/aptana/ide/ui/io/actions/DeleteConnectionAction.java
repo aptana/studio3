@@ -9,6 +9,8 @@
 package com.aptana.ide.ui.io.actions;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,39 +19,61 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import com.aptana.ide.core.io.CoreIOPlugin;
 import com.aptana.ide.core.io.IConnectionPoint;
 import com.aptana.ide.ui.io.IOUIPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Max Stepanov
- *
  */
-public class DeleteConnectionAction extends ConnectionActionDelegate {
+public class DeleteConnectionAction extends ConnectionActionDelegate
+{
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public void run(IAction action) {
-	    final IConnectionPoint[] connections = getSelectedConnectionPoints();
-		if (connections.length == 0) {
+	public void run(IAction action)
+	{
+		IConnectionPoint[] connections = getSelectedConnectionPoints();
+		if (connections.length == 0)
+		{
 			return;
 		}
-		Job job = new Job(Messages.DeleteConnectionAction_DeletingConnections) {
+		final List<IConnectionPoint> connectionsToDelete = new ArrayList<IConnectionPoint>();
+		for (IConnectionPoint connection : connections)
+		{
+			if (MessageDialog.openConfirm(UIUtils.getActiveShell(), Messages.DeleteConnectionAction_Confirm_Title,
+					MessageFormat.format(Messages.DeleteConnectionAction_Confirm_Message, connection)))
+			{
+				connectionsToDelete.add(connection);
+			}
+		}
+
+		Job job = new Job(Messages.DeleteConnectionAction_DeletingConnections)
+		{
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-                for (IConnectionPoint connection : connections) {
-                    monitor.subTask(MessageFormat.format(Messages.DeleteConnectionAction_Deleting, connection));
-                    CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(connection);
-                    if (connection.canDisconnect()) {
-                        try {
-                            connection.disconnect(monitor);
-                        } catch (CoreException e) {
-                            IOUIPlugin.logError(Messages.DeleteConnectionAction_FailedToDisconnect, e);
-                        }
-                    }
-                }
+			protected IStatus run(IProgressMonitor monitor)
+			{
+				for (IConnectionPoint connection : connectionsToDelete)
+				{
+					monitor.subTask(MessageFormat.format(Messages.DeleteConnectionAction_Deleting, connection));
+					CoreIOPlugin.getConnectionPointManager().removeConnectionPoint(connection);
+					if (connection.canDisconnect())
+					{
+						try
+						{
+							connection.disconnect(monitor);
+						}
+						catch (CoreException e)
+						{
+							IOUIPlugin.logError(Messages.DeleteConnectionAction_FailedToDisconnect, e);
+						}
+					}
+				}
 				return Status.OK_STATUS;
 			}
 		};

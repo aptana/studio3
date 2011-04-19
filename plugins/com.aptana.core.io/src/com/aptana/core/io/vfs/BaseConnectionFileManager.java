@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -43,6 +44,7 @@ import com.aptana.ide.core.io.preferences.PreferenceUtils;
 public abstract class BaseConnectionFileManager implements IConnectionFileManager {
 
 	protected static final int CACHE_TTL = 60000; /* 1min */
+	private static final int RETRIES_AFTER_FAILURE = 2;
 
 	protected String login;
 	protected char[] password = new char[0];
@@ -92,11 +94,8 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			ExtendedFileInfo fileInfo = getCachedFileInfo(path);
 			if (fileInfo == null) {
 				testOrConnect(monitor);
-				try {
-					fileInfo = fetchAndCacheFileInfo(path, options, monitor);
-				} finally {
-					setLastOperationTime();
-				}
+				fileInfo = fetchAndCacheFileInfo(path, options, monitor);
+				setLastOperationTime();
 			}
 			return (IExtendedFileInfo) fileInfo.clone();
 		} finally {
@@ -120,12 +119,11 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				return list.toArray(new String[list.size()]);
 			}
 			testOrConnect(monitor);
-			try {
-				return listDirectory(basePath.append(path), monitor);
-			} finally {
-				setLastOperationTime();
-			}
+			String[] result =  listDirectory(basePath.append(path), monitor);
+			setLastOperationTime();
+			return result;
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			return new String[0];
 		} finally {
 			monitor.done();
@@ -144,18 +142,19 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (fileInfos == null) {
 				testOrConnect(monitor);
 				try {
-					fileInfos = cache(path, fetchFiles(basePath.append(path), options, monitor));
+					fileInfos = cache(path, fetchFilesInternal(basePath.append(path), options, monitor));
 					for (ExtendedFileInfo fileInfo : fileInfos) {
 						postProcessFileInfo(fileInfo, basePath.append(path), options, monitor);
 						cache(path.append(fileInfo.getName()), fileInfo);
 					}
+					setLastOperationTime();
 				} catch (FileNotFoundException e) {
+					setLastOperationTime();
 					return new IExtendedFileInfo[0];
 				} catch (PermissionDeniedException e) {
+					setLastOperationTime();
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 							MessageFormat.format(Messages.BaseConnectionFileManager_PermissionDenied0, path.toPortableString()), e));
-				} finally {
-					setLastOperationTime();
 				}
 			}
 			return fileInfos.clone();
@@ -173,6 +172,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		testOrConnect(monitor);
 		try {
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
+			setLastOperationTime();
 			if (!fileInfo.exists()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 						Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, null)));
@@ -186,10 +186,10 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 			return readFile(basePath.append(path), Policy.subMonitorFor(monitor, 1));			
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
@@ -203,6 +203,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		testOrConnect(monitor);
 		try {
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
+			setLastOperationTime();
 			if (fileInfo.exists() && fileInfo.isDirectory()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 						Messages.BaseConnectionFileManager_file_is_directory, initFileNotFoundException(path, null)));
@@ -220,10 +221,10 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			clearCache(path);
 			return writeFile(basePath.append(path), useTemporary, permissions, Policy.subMonitorFor(monitor, 1));
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e.getCause())));
 		} finally {
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
@@ -251,12 +252,13 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				} else {
 					deleteFile(basePath.append(path), monitor);				
 				}
+				setLastOperationTime();
 			} catch (FileNotFoundException ignore) {
+				setLastOperationTime();
 			} finally {
 				clearCache(path);
 			}
 		} finally {
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
@@ -270,6 +272,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		testOrConnect(monitor);
 		try {
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
+			setLastOperationTime();
 			if (fileInfo.exists()) {
 				if (!fileInfo.isDirectory()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
@@ -279,6 +282,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			}
 			if ((options & EFS.SHALLOW) != 0 && path.segmentCount() > 1) {
 				fileInfo = fetchAndCacheFileInfo(path.removeLastSegments(1), IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
+				setLastOperationTime();
 				if (!fileInfo.exists()) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, null)));
@@ -299,11 +303,12 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				}
 				subMonitor.done();
 			}
+			setLastOperationTime();
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(path, e).getCause()));
 		} finally {
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
@@ -318,6 +323,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		try {
 			if ((options & EFS.SET_LAST_MODIFIED) != 0) {
 				setModificationTime(basePath.append(path), info.getLastModified(), Policy.subMonitorFor(monitor, 1));
+				setLastOperationTime();
 			}
 			if ((options & EFS.SET_ATTRIBUTES) != 0 && (options & IExtendedFileInfo.SET_PERMISSIONS) == 0) {
 				ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(path, Policy.subMonitorFor(monitor, 1));
@@ -335,6 +341,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 					}
 					changeFilePermissions(basePath.append(path), permissions, Policy.subMonitorFor(monitor, 1));
 				}
+				setLastOperationTime();
 			}
 			if (info instanceof IExtendedFileInfo) {
 				IExtendedFileInfo extInfo = (IExtendedFileInfo) info;
@@ -344,13 +351,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				if ((options & IExtendedFileInfo.SET_GROUP) != 0) {
 					changeFileGroup(basePath.append(path), extInfo.getGroup(), Policy.subMonitorFor(monitor, 1));
 				}
+				setLastOperationTime();
 			}
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(path, e.getCause())));
 		} finally {
 			clearCache(path);
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
@@ -364,12 +372,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 		testOrConnect(monitor);
 		try {
 			ExtendedFileInfo fileInfo = fetchAndCacheFileInfo(sourcePath, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
+			setLastOperationTime();
 			if (!fileInfo.exists()) {
 				throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 						Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, null)));
 			}
 			boolean isDirectory = fileInfo.isDirectory();
 			fileInfo = fetchAndCacheFileInfo(destinationPath, IExtendedFileStore.EXISTENCE, Policy.subMonitorFor(monitor, 1));
+			setLastOperationTime();
 			if (fileInfo.exists()) {
 				if ((options & EFS.OVERWRITE) == 0) {
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
@@ -383,6 +393,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 				try {
 					changeCurrentDir(basePath.append(destinationPath).removeLastSegments(1));
 				} catch (FileNotFoundException e) {
+					setLastOperationTime();
 					throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 							Messages.BaseConnectionFileManager_parent_doesnt_exist, initFileNotFoundException(destinationPath, e.getCause())));
 				} catch (Exception e) {
@@ -394,17 +405,18 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			clearCache(sourcePath);
 			clearCache(destinationPath);
 			renameFile(basePath.append(sourcePath), basePath.append(destinationPath), Policy.subMonitorFor(monitor, 2));
+			setLastOperationTime();
 		} catch (FileNotFoundException e) {
+			setLastOperationTime();
 			throw new CoreException(new Status(IStatus.ERROR, CoreIOPlugin.PLUGIN_ID,
 					Messages.BaseConnectionFileManager_no_such_file, initFileNotFoundException(sourcePath, e.getCause())));
 		} finally {
-			setLastOperationTime();
 			monitor.done();
 		}
 	}
 
 	
-	protected abstract void testConnection();
+	protected abstract void testConnection(boolean force);
 	protected abstract boolean canUseTemporaryFile(IPath path, ExtendedFileInfo fileInfo, IProgressMonitor monitor);
 	
 	// all methods here accept absolute path
@@ -423,6 +435,49 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected abstract void changeFilePermissions(IPath path, long permissions, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 	protected abstract void changeFileGroup(IPath path, String group, IProgressMonitor monitor) throws CoreException, FileNotFoundException;
 
+	protected final ExtendedFileInfo[] fetchFilesInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
+		MultiStatus multiStatus = null;
+		boolean force = false;
+		for (int trial = 0; trial <= RETRIES_AFTER_FAILURE; ++trial) {
+			try {
+				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
+				return fetchFiles(path, options, monitor);
+			} catch (CoreException e) {
+				IStatus status = e.getStatus();
+				if (multiStatus == null) {
+					multiStatus = new MultiStatus(status.getPlugin(), status.getCode(), status.getMessage(), null);
+				}
+				IStatus[] childStatus = multiStatus.getChildren();
+				if (childStatus.length < 1 || !childStatus[childStatus.length-1].getException().getClass().isInstance(status.getException())) {
+					multiStatus.add(status);
+				}
+				force = e.getCause() instanceof IOException || trial > 0;
+			}
+		}
+		throw new CoreException(multiStatus);
+	}
+	
+	protected final ExtendedFileInfo fetchFileInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
+		MultiStatus multiStatus = null;
+		boolean force = false;
+		for (int trial = 0; trial <= RETRIES_AFTER_FAILURE; ++trial) {
+			try {
+				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
+				return fetchFile(path, options, monitor);
+			} catch (CoreException e) {
+				IStatus status = e.getStatus();
+				if (multiStatus == null) {
+					multiStatus = new MultiStatus(status.getPlugin(), status.getCode(), status.getMessage(), null);
+				}
+				IStatus[] childStatus = multiStatus.getChildren();
+				if (childStatus.length < 1 || !childStatus[childStatus.length-1].getException().getClass().isInstance(status.getException())) {
+					multiStatus.add(status);
+				}
+				force = e.getCause() instanceof IOException || trial > 0;
+			}
+		}
+		throw new CoreException(multiStatus);
+	}
 
 	private ExtendedFileInfo fetchAndCacheFileInfo(IPath path, IProgressMonitor monitor) throws CoreException {
 		return fetchAndCacheFileInfo(path, EFS.NONE, monitor);
@@ -431,7 +486,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	private ExtendedFileInfo fetchAndCacheFileInfo(IPath path, int options, IProgressMonitor monitor) throws CoreException {
 		ExtendedFileInfo fileInfo;
 		try {
-			fileInfo = fetchFile(basePath.append(path), options, monitor);
+			fileInfo = fetchFileInternal(basePath.append(path), options, monitor);
 		} catch (FileNotFoundException e) {
 			fileInfo = new ExtendedFileInfo(path.segmentCount() > 0 ? path.lastSegment() : Path.ROOT.toPortableString());
 			fileInfo.setExists(false);
@@ -495,7 +550,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 			if (targetFileInfo == null) {
 				Policy.checkCanceled(monitor);
 				try {
-					targetFileInfo = cache(targetPath, fetchFile(targetPath, options, Policy.subMonitorFor(monitor, 1)));
+					targetFileInfo = cache(targetPath, fetchFileInternal(targetPath, options, Policy.subMonitorFor(monitor, 1)));
 				} catch (PermissionDeniedException e) {
 					// permission denied is like file not found for the case of symlink resolving
 					throw initFileNotFoundException(targetPath, e);
@@ -563,10 +618,14 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	
 	protected void setLastOperationTime() {
 	}
-	
+
 	protected final void testOrConnect(IProgressMonitor monitor) throws CoreException {
+		testOrConnect(false, monitor);
+	}
+
+	protected final void testOrConnect(boolean force, IProgressMonitor monitor) throws CoreException {
 		Policy.checkCanceled(monitor);
-		testConnection();
+		testConnection(force);
 		if (!isConnected()) {
 			connect(Policy.subMonitorFor(monitor, 1));
 			Policy.checkCanceled(monitor);

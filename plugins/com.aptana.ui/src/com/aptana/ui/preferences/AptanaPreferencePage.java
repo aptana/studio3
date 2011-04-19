@@ -31,6 +31,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 	protected static String PAGE_ID = "com.aptana.ui.AptanaPreferencePage"; //$NON-NLS-1$
 	private Button debugButton;
 	private Button migrateButton;
+	private Button autoRefreshButton;
 
 	@Override
 	protected String getPageId()
@@ -74,6 +75,10 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		migrateButton.setText(Messages.AptanaPreferencePage_Auto_Migrate_Projects);
 		migrateButton.setSelection(autoMigration());
 
+		autoRefreshButton = new Button(comp, SWT.CHECK);
+		autoRefreshButton.setText(Messages.AptanaPreferencePage_Auto_Refresh_Projects);
+		autoRefreshButton.setSelection(autoRefresh());
+
 		return comp;
 	}
 
@@ -90,6 +95,12 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 				ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, false, null);
 	}
 
+	private boolean autoRefresh()
+	{
+		return Platform.getPreferencesService().getBoolean(CorePlugin.PLUGIN_ID,
+				ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, true, null);
+	}
+
 	@Override
 	public boolean performOk()
 	{
@@ -98,6 +109,7 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 			prefs.putBoolean(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS, debugButton.getSelection());
 			prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS, migrateButton.getSelection());
+			prefs.putBoolean(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS, autoRefreshButton.getSelection());
 			prefs.flush();
 		}
 		catch (BackingStoreException e)
@@ -116,6 +128,8 @@ public class AptanaPreferencePage extends GenericRootPreferencePage
 		{
 			IEclipsePreferences prefs = new InstanceScope().getNode(CorePlugin.PLUGIN_ID);
 			prefs.remove(ICorePreferenceConstants.PREF_SHOW_SYSTEM_JOBS);
+			prefs.remove(ICorePreferenceConstants.PREF_AUTO_MIGRATE_OLD_PROJECTS);
+			prefs.remove(ICorePreferenceConstants.PREF_AUTO_REFRESH_PROJECTS);
 			prefs.flush();
 		}
 		catch (BackingStoreException e)

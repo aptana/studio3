@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.swt.graphics.Point;
@@ -13,6 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.git.core.model.GitRepository;
 import com.aptana.ui.MenuDialogItem;
 import com.aptana.ui.QuickMenuDialog;
@@ -57,11 +59,22 @@ public class SwitchBranchHandler extends AbstractGitHandler
 
 	public static void switchBranch(final GitRepository repo, final String branchName)
 	{
-		if (!repo.switchBranch(branchName, new NullProgressMonitor()))
-			return;
+		String text = MessageFormat.format(Messages.SwitchBranchAction_BranchSwitch_Msg, branchName);
+		IStatus switchStatus = repo.switchBranch(branchName, new NullProgressMonitor());
+		if (!switchStatus.isOK())
+		{
+			// If we couldn't switch, surface up the output
+			if (switchStatus instanceof ProcessStatus)
+			{
+				text = ((ProcessStatus) switchStatus).getStdErr();
+			}
+			else
+			{
+				text = switchStatus.getMessage();
+			}
+		}
 		// Now show a tooltip "toast" for 3 seconds to announce success
 		final Shell shell = UIUtils.getActiveShell();
-		String text = MessageFormat.format(Messages.SwitchBranchAction_BranchSwitch_Msg, branchName);
 		DefaultToolTip toolTip = new DefaultToolTip(shell)
 		{
 			@Override

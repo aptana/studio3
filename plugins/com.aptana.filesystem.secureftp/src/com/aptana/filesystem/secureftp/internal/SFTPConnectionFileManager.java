@@ -73,7 +73,6 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 	private IPath cwd;
 	private Map<IPath, FTPFile> ftpFileCache = new ExpiringMap<IPath, FTPFile>(CACHE_TTL);
 
-	private int connectionRetryCount;
 	private Thread keepaliveThread;
 
 	/* (non-Javadoc)
@@ -462,15 +461,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			// forces one connection retry
-			if (connectionRetryCount < 1) {
-				connectionRetryCount++;
-				testOrConnect(monitor);
-				return fetchFile(path, options, monitor);
-			} else {
-				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchFileInfo, e));
-			}
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchFileInfo, e));
 		}
 		ExtendedFileInfo fileInfo = new ExtendedFileInfo(path.lastSegment());
 		fileInfo.setExists(false);
@@ -507,15 +498,7 @@ public class SFTPConnectionFileManager extends BaseFTPConnectionFileManager impl
 		} catch (OperationCanceledException e) {
 			throw e;
 		} catch (Exception e) {
-			// forces one connection retry
-			if (connectionRetryCount < 1) {
-				connectionRetryCount++;
-				testOrConnect(monitor);
-				return fetchFiles(path, options, monitor);
-			} else {
-				connectionRetryCount = 0;
-				throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchDirectory, e));
-			}
+			throw new CoreException(new Status(Status.ERROR, SecureFTPPlugin.PLUGIN_ID, Messages.SFTPConnectionFileManager_FailedFetchDirectory, e));
 		} finally {
 			monitor.done();
 		}

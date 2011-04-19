@@ -331,6 +331,30 @@ public class JSTypeUtil
 	}
 
 	/**
+	 * getFunctionType
+	 * 
+	 * @param typeName
+	 * @return
+	 */
+	public static String getFunctionType(String typeName)
+	{
+		String result = typeName;
+
+		if (typeName != null && typeName.startsWith(JSTypeConstants.GENERIC_FUNCTION_OPEN))
+		{
+			int startingIndex = JSTypeConstants.GENERIC_FUNCTION_OPEN.length();
+			int endingIndex = typeName.indexOf(JSTypeConstants.GENERIC_CLOSE, startingIndex);
+
+			if (endingIndex != -1)
+			{
+				result = typeName.substring(startingIndex, endingIndex);
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * getName
 	 * 
 	 * @param node

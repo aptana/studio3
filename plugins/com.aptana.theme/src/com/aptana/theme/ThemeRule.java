@@ -44,6 +44,10 @@ public class ThemeRule
 
 	public DelayedTextAttribute getTextAttribute()
 	{
+		if (fTextAttribute == null)
+		{
+			return new DelayedTextAttribute(null);
+		}
 		return fTextAttribute;
 	}
 
