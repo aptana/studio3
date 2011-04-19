@@ -1075,7 +1075,14 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		for (int i = 0; i < data.length; ++i) {
 			data[i] = data[i].trim();
 		}
-		return fileFactory.parse(data);
+		FTPFile[] ftpFiles = fileFactory.parse(data);
+		for (FTPFile ftpFile : ftpFiles) {
+			String name = ftpFile.getName();
+			if (name.indexOf('/') != -1) {
+				ftpFile.setName(Path.fromPortableString(name).lastSegment());
+			}
+		}
+		return ftpFiles;
 	}
 	
 	private FTPFile[] ftpLIST(IPath dirPath, IProgressMonitor monitor) throws IOException, ParseException, FTPException {
