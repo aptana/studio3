@@ -83,7 +83,11 @@ public class FormatterDefaultElementNode extends FormatterBlockWithBeginEndNode
 	 */
 	protected int getBlankLinesAfter(IFormatterContext context)
 	{
-		return getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		int linesAfter = getInt(HTMLFormatterConstants.LINES_AFTER_ELEMENTS);
+		if (linesAfter == 0)
+		{
+			return -1;
+		}
+		return linesAfter;
 	}
-
 }
