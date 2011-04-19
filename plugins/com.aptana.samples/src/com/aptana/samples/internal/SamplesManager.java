@@ -29,12 +29,14 @@ public class SamplesManager implements ISamplesManager
 {
 
 	private static final String EXTENSION_POINT = SamplesPlugin.PLUGIN_ID + ".samplespath"; //$NON-NLS-1$
+	private static final String TOOLTIP_DESCRIPTION = "toolTipDescription"; //$NON-NLS-1$
 	private static final String ELEMENT_CATEGORY = "category"; //$NON-NLS-1$
 	private static final String ELEMENT_SAMPLESINFO = "samplesinfo"; //$NON-NLS-1$
 	private static final String ELEMENT_LOCAL = "local"; //$NON-NLS-1$
 	private static final String ELEMENT_REMOTE = "remote"; //$NON-NLS-1$
 	private static final String ELEMENT_NATURE = "nature"; //$NON-NLS-1$
 	private static final String ELEMENT_INCLUDE = "include"; //$NON-NLS-1$
+	private static final String ELEMENT_LOCAL_TOOLTIP = "localToolTip"; //$NON-NLS-1$
 	private static final String ATTR_ID = "id"; //$NON-NLS-1$
 	private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 	private static final String ATTR_DIRECTORY = "directory"; //$NON-NLS-1$
@@ -120,13 +122,19 @@ public class SamplesManager implements ISamplesManager
 			// either a local path or remote git url needs to be defined
 			boolean isRemote = false;
 			String path = null;
+			Map<String, String> toolTipText = new HashMap<String, String>();
 			Bundle bundle = Platform.getBundle(element.getNamespaceIdentifier());
 			IConfigurationElement[] localPaths = element.getChildren(ELEMENT_LOCAL);
 			if (localPaths.length > 0)
 			{
 				String directory = localPaths[0].getAttribute(ATTR_DIRECTORY);
+				IConfigurationElement[] toolTipElement = localPaths[0].getChildren(ELEMENT_LOCAL_TOOLTIP);
 				URL url = bundle.getEntry(directory);
 				path = ResourceUtil.resourcePathToString(url);
+				for (IConfigurationElement toolTip : toolTipElement)
+				{
+					toolTipText.put(toolTip.getAttribute(ATTR_NAME), toolTip.getAttribute(TOOLTIP_DESCRIPTION));
+				}
 			}
 			else
 			{
@@ -135,6 +143,8 @@ public class SamplesManager implements ISamplesManager
 				{
 					isRemote = true;
 					path = remotePaths[0].getAttribute(ATTR_URL);
+					toolTipText.put(SamplesReference.REMOTE_TOOLTIP_KEY,
+							remotePaths[0].getAttribute(TOOLTIP_DESCRIPTION));
 				}
 			}
 			if (StringUtil.isEmpty(path))
@@ -160,7 +170,8 @@ public class SamplesManager implements ISamplesManager
 				samples = new ArrayList<SamplesReference>();
 				samplesRefs.put(categoryId, samples);
 			}
-			SamplesReference samplesRef = new SamplesReference(category, path, isRemote, element);
+
+			SamplesReference samplesRef = new SamplesReference(category, path, isRemote, element, toolTipText);
 			samples.add(samplesRef);
 
 			String name = element.getAttribute(ATTR_NAME);

@@ -10,7 +10,7 @@ package com.aptana.samples.ui.views;
 import java.io.File;
 
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorDescriptor;
@@ -28,7 +28,7 @@ import com.aptana.samples.ui.SamplesUIPlugin;
  * @author Michael Xia
  */
 @SuppressWarnings("restriction")
-public class SamplesViewLabelProvider extends LabelProvider
+public class SamplesViewLabelProvider extends ColumnLabelProvider
 {
 	private static final Image IMAGE_FOLDER = PlatformUI.getWorkbench().getSharedImages()
 			.getImage(ISharedImages.IMG_OBJ_FOLDER);
@@ -130,4 +130,44 @@ public class SamplesViewLabelProvider extends LabelProvider
 		}
 		return super.getText(element);
 	}
+
+	@Override
+	public String getToolTipText(Object element)
+	{
+		String toolTipText;
+
+		if (element instanceof SampleCategory)
+		{
+			return ((SampleCategory) element).getName();
+		}
+		if (element instanceof SamplesReference)
+		{
+			SamplesReference samplesRef = (SamplesReference) element;
+			toolTipText = samplesRef.getToolTipText();
+			if (toolTipText == null)
+			{
+				toolTipText = samplesRef.getName();
+			}
+			if (toolTipText == null)
+			{
+				toolTipText = samplesRef.getPath();
+			}
+			return toolTipText;
+		}
+		if (element instanceof SampleEntry)
+		{
+			toolTipText = ((SampleEntry) element).getToolTip();
+			if (toolTipText != null)
+			{
+				return toolTipText;
+			}
+			File file = ((SampleEntry) element).getFile();
+			if (file != null)
+			{
+				return file.getName();
+			}
+		}
+		return super.getText(element);
+	}
+
 }

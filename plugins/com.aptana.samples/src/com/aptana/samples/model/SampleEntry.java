@@ -20,6 +20,7 @@ public class SampleEntry
 	private final File file;
 	private final Object parent;
 	private final boolean isRoot;
+	private String toolTip;
 
 	private List<SampleEntry> subEntries;
 
@@ -38,6 +39,13 @@ public class SampleEntry
 		this.file = file;
 		this.parent = parent;
 		this.isRoot = isRoot;
+		toolTip = null;
+	}
+
+	public SampleEntry(File file, Object parent, boolean isRoot, String toolTip)
+	{
+		this(file, parent, isRoot);
+		this.toolTip = toolTip;
 	}
 
 	public File getFile()
@@ -53,6 +61,11 @@ public class SampleEntry
 	public boolean isRoot()
 	{
 		return isRoot;
+	}
+
+	public String getToolTip()
+	{
+		return toolTip;
 	}
 
 	public SampleEntry[] getSubEntries()

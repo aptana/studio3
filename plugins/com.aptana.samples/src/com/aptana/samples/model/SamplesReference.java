@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -23,12 +24,14 @@ public class SamplesReference
 
 	private static final String ATTR_PROJECT_HANDLER = "projectHandler"; //$NON-NLS-1$
 	private static final String ATTR_PREVIEW_HANDLER = "previewHandler"; //$NON-NLS-1$
+	public static final String REMOTE_TOOLTIP_KEY = "remoteToolTip"; //$NON-NLS-1$
 
 	private final SampleCategory category;
 	private final String path;
 	private final IConfigurationElement configElement;
 
 	private String name;
+	private Map<String, String> toolTipText;
 	private boolean isRemote;
 	private String infoFile;
 	private ISampleProjectHandler projectHandler;
@@ -38,11 +41,13 @@ public class SamplesReference
 
 	private List<SampleEntry> samples;
 
-	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element)
+	public SamplesReference(SampleCategory category, String path, boolean isRemote, IConfigurationElement element,
+			Map<String, String> toolTipText)
 	{
 		this.category = category;
 		this.path = path;
 		this.isRemote = isRemote;
+		this.toolTipText = toolTipText;
 		configElement = element;
 		natures = new String[0];
 		includePaths = new String[0];
@@ -52,6 +57,16 @@ public class SamplesReference
 		{
 			loadSamples();
 		}
+	}
+
+	public String getToolTipText()
+	{
+		if (isRemote)
+		{
+			return toolTipText.get(REMOTE_TOOLTIP_KEY);
+		}
+
+		return null;
 	}
 
 	public SampleCategory getCategory()
@@ -162,7 +177,15 @@ public class SamplesReference
 			{
 				if (file.isDirectory())
 				{
-					samples.add(new SampleEntry(file, this, true));
+					String directoryName = file.getName();
+					if (toolTipText.containsKey(directoryName))
+					{
+						samples.add(new SampleEntry(file, this, true, toolTipText.get(directoryName)));
+					}
+					else
+					{
+						samples.add(new SampleEntry(file, this, true));
+					}
 				}
 			}
 		}
