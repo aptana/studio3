@@ -78,21 +78,31 @@
    </extension>
    <extension
          point="com.aptana.editor.common.validator">
-      <language
+      <content-type
             name="%validator.language.js.name"
-            type="text/javascript">
-      </language>
+            id="com.aptana.contenttype.js">
+      </content-type>
       <validator
             class="com.aptana.editor.js.validator.MozillaJsValidator"
-            language="text/javascript"
-            name="%validator.mozilla.name"
-            type="com.aptana.editor.js.problem">
+            content-type="com.aptana.contenttype.js"
+            marker-type="com.aptana.editor.js.problem"
+            name="%validator.mozilla.name">
       </validator>
       <validator
             class="com.aptana.editor.js.validator.JSLintValidator"
-            language="text/javascript"
-            name="%validator.jslint.name"
-            type="com.aptana.editor.js.problem">
+            content-type="com.aptana.contenttype.js"
+            marker-type="com.aptana.editor.js.problem"
+            name="%validator.jslint.name">
+      </validator>
+      <content-type
+            id="com.aptana.contenttype.sdocml"
+            name="%sdocml.content.name">
+      </content-type>
+      <validator
+            class="com.aptana.editor.js.validator.SDocMLValidator"
+            content-type="com.aptana.contenttype.sdocml"
+            marker-type="com.aptana.editor.js.sdocml.problem"
+            name="%validator.sdocml.name">
       </validator>
    </extension>
    <extension
@@ -157,6 +167,23 @@
       <persistent
             value="true">
       </persistent>
+      <attribute
+            name="id">
+      </attribute>
+      <attribute
+            name="flags">
+      </attribute>
+      <attribute
+            name="arguments">
+      </attribute>
+   </extension>
+   <extension
+         id="sdocml.problem"
+         name="%sdocml.problem.name"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="com.aptana.core.problem">
+      </super>
       <attribute
             name="id">
       </attribute>

@@ -13,7 +13,6 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.yaml.internal.text.YAMLFoldingComputer;
 import com.aptana.editor.yaml.outline.YAMLOutlineContentProvider;
 import com.aptana.editor.yaml.outline.YAMLOutlineLabelProvider;
-import com.aptana.editor.yaml.parsing.IYAMLParserConstants;
 
 @SuppressWarnings("restriction")
 public class YAMLEditor extends AbstractThemeableEditor
@@ -47,7 +46,7 @@ public class YAMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(IYAMLParserConstants.LANGUAGE);
+		return new FileService(IYAMLConstants.CONTENT_TYPE_YAML);
 	}
 
 	/*

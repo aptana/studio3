@@ -123,15 +123,15 @@
 
    <extension
          point="com.aptana.editor.common.validator">
-      <language
+      <content-type
             name="%validator.language.html.name"
-            type="text/html">
-      </language>
+            id="com.aptana.contenttype.html">
+      </content-type>
       <validator
             class="com.aptana.editor.html.validator.HTMLTidyValidator"
-            language="text/html"
-            name="%validator.tidy.name"
-            type="com.aptana.editor.html.problem">
+            content-type="com.aptana.contenttype.html"
+            marker-type="com.aptana.editor.html.problem"
+            name="%validator.tidy.name">
       </validator>
    </extension>
    <extension

@@ -145,6 +145,9 @@
 
    <element name="local">
       <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="localDescription"/>
+         </sequence>
          <attribute name="directory" type="string" use="required">
             <annotation>
                <documentation>
@@ -161,6 +164,13 @@
    <element name="remote">
       <complexType>
          <attribute name="url" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
             <annotation>
                <documentation>
                   
@@ -197,6 +207,30 @@
                <appinfo>
                   <meta.attribute kind="resource"/>
                </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="localDescription">
+      <annotation>
+         <documentation>
+            Provides the description for the given sample name
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the sample that needs to have a special tooltip applied to it. (Normally the directory name)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

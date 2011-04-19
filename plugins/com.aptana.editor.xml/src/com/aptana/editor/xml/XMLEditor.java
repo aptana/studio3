@@ -35,7 +35,6 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.xml.internal.text.XMLFoldingComputer;
 import com.aptana.editor.xml.outline.XMLOutlineContentProvider;
 import com.aptana.editor.xml.outline.XMLOutlineLabelProvider;
-import com.aptana.editor.xml.parsing.IXMLParserConstants;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.parsing.ast.IParseNode;
 
@@ -107,7 +106,7 @@ public class XMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(IXMLParserConstants.LANGUAGE);
+		return new FileService(IXMLConstants.CONTENT_TYPE_XML);
 	}
 
 	/*
