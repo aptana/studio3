@@ -513,6 +513,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			path = path.append(projectDescription.getName());
 		}
+		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
 		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{
