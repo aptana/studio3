@@ -53,8 +53,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.html.parsing.HTMLParser"
-            content-type="com.aptana.contenttype.html"
-            language="text/html">
+            content-type="com.aptana.contenttype.html">
       </parser>
    </extension>
    <extension

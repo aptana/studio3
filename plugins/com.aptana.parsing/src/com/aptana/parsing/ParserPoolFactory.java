@@ -66,10 +66,7 @@ public class ParserPoolFactory
 
 					for (IConfigurationElement element : elements)
 					{
-						String language = element.getAttribute("language"); //$NON-NLS-1$
 						String contentType = element.getAttribute("content-type"); //$NON-NLS-1$
-
-						parsers.put(language, element);
 						parsers.put(contentType, element);
 					}
 				}

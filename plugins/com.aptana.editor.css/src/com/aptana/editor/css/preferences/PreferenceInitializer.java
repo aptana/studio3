@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
@@ -40,7 +40,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 				".*text-align-.*", ".*text-justify.*", ".*text-overflow.*", ".*text-shadow.*",
 				".*text-underline-position.*", ".*word-spacing.*", ".*word-wrap.*", ".*writing-mode.*", ".*zoom.*",
 				".*Parse Error.*", ".*-webkit-.*", ".*rgba.*is not a background.*" };
-		prefs.put(ICSSParserConstants.LANGUAGE + ":"
+		prefs.put(ICSSConstants.CONTENT_TYPE_CSS + ":"
 				+ com.aptana.editor.common.preferences.IPreferenceConstants.FILTER_EXPRESSIONS,
 				StringUtil.join("####", filtered));
 	}

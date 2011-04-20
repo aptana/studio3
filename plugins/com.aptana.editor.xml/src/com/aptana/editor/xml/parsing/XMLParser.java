@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.rules.IToken;
 
+import com.aptana.editor.xml.IXMLConstants;
 import com.aptana.editor.xml.parsing.ast.XMLCDATANode;
 import com.aptana.editor.xml.parsing.ast.XMLCommentNode;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
@@ -108,7 +109,7 @@ public class XMLParser implements IParser
 
 		// creates the root node
 		IParseRootNode root = new ParseRootNode( //
-				IXMLParserConstants.LANGUAGE, //
+				IXMLConstants.CONTENT_TYPE_XML, //
 				new XMLNode[0], //
 				startingOffset, //
 				startingOffset + source.length() //

@@ -11,6 +11,7 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 
 import beaver.Symbol;
 
+import com.aptana.editor.yaml.IYAMLConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -20,7 +21,7 @@ public class YAMLParseRootNode extends ParseRootNode
 
 	public YAMLParseRootNode(Node yamlRoot, IParseState parseState)
 	{
-		super(IYAMLParserConstants.LANGUAGE, new Symbol[0], parseState.getStartingOffset(), parseState
+		super(IYAMLConstants.CONTENT_TYPE_YAML, new Symbol[0], parseState.getStartingOffset(), parseState
 				.getStartingOffset() + parseState.getSource().length);
 		traverse(yamlRoot, parseState);
 	}

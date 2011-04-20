@@ -24,6 +24,7 @@ import org.jaxen.XPath;
 
 import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.tasks.TaskTag;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
 import com.aptana.editor.js.JSTypeConstants;
 import com.aptana.editor.js.contentassist.JSIndexQueryHelper;
@@ -32,7 +33,6 @@ import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.inferencing.JSScope;
 import com.aptana.editor.js.inferencing.JSSymbolTypeInferrer;
 import com.aptana.editor.js.inferencing.JSTypeUtil;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.js.parsing.ast.JSCommentNode;
 import com.aptana.editor.js.parsing.ast.JSFunctionNode;
 import com.aptana.editor.js.parsing.ast.JSParseRootNode;
@@ -136,7 +136,7 @@ public class JSFileIndexingParticipant extends AbstractFileIndexingParticipant
 				// minor optimization when creating a new empty file
 				if (source != null && source.trim().length() > 0)
 				{
-					IParseNode ast = ParserPoolFactory.parse(IJSParserConstants.LANGUAGE, source);
+					IParseNode ast = ParserPoolFactory.parse(IJSConstants.CONTENT_TYPE_JS, source);
 					sub.worked(50);
 					
 					if (ast != null)

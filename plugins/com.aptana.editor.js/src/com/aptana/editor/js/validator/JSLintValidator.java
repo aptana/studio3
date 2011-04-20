@@ -29,8 +29,8 @@ import com.aptana.core.util.StreamUtil;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.JSPlugin;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 
 public class JSLintValidator implements IValidator
 {
@@ -103,7 +103,7 @@ public class JSLintValidator implements IValidator
 						String reason = object.get("reason", scope).toString().trim(); //$NON-NLS-1$
 						int character = (int) Double.parseDouble(object.get("character", scope).toString()); //$NON-NLS-1$
 
-						if (!manager.isIgnored(reason, IJSParserConstants.LANGUAGE))
+						if (!manager.isIgnored(reason, IJSConstants.CONTENT_TYPE_JS))
 						{
 							if (i == ids.length - 2 && lastIsError)
 							{

@@ -18,9 +18,9 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.aptana.editor.common.parsing.CompositeParser;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
 import com.aptana.editor.html.parsing.HTMLParser;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.formatter.AbstractScriptFormatter;
 import com.aptana.formatter.FormatterDocument;
 import com.aptana.formatter.FormatterIndentDetector;
@@ -129,7 +129,7 @@ public class HTMLFormatter extends AbstractScriptFormatter implements IScriptFor
 			// This will happen when dealing with a master formatter that runs with a parser that does not extend from
 			// HTNLParser (like PHPParser).
 			checkinParser(parser, mainContentType);
-			mainContentType = IHTMLParserConstants.LANGUAGE;
+			mainContentType = IHTMLConstants.CONTENT_TYPE_HTML;
 			parser = checkoutParser(mainContentType);
 		}
 		try

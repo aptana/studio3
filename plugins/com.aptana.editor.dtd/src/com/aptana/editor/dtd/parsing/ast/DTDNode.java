@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.dtd.parsing.ast;
 
-import com.aptana.editor.dtd.parsing.DTDParserConstants;
+import com.aptana.editor.dtd.IDTDConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 public class DTDNode extends ParseNode
@@ -29,7 +29,7 @@ public class DTDNode extends ParseNode
 	 */
 	protected DTDNode(DTDNodeType type)
 	{
-		super(DTDParserConstants.LANGUAGE);
+		super(IDTDConstants.CONTENT_TYPE_DTD);
 
 		this._type = type;
 	}
