@@ -24,6 +24,8 @@ public class Messages extends NLS
 	public static String ImportConnectionsPage_SourceType_Workspace;
 	public static String ImportConnectionsPage_Title;
 
+	public static String ImportConnectionsWizard_Info_Message;
+	public static String ImportConnectionsWizard_Info_Title;
 	public static String ImportConnectionsWizard_Title;
 
 	static

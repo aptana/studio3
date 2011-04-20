@@ -138,7 +138,8 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 		}
 	}
 
-	public void addConnectionsFrom(IPath path) {
+	public List<IConnectionPoint> addConnectionsFrom(IPath path) {
+		List<IConnectionPoint> newConnections = new ArrayList<IConnectionPoint>();
 		File file = path.toFile();
 		if (file.exists()) {
 			FileReader reader = null;
@@ -149,6 +150,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
 					if (connectionPoint != null) {
 						connections.add(connectionPoint);
+						newConnections.add(connectionPoint);
 					} else {
 						unresolvedConnections.add(child);
 					}
@@ -164,6 +166,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 				}
 			}
 		}
+		return newConnections;
 	}
 
 	/**

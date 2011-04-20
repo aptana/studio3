@@ -109,7 +109,8 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 		}
 	}
 
-	public void addConnectionsFrom(IPath path) {
+	public List<ISiteConnection> addConnectionsFrom(IPath path) {
+		List<ISiteConnection> newConnections = new ArrayList<ISiteConnection>();
 		File file = path.toFile();
 		if (file.exists()) {
 			FileReader reader = null;
@@ -120,6 +121,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 					SiteConnection siteConnection = restoreConnection(child);
 					if (siteConnection != null && siteConnection.isValid()) {
 						connections.add(siteConnection);
+						newConnections.add(siteConnection);
 					}
 				}
 			} catch (IOException e) {
@@ -142,6 +144,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 				}
 			}
 		}
+		return newConnections;
 	}
 
 	private IMemento storeConnection(SiteConnection siteConnection) {
