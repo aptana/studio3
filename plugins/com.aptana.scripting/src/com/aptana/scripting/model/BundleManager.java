@@ -37,7 +37,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.jruby.RubyRegexp;
 
-import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.core.projecttemplates.IProjectTemplate;
 import com.aptana.core.util.EclipseUtil;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;

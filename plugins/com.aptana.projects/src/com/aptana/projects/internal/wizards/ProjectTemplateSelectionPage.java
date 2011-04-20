@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import com.aptana.core.projectTemplates.IProjectTemplate;
+import com.aptana.core.projecttemplates.IProjectTemplate;
 import com.aptana.projects.ProjectsPlugin;
 
 public class ProjectTemplateSelectionPage extends WizardPage implements SelectionListener, ISelectionChangedListener
