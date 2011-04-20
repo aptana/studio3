@@ -87,39 +87,19 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * loadState
+	 * 
 	 * @param path
 	 */
 	public void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
-		    connections.clear();
-		    unresolvedConnections.clear();
+			connections.clear();
+			unresolvedConnections.clear();
 
-		    FileReader reader = null;
-			try {
-				reader = new FileReader(file);
-				XMLMemento memento = XMLMemento.createReadRoot(reader);
-				for (IMemento child : memento.getChildren(ELEMENT_CONNECTION)) {
-					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
-					if (connectionPoint != null) {
-						connections.add(connectionPoint);
-					} else {
-						unresolvedConnections.add(child);
-					}
-				}
-			} catch (IOException e) {
-			} catch (CoreException e) {
-			} finally {
-			    if (reader != null) {
-			        try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
-			    }
-			}
+			addConnectionsFrom(path);
 		}
 	}
 
@@ -155,6 +135,34 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
                 } catch (IOException e) {
                 }
 		    }
+		}
+	}
+
+	public void addConnectionsFrom(IPath path) {
+		File file = path.toFile();
+		if (file.exists()) {
+			FileReader reader = null;
+			try {
+				reader = new FileReader(file);
+				XMLMemento memento = XMLMemento.createReadRoot(reader);
+				for (IMemento child : memento.getChildren(ELEMENT_CONNECTION)) {
+					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
+					if (connectionPoint != null) {
+						connections.add(connectionPoint);
+					} else {
+						unresolvedConnections.add(child);
+					}
+				}
+			} catch (IOException e) {
+			} catch (CoreException e) {
+			} finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
+			}
 		}
 	}
 

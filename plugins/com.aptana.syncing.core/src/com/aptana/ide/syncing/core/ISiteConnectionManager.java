@@ -33,4 +33,6 @@ public interface ISiteConnectionManager {
 
 	public void loadState(IPath path);
 	public void saveState(IPath path);
+
+	public void addConnectionsFrom(IPath path);
 }

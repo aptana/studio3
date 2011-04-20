@@ -551,5 +551,18 @@
             class="com.aptana.ide.syncing.ui.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            category="com.aptana.ui.wizards.import.category"
+            class="com.aptana.syncing.ui.wizards.ImportConnectionsWizard"
+            icon="icons/full/obj16/transfer_files.png"
+            id="com.aptana.syncing.ui.wizards.import"
+            name="%wizard.import.name">
+         <description>
+            %wizard.import.description
+         </description>
+      </wizard>
+   </extension>
 
 </plugin>
