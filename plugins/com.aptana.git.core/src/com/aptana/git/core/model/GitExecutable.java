@@ -295,7 +295,7 @@ public class GitExecutable
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getSSHEnvironment()
+	public Map<String, String> getShellEnvironment()
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
