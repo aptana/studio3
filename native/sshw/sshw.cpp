@@ -209,6 +209,7 @@ int create_ssh_process(_TCHAR* host, _TCHAR* cmd)
 
 static BOOL CALLBACK DialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 static void SavePassword(LPCTSTR szKeyName);
+static void ClearPassword(LPCTSTR szKeyName);
 static BOOL LoadPassword(LPCTSTR szKeyName);
 
 static _TCHAR szRegistrySubKey[] = _T("Software\\SSHW");
@@ -219,7 +220,7 @@ static BOOL bRememberPassword = FALSE;
 int ask_password(_TCHAR* message)
 {
 	if( _tcsstr(message, _T("(yes/no)"))) {
-		if( MessageBox(NULL,
+		if( ::MessageBox(NULL,
 			message,
 			_T("SSH"),
 			MB_ICONEXCLAMATION | MB_YESNO) == IDYES ) {
@@ -237,12 +238,15 @@ int ask_password(_TCHAR* message)
 			}
 		}
 		::ZeroMemory(szPassword, sizeof(szPassword));
-		if( (_tcslen(szKeyName) != 0) && LoadPassword(szKeyName) )
-		{
-			_tprintf(_T("%s"), szPassword);
-			SavePassword(szKeyName);
-			::SecureZeroMemory(szPassword, sizeof(szPassword));
-			return 0;
+		if( _tcslen(szKeyName) != 0 ) {
+			if( LoadPassword(szKeyName) ) {
+				_tprintf(_T("%s"), szPassword);
+				SavePassword(szKeyName);
+				::SecureZeroMemory(szPassword, sizeof(szPassword));
+				return 0;
+			} else {
+				ClearPassword(szKeyName);
+			}
 		}
 		if( ::DialogBoxParam(GetModuleHandle(NULL),
 			MAKEINTRESOURCE(IDD_DIALOG),
@@ -304,6 +308,16 @@ void SavePassword(LPCTSTR szKeyName)
 		::RegCloseKey(hKey);
 	}
 	::LocalFree(dbDataOut.pbData);
+}
+
+void ClearPassword(LPCTSTR szKeyName)
+{
+	HKEY hKey;
+	if( ::RegOpenKeyEx(HKEY_CURRENT_USER, szRegistrySubKey, 0, KEY_READ | KEY_SET_VALUE, &hKey) != ERROR_SUCCESS ) {
+		return;
+	}
+	::RegDeleteValue(hKey, szKeyName);
+	::RegCloseKey(hKey);
 }
 
 BOOL LoadPassword(LPCTSTR szKeyName)
