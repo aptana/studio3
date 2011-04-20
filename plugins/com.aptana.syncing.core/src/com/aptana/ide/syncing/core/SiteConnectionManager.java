@@ -70,42 +70,15 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
 	/**
 	 * loadState
+	 * 
 	 * @param path
 	 */
 	public void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
-		    connections.clear();
+			connections.clear();
 
-		    FileReader reader = null;
-			try {
-				reader = new FileReader(file);
-				XMLMemento memento = XMLMemento.createReadRoot(reader);
-				for (IMemento child : memento.getChildren(ELEMENT_SITE)) {
-					SiteConnection siteConnection = restoreConnection(child);
-                    if (siteConnection != null && siteConnection.isValid()) {
-                        connections.add(siteConnection);
-                    }
-                }
-            } catch (IOException e) {
-                SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-                        Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e));
-            } catch (CoreException e) {
-                // could be an 1.5 exported file; try to migrate
-                try {
-                    load15State(file);
-                } catch (Exception e1) {
-                    SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-                            Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1));
-                }
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
-                }
-            }
+			addConnectionsFrom(path);
 		}
 	}
 
@@ -134,6 +107,41 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
                 } catch (IOException e) {
                 }
 		    }
+		}
+	}
+
+	public void addConnectionsFrom(IPath path) {
+		File file = path.toFile();
+		if (file.exists()) {
+			FileReader reader = null;
+			try {
+				reader = new FileReader(file);
+				XMLMemento memento = XMLMemento.createReadRoot(reader);
+				for (IMemento child : memento.getChildren(ELEMENT_SITE)) {
+					SiteConnection siteConnection = restoreConnection(child);
+					if (siteConnection != null && siteConnection.isValid()) {
+						connections.add(siteConnection);
+					}
+				}
+			} catch (IOException e) {
+				SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
+						Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e));
+			} catch (CoreException e) {
+				// could be an 1.5 exported file; try to migrate
+				try {
+					load15State(file);
+				} catch (Exception e1) {
+					SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
+							Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1));
+				}
+			} finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
+			}
 		}
 	}
 

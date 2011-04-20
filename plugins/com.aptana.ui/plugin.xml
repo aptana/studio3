@@ -298,5 +298,12 @@
             ordinal="100">
       </diagnostic>
    </extension>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <category
+            id="com.aptana.ui.wizards.import.category"
+            name="%category.wizards.import.name">
+      </category>
+   </extension>
 
 </plugin>
