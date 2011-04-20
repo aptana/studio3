@@ -21,6 +21,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -131,6 +132,7 @@ public class SamplesView extends ViewPart
 		treeViewer.setLabelProvider(new SamplesViewLabelProvider());
 		treeViewer.setInput(SamplesPlugin.getDefault().getSamplesManager());
 		treeViewer.setComparator(new ViewerComparator());
+		ColumnViewerToolTipSupport.enableFor(treeViewer);
 
 		return treeViewer;
 	}

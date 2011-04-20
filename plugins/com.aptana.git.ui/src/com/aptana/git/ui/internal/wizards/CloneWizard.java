@@ -7,13 +7,17 @@
  */
 package com.aptana.git.ui.internal.wizards;
 
-import org.eclipse.core.runtime.jobs.Job;
+import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
 import com.aptana.git.ui.CloneJob;
+import com.aptana.git.ui.GitUIPlugin;
 
 public class CloneWizard extends Wizard implements IImportWizard
 {
@@ -23,14 +27,35 @@ public class CloneWizard extends Wizard implements IImportWizard
 	@Override
 	public boolean performFinish()
 	{
-		Job job = new CloneJob(cloneSource.getSource(), cloneSource.getDestination());
-		job.schedule();
+		final String sourceURI = cloneSource.getSource();
+		final String dest = cloneSource.getDestination();
+		try
+		{
+			getContainer().run(true, true, new IRunnableWithProgress()
+			{
+
+				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
+				{
+					CloneJob job = new CloneJob(sourceURI, dest);
+					job.run(monitor);
+				}
+			});
+		}
+		catch (InvocationTargetException e)
+		{
+			GitUIPlugin.logError(e);
+		}
+		catch (InterruptedException e)
+		{
+			GitUIPlugin.logError(e);
+		}
 		return true;
 	}
 
 	public void init(IWorkbench workbench, IStructuredSelection selection)
 	{
 		cloneSource = new RepositorySelectionPage();
+		setNeedsProgressMonitor(true);
 	}
 
 	@Override

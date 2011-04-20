@@ -619,17 +619,20 @@ public class SiteConnectionPropertiesWidget extends Composite implements ModifyL
             } else if (ConnectionPointUtils.isWorkspace(connectionPoint)) {
                 setType(PROJECT);
                 IResource resource = (IResource) connectionPoint.getAdapter(IResource.class);
-                projectViewer.setSelection(new StructuredSelection(resource.getProject()), true);
-                IPath path = resource.getProjectRelativePath();
-                if (path.isEmpty()) {
-                    path = Path.ROOT;
-                }
-                projectFolderText.setText(path.toPortableString());
+				if (resource != null) {
+					projectViewer.setSelection(new StructuredSelection(resource.getProject()), true);
+					IPath path = resource.getProjectRelativePath();
+					if (path.isEmpty()) {
+						path = Path.ROOT;
+					}
+					projectFolderText.setText(path.toPortableString());
+				}
             } else if (ConnectionPointUtils.isLocal(connectionPoint)) {
                 setType(FILESYSTEM);
                 File file = (File) connectionPoint.getAdapter(File.class);
-                filesystemFolderText.setText(Path.fromOSString(file.getAbsolutePath())
-                        .toPortableString());
+				if (file != null) {
+					filesystemFolderText.setText(Path.fromOSString(file.getAbsolutePath()).toPortableString());
+				}
             }
         }
 

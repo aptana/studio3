@@ -87,39 +87,19 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * loadState
+	 * 
 	 * @param path
 	 */
-	public void loadState(IPath path) {
+	/* package */ void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
-		    connections.clear();
-		    unresolvedConnections.clear();
+			connections.clear();
+			unresolvedConnections.clear();
 
-		    FileReader reader = null;
-			try {
-				reader = new FileReader(file);
-				XMLMemento memento = XMLMemento.createReadRoot(reader);
-				for (IMemento child : memento.getChildren(ELEMENT_CONNECTION)) {
-					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
-					if (connectionPoint != null) {
-						connections.add(connectionPoint);
-					} else {
-						unresolvedConnections.add(child);
-					}
-				}
-			} catch (IOException e) {
-			} catch (CoreException e) {
-			} finally {
-			    if (reader != null) {
-			        try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
-			    }
-			}
+			addConnectionsFrom(path);
 		}
 	}
 
@@ -127,7 +107,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * saveState
 	 * @param path
 	 */
-	public void saveState(IPath path) {
+	/* package */ void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
         synchronized (connections) {
             for (ConnectionPoint connectionPoint : connections) {
@@ -156,6 +136,37 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
                 }
 		    }
 		}
+	}
+
+	public List<IConnectionPoint> addConnectionsFrom(IPath path) {
+		List<IConnectionPoint> newConnections = new ArrayList<IConnectionPoint>();
+		File file = path.toFile();
+		if (file.exists()) {
+			FileReader reader = null;
+			try {
+				reader = new FileReader(file);
+				XMLMemento memento = XMLMemento.createReadRoot(reader);
+				for (IMemento child : memento.getChildren(ELEMENT_CONNECTION)) {
+					ConnectionPoint connectionPoint = restoreConnectionPoint(child, null);
+					if (connectionPoint != null) {
+						connections.add(connectionPoint);
+						newConnections.add(connectionPoint);
+					} else {
+						unresolvedConnections.add(child);
+					}
+				}
+			} catch (IOException e) {
+			} catch (CoreException e) {
+			} finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
+		return newConnections;
 	}
 
 	/**

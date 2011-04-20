@@ -13,7 +13,6 @@ import com.aptana.editor.common.outline.CommonOutlinePage;
 import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.svg.outline.SVGOutlineContentProvider;
 import com.aptana.editor.svg.outline.SVGOutlineLabelProvider;
-import com.aptana.editor.svg.parsing.SVGParserConstants;
 import com.aptana.editor.xml.XMLEditor;
 
 public class SVGEditor extends XMLEditor
@@ -25,7 +24,7 @@ public class SVGEditor extends XMLEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(SVGParserConstants.LANGUAGE);
+		return new FileService(ISVGConstants.CONTENT_TYPE_SVG);
 	}
 
 	/*

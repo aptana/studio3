@@ -36,7 +36,6 @@ import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.outline.HTMLOutlineContentProvider;
 import com.aptana.editor.html.outline.HTMLOutlineLabelProvider;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.xml.TagUtil;
 
@@ -77,7 +76,7 @@ public class HTMLEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		FileService fileService = new FileService(IHTMLParserConstants.LANGUAGE, new HTMLParseState());
+		FileService fileService = new FileService(IHTMLConstants.CONTENT_TYPE_HTML, new HTMLParseState());
 		IValidationManager validationManager = fileService.getValidationManager();
 		validationManager.addNestedLanguage(ICSSParserConstants.LANGUAGE);
 		validationManager.addNestedLanguage(IJSParserConstants.LANGUAGE);

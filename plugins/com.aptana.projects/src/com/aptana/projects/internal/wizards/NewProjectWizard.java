@@ -66,8 +66,8 @@ import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import com.aptana.core.build.UnifiedBuilder;
-import com.aptana.core.projectTemplates.IProjectTemplate;
-import com.aptana.core.projectTemplates.TemplateType;
+import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.internal.actions.DisconnectHandler;
 import com.aptana.projects.ProjectsPlugin;
@@ -513,6 +513,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		{
 			path = path.append(projectDescription.getName());
 		}
+		// FIXME Run an IrunnableWithProgress in wizard container, have it just do job.run(monitor)!
 		Job job = new CloneJob(template.getLocation(), path.toOSString(), true, true);
 		job.addJobChangeListener(new JobChangeAdapter()
 		{

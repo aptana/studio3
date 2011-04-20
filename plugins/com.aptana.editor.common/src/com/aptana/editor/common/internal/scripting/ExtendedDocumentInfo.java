@@ -57,7 +57,7 @@ import com.aptana.scripting.model.BundleManager;
 			if (offset == document.getLength())
 			{
 				ITypedRegion region = document.getPartition(offset);
-				if (region.getLength() == 0)
+				if (region.getLength() == 0 && offset > 0)
 				{
 					offset = offset - 1;
 				}

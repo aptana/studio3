@@ -8,6 +8,8 @@
 
 package com.aptana.ide.syncing.core;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
@@ -31,6 +33,5 @@ public interface ISiteConnectionManager {
 	public void addListener(ISiteConnectionListener listener);
 	public void removeListener(ISiteConnectionListener listener);
 
-	public void loadState(IPath path);
-	public void saveState(IPath path);
+	public List<ISiteConnection> addConnectionsFrom(IPath path);
 }

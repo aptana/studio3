@@ -20,7 +20,6 @@ import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.css.internal.text.CSSFoldingComputer;
 import com.aptana.editor.css.outline.CSSOutlineContentProvider;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
 
 @SuppressWarnings("restriction")
 public class CSSSourceEditor extends AbstractThemeableEditor
@@ -67,7 +66,7 @@ public class CSSSourceEditor extends AbstractThemeableEditor
 	@Override
 	protected FileService createFileService()
 	{
-		return new FileService(ICSSParserConstants.LANGUAGE);
+		return new FileService(ICSSConstants.CONTENT_TYPE_CSS);
 	}
 
 	/*

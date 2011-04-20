@@ -610,7 +610,7 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 					} catch (FileNotFoundException ignore) {
 					}
 					if (!fileInfo.exists()) {
-						fileInfo.setExists(ftpClient.existsFile(path.toPortableString()));
+						fileInfo.setExists(existsFile(path));
 					}
 					return fileInfo;
 				}
@@ -1061,6 +1061,10 @@ public class FTPConnectionFileManager extends BaseFTPConnectionFileManager imple
 		} finally {
 			monitor.done();
 		}
+	}
+	
+	private boolean existsFile(IPath filePath) throws IOException, FTPException {
+		return ftpClient.existsFile(filePath.toPortableString());
 	}
 
 	private FTPFile[] ftpSTAT(String dirname) throws IOException, FTPException, ParseException {

@@ -49,8 +49,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
 	private static SiteConnectionManager instance;
 
-    private List<SiteConnection> connections = Collections
-            .synchronizedList(new ArrayList<SiteConnection>());
+    private List<SiteConnection> connections = Collections.synchronizedList(new ArrayList<SiteConnection>());
 	private boolean dirty = false;
 	
 	private ListenerList listeners = new ListenerList();
@@ -70,42 +69,15 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 
 	/**
 	 * loadState
+	 * 
 	 * @param path
 	 */
-	public void loadState(IPath path) {
+	/* package */ void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
-		    connections.clear();
+			connections.clear();
 
-		    FileReader reader = null;
-			try {
-				reader = new FileReader(file);
-				XMLMemento memento = XMLMemento.createReadRoot(reader);
-				for (IMemento child : memento.getChildren(ELEMENT_SITE)) {
-					SiteConnection siteConnection = restoreConnection(child);
-                    if (siteConnection != null && siteConnection.isValid()) {
-                        connections.add(siteConnection);
-                    }
-                }
-            } catch (IOException e) {
-                SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-                        Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e));
-            } catch (CoreException e) {
-                // could be an 1.5 exported file; try to migrate
-                try {
-                    load15State(file);
-                } catch (Exception e1) {
-                    SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
-                            Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1));
-                }
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
-                }
-            }
+			addConnectionsFrom(path);
 		}
 	}
 
@@ -113,7 +85,7 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
 	 * saveState
 	 * @param path
 	 */
-	public void saveState(IPath path) {
+	/* package */ void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
         synchronized (connections) {
             for (SiteConnection siteConnection : connections) {
@@ -135,6 +107,44 @@ import com.aptana.ide.syncing.core.events.SiteConnectionEvent;
                 }
 		    }
 		}
+	}
+
+	public List<ISiteConnection> addConnectionsFrom(IPath path) {
+		List<ISiteConnection> newConnections = new ArrayList<ISiteConnection>();
+		File file = path.toFile();
+		if (file.exists()) {
+			FileReader reader = null;
+			try {
+				reader = new FileReader(file);
+				XMLMemento memento = XMLMemento.createReadRoot(reader);
+				for (IMemento child : memento.getChildren(ELEMENT_SITE)) {
+					SiteConnection siteConnection = restoreConnection(child);
+					if (siteConnection != null && siteConnection.isValid()) {
+						connections.add(siteConnection);
+						newConnections.add(siteConnection);
+					}
+				}
+			} catch (IOException e) {
+				SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
+						Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e));
+			} catch (CoreException e) {
+				// could be an 1.5 exported file; try to migrate
+				try {
+					load15State(file);
+				} catch (Exception e1) {
+					SyncingPlugin.log(new Status(IStatus.ERROR, SyncingPlugin.PLUGIN_ID,
+							Messages.SiteConnectionManager_ERR_FailedToLoadConnections, e1));
+				}
+			} finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+					}
+				}
+			}
+		}
+		return newConnections;
 	}
 
 	private IMemento storeConnection(SiteConnection siteConnection) {

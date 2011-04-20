@@ -10,8 +10,8 @@ package com.aptana.scripting.model;
 import java.io.File;
 import java.net.URL;
 
-import com.aptana.core.projectTemplates.IProjectTemplate;
-import com.aptana.core.projectTemplates.TemplateType;
+import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.SourcePrinter;
 
 public class ProjectTemplateElement extends AbstractBundleElement implements IProjectTemplate
@@ -169,7 +169,7 @@ public class ProjectTemplateElement extends AbstractBundleElement implements IPr
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projectTemplates.IProjectTemplate#getIconPath()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getIconPath()
 	 */
 	public URL getIconPath()
 	{

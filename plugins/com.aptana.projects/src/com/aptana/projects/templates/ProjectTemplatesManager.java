@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
-import com.aptana.core.projectTemplates.IProjectTemplate;
-import com.aptana.core.projectTemplates.TemplateType;
+import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.TemplateType;
 import com.aptana.core.util.ResourceUtil;
 import com.aptana.core.util.StringUtil;
 import com.aptana.projects.ProjectsPlugin;

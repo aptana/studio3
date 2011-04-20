@@ -44,7 +44,7 @@ import com.aptana.ide.core.io.preferences.PreferenceUtils;
 public abstract class BaseConnectionFileManager implements IConnectionFileManager {
 
 	protected static final int CACHE_TTL = 60000; /* 1min */
-	private static final int RETRY_COUNT = 2;
+	private static final int RETRIES_AFTER_FAILURE = 2;
 
 	protected String login;
 	protected char[] password = new char[0];
@@ -438,7 +438,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected final ExtendedFileInfo[] fetchFilesInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		MultiStatus multiStatus = null;
 		boolean force = false;
-		for (int trial = 0; trial <= RETRY_COUNT; ++trial) {
+		for (int trial = 0; trial <= RETRIES_AFTER_FAILURE; ++trial) {
 			try {
 				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
 				return fetchFiles(path, options, monitor);
@@ -460,7 +460,7 @@ public abstract class BaseConnectionFileManager implements IConnectionFileManage
 	protected final ExtendedFileInfo fetchFileInternal(IPath path, int options, IProgressMonitor monitor) throws CoreException, FileNotFoundException, PermissionDeniedException {
 		MultiStatus multiStatus = null;
 		boolean force = false;
-		for (int trial = 0; trial <= RETRY_COUNT; ++trial) {
+		for (int trial = 0; trial <= RETRIES_AFTER_FAILURE; ++trial) {
 			try {
 				testOrConnect(force, Policy.subMonitorFor(monitor, 1));
 				return fetchFile(path, options, monitor);
