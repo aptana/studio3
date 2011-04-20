@@ -12,8 +12,8 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.Path;
 
-import com.aptana.core.projecttemplates.IProjectTemplate;
-import com.aptana.core.projecttemplates.TemplateType;
+import com.aptana.core.projects.templates.IProjectTemplate;
+import com.aptana.core.projects.templates.TemplateType;
 
 /**
  * Project template that is loaded from the <code>"projectTemplates"</code> extension point.
@@ -49,7 +49,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getDisplayName()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getDisplayName()
 	 */
 	public String getDisplayName()
 	{
@@ -58,7 +58,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getDescription()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getDescription()
 	 */
 	public String getDescription()
 	{
@@ -67,7 +67,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getDirectory()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getDirectory()
 	 */
 	public File getDirectory()
 	{
@@ -76,7 +76,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getLocation()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getLocation()
 	 */
 	public String getLocation()
 	{
@@ -85,7 +85,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getType()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getType()
 	 */
 	public TemplateType getType()
 	{
@@ -94,7 +94,7 @@ public class ProjectTemplate implements IProjectTemplate
 
 	/*
 	 * (non-Javadoc)
-	 * @see com.aptana.core.projecttemplates.IProjectTemplate#getIconPath()
+	 * @see com.aptana.core.projects.templates.IProjectTemplate#getIconPath()
 	 */
 	public URL getIconPath()
 	{
