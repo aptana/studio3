@@ -8,6 +8,8 @@
 
 package com.aptana.ide.core.io;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -41,10 +43,7 @@ public interface IConnectionPointManager extends IAdaptable {
 	public void addConnectionPointListener(IConnectionPointListener listener);
 	public void removeConnectionPointListener(IConnectionPointListener listener);
 
-	public void loadState(IPath path);
-	public void saveState(IPath path);
-
-	public void addConnectionsFrom(IPath path);
+	public List<IConnectionPoint> addConnectionsFrom(IPath path);
 
     /**
      * For migrating connection point from Studio 1.5.

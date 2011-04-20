@@ -9,16 +9,22 @@ package com.aptana.syncing.ui.wizards;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.MessageFormat;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
 import com.aptana.ide.core.io.CoreIOPlugin;
+import com.aptana.ide.core.io.IConnectionPoint;
+import com.aptana.ide.syncing.core.ISiteConnection;
 import com.aptana.ide.syncing.core.SyncingPlugin;
+import com.aptana.ui.util.UIUtils;
 
 /**
  * @author Michael Xia (mxia@appcelerator.com)
@@ -44,6 +50,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 	public boolean performFinish()
 	{
 		IPath location = mainPage.getLocation();
+		int connectionCount = 0, siteCount = 0;
 		if (mainPage.isWorkspaceSelected())
 		{
 			// importing from workspace
@@ -53,7 +60,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 			if (dir.isDirectory())
 			{
 				// this is a 2.0 workspace
-				loadConnectionPoints(dir);
+				connectionCount = loadConnectionPoints(dir);
 			}
 			else
 			{
@@ -62,7 +69,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 				dir = connectionPath.toFile();
 				if (dir.isDirectory())
 				{
-					loadConnectionPoints(dir);
+					connectionCount = loadConnectionPoints(dir);
 				}
 			}
 
@@ -72,7 +79,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 			if (dir.isDirectory())
 			{
 				// this is a 2.0 workspace
-				loadSiteConnections(dir);
+				siteCount = loadSiteConnections(dir);
 			}
 			else
 			{
@@ -81,16 +88,29 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 				dir = sitePath.toFile();
 				if (dir.isDirectory())
 				{
-					loadSiteConnections(dir);
+					siteCount = loadSiteConnections(dir);
 				}
 			}
 		}
 		else
 		{
 			// importing from file
-			CoreIOPlugin.getConnectionPointManager().addConnectionsFrom(location);
-			SyncingPlugin.getSiteConnectionManager().addConnectionsFrom(location);
+			List<IConnectionPoint> connections = CoreIOPlugin.getConnectionPointManager().addConnectionsFrom(location);
+			connectionCount = connections.size();
+			List<ISiteConnection> sites = SyncingPlugin.getSiteConnectionManager().addConnectionsFrom(location);
+			siteCount = sites.size();
 		}
+		final int cCount = connectionCount;
+		final int sCount = siteCount;
+		UIUtils.getDisplay().asyncExec(new Runnable()
+		{
+
+			public void run()
+			{
+				MessageDialog.openInformation(getShell(), Messages.ImportConnectionsWizard_Info_Title,
+						MessageFormat.format(Messages.ImportConnectionsWizard_Info_Message, cCount, sCount));
+			}
+		});
 		return true;
 	}
 
@@ -99,7 +119,7 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 		setWindowTitle(Messages.ImportConnectionsWizard_Title);
 	}
 
-	private void loadConnectionPoints(File dir)
+	private int loadConnectionPoints(File dir)
 	{
 		File[] files = dir.listFiles(new FilenameFilter()
 		{
@@ -112,11 +132,14 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 		File file = getLatestFile(files);
 		if (file != null)
 		{
-			CoreIOPlugin.getConnectionPointManager().addConnectionsFrom(Path.fromOSString(file.getAbsolutePath()));
+			List<IConnectionPoint> connections = CoreIOPlugin.getConnectionPointManager().addConnectionsFrom(
+					Path.fromOSString(file.getAbsolutePath()));
+			return connections.size();
 		}
+		return 0;
 	}
 
-	private void loadSiteConnections(File dir)
+	private int loadSiteConnections(File dir)
 	{
 		File[] files = dir.listFiles(new FilenameFilter()
 		{
@@ -129,8 +152,11 @@ public class ImportConnectionsWizard extends Wizard implements IImportWizard
 		File file = getLatestFile(files);
 		if (file != null)
 		{
-			SyncingPlugin.getSiteConnectionManager().addConnectionsFrom(Path.fromOSString(file.getAbsolutePath()));
+			List<ISiteConnection> sites = SyncingPlugin.getSiteConnectionManager().addConnectionsFrom(
+					Path.fromOSString(file.getAbsolutePath()));
+			return sites.size();
 		}
+		return 0;
 	}
 
 	private static File getLatestFile(File[] files)
