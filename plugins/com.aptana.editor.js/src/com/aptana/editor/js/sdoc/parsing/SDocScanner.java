@@ -40,6 +40,24 @@ public class SDocScanner extends Scanner
 		fQueue = new LinkedList<Symbol>();
 	}
 
+	/**
+	 * Provide a means to advance over source. This is needed specifically when queueTypeTokens is called directly. In
+	 * that case we need to advance the token scanner over the text we've processed. This is only needed in rare cases
+	 * as nextToken normally handles this logic for us
+	 * 
+	 * @param count
+	 */
+	public void advance(int count)
+	{
+		if (count > 0)
+		{
+			for (int i = 0; i < count; i++)
+			{
+				fTokenScanner.read();
+			}
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see beaver.Scanner#nextToken()

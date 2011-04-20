@@ -35,10 +35,4 @@ public final class Messages extends NLS
 	public static String JSCAHandler_Invalid_Type_Name;
 	public static String JSCAHandler_Unable_To_Set_Name_Property;
 	public static String JSCAHandler_Unrecognized_Property_Name;
-	public static String JSMetadataReader_Invalid_Exception_Name;
-	public static String JSMetadataReader_Invalid_Parameter_Type;
-	public static String JSMetadataReader_Invalid_Property_Type;
-	public static String JSMetadataReader_Invalid_Return_Type;
-	public static String JSMetadataReader_Invalid_Supertype_Name;
-	public static String JSMetadataReader_Invalid_Type_Name;
 }

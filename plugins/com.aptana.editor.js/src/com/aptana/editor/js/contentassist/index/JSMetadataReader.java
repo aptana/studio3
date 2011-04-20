@@ -34,6 +34,8 @@ import com.aptana.editor.js.contentassist.model.ReturnTypeElement;
 import com.aptana.editor.js.contentassist.model.SinceElement;
 import com.aptana.editor.js.contentassist.model.TypeElement;
 import com.aptana.editor.js.contentassist.model.UserAgentElement;
+import com.aptana.editor.js.sdoc.model.Type;
+import com.aptana.editor.js.sdoc.parsing.SDocParser;
 
 /**
  * ScriptDocReader
@@ -42,13 +44,10 @@ public class JSMetadataReader extends MetadataReader
 {
 	static final Pattern DOT_PATTERN = Pattern.compile("\\."); //$NON-NLS-1$
 	static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+"); //$NON-NLS-1$
-	static final Pattern PARAMETER_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*[,|]\\s*"); //$NON-NLS-1$
 	static final Pattern PROPERTY_TYPE_DELIMITER_PATTERN = Pattern.compile("\\s*\\|\\s*"); //$NON-NLS-1$
 
 	private static final String JS_METADATA_SCHEMA = "/metadata/JSMetadataSchema.xml"; //$NON-NLS-1$
 	private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("[$_a-zA-Z][$_a-zA-Z0-9]*"); //$NON-NLS-1$
-	private static final Pattern TYPE_PATTERN = Pattern
-		.compile("[$_a-zA-Z][$_a-zA-Z0-9]*(?:\\.[$_a-zA-Z][$_a-zA-Z0-9]*)*(?:(?:<[$_a-zA-Z][$_a-zA-Z0-9]*>)|(?:\\[\\]))?"); //$NON-NLS-1$
 
 	// state flags
 	private boolean _parsingCtors;
@@ -203,9 +202,10 @@ public class JSMetadataReader extends MetadataReader
 					}
 					else
 					{
-						String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Supertype_Name, superType, typeName);
+						String message = MessageFormat.format(
+								"Invalid superType ''{0}'' for type ''{1}''", superType, typeName); //$NON-NLS-1$
 
-						JSPlugin.logError(message, null);
+						this.logError(message);
 					}
 				}
 			}
@@ -216,9 +216,9 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Type_Name, typeName);
+			String message = MessageFormat.format("Invalid type name: {0}", typeName); //$NON-NLS-1$
 
-			JSPlugin.logError(message, null);
+			this.logError(message);
 		}
 	}
 
@@ -258,7 +258,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			JSPlugin.logError(Messages.JSMetadataReader_Invalid_Exception_Name + exceptionName, null);
+			this.logError("Invalid exception name: " + exceptionName); //$NON-NLS-1$
 		}
 	}
 
@@ -360,21 +360,23 @@ public class JSMetadataReader extends MetadataReader
 
 			// grab and set properties
 			parameter.setName(parameterName);
-			
-			String types = attrs.get("type"); //$NON-NLS-1$
 
-			for (String type : PARAMETER_TYPE_DELIMITER_PATTERN.split(types))
+			String typespec = attrs.get("type"); //$NON-NLS-1$
+			List<Type> types = this.parseTypes(typespec);
+
+			if (types != null)
 			{
-				if (this.isValidTypeIdentifier(type))
+				for (Type type : types)
 				{
-					parameter.addType(type);
+					parameter.addType(type.toSource());
 				}
-				else
-				{
-					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Parameter_Type, type, parameterName);
+			}
+			else
+			{
+				String message = MessageFormat.format(
+						"Invalid parameter type ''{0}'' for parameter ''{1}''", typespec, parameterName); //$NON-NLS-1$
 
-					JSPlugin.logError(message, null);
-				}
+				this.logError(message);
 			}
 
 			parameter.setUsage(attrs.get("usage")); //$NON-NLS-1$
@@ -432,9 +434,10 @@ public class JSMetadataReader extends MetadataReader
 				}
 				else
 				{
-					String message = MessageFormat.format(Messages.JSMetadataReader_Invalid_Property_Type, propertyType, propertyName);
+					String message = MessageFormat.format(
+							"Invalid property type ''{0}'' for property ''{1}''", propertyType, propertyName); //$NON-NLS-1$
 
-					JSPlugin.logError(message, null);
+					this.logError(message);
 				}
 			}
 
@@ -485,7 +488,7 @@ public class JSMetadataReader extends MetadataReader
 		}
 		else
 		{
-			JSPlugin.logError(Messages.JSMetadataReader_Invalid_Return_Type + type, null);
+			this.logError("Invalid return type: " + type); //$NON-NLS-1$
 		}
 	}
 
@@ -896,7 +899,8 @@ public class JSMetadataReader extends MetadataReader
 	{
 		try
 		{
-			return FileLocator.openStream(JSPlugin.getDefault().getBundle(), Path.fromPortableString(JS_METADATA_SCHEMA), false);
+			return FileLocator.openStream(JSPlugin.getDefault().getBundle(),
+					Path.fromPortableString(JS_METADATA_SCHEMA), false);
 		}
 		catch (IOException e)
 		{
@@ -976,11 +980,31 @@ public class JSMetadataReader extends MetadataReader
 
 		if (name != null)
 		{
-			Matcher m = TYPE_PATTERN.matcher(name);
-
-			result = m.matches();
+			result = (this.parseTypes(name) != null);
 		}
 
 		return result;
+	}
+
+	/**
+	 * parseTypes
+	 * 
+	 * @param typeSpec
+	 * @return
+	 */
+	protected List<Type> parseTypes(String typeSpec)
+	{
+		SDocParser parser = new SDocParser();
+		List<Type> types = null;
+
+		try
+		{
+			types = parser.parseType(typeSpec);
+		}
+		catch (Exception e)
+		{
+		}
+
+		return types;
 	}
 }
