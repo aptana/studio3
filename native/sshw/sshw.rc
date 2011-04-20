@@ -91,7 +91,7 @@ BEGIN
             VALUE "FileDescription", "SSH Wrapper for Windows"
             VALUE "FileVersion", "1, 0, 0, 0"
             VALUE "InternalName", "sshw"
-            VALUE "LegalCopyright", "Copyright (C) Aptana, Inc. 2010"
+            VALUE "LegalCopyright", "Copyright (C) Appcelerator, Inc. 2010,2011"
             VALUE "OriginalFilename", "sshw.exe"
             VALUE "ProductName", "Aptana Studio 3"
             VALUE "ProductVersion", "1, 0, 0, 0"
