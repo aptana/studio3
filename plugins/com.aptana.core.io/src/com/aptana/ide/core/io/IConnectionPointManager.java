@@ -41,9 +41,6 @@ public interface IConnectionPointManager extends IAdaptable {
 	public void addConnectionPointListener(IConnectionPointListener listener);
 	public void removeConnectionPointListener(IConnectionPointListener listener);
 
-	public void loadState(IPath path);
-	public void saveState(IPath path);
-
 	public void addConnectionsFrom(IPath path);
 
     /**

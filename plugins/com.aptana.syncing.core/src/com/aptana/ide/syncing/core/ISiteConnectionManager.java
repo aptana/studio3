@@ -31,8 +31,5 @@ public interface ISiteConnectionManager {
 	public void addListener(ISiteConnectionListener listener);
 	public void removeListener(ISiteConnectionListener listener);
 
-	public void loadState(IPath path);
-	public void saveState(IPath path);
-
 	public void addConnectionsFrom(IPath path);
 }

@@ -93,7 +93,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * 
 	 * @param path
 	 */
-	public void loadState(IPath path) {
+	/* package */ void loadState(IPath path) {
 		File file = path.toFile();
 		if (file.exists()) {
 			connections.clear();
@@ -107,7 +107,7 @@ import com.aptana.ide.core.io.events.IConnectionPointListener;
 	 * saveState
 	 * @param path
 	 */
-	public void saveState(IPath path) {
+	/* package */ void saveState(IPath path) {
 		XMLMemento memento = XMLMemento.createWriteRoot(ELEMENT_ROOT);
         synchronized (connections) {
             for (ConnectionPoint connectionPoint : connections) {
