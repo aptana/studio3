@@ -357,22 +357,19 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 */
 	public static void extractZip(IProjectTemplate template, IProject project, Set<IPath> preExistingResources)
 	{
-		extractZip(template, new File(template.getDirectory(), template.getLocation()), project,
-				!preExistingResources.isEmpty(), preExistingResources);
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, !preExistingResources.isEmpty(),
+				preExistingResources);
 	}
 
 	public static void extractZip(IProjectTemplate template, IProject project, boolean promptForOverwrite)
 	{
 		Set<IPath> emptySet = Collections.emptySet();
-		extractZip(template, new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite,
-				emptySet);
+		extractZip(new File(template.getDirectory(), template.getLocation()), project, promptForOverwrite, emptySet);
 	}
 
 	/**
 	 * Extracts a zip into a given project.
 	 * 
-	 * @param template
-	 *            A project template.
 	 * @param zipPath
 	 * @param project
 	 * @param promptForOverwrite
@@ -382,8 +379,8 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
 	 *            empty list, the function will prompt on any overwritten file.
 	 */
-	public static void extractZip(final IProjectTemplate template, final File zipPath, final IProject project,
-			boolean promptForOverwrite, Set<IPath> preExistingResources)
+	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
+			Set<IPath> preExistingResources)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
 		if (zipPath.exists())
