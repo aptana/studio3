@@ -606,7 +606,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 		catch (Exception e)
 		{
 			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID,
-					"Failed applying file-template variables", e)); //$NON-NLS-1$
+					Messages.NewProjectWizard_templateVariableApplyError, e));
 		}
 		finally
 		{
