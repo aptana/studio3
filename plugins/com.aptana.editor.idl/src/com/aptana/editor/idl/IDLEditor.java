@@ -9,18 +9,9 @@ package com.aptana.editor.idl;
 
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 
 public class IDLEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	protected FileService createFileService()
-	{
-		return new FileService(IIDLConstants.CONTENT_TYPE_IDL);
-	}
 
 	/*
 	 * (non-Javadoc)
