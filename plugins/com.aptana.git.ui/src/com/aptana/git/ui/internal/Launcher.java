@@ -101,7 +101,7 @@ public abstract class Launcher
 		config.setAttribute(IExternalToolConstants.ATTR_SHOW_CONSOLE, true);
 		config.setAttribute(IDebugUIConstants.ATTR_LAUNCH_IN_BACKGROUND, false);
 		config.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, ConsoleProcessFactory.ID);
-		Map<String, String> env = GitExecutable.instance().getSSHEnvironment();
+		Map<String, String> env = GitExecutable.instance().getShellEnvironment();
 		if (!env.isEmpty())
 		{
 			config.setAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES, env);

@@ -26,17 +26,17 @@ import com.aptana.core.util.IOUtil;
 import com.aptana.editor.common.resolver.IPathResolver;
 import com.aptana.editor.common.resolver.URIResolver;
 import com.aptana.editor.common.tasks.TaskTag;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.contentassist.index.CSSFileIndexingParticipant;
 import com.aptana.editor.css.contentassist.index.CSSIndexConstants;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
 import com.aptana.editor.html.HTMLPlugin;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.parsing.HTMLParseState;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLCommentNode;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLSpecialNode;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.contentassist.index.JSFileIndexingParticipant;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.index.core.AbstractFileIndexingParticipant;
 import com.aptana.index.core.Index;
 import com.aptana.parsing.ParserPoolFactory;
@@ -109,7 +109,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 		{
 			String language = child.getLanguage();
 
-			if (ICSSParserConstants.LANGUAGE.equals(language))
+			if (ICSSConstants.CONTENT_TYPE_CSS.equals(language))
 			{
 				// process inline code
 				CSSFileIndexingParticipant cssIndex = new CSSFileIndexingParticipant();
@@ -131,7 +131,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 					addIndex(index, file, HTMLIndexConstants.RESOURCE_JS, resolved.toString());
 				}
 			}
-			else if (child != null && IJSParserConstants.LANGUAGE.equals(child.getLanguage()))
+			else if (child != null && IJSConstants.CONTENT_TYPE_JS.equals(child.getLanguage()))
 			{
 				// process inline code
 				JSFileIndexingParticipant jsIndex = new JSFileIndexingParticipant();
@@ -280,7 +280,7 @@ public class HTMLFileIndexingParticipant extends AbstractFileIndexingParticipant
 					HTMLParseState parseState = new HTMLParseState();
 					parseState.setEditState(fileContents, null, 0, 0);
 
-					IParseNode parseNode = ParserPoolFactory.parse(IHTMLParserConstants.LANGUAGE, parseState);
+					IParseNode parseNode = ParserPoolFactory.parse(IHTMLConstants.CONTENT_TYPE_HTML, parseState);
 					sub.worked(50);
 
 					walkAST(index, file, fileContents, parseNode, sub.newChild(20));

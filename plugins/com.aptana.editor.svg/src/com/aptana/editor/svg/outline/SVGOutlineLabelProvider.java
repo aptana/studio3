@@ -10,10 +10,10 @@ package com.aptana.editor.svg.outline;
 import org.eclipse.swt.graphics.Image;
 
 import com.aptana.editor.common.outline.CompositeOutlineLabelProvider;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.editor.css.outline.CSSOutlineLabelProvider;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.js.outline.JSOutlineLabelProvider;
-import com.aptana.editor.js.parsing.IJSParserConstants;
 import com.aptana.editor.svg.SVGPlugin;
 import com.aptana.editor.xml.parsing.ast.XMLNode;
 
@@ -29,8 +29,8 @@ public class SVGOutlineLabelProvider extends CompositeOutlineLabelProvider
 	 */
 	public SVGOutlineLabelProvider()
 	{
-		this.addSubLanguage(IJSParserConstants.LANGUAGE, new JSOutlineLabelProvider());
-		this.addSubLanguage(ICSSParserConstants.LANGUAGE, new CSSOutlineLabelProvider());
+		this.addSubLanguage(IJSConstants.CONTENT_TYPE_JS, new JSOutlineLabelProvider());
+		this.addSubLanguage(ICSSConstants.CONTENT_TYPE_CSS, new CSSOutlineLabelProvider());
 	}
 
 	/*

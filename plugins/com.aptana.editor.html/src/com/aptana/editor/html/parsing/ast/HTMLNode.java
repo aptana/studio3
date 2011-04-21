@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.html.parsing.ast;
 
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 public class HTMLNode extends ParseNode
@@ -17,7 +17,7 @@ public class HTMLNode extends ParseNode
 
 	public HTMLNode(short type, int start, int end)
 	{
-		super(IHTMLParserConstants.LANGUAGE);
+		super(IHTMLConstants.CONTENT_TYPE_HTML);
 		fType = type;
 		this.setLocation(start, end);
 	}

@@ -30,8 +30,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.json.parsing.JSONParser"
-            content-type="com.aptana.contenttype.json"
-            language="text/json">
+            content-type="com.aptana.contenttype.json">
       </parser>
    </extension>
    <extension

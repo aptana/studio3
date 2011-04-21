@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.idl.parsing.ast;
 
-import com.aptana.editor.idl.parsing.IDLParserConstants;
+import com.aptana.editor.idl.IIDLConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 public class IDLNode extends ParseNode
@@ -29,7 +29,7 @@ public class IDLNode extends ParseNode
 	 */
 	public IDLNode(IDLNodeType type)
 	{
-		super(IDLParserConstants.LANGUAGE);
+		super(IIDLConstants.CONTENT_TYPE_IDL);
 
 		this._type = type;
 	}

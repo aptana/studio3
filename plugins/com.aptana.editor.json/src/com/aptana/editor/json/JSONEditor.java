@@ -15,7 +15,6 @@ import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import com.aptana.editor.common.AbstractThemeableEditor;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.common.text.reconciler.IFoldingComputer;
 import com.aptana.editor.json.internal.text.JSONFoldingComputer;
 import com.aptana.editor.json.outline.JSONOutlineContentProvider;
@@ -24,15 +23,6 @@ import com.aptana.editor.json.outline.JSONOutlineLabelProvider;
 @SuppressWarnings("restriction")
 public class JSONEditor extends AbstractThemeableEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.common.AbstractThemeableEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(IJSONConstants.CONTENT_TYPE_JSON);
-	}
 
 	/*
 	 * (non-Javadoc)

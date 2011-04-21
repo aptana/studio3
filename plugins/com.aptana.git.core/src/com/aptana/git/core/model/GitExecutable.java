@@ -295,7 +295,7 @@ public class GitExecutable
 	 * 
 	 * @return
 	 */
-	public Map<String, String> getSSHEnvironment()
+	public Map<String, String> getShellEnvironment()
 	{
 		Map<String, String> env = new HashMap<String, String>();
 		env.putAll(ShellExecutable.getEnvironment());
@@ -303,6 +303,7 @@ public class GitExecutable
 		if (git_ssh != null)
 		{
 			env.put("GIT_SSH", git_ssh.toOSString()); //$NON-NLS-1$
+			env.put("GIT_ASKPASS", git_ssh.toOSString()); //$NON-NLS-1$
 		}
 		if (!env.isEmpty())
 		{

@@ -223,6 +223,7 @@ public final class ShellExecutable {
 
 	private static Map<String, String> buildEnvironment(String envp) {
 		Map<String, String> env = new HashMap<String, String>();
+		env.put("HOME", PlatformUtil.expandEnvironmentStrings("~")); //$NON-NLS-1$ //$NON-NLS-2$
 		StringTokenizer tok = new StringTokenizer(envp, "\r\n"); //$NON-NLS-1$
 		while (tok.hasMoreTokens()) {
 			String envstring = tok.nextToken();

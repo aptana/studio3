@@ -20,7 +20,7 @@ import org.mozilla.javascript.Parser;
 import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
-import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.js.IJSConstants;
 
 public class MozillaJsValidator implements IValidator
 {
@@ -58,7 +58,7 @@ public class MozillaJsValidator implements IValidator
 		for (ErrorItem error : errors)
 		{
 			message = error.getMessage();
-			if (!manager.isIgnored(message, IJSParserConstants.LANGUAGE))
+			if (!manager.isIgnored(message, IJSConstants.CONTENT_TYPE_JS))
 			{
 				severity = error.getSeverity();
 				if (severity == IMarker.SEVERITY_ERROR)

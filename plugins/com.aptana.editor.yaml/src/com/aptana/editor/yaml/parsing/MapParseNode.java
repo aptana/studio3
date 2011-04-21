@@ -6,6 +6,7 @@ import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import com.aptana.editor.yaml.IYAMLConstants;
 import com.aptana.parsing.IParseState;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
@@ -17,7 +18,7 @@ public class MapParseNode extends ParseNode
 
 	public MapParseNode(MappingNode node, IParseState parseState)
 	{
-		super(IYAMLParserConstants.LANGUAGE);
+		super(IYAMLConstants.CONTENT_TYPE_YAML);
 		setLocation(YAMLParseRootNode.getStart(node, parseState), YAMLParseRootNode.getEnd(node, parseState));
 		this.node = node;
 		traverse(parseState);
