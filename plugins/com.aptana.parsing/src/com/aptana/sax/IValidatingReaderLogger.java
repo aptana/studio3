@@ -17,19 +17,19 @@ public interface IValidatingReaderLogger
 	 * 
 	 * @param message
 	 */
-	void logError(String message);
+	void logError(String message, int line, int column);
 
 	/**
 	 * log info
 	 * 
 	 * @param message
 	 */
-	void logInfo(String message);
+	void logInfo(String message, int line, int column);
 
 	/**
 	 * log a warning
 	 * 
 	 * @param message
 	 */
-	void logWarning(String message);
+	void logWarning(String message, int line, int column);
 }

@@ -18,6 +18,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -31,6 +32,7 @@ public class ValidatingReader extends DefaultHandler
 	 */
 	protected Schema _schema;
 	protected IValidatingReaderLogger _logger;
+	protected Locator _locator;
 
 	/**
 	 * Create a new instance of ValidatingReader
@@ -119,9 +121,9 @@ public class ValidatingReader extends DefaultHandler
 	 */
 	public void logError(String message)
 	{
-		if (this._logger != null)
+		if (this._logger != null && this._locator != null)
 		{
-			this._logger.logError(message);
+			this._logger.logError(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
 		}
 		else
 		{
@@ -138,7 +140,7 @@ public class ValidatingReader extends DefaultHandler
 	{
 		if (this._logger != null)
 		{
-			this._logger.logInfo(message);
+			this._logger.logInfo(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
 		}
 		else
 		{
@@ -155,7 +157,7 @@ public class ValidatingReader extends DefaultHandler
 	{
 		if (this._logger != null)
 		{
-			this._logger.logWarning(message);
+			this._logger.logWarning(message, this._locator.getLineNumber(), this._locator.getColumnNumber());
 		}
 		else
 		{
@@ -192,6 +194,18 @@ public class ValidatingReader extends DefaultHandler
 		
 		// parse the XML
 		saxParser.parse(in, this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#setDocumentLocator(org.xml.sax.Locator)
+	 */
+	@Override
+	public void setDocumentLocator(Locator locator)
+	{
+		super.setDocumentLocator(locator);
+
+		this._locator = locator;
 	}
 
 	/**
