@@ -54,8 +54,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
-	private static final Object RUBY_LANGUAGE = "text/ruby"; //$NON-NLS-1$
-	private static final Object PHP_LANGUAGE = "text/php"; //$NON-NLS-1$
+	private static final Object RUBY_LANGUAGE = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
+	private static final Object PHP_LANGUAGE = "com.aptana.contenttype.php"; //$NON-NLS-1$
 
 	private FormatterDocument document;
 
