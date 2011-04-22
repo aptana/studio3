@@ -77,8 +77,8 @@ public class HTMLSubPartitionScanner extends CompositeSubPartitionScanner
 		if (HTMLSourceConfiguration.HTML_SCRIPT.equals(contentType)
 				|| SVGSourceConfiguration.SCRIPT.equals(contentType)) {
 			if (!(token instanceof ExtendedToken
-					&& (HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))
-						|| !HTMLUtils.isJavaScriptTag(((ExtendedToken) token).getContents())
+					&& ((HTMLUtils.isTagSelfClosing(((ExtendedToken) token).getContents()))
+						|| !HTMLUtils.isJavaScriptTag(((ExtendedToken) token).getContents()))
 					)) {
 				current = TYPE_JS;
 			}
