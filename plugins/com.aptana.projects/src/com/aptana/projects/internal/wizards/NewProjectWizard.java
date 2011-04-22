@@ -7,12 +7,18 @@
  */
 package com.aptana.projects.internal.wizards;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -22,6 +28,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.ICommand;
@@ -41,7 +49,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -369,7 +379,7 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 	 *            A defined list of resources that will be used when prompting for overwrite conflicts. In case of an
 	 *            empty list, the function will prompt on any overwritten file.
 	 */
-	public static void extractZip(final File zipPath, IProject project, boolean promptForOverwrite,
+	public static void extractZip(final File zipPath, final IProject project, boolean promptForOverwrite,
 			Set<IPath> preExistingResources)
 	{
 		final Map<IFile, ZipEntry> conflicts = new HashMap<IFile, ZipEntry>();
@@ -407,24 +417,27 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 										|| preExistingResources.contains(newFile.getLocation()))
 								{
 									conflicts.put(newFile, entry);
+									// Remove the file for now. We will add it again if the user agrees the
+									// overwrite it.
 								}
 								else
 								{
 									// The file exists right now, but was not in the pre-existing resources we check
 									// against, so we just need to set it with the new content.
-									((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
+									newFile.setContents(getInputStream(zipFile, entry, newFile, project), true, true,
+											null);
 								}
 							}
 							else
 							{
-								((IFile) newFile).setContents(zipFile.getInputStream(entry), true, true, null);
+								newFile.setContents(getInputStream(zipFile, entry, newFile, project), true, true, null);
 							}
 						}
 						else
 						{
 							try
 							{
-								newFile.create(zipFile.getInputStream(entry), true, null);
+								newFile.create(getInputStream(zipFile, entry, newFile, project), true, null);
 							}
 							catch (CoreException re)
 							{
@@ -433,15 +446,14 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 								{
 									IResourceStatus rs = (IResourceStatus) re.getStatus();
 									IFile newVariantFile = project.getParent().getFile(rs.getPath());
-									((IFile) newVariantFile).setContents(zipFile.getInputStream(entry), true, true,
-											null);
+									newVariantFile.setContents(getInputStream(zipFile, entry, newVariantFile, project),
+											true, true, null);
 								}
 								else
 								{
 									ProjectsPlugin.logError(Messages.NewProjectWizard_ZipFailure, re);
 								}
 							}
-
 						}
 					}
 				}
@@ -464,7 +476,9 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 									// Overwrite the selected files only.
 									for (Object file : overwrittenFiles)
 									{
-										((IFile) file).setContents(finalZipFile.getInputStream(conflicts.get(file)),
+										IFile iFile = (IFile) file;
+										iFile.setContents(
+												getInputStream(finalZipFile, conflicts.get(file), iFile, project),
 												true, true, null);
 									}
 								}
@@ -482,6 +496,10 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 					openDialogJob.join();
 				}
 			}
+			catch (CoreException e)
+			{
+				ProjectsPlugin.logError(e.getMessage(), e);
+			}
 			catch (Exception e)
 			{
 				ProjectsPlugin.logError(MessageFormat.format(Messages.NewProjectWizard_ERR_UnzipFile, zipPath), e);
@@ -498,6 +516,105 @@ public class NewProjectWizard extends BasicNewResourceWizard implements IExecuta
 					{
 						// ignores
 					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns an input stream for a zip entry. The returned input stream may be a stream that was generated after
+	 * processing the file for template-variables.
+	 * 
+	 * @param zipFile
+	 * @param entry
+	 *            A zip entry
+	 * @param file
+	 *            An {@link IFile} reference.
+	 * @param project
+	 *            An {@link IProject} reference.
+	 * @return An input stream for the content.
+	 * @throws IOException
+	 * @throws CoreException
+	 */
+	private static InputStream getInputStream(ZipFile zipFile, ZipEntry entry, IFile file, IProject project)
+			throws IOException, CoreException
+	{
+		if (!isSupportedFile(file))
+		{
+			return zipFile.getInputStream(entry);
+		}
+		String content = applyTemplateVariables(new InputStreamReader(zipFile.getInputStream(entry)), file, project);
+		return new ByteArrayInputStream(content.getBytes());
+	}
+
+	/**
+	 * Returns true if the given file can be evaluated for template-variables.<br>
+	 * There is no good way of detecting what is binary and what is not, so we decide what is supported according to the
+	 * existing editor's supported content types (file extensions).
+	 * 
+	 * @param file
+	 * @return True if the file can be processed; False, otherwise.
+	 */
+	private static boolean isSupportedFile(IFile file)
+	{
+		IContentType contentType = Platform.getContentTypeManager().findContentTypeFor(file.getName());
+		return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType) != null;
+	}
+
+	/**
+	 * Apply the project-template variables on the files that were extracted as the project contents.
+	 * 
+	 * @param reader
+	 * @param file
+	 * @param project
+	 * @return A string content of the {@link InputStream}, <b>after</b> the variables substitution.
+	 * @throws CoreException
+	 */
+	private static String applyTemplateVariables(Reader reader, IFile file, IProject project) throws CoreException
+	{
+		try
+		{
+			// Initialize the singleton Velocity
+			Velocity.init();
+		}
+		catch (Exception e)
+		{
+			throw new CoreException(
+					new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID, "Failed initialize Velocity", e)); //$NON-NLS-1$
+		}
+		try
+		{
+			IPath absoluteFilePath = file.getLocation();
+			String filePathString = absoluteFilePath.toOSString();
+
+			VelocityContext context = new VelocityContext();
+			context.put("TM_NEW_FILE_BASENAME", absoluteFilePath.removeFileExtension().lastSegment()); //$NON-NLS-1$
+			context.put("TM_NEW_FILE", filePathString); //$NON-NLS-1$
+			context.put("TM_NEW_FILE_DIRECTORY", absoluteFilePath.removeLastSegments(1).toOSString()); //$NON-NLS-1$
+			context.put("TM_PROJECTNAME", project.getName()); //$NON-NLS-1$
+			Calendar calendar = Calendar.getInstance();
+			context.put("TIME", calendar.getTime()); //$NON-NLS-1$
+			context.put("YEAR", calendar.get(Calendar.YEAR)); //$NON-NLS-1$
+
+			StringWriter writer = new StringWriter();
+			Velocity.evaluate(context, writer, filePathString, reader);
+			return writer.getBuffer().toString();
+		}
+		catch (Exception e)
+		{
+			throw new CoreException(new Status(IStatus.ERROR, ProjectsPlugin.PLUGIN_ID,
+					Messages.NewProjectWizard_templateVariableApplyError, e));
+		}
+		finally
+		{
+			if (reader != null)
+			{
+				try
+				{
+					reader.close();
+				}
+				catch (IOException e)
+				{
 				}
 			}
 		}

@@ -143,14 +143,20 @@ public class FileService
 					// not logging the parsing error here since the source could be in an intermediate state of being
 					// edited by the user
 				}
-
-				fValidationManager.validate(source, contentType);
 			}
 		}
 		else
 		{
 			// indicate failure
 			this.fHasValidParseResult = false;
+		}
+	}
+
+	public void validate()
+	{
+		if (contentType != null)
+		{
+			fValidationManager.validate(fDocument.get(), contentType);
 		}
 	}
 
