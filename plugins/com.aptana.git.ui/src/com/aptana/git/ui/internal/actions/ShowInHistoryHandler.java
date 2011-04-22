@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.team.ui.history.IHistoryView;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.ISources;
 
 import com.aptana.git.core.GitPlugin;
 import com.aptana.git.core.model.GitRepository;
@@ -83,7 +84,7 @@ public class ShowInHistoryHandler extends AbstractHandler
 	@SuppressWarnings("unchecked")
 	private IResource getResource(EvaluationContext evContext)
 	{
-		Object input = evContext.getVariable("showInInput"); //$NON-NLS-1$
+		Object input = evContext.getVariable(ISources.SHOW_IN_INPUT);
 		if (input instanceof IFileEditorInput)
 		{
 			IFileEditorInput fei = (IFileEditorInput) input;
