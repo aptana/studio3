@@ -108,7 +108,7 @@ class CommitGraphTable extends TableViewer
 	{
 		this.commits = commits;
 		decorations = new GitGrapher().decorateCommits(commits);
-		getTable().setItemCount(commits.size());
+		setInput(commits);
 	}
 
 	/**
