@@ -9,7 +9,7 @@ package com.aptana.editor.json.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.json.parsing.IJSONParserConstants;
+import com.aptana.editor.json.IJSONConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 /**
@@ -35,7 +35,7 @@ public class JSONParseRootNode extends ParseRootNode
 	public JSONParseRootNode(Symbol[] children)
 	{
 		super( //
-			IJSONParserConstants.LANGUAGE, //
+			IJSONConstants.CONTENT_TYPE_JSON, //
 			children, //
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[children.length - 1].getEnd() : 0);

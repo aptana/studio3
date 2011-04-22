@@ -10,8 +10,8 @@ package com.aptana.editor.svg.parsing;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import com.aptana.editor.css.parsing.ICSSParserConstants;
-import com.aptana.editor.js.parsing.IJSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
+import com.aptana.editor.js.IJSConstants;
 import com.aptana.editor.xml.parsing.XMLParser;
 import com.aptana.editor.xml.parsing.ast.XMLElementNode;
 import com.aptana.editor.xml.parsing.lexer.XMLTokenType;
@@ -151,11 +151,11 @@ public class SVGParser extends XMLParser
 
 				if ("script".equals(elementName)) //$NON-NLS-1$
 				{
-					this.processLanguage(IJSParserConstants.LANGUAGE, elementName);
+					this.processLanguage(IJSConstants.CONTENT_TYPE_JS, elementName);
 				}
 				else if ("style".equals(elementName)) //$NON-NLS-1$
 				{
-					this.processLanguage(ICSSParserConstants.LANGUAGE, elementName);
+					this.processLanguage(ICSSConstants.CONTENT_TYPE_CSS, elementName);
 				}
 			}
 		}

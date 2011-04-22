@@ -26,7 +26,7 @@ import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.html.HTMLPlugin;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
+import com.aptana.editor.html.IHTMLConstants;
 
 public class HTMLTidyValidator implements IValidator
 {
@@ -111,7 +111,7 @@ public class HTMLTidyValidator implements IValidator
 			String type = matcher.group(3);
 			String message = patchMessage(matcher.group(4));
 
-			if (message != null && !manager.isIgnored(message, IHTMLParserConstants.LANGUAGE)
+			if (message != null && !manager.isIgnored(message, IHTMLConstants.CONTENT_TYPE_HTML)
 					&& !containsHTML5Element(message))
 			{
 				if (type.startsWith("Error")) //$NON-NLS-1$

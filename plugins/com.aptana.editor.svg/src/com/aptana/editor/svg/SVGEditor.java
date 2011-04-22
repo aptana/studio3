@@ -10,22 +10,12 @@ package com.aptana.editor.svg;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.aptana.editor.common.outline.CommonOutlinePage;
-import com.aptana.editor.common.parsing.FileService;
 import com.aptana.editor.svg.outline.SVGOutlineContentProvider;
 import com.aptana.editor.svg.outline.SVGOutlineLabelProvider;
 import com.aptana.editor.xml.XMLEditor;
 
 public class SVGEditor extends XMLEditor
 {
-	/*
-	 * (non-Javadoc)
-	 * @see com.aptana.editor.xml.XMLEditor#createFileService()
-	 */
-	@Override
-	protected FileService createFileService()
-	{
-		return new FileService(ISVGConstants.CONTENT_TYPE_SVG);
-	}
 
 	/*
 	 * (non-Javadoc)

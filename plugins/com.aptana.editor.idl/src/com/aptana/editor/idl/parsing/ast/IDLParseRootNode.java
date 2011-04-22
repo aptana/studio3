@@ -9,7 +9,7 @@ package com.aptana.editor.idl.parsing.ast;
 
 import beaver.Symbol;
 
-import com.aptana.editor.idl.parsing.IDLParserConstants;
+import com.aptana.editor.idl.IIDLConstants;
 import com.aptana.parsing.ast.ParseRootNode;
 
 public class IDLParseRootNode extends ParseRootNode
@@ -30,7 +30,7 @@ public class IDLParseRootNode extends ParseRootNode
 	public IDLParseRootNode(Symbol[] children)
 	{
 		super( //
-			IDLParserConstants.LANGUAGE, //
+			IIDLConstants.CONTENT_TYPE_IDL, //
 			children, //
 			(children != null && children.length > 0) ? children[0].getStart() : 0, //
 			(children != null && children.length > 0) ? children[0].getEnd() : 0 //

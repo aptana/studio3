@@ -11,13 +11,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import com.aptana.core.util.StringUtil;
+import com.aptana.editor.html.IHTMLConstants;
 import com.aptana.editor.html.formatter.nodes.FormatterDefaultElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterForeignElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLCommentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterHTMLContentNode;
 import com.aptana.editor.html.formatter.nodes.FormatterSpecialElementNode;
 import com.aptana.editor.html.formatter.nodes.FormatterVoidElementNode;
-import com.aptana.editor.html.parsing.IHTMLParserConstants;
 import com.aptana.editor.html.parsing.ast.HTMLElementNode;
 import com.aptana.editor.html.parsing.ast.HTMLNode;
 import com.aptana.editor.html.parsing.ast.HTMLNodeTypes;
@@ -54,8 +54,8 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 	@SuppressWarnings("nls")
 	protected static final HashSet<String> OPTIONAL_ENDING_TAGS = new HashSet<String>(Arrays.asList(""));
 	private static final String INLINE_TAG_CLOSING = "/>"; //$NON-NLS-1$
-	private static final Object RUBY_LANGUAGE = "text/ruby"; //$NON-NLS-1$
-	private static final Object PHP_LANGUAGE = "text/php"; //$NON-NLS-1$
+	private static final Object RUBY_LANGUAGE = "com.aptana.contenttype.ruby"; //$NON-NLS-1$
+	private static final Object PHP_LANGUAGE = "com.aptana.contenttype.php"; //$NON-NLS-1$
 
 	private FormatterDocument document;
 
@@ -352,7 +352,7 @@ public class HTMLFormatterNodeBuilder extends AbstractFormatterNodeBuilder
 		formatterNode.setBegin(createTextNode(document, beginNodeRange.getStartingOffset(),
 				beginNodeRange.getEndingOffset() + 1));
 		push(formatterNode);
-		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLParserConstants.LANGUAGE.equals(node.getLanguage()))
+		if (node.getNodeType() == HTMLNodeTypes.SPECIAL && !IHTMLConstants.CONTENT_TYPE_HTML.equals(node.getLanguage()))
 		{
 			// Everything under this HTMLSpecialNode should be wrapped with a
 			// FormatterSpecialElementNode, and no need to visit its children.

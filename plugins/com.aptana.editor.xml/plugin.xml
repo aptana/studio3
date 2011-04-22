@@ -30,8 +30,7 @@
          point="com.aptana.parsing.parser">
       <parser
             class="com.aptana.editor.xml.parsing.XMLParser"
-            content-type="com.aptana.contenttype.xml"
-            language="text/xml">
+            content-type="org.eclipse.core.runtime.xml">
       </parser>
    </extension>
    <extension

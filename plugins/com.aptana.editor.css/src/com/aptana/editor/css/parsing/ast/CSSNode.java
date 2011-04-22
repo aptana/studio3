@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.css.parsing.ast;
 
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 import com.aptana.parsing.ast.IParseNode;
 import com.aptana.parsing.ast.ParseNode;
 import com.aptana.parsing.ast.ParseRootNode;
@@ -35,7 +35,7 @@ public class CSSNode extends ParseNode
 	 */
 	public CSSNode(short type, int start, int end)
 	{
-		super(ICSSParserConstants.LANGUAGE);
+		super(ICSSConstants.CONTENT_TYPE_CSS);
 		
 		fType = type;
 		

@@ -37,7 +37,7 @@ import com.aptana.editor.common.validator.IValidationItem;
 import com.aptana.editor.common.validator.IValidationManager;
 import com.aptana.editor.common.validator.IValidator;
 import com.aptana.editor.css.CSSPlugin;
-import com.aptana.editor.css.parsing.ICSSParserConstants;
+import com.aptana.editor.css.ICSSConstants;
 
 public class CSSValidator implements IValidator
 {
@@ -259,7 +259,7 @@ public class CSSValidator implements IValidator
 			message = StringEscapeUtils.unescapeHtml(message);
 			message = message.replaceAll("\\s+", " "); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (!manager.isIgnored(message, ICSSParserConstants.LANGUAGE) && !containsCSS3Property(message))
+			if (!manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS) && !containsCSS3Property(message))
 			{
 				// there is no info on the line offset or the length of the errored text
 				items.add(manager.addError(message, lineNumber, 0, 0, sourcePath));
@@ -295,7 +295,7 @@ public class CSSValidator implements IValidator
 
 			String hash = MessageFormat.format("{0}:{1}:{2}:{3}", lineNumber, level, message, context); //$NON-NLS-1$
 			// guards against duplicate warnings
-			if (!last.equals(hash) && !manager.isIgnored(message, ICSSParserConstants.LANGUAGE))
+			if (!last.equals(hash) && !manager.isIgnored(message, ICSSConstants.CONTENT_TYPE_CSS))
 			{
 				items.add(manager.addWarning(message, lineNumber, 0, 0, sourcePath));
 			}

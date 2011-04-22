@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.core.runtime.content.IContentTypeManager;
 
 import com.aptana.internal.parsing.ParserPool;
 import com.aptana.parsing.ast.IParseRootNode;
@@ -25,7 +27,7 @@ public class ParserPoolFactory
 	private static ParserPoolFactory fgInstance;
 	private Map<String, IConfigurationElement> parsers;
 	private HashMap<String, IParserPool> pools;
-	
+
 	/**
 	 * Singleton!
 	 * 
@@ -66,10 +68,7 @@ public class ParserPoolFactory
 
 					for (IConfigurationElement element : elements)
 					{
-						String language = element.getAttribute("language"); //$NON-NLS-1$
 						String contentType = element.getAttribute("content-type"); //$NON-NLS-1$
-
-						parsers.put(language, element);
 						parsers.put(contentType, element);
 					}
 				}
@@ -111,77 +110,91 @@ public class ParserPoolFactory
 	}
 
 	/**
-	 * The main use of this class. Pass in a language (usually "text/language") or content type and get back an
-	 * IParserPool to use to "borrow" a parser instance.
+	 * The main use of this class. Pass in a content type and get back an IParserPool to use to "borrow" a parser
+	 * instance. If the specified content type does not exist in the parser pool, then we work our way up the base
+	 * content types until we find a parser or fail.
 	 * 
-	 * @param languageOrContentType
+	 * @param contentTypeId
 	 * @return
 	 */
-	public synchronized IParserPool getParserPool(String languageOrContentType)
+	public synchronized IParserPool getParserPool(String contentTypeId)
 	{
+		IContentTypeManager ctm = Platform.getContentTypeManager();
+		IContentType contentType = ctm.getContentType(contentTypeId);
+		IParserPool result = null;
+
 		if (pools == null)
 		{
 			pools = new HashMap<String, IParserPool>();
 		}
 
-		IParserPool pool = pools.get(languageOrContentType);
-
-		if (pool == null)
+		while (result == null && contentType != null)
 		{
-			if (parsers == null)
-			{
-				parsers = getParsers();
-			}
+			String currentContentTypeID = contentType.getId();
 
-			IConfigurationElement parserExtension = parsers.get(languageOrContentType);
+			result = pools.get(currentContentTypeID);
 
-			if (parserExtension != null)
+			if (result == null)
 			{
-				pool = new ParserPool(parserExtension);
-				pools.put(languageOrContentType, pool);
+				if (parsers == null)
+				{
+					parsers = getParsers();
+				}
+
+				IConfigurationElement parserExtension = parsers.get(currentContentTypeID);
+
+				if (parserExtension != null)
+				{
+					result = new ParserPool(parserExtension);
+					pools.put(currentContentTypeID, result);
+				}
+				else
+				{
+					contentType = contentType.getBaseType();
+				}
 			}
 		}
 
-		return pool;
+		return result;
 	}
-	
+
 	/**
 	 * parse
 	 * 
-	 * @param language
+	 * @param contentTypeId
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String language, String source)
+	public static IParseRootNode parse(String contentTypeId, String source)
 	{
 		ParseState parseState = new ParseState();
-		
+
 		parseState.setEditState(source, null, 0, 0);
-		
-		return parse(language, parseState);
+
+		return parse(contentTypeId, parseState);
 	}
-	
+
 	/**
 	 * parse
 	 * 
-	 * @param language
+	 * @param contentTypeId
 	 * @param source
 	 * @return
 	 */
-	public static IParseRootNode parse(String language, IParseState parseState)
+	public static IParseRootNode parse(String contentTypeId, IParseState parseState)
 	{
-		if (language == null)
+		if (contentTypeId == null)
 		{
 			return null;
 		}
 
-		IParserPool pool = getInstance().getParserPool(language);
+		IParserPool pool = getInstance().getParserPool(contentTypeId);
 		IParseRootNode result = null;
-		
+
 		if (pool != null)
 		{
 			IParser parser = pool.checkOut();
-			
+
 			if (parser != null)
 			{
 				try
@@ -200,24 +213,18 @@ public class ParserPoolFactory
 			}
 			else
 			{
-				String message = MessageFormat.format(
-					Messages.ParserPoolFactory_Cannot_Acquire_Parser,
-					language
-				);
-				
+				String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser, contentTypeId);
+
 				ParsingPlugin.logError(message, null);
 			}
 		}
 		else
 		{
-			String message = MessageFormat.format(
-				Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool,
-				language
-			);
-			
+			String message = MessageFormat.format(Messages.ParserPoolFactory_Cannot_Acquire_Parser_Pool, contentTypeId);
+
 			ParsingPlugin.logError(message, null);
 		}
-		
+
 		return result;
 	}
 }

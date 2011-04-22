@@ -7,7 +7,7 @@
  */
 package com.aptana.editor.xml.parsing.ast;
 
-import com.aptana.editor.xml.parsing.IXMLParserConstants;
+import com.aptana.editor.xml.IXMLConstants;
 import com.aptana.parsing.ast.ParseNode;
 
 public class XMLNode extends ParseNode
@@ -23,7 +23,7 @@ public class XMLNode extends ParseNode
 	 */
 	public XMLNode(XMLNodeType type, int start, int end)
 	{
-		super(IXMLParserConstants.LANGUAGE);
+		super(IXMLConstants.CONTENT_TYPE_XML);
 
 		fType = type;
 		this.setLocation(start, end);
