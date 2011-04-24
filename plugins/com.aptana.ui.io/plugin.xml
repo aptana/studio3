@@ -741,5 +741,13 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.ide.ui.io.internal.LocalConnectionPropertyDialogProvider"
+            id="com.aptana.ui.io.dialogs.localConnection"
+            objectClass="com.aptana.ide.core.io.LocalConnectionPoint">
+      </dialog>
+   </extension>
 
 </plugin>
