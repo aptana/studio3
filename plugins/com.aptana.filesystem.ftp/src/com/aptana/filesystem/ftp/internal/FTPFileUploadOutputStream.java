@@ -92,6 +92,7 @@ public class FTPFileUploadOutputStream extends OutputStream {
 				if (filename != null) {
 					if (ftpClient.exists(filename)) {
 						ftpClient.delete(filename);
+						filename = null;
 					}
 					ftpClient.rename(ftpOutputStream.getRemoteFile(), actualFilename);
 					filename = null;
