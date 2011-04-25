@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IDocument;
@@ -42,17 +43,20 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.internal.editors.text.EditorsPlugin;
+import org.eclipse.ui.texteditor.AbstractDecoratedTextEditorPreferenceConstants;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 
 import com.aptana.core.util.StringUtil;
 import com.aptana.editor.common.CommonEditorPlugin;
 import com.aptana.editor.common.contentassist.ICommonCompletionProposal;
+import com.aptana.ui.util.UIUtils;
 
+@SuppressWarnings("restriction")
 public class SnippetTemplateProposal extends TemplateProposal implements ICommonCompletionProposal,
 		ICompletionProposalExtension6, Comparable<ICompletionProposal>
 {
-
-	// TODO Figure out space tab width and use it rather than constant of 2!
-	private static final int SPACE_INDENT_SIZE = 2;
+	private static final int DEFAULT_SPACE_INDENT_SIZE = 2;
 
 	protected ICompletionProposal[] templateProposals;
 	protected char triggerChar;
@@ -81,6 +85,9 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		fTemplate = template;
 		fContext = context;
 		fRegion = region;
+		fTemplate.getContextTypeId();
+		getSpaceIndentSize();
+
 	}
 
 	/*
@@ -161,7 +168,8 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 				}
 				catch (TemplateException e1)
 				{
-					CommonEditorPlugin.logWarning(MessageFormat.format("Error in template {0}. {1}", fTemplate.toString(), e1.getMessage())); //$NON-NLS-1$
+					CommonEditorPlugin.logWarning(MessageFormat.format(
+							"Error in template {0}. {1}", fTemplate.toString(), e1.getMessage())); //$NON-NLS-1$
 					fSelectedRegion = fRegion;
 					return;
 				}
@@ -361,7 +369,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		if (useTabs && indent.contains(" ")) //$NON-NLS-1$
 		{
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() / SPACE_INDENT_SIZE; i++)
+			for (int i = 0; i < indent.length() / getSpaceIndentSize(); i++)
 			{
 				newIndent += '\t';
 			}
@@ -370,7 +378,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		if (!useTabs && indent.contains("\t")) //$NON-NLS-1$
 		{
 			String newIndent = ""; //$NON-NLS-1$
-			for (int i = 0; i < indent.length() * SPACE_INDENT_SIZE; i++)
+			for (int i = 0; i < indent.length() * getSpaceIndentSize(); i++)
 			{
 				newIndent += " "; //$NON-NLS-1$
 			}
@@ -443,6 +451,26 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 		}
 
 		return buffer.getString().length();
+	}
+
+	private int getSpaceIndentSize()
+	{
+		int spaceIndentSize;
+
+		// Check the preferences of the active editor
+		spaceIndentSize = Platform.getPreferencesService().getInt(UIUtils.getActiveEditor().getSite().getId(),
+				AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH, 0, null);
+
+		if (spaceIndentSize == 0)
+		{
+			// Fall back on CommonEditorPlugin or EditorsPlugin values if none are set for current editor
+			spaceIndentSize = new ChainedPreferenceStore(new IPreferenceStore[] {
+					CommonEditorPlugin.getDefault().getPreferenceStore(),
+					EditorsPlugin.getDefault().getPreferenceStore() })
+					.getInt(AbstractDecoratedTextEditorPreferenceConstants.EDITOR_TAB_WIDTH);
+		}
+
+		return spaceIndentSize != 0 ? spaceIndentSize : DEFAULT_SPACE_INDENT_SIZE;
 	}
 
 	private void openErrorDialog(Shell shell, Exception e)
@@ -629,8 +657,7 @@ public class SnippetTemplateProposal extends TemplateProposal implements ICommon
 				return 1;
 			}
 
-			return StringUtil
-.compareCaseInsensitive(t.getName(), t2.getName());
+			return StringUtil.compareCaseInsensitive(t.getName(), t2.getName());
 		}
 		else
 		{
