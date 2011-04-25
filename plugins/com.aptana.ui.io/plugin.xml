@@ -45,6 +45,10 @@
              </actionExtension>
          </includes>
        </viewerActionBinding>
+       <dragAssistant
+             class="com.aptana.ide.ui.io.navigator.resources.FileDragAdapterAssistant"
+             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       </dragAssistant>
    </extension>
       <extension
          point="org.eclipse.ui.navigator.navigatorContent">
