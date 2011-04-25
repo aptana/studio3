@@ -128,11 +128,13 @@ public class ParserPoolFactory
 			pools = new HashMap<String, IParserPool>();
 		}
 
-		while (result == null && contentType != null)
+		while (result == null && (contentType != null || contentTypeId != null))
 		{
-			String currentContentTypeID = contentType.getId();
-
-			result = pools.get(currentContentTypeID);
+			if (contentType != null)
+			{
+				contentTypeId = contentType.getId();
+			}
+			result = pools.get(contentTypeId);
 
 			if (result == null)
 			{
@@ -141,12 +143,12 @@ public class ParserPoolFactory
 					parsers = getParsers();
 				}
 
-				IConfigurationElement parserExtension = parsers.get(currentContentTypeID);
+				IConfigurationElement parserExtension = parsers.get(contentTypeId);
 
 				if (parserExtension != null)
 				{
 					result = new ParserPool(parserExtension);
-					pools.put(currentContentTypeID, result);
+					pools.put(contentTypeId, result);
 				}
 				else
 				{
