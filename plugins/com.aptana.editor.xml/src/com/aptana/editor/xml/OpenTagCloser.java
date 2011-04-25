@@ -132,7 +132,7 @@ public class OpenTagCloser implements VerifyKeyListener
 
 	protected boolean skipOpenTag(String openTag)
 	{
-		return openTag == null || openTag.startsWith("<!");
+		return openTag == null || openTag.startsWith("<!") || openTag.startsWith("<?") || openTag.startsWith("<%");
 	}
 
 	private String getMatchingCloseTag(String openTag)

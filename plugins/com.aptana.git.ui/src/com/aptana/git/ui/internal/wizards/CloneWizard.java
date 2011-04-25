@@ -9,13 +9,18 @@ package com.aptana.git.ui.internal.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.git.ui.CloneJob;
 import com.aptana.git.ui.GitUIPlugin;
 
@@ -37,13 +42,32 @@ public class CloneWizard extends Wizard implements IImportWizard
 				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 				{
 					CloneJob job = new CloneJob(sourceURI, dest);
-					job.run(monitor);
+					IStatus status = job.run(monitor);
+					if (!status.isOK())
+					{
+						if (status instanceof ProcessStatus)
+						{
+							ProcessStatus ps = (ProcessStatus) status;
+							String stderr = ps.getStdErr();
+							throw new InvocationTargetException(new CoreException(new Status(status.getSeverity(),
+									status.getPlugin(), stderr)));
+						}
+						throw new InvocationTargetException(new CoreException(status));
+					}
 				}
 			});
 		}
 		catch (InvocationTargetException e)
 		{
-			GitUIPlugin.logError(e);
+			if (e.getCause() instanceof CoreException)
+			{
+				CoreException ce = (CoreException) e.getCause();
+				MessageDialog.openError(getShell(), Messages.CloneWizard_CloneFailedTitle, ce.getMessage());
+			}
+			else
+			{
+				GitUIPlugin.logError(e);
+			}
 		}
 		catch (InterruptedException e)
 		{

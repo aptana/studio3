@@ -45,6 +45,10 @@
              </actionExtension>
          </includes>
        </viewerActionBinding>
+       <dragAssistant
+             class="com.aptana.ide.ui.io.navigator.resources.FileDragAdapterAssistant"
+             viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       </dragAssistant>
    </extension>
       <extension
          point="org.eclipse.ui.navigator.navigatorContent">
@@ -740,6 +744,14 @@
                style="push">
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="com.aptana.ui.propertyDialogs">
+      <dialog
+            class="com.aptana.ide.ui.io.internal.LocalConnectionPropertyDialogProvider"
+            id="com.aptana.ui.io.dialogs.localConnection"
+            objectClass="com.aptana.ide.core.io.LocalConnectionPoint">
+      </dialog>
    </extension>
 
 </plugin>

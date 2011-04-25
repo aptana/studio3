@@ -158,6 +158,8 @@ public class GitUIPlugin extends AbstractUIPlugin
 									Messages.GitUIPlugin_ToggleMessage, false);
 							switch (dlg.open())
 							{
+								case SWT.DEFAULT:
+									return Status.OK_STATUS;
 								case 5:
 									getPreferenceStore().setValue(IPreferenceConstants.IGNORE_NO_GIT, dlg.getToggleState());
 									return Status.OK_STATUS;
