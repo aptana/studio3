@@ -39,6 +39,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 import com.aptana.core.CorePlugin;
+import com.aptana.core.util.IOUtil;
+import com.aptana.core.util.ProcessStatus;
 import com.aptana.core.util.ProcessUtil;
 import com.aptana.git.core.model.GitExecutable;
 import com.aptana.git.ui.internal.sharing.ConnectProviderOperation;
@@ -108,10 +110,16 @@ public class CloneJob extends Job
 						Messages.CloneJob_UnableToLaunchGitError, sourceURI, dest)));
 			}
 
-			Runnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
+			CloneRunnable runnable = new CloneRunnable(p, subMonitor.newChild(900));
 			Thread t = new Thread(runnable);
 			t.start();
 			t.join();
+
+			IStatus result = runnable.getResult();
+			if (!result.isOK())
+			{
+				return result;
+			}
 
 			subMonitor.setWorkRemaining(100);
 			Collection<File> existingProjects = new ArrayList<File>();
@@ -161,23 +169,31 @@ public class CloneJob extends Job
 	{
 		private Process p;
 		private IProgressMonitor monitor;
+		private IStatus status;
 
 		public CloneRunnable(Process p, IProgressMonitor monitor)
 		{
 			this.p = p;
 			this.monitor = monitor;
+			this.status = Status.OK_STATUS;
+		}
+
+		public IStatus getResult()
+		{
+			return status;
 		}
 
 		public void run()
 		{
 			SubMonitor sub = SubMonitor.convert(monitor, 100);
-			// FIXME Only sniff for "receiving objects", which is the meat of the operation
-			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+");
+			// Only sniff for "receiving objects", which is the meat of the operation
+			Pattern percentPattern = Pattern.compile("^Receiving objects:\\s+(\\d+)%\\s\\((\\d+)/(\\d+)\\).+"); //$NON-NLS-1$
 			InputStreamReader isr = null;
 			int lastPercent = 0;
 			try
 			{
 				isr = new InputStreamReader(p.getErrorStream(), "UTF-8"); //$NON-NLS-1$
+				StringBuilder builder = new StringBuilder();
 				BufferedReader br = new BufferedReader(isr);
 				String line = null;
 				while ((line = br.readLine()) != null)
@@ -185,9 +201,11 @@ public class CloneJob extends Job
 					if (monitor.isCanceled())
 					{
 						p.destroy();
+						this.status = Status.CANCEL_STATUS;
 						return;
 					}
 					sub.subTask(line);
+					builder.append(line).append("\n"); //$NON-NLS-1$
 					// Else, read in the line and see if we can sniff progress
 					Matcher m = percentPattern.matcher(line);
 					if (m.find())
@@ -201,10 +219,14 @@ public class CloneJob extends Job
 						}
 					}
 				}
+
+				String stdout = IOUtil.read(p.getInputStream(), "UTF-8"); //$NON-NLS-1$
+				this.status = new ProcessStatus(p.exitValue(), stdout, builder.toString());
 			}
 			catch (IOException ioe)
 			{
 				CorePlugin.logError(ioe.getMessage(), ioe);
+				this.status = new Status(IStatus.ERROR, GitUIPlugin.getPluginId(), ioe.getMessage(), ioe);
 			}
 			finally
 			{
