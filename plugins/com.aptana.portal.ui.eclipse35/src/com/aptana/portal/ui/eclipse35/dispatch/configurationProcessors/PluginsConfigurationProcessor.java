@@ -311,8 +311,15 @@ public class PluginsConfigurationProcessor extends AbstractConfigurationProcesso
 					}
 					sub.worked(1);
 
-					InstallableUnitQuery query = new InstallableUnitQuery(featureID + FEATURE_IU_SUFFIX,
-							VersionRange.emptyRange);
+					InstallableUnitQuery query;
+					if (featureID == null)
+					{
+						query = new InstallableUnitQuery(null, VersionRange.emptyRange);
+					}
+					else
+					{
+						query = new InstallableUnitQuery(featureID + FEATURE_IU_SUFFIX, VersionRange.emptyRange);
+					}
 					Collector roots = repo.query(query, new Collector(), monitor);
 
 					if (roots.size() <= 0)
