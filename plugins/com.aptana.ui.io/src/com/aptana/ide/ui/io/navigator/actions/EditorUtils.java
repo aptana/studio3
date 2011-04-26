@@ -142,8 +142,9 @@ public class EditorUtils
 							try
 							{
 								IFileInfo currentFileInfo = originalFile.fetchInfo(EFS.NONE, monitor);
-								if (currentFileInfo.getLastModified() != originalFileInfo.getLastModified()
-										|| currentFileInfo.getLength() != originalFileInfo.getLength())
+								if (currentFileInfo.exists()
+										&& (currentFileInfo.getLastModified() != originalFileInfo.getLastModified() || currentFileInfo
+												.getLength() != originalFileInfo.getLength()))
 								{
 									if (!UIUtils.showPromptDialog(Messages.EditorUtils_OverwritePrompt_Title,
 											MessageFormat.format(Messages.EditorUtils_OverwritePrompt_Message,
@@ -159,11 +160,16 @@ public class EditorUtils
 								UIUtils.showErrorMessage(
 										MessageFormat.format(Messages.EditorUtils_ERR_SavingRemoteFile,
 												originalFile.getName()), e);
-							} finally {
+							}
+							finally
+							{
 								// update cached remote file info
-								try {
+								try
+								{
 									input.setFileInfo(originalFile.fetchInfo(EFS.NONE, monitor));
-								} catch (CoreException e) {
+								}
+								catch (CoreException e)
+								{
 									IOUIPlugin.logError(e);
 								}
 							}
